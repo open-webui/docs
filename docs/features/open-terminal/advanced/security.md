@@ -51,7 +51,7 @@ An API key gates all access: anyone who can reach the port and present the key c
 -e OPEN_TERMINAL_API_KEY=a-strong-password-here
 ```
 
-For production, use a [config file](./configuration#config-file) or [Docker secrets](./configuration#docker-secrets) instead of putting the key on the command line.
+For production, use a [config file](./configuration.md#config-file) or [Docker secrets](./configuration.md#docker-secrets) instead of putting the key on the command line.
 
 When you do not supply a key, the server generates one and prints it at startup:
 
@@ -258,5 +258,5 @@ When the agent starts a server, the port preview shows it inside a sandboxed fra
 
 ## Related
 
-- [All configuration options →](./configuration)
-- [Multi-user setup →](./multi-user)
+- [All configuration options →](./configuration.md)
+- [Multi-user setup →](./multi-user.md)

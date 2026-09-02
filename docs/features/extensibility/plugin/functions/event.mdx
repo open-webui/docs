@@ -25,7 +25,7 @@ Event functions are a new plugin primitive introduced in Open WebUI **0.10.0**.
 **Functions execute arbitrary Python code on your server**, and Event functions run automatically in response to system activity, not just when a user acts. Function creation is restricted to administrators. Only install from trusted sources and review code before importing. See the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
-An **Event function** is the fourth function primitive, alongside [Pipe](./pipe), [Filter](./filter), and [Action](./action). Where those shape an individual chat request, an Event function runs custom Python **in response to events happening across Open WebUI**: a user signs up, a chat is deleted, a model is created, the server starts up, configuration changes, and so on.
+An **Event function** is the fourth function primitive, alongside [Pipe](./pipe.mdx), [Filter](./filter.mdx), and [Action](./action.mdx). Where those shape an individual chat request, an Event function runs custom Python **in response to events happening across Open WebUI**: a user signs up, a chat is deleted, a model is created, the server starts up, configuration changes, and so on.
 
 This turns Open WebUI from an app you configure into a platform you can program: lifecycle automation, audit logging, signup gating, provisioning, alerting, and integrations with external systems, all expressed as a single function.
 
@@ -239,7 +239,7 @@ The `function.valves_updated` event also fires when an admin saves new Valve val
 Event functions turn one-off admin chores and external glue scripts into configuration that lives inside Open WebUI. Because they receive `__app__`, they can read and write application state, call internal services, register routes, and run scheduled work, all gated by [Valves](#configuration-with-valves). The families below are a map of what that unlocks.
 
 :::info React, don't intercept
-An Event function runs **after** the activity it reacts to (the user is already created, the message already exists). It can respond, remediate, or notify, but it cannot block or rewrite the triggering action in-band. To validate or transform a chat request as it flows, use a [Filter](./filter); to gate a signup, hold the freshly created account as `pending` rather than trying to stop the request.
+An Event function runs **after** the activity it reacts to (the user is already created, the message already exists). It can respond, remediate, or notify, but it cannot block or rewrite the triggering action in-band. To validate or transform a chat request as it flows, use a [Filter](./filter.mdx); to gate a signup, hold the freshly created account as `pending` rather than trying to stop the request.
 :::
 
 ### Onboarding and provisioning
@@ -274,7 +274,7 @@ Register a periodic background task on `system.startup.completed` (see [Spawn a 
 
 - **Event-driven alerting.** Fan out a loud multi-sink alert (channel + email + SIEM) on a high-signal event. Flagship: scream when someone becomes **admin**. `user.role_updated` fires however the role was set, and the event's `source` names the route: `api` for the admin panel, `scim` for a directory sync, `oauth` for an identity provider login that maps roles, `trusted_header` for the trusted role header. A role change never hides inside `user.updated`. Same pattern for `config.*` changes.
 - **Immutable audit sink.** Ship every event to an append-only store or SIEM. Tamper-evident audit logging, for free.
-- **Content flagging.** Scan `message.created` for secrets and PII and flag it. (To block in-band, use a [Filter](./filter).)
+- **Content flagging.** Scan `message.created` for secrets and PII and flag it. (To block in-band, use a [Filter](./filter.mdx).)
 - **Access recertification.** Periodically ask resource owners to re-approve who can access their stuff. Automated access reviews.
 
 ### Instance-as-code and fleet ops

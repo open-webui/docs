@@ -14,7 +14,7 @@ That's why the [remote-access options](./index.md) all reduce to the same questi
 - **Password mode (default).** On first run, `cptr` prints a one-time setup URL (`/?token=...`) that only works while no user exists; the account it creates is the admin. Passwords are at least 6 characters and stored bcrypt-hashed. Login is rate-limited to 5 attempts per minute per IP.
 - **Sessions.** Signing in sets a JWT cookie (`cptr_session`) valid for 30 days, renewed on use past the halfway point. Every request authenticates; there is no localhost bypass.
 - **Signup.** Admins can enable self-registration (**Settings → Admin**). New signups get the **pending** role and cannot log in until an admin approves them. Roles gate admin settings; they do not create filesystem isolation between users.
-- **Other modes.** `pam` (Linux system users) and `trusted_header` (reverse-proxy SSO) exist for proxy setups; see [Reverse proxy and SSO](./reverse-proxy).
+- **Other modes.** `pam` (Linux system users) and `trusted_header` (reverse-proxy SSO) exist for proxy setups; see [Reverse proxy and SSO](./reverse-proxy.md).
 
 ## Sign every session out
 
@@ -30,9 +30,9 @@ Off by default. When enabled it records mutating API requests (with sensitive da
 
 ## What not to do
 
-- **Don't expose it raw to the public internet.** A public URL with only the password gate is an open invitation; use [Tailscale](./tailscale) or put [provider auth in front of a tunnel](./cloudflare-and-ngrok).
+- **Don't expose it raw to the public internet.** A public URL with only the password gate is an open invitation; use [Tailscale](./tailscale.md) or put [provider auth in front of a tunnel](./cloudflare-and-ngrok.md).
 - **Don't share an instance with people you wouldn't give shell access.** Accounts are not isolation.
-- **Don't run `trusted_header` mode behind a proxy that passes client headers through.** The proxy must strip and own the identity header; see [Reverse proxy and SSO](./reverse-proxy).
+- **Don't run `trusted_header` mode behind a proxy that passes client headers through.** The proxy must strip and own the identity header; see [Reverse proxy and SSO](./reverse-proxy.md).
 
 :::info If it was exposed
 Bind back to `127.0.0.1` (or stop the tunnel), rotate `[server] secret` and restart, reset passwords and rotate gateway keys and bot tokens, then review the [audit logs](/ecosystem/computer/operate/logs-and-health) if you had them enabled.
