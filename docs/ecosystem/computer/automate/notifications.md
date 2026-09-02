@@ -13,7 +13,7 @@ The agent has a **notify** tool, which makes notifications part of the instructi
 
 > Run the test suite. If anything fails, notify me with the failing test names. If everything passes, don't ping me.
 
-The agent composes the message and sends it to your default target only when the condition you described is met. This works in normal chats ("notify me when the build finishes") and especially in [scheduled tasks](./scheduled-tasks), where it turns a daily run into a zero-noise alarm that only fires with something to say.
+The agent composes the message and sends it to your default target only when the condition you described is met. This works in normal chats ("notify me when the build finishes") and especially in [scheduled tasks](./scheduled-tasks.md), where it turns a daily run into a zero-noise alarm that only fires with something to say.
 
 ## Event notifications
 
@@ -40,7 +40,7 @@ Scheduled-task runs are covered by these same events, since every run creates a 
 }
 ```
 
-**Bot**: deliver through one of your [messaging bots](./messaging-bots) to a chat you pick. Useful when you already message your computer on Telegram or Slack and want completion pings in the same thread app.
+**Bot**: deliver through one of your [messaging bots](./messaging-bots.md) to a chat you pick. Useful when you already message your computer on Telegram or Slack and want completion pings in the same thread app.
 
 ## Delivery mode
 
