@@ -88,7 +88,7 @@ If you understand the risk and need it, the per-user **Settings > Interface > if
 
 **Drag and drop** files from your computer directly onto the file browser to upload them. This is how you share data with the AI: drop a spreadsheet, a PDF, an image, or any file you want the AI to work with.
 
-![File browser showing uploaded files with names and sizes](/images/open-terminal-file-browser-home.png)
+![Files listed in the browser with their names and sizes](/images/open-terminal-file-browser-documents.png)
 
 :::tip Upload to any folder
 Navigate to the folder you want first, then drag and drop. The file uploads to whatever directory you're currently viewing.
@@ -114,15 +114,27 @@ The preview understands the same formats the browser does, so a spreadsheet arri
 
 A long document can be opened at the part that matters. For a PDF, a Word document or a slide deck, the AI can name the page or slide it means, and the preview opens there rather than at the beginning. Ask for the page an answer came from and you get the document already scrolled to it, which saves hunting through a hundred pages for the paragraph the reply is quoting. The same applies when the file opens in the browser instead of in the message.
 
+![The AI quoting a cable rating and opening the manual at page 132](/images/open-terminal-display-file-manual-page.png)
+
+Here the AI searched a 150 page manual, quoted the specification it found, and opened the PDF at page 132 so the quote could be read in context.
+
+It works the same way when you do not know which file to look in. Asking which document covers something searches the folder first, then opens the match at the right page.
+
+![The AI locating the right document and opening it at the relevant page](/images/open-terminal-display-file-report-page.png)
+
 This replaces the older behaviour where a generated file produced a link in the reply that pointed at a path on the terminal's filesystem rather than at anything the browser could open.
 
 ![A CSV and a generated chart shown as cards inside an assistant message](/images/open-terminal-inline-file-card.png)
+
+A presentation arrives the same way, with its slide rail, page controls and zoom, so a deck can be paged through without leaving the conversation.
+
+![A presentation rendered inline in the chat message](/images/open-terminal-display-file-deck-inline.png)
 
 The card header is a toggle, so a preview can be folded down to just the filename when it is taking up too much of the reply, and image and document previews carry a zoom control and a resize handle.
 
 By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Terminal File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message. The preference applies to terminals you connect yourself.
 
-![File browser with download and action buttons](/images/open-terminal-file-browser-project.png)
+![A Word report opened in the file viewer beside the chat](/images/open-terminal-display-file-report-viewer.png)
 
 ---
 

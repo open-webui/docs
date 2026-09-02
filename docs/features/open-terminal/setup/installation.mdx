@@ -92,7 +92,16 @@ pip install open-terminal
 open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
 ```
 
-{/* TODO: Screenshot: Terminal showing Open Terminal starting up with server address and API key. */}
+Open Terminal prints its address and key on startup:
+
+```
+  Local:    http://localhost:8000
+  Network:  http://<this-machine-ip>:8000
+
+  API Key:  <your key appears here>
+```
+
+Use the **Local** address when Open WebUI runs on the same machine, and the **Network** address when it reaches the terminal from anywhere else.
 
 ### 2. Working directory
 
@@ -150,7 +159,14 @@ volumes:
 docker compose up -d
 ```
 
-{/* TODO: Screenshot: Terminal showing docker compose up -d with both containers starting. */}
+With a project folder named `myproject`, Compose brings both services up together:
+
+```
+ ✔ Container myproject-open-terminal-1  Started
+ ✔ Container myproject-open-webui-1     Started
+```
+
+Check both are healthy with `docker compose ps` before moving on.
 
 :::tip Connection URL
 When both services share a Docker Compose network, use the service name as the host:
