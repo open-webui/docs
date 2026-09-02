@@ -48,6 +48,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Vercel AI Gateway | Yes | Auto-detection works; filtering is recommended if you only want specific gateway models |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
+| Morph | Yes | Auto-detection works |
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
 
@@ -131,6 +132,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::caution Legacy aliases retired
   The `deepseek-chat` and `deepseek-reasoner` aliases were retired on 2026-07-24. Use the `deepseek-v4-*` model IDs directly.
+  :::
+
+  </TabItem>
+  <TabItem value="morph" label="Morph">
+
+  **Morph** serves open-weight models through an OpenAI-compatible API with working `/models` auto-detection.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.morphllm.com/v1` |
+  | **API Key** | Your API key from the [Morph dashboard](https://morphllm.com/dashboard/api-keys) |
+  | **Model IDs** | Auto-detected (e.g., `morph-kimik3`, `morph-glm53-744b`, `morph-glm53flash`, `morph-dsv4flash`) |
+
+  :::tip Dedicated capacity
+  The same OpenAI-compatible setup also works with a [Morph dedicated inference endpoint](https://www.morphllm.com/dedicated-inference). Use the endpoint URL and model ID shown in the Morph dashboard after provisioning.
   :::
 
   </TabItem>
