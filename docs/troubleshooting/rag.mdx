@@ -205,7 +205,7 @@ Open WebUI implements various limits to ensure system stability and prevent abus
     *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Documents > General > Allowed File Extensions**.
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
-    *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
+    *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats (not `RAG_FILE_MAX_COUNT`, which only applies to chat attachments), plus two knowledge-base-specific limits: `RAG_KNOWLEDGE_MAX_SIZE` (max size per file, default unlimited) and `RAG_KNOWLEDGE_MAX_COUNT` (max files per knowledge base, default unlimited). Both are configurable in **Settings > Admin > Tools > Documents > Files > Max Knowledge Base File Size / Max Knowledge Base Files** and apply to every upload method (manual upload, directory upload/sync, and the API).
     *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used in **Full Context Mode** (accessible in chat settings), which feeds the full document content to the model instead of using vector search retrieval.
 
 :::info

@@ -4066,6 +4066,20 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `RAG_KNOWLEDGE_MAX_SIZE`
+
+- Type: `int`
+- Default: `None` (unlimited)
+- Description: Sets the maximum size, in MB, of a single file that can be added to a knowledge base. `0` also means unlimited. Applies to every way of adding a file to a knowledge base (manual upload, directory upload, directory sync, and the API). Configurable in **Admin Panel → Settings → Documents → Max Knowledge Base File Size**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_KNOWLEDGE_MAX_COUNT`
+
+- Type: `int`
+- Default: `None` (unlimited)
+- Description: Sets the maximum number of files allowed in a single knowledge base. `0` also means unlimited. Configurable in **Admin Panel → Settings → Documents → Max Knowledge Base Files**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `RAG_FILE_CONTENT_SEARCH_MAX_CHARS`
 
 - Type: `int`
