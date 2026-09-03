@@ -44,7 +44,7 @@ networks:
 - The `osixia/openldap` image automatically creates a basic organization structure with just `LDAP_DOMAIN` and `LDAP_ADMIN_PASSWORD`.
 - The `osixia/phpldapadmin` image provides a web interface for managing your LDAP directory, accessible at `https://localhost:6443`.
 
-Run `docker-compose up -d` to start the containers. Confirm that the LDAP server has started by checking the logs: `docker logs openldap`. You should see a "started slapd" message.
+Run `docker compose up -d` to start the containers. Confirm that the LDAP server has started by checking the logs: `docker logs openldap`. You should see a "started slapd" message.
 
 ## 2. Seeding a Sample User (LDIF)
 

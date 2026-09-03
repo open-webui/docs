@@ -42,7 +42,7 @@ services:
 Run the Docker Compose file using the following command:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 **Option 2: Using Docker Run Command**

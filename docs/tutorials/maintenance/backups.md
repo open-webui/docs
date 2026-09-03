@@ -209,7 +209,7 @@ rclone_sync() {
 
 # 1. Stop the Docker Compose environment
 echo "Stopping Docker Compose environment..."
-docker-compose -f "$COMPOSE_FILE" down
+docker compose -f "$COMPOSE_FILE" down
 
 # 2. Perform the backup
 echo "Starting backup..."
@@ -219,7 +219,7 @@ rclone_sync "$SOURCE_WEBUI_DB" "$DEST_MAIN_DB"
 
 # 3. Start the Docker Compose environment
 echo "Starting Docker Compose environment..."
-docker-compose -f "$COMPOSE_FILE" up -d
+docker compose -f "$COMPOSE_FILE" up -d
 
 echo "Backup completed successfully."
 exit 0

@@ -69,7 +69,7 @@ LT_FRONTEND_TIMEOUT="2000"
 Run the following command to start the LibreTranslate service:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 This will start the LibreTranslate service in detached mode.
