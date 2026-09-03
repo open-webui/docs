@@ -131,5 +131,5 @@ Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/ente
 - [Terminals overview →](../terminals/)
 - [Terminals: Docker Backend →](../terminals/)
 - [Terminals: Kubernetes Operator →](../terminals/)
-- [Security best practices →](./security)
-- [All configuration options →](./configuration)
+- [Security best practices →](./security.md)
+- [All configuration options →](./configuration.md)

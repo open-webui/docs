@@ -32,7 +32,7 @@ Use the toolbar above the file list to sort by **Name** or **Date Modified**, as
 Click any file to see a preview. Different file types display differently:
 
 :::info Word and PowerPoint rendering needs a recent terminal
-The terminal lays those files out itself, which needs Open Terminal 0.12.1 or newer running the default image. On anything older, or on the smaller images, the browser draws an approximation instead. See [Updating](./setup/updating) if your previews look rougher than the ones described here.
+The terminal lays those files out itself, which needs Open Terminal 0.12.1 or newer running the default image. On anything older, or on the smaller images, the browser draws an approximation instead. See [Updating](./setup/updating.mdx) if your previews look rougher than the ones described here.
 :::
 
 ### Text and code
@@ -188,9 +188,9 @@ An administrator can set an orchestrated terminal to give every conversation a w
 
 ## More things to try
 
-- **[Analyze documents & data →](./use-cases/file-analysis)**: drag in a spreadsheet or PDF and ask about it
-- **[Run code from chat →](./use-cases/code-execution)**: the AI creates files you can see here
-- **[Build & preview websites →](./use-cases/web-development)**: the files the AI creates appear in the browser
+- **[Analyze documents & data →](./use-cases/file-analysis.md)**: drag in a spreadsheet or PDF and ask about it
+- **[Run code from chat →](./use-cases/code-execution.md)**: the AI creates files you can see here
+- **[Build & preview websites →](./use-cases/web-development.md)**: the files the AI creates appear in the browser
 
 :::tip
 Want to browse and edit your real files from any device? [**Open WebUI Computer**](/ecosystem/computer) puts your entire machine in a browser tab, with a full file browser, terminal, git, and editor.

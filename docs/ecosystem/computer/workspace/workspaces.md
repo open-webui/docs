@@ -40,7 +40,7 @@ Here the workspace path is `/workspace`. If a folder doesn't appear in the picke
 
 ## Separate checkouts, separate workspaces
 
-Give each checkout of a repository its own workspace. A git worktree is its own directory with its own checked-out branch, so add it as its own workspace. The [worktree picker in the git panel](./git#worktrees) does this for you when you create or open one. That way two branches can be checked out and worked on side by side without fighting over one working tree.
+Give each checkout of a repository its own workspace. A git worktree is its own directory with its own checked-out branch, so add it as its own workspace. The [worktree picker in the git panel](./git.md#worktrees) does this for you when you create or open one. That way two branches can be checked out and worked on side by side without fighting over one working tree.
 
 ## Permissions
 

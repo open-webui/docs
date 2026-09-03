@@ -87,6 +87,6 @@ If a document is very long, the AI is smart about reading it in sections rather 
 
 ## More things to try
 
-- **[Run code from chat →](./code-execution)**: the AI writes, runs, and debugs code
-- **[Build & preview websites →](./web-development)**: create and iterate on web pages
-- **[Explore the file browser →](../file-browser)**: upload, preview, download, and edit files
+- **[Run code from chat →](./code-execution.md)**: the AI writes, runs, and debugs code
+- **[Build & preview websites →](./web-development.md)**: create and iterate on web pages
+- **[Explore the file browser →](../file-browser.md)**: upload, preview, download, and edit files

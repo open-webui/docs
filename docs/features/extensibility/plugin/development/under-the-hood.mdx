@@ -51,8 +51,8 @@ From any hook (and from module top level):
 
 - The full `open_webui.*` package. Examples: `from open_webui.models.chats import Chats`, `from open_webui.utils.middleware import process_chat_payload`, `from open_webui.models.config import Config`.
 - The live FastAPI `Request` via `__request__`, which carries `__request__.app` (the FastAPI app), `__request__.app.state` (config, caches, handlers), and `__request__.state` (per-request scratch).
-- The reserved dunder args documented in [Reserved Arguments](./reserved-args): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
-- Events documented in [Events](./events): emit anything to the frontend, or solicit a response from the user with `event_call`.
+- The reserved dunder args documented in [Reserved Arguments](./reserved-args.mdx): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
+- Events documented in [Events](./events.mdx): emit anything to the frontend, or solicit a response from the user with `event_call`.
 - Any pip package via `requirements:` frontmatter, installed at load time (gated by [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)).
 - The Python stdlib, plus everything pip-installed in the container.
 
@@ -175,7 +175,7 @@ Shared across requests and **across plugins** in the same process. There is no n
 
 ### 6. Use `event_emitter` for arbitrary side effects in the UI
 
-`event_emitter` accepts any event shape the frontend handles: status banners, source citations, file attachments, chat-message updates, toasts. You are not restricted to the events documented on the per-type pages. See [Events](./events) for the full catalogue.
+`event_emitter` accepts any event shape the frontend handles: status banners, source citations, file attachments, chat-message updates, toasts. You are not restricted to the events documented on the per-type pages. See [Events](./events.mdx) for the full catalogue.
 
 ### 7. Prompt the user mid-handler with `event_call`
 

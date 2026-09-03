@@ -40,8 +40,8 @@ or OAuth (Google, GitHub, and others) via `--oauth`. See [ngrok's docs](https://
 
 - **Cloudflare Tunnel** if you have a domain on Cloudflare and want a permanent URL with a real access policy.
 - **ngrok** if you want a URL in one command right now.
-- If you don't need a public URL at all, [Tailscale](./tailscale) is the better default: private by construction, no second auth layer to configure.
+- If you don't need a public URL at all, [Tailscale](./tailscale.md) is the better default: private by construction, no second auth layer to configure.
 
 :::warning
-Don't run either of these bare. Without Cloudflare Access or ngrok auth in front, you've published an SSH-equivalent login page to the internet. See the [security model](./security).
+Don't run either of these bare. Without Cloudflare Access or ngrok auth in front, you've published an SSH-equivalent login page to the internet. See the [security model](./security.md).
 :::

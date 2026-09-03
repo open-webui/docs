@@ -39,7 +39,7 @@ The AI reads the data, builds the `.docx` with a heading, a summary paragraph an
 
 ![The AI generating a PDF and displaying it in the chat](/images/open-terminal-create-pdf.png)
 
-Long documents open at whichever page you ask for. See [Files shown in the chat message](../file-browser#files-shown-in-the-chat-message).
+Long documents open at whichever page you ask for. See [Files shown in the chat message](../file-browser.md#files-shown-in-the-chat-message).
 
 ---
 
@@ -89,7 +89,7 @@ Every file shown in the chat carries a **download button** in the top right of i
 
 ![The download button on a file shown in the chat](/images/open-terminal-inline-download-button.png)
 
-The file is also sitting in your workspace, so the [file browser](../file-browser) has it too, alongside everything else the AI has made. Asking for it in the chat just saves you going to look.
+The file is also sitting in your workspace, so the [file browser](../file-browser.md) has it too, alongside everything else the AI has made. Asking for it in the chat just saves you going to look.
 
 :::tip Ask for the format you want
 "as a Word document", "as a PDF", "as a deck", "as an SVG" all work in plain language. If you do not say, the AI usually picks Markdown, which is fine for reading and less useful for sending on.
@@ -99,5 +99,5 @@ The file is also sitting in your workspace, so the [file browser](../file-browse
 
 ## Related
 
-- [Analyze Documents & Data](./file-analysis)
-- [The File Browser](../file-browser)
+- [Analyze Documents & Data](./file-analysis.md)
+- [The File Browser](../file-browser.md)

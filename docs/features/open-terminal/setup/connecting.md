@@ -5,7 +5,7 @@ title: "Connecting to Open WebUI"
 
 # Connecting Open Terminal to Open WebUI
 
-Open Terminal is [installed and running](./installation). This guide covers connecting it to Open WebUI.
+Open Terminal is [installed and running](./installation.mdx). This guide covers connecting it to Open WebUI.
 
 ---
 
@@ -128,7 +128,7 @@ If you need to test a connection without admin access, you can add one from the 
 
 `Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what a connection nobody has touched does, and what happens with no terminal selected at all.
 
-`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
+`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser.md) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
 
 A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
 
@@ -215,7 +215,7 @@ If you see "unauthorized" or "invalid key":
 
 ## Next steps
 
-- **[Code execution](../use-cases/code-execution)**
-- **[Document & data analysis](../use-cases/file-analysis)**
-- **[Software development](../use-cases/software-development)**
-- **[File browser](../file-browser)**
+- **[Code execution](../use-cases/code-execution.md)**
+- **[Document & data analysis](../use-cases/file-analysis.md)**
+- **[Software development](../use-cases/software-development.md)**
+- **[File browser](../file-browser.md)**
