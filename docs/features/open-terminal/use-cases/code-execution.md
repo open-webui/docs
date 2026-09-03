@@ -84,10 +84,10 @@ Additional languages (Rust, Go, Java, etc.) can be installed on the fly.
 
 ## Related
 
-- **[Software development →](./software-development)**: repos, tests, debugging, refactoring
-- **[Document & data analysis →](./file-analysis)**: spreadsheets, PDFs, Word docs
-- **[Web development →](./web-development)**: build and preview websites
-- **[System automation →](./system-automation)**: file management, backups, batch operations
+- **[Software development →](./software-development.md)**: repos, tests, debugging, refactoring
+- **[Document & data analysis →](./file-analysis.md)**: spreadsheets, PDFs, Word docs
+- **[Web development →](./web-development.md)**: build and preview websites
+- **[System automation →](./system-automation.md)**: file management, backups, batch operations
 
 :::tip
 Want a persistent environment on your real machine? [**Open WebUI Computer**](/ecosystem/computer) puts your computer in a browser tab, accessible from any device.

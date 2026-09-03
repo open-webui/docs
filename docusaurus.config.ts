@@ -51,6 +51,9 @@ const config: Config = {
 	// Enable Mermaid for diagrams
 	markdown: {
 		mermaid: true,
+		hooks: {
+			onBrokenMarkdownLinks: "throw",
+		},
 	},
 	clientModules: ["./src/clientModules/ensure-gtag.js"],
 	themes: [

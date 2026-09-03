@@ -42,4 +42,4 @@ With a hardware keyboard (tablet or desktop):
 
 Use `Ctrl` instead of `Cmd` on Windows and Linux.
 
-Next: make sure the machine is still awake when you pull your phone out. See [Keep it running](./keep-it-running).
+Next: make sure the machine is still awake when you pull your phone out. See [Keep it running](./keep-it-running.md).

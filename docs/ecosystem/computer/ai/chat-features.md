@@ -10,8 +10,8 @@ Quick reference for what the chat input and chat view can do.
 ## Mentions and slash commands
 
 - **`@`** mentions a file; its content is fed to the AI as context. Type `@` and start typing a filename.
-- **`$`** mentions a [skill](./skills-and-memory), pulling a reusable instruction set into the turn.
-- **`/`** opens slash commands: `/plan` toggles [plan mode](./approvals-and-plan-mode), `/fork` branches the chat. Skills are also reachable through `/`.
+- **`$`** mentions a [skill](./skills-and-memory.md), pulling a reusable instruction set into the turn.
+- **`/`** opens slash commands: `/plan` toggles [plan mode](./approvals-and-plan-mode.md), `/fork` branches the chat. Skills are also reachable through `/`.
 
 ## Queue or interrupt
 
