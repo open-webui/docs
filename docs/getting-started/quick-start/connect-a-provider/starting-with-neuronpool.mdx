@@ -1,0 +1,62 @@
+---
+sidebar_position: 6
+title: "NeuronPool"
+
+---
+
+## Overview
+
+[NeuronPool](https://neuronpool.damnknee.workers.dev) is an OpenAI-compatible inference API (pool machines plus public buyers). Open WebUI talks to it as a normal OpenAI-compatible connection: paste the base URL and a buyer key, then pick a catalog model.
+
+`GET /v1/models` and `POST /v1/chat/completions` (streaming + tools) are implemented. Mint a key on the [dashboard](https://neuronpool.damnknee.workers.dev/dashboard).
+
+---
+
+## Step 1: Get Your API Key
+
+1. Open the [NeuronPool dashboard](https://neuronpool.damnknee.workers.dev/dashboard).
+2. Create an account or sign in.
+3. Mint a buyer key. It starts with `sk-neuronpool-`.
+
+---
+
+## Step 2: Add the Connection in Open WebUI
+
+1. Open Open WebUI in your browser.
+2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
+3. Click ➕ **Add Connection**.
+4. Enter the following:
+
+| Setting | Value |
+|---|---|
+| **URL** | `https://neuronpool.damnknee.workers.dev/v1` |
+| **API Key** | Your `sk-neuronpool-…` buyer key |
+| **Model IDs** | Auto-detected (`gpt-oss-20b`, `llama-3.1-8b-instruct`, …) |
+
+5. Click **Save**.
+
+Docker / env (semicolon-separated if you already have other hosts):
+
+```bash
+OPENAI_API_BASE_URLS=https://neuronpool.damnknee.workers.dev/v1
+OPENAI_API_KEYS=sk-neuronpool-…
+```
+
+Until `api.neuronpool.dev` resolves, use the live Worker URL above. After the custom-domain cutover, swap the URL to `https://api.neuronpool.dev/v1`.
+
+---
+
+## Step 3: Start Chatting!
+
+Select a NeuronPool catalog id from the model dropdown. Streaming and tool calling ride the OpenAI Chat Completions protocol.
+
+:::info Optional: Filter Models
+If you want only specific models to appear, add model IDs to the **Model IDs (Filter)** allowlist. Common catalog ids: `gpt-oss-20b`, `llama-3.1-8b-instruct`, `qwen2.5-7b-instruct`, `gemma-3-12b-it`.
+:::
+
+---
+
+## Learn More
+
+- **[OpenAI-Compatible Providers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)**: Protocol design and setup for other hosts.
+- **[NeuronPool models](https://neuronpool.damnknee.workers.dev/v1/models)**: Live catalog.
