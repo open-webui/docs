@@ -55,6 +55,25 @@ It is tempting to assume that moving retrieval into tools makes citations harmle
 The practical effect: the cached prefix is invalidated on every single tool round, which is exactly the thing an agentic setup does most. Turning File Context off but leaving Citations on gives you most of the cost of the old setup with none of the benefit.
 :::
 
+### Why the injection goes into the latest user message
+
+The placement is deliberate, and worth understanding before treating it as a defect to be fixed.
+
+Automatic retrieval was built on the premise that the model mainly attends to the message it is answering. Very small local models and older models behave that way in practice: context placed earlier in the conversation gets ignored, or falls out of a context window too short to hold the whole history. Putting the retrieved context anywhere other than the message being answered means those models do not reliably see it, which is the difference between retrieval working and retrieval silently doing nothing.
+
+Breaking the cached prefix is the price of that guarantee, and it is a price worth paying when the alternative is a model that cannot use the context at all. It stops being worth paying the moment your model is large enough and long enough in context to attend to material further up the conversation, which is every frontier model and most current local ones.
+
+So the two capabilities are a choice between two designs rather than a feature and a bug:
+
+| | Context injection on | Context injection off |
+| :--- | :--- | :--- |
+| **Retrieval** | Forced, before the model runs | On demand, the model calls a tool |
+| **Placement** | Rewritten into the latest message every turn | Appended at the end as tool results |
+| **Prefix cache** | Invalidated each turn | Preserved |
+| **Suits** | Small and short-context models | Everything else |
+
+Turning File Context and Citations off is not a workaround for the cost described above. It selects the other design, the one this page is about.
+
 ## The cache-optimal setup
 
 The goal is a **static prefix** (system prompt + tools) with **append-only** growth (user turns and tool results), using **on-demand retrieval** instead of automatic injection.
