@@ -92,12 +92,20 @@ The per-file/per-knowledge **Full Context** ("Using Entire Document") mode injec
 
 This matters more than it used to, not less. With **Citations** disabled, Open WebUI stops re-applying the RAG template and source list into the system and last user message after each tool round, so the prefix survives an agentic conversation intact. What you give up is the source pills rendered under the reply in the UI; the model still receives the tool results themselves, which is where the content was all along.
 
-Keep citations in the answer text anyway by adding **static citation instructions to your system prompt**, for example:
+Keep citations in the answer text anyway by adding **static citation instructions to your system prompt**. Write them against what the tools actually return, which is a filename or a URL rather than a number:
 
-- Cite retrieved passages using the source id returned in the tool result (e.g. `[1]`, `[2]`).
-- Cite web pages as markdown links, e.g. `[example.com](https://example.com/...)`.
+- Cite passages from files and knowledge as the `source` filename the tool result carries, for example `(handbook.pdf)`.
+- Cite web pages as markdown links built from the `link` field, for example `[example.com](https://example.com/...)`.
 
 Because the instruction lives in the (cached) system prompt, you get citations **without** a per-turn injection.
+
+:::warning Do not ask for numbered citations here
+Numbered `[1]`, `[2]` citations work only while **Citations** is on, because the numbers come from the injected `<source>` block and not from the tools. No builtin tool returns one: the file and knowledge tools return `content`, a `source` filename and a `file_id`, and `search_web` returns `title`, `link` and `snippet`. A system prompt asking for `[1]` style citations with Citations off gives the model nothing to number, and it will invent the numbers.
+:::
+
+:::info `search_web` returns search results, not page text
+`search_web` gives the model a title, a link and a snippet per hit, which is what the search engine returned. It does not fetch those pages. When the model needs what a page actually says, it calls `fetch_url` on the link. Citing a page it only saw a snippet of is citing the search engine, so tell it to fetch before it cites anything specific.
+:::
 
 ### 4. Keep retrieval agentic
 
