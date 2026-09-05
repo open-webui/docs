@@ -98,6 +98,8 @@ This is the most common problem, and it's typically caused by issues during cont
 
 Try uploading a document and preview the extracted content. If it's blank or missing key sections, you need to adjust your extractor settings or use a different engine.
 
+**Note on Docling:** When using Docling for large or scanned PDFs, uploads may take longer because Docling processes files asynchronously. By default, Open WebUI waits indefinitely. To prevent timeouts on very large documents, you can increase the **Docling Serve Timeout** setting (in **Admin > Tools > Documents**) to give long conversions more time. For small documents, the default behavior is typically fine.
+
 :::
 
 ---
