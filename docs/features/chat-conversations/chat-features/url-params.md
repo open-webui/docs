@@ -82,7 +82,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
   - **Note**: Document processing in temporary chats is frontend-only for privacy. Complex files requiring backend parsing (e.g., DOCX) may not be fully supported.
   - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so no chat record is created and nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts) and the [ask user tool](/features/extensibility/plugin/tools), are unavailable there. Chats in [channels](/features/channels) are treated the same way.
-  - **Note**: The list of unavailable features above is complete. Any feature or tool not listed there works in a temporary chat exactly as it does in a normal one. Disable a tool on the model if you do not want a temporary chat to use it.
+  - **Note**: The list of unavailable features above is complete. Any feature or tool not listed there works in a temporary chat exactly as it does in a normal one. That includes tools that store or send data of their own, memory, notes and web search for example. Disable a tool on the model if you do not want a temporary chat to use it.
 
 ### 9. **Code Interpreter**
 
