@@ -268,15 +268,15 @@ The **File Context** capability controls whether Open WebUI performs RAG (Retrie
 | File Context | Behavior |
 |--------------|----------|
 | ✅ **Enabled** (default) | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
-| ❌ **Disabled** | File content is never extracted or injected. If Builtin Tools is also enabled, the model still receives a short listing of which files are attached, their names rather than their content, so it can decide to fetch one with a tool. |
+| ❌ **Disabled** | File content is never extracted or injected. If [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) is also enabled, the model still receives a short listing of which files are attached, their names rather than their content, so it can decide to fetch one with a tool. |
 
 **When to disable File Context:**
 - **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
-- **Using Builtin Tools only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling File Context is also what injects the builtin **Files** tools, which let the model list, search and read the chat's attachments itself.
+- **Using [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling File Context is also what injects the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), which let the model list, search and read the chat's attachments itself.
 - **Debugging/testing**: To isolate whether issues are related to RAG processing.
 
 :::warning File Context Disabled = No Pre-Injected Content
-When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through builtin tools (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
+When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
 :::
 
 :::tip Per-File Retrieval Mode
@@ -291,14 +291,14 @@ The File Context toggle only appears when **File Upload** is enabled for the mod
 
 ### Builtin Tools Capability
 
-The **Builtin Tools** capability controls whether the model receives native function-calling tools for autonomous retrieval:
+The **[Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)** capability controls whether the model receives native function-calling tools for autonomous retrieval:
 
 | Builtin Tools | Behavior |
 |---------------|----------|
 | ✅ **Enabled** (default) | Unless the model is set to Legacy, it receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats` and others. |
-| ❌ **Disabled** | No builtin tools are injected. The model works only with pre-injected context. |
+| ❌ **Disabled** | No [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) are injected. The model works only with pre-injected context. |
 
-**When to disable Builtin Tools:**
+**When to disable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode):**
 - **Model doesn't support function calling**: Smaller or older models may not handle the `tools` parameter.
 - **Predictable behavior needed**: You want the model to work only with what's provided upfront.
 
@@ -306,34 +306,34 @@ The **Builtin Tools** capability controls whether the model receives native func
 
 These capabilities work independently, giving you fine-grained control, and the rows below describe files and knowledge bases attached **inside the chat** on a model set to Default or Native function calling.
 
-On Legacy, the Builtin Tools setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so File Context alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
+On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so File Context alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
 
 | File Context | Builtin Tools | Result |
 |--------------|---------------|--------|
 | ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
 | ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
-| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
+| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
 | ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
 :::warning Knowledge attached to a model or a folder behaves differently
 The table above covers attachments made in the chat. Knowledge attached to a model in the Workspace, and knowledge attached to a folder, follow the Function Calling mode instead:
 
 - **Legacy**: the knowledge is queued for retrieval and injected upfront, exactly as the table describes, provided File Context is enabled. Turning File Context off removes the retrieval step entirely, so nothing is injected on Legacy either.
-- **Default and Native**: nothing is injected regardless of File Context. The knowledge is offered to the model through the builtin knowledge tools, and the model decides whether to search it.
+- **Default and Native**: nothing is injected regardless of File Context. The knowledge is offered to the model through the [builtin knowledge tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), and the model decides whether to search it.
 
-The consequence is a configuration that silently does nothing. With File Context enabled, Builtin Tools disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
+The consequence is a configuration that silently does nothing. With File Context enabled, [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
 
 Any one of these resolves it:
 
-- Leave Builtin Tools enabled on that model.
+- Leave [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) enabled on that model.
 - Set Function Calling to Legacy on that model.
 - Attach the knowledge base in the chat rather than on the model or folder.
 :::
 
 :::tip Choosing the Right Configuration
 - **Most models**: Keep both enabled (defaults) for full functionality.
-- **Small/local models**: Disable Builtin Tools if they don't support function calling.
-- **On-demand retrieval only**: Disable File Context, enable Builtin Tools and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with File Context off nothing would be retrieved at all.
+- **Small/local models**: Disable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) if they don't support function calling.
+- **On-demand retrieval only**: Disable File Context, enable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with File Context off nothing would be retrieved at all.
 :::
 
 ## Enhanced RAG Pipeline
@@ -341,7 +341,7 @@ Any one of these resolves it:
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
 :::tip Filesystem-style knowledge access (`kb_exec`)
-For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode builtin tool) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode [builtin tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
 
 ## YouTube RAG Pipeline
