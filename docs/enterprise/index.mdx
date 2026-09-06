@@ -13,6 +13,8 @@ Open WebUI is one of the **fastest-growing AI platforms** in the world. Designed
 
 Whether you're a startup scaling fast or a Fortune 500 managing global operations, Open WebUI is built for the reliability, security, and flexibility your teams need to deploy AI confidently and securely, **without vendor lock-in**.
 
+**Stateless by design, built to scale horizontally.** Open WebUI keeps application replicas interchangeable by using shared databases and storage, with Redis coordinating sessions and real-time events. Add replicas behind a load balancer as demand grows. [Explore the architecture →](/enterprise/architecture)
+
 <ThemedImage
   alt="Open WebUI Enterprise platform diagram showing identity, data, deployment, and support connected through self-hosted control"
   sources={{
@@ -73,8 +75,8 @@ Unlike proprietary AI platforms that dictate your path, **Open WebUI puts you in
 #### 🔒 Security-First Architecture
 Security is a business-critical requirement. Open WebUI's self-hosted, on-premise, and air-gapped deployment options give your organization **full control over its data pipeline**, providing the technical foundation needed to operate within frameworks such as SOC 2, HIPAA, GDPR, FedRAMP, and ISO 27001. Compliance responsibility sits with the deploying organization.
 
-#### ⚡ Reliable, Scalable, and Performance-Optimized
-Built for large-scale enterprise deployments with multi-node high availability, Open WebUI's architecture supports configurations targeting **high uptime**, optimized workloads, and scalability across regions and business units.
+#### ⚡ Stateless Architecture, Horizontal Scaling
+Open WebUI's **stateless application layer** lets you add replicas across servers as demand grows. Shared databases, storage, and Redis keep those replicas working with the same data and coordinated state, providing the foundation for multi-node high availability. See the [scaling guide](/getting-started/advanced-topics/scaling) for the required configuration.
 
 #### 💡 Highly Customizable & Modular
 **White-label the interface** to match your brand identity. Integrate proprietary or third-party AI models. Extend functionality to fit your organization's unique workflows, Open WebUI adapts to you, not the other way around.
