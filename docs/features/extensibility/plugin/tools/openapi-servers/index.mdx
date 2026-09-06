@@ -10,6 +10,10 @@ This repository provides reference OpenAPI Tool Server implementations making it
 
 By leveraging OpenAPI, we eliminate the need for a proprietary or unfamiliar communication protocol, ensuring you can quickly and confidently build or integrate servers. This means less time spent figuring out custom interfaces and more time building powerful tools that enhance your AI applications.
 
+:::tip Tool reliability depends on your model
+Connecting an external tool makes it available to the model; the model still has to choose the right tool, supply valid arguments, and use the result. A model that supports tool calling can still struggle with these steps, especially across multiple calls. If tools are enabled but the model ignores them or calls them incorrectly, **try a more capable model with reliable native tool calling** before assuming Open WebUI is at fault. See [troubleshooting model tool use](/features/extensibility/plugin/tools/openapi-servers/open-webui#tools-are-enabled-but-the-model-does-not-use-them-correctly).
+:::
+
 :::tip A first-party example
 The [oikb](/ecosystem/knowledge-base-sync) sync daemon is a ready-made OpenAPI tool server. Run it, add its URL under **Settings → Integrations**, and a model can trigger Knowledge Base syncs and check their status from chat. See [Let the model trigger syncs](/ecosystem/knowledge-base-sync/daemon#let-the-model-trigger-syncs).
 :::
