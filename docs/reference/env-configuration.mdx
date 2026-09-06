@@ -3821,6 +3821,19 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 - Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `SENTENCE_TRANSFORMERS_BACKEND`
+
+- Type: `str`
+- Default: `torch` (when unset)
+- Description: Selects the runtime backend used to run local Sentence-Transformer embedding models. Defaults to `torch`; set it to another backend (for example `onnx` or `openvino`) when the corresponding optional runtime is installed.
+
+
+#### `SENTENCE_TRANSFORMERS_MODEL_KWARGS`
+
+- Type: `str` (JSON)
+- Default: Empty (no extra keyword arguments)
+- Description: JSON string of extra keyword arguments passed to the local Sentence-Transformer embedding model constructor (for example execution-provider options for the `onnx` backend). Leave empty for none; an invalid JSON value is ignored.
+
 #### `RAG_TOP_K`
 
 - Type: `int`
@@ -4273,6 +4286,19 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 - Default: `32`
 - Description: Controls how many query-document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND`
+
+- Type: `str`
+- Default: `torch` (when unset)
+- Description: Selects the runtime backend used to run the local Sentence-Transformer CrossEncoder reranking model. Defaults to `torch`; set it to another backend (for example `onnx` or `openvino`) when the corresponding optional runtime is installed.
+
+
+#### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_MODEL_KWARGS`
+
+- Type: `str` (JSON)
+- Default: Empty (no extra keyword arguments)
+- Description: JSON string of extra keyword arguments passed to the local Sentence-Transformer CrossEncoder reranking model constructor (for example execution-provider options for the `onnx` backend). Leave empty for none; an invalid JSON value is ignored.
 
 #### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_SIGMOID_ACTIVATION_FUNCTION`
 
@@ -6064,6 +6090,12 @@ For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this settin
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
 :::
+
+#### `ENABLE_OAUTH_EMAIL_FALLBACK`
+
+- Type: `bool`
+- Default: `False`
+- Description: When a provider does not supply an email address during an OAuth login, generate a placeholder address of the form `<provider>@<sub>.local` so the login can continue instead of being rejected. This applies only when the provider returned no email, and complements `ENABLE_OAUTH_WITHOUT_EMAIL` (which lets accounts exist without any email address at all).
 
 #### `ENABLE_OAUTH_ID_TOKEN_COOKIE`
 
