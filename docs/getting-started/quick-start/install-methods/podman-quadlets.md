@@ -1,3 +1,8 @@
+---
+sidebar_position: 3
+title: "Podman Quadlets"
+---
+
 # Podman Quadlets (systemd)
 
 Podman Quadlets allow you to manage containers as native systemd services. This is the recommended way to run production containers on Linux distributions that use systemd (like Fedora, RHEL, Ubuntu, etc.).
@@ -23,6 +28,7 @@ Podman Quadlets allow you to manage containers as native systemd services. This 
    ContainerName=open-webui
    PublishPort=3000:8080
    Volume=open-webui:/app/backend/data
+   Environment=WEBUI_SECRET_KEY=your-secret-key
    
    # Networking: Pasta is used by default in Podman 5+
    # If you need to access host services (like Ollama on the host):

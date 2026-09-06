@@ -37,7 +37,7 @@ Open WebUI is **a home for AI**, a self-hosted AI platform that's **[extensible]
   <TabItem value="docker" label="Docker" default>
 
 ```bash
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
 Then open [http://localhost:3000](http://localhost:3000).
@@ -52,7 +52,7 @@ Then open [http://localhost:3000](http://localhost:3000).
   Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
 </p>
 
-For GPU support, Docker Compose, and more → [Full Docker guide](/getting-started/quick-start)
+For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start/install-methods/docker-images)
 
   </TabItem>
   <TabItem value="pip" label="pip">
@@ -87,19 +87,19 @@ For production deployments, install via **Docker** or **Python**.
 </Tabs>
 
 :::tip Running? Read this next.
-Installed Open WebUI but not sure where to start? The [**Essentials for Open WebUI**](/getting-started/essentials) guide covers the six things every new user needs to know: plugins, tool calling, task models, context management, RAG, and Open Terminal.
+Installed Open WebUI but not sure where to start? The [**Essentials for Open WebUI**](/getting-started/essentials) guide covers what every new user needs to know: plugins, tool calling, task models, context management, RAG, web search and Open Terminal.
 :::
 
 ---
 
 ## Getting Started
 
-- [**Quick Start**](/getting-started/quick-start): Docker, Python, Kubernetes install options
+- [**Quick Start**](/getting-started/quick-start): Docker, Python and desktop app installs, with every other method one link away
 - [**Connect a Provider**](/getting-started/quick-start/connect-a-provider): Ollama, OpenAI, Anthropic, vLLM, and more
-- [**Essentials for Open WebUI**](/getting-started/essentials): Start here after your first install. Plugins, tool calling, task models, context management, RAG, Open Terminal.
+- [**Essentials for Open WebUI**](/getting-started/essentials): Start here after your first install. Plugins, tool calling, task models, context management, RAG, web search, Open Terminal.
 - [**Connect an Agent**](/getting-started/quick-start/connect-an-agent): Open WebUI Computer, Hermes Agent, OpenClaw, and other autonomous AI agents
 - [**Updating**](/getting-started/updating): Keep your instance current
-- [**Development Branch**](/getting-started/quick-start): Help test the latest changes before stable release
+- [**Development Branch**](/getting-started/quick-start/install-methods/docker-images#using-the-dev-branch): Help test the latest changes before stable release
 - [**Advanced Topics**](/getting-started/advanced-topics): Scaling, logging, and advanced configuration
 
 ---

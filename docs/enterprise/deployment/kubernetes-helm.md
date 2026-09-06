@@ -168,7 +168,7 @@ Skipping this process risks database corruption from concurrent migrations.
 | **Redis** | A single Redis instance with `timeout 1800` and `maxclients 10000` is sufficient for most deployments. Redis Sentinel or Cluster is only needed if Redis itself must be highly available. |
 | **Networking** | Keep all services in the same availability zone. Target < 2 ms database latency. Audit network policies to ensure pods can reach PostgreSQL, Redis, and storage backends. |
 
-For the complete Helm setup guide, see the [Quick Start guide](/getting-started/quick-start). For troubleshooting multi-replica issues, see [Multi-Replica Troubleshooting](/troubleshooting/multi-replica).
+For the complete Helm setup guide, see [Kubernetes with Helm](/getting-started/quick-start/install-methods/kubernetes-helm). For troubleshooting multi-replica issues, see [Multi-Replica Troubleshooting](/troubleshooting/multi-replica).
 
 ---
 

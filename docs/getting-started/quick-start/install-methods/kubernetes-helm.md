@@ -1,3 +1,7 @@
+---
+sidebar_position: 5
+title: "Kubernetes (Helm)"
+---
 
 # Helm Setup for Kubernetes
 
@@ -22,6 +26,8 @@ Helm helps you manage Kubernetes applications.
    ```bash
    helm install openwebui open-webui/open-webui
    ```
+
+   The chart pins its own image tag. To run the `:dev` pre-release or a `-slim` / `-cuda` variant, override the image tag in the chart values; see the [chart repository](https://github.com/open-webui/helm-charts) for the value names and [Docker images and tags](/getting-started/quick-start/install-methods/docker-images) for what each tag contains.
 
 3. **Verify Installation:**
 
