@@ -68,7 +68,7 @@ docker run --rm --entrypoint python ghcr.io/open-webui/open-webui:main \
 
 ### Symptom
 
-Startup fails (after the banner) with:
+The container starts, its log carries the `LocalEntryNotFoundError` below, and the first document upload or RAG query then fails with the `ValueError`:
 
 ```text
 huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached
@@ -83,7 +83,7 @@ It happens when [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode)
 
 ### Cause
 
-Offline mode means *never reach the network*. The default RAG embedding engine uses a **local SentenceTransformers model that must be downloaded once**. On a fresh install with offline mode already enabled, it was never cached, so there is nothing to load and startup aborts.
+Offline mode blocks the Hugging Face downloads and the version check. The default RAG embedding engine uses a **local SentenceTransformers model that must be downloaded once**. On a fresh install with offline mode already enabled, it was never cached, so there is nothing to load; the error surfaces on the first embedding call (0.9.6 aborted startup instead, fixed in 0.10.0).
 
 ### Fix
 
