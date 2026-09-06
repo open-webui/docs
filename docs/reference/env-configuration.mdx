@@ -3829,7 +3829,6 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 - Default: `torch` (when unset)
 - Description: Selects the runtime backend used to run local Sentence-Transformer embedding models. Defaults to `torch`; set it to another backend (for example `onnx` or `openvino`) when the corresponding optional runtime is installed.
 
-
 #### `SENTENCE_TRANSFORMERS_MODEL_KWARGS`
 
 - Type: `str` (JSON)
@@ -4294,7 +4293,6 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 - Type: `str`
 - Default: `torch` (when unset)
 - Description: Selects the runtime backend used to run the local Sentence-Transformer CrossEncoder reranking model. Defaults to `torch`; set it to another backend (for example `onnx` or `openvino`) when the corresponding optional runtime is installed.
-
 
 #### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_MODEL_KWARGS`
 
@@ -6054,31 +6052,9 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_WITHOUT_EMAIL`
-- Type: `bool`
-- Default: `False`
-- Description: Enables authentication with OpenID Connect (OIDC) providers that do not support or expose an email scope. When enabled, Open WebUI will create and manage user accounts without requiring an email address from the OAuth provider.
-- Persistence: This environment variable is a `ConfigVar` variable.
 
-:::warning
-
-**Use with Caution**
-
-Enabling this option bypasses email-based user identification, which is the standard method for uniquely identifying users across authentication systems. When enabled:
-
-- User accounts will be created using the `sub` claim (or the claim specified in `OAUTH_SUB_CLAIM`) as the primary identifier
-- Email-based features such as password recovery, email notifications, and account merging via `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` will not function properly
-- Ensure your OIDC provider's `sub` claim is stable and unique to prevent authentication conflicts
-
-Only enable this if your identity provider does not support email scope and you have alternative user identification mechanisms in place.
-
-This setting is designed for enterprise environments using identity providers that:
-- Use employee IDs, usernames, or other non-email identifiers as the primary user claim
-- Have privacy policies that prevent sharing email addresses via OAuth
-- Operate in air-gapped or highly restricted networks where email-based services are unavailable
-
-For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this setting should remain `False`.
-
-:::
+- Status: **Not implemented.** Open WebUI reads no such variable, so setting it has no effect. It was named in the v0.6.33 release notes, but the change that shipped reads [`ENABLE_OAUTH_EMAIL_FALLBACK`](#enable_oauth_email_fallback) instead.
+- Instead: to sign users in from a provider that returns no email address, set `ENABLE_OAUTH_EMAIL_FALLBACK` to `true`, which gives the account a placeholder address built from the provider name and the `sub` claim.
 
 #### `OAUTH_UPDATE_PICTURE_ON_LOGIN`
 
@@ -6097,7 +6073,7 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 - Type: `bool`
 - Default: `False`
-- Description: When a provider does not supply an email address during an OAuth login, generate a placeholder address of the form `<provider>@<sub>.local` so the login can continue instead of being rejected. This applies only when the provider returned no email, and complements `ENABLE_OAUTH_WITHOUT_EMAIL` (which lets accounts exist without any email address at all).
+- Description: When a provider does not supply an email address during an OAuth login, generate a placeholder address of the form `<provider>@<sub>.local` so the login can continue instead of being rejected. This applies only when the provider returned no email. The account is then identified by that placeholder, so the `sub` claim it is built from has to be stable, and email-based features such as account merging via `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` will not behave as they would with a real address.
 
 #### `ENABLE_OAUTH_ID_TOKEN_COOKIE`
 
