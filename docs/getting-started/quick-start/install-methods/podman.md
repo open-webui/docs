@@ -1,3 +1,7 @@
+---
+sidebar_position: 2
+title: "Podman"
+---
 
 # Using Podman
 
@@ -8,7 +12,7 @@ Podman is a daemonless container engine for developing, managing, and running OC
 - **Run a Container:**
 
   ```bash
-  podman run -d --name openwebui -p 3000:8080 -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main
+  podman run -d --name openwebui -p 3000:8080 -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key ghcr.io/open-webui/open-webui:main
   ```
 
 - **List Running Containers:**
@@ -40,11 +44,11 @@ If you are on an older version of Podman and `pasta` is not available:
 2. Start the container with the following flag to allow host loopback:
 
 ```bash
-podman run -d --network=slirp4netns:allow_host_loopback=true --name openwebui -p 3000:8080 -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main
+podman run -d --network=slirp4netns:allow_host_loopback=true --name openwebui -p 3000:8080 -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key ghcr.io/open-webui/open-webui:main
 ```
 
 ### Connection Configuration
-Once inside Open WebUI, navigate to **Settings > Settings > Admin > Connections** and set your Ollama API connection to:
+Once inside Open WebUI, go to your avatar > **Settings > Admin > Connections** and set your Ollama API connection to:
 `http://host.containers.internal:11434`
 
 Refer to the Podman [documentation](https://podman.io/) for advanced configurations.

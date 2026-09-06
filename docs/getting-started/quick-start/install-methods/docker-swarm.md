@@ -1,4 +1,9 @@
-## Docker Swarm
+---
+sidebar_position: 6
+title: "Docker Swarm"
+---
+
+# Docker Swarm
 
 This installation method requires knowledge on Docker Swarms, as it utilizes a stack file to deploy 3 seperate containers as services in a Docker Swarm.
 
@@ -44,6 +49,7 @@ Choose the appropriate command based on your hardware setup:
           - ./data/open-webui:/app/backend/data
         environment:
           DATA_DIR: /app/backend/data
+          WEBUI_SECRET_KEY: your-secret-key
           OLLAMA_BASE_URLS: http://ollama:11434
           CHROMA_HTTP_PORT: 8000
           CHROMA_HTTP_HOST: chromadb
