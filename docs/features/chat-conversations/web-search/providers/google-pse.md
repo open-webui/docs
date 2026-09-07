@@ -44,7 +44,6 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 #### Note
 
-You have to enable `Web search` in the prompt field, using plus (`+`) button.
-Search the web ;-)
+You have to enable `Web Search` in the prompt field. Click the Integrations button next to the `+` icon.
 
 ![enable Web search](/images/tutorial_google_pse2.png)
