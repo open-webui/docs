@@ -39,6 +39,6 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 #### Note
 
-You have to enable `Web search` in the prompt field, using plus (`+`) button to search the web using [SearchApi](https://www.searchapi.io/) engines.
+You have to enable `Web Search` in the prompt field. Click the Integrations button next to the `+` icon to search the web using [SearchApi](https://www.searchapi.io/) engines.
 
 ![enable Web search](/images/enable_web_search.png)

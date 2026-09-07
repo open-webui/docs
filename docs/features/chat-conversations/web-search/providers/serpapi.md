@@ -39,6 +39,6 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 #### Note
 
-You have to enable `Web search` in the prompt field to search the web using [SerpApi](https://serpapi.com/) engines.
+You have to enable `Web Search` in the prompt field. Click the Integrations button next to the `+` icon to search the web using [SerpApi](https://serpapi.com/) engines.
 
 ![enable Web search](/images/enable_web_search.png)
