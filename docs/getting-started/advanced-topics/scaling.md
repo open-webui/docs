@@ -531,6 +531,8 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 
 ## Quick Reference: When Do I Need What?
 
+<div className="responsive-table">
+
 | Scenario | PostgreSQL | Redis | External Vector DB | Ext. Content Extraction | Ext. Embeddings | Shared Storage |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Single user / evaluation | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
@@ -538,6 +540,8 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 | Multiple Uvicorn workers | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | ✗ (same filesystem) |
 | Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
 | Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
+
+</div>
 
 †Without Redis, signing out and password changes do **not** revoke tokens: they remain valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). For production deployments handling sensitive data, Redis is recommended for proper token revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
 
