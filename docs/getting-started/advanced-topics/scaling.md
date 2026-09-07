@@ -15,14 +15,15 @@ This guide walks you through the key concepts and configurations at a high level
 
 ## Understanding the Defaults
 
-Out of the box, Open WebUI runs as a **single container** with:
+Open WebUI defaults to a **self-contained, single-instance deployment**. The standard Docker setup includes:
 
-- An **embedded SQLite database** stored on a local volume
-- An **embedded ChromaDB vector database** (also backed by SQLite) for RAG embeddings
-- A **single Uvicorn worker** process
-- **No external dependencies** (no Redis, no external DB)
+- **Embedded SQLite** for application data on a persistent volume
+- **Embedded ChromaDB** (also backed by SQLite) for RAG embeddings
+- **A single Uvicorn worker**, with no external database or Redis required
 
-This is perfect for personal use, small teams, or evaluation. The scaling journey begins when you outgrow any of these defaults. Crucially, **both SQLite databases** (main and vector) must be replaced before you can safely run multiple processes.
+This approach was chosen to **minimize time to deployment and operational overhead**: you can start using Open WebUI without first provisioning separate database or coordination services. Keeping these dependencies local also simplifies **air-gapped deployment** when models and required assets are provisioned within the isolated environment.
+
+**Horizontal scaling requires shared persistence and coordination**, so every replica operates on the same data. Before adding replicas or workers, replace the embedded database configuration with PostgreSQL and a client-server vector database, configure shared file storage, and add Redis for coordination. This separates state from individual instances, allowing the **stateless application tier** to scale independently behind a load balancer.
 
 ---
 
