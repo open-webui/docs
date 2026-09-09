@@ -1,6 +1,5 @@
 ---
-slug: /deployment/docker-desktop-extension
-sidebar_position: 17
+sidebar_position: 6
 title: "Docker Desktop Extension and Pinokio"
 ---
 

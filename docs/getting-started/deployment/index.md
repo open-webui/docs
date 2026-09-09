@@ -20,16 +20,13 @@ Choose how to run Open WebUI in your environment. Start with a single instance o
 | Managed container service | Your organization runs applications on a managed container platform. | [Container Service](/enterprise/deployment/container-service) |
 | Python on virtual machines | You manage application processes and scaling on VMs. | [Python / Pip on VMs](/enterprise/deployment/python-pip) |
 
-### Other ways to run it
+### Docker Swarm
 
 | Guide | What it covers |
 | :--- | :--- |
-| [Docker images and tags](./docker-images) | Every image and tag, the GPU and bundled-Ollama variants, slim, pinned versions, updating and uninstalling |
-| [Podman](./podman) · [Quadlets](./podman-quadlets) · [Kube Play](./podman-kube-play) | Rootless containers, systemd-managed units, and Podman's Kubernetes-style manifests |
-| [Docker Swarm](./docker-swarm) | A Swarm stack, with GPU and without |
-| [Docker on Windows with WSL](./windows-wsl) | Running the container on Windows through WSL 2 |
-| [Docker Desktop Extension and Pinokio](./docker-desktop-extension) | One-click installs for a desktop machine |
-| [Python environments](./python-environments) | uv, Conda and venv, for running the package without a container |
+| [Docker Swarm](./docker-swarm) | A Swarm stack across nodes, with GPU and without |
+
+Running **one instance** on a machine you manage, on Podman, WSL, the Docker Desktop extension or a plain Python environment, is [More install methods](/getting-started/quick-start/install-methods) under Quick Start. The tag reference, including the GPU, Ollama and slim variants, is [Docker images and tags](/getting-started/quick-start/install-methods/docker-images).
 
 The Kubernetes guide includes both a persistent single-replica installation and a production configuration using shared PostgreSQL, Redis, and object storage.
 

@@ -1,6 +1,5 @@
 ---
-slug: /deployment/windows-wsl
-sidebar_position: 16
+sidebar_position: 5
 title: "Docker on Windows with WSL"
 ---
 

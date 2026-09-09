@@ -49,17 +49,17 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
     <tr>
       <td><code>:dev</code></td>
       <td>You want the newest fixes now.</td>
-      <td>The pre-release, in practice a nightly: rebuilt from the <code>dev</code> branch as changes land, and shipped as the next release unchanged. Give it <strong>its own volume and container name</strong> (<code>-v open-webui-dev:/app/backend/data --name open-webui-dev -p 3001:8080</code>) and keep <code>:main</code> running beside it. <Link to="/deployment/docker-images#using-the-dev-branch">Using the Dev Branch</Link></td>
+      <td>The pre-release, in practice a nightly: rebuilt from the <code>dev</code> branch as changes land, and shipped as the next release unchanged. Give it <strong>its own volume and container name</strong> (<code>-v open-webui-dev:/app/backend/data --name open-webui-dev -p 3001:8080</code>) and keep <code>:main</code> running beside it. <Link to="/getting-started/quick-start/install-methods/docker-images#using-the-dev-branch">Using the Dev Branch</Link></td>
     </tr>
     <tr>
       <td><code>:main-slim</code></td>
       <td>You want a smaller download.</td>
-      <td>The same app minus the pre-downloaded model files: the embedding models <code>all-MiniLM-L6-v2</code> and <code>bge-micro-v2</code>, the <code>faster-whisper</code> <code>base</code> speech-to-text model and the <code>tiktoken</code> <code>cl100k_base</code> encoding. Roughly 0.3 GB less to pull. It downloads the embedding model at first start and the rest on first use. The saving only holds if the models never get downloaded: start with <code>OFFLINE_MODE=true</code>, then pick an external embedding engine in the admin settings, see <Link to="/deployment/docker-images#when-slim-saves-anything">When slim saves anything</Link>. With the default local engine and no way to download, the container still starts, but document upload and RAG fail until you switch the engine or supply the model. Costs nothing if your volume already holds the models from an earlier <code>:main</code> run. <Link to="/deployment/docker-images#what-slim-leaves-out">What slim leaves out</Link></td>
+      <td>The same app minus the pre-downloaded model files: the embedding models <code>all-MiniLM-L6-v2</code> and <code>bge-micro-v2</code>, the <code>faster-whisper</code> <code>base</code> speech-to-text model and the <code>tiktoken</code> <code>cl100k_base</code> encoding. Roughly 0.3 GB less to pull. It downloads the embedding model at first start and the rest on first use. The saving only holds if the models never get downloaded: start with <code>OFFLINE_MODE=true</code>, then pick an external embedding engine in the admin settings, see <Link to="/getting-started/quick-start/install-methods/docker-images#when-slim-saves-anything">When slim saves anything</Link>. With the default local engine and no way to download, the container still starts, but document upload and RAG fail until you switch the engine or supply the model. Costs nothing if your volume already holds the models from an earlier <code>:main</code> run. <Link to="/getting-started/quick-start/install-methods/docker-images#what-slim-leaves-out">What slim leaves out</Link></td>
     </tr>
   </tbody>
 </table>
 
-Both combine as `:dev-slim`. GPU (`:cuda`), bundled Ollama (`:ollama`), pinned versions and Docker Hub: [Docker images and tags](/deployment/docker-images).
+Both combine as `:dev-slim`. GPU (`:cuda`), bundled Ollama (`:ollama`), pinned versions and Docker Hub: [Docker images and tags](/getting-started/quick-start/install-methods/docker-images).
 :::
 
   </TabItem>
@@ -85,12 +85,12 @@ volumes:
   open-webui:
 ```
 
-The tags are the same as on the Docker tab: change the `image:` line. To try `:dev`, add it as a second service with its own volume and port, see [Running the pre-release image](/deployment/docker-images#running-the-pre-release-image). Use Docker Compose v2 (`docker compose`, with a space).
+The tags are the same as on the Docker tab: change the `image:` line. To try `:dev`, add it as a second service with its own volume and port, see [Running the pre-release image](/getting-started/quick-start/install-methods/docker-images#running-the-pre-release-image). Use Docker Compose v2 (`docker compose`, with a space).
 
   </TabItem>
   <TabItem value="python" label="Python (pip)">
 
-Prefer `uv`, Conda or `venv`? Those live on [Python environments](/deployment/python-environments). Plain pip:
+Prefer `uv`, Conda or `venv`? Those live on [Python environments](/getting-started/quick-start/install-methods/python-environments). Plain pip:
 
 <PythonCompat />
 
@@ -183,4 +183,4 @@ Want an autonomous agent with terminal, file and web access? [Connect an Agent](
 
 ## More install methods
 
-Podman, Kubernetes with Helm, Docker Swarm, Docker on Windows with WSL, the Docker Desktop extension, Pinokio and the uv, Conda and venv setups each have their own page under [More install methods](/deployment/). The full image and tag reference, including GPU, bundled Ollama, pinned versions and uninstall, is [Docker images and tags](/deployment/docker-images).
+Podman, Kubernetes with Helm, Docker Swarm, Docker on Windows with WSL, the Docker Desktop extension, Pinokio and the uv, Conda and venv setups each have their own page under [More install methods](/deployment/). The full image and tag reference, including GPU, bundled Ollama, pinned versions and uninstall, is [Docker images and tags](/getting-started/quick-start/install-methods/docker-images).
