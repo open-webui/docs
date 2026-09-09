@@ -26,7 +26,7 @@ Choose how to run Open WebUI in your environment. Start with a single instance o
 | :--- | :--- |
 | [Docker Swarm](./docker-swarm) | A Swarm stack across nodes, with GPU and without |
 
-Running **one instance** on a machine you manage, on Podman, WSL, the Docker Desktop extension or a plain Python environment, is [More install methods](/getting-started/quick-start/install-methods) under Quick Start. The tag reference, including the GPU, Ollama and slim variants, is [Docker images and tags](/getting-started/quick-start/install-methods/docker-images).
+Running **one instance** on a machine you manage, on Podman, WSL, the Docker Desktop extension or a plain Python environment, is covered in [Quick Start](/getting-started/quick-start) under Quick Start. The tag reference, including the GPU, Ollama and slim variants, is [Docker images and tags](/getting-started/quick-start/docker-images).
 
 The Kubernetes guide includes both a persistent single-replica installation and a production configuration using shared PostgreSQL, Redis, and object storage.
 
