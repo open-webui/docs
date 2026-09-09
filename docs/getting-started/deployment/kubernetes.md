@@ -9,7 +9,7 @@ description: "Deploy Open WebUI on Kubernetes with Helm, from one persistent ins
 
 Use the official Open WebUI Helm chart to deploy on your Kubernetes cluster. This guide covers setup, installation, verification, and updates in one place.
 
-For the existing Helm documentation, see the [Helm quick start](/deployment/kubernetes-helm) and [enterprise Helm deployment guide](/enterprise/deployment/kubernetes-helm).
+For a deployment with an enterprise licence, see the [enterprise Helm deployment guide](/enterprise/deployment/kubernetes-helm).
 
 Open WebUI connects to an existing model server or API. The examples do not install Ollama, Pipelines, or Terminals, and do not require GPUs for the Open WebUI pods.
 
@@ -185,6 +185,10 @@ Provision these services before installing. The chart configuration below connec
 | Service | What to prepare |
 | :--- | :--- |
 | PostgreSQL + PGVector | An application database and role with schema migration permissions. Have the database administrator enable the `vector` extension in that database. |
+
+:::warning The default vector store cannot be shared
+ChromaDB's default client is SQLite on local disk. Its connections are not fork-safe, so several replicas or workers writing at once crash them. Any deployment past a single replica needs an external vector store, PGVector, Milvus or Qdrant through [`VECTOR_DB`](/reference/env-configuration#vector_db), or ChromaDB run as its own server through [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host).
+:::
 | Redis | A shared endpoint, with authentication and TLS where configured. |
 | S3-compatible storage | An existing bucket and credentials for the required read, write, list, and delete operations. |
 | Embedding API | An OpenAI-compatible embedding endpoint, its API key, and a supported embedding model ID. |
@@ -341,6 +345,19 @@ kubectl -n openwebui get pods,ingress
 This disables migrations on all replicas, applies the desired replica count, and enables ingress. Expect a brief restart. Point DNS at your ingress controller, then open your HTTPS hostname.
 
 Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Session affinity may be needed for Socket.IO polling. Affinity does not replace Redis; see [connection troubleshooting](/troubleshooting/connection-error).
+
+On the NGINX Ingress Controller, sticky sessions are these annotations on the Ingress resource:
+
+```yaml
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/affinity: 'cookie'
+    nginx.ingress.kubernetes.io/session-cookie-name: 'open-webui-session'
+    nginx.ingress.kubernetes.io/session-cookie-expires: '172800'
+    nginx.ingress.kubernetes.io/session-cookie-max-age: '172800'
+```
+
+They keep a user on the same pod, which steadies WebSocket connections across replicas.
 
 ### Verify the Deployment
 
