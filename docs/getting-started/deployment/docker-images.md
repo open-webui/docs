@@ -1,5 +1,6 @@
 ---
-sidebar_position: 1
+slug: /deployment/docker-images
+sidebar_position: 10
 title: "Docker images and tags"
 ---
 

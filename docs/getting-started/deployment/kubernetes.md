@@ -9,7 +9,7 @@ description: "Deploy Open WebUI on Kubernetes with Helm, from one persistent ins
 
 Use the official Open WebUI Helm chart to deploy on your Kubernetes cluster. This guide covers setup, installation, verification, and updates in one place.
 
-For the existing Helm documentation, see the [Helm quick start](/getting-started/quick-start/install-methods/kubernetes-helm) and [enterprise Helm deployment guide](/enterprise/deployment/kubernetes-helm).
+For the existing Helm documentation, see the [Helm quick start](/deployment/kubernetes-helm) and [enterprise Helm deployment guide](/enterprise/deployment/kubernetes-helm).
 
 Open WebUI connects to an existing model server or API. The examples do not install Ollama, Pipelines, or Terminals, and do not require GPUs for the Open WebUI pods.
 
@@ -38,7 +38,7 @@ helm repo update
 
 **Expected result:** your nodes are ready and the `openwebui` namespace exists. If it already exists, reuse it.
 
-This guide pins **chart 16.5.0** and **application v0.11.3**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-16.5.0/charts/open-webui) and [image reference](/getting-started/quick-start/install-methods/docker-images) before changing versions.
+This guide pins **chart 16.5.0** and **application v0.11.3**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-16.5.0/charts/open-webui) and [image reference](/deployment/docker-images) before changing versions.
 
 ## 2. Configure the Application
 

@@ -13,12 +13,24 @@ Choose how to run Open WebUI in your environment. Start with a single instance o
 | Deployment | When to use it | Guide |
 | :--- | :--- | :--- |
 | Docker or Python | You want to get an instance running on a machine you manage. | [Quick Start](/getting-started/quick-start) |
-| Kubernetes | Your team operates a cluster and wants to deploy with Helm. | [Kubernetes Deployment](./kubernetes) · [Helm quick start](/getting-started/quick-start/install-methods/kubernetes-helm) |
+| Kubernetes | Your team operates a cluster and wants to deploy with Helm. | [Kubernetes Deployment](./kubernetes) · [Helm quick start](/deployment/kubernetes-helm) |
 | AWS ECS / Fargate | You want AWS-managed container tasks with an Application Load Balancer. | [AWS ECS / Fargate](./aws-ecs) |
 | Azure Container Apps | You want managed containers integrated with Azure networking and services. | [Azure Container Apps](./azure-container-apps) |
 | Google Cloud Run | You want managed Google Cloud containers and can accommodate request-duration and instance-lifecycle limits. | [Google Cloud Run](./google-cloud-run) |
 | Managed container service | Your organization runs applications on a managed container platform. | [Container Service](/enterprise/deployment/container-service) |
 | Python on virtual machines | You manage application processes and scaling on VMs. | [Python / Pip on VMs](/enterprise/deployment/python-pip) |
+
+### Other ways to run it
+
+| Guide | What it covers |
+| :--- | :--- |
+| [Docker images and tags](./docker-images) | Every image and tag, the GPU and bundled-Ollama variants, slim, pinned versions, updating and uninstalling |
+| [Podman](./podman) · [Quadlets](./podman-quadlets) · [Kube Play](./podman-kube-play) | Rootless containers, systemd-managed units, and Podman's Kubernetes-style manifests |
+| [Kubernetes (Helm)](./kubernetes-helm) | The community Helm chart, as an alternative to the manifests in the Kubernetes guide |
+| [Docker Swarm](./docker-swarm) | A Swarm stack, with GPU and without |
+| [Docker on Windows with WSL](./windows-wsl) | Running the container on Windows through WSL 2 |
+| [Docker Desktop Extension and Pinokio](./docker-desktop-extension) | One-click installs for a desktop machine |
+| [Python environments](./python-environments) | uv, Conda and venv, for running the package without a container |
 
 The Kubernetes guide includes both a persistent single-replica installation and a production configuration using shared PostgreSQL, Redis, and object storage.
 

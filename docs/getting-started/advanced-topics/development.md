@@ -30,7 +30,7 @@ Run the `:dev` pre-release image instead. It is the same code, rebuilt nightly a
 docker run -d -p 3001:8080 --add-host=host.docker.internal:host-gateway -v open-webui-dev:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui-dev --restart always ghcr.io/open-webui/open-webui:dev
 ```
 
-Testing it and reporting what you find is the lowest-effort way to help, and it is what makes releases good. See [Using the Dev Branch](/getting-started/quick-start/install-methods/docker-images#using-the-dev-branch) for the details, and note the separate volume.
+Testing it and reporting what you find is the lowest-effort way to help, and it is what makes releases good. See [Using the Dev Branch](/deployment/docker-images#using-the-dev-branch) for the details, and note the separate volume.
 :::
 
 ---

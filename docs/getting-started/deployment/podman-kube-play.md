@@ -1,5 +1,6 @@
 ---
-sidebar_position: 4
+slug: /deployment/podman-kube-play
+sidebar_position: 13
 title: "Podman Kube Play"
 ---
 

@@ -1,5 +1,6 @@
 ---
-sidebar_position: 2
+slug: /deployment/podman
+sidebar_position: 11
 title: "Podman"
 ---
 

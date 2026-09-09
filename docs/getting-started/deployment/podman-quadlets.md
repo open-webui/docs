@@ -1,5 +1,6 @@
 ---
-sidebar_position: 3
+slug: /deployment/podman-quadlets
+sidebar_position: 12
 title: "Podman Quadlets"
 ---
 
