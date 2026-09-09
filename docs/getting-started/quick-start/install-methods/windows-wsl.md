@@ -1,5 +1,5 @@
 ---
-sidebar_position: 24
+sidebar_position: 5
 title: "Docker on Windows with WSL"
 ---
 

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 20
+sidebar_position: 1
 title: "Docker images and tags"
 ---
 

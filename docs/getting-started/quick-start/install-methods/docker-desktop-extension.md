@@ -1,5 +1,5 @@
 ---
-sidebar_position: 25
+sidebar_position: 6
 title: "Docker Desktop Extension and Pinokio"
 ---
 
