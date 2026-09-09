@@ -1,4 +1,5 @@
 ---
+slug: /deployment/google-cloud-run
 sidebar_position: 4
 title: "Google Cloud Run"
 description: "Deploy Open WebUI on Google Cloud Run with Cloud SQL, Redis, Cloud Storage, and a separate migration job."

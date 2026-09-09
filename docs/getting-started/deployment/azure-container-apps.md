@@ -1,4 +1,5 @@
 ---
+slug: /deployment/azure-container-apps
 sidebar_position: 3
 title: "Azure Container Apps"
 description: "Deploy Open WebUI on Azure Container Apps with PostgreSQL, Redis, Blob Storage, and managed secrets."

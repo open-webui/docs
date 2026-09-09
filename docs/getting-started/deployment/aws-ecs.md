@@ -1,4 +1,5 @@
 ---
+slug: /deployment/aws-ecs
 sidebar_position: 2
 title: "AWS ECS / Fargate"
 description: "Deploy Open WebUI on AWS ECS with Fargate, shared data services, Secrets Manager, and an Application Load Balancer."

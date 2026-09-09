@@ -1,4 +1,5 @@
 ---
+slug: /deployment/
 sidebar_position: 0
 title: "Deploying Open WebUI"
 ---

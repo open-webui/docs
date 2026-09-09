@@ -1,4 +1,5 @@
 ---
+slug: /deployment/kubernetes
 sidebar_position: 1
 title: "Kubernetes Deployment"
 description: "Deploy Open WebUI on Kubernetes with Helm, from one persistent instance to a production deployment with shared services."
