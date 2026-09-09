@@ -10,7 +10,7 @@ When multiple people on your team need terminal access through Open WebUI, you h
 | | Single Container | Per-User Containers |
 | :--- | :--- | :--- |
 | **How** | One container, separate accounts inside | Each user gets their own container |
-| **Isolation** | Files are separate, but they share the same system | Fully isolated, separate everything |
+| **Isolation** | Files are separate, but they share the same system | Separate files, processes, and resources per user. On the Docker backend the workspaces share one network |
 | **Setup** | One extra setting | Additional orchestration service |
 | **Best for** | Small teams you trust | Production, larger teams, untrusted users |
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
@@ -18,7 +18,7 @@ When multiple people on your team need terminal access through Open WebUI, you h
 :::danger Required for multi-user Open WebUI deployments
 If your Open WebUI instance has **more than one user account** and the same terminal-server connection is shared across users, you **must** use one of the two isolation modes below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
 
-For deployments with **untrusted users** (open signup, public-facing portals, mixed-tenant setups), Option 1 is also insufficient on its own. File isolation does not extend to network namespace, so users can still reach each other through bound ports on the shared container. Use **Option 2 (per-user containers via Terminals)** for these deployments, or layer `TERMINAL_PROXY_HEADERS` on top of Option 1 to restrict what proxied responses can do in the user's browser.
+For deployments with **untrusted users** (open signup, public-facing portals, mixed-tenant setups), Option 1 is also insufficient on its own. File isolation does not extend to network namespace, so users can still reach each other through bound ports on the shared container. Use **Option 2 (per-user containers via Terminals)** on its Kubernetes backend with a NetworkPolicy for these deployments, or layer `TERMINAL_PROXY_HEADERS` on top of Option 1 to restrict what proxied responses can do in the user's browser.
 :::
 
 ---
@@ -63,7 +63,7 @@ Each user sees only their own files in the file browser.
 :::warning Good for small teams, not production
 This mode gives everyone their own workspace, but they're all running inside the same container. Resource pressure (memory, CPU) is shared, **and so is the network namespace**: a user who binds a port (e.g. `python -m http.server 8080`) is reachable from any other user's terminal-server proxy URL on that port. Per-user file isolation does **not** extend to per-user network isolation in this mode.
 
-Use this for small, trusted groups, not for wide-open deployments. For untrusted multi-user deployments, use **Option 2 (per-user containers)** below, or layer the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top to lock proxied responses into a sandbox CSP.
+Use this for small, trusted groups, not for wide-open deployments. For untrusted multi-user deployments, use **Option 2 (per-user containers)** below on its Kubernetes backend, or layer the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top to lock proxied responses into a sandbox CSP.
 :::
 
 ```mermaid
@@ -92,7 +92,7 @@ flowchart LR
 
 ## Option 2: Per-user containers with Terminals
 
-For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, completely separate from everyone else.
+For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, with files, processes, and resources separate from everyone else's.
 
 - **Full isolation**: each user's container is independent with its own files, processes, and resources
 - **On-demand provisioning**: containers are created when users start a session and cleaned up when idle
@@ -100,6 +100,7 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 - **Multiple environments**: different setups for different teams (e.g., data science, development)
 - **Kubernetes support**: works with Docker, Kubernetes, and k3s
 - **Scoped workspaces**: optionally give each saved chat or each automation its own workspace instead of one per user, via [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)
+- **One network on the Docker backend**: every workspace sits on the same Docker network so the orchestrator can reach each one by name, which also lets a workspace reach a port another user's workspace has opened. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
 
 ```mermaid
 flowchart LR
@@ -119,8 +120,8 @@ flowchart LR
 
 Two deployment backends are available:
 
-- **[Docker Backend](../terminals/)**: runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
-- **[Kubernetes Operator](../terminals/)**: production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
+- **[Docker Backend](../terminals/#deployment)**: runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
+- **[Kubernetes Operator](../terminals/#deployment)**: production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
 Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
@@ -129,7 +130,7 @@ Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/ente
 ## Related
 
 - [Terminals overview →](../terminals/)
-- [Terminals: Docker Backend →](../terminals/)
-- [Terminals: Kubernetes Operator →](../terminals/)
+- [Terminals: Docker Backend →](../terminals/#deployment)
+- [Terminals: Kubernetes Operator →](../terminals/#deployment)
 - [Security best practices →](./security.md)
 - [All configuration options →](./configuration.md)

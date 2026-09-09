@@ -9,7 +9,7 @@ A policy describes what a user's Open Terminal workspace should look like. It co
 
 Think of policies as agent workspace profiles. A data team might get Python, notebooks, and larger storage. A training lab might get a locked-down image and scheduled resets. A software team might get Git, build tools, language runtimes, and persistent files.
 
-In Open WebUI, go to **Settings** -> **Admin** -> **Tools** -> **Integrations** -> Open Terminal**, add an orchestrator connection, verify it, then edit the policy fields.
+In Open WebUI, go to **Settings > Admin > Integrations**, add an orchestrator connection in the **Open Terminal** section, verify it, then edit the policy fields.
 
 ## Policy Fields
 
