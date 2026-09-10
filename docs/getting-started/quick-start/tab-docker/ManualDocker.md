@@ -20,7 +20,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 |-----|----------|
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
-| `:main-slim` | Smaller image without the pre-downloaded models, see [What slim leaves out](#what-slim-leaves-out) |
+| `:main-slim` | Small image for deployments that use external services for embeddings, speech and vector storage, see [What slim leaves out](#what-slim-leaves-out) |
 | `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
@@ -29,24 +29,29 @@ Channel and variant combine: `:dev-slim`, `:dev-cuda`, `:dev-cuda126` and `:dev-
 
 ### What slim leaves out
 
-The slim image is the standard image without the pre-downloaded model files. The Python packages, ffmpeg and pandoc are identical, and on the amd64 build the download shrinks from roughly 1.8 GB to 1.5 GB.
+:::info Two generations of slim
+The `dev` builds after v0.11.3 rebuilt slim from the ground up, and this section describes that build. It is what `:dev-slim` serves today and what `:main-slim` becomes with the next release. Until then, `:main-slim` is still the previous slim, which is the standard image with only the pre-downloaded model files removed, about 1.5 GB compressed on amd64.
+:::
 
-| Left out | Downloaded when |
+The rebuilt slim image is about 170 MB compressed per architecture, against about 1.6 GB for the standard image on amd64. It gets there by leaving out every local machine learning runtime and the packages that depend on one, so it is an image for deployments where those jobs are done by other services.
+
+| Left out | What to use instead |
 |---|---|
-| RAG embedding model `sentence-transformers/all-MiniLM-L6-v2` | **First start** (it is loaded at boot), from Hugging Face |
-| Speech-to-text model `faster-whisper` `base` | First local speech-to-text request, from Hugging Face |
-| Auxiliary embedding model `TaylorAI/bge-micro-v2` | First leaderboard search, from Hugging Face |
-| `tiktoken` `cl100k_base` encoding | When the token text splitter is selected, from OpenAI |
+| Local embedding model (`sentence-transformers`, `transformers`, torch) | Set `RAG_EMBEDDING_ENGINE` to `ollama`, `openai` or `azure_openai`. Until you do, document upload and retrieval answer `503 Configure an external embedding engine`. |
+| Local speech-to-text (`faster-whisper`) | Pick an external speech-to-text engine in the admin settings, or leave it unused. |
+| Local reranking | Use an external reranker, or clear the reranking model to fall back to cosine scoring. |
+| Embedded Chroma and every vector database client except pgvector | `VECTOR_DB` defaults to `pgvector`. Point `PGVECTOR_DB_URL`, or `DATABASE_URL`, at a PostgreSQL server with the pgvector extension. Any other `VECTOR_DB` value fails with a 503 that says so. |
+| Document loaders for PDF and Office files, plus `ffmpeg` and `pandoc` | Plain text, Markdown, reStructuredText, XML, CSV and HTML files still load locally. For anything else, set an external content extraction engine such as Tika, Docling or Azure Document Intelligence. |
+| Cloud storage clients for S3, Google Cloud Storage and Azure Blob | Local storage only. |
+| `git` and the build toolchain | Tools and functions whose requirements install from git need the standard image. |
 
-So slim reaches out to the internet on first start and again on first use of local speech-to-text. Offline, air-gapped, behind a proxy that blocks Hugging Face, or with `OFFLINE_MODE=true`, it still works, as long as the default local embedding engine is not in use: set `RAG_EMBEDDING_ENGINE` to `ollama`, `openai` or `azure_openai` before the first start, or supply the model files yourself.
-
-Otherwise the container starts, but the first document upload or RAG query fails with `ValueError: No embedding model is loaded` (0.9.6 aborted startup instead, fixed in 0.10.0); switch `RAG_EMBEDDING_ENGINE` or supply the model files, see [Startup & Docker Failures](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install).
+Slim is a variant of its own. It cannot be combined with `USE_CUDA` or `USE_OLLAMA`, so there is no CUDA or Ollama flavor of it.
 
 ### When slim saves anything
 
-The slim image is always about 0.3 GB smaller on disk. The bandwidth saving only holds if the models never get downloaded: with default settings slim pulls the embedding model into your volume at first start, and the first local speech-to-text request pulls Whisper, so the total transfer ends up about the same as `:main`. To keep the downloads at zero, start the container with `OFFLINE_MODE=true`. It blocks every Hugging Face download (the embedding models and Whisper) and the version check, and the container boots normally; document upload and RAG just fail until you open your avatar > **Settings > Admin > Documents** and set **Embedding Model Engine** to Ollama, OpenAI or Azure OpenAI. The change takes effect immediately, persists, and nothing is ever downloaded. Speech-to-text works the same way: pick an external engine in the admin settings, or leave it unused. Two things to leave alone: the `token` text splitter pulls the tiktoken encoding, which `OFFLINE_MODE` does not block, and leaderboard searches fail offline because they need the auxiliary embedding model.
+Always, with this build. There are no model files to fetch, so nothing is downloaded at first start or on first use, and `OFFLINE_MODE=true` has nothing left to block. The one exception is the `token` text splitter, which fetches the tiktoken encoding the first time it is selected.
 
-If your data volume already holds the models from an earlier `:main` run, slim costs you nothing either.
+If you were running the previous slim to save a download, note that the trade has changed. That image kept every feature and fetched the models on demand. This one keeps the download small by handing embeddings, speech, reranking, vector storage and document parsing to services you run or subscribe to. A single-container setup that relies on the built-in local models wants `:main`.
 
 ### How the tags update
 
