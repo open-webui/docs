@@ -1,8 +1,3 @@
----
-sidebar_position: 4
-title: "Podman Kube Play"
----
-
 # Podman Kube Play Setup
 
 Podman supports Kubernetes like-syntax for deploying resources such as pods, volumes without having the overhead of a full Kubernetes cluster. [More about Kube Play](https://docs.podman.io/en/latest/markdown/podman-kube-play.1.html).

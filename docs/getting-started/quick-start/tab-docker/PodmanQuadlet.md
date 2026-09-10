@@ -1,8 +1,3 @@
----
-sidebar_position: 3
-title: "Podman Quadlets"
----
-
 # Podman Quadlets (systemd)
 
 Podman Quadlets allow you to manage containers as native systemd services. This is the recommended way to run production containers on Linux distributions that use systemd (like Fedora, RHEL, Ubuntu, etc.).

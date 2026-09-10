@@ -1,8 +1,3 @@
----
-sidebar_position: 2
-title: "Podman"
----
-
 # Using Podman
 
 Podman is a daemonless container engine for developing, managing, and running OCI Containers.

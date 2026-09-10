@@ -27,13 +27,13 @@ Open WebUI runs anywhere (Docker, Kubernetes, pip, bare metal) and connects to O
 
 **Install Open WebUI, connect a model, and start chatting.**
 
-Everything you need for a working setup. Choose Docker for the fastest path or Python for lightweight installs; Kubernetes and the other methods are one link away. Each guide includes connecting your first model provider.
+Everything you need for a working setup. Choose Docker for the fastest path, Python for lightweight installs, or Kubernetes for production orchestration. Each guide includes connecting your first model provider.
 
 | | |
 | :--- | :--- |
 | 🐳 **Docker** | One-command deploy, the officially recommended path |
 | 📦 **Python (pip / uv)** | Lightweight install for low-resource or manual setups |
-| ☸️ **Kubernetes (Helm)** | Production-ready orchestration with scaling, under More install methods |
+| ☸️ **Kubernetes (Helm)** | Production-ready orchestration with scaling |
 | 🖥️ **Desktop app** | Native app, no Docker required |
 | 🔌 **Connect a provider** | Ollama, OpenAI, Anthropic, llama.cpp, vLLM, and more |
 | ⚙️ **Understanding settings** | Learn how Admin Settings and User Settings work together |

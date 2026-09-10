@@ -5,108 +5,134 @@ title: "Quick Start"
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import Link from '@docusaurus/Link';
+
+
+import DockerCompose from './tab-docker/DockerCompose.md';
+import Extension from './tab-docker/DockerDesktopExtension.md';
+import Podman from './tab-docker/Podman.md';
+import PodmanQuadlet from './tab-docker/PodmanQuadlet.md';
+import PodmanKubePlay from './tab-docker/PodmanKubePlay.md';
+import ManualDocker from './tab-docker/ManualDocker.md';
+import DockerSwarm from './tab-docker/DockerSwarm.md';
+import WSL from './tab-docker/WSL.md';
+import DockerUpdating from './tab-docker/DockerUpdating.md';
+import Helm from './tab-kubernetes/Helm.md';
+import Venv from './tab-python/Venv.md';
+import Pip from './tab-python/Pip.md';
+import Uv from './tab-python/Uv.md';
+import Conda from './tab-python/Conda.md';
+import PythonUpdating from './tab-python/PythonUpdating.md';
 import PythonCompat from './tab-python/_PythonCompat.md';
 
 # Quick Start
 
-Docker is the recommended path, and five steps get you to your first chat. Podman, WSL and the other single-instance routes are under [More install methods](#more-install-methods); Kubernetes, Swarm and the cloud platforms are in [Deploying Open WebUI](/deployment/).
+Get Open WebUI running on your machine. Pick your preferred method below.
 
-Open WebUI works on **macOS, Linux** (x86_64 and ARM64, including Raspberry Pi and NVIDIA DGX Spark) and **Windows**.
+Open WebUI works on **macOS, Linux** (x86_64 and ARM64, including Raspberry Pi and NVIDIA DGX Spark), and **Windows**.
 
-## 1. Install
+- **Docker:** Officially supported and recommended for most users. Requires [Docker](https://docs.docker.com/get-docker/) installed.
+- **Python:** Suitable for low-resource environments or manual setups
+- **Kubernetes:** Ideal for enterprise deployments requiring scaling and orchestration
 
-<Tabs groupId="setup-method" queryString>
-  <TabItem value="docker-run" label="Docker" default>
+<Tabs>
+  <TabItem value="docker" label="Docker">
+    <Tabs>
+      <TabItem value="docker" label="Docker">
+        <div className='mt-5'>
+          <ManualDocker />
+          <DockerUpdating />
+        </div>
+      </TabItem>
 
-Requires [Docker](https://docs.docker.com/get-docker/). Replace `your-secret-key` with the output of `openssl rand -hex 32`, then run the command below; it pulls the image and starts it:
+      <TabItem value="compose" label="Docker Compose">
+        <div className='mt-5'>
+          <DockerCompose />
+        </div>
+      </TabItem>
 
-```bash
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-```
+      <TabItem value="extension" label="Extension">
+        <div className='mt-5'>
+          <Extension />
+        </div>
+      </TabItem>
 
-| Flag | What it does |
-|---|---|
-| `-p 3000:8080` | The UI is on port 3000 of your machine. Change the left number if 3000 is taken. |
-| `-v open-webui:/app/backend/data` | Your chats, users and settings live in this volume. It survives updates; never run without it. |
-| `--add-host=host.docker.internal:host-gateway` | Lets the container reach Ollama, or anything else, running on your machine. |
-| `--restart always` | Comes back after a reboot. |
-| `-e WEBUI_SECRET_KEY=your-secret-key` | Set it once and keep it. Without a fixed key, every recreated container logs everyone out. Generate one with `openssl rand -hex 32`. |
+      <TabItem value="podman" label="Podman">
+        <div className='mt-5'>
+          <Podman />
+        </div>
+      </TabItem>
 
-:::tip Which image?
-`:main` has everything in it: the app plus the bundled models for local speech-to-text and document embedding, so it works offline once pulled. Two other tags are worth knowing on day one.
+      <TabItem value="podman-quadlet" label="Quadlets">
+        <div className='mt-5'>
+          <PodmanQuadlet />
+        </div>
+      </TabItem>
 
-<table>
-  <colgroup>
-    <col style={{ width: '14%' }} />
-    <col style={{ width: '24%' }} />
-    <col style={{ width: '62%' }} />
-  </colgroup>
-  <thead>
-    <tr><th>Tag</th><th>Pick it when</th><th>Good to know</th></tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>:dev</code></td>
-      <td>You want the newest fixes now.</td>
-      <td>The pre-release, in practice a nightly: rebuilt from the <code>dev</code> branch as changes land, and shipped as the next release unchanged. Give it <strong>its own volume and container name</strong> (<code>-v open-webui-dev:/app/backend/data --name open-webui-dev -p 3001:8080</code>) and keep <code>:main</code> running beside it. <Link to="/getting-started/quick-start/install-methods/docker-images#using-the-dev-branch">Using the Dev Branch</Link></td>
-    </tr>
-    <tr>
-      <td><code>:main-slim</code></td>
-      <td>You want a smaller download.</td>
-      <td>The same app minus the pre-downloaded model files: the embedding models <code>all-MiniLM-L6-v2</code> and <code>bge-micro-v2</code>, the <code>faster-whisper</code> <code>base</code> speech-to-text model and the <code>tiktoken</code> <code>cl100k_base</code> encoding. Roughly 0.3 GB less to pull. It downloads the embedding model at first start and the rest on first use. The saving only holds if the models never get downloaded: start with <code>OFFLINE_MODE=true</code>, then pick an external embedding engine in the admin settings, see <Link to="/getting-started/quick-start/install-methods/docker-images#when-slim-saves-anything">When slim saves anything</Link>. With the default local engine and no way to download, the container still starts, but document upload and RAG fail until you switch the engine or supply the model. Costs nothing if your volume already holds the models from an earlier <code>:main</code> run. <Link to="/getting-started/quick-start/install-methods/docker-images#what-slim-leaves-out">What slim leaves out</Link></td>
-    </tr>
-  </tbody>
-</table>
+    <TabItem value="podman-kube-play" label="Kube Play">
+      <div className='mt-5'>
+        <PodmanKubePlay />
+      </div>
+    </TabItem>
 
-Both combine as `:dev-slim`. GPU (`:cuda`), bundled Ollama (`:ollama`), pinned versions and Docker Hub: [Docker images and tags](/getting-started/quick-start/install-methods/docker-images).
-:::
-
-  </TabItem>
-  <TabItem value="docker-compose" label="Docker Compose">
-
-Save this as `docker-compose.yml`, replace the secret key with the output of `openssl rand -hex 32`, then run `docker compose up -d`:
-
-```yaml title="docker-compose.yml"
-services:
-  open-webui:
-    image: ghcr.io/open-webui/open-webui:main
-    ports:
-      - "3000:8080"
-    volumes:
-      - open-webui:/app/backend/data
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    environment:
-      - WEBUI_SECRET_KEY=your-secret-key
-    restart: unless-stopped
-
-volumes:
-  open-webui:
-```
-
-The tags are the same as on the Docker tab: change the `image:` line. To try `:dev`, add it as a second service with its own volume and port, see [Running the pre-release image](/getting-started/quick-start/install-methods/docker-images#running-the-pre-release-image). Use Docker Compose v2 (`docker compose`, with a space).
+      <TabItem value="swarm" label="Swarm">
+        <div className='mt-5'>
+          <DockerSwarm />
+        </div>
+      </TabItem>
+      <TabItem value="wsl" label="WSL">
+        <div className='mt-5'>
+          <WSL />
+        </div>
+      </TabItem>
+    </Tabs>
 
   </TabItem>
-  <TabItem value="python" label="Python (pip)">
+  <TabItem value="python" label="Python">
+    <PythonCompat />
+    <Tabs>
+      <TabItem value="pip" label="pip">
+        <div className='mt-5'>
+          <Pip />
+        </div>
+        <PythonUpdating />
+      </TabItem>
 
-Prefer `uv`, Conda or `venv`? Those live on [Python environments](/getting-started/quick-start/install-methods/python-environments). Plain pip:
+      <TabItem value="uv" label="uv">
+        <div className='mt-5'>
+          <Uv />
+        </div>
+        <PythonUpdating />
+      </TabItem>
 
-<PythonCompat />
+      <TabItem value="conda" label="Conda">
+        <div className='mt-5'>
+          <Conda />
+        </div>
+        <PythonUpdating />
+      </TabItem>
 
-```bash
-pip install open-webui
-open-webui serve
-```
+      <TabItem value="venv" label="Venv">
+        <div className='mt-5'>
+          <Venv />
+        </div>
+        <PythonUpdating />
 
-Open WebUI is now on [http://localhost:8080](http://localhost:8080). Set `DATA_DIR` to choose where your data lives, for example `DATA_DIR=~/.open-webui open-webui serve`.
+      </TabItem>
 
-**Command not found?** Activate the environment you installed into; the `open-webui` command lives in its `bin` folder (`Scripts` on Windows).
-
-**Need a fix that is not released yet?** PyPI carries releases only. Run the Docker `:dev` image beside your install with its own volume, or run from the `dev` branch as described in [Developing Open WebUI](/getting-started/advanced-topics/development).
-
+    </Tabs>
   </TabItem>
-  <TabItem value="desktop" label="Desktop app">
+
+  <TabItem value="kubernetes" label="Kubernetes">
+    <Tabs>
+      <TabItem value="helm" label="Helm">
+        <Helm />
+      </TabItem>
+    </Tabs>
+  </TabItem>
+
+  <TabItem value="desktop" label="Desktop">
+
+### Desktop App
 
 Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
 
@@ -115,15 +141,31 @@ For production deployments, install via **Docker** or **Python**.
 :::
 
   </TabItem>
+
+  <TabItem value="third-party" label="Third Party">
+    <Tabs>
+      <TabItem value="pinokio-computer" label="Pinokio.computer">
+        ### Pinokio.computer Installation
+
+        For installation via Pinokio.computer, visit their website:
+
+        [https://pinokio.computer/](https://pinokio.computer/)
+
+        Support for this installation method is provided through their website.
+      </TabItem>
+    </Tabs>
+  </TabItem>
 </Tabs>
 
-## 2. Open it
+---
+
+## Open it
 
 Docker: [http://localhost:3000](http://localhost:3000). Python and the desktop app: [http://localhost:8080](http://localhost:8080). The first start takes a minute.
 
 Nothing loads? Run `docker logs -f open-webui` (`docker compose logs -f` with Compose) and wait for `Application startup complete`. If it never appears, see [Startup & Docker Failures](/troubleshooting/startup). Port already taken: change the left number in `-p 3000:8080`, or run `open-webui serve --port 9999` with Python.
 
-## 3. Create the admin account
+## Create the admin account
 
 The first screen says **Get started with Open WebUI** and offers **Create Admin Account**. That first account is the administrator: it manages users and every instance-wide setting. Everything, including this login, stays in your own volume.
 
@@ -133,7 +175,7 @@ Sign-up switches itself off once the admin account exists. To let other people j
 Your avatar > **Settings** is yours alone (theme, language). The **Admin** section inside it applies to the whole instance. [Understanding Settings](/getting-started/quick-start/settings) explains the split.
 :::
 
-## 4. Connect a model provider
+## Connect a model provider
 
 Open WebUI has no models of its own. Go to your avatar > **Settings > Admin > Connections**.
 
@@ -147,7 +189,7 @@ Guides: [Ollama](/getting-started/quick-start/connect-a-provider/starting-with-o
 Ollama on the host has to listen on `0.0.0.0` when Open WebUI runs in Docker: [Connection to Ollama Server](/troubleshooting/connection-error#connection-to-ollama-server). For API providers, check the URL and key; some do not publish a model list and need the model IDs entered under **Model IDs** on the connection: [OpenAI-compatible providers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible).
 :::
 
-## 5. Send your first message
+## Send your first message
 
 Click **New Chat**, pick a model in the selector inside the message box, type, press Enter. Drop a file into the chat to ask questions about it.
 
@@ -180,7 +222,3 @@ That is the whole install. Everything below is optional.
 - **Outbound calls:** a stock install makes these on its own. A version check to GitHub, off with `ENABLE_VERSION_UPDATE_CHECK=false`. A model-list request to the default OpenAI connection, gone once you delete that connection or set `ENABLE_OPENAI_API=false`. An update check for the local embedding model on Hugging Face at every start, off with `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false`.
 
 Want an autonomous agent with terminal, file and web access? [Connect an Agent](/getting-started/quick-start/connect-an-agent). Questions: [Discord](https://discord.gg/5rJgQTnV4s). Bugs: [GitHub Issues](https://github.com/open-webui/open-webui/issues).
-
-## More install methods
-
-Podman, Docker on Windows with WSL, the Docker Desktop extension, Pinokio and the uv, Conda and venv setups each have their own page in this section. Kubernetes, Docker Swarm and the managed cloud platforms are in [Deploying Open WebUI](/deployment/). The full image and tag reference, including GPU, bundled Ollama, pinned versions and uninstall, is [Docker images and tags](/getting-started/quick-start/install-methods/docker-images).
