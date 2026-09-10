@@ -566,6 +566,18 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 - Default: Empty string (no CSP injected)
 - Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, and citation modals. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset to keep the existing behavior (sandbox-only).
 
+#### `MAP_TILE_SERVER_URL`
+
+- Type: `str`
+- Default: `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`
+- Description: Sets the tile server used by Leaflet, which is rendered for `map` type prompt input variables and tool/function valves. See [Leaflet docs](https://leafletjs.com/reference.html#tilelayer). Can be used to render map tiles from a provider other than OpenStreetMap
+
+#### `MAP_TILE_SERVER_ATTRIBUTION`
+
+- Type: `str`
+- Default: `&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors`
+- Description: Passed to the `attribution` option in the Leaflet map used for `map` type prompt input variables. Accepts HTML. Set this whenever [`MAP_TILE_SERVER_URL`](#map_tile_server_url) points somewhere other than OpenStreetMap as per the attribution requirements of the chosen map tile server provider. See [Leaflet docs](https://leafletjs.com/reference.html#layer-attribution)
+
 #### `THREAD_POOL_SIZE`
 
 - Type: `int`
