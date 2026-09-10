@@ -22,7 +22,7 @@ The tags are the same as on the Docker tab: change the `image:` line. To try `:d
 
 
 
-The base `docker-compose.yml` is on the [Quick Start](/getting-started/quick-start?setup-method=docker-compose); the sections below extend it.
+The sections below extend the `docker-compose.yml` above.
 
 :::warning
 
