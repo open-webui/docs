@@ -54,7 +54,7 @@ From any hook (and from module top level):
 - The reserved dunder args documented in [Reserved Arguments](./reserved-args.mdx): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
 - Events documented in [Events](./events.mdx): emit anything to the frontend, or solicit a response from the user with `event_call`.
 - Any pip package via `requirements:` frontmatter, installed at load time (gated by [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)).
-- The Python stdlib, plus everything pip-installed in the container.
+- The Python stdlib, plus everything pip-installed in the container. Only what you declare under `requirements:` is yours to rely on. Packages Open WebUI happens to install come and go between releases: `langchain-community` was removed on `dev` (shipping in an upcoming release), so a plugin importing `langchain_community` without declaring it fails to load from that release on.
 
 There is no sandbox, no allowlist, no capability system. The execution model is **"this is Python, you are inside the server process"**.
 
