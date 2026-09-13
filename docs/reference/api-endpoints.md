@@ -45,6 +45,7 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 
 | Endpoint | Description |
 | :--- | :--- |
+| `GET /api/v1/models/all` | **(Admin)** Every saved model record in one unpaginated list, including models no connection is currently offering. Backs the admin models page. |
 | `GET /api/v1/models/export` | Export **all** custom models as a JSON array. |
 | `POST /api/v1/models/import` | Bulk **upsert**: create new models and update existing ones (matched by `id`). Additive, never deletes. |
 | `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
