@@ -506,6 +506,10 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
 
+# Grow streamed responses in place instead of re-copying them per chunk.
+# Pays off with long answers under concurrency; also lowers peak memory
+ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND=True
+
 # Faster name lookups: removes the queueing delay in front of every outbound
 # request. Verify your names still resolve after enabling it; see Step 3
 AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
