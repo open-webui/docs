@@ -98,6 +98,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
+  | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved on the selected terminal. Offered only when an Open Terminal is selected and the chat already has content, and anything you type after it steers what the skill covers. |
   | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
   `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` and `/settings` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.

@@ -127,6 +127,44 @@ description: Step-by-step instructions for thorough code reviews
 1. Check for correctness...
 ```
 
+### From a chat with `/skills:create`
+
+A workflow you just worked through in a chat can be turned into a skill without writing it out yourself. Type `/skills:create` in that chat, optionally followed by what the skill should cover, and the model gathers the material, authors one `SKILL.md` to the standard below and saves it on the selected terminal at `<terminal-home>/.agents/skills/<skill-name>/SKILL.md`, with any supporting files under `scripts/`, `references/`, `templates/` or `assets/`. It reports the name, the location and a one-line summary when it is done.
+
+Anything you write after the command is treated as authoring guidance, all of it. Sources to pull from (paths, URLs, "what we just did", pasted notes) and requirements that shape the result (focus, exclusions, naming, style) can be mixed freely in one request.
+
+The command needs a **selected Open Terminal** and a chat that **already has content**, since the chat is the raw material. Both are checked on the server, so a skill is never written when one is missing, and the `/` menu leaves the command out until both hold.
+
+---
+
+## Skill Authoring Standard
+
+This is the standard Open WebUI itself follows when it writes a skill through `/skills:create`, and the one to hold your own skills to.
+
+**Frontmatter**
+
+| Key | Rule |
+| :--- | :--- |
+| `name` | Lowercase and hyphenated, no spaces, 64 characters at most. |
+| `description` | One sentence, **60 characters at most**, ending in a period. Name the capability, skip the implementation, do not repeat the skill name, and leave out words like powerful, comprehensive, seamless, advanced or robust. Count the characters before saving. |
+| `version` | Starts at `0.1.0`. |
+| `platforms` | `[macos]`, `[linux]` or `[windows]`, and only when the skill uses something OS-bound. Omit it for portable skills. |
+
+**Body sections, in this order**
+
+1. `# <Human Title>` and a short intro: what it does, what it does not do, what it assumes is installed.
+2. `## When to Use`, with concrete trigger phrases.
+3. `## Prerequisites`: exact environment variables, credentials and install steps, or `None`.
+4. `## How to Run`: the canonical workflow, framed through the tools the model actually has.
+5. `## Quick Reference`: flat list of commands, routes, files or APIs.
+6. `## Procedure`: numbered steps, copy-paste exact.
+7. `## Pitfalls`: known limits and failure modes.
+8. `## Verification`: one focused check that proves the skill works.
+
+**Framing the tools.** Name tools in backticks, `run_command`, `write_file` and `view_skill` among them, and describe shell work as run through `run_command`. Prefer the read and search tools over raw shell utilities where one exists. Third-party CLIs are fine inside a procedure as long as it is clear the agent invokes them through `run_command`.
+
+**Quality bar.** Use commands, routes, paths, function names, config keys and error text exactly as they appear in the source; invented flags or APIs are the main way a skill goes wrong. Keep `SKILL.md` scannable, roughly 100 lines for a simple workflow and 200 for a complex one, and put the bulk elsewhere: larger scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/`, binary or visual assets in `assets/`. A skill that only points at other skills is worth nothing; write the one that does the work.
+
 ---
 
 ## Binding Skills to a Model
