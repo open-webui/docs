@@ -16,7 +16,7 @@ The following table lists the available URL parameters, their function, and exam
 | `youtube`             | Specifies a YouTube video ID to be transcribed within the chat. | `/?youtube=VIDEO_ID`             |
 | `load-url`            | Specifies a Website URL to be fetched and uploaded as a document within the chat. | `/?load-url=https://google.com`  |
 | `web-search`          | Enables web search functionality if set to `true`. | `/?web-search=true`              |
-| `tools` or `tool-ids` | Specifies a comma-separated list of tool IDs to activate in the chat. | `/?tools=tool1,tool2`            |
+| `tools` or `tool-ids` | Specifies a comma-separated list of tool IDs to activate in the chat. Tool server connections use a prefixed ID. | `/?tools=tool1,tool2`            |
 | `call`                | Enables a call overlay if set to `true`. | `/?call=true`                    |
 | `q`                   | Sets an initial query or prompt for the chat. | `/?q=Hello%20there`              |
 | `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions. | `/?temporary-chat=true`          |
@@ -59,6 +59,7 @@ The following table lists the available URL parameters, their function, and exam
 - **How to Set**: Provide a comma-separated list of tool IDs as the parameter’s value.
 - **Example**: `/?tools=tool1,tool2` or `/?tool-ids=tool1,tool2`
 - **Behavior**: Each tool ID is matched and activated within the session for user interaction.
+- **Note**: The value must be the ID Open WebUI uses internally, which is not always the name you see in the Integrations menu. A workspace tool uses its plain ID, for example `/?tools=my_workspace_tool`. A tool server connection carries a prefix in front of the ID set on the connection. Use `server:mcp:<server-id>` for an MCP connection and `server:<server-id>` for an OpenAPI connection, for example `/?tool-ids=server:mcp:my_mcp_server`. An OpenAPI connection with no ID set uses its position in the connections list, starting at `0`. An ID that matches nothing is not activated. The tools list endpoint returns the exact IDs, see [Using Open WebUI tools, including MCP, from the API](/reference/api-endpoints#using-open-webui-tools-including-mcp-from-the-api).
 
 ### 6. **Call Overlay**
 
@@ -81,7 +82,8 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?temporary-chat=true`
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
   - **Note**: Document processing in temporary chats is frontend-only for privacy. Complex files requiring backend parsing (e.g., DOCX) may not be fully supported.
-  - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management) and [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts), are unavailable there. Chats in [channels](/features/channels) are treated the same way.
+  - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so no chat record is created and nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts) and the [ask user tool](/features/extensibility/plugin/tools), are unavailable there. Chats in [channels](/features/channels) are treated the same way.
+  - **Note**: The list of unavailable features above is complete. Any feature or tool not listed there works in a temporary chat exactly as it does in a normal one. That includes tools that store or send data of their own, memory, notes and web search for example. Disable a tool on the model if you do not want a temporary chat to use it.
 
 ### 9. **Code Interpreter**
 

@@ -30,14 +30,14 @@ There's a few steps we'll follow to get everything set up:
 
 Follow the guide to set up Docker's apt repository [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
-I've included `docker-compose` as it's needed to run `docker compose`.
+`docker-compose-plugin` is the package that provides the `docker compose` command.
 
 ### Installing Docker
 
 Here's the command I've used to install Docker on Ubuntu:
 
 ```bash
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 ```
 
 ## OpenWebUI

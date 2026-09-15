@@ -15,14 +15,15 @@ This guide walks you through the key concepts and configurations at a high level
 
 ## Understanding the Defaults
 
-Out of the box, Open WebUI runs as a **single container** with:
+Open WebUI defaults to a **self-contained, single-instance deployment**. The standard Docker setup includes:
 
-- An **embedded SQLite database** stored on a local volume
-- An **embedded ChromaDB vector database** (also backed by SQLite) for RAG embeddings
-- A **single Uvicorn worker** process
-- **No external dependencies** (no Redis, no external DB)
+- **Embedded SQLite** for application data on a persistent volume
+- **Embedded ChromaDB** (also backed by SQLite) for RAG embeddings
+- **A single Uvicorn worker**, with no external database or Redis required
 
-This is perfect for personal use, small teams, or evaluation. The scaling journey begins when you outgrow any of these defaults. Crucially, **both SQLite databases** (main and vector) must be replaced before you can safely run multiple processes.
+This approach was chosen to **minimize time to deployment and operational overhead**: you can start using Open WebUI without first provisioning separate database or coordination services. Keeping these dependencies local also simplifies **air-gapped deployment** when models and required assets are provisioned within the isolated environment.
+
+**Horizontal scaling requires shared persistence and coordination**, so every replica operates on the same data. Before adding replicas or workers, replace the embedded database configuration with PostgreSQL and a client-server vector database, configure shared file storage, and add Redis for coordination. This separates state from individual instances, allowing the **stateless application tier** to scale independently behind a load balancer.
 
 ---
 
@@ -365,6 +366,8 @@ CONTENT_EXTRACTION_ENGINE=tika
 TIKA_SERVER_URL=http://tika:9998
 ```
 
+If Tika or Docling don't cover your document types, or you need to route different file types to different backends, run your own service instead and set `CONTENT_EXTRACTION_ENGINE=external`. See [External Document Extraction](/features/chat-conversations/rag/document-extraction/external) for the HTTP contract.
+
 2. **Switch the embedding engine** to an external provider:
 
 ```
@@ -528,6 +531,8 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 
 ## Quick Reference: When Do I Need What?
 
+<div className="responsive-table">
+
 | Scenario | PostgreSQL | Redis | External Vector DB | Ext. Content Extraction | Ext. Embeddings | Shared Storage |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Single user / evaluation | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
@@ -535,6 +540,8 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 | Multiple Uvicorn workers | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | ✗ (same filesystem) |
 | Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
 | Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
+
+</div>
 
 †Without Redis, signing out and password changes do **not** revoke tokens: they remain valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). For production deployments handling sensitive data, Redis is recommended for proper token revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
 

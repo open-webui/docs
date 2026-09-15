@@ -20,7 +20,9 @@ Upload messy data, and the AI cleans it, analyzes it, builds charts, and produce
 5. Assembles everything into a formatted PDF with title page, summary, charts, and data tables
 6. Saves the PDF to the file browser for download
 
-{/* TODO: Screenshot: File browser showing three outputs: survey_cleaned.csv, charts/ folder with .png files, and survey_report.pdf. The PDF is previewed showing a professional title page. */}
+![The cleaned data and generated charts in the file browser](/images/open-terminal-data-report-outputs.png)
+
+![A generated chart previewed in the file browser](/images/open-terminal-data-report-chart.png)
 
 {/* TODO: Screenshot: A page inside the generated PDF showing a bar chart, key findings, and a summary table. */}
 

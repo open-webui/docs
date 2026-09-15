@@ -55,6 +55,25 @@ It is tempting to assume that moving retrieval into tools makes citations harmle
 The practical effect: the cached prefix is invalidated on every single tool round, which is exactly the thing an agentic setup does most. Turning File Context off but leaving Citations on gives you most of the cost of the old setup with none of the benefit.
 :::
 
+### Why the injection goes into the latest user message
+
+The placement is deliberate, and worth understanding before treating it as a defect to be fixed.
+
+Automatic retrieval was built on the premise that the model mainly attends to the message it is answering. Very small local models and older models behave that way in practice: context placed earlier in the conversation gets ignored, or falls out of a context window too short to hold the whole history. Putting the retrieved context anywhere other than the message being answered means those models do not reliably see it, which is the difference between retrieval working and retrieval silently doing nothing.
+
+Breaking the cached prefix is the price of that guarantee, and it is a price worth paying when the alternative is a model that cannot use the context at all. It stops being worth paying the moment your model is large enough and long enough in context to attend to material further up the conversation, which is every frontier model and most current local ones.
+
+So the two capabilities are a choice between two designs rather than a feature and a bug:
+
+| | Context injection on | Context injection off |
+| :--- | :--- | :--- |
+| **Retrieval** | Forced, before the model runs | On demand, the model calls a tool |
+| **Placement** | Rewritten into the latest message every turn | Appended at the end as tool results |
+| **Prefix cache** | Invalidated each turn | Preserved |
+| **Suits** | Small and short-context models | Everything else |
+
+Turning File Context and Citations off is not a workaround for the cost described above. It selects the other design, the one this page is about.
+
 ## The cache-optimal setup
 
 The goal is a **static prefix** (system prompt + tools) with **append-only** growth (user turns and tool results), using **on-demand retrieval** instead of automatic injection.
@@ -92,12 +111,20 @@ The per-file/per-knowledge **Full Context** ("Using Entire Document") mode injec
 
 This matters more than it used to, not less. With **Citations** disabled, Open WebUI stops re-applying the RAG template and source list into the system and last user message after each tool round, so the prefix survives an agentic conversation intact. What you give up is the source pills rendered under the reply in the UI; the model still receives the tool results themselves, which is where the content was all along.
 
-Keep citations in the answer text anyway by adding **static citation instructions to your system prompt**, for example:
+Keep citations in the answer text anyway by adding **static citation instructions to your system prompt**. Write them against what the tools actually return, which is a filename or a URL rather than a number:
 
-- Cite retrieved passages using the source id returned in the tool result (e.g. `[1]`, `[2]`).
-- Cite web pages as markdown links, e.g. `[example.com](https://example.com/...)`.
+- Cite passages from files and knowledge as the `source` filename the tool result carries, for example `(handbook.pdf)`.
+- Cite web pages as markdown links built from the `link` field, for example `[example.com](https://example.com/...)`.
 
 Because the instruction lives in the (cached) system prompt, you get citations **without** a per-turn injection.
+
+:::warning Do not ask for numbered citations here
+Numbered `[1]`, `[2]` citations work only while **Citations** is on, because the numbers come from the injected `<source>` block and not from the tools. No builtin tool returns one: the file and knowledge tools return `content`, a `source` filename and a `file_id`, and `search_web` returns `title`, `link` and `snippet`. A system prompt asking for `[1]` style citations with Citations off gives the model nothing to number, and it will invent the numbers.
+:::
+
+:::info `search_web` returns search results, not page text
+`search_web` gives the model a title, a link and a snippet per hit, which is what the search engine returned. It does not fetch those pages. When the model needs what a page actually says, it calls `fetch_url` on the link. Citing a page it only saw a snippet of is citing the search engine, so tell it to fetch before it cites anything specific.
+:::
 
 ### 4. Keep retrieval agentic
 

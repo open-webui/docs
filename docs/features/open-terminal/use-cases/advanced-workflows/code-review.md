@@ -19,9 +19,9 @@ Point the AI at a pull request, a branch diff, or a file, and get a detailed cod
 5. Suggests specific fixes with code snippets
 6. Saves a structured review report
 
-{/* TODO: Screenshot: Chat showing the AI reviewing a branch diff. The response lists findings organized by severity: "🔴 Critical: SQL injection in user_query(), use parameterized queries. 🟡 Warning: N+1 query in get_orders(). 🔵 Suggestion: Extract validation logic into a helper." */}
+![The AI reporting review findings grouped by severity](/images/open-terminal-code-review-findings.png)
 
-{/* TODO: Screenshot: The generated review report in the file browser: a markdown file with sections for each file reviewed, findings with line numbers, and suggested fixes with code blocks. */}
+![The generated review report open in the file viewer](/images/open-terminal-code-review-report.png)
 
 ## Skill content
 

@@ -1076,7 +1076,7 @@ Take the application offline during migration:
 
 ```bash title="Maintenance Workflow"
 # 1. Stop all application instances
-docker-compose down
+docker compose down
 
 # 2. Run migrations
 docker run --rm -v open-webui:/app/backend/data \
@@ -1084,7 +1084,7 @@ docker run --rm -v open-webui:/app/backend/data \
   bash -c "cd /app/backend/open_webui && alembic upgrade head"
 
 # 3. Start all instances with new code
-docker-compose up -d
+docker compose up -d
 ```
 
 Simplest approach but requires downtime.

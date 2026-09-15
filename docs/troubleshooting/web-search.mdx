@@ -74,7 +74,7 @@ If web search returns empty content or poor quality results, the issue is often 
 
 - **Set a real User-Agent**: If results from Wikipedia, Cloudflare-protected sites, or other large publishers come back empty (or as 403s in logs), the default Python `requests`/`aiohttp` UA is being filtered by bot detection. Set [`USER_AGENT`](/reference/env-configuration#user_agent) to a real browser-like string (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`). This affects both web search result fetching and the `fetch_url` tool.
 
-For more details on context window issues, see the [RAG Troubleshooting Guide](./rag).
+For more details on context window issues, see the [RAG Troubleshooting Guide](./rag.mdx).
 
 ---
 

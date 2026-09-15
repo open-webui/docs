@@ -41,7 +41,7 @@ services:
 Run the container:
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 3. **Configure DNS and Domain:**

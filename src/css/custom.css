@@ -620,7 +620,8 @@ article p a {
 	letter-spacing: 0.04em;
 	line-height: 1.35;
 	text-transform: uppercase;
-	white-space: nowrap;
+	white-space: normal;
+	overflow-wrap: anywhere;
 }
 
 [data-theme="light"] .markdown th {

@@ -5,7 +5,7 @@ title: "Quick Start"
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
- 
+
 
 import DockerCompose from './tab-docker/DockerCompose.md';
 import Extension from './tab-docker/DockerDesktopExtension.md';
@@ -159,56 +159,66 @@ For production deployments, install via **Docker** or **Python**.
 
 ---
 
-## After You Install
+## Open it
 
-:::tip First Login
+Docker: [http://localhost:3000](http://localhost:3000). Python and the desktop app: [http://localhost:8080](http://localhost:8080). The first start takes a minute.
 
-- **Admin account:** The first account created gets **Administrator privileges** and controls user management and system settings.
-- **New sign-ups:** Subsequent registrations start with **Pending** status and require Administrator approval.
-- **Privacy:** All data, including login details, is stored locally on your device by default. Open WebUI does not make external requests by default. All models are private by default and must be explicitly shared.
+Nothing loads? Run `docker logs -f open-webui` (`docker compose logs -f` with Compose) and wait for `Application startup complete`. If it never appears, see [Startup & Docker Failures](/troubleshooting/startup). Port already taken: change the left number in `-p 3000:8080`, or run `open-webui serve --port 9999` with Python.
 
+## Create the admin account
+
+The first screen says **Get started with Open WebUI** and offers **Create Admin Account**. That first account is the administrator: it manages users and every instance-wide setting. Everything, including this login, stays in your own volume.
+
+Sign-up switches itself off once the admin account exists. To let other people join, turn on **New Sign Ups** under your avatar > **Settings > Admin > Authentication**; new accounts then wait as **Pending** until you approve them in the Admin Panel. Note the admin password: losing it locks you out of instance settings, see [Reset Admin Password](/troubleshooting/password-reset).
+
+:::note Two settings areas
+Your avatar > **Settings** is yours alone (theme, language). The **Admin** section inside it applies to the whole instance. [Understanding Settings](/getting-started/quick-start/settings) explains the split.
 :::
 
-### Connect a Model Provider
+## Connect a model provider
 
-Open WebUI needs at least one model provider to start chatting. Choose yours:
+Open WebUI has no models of its own. Go to your avatar > **Settings > Admin > Connections**.
 
-| Provider | Guide |
-|----------|-------|
-| **Ollama** (local models) | [Starting with Ollama →](/getting-started/quick-start/connect-a-provider/starting-with-ollama) |
-| **OpenAI** | [Starting with OpenAI →](/getting-started/quick-start/connect-a-provider/starting-with-openai) |
-| **Any OpenAI-compatible API** | [OpenAI-Compatible Providers →](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) |
-| **Anthropic** | [Starting with Anthropic →](/getting-started/quick-start/connect-a-provider/starting-with-anthropic) |
-| **llama.cpp** | [Starting with llama.cpp →](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) |
-| **vLLM** | [Starting with vLLM →](/getting-started/quick-start/connect-a-provider/starting-with-vllm) |
+**Ollama on this machine?** It is picked up automatically at `http://host.docker.internal:11434` from Docker (that is what `--add-host` in step 1 is for) or `http://localhost:11434` from Python, and shows under **Manage Ollama API Connections**. As the admin, download a model by typing its name into the model selector of a new chat and confirming the pull. Ollama on another machine: `-e OLLAMA_BASE_URL=http://server:11434`, or set the URL on the connection.
 
-### Connect an Agent
+**An API key from OpenAI, Anthropic or any OpenAI-compatible provider?** Click the **+** next to **Manage OpenAI API Connections**, enter the provider URL (OpenAI: `https://api.openai.com/v1`) and your key, then **Save**. Models are listed automatically.
 
-Want more than a model? AI agents can execute terminal commands, read and write files, search the web, maintain memory, and chain complex workflows, all through Open WebUI's familiar chat interface.
+Guides: [Ollama](/getting-started/quick-start/connect-a-provider/starting-with-ollama) · [OpenAI](/getting-started/quick-start/connect-a-provider/starting-with-openai) · [Anthropic](/getting-started/quick-start/connect-a-provider/starting-with-anthropic) · [OpenAI-compatible APIs and local servers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) · [all providers](/getting-started/quick-start/connect-a-provider)
 
-| Agent | Description | Guide |
-|-------|-------------|-------|
-| **Hermes Agent** | Autonomous agent by Nous Research with terminal, file ops, web search, memory, and extensible skills | [Set up Hermes Agent →](/getting-started/quick-start/connect-an-agent/hermes-agent) |
-| **OpenClaw** | Open-source self-hosted agent with shell access, file operations, web browsing, and messaging integrations | [Set up OpenClaw →](/getting-started/quick-start/connect-an-agent/openclaw) |
+:::tip Model list empty?
+Ollama on the host has to listen on `0.0.0.0` when Open WebUI runs in Docker: [Connection to Ollama Server](/troubleshooting/connection-error#connection-to-ollama-server). For API providers, check the URL and key; some do not publish a model list and need the model IDs entered under **Model IDs** on the connection: [OpenAI-compatible providers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible).
+:::
 
-Learn more about how agents differ from providers in the [**Connect an Agent overview →**](/getting-started/quick-start/connect-an-agent)
+## Send your first message
 
-### New to Open WebUI?
+Click **New Chat**, pick a model in the selector inside the message box, type, press Enter. Drop a file into the chat to ask questions about it.
 
-If this is your first time with Open WebUI, read the [**Essentials for Open WebUI**](/getting-started/essentials) guide next. It covers the six things every new user needs to know: plugins, tool calling, task models, context management, RAG, and Open Terminal.
+![A new chat with the model selector and prompt suggestions](/images/features/chat/new-chat-placeholder.png)
 
-### Explore Features
+No models in the selector: back to step 4. The reply stays empty or the chat hangs behind a reverse proxy: [WebSocket troubleshooting](/troubleshooting/connection-error#websocket-troubleshooting).
 
-Once connected, explore what Open WebUI can do: [Features Overview →](/features)
+That is the whole install. Everything below is optional.
 
-### Experimental: Open Responses
+## Where to go next
 
-Open WebUI has experimental support for the [Open Responses](https://www.openresponses.org/) specification. See the [Starting with Open Responses Guide](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) to learn more.
+[**Essentials for Open WebUI**](/getting-started/essentials) continues from here. It covers what most people set up in their first week:
 
----
+| | |
+|---|---|
+| [Plugins](/getting-started/essentials#plugins) | Tools and Functions from the community catalog; the feature you are missing usually exists as one. |
+| [Tool calling](/getting-started/essentials#tool-calling-native-vs-legacy) | Native mode lets the model decide when to search, read files or save memory. |
+| [Task models](/getting-started/essentials#task-models) | Titles, tags and autocomplete run on a model of their own; point them at a small one. |
+| [Context management](/getting-started/essentials#context-management) | Why long chats hit a wall and how Context Compaction handles it. |
+| [Basic RAG](/getting-started/essentials#basic-rag) | Chat with your own documents, in a chat or as a knowledge base. |
+| [Web search](/getting-started/essentials#web-search) | Pick a search provider and the model searches when a question needs it. |
+| [Open Terminal](/getting-started/essentials#open-terminal) | A sandboxed shell the model can build and run things in. |
 
-## Community
+**Keep it running**
 
-- [**Discord**](https://discord.gg/5rJgQTnV4s) for questions, discussion, and support
-- [**GitHub Issues**](https://github.com/open-webui/open-webui/issues) for bug reports and feature requests
-- **Want to help?** Test the [development branch](/contributing) and report issues. No code required.
+- **Update:** pull the new image and recreate the container with the step 1 command, same `WEBUI_SECRET_KEY`; your data is in the volume. [Updating](/getting-started/updating)
+- **Back up** the volume before every update: [Backup & Restore](/getting-started/updating#backup--restore)
+- **Share it** with others on your network or team: [Sharing Open WebUI](/getting-started/sharing). Read the [hardening guide](/getting-started/advanced-topics/hardening) before exposing it beyond your machine.
+- **Install it as an app** on your phone or desktop: [Open WebUI as an App](/getting-started/open-webui-as-app)
+- **Outbound calls:** a stock install makes these on its own. A version check to GitHub, off with `ENABLE_VERSION_UPDATE_CHECK=false`. A model-list request to the default OpenAI connection, gone once you delete that connection or set `ENABLE_OPENAI_API=false`. An update check for the local embedding model on Hugging Face at every start, off with `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false`.
+
+Want an autonomous agent with terminal, file and web access? [Connect an Agent](/getting-started/quick-start/connect-an-agent). Questions: [Discord](https://discord.gg/5rJgQTnV4s). Bugs: [GitHub Issues](https://github.com/open-webui/open-webui/issues).

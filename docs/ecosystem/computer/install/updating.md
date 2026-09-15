@@ -16,7 +16,7 @@ pip install --upgrade cptr
 uvx cptr@latest run
 ```
 
-For Docker, pull the new image and recreate the container with the same `/data` volume; see [Docker](./docker#upgrading).
+For Docker, pull the new image and recreate the container with the same `/data` volume; see [Docker](./docker.md#upgrading).
 
 ## Migrations are automatic
 

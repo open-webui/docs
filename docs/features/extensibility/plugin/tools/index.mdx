@@ -292,7 +292,7 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, optional `line_numbers`). |
 | `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
-| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases.* |
+| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **File Context** off for this is also the setup that keeps the prompt prefix cacheable, so turn **Citations** off alongside it and put your citation rules in the system prompt instead; see [prompt caching](/features/chat-conversations/prompt-caching).* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
 | `query_chat_files` | Semantic / RAG search across the attached files, or one file when given its ID. Results are returned as cited chunks. |
 | `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. Capped at 50 matches by default, the same [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches) limit the knowledge greps use. |
@@ -324,7 +324,7 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
 | `view_channel_message` | View a specific message or its details in a channel. |
 | `view_channel_thread` | View a full message thread/replies in a channel. |
-| **Task Management** | *Requires per-model "Task Management" category enabled (default: on).* |
+| **Task Management** | *Requires per-model "Task Management" category enabled (default: on) AND a saved chat, since the checklist is stored on the chat. Not available in a [temporary chat](/features/chat-conversations/chat-features/url-params).* |
 | `create_tasks` | Create a structured task checklist for the current chat. Called once at the start of multi-step work to define all steps. |
 | `update_task` | Update the status of a single task by id (`pending`, `in_progress`, `completed`, `cancelled`). Called after finishing each step. |
 | **Automations** | *Requires per-model "Automations" category enabled (default: on) AND `ENABLE_AUTOMATIONS` enabled AND user has `features.automations` permission (admins always pass).* |
@@ -343,7 +343,7 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
-| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message.* |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message. Not available in a [temporary chat](/features/chat-conversations/chat-features/url-params).* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |

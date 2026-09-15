@@ -71,6 +71,7 @@ docker pull ghcr.io/open-webui/open-webui:main
 
 # 3. Recreate the container
 docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
   -v open-webui:/app/backend/data \
   -e WEBUI_SECRET_KEY="your-secret-key" \
   --name open-webui --restart always \
@@ -97,6 +98,8 @@ services:
       - "3000:8080"
     volumes:
       - open-webui:/app/backend/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
     environment:
       - WEBUI_SECRET_KEY=your-secret-key
     restart: unless-stopped
@@ -150,6 +153,7 @@ If an update causes problems, you can go back to a previous version by pinning i
 docker rm -f open-webui
 docker pull ghcr.io/open-webui/open-webui:v0.8.3
 docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
+  --add-host=host.docker.internal:host-gateway \
   -e WEBUI_SECRET_KEY="your-secret-key" \
   --name open-webui --restart always \
   ghcr.io/open-webui/open-webui:v0.8.3

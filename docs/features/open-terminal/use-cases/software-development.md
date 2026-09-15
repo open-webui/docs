@@ -155,6 +155,6 @@ The AI can install additional tools on the fly: Rust, Go, Java, Docker CLI, data
 
 ## Related
 
-- **[Code execution →](./code-execution)**: quick scripts and one-off tasks
-- **[Web development →](./web-development)**: build and preview websites
-- **[Advanced workflows →](./advanced-workflows)**: skills for code review, database analysis, and more
+- **[Code execution →](./code-execution.md)**: quick scripts and one-off tasks
+- **[Web development →](./web-development.md)**: build and preview websites
+- **[Advanced workflows →](./advanced-workflows/)**: skills for code review, database analysis, and more

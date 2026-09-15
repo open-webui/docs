@@ -131,6 +131,8 @@ Some OTLP backends require custom headers that are better handled in an OpenTele
 requires `space_id` and `api_key` headers on its OTLP exporter. Point Open WebUI at the collector, then configure the
 collector to add the backend-specific headers:
 
+This exports Open WebUI’s built-in backend telemetry, including HTTP, database, Redis, and service spans. Capturing full prompts, responses, token usage, and tool calls requires separate instrumentation on the model-provider or Pipeline path.
+
 ```yaml
 receivers:
   otlp:

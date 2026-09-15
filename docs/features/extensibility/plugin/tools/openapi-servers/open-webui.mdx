@@ -9,6 +9,10 @@ Open WebUI v0.6+ supports seamless integration with external tools via the OpenA
 
 In this guide, you'll learn how to launch an OpenAPI-compatible tool server and connect it to Open WebUI through the intuitive user interface. Let's get started! 🚀
 
+:::tip Choose a model that can use tools reliably
+External tools depend on the model to select a tool, generate valid arguments, and interpret its response. Supporting tool calling does not guarantee doing it well. If a connected and enabled tool is ignored or used incorrectly, **try a stronger model with reliable native tool calling** before assuming the problem is in Open WebUI. This applies to OpenAPI tools, native MCP connections, and MCP tools exposed through `mcpo`.
+:::
+
 ---
 
 ## Step 1: Launch an OpenAPI Tool Server
@@ -200,6 +204,16 @@ You can run any of these in the same way and connect them to Open WebUI by repea
 ---
 
 ## Troubleshooting & Tips 🧩
+
+### Tools are enabled but the model does not use them correctly
+
+If the model answers without calling a needed tool, invents a tool result, supplies invalid arguments, or stops partway through a task, model capability may be the cause. Open WebUI makes the tools available and executes their calls; the model decides how to use them.
+
+1. Confirm that the tool is enabled in the current chat and that the selected model supports native tool calling.
+2. Start a fresh chat with only the tool needed for a simple request, such as asking a time tool for the current time.
+3. Repeat the same request with a more capable model, keeping the tool and server configuration the same. If that model succeeds, the original model or its serving configuration is a likely cause. Multi-step workflows may require a stronger model even when simple calls work.
+
+Connection failures, authentication errors, and tool-server errors still need their own troubleshooting; switching models will not repair those. See [Model Requirements & Caveats](/features/extensibility/plugin/tools#model-requirements--caveats) for more on model selection.
 
 ### Connection fails immediately after adding the URL
 

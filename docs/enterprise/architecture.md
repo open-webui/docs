@@ -7,19 +7,21 @@ title: "Architecture & High Availability"
 
 When AI becomes central to your organization's operations, downtime isn't just inconvenient, it's costly. Open WebUI is architected from the ground up to support enterprise-scale deployments where reliability isn't optional.
 
-Whether you're supporting a pilot team of 15 or a global workforce of thousands of users, Open WebUI's architecture scales with you, without requiring a complete rebuild as your needs grow.
+Whether you're supporting a pilot team of 15 or a global workforce of thousands of users, Open WebUI's stateless architecture scales with you, without requiring a complete rebuild as your needs grow.
 
 ### Architecture Overview
 
 #### Stateless, Container-First Design
 
-Open WebUI follows a **stateless, container-first architecture**, meaning you are not limited to a single server. This design philosophy enables:
+Open WebUI follows a **stateless, container-first architecture**. In a scaled deployment, state lives in shared services rather than depending on a particular application replica. PostgreSQL holds application data, a shared vector database holds embeddings, shared storage holds files, and Redis coordinates instances. This enables:
 
 * **Horizontal Scaling:** Add more instances as demand grows, rather than upgrading to larger (and more expensive) hardware.
 * **Flexible Deployment:** Run on-premise, in private clouds, or hybrid environments without architectural changes.
 * **Container Orchestration Compatibility:** Full support for Kubernetes, Docker Swarm, and other orchestration platforms.
 
 For decision-makers, this means your initial investment in Open WebUI doesn't become technical debt. The same architecture that supports your proof-of-concept can scale to support your entire organization.
+
+The default single-instance setup uses local SQLite and ChromaDB storage. Before adding replicas, configure the shared services and matching secret keys described in the [scaling guide](/getting-started/advanced-topics/scaling).
 
 ### High Availability Configuration
 

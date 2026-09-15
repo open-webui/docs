@@ -35,7 +35,7 @@ Here is the target configuration we're going to set-up through this tutorial.
 
 # Step 1: Launch OUI and Jupyter
 
-To accomplish this, I used `docker-compose` to launch a stack that includes both services, along with my LLMs, but this should also work if run each docker container separately.
+To accomplish this, I used Docker Compose to launch a stack that includes both services, along with my LLMs, but this should also work if run each docker container separately.
 
 ```yaml title="docker-compose.yml"
 services:
@@ -63,10 +63,10 @@ open-webui:
 jupyter_data:
 ```
 
-You can launch the above stack by running the below command in the directory where the `docker-compose` file is saved:
+You can launch the above stack by running the below command in the directory where the `docker-compose.yml` file is saved:
 
-```bash title="Run docker-compose"
-docker-compose up -d
+```bash title="Run Docker Compose"
+docker compose up -d
 ```
 
 You should now be able to access both services at the following URLs:

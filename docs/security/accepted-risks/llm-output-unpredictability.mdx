@@ -7,13 +7,13 @@ title: "LLM Output Unpredictability"
 |  |  |
 | :--- | :--- |
 | **Class** | Inherent model behavior (prompt injection, jailbreaks, unsafe or hallucinated output), OWASP LLM Top 10 |
-| **Status** | Inherent to LLMs; not a remediable application defect; out of scope as a vulnerability on its own, unless proven as part of a chain with a legitimate Open WebUI vulnerability per the [Security Policy](../security-policy) |
+| **Status** | Inherent to LLMs; not a remediable application defect; out of scope as a vulnerability on its own, unless proven as part of a chain with a legitimate Open WebUI vulnerability per the [Security Policy](../security-policy.mdx) |
 
 ---
 
 ## Summary
 
-Open WebUI respects and appreciates the [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/); it is a valuable framework for reasoning about how AI systems fail. Many of the behaviours it catalogues, however, are not classical security vulnerabilities. They are risks inherent to large language models themselves, carried by any application built on one rather than introduced by a defect in a particular vendor's code. Where those models are given tools and autonomy, the same risks extend into agent behaviour; see [Agentic Application Risks](./agentic-application-risks).
+Open WebUI respects and appreciates the [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/); it is a valuable framework for reasoning about how AI systems fail. Many of the behaviours it catalogues, however, are not classical security vulnerabilities. They are risks inherent to large language models themselves, carried by any application built on one rather than introduced by a defect in a particular vendor's code. Where those models are given tools and autonomy, the same risks extend into agent behaviour; see [Agentic Application Risks](./agentic-application-risks.mdx).
 
 Large language models are non-deterministic and steerable by their input. A model can be convinced, through a crafted prompt, injected content in a fetched web page or uploaded document, or adversarial conversation, to produce unsafe, misleading, or attacker-desired output: a jailbreak, a prompt injection, a hallucinated fact, an unsafe recommendation, or an attempt to use an available tool in a way the user did not intend.
 
@@ -41,10 +41,10 @@ We therefore **do not accept reports as vulnerabilities when the whole impact is
 - a **bypass of an access-control, permission, or isolation check**; or
 - any flaw where the model is merely the **trigger** for an underlying application bug.
 
-Those are Open WebUI defects and are fixed as such. See the [Security Policy](../security-policy) for the full reporting scope.
+Those are Open WebUI defects and are fixed as such. See the [Security Policy](../security-policy.mdx) for the full reporting scope.
 
 ## References
 
 - [OWASP Top 10 for LLM Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/)
-- [Agentic Application Risks](./agentic-application-risks)
-- [Open WebUI Security Policy](../security-policy)
+- [Agentic Application Risks](./agentic-application-risks.mdx)
+- [Open WebUI Security Policy](../security-policy.mdx)

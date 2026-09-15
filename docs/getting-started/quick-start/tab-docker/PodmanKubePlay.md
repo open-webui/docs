@@ -17,6 +17,9 @@ spec:
   containers:
     - name: container
       image: ghcr.io/open-webui/open-webui:main
+      env:
+        - name: WEBUI_SECRET_KEY
+          value: your-secret-key
       ports:
         - name: http
           containerPort: 8080

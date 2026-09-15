@@ -23,7 +23,7 @@ The catch: the default `cptr run` binds to `127.0.0.1`, which the tailnet can't 
 
 ## Option B: Tailscale Serve (HTTPS, cptr stays on localhost)
 
-Tailscale Serve proxies HTTPS from your tailnet to a local port, so `cptr` keeps its default localhost binding and you get a proper `https://` URL (which the [PWA install](./phone-app) and browser features like clipboard access are happier with).
+Tailscale Serve proxies HTTPS from your tailnet to a local port, so `cptr` keeps its default localhost binding and you get a proper `https://` URL (which the [PWA install](./phone-app.md) and browser features like clipboard access are happier with).
 
 With `cptr run` already running:
 
@@ -52,5 +52,5 @@ Turn off Wi-Fi on your phone so it's on cellular, then open the URL again. If yo
 If it doesn't load: check `http://127.0.0.1:8000/api/health` on the computer, confirm both devices show up in the Tailscale admin console, and rerun `tailscale serve status`.
 
 :::warning Don't reach for Funnel
-`tailscale funnel` publishes the URL to the whole internet, not just your devices. Only do that if you understand you're going public. Then treat it like the [Cloudflare Tunnel / ngrok setups](./cloudflare-and-ngrok): put the provider's own authentication in front, don't rely on Computer's login alone.
+`tailscale funnel` publishes the URL to the whole internet, not just your devices. Only do that if you understand you're going public. Then treat it like the [Cloudflare Tunnel / ngrok setups](./cloudflare-and-ngrok.md): put the provider's own authentication in front, don't rely on Computer's login alone.
 :::

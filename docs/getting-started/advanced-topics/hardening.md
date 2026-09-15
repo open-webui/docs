@@ -535,7 +535,9 @@ For air-gapped environments:
 OFFLINE_MODE=true
 ```
 
-This disables HuggingFace Hub downloads, version update checks, and other outbound calls. Models and embeddings must be available locally.
+This disables HuggingFace Hub downloads, version update checks, and automatic updates of the embedding, reranking, and Whisper models. Models and embeddings must be available locally.
+
+Offline mode governs the connections Open WebUI makes on its own behalf. It does not block connections you configure, such as external model APIs, OAuth providers, web search, tool servers, or object storage. Isolating the instance at the network level is what closes those. See [`OFFLINE_MODE`](/reference/env-configuration#offline_mode) for the full list of what stays functional.
 
 ### SSRF prevention
 
@@ -830,7 +832,7 @@ For organizations where security is a priority, the following practices define t
 
 ### Outbound Network Controls
 
-11. **Keep SSRF protections, outbound TLS verification, and network restrictions enabled.** Do not enable local web fetch. The default configuration blocks access to private IP ranges and cloud provider metadata endpoints; extend the blocklist to include internal domains specific to your environment. Do not disable certificate verification for outbound connections. For air-gapped environments, enable offline mode to disable all outbound calls. [Details](#ssrf-prevention)
+11. **Keep SSRF protections, outbound TLS verification, and network restrictions enabled.** Do not enable local web fetch. The default configuration blocks access to private IP ranges and cloud provider metadata endpoints; extend the blocklist to include internal domains specific to your environment. Do not disable certificate verification for outbound connections. For air-gapped environments, enable offline mode so Open WebUI stops making its own outbound calls, and isolate the instance at the network level to close the connections it does not control. [Details](#ssrf-prevention)
 
 ### Supply Chain and Change Management
 

@@ -1,8 +1,8 @@
-### Installation with `uv`
+## Installation with `uv`
 
 The `uv` runtime manager ensures seamless Python environment management for applications like Open WebUI. Follow these steps to get started:
 
-#### 1. Install `uv`
+### 1. Install `uv`
 
 Pick the appropriate installation command for your operating system:
 
@@ -18,7 +18,7 @@ Pick the appropriate installation command for your operating system:
   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
   ```
 
-#### 2. Run Open WebUI
+### 2. Run Open WebUI
 
 Once `uv` is installed, running Open WebUI is a breeze. Use the command below, ensuring to set the `DATA_DIR` environment variable to avoid data loss. Example paths are provided for each platform:
 
@@ -40,7 +40,7 @@ Open WebUI is now running at [http://localhost:8080](http://localhost:8080).
 Setting `DATA_DIR` ensures your chats and settings are saved in a predictable location. If you don't set it, `uvx` might store it in a temporary folder that gets deleted when the process ends.
 :::
 
-## Uninstall
+### Uninstall
 
 To remove Open WebUI when running with `uvx`:
 
@@ -61,3 +61,5 @@ To remove Open WebUI when running with `uvx`:
     ```bash
     rm -rf ~/.open-webui
     ```
+
+---

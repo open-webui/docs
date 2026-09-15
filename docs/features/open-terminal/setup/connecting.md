@@ -5,7 +5,7 @@ title: "Connecting to Open WebUI"
 
 # Connecting Open Terminal to Open WebUI
 
-Open Terminal is [installed and running](./installation). This guide covers connecting it to Open WebUI.
+Open Terminal is [installed and running](./installation.mdx). This guide covers connecting it to Open WebUI.
 
 ---
 
@@ -52,18 +52,20 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 
 ### 5. Save
 
-Click **Save**. A green "Connected" indicator confirms the connection.
+Click **Save**. The connection appears under **Open Terminal** with its toggle switched on.
 
-![Connected status with green indicator](/images/open-terminal-connected.png)
+![The saved Open Terminal connection listed and enabled](/images/open-terminal-connected.png)
 
 ### 6. (Optional) Restrict access to specific groups
 
 Limit terminal access to specific user groups via the access control button.
 
-{/* TODO: Screenshot: The Access Grants dropdown showing available user groups with checkboxes. */}
+![The access control panel listing user groups with checkboxes](/images/open-terminal-access-grants.png)
 
 :::tip Orchestrator connections can be scoped further
 A connection Open WebUI has detected as a [Terminals orchestrator](/features/open-terminal/terminals/) gets an extra **Orchestrator > Terminal Contexts** section, where you decide whether the terminal is offered in chats and in automations, and whether everything shares one workspace or each saved chat or automation gets its own. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). A direct Open Terminal connection has no such setting and is always available in both.
+
+The same section carries a **Policy** block that takes environment variables for the terminals the orchestrator starts. That is where you set `OPEN_TERMINAL_SYSTEM_PROMPT` to replace the generated system prompt with your own, along with any other [environment variable](/features/open-terminal/terminals/orchestration/environment-variables) those terminals should run with. See [System Prompts](/features/open-terminal/terminals/orchestration/system-prompts) for the template placeholders.
 :::
 
 ### 7. Select a terminal in chat
@@ -126,7 +128,7 @@ If you need to test a connection without admin access, you can add one from the 
 
 `Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what a connection nobody has touched does, and what happens with no terminal selected at all.
 
-`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
+`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser.md) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
 
 A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
 
@@ -138,6 +140,8 @@ Four things change with it:
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
 
 The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
+
+![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)
 
 ---
 
@@ -154,7 +158,25 @@ This almost always means Open WebUI can't reach Open Terminal over the network. 
 | Both on same machine, no Docker | `http://localhost:8000` |
 | Open Terminal on another machine | `http://that-machines-ip:8000` |
 
-{/* TODO: Screenshot: A simple diagram showing Open WebUI and Open Terminal as two boxes, with an arrow between them labeled with the URL. Shows correct URLs for Docker Compose (service name) vs separate containers (host.docker.internal). */}
+```mermaid
+flowchart TB
+    subgraph Compose["One Docker Compose project"]
+        direction LR
+        W1["Open WebUI"] -->|"http://open-terminal:8000"| T1["Open Terminal"]
+    end
+    subgraph Separate["Separate containers on one host"]
+        direction LR
+        W2["Open WebUI"] -->|"http://host.docker.internal:8000"| T2["Open Terminal"]
+    end
+    subgraph Remote["Open Terminal elsewhere"]
+        direction LR
+        W3["Open WebUI"] -->|"http://that-machines-ip:8000"| T3["Open Terminal"]
+    end
+```
+
+Compose gives the containers a shared network and resolves the service name, so the service name is the address. Separate containers have no shared name to resolve, so the request goes back out through the host. A terminal on another machine is reached the way any other host is.
+
+`localhost` only works when neither side is containerised, because inside a container `localhost` is that container rather than the machine it runs on. That is the most common cause of the timeout this section is about.
 
 :::tip Quick check
 Run this command to see if Open WebUI can reach Open Terminal:
@@ -193,7 +215,7 @@ If you see "unauthorized" or "invalid key":
 
 ## Next steps
 
-- **[Code execution](../use-cases/code-execution)**
-- **[Document & data analysis](../use-cases/file-analysis)**
-- **[Software development](../use-cases/software-development)**
-- **[File browser](../file-browser)**
+- **[Code execution](../use-cases/code-execution.md)**
+- **[Document & data analysis](../use-cases/file-analysis.md)**
+- **[Software development](../use-cases/software-development.md)**
+- **[File browser](../file-browser.md)**

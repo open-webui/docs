@@ -80,6 +80,24 @@ What we do instead is answer every one of them in public, in detail, against the
 
 That is what follows. Every externally filed CVE against Open WebUI that we contest has a page below, setting out what the record claims, what the software actually does, which policy rules apply, and where the dispute currently stands.
 
+### We are not the only ones who read these records this way
+
+On 2026-09-02, a maintainer of the [GitHub Advisory Database](https://github.com/github/advisory-database/pull/8031#issuecomment-5512489251) stated that three advisories mirroring CVEs filed against Open WebUI had been left `unreviewed` on purpose, "due to concerns by teammates and I had about the validity of the vulnerabilities described in the CVE records". Because they are unreviewed, they raise no Dependabot alerts.
+
+The three are one from each of the three CNAs that have filed against us:
+
+| Advisory | CVE | Issuing CNA | Our assessment |
+| :--- | :--- | :--- | :--- |
+| [GHSA-vh96-p962-544h](https://github.com/advisories/GHSA-vh96-p962-544h) | CVE-2026-0767 | Zero Day Initiative | [Disposition](./cve-2026-0767.mdx) |
+| [GHSA-2rf6-9rc8-rqch](https://github.com/advisories/GHSA-2rf6-9rc8-rqch) | CVE-2025-15603 | VulDB | [Disposition](./cve-2025-15603.mdx) |
+| [GHSA-cfvq-fj53-j2c7](https://github.com/advisories/GHSA-cfvq-fj53-j2c7) | CVE-2024-7040 | huntr / Protect AI | [Disposition](./cve-2024-7040.mdx) |
+
+This was decided independently, by people with no stake in the outcome and no contact with us about it, before any of the three records were withdrawn. All three have since been withdrawn by the CNA that issued them.
+
+We record it because the objection this page most often meets is that a vendor disputing a CVE is simply a vendor that does not want a CVE. Here a third party who curates this data for a living, and who gains nothing either way, read the same records and reached the same conclusion we did.
+
+It is also the clearest illustration of the asymmetry described above. Three records were doubted enough to be held back from the alerting pipeline, and were still circulating as published CVEs, with a severity and an affected version range, for as long as it took each CNA to withdraw them.
+
 ---
 
 ## All Dispositions
@@ -88,9 +106,9 @@ That is what follows. Every externally filed CVE against Open WebUI that we cont
 
 | CVE | Title | Issuing CNA | Vendor Disposition | Resolution | CVE Published |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| [CVE-2026-0765](./cve-2026-0765.mdx) | PIP install_frontmatter_requirements Command Injection | Zero Day Initiative | Rejected | In progress | 2026-01-23 |
-| [CVE-2026-0766](./cve-2026-0766.mdx) | load_tool_module_by_id Code Injection | Zero Day Initiative | Rejected | In progress | 2026-01-23 |
-| [CVE-2026-0767](./cve-2026-0767.mdx) | Cleartext Transmission of Credentials | Zero Day Initiative | Rejected | In progress | 2026-01-23 |
+| [CVE-2026-0765](./cve-2026-0765.mdx) | PIP install_frontmatter_requirements Command Injection | Zero Day Initiative | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2026-01-23 |
+| [CVE-2026-0766](./cve-2026-0766.mdx) | load_tool_module_by_id Code Injection | Zero Day Initiative | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2026-01-23 |
+| [CVE-2026-0767](./cve-2026-0767.mdx) | Cleartext Transmission of Credentials | Zero Day Initiative | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2026-01-23 |
 | [CVE-2025-15603](./cve-2025-15603.mdx) | Insufficiently Random Values in start_windows.bat | VulDB | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2026-03-09 |
 | [CVE-2025-29446](./cve-2025-29446.mdx) | SSRF in verify_connection | MITRE | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-04-21 |
 | [CVE-2025-63391](./cve-2025-63391.mdx) | Authentication Bypass in /api/config | MITRE (CISA-ADP enrichment) | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-12-18 |

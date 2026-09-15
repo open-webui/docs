@@ -37,13 +37,13 @@ Both of these are live at the time of writing and can be checked directly.
 
 ### An executive summary beside the withdrawal notice
 
-On [BaseFortify](./vulnerability-databases/basefortify) the entry for a withdrawn record carries the CNA's rejection notice in the description, and an AI-generated Executive Summary in the right-hand column of the same screen explains how the vulnerability is exploited, including that it is remotely exploitable without authentication. Neither statement is hidden from the other. A reader sees the correct answer and the wrong one in one glance, and only the wrong one is written as an assessment.
+On [BaseFortify](./vulnerability-databases/basefortify.mdx) the entry for a withdrawn record carries the CNA's rejection notice in the description, and an AI-generated Executive Summary in the right-hand column of the same screen explains how the vulnerability is exploited, including that it is remotely exploitable without authentication. Neither statement is hidden from the other. A reader sees the correct answer and the wrong one in one glance, and only the wrong one is written as an assessment.
 
 Around it, every structured field still describes a current finding: a status of Received, CVSS across three versions with a plotted vector, an EPSS probability, a CPE range, and an attack-flow graph mapping the record through CWE and CAPEC into MITRE ATT&CK.
 
 ### Generated text that recommends an upgrade
 
-On [Vulners](./vulnerability-databases/vulners) the default description for a withdrawn record is machine-generated and labelled "AI enhanced". It states that the endpoint allows unauthenticated remote attackers to reach sensitive configuration data, cites other databases as corroboration, and closes by advising affected organisations to upgrade to a patched version or apply vendor mitigations.
+On [Vulners](./vulnerability-databases/vulners.mdx) the default description for a withdrawn record is machine-generated and labelled "AI enhanced". It states that the endpoint allows unauthenticated remote attackers to reach sensitive configuration data, cites other databases as corroboration, and closes by advising affected organisations to upgrade to a patched version or apply vendor mitigations.
 
 There is nothing to upgrade to, because there was nothing to fix. The same entry also carries a generated risk score above the rating the issuing CNA gave the record before withdrawing it.
 
@@ -76,11 +76,11 @@ The same shape appears anywhere a model is pointed at vulnerability records: sec
 
 Each of them inherits the same failure if it summarises before checking state. And where one of those systems publishes its output, the next one ingests it, so a withdrawn identifier can acquire fresh corroboration long after the record itself went quiet.
 
-For what happens to withdrawn identifiers across databases generally, see [Rejected CVEs in Vulnerability Databases](./vulnerability-databases).
+For what happens to withdrawn identifiers across databases generally, see [Rejected CVEs in Vulnerability Databases](./vulnerability-databases/).
 
 ---
 
 ## See also
 
-- [Rejected CVEs in Vulnerability Databases](./vulnerability-databases), the per-database record and how to verify any entry yourself.
+- [Rejected CVEs in Vulnerability Databases](./vulnerability-databases/), the per-database record and how to verify any entry yourself.
 - [Vendor Dispositions](/security/vendor-dispositions), our assessment of each identifier raised against Open WebUI.

@@ -48,4 +48,4 @@ OpenRouter exposes many models; set a **Prefix ID** like `openrouter` so its mod
 - **Enable/disable:** individual models can be toggled on or off, so the selector only shows what you actually use.
 - **Default model:** set the default for new chats in settings (config key `chat.default_model`).
 
-Prefer a subscription over an API key? See [Use your coding agent subscription](./coding-agents).
+Prefer a subscription over an API key? See [Use your coding agent subscription](./coding-agents.md).

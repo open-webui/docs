@@ -19,9 +19,9 @@ Upload two versions of a contract or proposal and get a clear summary of what ch
 4. Highlights the specific areas you asked about (payment terms, liability)
 5. Creates a comparison report with side-by-side views of key changes
 
-{/* TODO: Screenshot: Chat showing the AI's analysis: "Found 14 changes. 3 substantive:" followed by a highlighted comparison showing a payment term change ("Net 30" → "Net 60") with surrounding context. */}
+![The AI comparing two contract versions and listing what changed](/images/open-terminal-document-comparison.png)
 
-{/* TODO: Screenshot: A generated diff report showing additions in green and removals in red, with change categories labeled. */}
+![The generated diff report with additions in green and removals in red](/images/open-terminal-contract-diff-report.png)
 
 ## Skill content
 

@@ -83,9 +83,9 @@ If the AI starts more than one server (say, a frontend on port 3000 and a backen
 
 ## More things to try
 
-- **[Run code from chat →](./code-execution)**: the AI writes, runs, and debugs code
-- **[Analyze documents & data →](./file-analysis)**: spreadsheets, PDFs, Word docs, emails
-- **[Automate tasks →](./system-automation)**: file management, backups, batch operations
+- **[Run code from chat →](./code-execution.md)**: the AI writes, runs, and debugs code
+- **[Analyze documents & data →](./file-analysis.md)**: spreadsheets, PDFs, Word docs, emails
+- **[Automate tasks →](./system-automation.md)**: file management, backups, batch operations
 
 :::tip
 Want to preview and iterate on websites from your phone? [**Open WebUI Computer**](/ecosystem/computer) gives you your whole machine in a browser tab, accessible from any device.

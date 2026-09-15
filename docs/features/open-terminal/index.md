@@ -19,6 +19,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 **Turn Open WebUI into a full agent harness.**
 
+[View on GitHub →](https://github.com/open-webui/open-terminal)
+
 An agent harness is the system around a model that lets it do real work: instructions, context, tools, state, permissions, feedback loops, observability, and an execution environment. Open WebUI already gives you the control side of that harness: models, chats, knowledge, prompts, tools, MCP connections, memory, users, permissions, automations, and shared workflow controls. Open Terminal completes it with the part most chat products are still missing: a real computer substrate where actions run and evidence comes back.
 
 That means the agent can do real work. Not just answer questions about a task, and not just emit code you run somewhere else. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
@@ -103,13 +105,13 @@ Upload spreadsheets, CSVs, databases, or exported logs. The agent can inspect th
 
 Point the agent at a folder of PDFs, Word docs, spreadsheets, or emails. It can search, extract, convert, summarize, cross-reference, and produce structured output.
 
-{/* TODO: Screenshot: A chat where the user asks about the Johnson contract. The AI lists the files it found in a folder (contract_v2.docx, notes.pdf, invoice.xlsx) and provides a consolidated summary of relevant information from each. */}
+![The AI reading a folder of contract files and summarising the renewal](/images/open-terminal-document-search.png)
 
 ### Web development with live preview
 
 Describe a site or app. The agent can create the files, install dependencies, start a dev server, and render the result inside Open WebUI. Iterate by describing changes in chat.
 
-{/* TODO: Screenshot: A chat on the left side of the screen. On the right, a live website preview panel shows a clean event landing page with a banner, date, and registration button. */}
+![A chat beside a live preview of the event site the AI is serving](/images/open-terminal-live-site-preview.png)
 
 ### Software development
 
@@ -119,7 +121,7 @@ Clone repos, inspect architecture, run test suites, debug failures, refactor cod
 
 Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage disk usage, process logs, prepare exports, and automate repeatable operations.
 
-{/* TODO: Screenshot: A chat where the user asks "rename all the photos to include the date". The AI responds confirming "Renamed 43 files" with a before/after example: IMG_4521.jpg → 2025-03-15_IMG_4521.jpg. */}
+![The AI renaming 43 photos to prefix each filename with its date](/images/open-terminal-bulk-rename.png)
 
 ---
 

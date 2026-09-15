@@ -62,7 +62,7 @@ Open WebUI is a Progressive Web App (PWA). Add it to your phone's home screen, y
 
 **Installed and chatting. Now what?**
 
-Five short sections that cover the things every new user eventually wishes they'd known on day one: what plugins are and how to install them, why long chats eventually error out (and how to fix it with a filter), the "invisible" Task Model that powers titles/autocomplete, getting started with RAG over your own documents, and turning on Native tool calling.
+Short sections that cover the things every new user eventually wishes they'd known on day one: what plugins are and how to install them, why long chats eventually error out (and how Context Compaction handles it), the "invisible" Task Model that powers titles/autocomplete, getting started with RAG over your own documents, web search, Native tool calling and Open Terminal.
 
 | | |
 | :--- | :--- |
@@ -71,6 +71,8 @@ Five short sections that cover the things every new user eventually wishes they'
 | 🤖 **Task models** | Keep titles, tags, and autocomplete off your main model |
 | 📚 **Basic RAG** | Chatting with your own documents |
 | 🔧 **Tool calling** | Native mode + first Tools to install |
+| 🌐 **Web search** | Pick a provider and the model searches when it needs to |
+| 🖥️ **Open Terminal** | A sandboxed shell the model can build and run things in |
 
 [**Read the essentials →**](/getting-started/essentials)
 

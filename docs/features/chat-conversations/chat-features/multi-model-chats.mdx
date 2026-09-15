@@ -13,10 +13,11 @@ In a Multi-Model Chat, your prompt is sent to two or more selected models at the
 
 ## How to Use
 
-1.  **Select Models**: In the chat header (Model Selector), click the **+ (Plus)** button to add more models to your current session.
+1.  **Enable Compare Mode**: In the model picker, click the <img src="/images/features/chat/multi-model-compare.svg" alt="" width="20" height="20" /> **Compare** button, shown beside the search field.
+2.  **Select Models**: With comparison mode enabled, select the models you want to talk to simultaneously and compare.
     *   *Example Setup*: Select **GPT-5.6 Sol** (for reasoning), **Gemini 3.6 Flash** (for creative writing), and **Claude Sonnet 5** (for overall performance).
-2.  **Send Prompt**: Type your question as usual.
-3.  **View Results**: Watch as all models generate their responses simultaneously in the chat window.
+3.  **Send Prompt**: Type your question as usual.
+4.  **View Results**: Watch as all models generate their responses simultaneously in the chat window.
 
 ## Usage Scenarios
 
@@ -28,10 +29,10 @@ In a Multi-Model Chat, your prompt is sent to two or more selected models at the
 
 Admins can control access to Multi-Model Chats on a per-role or per-group basis.
 
-*   **Location**: Settings > Admin > General > User Permissions > Chat > **Multiple Models**
+*   **Location**: Admin Panel > Users > Groups > **Default permissions** > **Permissions** > **Allow Multiple Models in Chat**. To set a group-specific value, edit the group and open its **Permissions** tab.
 *   **Environment Variable**: `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS` (Default: `True`)
 
-If disabled, users will not see the "plus" button in the model selector and cannot initiate multi-model sessions.
+If disabled, users will not see the **Compare** button in the model picker and cannot initiate multi-model sessions.
 
 ---
 
@@ -67,6 +68,3 @@ There is nothing to configure, and that is worth knowing before you go looking:
 :::info Experimental
 The Merging/MOA feature is an advanced capability. The result is only as good as the model doing the synthesizing, so run the merge from your strongest model's response rather than a small one.
 :::
-
-
-

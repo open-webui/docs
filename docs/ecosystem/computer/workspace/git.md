@@ -23,4 +23,4 @@ From the branch picker you can create, switch, rename, and delete branches. If s
 
 ## Worktrees
 
-The worktree picker lists the repository's git worktrees and lets you create new ones. A worktree is its own directory with its own checked-out branch, so opening one opens it as its own workspace, with its own tabs, terminals, and layout. That's the way to work on two branches at once instead of bouncing a single checkout back and forth. See [add and switch workspaces](./workspaces) for how workspaces behave.
+The worktree picker lists the repository's git worktrees and lets you create new ones. A worktree is its own directory with its own checked-out branch, so opening one opens it as its own workspace, with its own tabs, terminals, and layout. That's the way to work on two branches at once instead of bouncing a single checkout back and forth. See [add and switch workspaces](./workspaces.md) for how workspaces behave.
