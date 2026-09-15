@@ -142,7 +142,7 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 | `search_notes` | Search your notes by title and content |
 | `view_note` | Read the full content of a note |
 | `write_note` | Create a new note |
-| `replace_note_content` | Update an existing note |
+| `replace_note_content` | Update an existing note, either replacing the whole content or editing a range of it in place |
 
 > **You:** Search my "Project X" notes and find the database schema.
 >
@@ -257,3 +257,7 @@ Attaching a note injects the full text. A very large note attached to a model wi
 ### Write access
 
 When manually attached, notes are **read-only**. In **Native Mode** with the `replace_note_content` tool enabled, models can modify your notes. Review changes and use **Undo/Redo** if needed.
+
+The tool has two modes. Passing whole `content` replaces the entire note, so anything the model leaves out is gone. Passing `replace_range` operations changes only the given character range and leaves the rest of the note untouched; each operation carries an `expected` field with the current text of that range, and a mismatch rejects the edit instead of applying it. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for range operations.
+
+Notes keep no server-side history. **Undo/Redo** only walks the versions the editor recorded, which happens when you insert a chat response into the note or step through versions, so a tool edit on a note without such versions cannot be undone there. The previous text is still in the chat: the model reads the note with `view_note` before editing, and that tool result stays in the chat message. Expand the tool call in that message to copy the old content back.
