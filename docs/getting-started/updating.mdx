@@ -49,6 +49,10 @@ Browse all available tags on the [GitHub releases page](https://github.com/open-
 2. **Check the [release notes](https://github.com/open-webui/open-webui/releases)** for breaking changes.
 3. **Clear your browser cache** after updating (`Ctrl+F5` / `Cmd+Shift+R`) to avoid stale frontend assets.
 
+:::info The personal Integrations tab is hidden after this update
+Personal tool servers now sit behind their own switch, **Settings > Admin > Connections > Direct Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which starts off. Users who had the `direct_tool_servers` permission lose sight of the **Integrations** tab in their settings until you turn it on, admins included. Servers they already added keep working the whole time, so nothing breaks; they just cannot add or edit one until the switch is on.
+:::
+
 :::warning Running multiple workers or replicas?
 Update every instance at the same time. Rolling updates are not supported across a release that changes the database schema: the migration moves the whole database forward at once, while the instances still on the old version keep querying the old shape. Stop all replicas and workers, let one instance migrate, then bring the rest back up on the new version.
 

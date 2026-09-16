@@ -1627,6 +1627,13 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 - Description: Enables or disables direct connections.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_DIRECT_INTEGRATIONS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Admin > Connections > Direct Integrations**. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is no longer enough. Connections that already exist keep being used while the tab is hidden, so switching this off takes the entry point away without breaking anything already wired up.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `TOOL_SERVER_CONNECTIONS`
 
 - Type: `str` (JSON array)
