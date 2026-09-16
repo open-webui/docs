@@ -71,6 +71,7 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 | Field | Description |
 | :--- | :--- |
 | **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
+| **Background** | An image shown behind the chat whenever this model is in use. It has to be uploaded here, since only a file held by this instance is accepted: an external URL or a pasted data URI is refused outright. PNG, JPEG, WebP or GIF, at most 5 MiB and 25 megapixels |
 | **Name and ID** | Display name and unique identifier. An ID holds no spaces or tabs and is at most 256 characters |
 | **Base Model** | The actual model that powers this agent |
 | **Description** | Short summary shown in the model selector |
@@ -195,6 +196,8 @@ Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** an
 - **Import**: From `.json` files or Open WebUI community links
 - **Export**: Download all custom model configurations as a single `.json`
 - **Discover**: Browse community presets at the bottom of the page
+
+A model's background image travels with it. Export carries the image inside the file, and import stores it on the target instance as a fresh upload, so a model moved between instances keeps its background without you moving files by hand. See the [API endpoints reference](/reference/api-endpoints) for the export and import calls.
 
 :::info Downloading base models
 To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.

@@ -46,7 +46,7 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 | Endpoint | Description |
 | :--- | :--- |
 | `GET /api/v1/models/all` | **(Admin)** Every saved model record in one unpaginated list, including models no connection is currently offering. Backs the admin models page. |
-| `GET /api/v1/models/export` | Export **all** custom models as a JSON array. |
+| `GET /api/v1/models/export` | Export **all** custom models as a JSON array, or the ones you name with a repeated `ids` query parameter (`?ids=a&ids=b`). Asking for a model you cannot write is refused with `403`, rather than being quietly left out. |
 | `POST /api/v1/models/import` | Bulk **upsert**: create new models and update existing ones (matched by `id`). Additive, never deletes. |
 | `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
 | `POST /api/v1/models/create` | Create a single model. |
@@ -54,6 +54,8 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 | `POST /api/v1/models/model/delete` | Delete a single model. |
 
 **Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+
+**Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
 **Version-controlled, code-driven workflow:**
 
