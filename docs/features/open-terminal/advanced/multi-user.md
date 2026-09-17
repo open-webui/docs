@@ -123,7 +123,7 @@ Two deployment backends are available:
 - **[Kubernetes Operator](../terminals/)**: production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
-Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
+Terminals requires an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
 :::
 
 ## Related
