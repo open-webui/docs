@@ -605,7 +605,9 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 
 - Type: `bool`
 - Default: `True`
-- Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
+- Description: Controls the user status feature, meaning the emoji, message and expiry a user sets on their own account to tell other people what they are up to. When disabled, that control is gone from the user menu and the two endpoints behind it (`GET /api/v1/users/user/status` and `POST /api/v1/users/user/status/update`) answer `403`, so nobody can set or read one.
+
+  This setting does not govern presence. The green activity dot beside a user in channel member lists, on message authors and in the admin user list reports whether that person currently has Open WebUI open, which is a separate signal that stays visible to everyone who can see the user when this setting is off.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > General > User Status**.
 
 #### `ENABLE_EASTER_EGGS`
