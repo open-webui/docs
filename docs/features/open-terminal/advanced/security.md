@@ -242,6 +242,14 @@ When the agent starts a server, the port preview shows it inside a sandboxed fra
 
 **Settings > Interface > Terminal Preview Allow Same Origin** relaxes that, and it is off unless you turn it on. Switch it on only for something you wrote and trust that genuinely needs same-origin browser APIs, such as storage or cookies, and remember that the code being previewed is often code the agent has just written.
 
+## Multi-user mode is a workspace split
+
+`OPEN_TERMINAL_MULTI_USER=true` gives each Open WebUI user their own Linux account and home folder inside one container, which keeps people and their agents out of each other's files while they work. Everyone still shares the kernel, the process list, the network namespace and the system, and provisioning those accounts requires elevated privileges inside the container, so root in there is within reach of any account. Run it only where every user on that instance is trusted at the same level.
+
+When users need to be protected from each other, give each one their own container with [Terminals](../terminals/). See [Multi-user setup](./multi-user.md) for both options side by side.
+
+---
+
 ## Security checklist
 
 | ✅ | Recommendation |
@@ -255,6 +263,7 @@ When the agent starts a server, the port preview shows it inside a sandboxed fra
 | ☐ | Don't mount the Docker socket unless necessary |
 | ☐ | Use `slim` or `alpine` images if you don't need runtime package installs |
 | ☐ | Leave **Terminal Preview Allow Same Origin** off unless a preview genuinely needs it |
+| ☐ | Give each user their own container when users must be protected from each other |
 
 ## Related
 

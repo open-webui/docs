@@ -10,15 +10,17 @@ When multiple people on your team need terminal access through Open WebUI, you h
 | | Single Container | Per-User Containers |
 | :--- | :--- | :--- |
 | **How** | One container, separate accounts inside | Each user gets their own container |
-| **Isolation** | Files are separate, but they share the same system | Fully isolated, separate everything |
+| **Isolation** | Separate workspaces inside one shared container | A separate container per user, isolated from each other |
 | **Setup** | One extra setting | Additional orchestration service |
-| **Best for** | Small teams you trust | Production, larger teams, untrusted users |
+| **Best for** | Small teams where everyone is trusted equally | Production, larger teams, untrusted users |
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
 
 :::danger Required for multi-user Open WebUI deployments
-If your Open WebUI instance has **more than one user account** and the same terminal-server connection is shared across users, you **must** use one of the two isolation modes below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
+If your Open WebUI instance has **more than one user account** and the same terminal-server connection is shared across users, you **must** use one of the two options below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
 
-For deployments with **untrusted users** (open signup, public-facing portals, mixed-tenant setups), Option 1 is also insufficient on its own. File isolation does not extend to network namespace, so users can still reach each other through bound ports on the shared container. Use **Option 2 (per-user containers via Terminals)** for these deployments, or layer `TERMINAL_PROXY_HEADERS` on top of Option 1 to restrict what proxied responses can do in the user's browser.
+**Option 1 separates workspaces. It is not a security boundary between users.** Everyone still shares one kernel, one process list, one network namespace and one set of system resources, and provisioning the per-user accounts requires elevated privileges inside that container, so a user who sets out to reach root inside it will get there. Run it where every user on the instance is trusted at the same level.
+
+For deployments with **untrusted users** (open signup, public-facing portals, users who are not trusted with each other's data), use **Option 2 (per-user containers via Terminals)**, which is the option that puts a real boundary between users. Layering `TERMINAL_PROXY_HEADERS` on top of Option 1 restricts what a proxied response can do in the user's browser, and it changes nothing about the shared container itself.
 :::
 
 ---
@@ -44,7 +46,7 @@ When someone uses the terminal through Open WebUI, Open Terminal automatically:
 1. Creates a personal account for that user (based on their Open WebUI user ID)
 2. Sets up a private home folder at `/home/{user-id}`
 3. Runs all their commands under their own account
-4. Restricts their file access to their own folder
+4. Keeps each user's files under their own folder
 
 Each user sees only their own files in the file browser.
 
@@ -59,11 +61,13 @@ Each user sees only their own files in the file browser.
 | System packages | | ✔ |
 | CPU and memory | | ✔ |
 | Network access | | ✔ |
+| Process list and command lines | | ✔ |
+| System state and root inside the container | | ✔ |
 
-:::warning Good for small teams, not production
-This mode gives everyone their own workspace, but they're all running inside the same container. Resource pressure (memory, CPU) is shared, **and so is the network namespace**: a port one user binds (e.g. `python -m http.server 8080`) is reachable from any other user's shell on that container. The port listing and the port proxy are scoped to the user who owns the port, so the port stays out of other users' file navigators, and reaching it takes a direct request from a shell. Per-user file isolation does **not** extend to per-user network isolation in this mode.
+:::warning Good for small trusted teams, not production
+This mode gives everyone their own workspace, and they all run inside the same container. Resource pressure (memory, CPU) is shared. The network namespace is shared, so a port one user binds (e.g. `python -m http.server 8080`) is reachable from any other user's shell on that container. The port listing and the port proxy are scoped to the user who owns the port, so the port stays out of other users' file navigators, and reaching it takes a direct request from a shell. The process list is shared, so users can watch each other's running commands. Root inside the container is reachable from any account, because provisioning the accounts needs those privileges in the first place.
 
-Use this for small, trusted groups, not for wide-open deployments. For untrusted multi-user deployments, use **Option 2 (per-user containers)** below, or layer the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top to lock proxied responses into a sandbox CSP.
+Treat every user on one instance as equally trusted, and use **Option 2 (per-user containers)** below when users have to be protected from each other. Layering the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top locks proxied responses into a sandbox CSP in the browser, which is worth doing and does not change what happens inside the container.
 :::
 
 ```mermaid
