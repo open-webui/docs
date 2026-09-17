@@ -65,7 +65,7 @@ Each user sees only their own files in the file browser.
 | System state and root inside the container | | ✔ |
 
 :::warning Good for small trusted teams, not production
-This mode gives everyone their own workspace, and they all run inside the same container. Resource pressure (memory, CPU) is shared. The network namespace is shared, so a user who binds a port (e.g. `python -m http.server 8080`) is reachable from any other user's terminal-server proxy URL on that port. The process list is shared, so users can watch each other's running commands. Root inside the container is reachable from any account, because provisioning the accounts needs those privileges in the first place.
+This mode gives everyone their own workspace, and they all run inside the same container. Resource pressure (memory, CPU) is shared. The network namespace is shared, so a port one user binds (e.g. `python -m http.server 8080`) is reachable from any other user's shell on that container. The port listing and the port proxy are scoped to the user who owns the port, so the port stays out of other users' file navigators, and reaching it takes a direct request from a shell. The process list is shared, so users can watch each other's running commands. Root inside the container is reachable from any account, because provisioning the accounts needs those privileges in the first place.
 
 Treat every user on one instance as equally trusted, and use **Option 2 (per-user containers)** below when users have to be protected from each other. Layering the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top locks proxied responses into a sandbox CSP in the browser, which is worth doing and does not change what happens inside the container.
 :::
