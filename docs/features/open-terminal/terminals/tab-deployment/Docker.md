@@ -2,7 +2,7 @@
 
 - [Docker Engine](https://docs.docker.com/engine/install/) installed and running
 - Open WebUI running (or ready to deploy alongside)
-- [Open WebUI Enterprise License](https://openwebui.com/enterprise) (required for production use)
+- [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise) (required for production use)
 
 ## Quick start with Docker Compose
 
