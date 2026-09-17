@@ -36,7 +36,7 @@ Settings are applied in this order (later ones override earlier ones):
 | **System Prompt** | Generated | `OPEN_TERMINAL_SYSTEM_PROMPT` | Replace the generated prompt with a custom template |
 | **Environment Info** | None | `OPEN_TERMINAL_INFO` | Append operator-provided environment context to the generated prompt |
 | **File Browser Root** | `home` | `OPEN_TERMINAL_FILE_BROWSER_ROOT` | Use `home`, an explicit path such as `/workspace`, or `filesystem` to opt out |
-| **Multi-User** | `false` | `OPEN_TERMINAL_MULTI_USER` | Enable [per-user isolation](./multi-user.md) |
+| **Multi-User** | `false` | `OPEN_TERMINAL_MULTI_USER` | Give each user their own account and home folder in one shared container ([multi-user setup](./multi-user.md)) |
 | **CORS Origins** | `*` | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains. The default `*` allows all origins (permissive); a startup warning is printed when it is left unset (since ~0.11.30) |
 | **Allowed Domains** | None | `OPEN_TERMINAL_ALLOWED_DOMAINS` | [Egress firewall](./security.md#egress-filtering): only allow outbound connections to these domains |
 | **Session CWD TTL** | `604800` (7 days) | `OPEN_TERMINAL_SESSION_CWD_TTL` | How long a session's saved working directory is remembered |
