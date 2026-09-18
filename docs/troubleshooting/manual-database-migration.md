@@ -211,14 +211,14 @@ echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
 ```
 
 :::note Local Installation Environment
-Local installations often have `DATABASE_URL` in a `.env` file, but Alembic's `env.py` may not automatically load `.env` files. You must explicitly export these variables in your shell before running Alembic commands.
+Local installations often have `DATABASE_URL` in a `.env` file, but Running `alembic` imports `open_webui.env`, which loads the repository's `.env`. A `.env` kept anywhere else is ignored, so export the variables in that case in your shell before running Alembic commands.
 :::
 
   </TabItem>
 </Tabs>
 
 :::danger Both Variables Required
-Alembic commands will fail with `Required environment variable not found` if `WEBUI_SECRET_KEY` is missing. Open WebUI's code imports `env.py` which validates this variable exists before Alembic can even connect to the database.
+Alembic commands will fail with `WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is enabled.` if `WEBUI_SECRET_KEY` is missing while `WEBUI_AUTH` is on. Open WebUI's code imports `env.py` which validates this variable exists before Alembic can even connect to the database.
 :::
 
 :::warning Path Syntax for SQLite
@@ -395,7 +395,7 @@ sqlite3 /app/backend/data/webui.db "SELECT COUNT(*) FROM user;"
   <TabItem value="local" label="Local Install">
     ```bash title="Terminal"
     # Start Open WebUI
-    python -m open_webui.main
+    open-webui serve
 
     # Watch for successful startup messages
     # Test by navigating to http://localhost:8080
@@ -430,7 +430,7 @@ or similar errors referencing other missing tables (e.g., `message`, `channel`).
 
 **Cause:** One or more Alembic migrations did not apply successfully. This can happen when:
 
-- A migration silently failed during an automated upgrade (Open WebUI logs the error but continues startup)
+- A migration failed during an automated upgrade (Open WebUI logs the traceback and aborts startup, so the container restarts in a loop)
 - The upgrade process was interrupted while migrations were running
 - `ENABLE_DB_MIGRATIONS=False` was set in the environment (disables automatic migrations on startup)
 - Multiple workers or replicas attempted to run migrations simultaneously
@@ -1021,7 +1021,7 @@ If you're not comfortable with SQL or aren't sure which column is the duplicate,
 
 **What happens automatically:**
 
-1. Open WebUI's `internal/db.py` runs old Peewee migrations first via `handle_peewee_migration()`
+1. No Peewee migration code remains. The only Peewee-era handling is Alembic revision `461111b60977`, which adds missing primary keys to legacy tables. A leftover `migratehistory` table is inert.
 2. Then `config.py` runs Alembic migrations via `run_migrations()`
 3. Both systems should work transparently
 
