@@ -3061,13 +3061,13 @@ pip install open-webui[all]
 
 #### `PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH`
 
-- Type: `str`
+- Type: `int`
 - Default: `1536`
 - Description: Specifies the maximum vector length for PGVector initialization.
 
 #### `PGVECTOR_CREATE_EXTENSION`
 
-- Type: `str`
+- Type: `bool`
 - Default `true`
 - Description: Creates the vector extension in the database
 
@@ -4009,15 +4009,16 @@ Provide a clear and direct response to the user's query, including inline citati
 - Options:
   - `character`
   - `token`
+  - `token_transformers`
 - Default: `character`
-- Description: Sets the text splitter for RAG models. Use `character` for RecursiveCharacterTextSplitter or `token` for TokenTextSplitter. By default the `token` splitter is Tiktoken-based; set `RAG_TOKENIZER_MODEL` to use a HuggingFace tokenizer instead.
+- Description: Sets the text splitter for RAG models. `character` uses RecursiveCharacterTextSplitter. `token` uses TokenTextSplitter with the Tiktoken encoding named by `TIKTOKEN_ENCODING_NAME`. `token_transformers` splits by character boundaries but measures length with the HuggingFace tokenizer selected by [`RAG_TOKENIZER_MODEL`](#rag_tokenizer_model), and is unavailable on the slim image.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_TOKENIZER_MODEL`
 
 - Type: `str`
 - Default: `(empty)`
-- Description: When `RAG_TEXT_SPLITTER=token`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Leave empty to use Tiktoken. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`); use it to match chunk boundaries to your embedding model's own tokenizer.
+- Description: When `RAG_TEXT_SPLITTER=token_transformers`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Leave empty to use Tiktoken. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`); use it to match chunk boundaries to your embedding model's own tokenizer.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
@@ -4683,7 +4684,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
   - `perplexity_search`: Uses the [Perplexity Search API](https://www.perplexity.ai/) search engine. In contrast to the `perplexity` option, this uses Perplexity's web search API for searching the web and retrieving results.
   - `sougou`: Uses the [Sougou](https://www.sogou.com/) search engine.
   - `ollama_cloud`: Uses the [Ollama Cloud](https://ollama.com/blog/web-search) search engine.
-  - `azure_ai_search`
+  - `azure`: Uses [Azure AI Search](https://learn.microsoft.com/azure/search/). Requires `AZURE_AI_SEARCH_API_KEY`, `AZURE_AI_SEARCH_ENDPOINT` and `AZURE_AI_SEARCH_INDEX_NAME`.
   - `yacy`
   - `yandex`: Uses the [Yandex Search API](https://yandex.cloud/en/docs/search-api/api-ref/WebSearch/search).
   - `youcom`: Uses the [You.com](https://you.com/) YDC Index API for web search.
@@ -5137,6 +5138,7 @@ If you use `perplexity`, this variable is not relevant to you.
   - `playwright`: Uses Playwright for rendering pages with JavaScript support.
   - `firecrawl`: Uses Firecrawl service.
   - `tavily`: Uses Tavily service.
+  - `microsoft_web_iq`: Uses the Microsoft Web IQ fetch API, configured by [`MICROSOFT_WEB_IQ_API_BASE_URL`](#microsoft_web_iq_api_base_url), [`MICROSOFT_WEB_IQ_API_KEY`](#microsoft_web_iq_api_key) and [`MICROSOFT_WEB_IQ_LANGUAGE`](#microsoft_web_iq_language).
   - `external`: Uses an external web loader API.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -6921,14 +6923,14 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 #### `USER_PERMISSIONS_CHAT_CALL`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to make calls in chats.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use multiple models in chats.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -6942,7 +6944,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables enforced temporary chats for users.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -6951,42 +6953,42 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 #### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables user permission to access direct tool servers.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_WEB_SEARCH`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use the web search feature.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_IMAGE_GENERATION`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use the image generation feature.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use code interpreter feature.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_MEMORIES`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use the [memory feature](/features/chat-conversations/memory). When `False`, the affected users lose the **Personalization** settings tab, the memory endpoints answer them with `403`, the model is not given the memory tools and their stored memories no longer reach the system context. Admins are exempt.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_AUTOMATIONS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables Automations access for non-admin users. When enabled, users can access `/automations` and manage their own scheduled automations.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7004,7 +7006,7 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 #### `USER_PERMISSIONS_FEATURES_CALENDAR`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables Calendar access for non-admin users. When enabled, users can access the Calendar feature to create calendars, manage events, and view shared calendars.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7022,28 +7024,28 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables the visibility of the Folders feature (chat sidebar) to users.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_NOTES`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables the visibility of the Notes feature to users.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CHANNELS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `True`
 - Description: Enables or disables the ability for users to create their own group channels.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables the ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7122,35 +7124,35 @@ These settings control whether users can share workspace items with other users 
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace models.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace knowledge.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace tools.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **private sharing** of workspace skills.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7164,7 +7166,7 @@ These settings control whether users can share workspace items with other users 
 
 #### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **private sharing** of chat folders with specific users or groups.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7181,21 +7183,21 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **public sharing** of workspace models.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **public sharing** of workspace knowledge.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **public sharing** of workspace prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7209,7 +7211,7 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables **public sharing** of workspace skills.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7288,14 +7290,14 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_IMPORT`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables user permission to import workspace tools.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_EXPORT`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables or disables user permission to export workspace tools.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -7378,13 +7380,13 @@ If the endpoint is an S3-compatible provider like MinIO that uses a TLS certific
 
 #### `S3_USE_ACCELERATE_ENDPOINT`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Specifies whether to use the accelerated endpoint for S3 storage.
 
 #### `S3_ENABLE_TAGGING`
 
-- Type: `str`
+- Type: `bool`
 - Default: `False`
 - Description: Enables S3 object tagging after uploads for better organization, searching, and integration with file management policies. Always set to `False` when using Cloudflare R2, as R2 does not support object tagging.
 
