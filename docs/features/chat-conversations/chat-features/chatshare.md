@@ -26,7 +26,7 @@ To share a chat:
 1. Select the chat conversation you want to share.
 2. Click on the 3-dots that appear when hovering the mouse pointer above the desired chat. On a touchscreen the 3-dots are always shown, so tap them directly.
 3. Then click on the **Share** option.
-4. Select either **Share to Open WebUI Community** (if **Enable Community Sharing** is toggled on by an **Admin**) or **Copy Link**.
+4. Select either **Share to Open WebUI Community** (if **Community Sharing** is toggled on by an **Admin** under **Settings > General > Features**; creating any share link also needs the **Allow Chat Share** permission, `USER_PERMISSIONS_CHAT_SHARE`) or **Copy Link**.
 
 :::info Sharing scope is controlled by RBAC
 

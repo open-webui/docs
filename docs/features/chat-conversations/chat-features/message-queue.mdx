@@ -29,7 +29,7 @@ Each queued message shows three action buttons:
 
 | Action | Icon | Description |
 |--------|------|-------------|
-| **Send Now** | ↑ | Interrupts the current generation and sends this message immediately. Greyed out, with a **Waiting for upload** tooltip, while the message still has an attachment that is uploading or that failed |
+| **Send now** | ↑ | Interrupts the current generation and sends this message immediately. Greyed out, with a **Waiting for upload** tooltip, while the message still has an attachment that is uploading or that failed |
 | **Edit** | ✏️ | Removes the message from the queue and puts it back in the input field |
 | **Delete** | 🗑️ | Removes the message from the queue without sending |
 
@@ -59,9 +59,9 @@ A queued message whose attachment failed is labeled **Upload failed** and holds 
 
 The message queue is preserved when you navigate between chats within the same browser session:
 
-- **Leaving a chat** - Queue is saved to session storage
+- **Switching chats in the same tab** - The queue stays in memory, keyed by chat id, and is there when you come back
 - **Returning to the chat** - Queue is restored and processed
-- **Closing the browser** - Queue is cleared (session storage only)
+- **Reloading the page, opening a new tab, or closing the tab** - The queue is cleared, since it lives in memory only
 
 This means you can start a thought, switch to another chat to check something, and return to find your queued messages waiting.
 
@@ -111,7 +111,7 @@ The AI is working on a complex response, but you remember additional context:
 You're in a long conversation and need to capture quick notes:
 - Queue messages as reminders
 - Edit or delete before they're sent
-- Use "Send Now" for urgent interruptions
+- Use "Send now" for urgent interruptions
 
 ---
 
@@ -124,6 +124,6 @@ You're in a long conversation and need to capture quick notes:
 | **Pending uploads** | Message is queued until its attachments finish, then sent, whether the toggle is on or off |
 | **Failed upload** | Queued message is marked **Upload failed** and holds the queue until you edit or delete it |
 | **Persistence** | Queue survives navigation within session |
-| **Actions** | Send Now, Edit, Delete for each queued item |
+| **Actions** | Send now, Edit, Delete for each queued item |
 
 The Message Queue helps you maintain your flow of thought without the friction of waiting for AI responses to complete.

@@ -9,9 +9,10 @@ For an AI to be truly helpful, it needs to understand the concept of time. Open 
 
 ## System-Level Awareness
 
-By default, Open WebUI injects temporal variables into the model's environment via the system prompt. Even without specialized tools, most models are aware of:
+Nothing about the date or time reaches the model on its own. It arrives only where a system prompt, model file or prompt contains one of these placeholders, which Open WebUI fills in before the request is sent:
 - **`CURRENT_DATE`**: Injected as YYYY-MM-DD.
-- **`CURRENT_TIME`**: Injected as HH:MM.
+- **`CURRENT_TIME`**: `HH:MM:SS` in the browser's local 24-hour time for chats from the interface. Requests that arrive without browser variables (API calls, automations, timers) get the server's local time as `hh:MM:SS AM/PM`.
+- **`CURRENT_DATETIME`**: date and time together. `CURRENT_TIMEZONE` and `USER_LANGUAGE` are filled only by the browser, so they stay literal for API callers, automations and timers.
 - **`CURRENT_WEEKDAY`**: (e.g., Monday, Tuesday).
 
 These variables can be manually used in [**Prompts**](/features/workspace/prompts) or [**Model Files**](/features/workspace/models) using the `{{CURRENT_DATE}}` syntax.
@@ -24,7 +25,7 @@ When using a model with **Native Function Calling** enabled (see the [**Central 
 
 ### Available Time Tools:
 - **`get_current_timestamp`**: The model can retrieve the exact current Unix timestamp (UTC) and ISO date string.
-- **`calculate_timestamp`**: The model can perform relative time arithmetic (e.g., "Calculate the date for 3 days ago" or "When is next Friday?").
+- **`calculate_timestamp`**: subtracts a number of days, weeks, months or years from now (for example "the date 3 days ago"). It cannot compute a future date such as "next Friday". The model has to reason that from `get_current_timestamp`, which also returns the user's local time and timezone when the profile has one.
 
 ### Why use native tool calling for Time?
 While static variables tell the model "when it is now," native tools allow the model to **reason about time**. 

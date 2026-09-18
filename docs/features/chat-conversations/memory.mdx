@@ -105,7 +105,7 @@ Taking the permission away closes every route memories take to a model. The affe
 
 ### Background Review & Limits
 
-- **Background review**: when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation and updates `context` memories automatically, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
+- **Background review**: when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation with the chat's own model and can add, replace, move or remove memories of either type, `user` included, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
 - **Injection budgets**: [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
 
 ### Memory System Context
