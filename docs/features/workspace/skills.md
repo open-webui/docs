@@ -36,7 +36,7 @@ Write guidelines in Markdown. No Python, no API calls, no deployment. If you can
 
 ### On-demand context loading
 
-Model-attached skills use lazy loading. Only a lightweight manifest (name + description) is injected by default. The model loads the full instructions only when it needs them via the `view_skill` tool.
+With native function calling, every active skill the user can read is listed in a lightweight manifest (id, name, description), bound to the model or not. Binding a skill to a model only pre-selects it in the chat. The model loads full instructions when it needs them via the `view_skill` tool. In legacy mode every bound, toggled or mentioned skill is injected in full and there is no manifest.
 
 ### Reusable across models
 
@@ -67,18 +67,18 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 ### User-selected skills ($ mention)
 
-Type `$` in the chat input to open the skill picker. Select a skill, and its **full content is injected directly** into the system prompt. The model has immediate access to the complete instructions.
+Type `$` in the chat input to open the skill picker. Select a skill, and its **full content is injected directly** into the system prompt, in both function calling modes. The model has immediate access to the complete instructions. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
 
 ### Per-chat skills (Integrations menu)
 
-Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message, and like `$` mention the toggled skill's **full content is injected** into the system prompt. The difference is that a `$` mention applies to a single message, whereas a toggle stays on for the whole conversation. It needs no model-edit permission, so it is the easiest way for a user to add a skill to one conversation.
+Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message, and the toggled skill is listed in the manifest under native function calling (only a `$` mention injects full content there). Under legacy function calling a toggled skill is injected in full, like a `$` mention.
 
 ### Model-attached skills
 
 Skills bound to a model use lazy loading:
 
 1. **Manifest injection** - Only the skill's name and description are added to the system prompt.
-2. **On-demand loading** - The model receives a `view_skill` builtin tool. When it determines it needs a skill's full instructions, it calls `view_skill(skill_name)` to load them.
+2. **On-demand loading** - The model receives a `view_skill` builtin tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them.
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
@@ -97,7 +97,7 @@ Navigate to **Workspace > Skills** and click **Create** in the Workspace header.
 
 ### Importing from Markdown
 
-Click **Import** and select a `.md` file. If the file contains YAML frontmatter with `name` and/or `description` fields, those values are auto-populated:
+Click **Import JSON** in the chevron menu beside **Create** and select a `.md` or `.json` file. A `.json` file creates the skills immediately. A `.md` file opens the editor pre-filled. If the file contains YAML frontmatter with `name` and/or `description` fields, those values are auto-populated:
 
 ```yaml
 ---
@@ -119,7 +119,7 @@ description: Step-by-step instructions for thorough code reviews
 3. Check the skills you want this model to always have access to.
 4. Click **Save**.
 
-The selected skills' manifests are automatically injected, and the model can load full content on-demand via `view_skill`.
+In native mode the manifest already lists every readable skill, so binding only pre-selects those skills in the chat. In legacy mode the bound skills' full content is appended to the system prompt.
 
 ---
 
@@ -130,11 +130,11 @@ From the Skills workspace list, use the ellipsis menu (**...**):
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Modify content, name, or description |
-| **Clone** | Create a copy with `-clone` appended to the ID |
+| **Clone** | Create a copy with `_clone` appended to the ID |
 | **Export** | Download as JSON |
 | **Delete** | Permanently remove (Shift+Click for quick deletion) |
 
-**Bulk export**: Click the **Export** button at the top of the Skills page to export all accessible skills as a single JSON file.
+**Bulk export**: Click **Export JSON** in the chevron menu beside **Create** to export all accessible skills as a single JSON file. It needs the Export Skills permission.
 
 **Active/Inactive toggle**: Inactive skills are excluded from manifests and cannot be loaded by the model, even if bound to one or mentioned in chat.
 
@@ -161,8 +161,8 @@ Attaching a skill to a model does **not** bypass access control. When a user cha
 | Permission | What it controls |
 | :--- | :--- |
 | **Workspace > Skills Access** | Access the Skills workspace and create/manage skills |
-| **Sharing > Share Skills** | Share skills with individual users or groups |
-| **Sharing > Public Skills** | Make skills publicly accessible |
+| **Sharing > Skills Sharing** | Share skills with individual users or groups |
+| **Sharing > Skills Public Sharing** | Make skills publicly accessible |
 
 See [Permissions](/features/authentication-access/rbac/permissions) for configuration details.
 
@@ -200,4 +200,4 @@ When injected via `$` mention, the full skill content goes into the system promp
 
 ### Lazy loading requires function calling
 
-Model-attached skills depend on the `view_skill` builtin tool, which requires [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) to be enabled. Without it, the model receives only the manifest and cannot load the full instructions.
+The manifest and the `view_skill` builtin tool need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with Builtin Tools enabled. Without them there is no lazy loading at all: every bound, toggled or mentioned skill is injected in full into the system prompt.
