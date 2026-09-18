@@ -37,7 +37,7 @@ Redis becomes **mandatory** in the following scenarios:
 
 1. **Multiple Uvicorn Workers** (`UVICORN_WORKERS > 1`)
    - Running multiple worker processes on a single host
-   - Requires Redis to share session state and application configuration between workers
+   - Requires Redis to share session state, websocket pools, locks and token revocations between workers
 
 2. **Multi-Node Deployments**
    - Kubernetes clusters with multiple pods
@@ -65,7 +65,7 @@ Without Redis in multi-worker or multi-instance scenarios, you will experience:
 
 ### Prerequisites
 
-- A valid Open WebUI instance (running version 1.0 or higher)
+- A current Open WebUI release
 - A Redis container (we will use `redis:7-alpine` in this example)
 - Docker Composer (version 2.0 or higher) installed on your system
 - A Docker network for communication between Open WebUI and Redis
@@ -144,7 +144,7 @@ With proper `timeout` configuration, this number should fluctuate naturally (ris
 Open WebUI uses Redis as a **stateful store, not a disposable cache**. Its keys fall into two groups:
 
 - **TTL'd security keys**: token-revocation entries (`{prefix}:auth:token:<jti>:revoked`, set to expire exactly when the token would) and distributed locks (set with an expiry).
-- **Persistent operational keys**: the websocket **session** and **usage** pools (Redis hashes with no expiry) and cached configuration.
+- **Persistent operational keys**: the websocket **session** and **usage** pools (Redis hashes with no expiry) and the cached tool server and terminal server lists.
 
 Under an `allkeys-lru`, `allkeys-lfu`, or `allkeys-random` policy, Redis evicts **any** key when memory fills, including the two groups above. That can:
 
@@ -157,7 +157,7 @@ Use **`noeviction`** (the safe default). When memory is exhausted, Redis rejects
 maxmemory-policy noeviction
 ```
 
-Open WebUI's Redis working set is small (sessions, revocations, locks, config), so with `maxmemory` left unset Redis simply uses what it needs and never evicts. Only set a `maxmemory` cap if you have a specific reason to, and if you do, alert on usage rather than relying on eviction.
+Open WebUI's Redis working set is small (websocket pools, revocations, locks, tasks, rate limits, model caches, collaborative-note documents and cached tool/terminal server lists), so with `maxmemory` left unset Redis simply uses what it needs and never evicts. Only set a `maxmemory` cap if you have a specific reason to, and if you do, alert on usage rather than relying on eviction.
 
 If you genuinely must cap memory **with** eviction, the only acceptable policies are `volatile-ttl` or `volatile-lru`: these evict **only** keys that carry a TTL (locks and revocations) and never the persistent pools. Be aware this can still drop a revocation early, so prefer adding RAM over enabling eviction.
 
@@ -316,7 +316,7 @@ You can also provide a semicolon-separated list of allowed domains. **Do not ski
 Notice the different database numbers (`/0` vs `/1`) in the URLs:
 
 - `REDIS_URL` uses database `0` for general application state
-- `WEBSOCKET_REDIS_URL` uses database `1` for websocket-specific data
+- `WEBSOCKET_REDIS_URL` uses database `1` for websocket-specific data (when unset it defaults to `REDIS_URL`, and `WEBSOCKET_REDIS_CLUSTER` defaults to `REDIS_CLUSTER`)
 
 This separation helps isolate different types of data. You can use the same database number for both if preferred, but using separate databases is recommended for better organization and potential performance optimization.
 
@@ -328,9 +328,11 @@ This separation helps isolate different types of data. You can use the same data
 REDIS_KEY_PREFIX="open-webui"
 ```
 
-The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Redis instance without key conflicts. In Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
+The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Redis instance without key conflicts. `open-webui` is already the default, so this line only matters when you change it, and the prefix is used verbatim in cluster mode too.
 
 ### Sentinel Failover Configuration
+
+Sentinel is enabled by setting `REDIS_SENTINEL_HOSTS` (comma-separated) and optionally `REDIS_SENTINEL_PORT` (default `26379`); `WEBSOCKET_SENTINEL_HOSTS` and `WEBSOCKET_SENTINEL_PORT` do the same for the websocket manager. In that mode the hostname part of `REDIS_URL` is the Sentinel master (service) name, and its database and credentials are reused.
 
 :::danger Critical: Socket Timeout for Sentinel Deployments
 
@@ -408,7 +410,6 @@ REDIS_CLUSTER="true"
 - `REDIS_CLUSTER` enables cluster-aware connection handling
 - The `REDIS_URL` should point to your cluster's configuration endpoint
 - This option has no effect if `REDIS_SENTINEL_HOSTS` is defined (Sentinel takes precedence)
-- When using cluster mode, the `REDIS_KEY_PREFIX` is automatically formatted as `{prefix}:` to ensure multi-key operations target the same hash slot
 
 :::
 
@@ -575,7 +576,7 @@ docker logs open-webui 2>&1 | grep -i redis
 
 #### Check for Websocket Redis Connection
 
-If you have enabled websocket support, you should see this specific log message:
+If you set `WEBSOCKET_MANAGER=redis` and `GLOBAL_LOG_LEVEL=DEBUG`, you should see this log message:
 
 ```
 DEBUG:open_webui.socket.main:Using Redis to manage websockets.
@@ -595,7 +596,7 @@ You can also verify that Open WebUI is actually writing data to Redis:
 docker exec -it redis redis-cli --scan --pattern "open-webui*"
 ```
 
-If Redis is configured correctly, you should see keys with your configured prefix (e.g., `open-webui:session:*`, `open-webui:config:*`).
+If Redis is configured correctly, you should see keys with your configured prefix, such as `open-webui:ratelimit:*` within a few minutes of a password sign-in and `open-webui:auth:token:*:revoked` after a sign-out. The websocket pools (`open-webui:session_pool`, `open-webui:usage_pool`) live in the `WEBSOCKET_REDIS_URL` database, so with the example above add `-n 1` to the command to see them. Persisted configuration is shared through the database `config` table, not Redis.
 
 ### Test Multi-Worker Setup
 
@@ -658,7 +659,7 @@ REDIS_URL="redis://redis:6379/0"
    - `ENABLE_WEBSOCKET_SUPPORT="true"`
    - `WEBSOCKET_MANAGER="redis"`
    - `WEBSOCKET_REDIS_URL="redis://redis:6379/1"`
-2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.`
+2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.` (logged at DEBUG level, so it appears only with `GLOBAL_LOG_LEVEL=DEBUG`)
 3. Verify Redis is accessible from Open WebUI container
 
 #### Issue: "Multiple Open WebUI instances interfering with each other"
