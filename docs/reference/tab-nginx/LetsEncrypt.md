@@ -225,7 +225,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             proxy_read_timeout 10m;
             proxy_buffering off;
             proxy_cache off;
-            client_max_body_size 20M;
+            client_max_body_size 20M; # the app sets no upload cap of its own until Max Upload Size (Admin Settings > Documents, or RAG_FILE_MAX_SIZE) is set; this limit is what returns 413
 
             proxy_no_cache 1;
             proxy_cache_bypass 1;
@@ -278,7 +278,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
             
             proxy_buffering off;
             proxy_cache off;
-            client_max_body_size 20M;
+            client_max_body_size 20M; # the app sets no upload cap of its own until Max Upload Size (Admin Settings > Documents, or RAG_FILE_MAX_SIZE) is set; this limit is what returns 413
 
             add_header Cache-Control "public, max-age=300, must-revalidate";
         }

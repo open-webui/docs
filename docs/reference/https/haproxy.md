@@ -96,8 +96,6 @@ frontend web
 
  #Subdomain method
     acl chat-acl hdr(host) -i subdomain.domain.tld
-    #Path Method
-    acl chat-acl path_beg /owui/
     use_backend owui_chat if chat-acl
 
 #Pass SSL Requests to Lets Encrypt
@@ -106,12 +104,16 @@ backend letsencrypt-backend
 
 #OWUI Chat
 backend owui_chat
-    # add X-FORWARDED-FOR
+    # add X-Forwarded-For; Open WebUI reads it and X-Forwarded-Proto for client IPs and the SSO callback URL
     option forwardfor
-    # add X-CLIENT-IP
-    http-request add-header X-CLIENT-IP %[src]
+    option httpchk GET /health
  http-request set-header X-Forwarded-Proto https if { ssl_fc }
-    server chat <ip>:3000
+    server chat <ip>:3000 check
+```
+
+:::note Load balancing several instances
+Socket.IO state lives in each process. To balance across several Open WebUI containers, or to run `UVICORN_WORKERS` above 1, set `WEBSOCKET_MANAGER=redis` with `REDIS_URL`, use a shared database, and set the same `WEBUI_SECRET_KEY` on every instance.
+:::
 
 ## WebSocket and HTTP/2 Compatibility
 
@@ -128,9 +130,9 @@ defaults
     option h2-workaround-bogus-websocket-clients
 ```
 
-You will see that we have ACL records (routers) for both Open WebUI and Let's Encrypt. To use WebSocket with OWUI, you need to have an SSL configured, and the easiest way to do that is to use Let's Encrypt.
+You will see that we have ACL records (routers) for both Open WebUI and Let's Encrypt. WebSocket does not need TLS (`ws://` over plain HTTP works); HTTPS is what browser features such as the microphone require, and the easiest way to get it is Let's Encrypt.
 
-You can use either the subdomain method or the path method for routing traffic to Open WebUI. The subdomain method requires a dedicated subdomain (e.g., chat.yourdomain.com), while the path method allows you to access Open WebUI through a specific path on your domain (e.g., yourdomain.com/owui/). Choose the method that best suits your needs and update the configuration accordingly.
+Open WebUI must be served from the root of a hostname: the frontend requests `/api/...`, `/ws/socket.io` and `/_app/...` from the domain root and there is no base-path setting, so route it by subdomain (for example `chat.yourdomain.com`), not by a path such as `/owui/`.
 
 :::info
 
