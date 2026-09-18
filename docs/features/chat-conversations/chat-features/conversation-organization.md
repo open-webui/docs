@@ -20,7 +20,7 @@ Folders are enabled by default. Administrators can control this feature via:
 
 Create a new folder to organize your conversations:
 
-1. In the **sidebar**, click the **+ button** next to "Chats" or right-click in the chat list.
+1. In the **sidebar**, click the **+ button** on the Folders section header.
 2. Select **"New Folder"**.
 3. Enter a name for your folder.
 4. Click **Save**.
@@ -40,7 +40,7 @@ Folders can be nested within other folders to create hierarchical organization:
 
 - **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
-- **Move via folder menu**: Open the same three-dot menu on a folder and use the move option to relocate it under a different parent.
+- **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. There is no move entry. Folders are re-parented by drag and drop only.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
@@ -137,7 +137,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
 - **Someone else's chat opens read-only, under their name.** Their messages carry their name and profile picture, both in the conversation and on the message nodes in the **Overview** panel. The name and picture beside a message appear only when **Chat Bubble UI** is off in **Settings > Interface**; the bubble layout shows neither, whoever wrote the message.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
-- **Only the owner or an admin can delete a shared root folder** or change who it is shared with. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
+- **Only the owner or an admin can delete a shared root folder.** Anyone with write access can change who it is shared with through the API. People with write access can add and edit chats and subfolders, but cannot remove the shared folder itself.
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
 
 Folder sharing is gated by the **Folders Sharing** permission, which is off by default. An administrator enables it per group under **Admin Panel > Users > Groups > Permissions**, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
