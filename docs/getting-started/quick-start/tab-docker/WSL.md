@@ -1,9 +1,3 @@
----
-slug: /deployment/windows-wsl
-sidebar_position: 16
-title: "Docker on Windows with WSL"
----
-
 # Using Docker with WSL (Windows Subsystem for Linux)
 
 This guide provides instructions for setting up Docker and running Open WebUI in a Windows Subsystem for Linux (WSL) environment.

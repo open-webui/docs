@@ -3,7 +3,7 @@
 - A running Kubernetes cluster (v1.24+)
 - [Helm](https://helm.sh/docs/intro/install/) v3 installed
 - `kubectl` configured to access your cluster
-- [Open WebUI Enterprise License](https://openwebui.com/enterprise) (required for production use)
+- [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise) (required for production use)
 
 ## Deploy with Helm
 

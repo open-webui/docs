@@ -169,7 +169,7 @@ docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host
 
 ### Q: RAG with Open WebUI is very bad or not working at all. Why?
 
-**A:** If you're using **Ollama**, be aware that Ollama sets the context length to **2048 tokens by default**. This means that none of the retrieved data might be used because it doesn't fit within the available context window.
+**A:** If you're using **Ollama**, be aware that Ollama picks a model's default context length from your GPU's VRAM, and on GPUs with less than 24 GiB that is **4096 tokens** (see [Ollama's context length documentation](https://docs.ollama.com/context-length)). This means that none of the retrieved data might be used because it doesn't fit within the available context window.
 
 To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open WebUI, you should **increase the context length** to a much larger value (**8192+ tokens**) to ensure that retrieved documents can effectively contribute to the model’s responses.
 

@@ -1,22 +1,55 @@
 ---
 sidebar_position: 10
 title: "Ollama Cloud Web Search"
+description: "Configure Ollama Cloud Web Search in Open WebUI, set the correct API key variable, and verify search results in a conversation."
 ---
+
+Use Ollama Cloud Web Search to give Open WebUI conversations access to web search results through Ollama’s hosted search API. This search service requires internet access even when your chat model runs locally.
 
 :::warning
 
-This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/contributing).
 
 :::
 
-:::tip
+## Requirements
 
-For a comprehensive list of all environment variables related to Web Search (including concurrency settings, result counts, and more), please refer to the [Environment Configuration documentation](/reference/env-configuration#web-search).
+- A running Open WebUI instance and an administrator account.
+- Outbound access from the Open WebUI server to the search provider and, for full-page retrieval, the sites returned by the search.
+- A chat model with reliable native tool calling and the Web Search capability enabled.
 
-:::
+Create an [Ollama account and API key](https://ollama.com/settings/keys). The [official web search documentation](https://docs.ollama.com/capabilities/web-search) requires an API key associated with an account; installing a local Ollama server alone does not enable the hosted search service.
 
-:::tip Troubleshooting
+## Configure in Open WebUI
 
-Having issues with web search? Check out the [Web Search Troubleshooting Guide](/troubleshooting/web-search) for solutions to common problems like proxy configuration, connection timeouts, and empty content.
+1. Open **Settings → Admin → Web Search** and enable web search.
+2. Set **Web Search Engine** to `ollama_cloud`.
+3. Paste your key into **Ollama Cloud Web Search API Key** and save the settings.
+4. Enable the model’s **Web Search** capability and its **Web Search** default feature, or turn on Web Search for the conversation. Follow the [native search setup](/features/chat-conversations/web-search/agentic-search#how-to-enable-agentic-behavior) for the model settings.
 
-:::
+The admin UI calls the setting **Ollama Cloud Web Search API Key**. The configuration API and persisted setting use `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`, but the environment variable is **`OLLAMA_CLOUD_API_KEY`**. Setting `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` in the environment has no effect.
+
+## Environment example
+
+For a deployment configured through environment variables:
+
+```bash
+ENABLE_WEB_SEARCH=true
+WEB_SEARCH_ENGINE=ollama_cloud
+OLLAMA_CLOUD_API_KEY=your-api-key
+```
+
+Restart Open WebUI after changing the environment. Previously saved admin settings can take precedence over these startup values; if the selected engine or key has not changed, update it in the Admin Panel. See the [web search configuration reference](/reference/env-configuration#web-search) for persistence behavior and additional options.
+
+## Verify
+
+Start a new conversation with the configured model and turn on **Web Search** in the chat’s integrations menu if it is not already enabled. Ask: “Search the web for the official Python documentation and give me a link to it.”
+
+Confirm that the conversation shows a web search tool call and returned sources, then open a source to check it. A plausible answer without a search tool call does not demonstrate that the provider is connected.
+
+## Troubleshooting
+
+- **Authentication or quota error:** check that the saved API key is correct and the provider account has an available search allowance.
+- **Key not picked up from the environment:** use `OLLAMA_CLOUD_API_KEY`, not the longer configuration-field name.
+- **No search tool call:** check the model’s Web Search capability, the chat toggle or default feature, and Native function calling using the [native search setup](/features/chat-conversations/web-search/agentic-search#how-to-enable-agentic-behavior).
+- **Search succeeds but page content is empty:** check outbound connectivity, proxy settings, and web loader errors using [Web Search troubleshooting](/troubleshooting/web-search). Search results and full-page fetching are separate steps.

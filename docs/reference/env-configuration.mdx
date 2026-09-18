@@ -605,7 +605,7 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 
 - Type: `bool`
 - Default: `True`
-- Description: Globally enables or disables user status functionality. When disabled, the status UI (including blinking active/away indicators and status messages) is hidden across the application, and user status API endpoints are restricted.
+- Description: Controls the user status feature: the emoji, message and expiry a user sets on their own account to tell other people what they are up to. Enabled, the control sits in the user menu and a status set there is shown to others beside that user. Disabled, the control is gone and the two endpoints behind it (`GET /api/v1/users/user/status` and `POST /api/v1/users/user/status/update`) answer `403`.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > General > User Status**.
 
 #### `ENABLE_EASTER_EGGS`

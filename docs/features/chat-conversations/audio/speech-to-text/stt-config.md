@@ -1,15 +1,17 @@
 ---
 sidebar_position: 1
-title: "Configuration"
+title: "Configure Speech-to-Text"
+sidebar_label: "Configuration"
+description: "Choose a local, browser, or hosted speech-to-text engine, configure audio settings, and dictate prompts in Open WebUI."
 ---
 
-Open WebUI supports both local, browser, and remote speech to text.
+Use speech-to-text to dictate prompts in Open WebUI. Choose local Whisper, your browser's speech recognition, or a hosted transcription provider, then configure the corresponding admin and user settings below.
 
 ![alt text](/images/tutorials/stt/image.png)
 
 ![alt text](/images/tutorials/stt/stt-providers.png)
 
-## Cloud / Remote Speech To Text Providers
+## Choose a Speech-to-Text Provider {#cloud--remote-speech-to-text-providers}
 
 The following speech-to-text providers are supported:
 

@@ -124,4 +124,4 @@ Open Terminal can run isolated in Docker or directly on a host, depending on how
 
 - [**Open WebUI Computer**](/ecosystem/computer): serves your real computer to any browser, with files, terminal, editor, git, and AI as an optional helper.
 
-Terminals requires an [Open WebUI Enterprise License](https://openwebui.com/enterprise) for production use. The project lives at [github.com/open-webui/terminals](https://github.com/open-webui/terminals).
+Terminals requires an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise) for production use. The project lives at [github.com/open-webui/terminals](https://github.com/open-webui/terminals).
