@@ -54,7 +54,7 @@ podman kube play ./play.yaml
 
 ## Using GPU Support
 
-For Nvidia GPU support, you need to replace the container image with `ghcr.io/open-webui/open-webui:cuda` and need to specify the device (GPU) required in the pod resources limits as followed:
+The `:cuda` image moves Open WebUI's own local models (embedding, reranking, and Whisper speech-to-text) to the GPU; Ollama's models are unaffected. For Nvidia GPU support, you need to replace the container image with `ghcr.io/open-webui/open-webui:cuda` and need to specify the device (GPU) required in the pod resources limits as followed:
 
 ```yaml
       [...]
