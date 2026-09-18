@@ -20,32 +20,11 @@ Open WebUI allows you to integrate directly into your web browser. This tutorial
 Before you begin, ensure that:
 
 - You have Chrome or another supported browser installed.
-- The `WEBUI_URL` environment variable is set correctly, either using Docker environment variables or in the `.env` file as specified in the [Getting Started](https://docs.openwebui.com/reference/env-configuration) guide.
+- Your Open WebUI instance is reachable from the browser at a stable URL.
 
-### Step 1: Set the WEBUI_URL Environment Variable
+### Step 1: Note your Open WebUI URL
 
-Setting the `WEBUI_URL` environment variable ensures your browser knows where to direct queries.
-
-#### Using Docker Environment Variables
-
-If you are running Open WebUI using Docker, you can set the environment variable in your `docker run` command:
-
-```bash
-docker run -d \
-  -p 3000:8080 \
-  --add-host=host.docker.internal:host-gateway \
-  -v open-webui:/app/backend/data \
-  --name open-webui \
-  --restart always \
-  -e WEBUI_URL="https://<your-open-webui-url>" \
-  ghcr.io/open-webui/open-webui:main
-```
-
-Alternatively, you can add the variable to your `.env` file:
-
-```plaintext
-WEBUI_URL=https://<your-open-webui-url>
-```
+The integration is entirely browser-side: the browser opens `<your-open-webui-url>/?q=%s` and Open WebUI reads the `q` parameter from the page URL. No environment variable is involved; `WEBUI_URL` is a server-side setting for OAuth redirects and links and plays no part here.
 
 ### Step 2: Add Open WebUI as a Custom Search Engine
 
@@ -105,6 +84,6 @@ This command will redirect you to the Open WebUI interface with your search resu
 
 If you encounter any issues, check the following:
 
-- Ensure the `WEBUI_URL` is correctly configured and points to a valid Open WebUI instance.
+- Ensure the URL in the search-engine setting points to a running Open WebUI instance.
 - Double-check that the search engine URL format is correctly entered in your browser settings.
 - Confirm your internet connection is active and that the Open WebUI service is running smoothly.
