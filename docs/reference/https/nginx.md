@@ -14,11 +14,9 @@ This guide provides three methods to set up HTTPS:
 - **Let's Encrypt**: Perfect for production environments requiring trusted SSL certificates, using docker.
 - **Windows+Self-Signed**: Simplified instructions for development and internal use on windows, no docker required.
 
-:::danger Critical: Configure CORS for WebSocket Connections
+:::tip Set CORS_ALLOW_ORIGIN to your public origin
 
-A very common and difficult-to-debug issue with WebSocket connections is a misconfigured Cross-Origin Resource Sharing (CORS) policy. When running Open WebUI behind a reverse proxy like Nginx Proxy Manager, you **must** set the `CORS_ALLOW_ORIGIN` environment variable in your Open WebUI configuration.
-
-Failure to do so will cause WebSocket connections to fail, even if you have enabled "Websockets support" in Nginx Proxy Manager.
+`CORS_ALLOW_ORIGIN` defaults to `*`, so leaving it unset never breaks WebSocket connections. Set it to your exact public origin (for example `https://chat.example.com`) as hardening. What does break browser and WebSocket requests is a value that omits that origin, such as an `http://` entry while you serve `https://`.
 
 ### HTTP/2 and WebSockets
 
@@ -33,11 +31,9 @@ proxy_set_header Connection "upgrade";
 
 :::
 
-:::danger Critical: Disable Proxy Buffering for SSE Streaming
+:::warning Disable Proxy Buffering for SSE Streaming
 
-**This is the most common cause of garbled markdown and broken streaming responses.**
-
-When Nginx's `proxy_buffering` is enabled (the default!), it re-chunks SSE streams arbitrarily. This breaks markdown tokens across chunk boundaries. For example, `**bold**` becomes `**` + `bold` + `**`, causing corrupted output with visible `##`, `**`, or missing words.
+The web UI streams chat tokens over the Socket.IO connection at `/ws/socket.io`, not over the HTTP response, so buffering does not garble chat in the browser while WebSocket works. It does hold back the SSE streams that API clients read from `/api/chat/completions`, `/openai/*` and `/ollama/*`, and the Socket.IO polling fallback, so keep buffering off.
 
 **You MUST include these directives in your Nginx location block:**
 
@@ -112,7 +108,7 @@ location /api/ {
     proxy_read_timeout 1800;
 }
 
-# WebSocket connections need even longer timeouts
+# The server pings every 25s, so any idle timeout above 45s keeps the socket alive
 location ~ ^/(ws/|socket\.io/) {
     proxy_connect_timeout 86400;  # 24 hours
     proxy_send_timeout 86400;
@@ -126,7 +122,7 @@ Prevent errors with large requests or OAuth tokens:
 
 ```nginx
 # In http {} or server {} block
-client_max_body_size 100M;           # Large file uploads
+client_max_body_size 100M;           # The app has no upload cap until Max Upload Size is set in Admin Settings > Documents; this limit is what returns 413
 proxy_buffer_size 128k;              # Large headers (OAuth tokens)
 proxy_buffers 4 256k;
 proxy_busy_buffers_size 256k;
@@ -199,12 +195,15 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
 
         gzip off;
         proxy_buffering off;
         proxy_cache off;
 
-        # 24-hour timeout for persistent connections
+        # The server pings every 25s, so any idle timeout above 45s keeps the socket alive
         proxy_connect_timeout 86400;
         proxy_send_timeout 86400;
         proxy_read_timeout 86400;
