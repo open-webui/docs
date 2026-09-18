@@ -76,16 +76,17 @@ This is useful for:
 
 ### think (Ollama)
 
-This Ollama-specific setting enables or disables the model's built-in reasoning feature:
+This Ollama-specific setting controls the model's built-in reasoning feature. Ollama has separated thinking from the answer natively since v0.9.0, so there is no server-side flag to set:
 
-| Option | Description |
-|--------|-------------|
-| **Default** | Uses Ollama's default behavior |
-| **On** | Explicitly enables thinking mode for the model |
-| **Off** | Disables thinking mode |
+| Option | What is sent | Description |
+|--------|--------------|-------------|
+| **Default** | nothing | Uses Ollama's default behavior, which is thinking on for models that support it |
+| **On** | `think: true` | Explicitly enables thinking mode for the model |
+| **Custom** | `think: "low"`, `"medium"`, `"high"` or `"max"` | Sets a thinking level. GPT-OSS accepts only a level, never `true` |
+| **Off** | `think: false` | Disables thinking mode |
 
 :::note
-This setting sends the `think` parameter directly to Ollama. It's separate from how Open WebUI parses the response. You may need both this setting AND proper reasoning tags configuration for the full experience.
+This setting sends the `think` parameter directly to Ollama, which returns the trace in a separate `thinking` field that Open WebUI reads as reasoning (see [Path 2](#path-2-reasoning-captured-into-a-structured-output-array) below). It's separate from how Open WebUI parses `<think>` tags in text, which only matters for models that write their reasoning inline.
 :::
 
 ### Reasoning Effort
@@ -96,7 +97,7 @@ For models that support variable reasoning depth (like some API providers), this
 - Some providers accept numeric values
 
 :::info
-Reasoning Effort is only applicable to models from specific providers that support this parameter. It has no effect on local Ollama models.
+Reasoning Effort is only applicable to models from specific providers that support this parameter. It is not forwarded on native Ollama connections, where the `think` setting above covers the same ground. Ollama's OpenAI-compatible endpoint does accept `reasoning_effort` when Ollama is added as an OpenAI connection instead.
 :::
 
 ---
@@ -132,7 +133,7 @@ When a model streams reasoning as `<think>…</think>` (or any other configured 
 
 #### Path 2: Reasoning captured into a structured `output` array
 
-If the upstream stream emits `reasoning_content` / `reasoning` / `thinking` deltas (rather than text tags), typical for **OpenAI o-series**, **DeepSeek's official API**, **llama.cpp** with reasoning enabled, or **Ollama** with the `--reasoning-parser` flag, Open WebUI captures those deltas into a separate `reasoning` item inside the assistant message's `output` array. The displayed `content` only contains a `<details type="reasoning">` block for the UI; the structured form lives on `output`.
+If the upstream stream emits `reasoning_content` / `reasoning` / `thinking` deltas (rather than text tags), typical for **OpenAI o-series**, **DeepSeek's official API**, **llama.cpp** with reasoning enabled, or **Ollama** with `think` on (its separate `thinking` field is read as one of these deltas), Open WebUI captures those deltas into a separate `reasoning` item inside the assistant message's `output` array. The displayed `content` only contains a `<details type="reasoning">` block for the UI; the structured form lives on `output`.
 
 When that message is replayed to the LLM (within a tool-call loop or on the next user turn), Open WebUI rebuilds it from `output` rather than forwarding the rendered `content`. The format used for the rebuilt reasoning depends on the **connection's `Provider` setting** (**Settings → Admin → Connections → OpenAI → Advanced → Provider** dropdown, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically):
 
@@ -169,7 +170,7 @@ For a `llama.cpp` connection it looks like:
 
 | Provider type | Path 1 (tags in `content`) | Path 2 (structured `output`) |
 | :--- | :--- | :--- |
-| OpenAI-compatible APIs that emit `<think>` tags inline (DeepSeek-R1 via Ollama, Qwen3 with the reasoning parser, etc.) | ✅ Round-trips automatically. | n/a |
+| OpenAI-compatible APIs that emit `<think>` tags inline (a llama.cpp or vLLM server not configured to split reasoning out, for example) | ✅ Round-trips automatically. | n/a |
 | Ollama (connection auto-tagged as `ollama`) | ✅ Round-trips. | ✅ Rebuilt as `<think>…</think>` in `content`. |
 | llama.cpp (connection *Provider* set to `llama.cpp`) | ✅ Round-trips if the model uses tags. | ✅ Rebuilt as `reasoning_content` field. |
 | OpenAI o-series (Responses API) | n/a (o-series doesn't expose reasoning text). | ⚠️ Reasoning continuity is handled by `previous_response_id`, not by re-sending content. |
@@ -197,11 +198,11 @@ Providers that send reasoning metadata alongside the answer rather than before i
 In non-streaming mode (`stream: false`), the entire response is returned at once. **This is where most parsing issues occur** because:
 
 1. The response arrives as a single block of text
-2. Without the reasoning parser, no post-processing separates the `<think>` content
+2. The `<think>` content is only separated if the tags are detected in the finished text
 3. The raw response is displayed as-is
 
 :::info Important
-If you're using non-streaming requests (via API or certain configurations), **the reasoning parser is essential** for proper thinking block separation.
+If you're using non-streaming requests (via API or certain configurations), **thinking block separation depends on the tags being detected in the full response**, or on the backend returning the reasoning as its own field.
 :::
 
 ---
@@ -247,69 +248,39 @@ Here's a complete code snippet that demonstrates a sticky header using CSS and J
 
 ### For Ollama Users
 
-The most common cause is that Ollama is not configured with the correct **reasoning parser**. When running Ollama, you need to specify the `--reasoning-parser` flag to enable proper parsing of thinking blocks.
+Ollama does not take a parser flag. `ollama serve` has no command-line options, and the `--reasoning-parser` flag some guides mention belongs to vLLM. Ollama splits thinking from the answer itself once the `think` parameter is on, and Open WebUI shows that split without any server-side setup.
 
-#### Step 1: Configure the Reasoning Parser
+#### Step 1: Check the Ollama Version
 
-When starting Ollama, add the `--reasoning-parser` flag:
-
-```bash
-# For DeepSeek-R1 style reasoning (recommended for most models)
-ollama serve --reasoning-parser deepseek_r1
-
-# Alternative parsers (if the above doesn't work for your model)
-ollama serve --reasoning-parser qwen3
-ollama serve --reasoning-parser deepseek_v3
-```
-
-:::tip Recommended Parser
-For most reasoning models, including Qwen3 and DeepSeek variants, use `--reasoning-parser deepseek_r1`. This parser handles the standard `<think>...</think>` format used by most reasoning models.
-:::
-
-#### Step 2: Restart Ollama
-
-After adding the flag, restart the Ollama service:
+Thinking support arrived in Ollama v0.9.0. Check what you are running:
 
 ```bash
-# Stop Ollama
-# On Linux/macOS:
-pkill ollama
-
-# On Windows (PowerShell):
-Stop-Process -Name ollama -Force
-
-# Start with the reasoning parser
-ollama serve --reasoning-parser deepseek_r1
+ollama --version
 ```
+
+#### Step 2: Turn Thinking On for the Model
+
+Open **Chat Controls > Advanced Params** (or the model's **Advanced Params** in the model editor) and set **think (Ollama)** to **On**, or to **Custom** with a level (`low`, `medium`, `high` or `max`) for models such as GPT-OSS that accept only a level. **Default** leaves the choice to Ollama, which turns thinking on for supported models.
 
 #### Step 3: Verify in Open WebUI
 
 1. Go to Open WebUI and start a new chat with your reasoning model
 2. Ask a question that requires reasoning (e.g., a math problem or logic puzzle)
-3. The response should now show the thinking content in a collapsible section
+3. The response should now show the thinking content in a collapsible section above the answer
 
-### Available Reasoning Parsers
-
-| Parser | Description | Use Case |
-|--------|-------------|----------|
-| `deepseek_r1` | DeepSeek R1 format | Most reasoning models, including Qwen3 |
-| `deepseek_v3` | DeepSeek V3 format | Some DeepSeek variants |
-| `qwen3` | Qwen3-specific format | If `deepseek_r1` doesn't work with Qwen |
+If the model writes its reasoning inline as `<think>...</think>` text instead of using Ollama's thinking field, check the **Reasoning Tags** setting above, and use **Custom** for any other tag pair.
 
 ### Troubleshooting Checklist
 
-#### 1. Verify Ollama Is Running with Reasoning Parser
+#### 1. Verify Ollama Separates the Thinking
 
-Check if Ollama was started with the correct flag:
+Run the model from the Ollama CLI with thinking on. A supported model prints the trace and the answer as two parts:
 
 ```bash
-# Check the Ollama process
-ps aux | grep ollama
-# or on Windows:
-Get-Process -Name ollama | Format-List *
+ollama run your-model:tag --think "Explain step by step: What is 15 + 27?"
 ```
 
-Look for `--reasoning-parser` in the command line arguments.
+If Ollama says the model does not support thinking, the model has no thinking mode, and Open WebUI can only pick up tags it writes into the text.
 
 #### 2. Check Model Compatibility
 
