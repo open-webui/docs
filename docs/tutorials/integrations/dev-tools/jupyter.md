@@ -19,7 +19,7 @@ Starting in v0.5.11, Open-WebUI released a new feature called `Jupyter Notebook 
 This tutorial walks you through the basics of setting-up the connection between the two services.
 
 - [See v0.5.11 Release Notes](https://github.com/open-webui/open-webui/releases/tag/v0.5.11)
-- [See v0.5.15 Release Notes](https://github.com/open-webui/open-webui/releases/tag/v0.5.14)
+- [See v0.5.15 Release Notes](https://github.com/open-webui/open-webui/releases/tag/v0.5.15)
 
 ## What are Jupyter Notebooks
 
@@ -39,29 +39,33 @@ To accomplish this, I used Docker Compose to launch a stack that includes both s
 
 ```yaml title="docker-compose.yml"
 services:
-open-webui:
-image: ghcr.io/open-webui/open-webui:latest
-container_name: open-webui
-ports:
-- "3000:8080"
-volumes:
-- open-webui:/app/backend/data
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
-jupyter:
-image: jupyter/minimal-notebook:latest
-container_name: jupyter-notebook
-ports:
-- "8888:8888"
-volumes:
-- jupyter_data:/home/jovyan/work
-environment:
-- JUPYTER_ENABLE_LAB=yes
-- JUPYTER_TOKEN=123456
+  jupyter:
+    image: jupyter/minimal-notebook:latest
+    container_name: jupyter-notebook
+    ports:
+      - "8888:8888"
+    volumes:
+      - jupyter_data:/home/jovyan/work
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=123456
 
 volumes:
-open-webui:
-jupyter_data:
+  open-webui:
+  jupyter_data:
 ```
+
+The `extra_hosts` line is what makes `host.docker.internal` resolve on Linux, which the `CODE_EXECUTION_JUPYTER_URL` below relies on; inside this Compose project `http://jupyter:8888` works as well.
 
 You can launch the above stack by running the below command in the directory where the `docker-compose.yml` file is saved:
 
@@ -83,6 +87,8 @@ When accessing the Jupyter service, you will need the `JUPYTER_TOKEN` defined ab
 # Step 2: Configure Code Execution for Jupyter
 
 Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI's Code Execution to use Jupyter under Settings > Admin > Code Execution. Since Open-WebUI is constantly releasing and improving this feature, I recommend always reviewing the possible configuraitons in the [`configs.py` file](https://github.com/open-webui/open-webui/blob/6fedd72e3973e1d13c9daf540350cd822826bf27/backend/open_webui/routers/configs.py#L72) for the latest and greatest. As of v0.5.16, this includes the following:
+
+These are persisted Admin settings: the environment variables seed the first start only, after which the database value wins. `CODE_EXECUTION_JUPYTER_AUTH` accepts exactly `token` or `password`; any other value sends no credentials, and password mode logs in through Jupyter's `/login` form. The `CODE_INTERPRETER_*` variables default to their `CODE_EXECUTION_*` twins.
 
 | Open-WebUI Env Var | Value |
 | ------------------------------------- | -------------------------------- |
@@ -150,7 +156,7 @@ We can see the visualizations were created and are now accessible within Jupyter
 
 ## Note about workflow
 
-While testing this feature, I noticed several times that Open-WebUI would not automatically save the code or output generated within Open-WebUI to my instance of Jupyter. To force it to output the file/item I created, I often followed this two-step workflow, which first creates the code artifact I want and then asks it to save it to my instance of Jupyter.
+While testing this feature, I noticed several times that Open-WebUI would not automatically save the code or output generated within Open-WebUI to my instance of Jupyter. To force it to output the file/item I created, I often followed this two-step workflow, which first creates the code artifact I want and then asks it to save it to my instance of Jupyter. This is by design: every execution starts a fresh kernel and deletes it when done, so variables and in-memory objects never persist between runs, and only files written to disk survive.
 
 ![Code Execution Configuration](/images/tutorials/jupyter/jupyter-workflow.png)
 
