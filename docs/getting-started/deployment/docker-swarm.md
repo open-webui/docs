@@ -17,6 +17,8 @@ This stack correctly deploys ChromaDB as a **separate HTTP server** container, w
 
 The default ChromaDB mode (without `CHROMA_HTTP_HOST`) uses a local SQLite-backed `PersistentClient` that is **not fork-safe**: concurrent writes from multiple worker processes will crash workers instantly. Running ChromaDB as a separate server avoids this by using HTTP connections instead of direct SQLite access.
 
+The `chromadb/chroma` image is pinned to the same version as the `chromadb` client library inside the Open WebUI image, because a 1.x client only speaks the v2 API. Keep the two major versions matched when you update either. The 1.x image stores its data under `/data` and does not read the `IS_PERSISTENT` and `PERSIST_DIRECTORY` variables of the old 0.5 image. Open WebUI's **Reset Vector Storage/Knowledge** and **Reset Upload Directory** actions call Chroma's reset endpoint, which the 1.x server refuses unless `allow_reset: true` is set in a config file mounted at `/config.yaml` (see [Chroma's Docker guide](https://docs.trychroma.com/guides/deploy/docker)).
+
 If you plan to scale the `openWebUI` service to multiple replicas, you should also switch to PostgreSQL for the main database and set up Redis. See the [Scaling & HA guide](https://docs.openwebui.com/troubleshooting/multi-replica) for full requirements.
 
 :::
@@ -51,12 +53,12 @@ Choose the appropriate command based on your hardware setup:
         environment:
           DATA_DIR: /app/backend/data
           WEBUI_SECRET_KEY: your-secret-key
-          OLLAMA_BASE_URLS: http://ollama:11434
+          OLLAMA_BASE_URL: http://ollama:11434
           CHROMA_HTTP_PORT: 8000
           CHROMA_HTTP_HOST: chromadb
           CHROMA_TENANT: default_tenant
           VECTOR_DB: chroma
-          WEBUI_NAME: Awesome ChatBot
+          WEBUI_NAME: Awesome ChatBot # shown as "Awesome ChatBot (Open WebUI)"
           CORS_ALLOW_ORIGIN: "*" # This is the current Default, will need to change before going live
           RAG_EMBEDDING_ENGINE: ollama
           RAG_EMBEDDING_MODEL: nomic-embed-text-v1.5
@@ -74,13 +76,9 @@ Choose the appropriate command based on your hardware setup:
 
       chromadb:
         hostname: chromadb
-        image: chromadb/chroma:0.5.15
+        image: chromadb/chroma:1.5.9
         volumes:
-          - ./data/chromadb:/chroma/chroma
-        environment:
-          - IS_PERSISTENT=TRUE
-          - ALLOW_RESET=TRUE
-          - PERSIST_DIRECTORY=/chroma/chroma
+          - ./data/chromadb:/data
         ports:
           - target: 8000
             published: 8000
@@ -91,12 +89,6 @@ Choose the appropriate command based on your hardware setup:
             condition: any
             delay: 5s
             max_attempts: 3
-        healthcheck:
-          test: ["CMD-SHELL", "curl localhost:8000/api/v1/heartbeat || exit 1"]
-          interval: 10s
-          retries: 2
-          start_period: 5s
-          timeout: 10s
 
       ollama:
         image: ollama/ollama:latest
