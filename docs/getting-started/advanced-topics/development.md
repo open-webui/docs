@@ -40,7 +40,7 @@ Testing it and reporting what you find is the lowest-effort way to help, and it 
 | Requirement | Version |
 |-------------|---------|
 | **Python** | 3.11 or 3.12 (see note below; 3.13 not supported yet) |
-| **Node.js** | 22.10+ |
+| **Node.js** | 18.13 to 22.x (the official image builds on Node 22) |
 | **Git** | Any recent version |
 
 :::info Python version compatibility
@@ -79,7 +79,7 @@ npm run build
 npm run dev
 ```
 
-`npm run build` compiles the frontend and catches build-time errors early. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). It will show a waiting screen until the backend is running.
+`npm run build` compiles the frontend and catches build-time errors early. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). Until the backend is running it redirects to a "Backend Required" error page; reload once the backend is up.
 
 :::tip
 If `npm install` fails with compatibility warnings, run `npm install --force`.
@@ -114,7 +114,7 @@ pip install -r requirements.txt -U
 sh dev.sh
 ```
 
-The backend starts at [http://localhost:8080](http://localhost:8080). API docs are available at [http://localhost:8080/docs](http://localhost:8080/docs).
+The backend starts at [http://localhost:8080](http://localhost:8080). API docs are available at [http://localhost:8080/docs](http://localhost:8080/docs). The `/docs` page is served only when `ENV=dev`, which is the default when running from source; the Docker image runs with `ENV=prod` and does not serve it.
 
 Refresh the frontend at [http://localhost:5173](http://localhost:5173) and you should see the full application.
 
@@ -125,13 +125,9 @@ Refresh the frontend at [http://localhost:5173](http://localhost:5173) and you s
 To access your dev instance from a phone or another computer on the same network:
 
 1. Find your machine's LAN IP (e.g., `192.168.1.42`)
-2. Add the origin to CORS in `backend/dev.sh`:
+2. Browse to `http://192.168.1.42:5173`
 
-```bash
-export CORS_ALLOW_ORIGIN="http://localhost:5173;http://localhost:8080;http://192.168.1.42:5173"
-```
-
-3. Restart the backend and browse to `http://192.168.1.42:5173`
+No CORS change is needed. `npm run dev` runs `vite dev --host`, so the dev server already listens on every interface, and it proxies `/api`, `/ollama`, `/openai`, `/oauth` and `/ws` to the backend, so the browser only ever talks to the Vite origin. If the backend runs on another machine, point the proxy at it with `WEBUI_BACKEND_URL=http://<host>:8080 npm run dev`.
 
 ---
 
@@ -160,11 +156,11 @@ lsof -i :5173
 Get-Process -Id (Get-NetTCPConnection -LocalPort 5173).OwningProcess
 ```
 
-Terminate the process or change the port in `vite.config.js` (frontend) or `dev.sh` (backend).
+Terminate the process, or start on another port: `PORT=9000 sh dev.sh` for the backend (then `WEBUI_BACKEND_URL=http://localhost:9000 npm run dev`), and `npm run dev:5050` or `npx vite dev --port 5050` for the frontend.
 
-### Icons not loading (CORS)
+### Icons not loading
 
-If static assets fail to load, configure `CORS_ALLOW_ORIGIN` in `backend/dev.sh` to include your frontend URL. See [CORS configuration](/reference/env-configuration#cors_allow_origin) for details.
+Static assets come from the Vite dev server, not the backend, so `CORS_ALLOW_ORIGIN` does not affect them. Check the dev server's terminal for the failing request instead.
 
 ### Hot reload not working
 
