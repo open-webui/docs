@@ -18,6 +18,10 @@ volumes:
   open-webui:
 ```
 
+`extra_hosts` makes `host.docker.internal` resolve to the host on Linux. With no `OLLAMA_BASE_URL` set, the image looks for Ollama at `http://host.docker.internal:11434` (then `:12434`), so this line is what lets it reach an Ollama running on the host.
+
+To update, run `docker compose pull` and then `docker compose up -d`. The Watchtower command on the Updating tab targets a container named `open-webui`; Compose names this one `<project>-open-webui-1` unless you add `container_name: open-webui` to the service.
+
 The tags are the same as on the Docker tab: change the `image:` line. To try `:dev`, add it as a second service with its own volume and port, see [Running the pre-release image](/getting-started/quick-start#running-the-pre-release-image). Use Docker Compose v2 (`docker compose`, with a space).
 
 
@@ -77,15 +81,15 @@ deploy:
           capabilities: [gpu]
 ```
 
-This setup ensures that your application can leverage GPU resources when available.
+This setup ensures that your application can leverage GPU resources when available. The `:cuda` image moves Open WebUI's own local models (embedding, reranking, and Whisper speech-to-text) to the GPU; Ollama's models use a GPU only if the Ollama container has one. If no GPU is visible, the image falls back to the CPU without an error. For the pre-release channel the tag is `:dev-cuda`.
 
 ### Helper Scripts
 
 A set of helper scripts is included with the codebase to streamline common Docker workflows:
 
-- `docker-compose-launcher.sh`: Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, host data mounts, and optional Playwright support. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project.
+- `docker-compose-launcher.sh`: Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, a host data mount for Ollama's models, and optional Playwright support. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project.
 - `docker-cleanup.sh`: Stops the Compose project and **deletes all volumes**, including persistent data. Prompts for confirmation before destroying data.
-- `docker-run.sh`: Builds the Open WebUI image and runs a single container, exposing it on `OPEN_WEBUI_PORT` (default `3000`).
+- `docker-run.sh`: Builds the Open WebUI image and runs a single container, exposing it on `OPEN_WEBUI_PORT` (default `3000`). It sets no `WEBUI_SECRET_KEY`, so add one to its `docker run` line before using the container for anything beyond a quick test.
 - `docker-ollama.sh`: Pulls and runs the official Ollama container with optional GPU passthrough, exposing it on `OLLAMA_PORT` (default `11434`).
 - `docker-update-models.sh`: Iterates through every model installed in the Ollama container and pulls the latest version.
 

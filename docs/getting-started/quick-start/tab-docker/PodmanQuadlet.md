@@ -28,6 +28,7 @@ Podman Quadlets allow you to manage containers as native systemd services. This 
    # Networking: Pasta is used by default in Podman 5+
    # If you need to access host services (like Ollama on the host):
    AddHost=host.containers.internal:host-gateway
+   Environment=OLLAMA_BASE_URL=http://host.containers.internal:11434
 
    [Service]
    Restart=always
