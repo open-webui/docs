@@ -7,8 +7,8 @@ description: Learn how to configure both Microsoft and Google OAuth providers si
 
 # Dual OAuth Configuration (Microsoft & Google)
 
-:::caution Unofficial Workaround
-This configuration is a community-contributed workaround and is **not officially supported** by the Open WebUI team. While it works in current versions, behavior may change in future updates. This tutorial serves as a demonstration for advanced users.
+:::info Supported configuration
+Google, Microsoft, GitHub and Feishu are separate built-in providers, each registered independently of the generic OIDC provider (`OPENID_PROVIDER_URL`). Only the generic OIDC slot is single, so Microsoft plus Google is a supported setup rather than a workaround.
 :::
 
 ## Overview
@@ -37,7 +37,7 @@ ENABLE_OAUTH_SIGNUP=true
 OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true
 
 # 1. Microsoft as the primary OIDC provider
-# This uses the generic OIDC flow via the OPENID_PROVIDER_URL
+# Registered as the built-in Microsoft provider from these three variables
 MICROSOFT_CLIENT_ID=your_microsoft_client_id
 MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
 MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
@@ -59,13 +59,13 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 
 ## Why This Works
 
-1.  **Microsoft** is handled via the generic OIDC flow because `OPENID_PROVIDER_URL` is set to the Microsoft endpoint.
-2.  **Google** is handled via the dedicated internal Google OAuth module because the system detects `GOOGLE_CLIENT_ID` but sees that the global `OPENID_PROVIDER_URL` is already "claimed" by Microsoft or simply isn't needed for the built-in Google module.
+1.  **Microsoft** is registered as the built-in Microsoft provider from `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET` and `MICROSOFT_CLIENT_TENANT_ID`, with its own tenant discovery URL. `OPENID_PROVIDER_URL` registers nothing here, because the generic OIDC provider also needs `OAUTH_CLIENT_ID`.
+2.  **Google** is registered as the built-in Google provider whenever `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` are set, regardless of any other provider.
 3.  **Account Merging**: Since both providers return the user's email, `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true` ensures the user logs into the same profile whether they click "Sign in with Google" or "Sign in with Microsoft."
 
 ## Troubleshooting
 
-- **Redirect Mismatch**: Ensure your Redirect URIs in both consoles match your `WEBUI_URL`.
+- **Redirect Mismatch**: Ensure the Redirect URIs in both consoles match `MICROSOFT_REDIRECT_URI` and `GOOGLE_REDIRECT_URI` if set, or otherwise the URL Open WebUI is reached at, since the callback URL is built from the incoming request; `WEBUI_URL` is not used for login redirects.
 - **Merge Failures**: Double-check that `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is set to `true`.
-- **Microsoft Logout**: Microsoft often requires the `OPENID_PROVIDER_URL` to handle the logout redirect correctly. If logout fails, ensure this URL is correct for your tenant.
+- **Microsoft Logout**: Sign-out discovers the end-session endpoint from the provider the session logged in with, so a Microsoft session logs out without `OPENID_PROVIDER_URL`; `OPENID_END_SESSION_ENDPOINT` overrides it if set.
 - **Azure AD Refresh Token Failures (`AADSTS90009`)**: If token refresh fails with the error "Application is requesting a token for itself", set `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE=true`. Azure AD requires the scope to be explicitly included in refresh token requests. You may also need to set `MICROSOFT_OAUTH_SCOPE` to include `offline_access` and any custom API scopes.

@@ -134,7 +134,7 @@ OAUTH_PROVIDER_NAME="Okta"
 
 # The claim name in the ID token containing group information (must match Okta config)
 
-# OAUTH_GROUP_CLAIM="groups"
+# OAUTH_GROUPS_CLAIM="groups"
 
 # Optional: Enable Just-in-Time (JIT) creation of groups if they exist in Okta claims but not in Open WebUI.
 
@@ -147,7 +147,7 @@ OAUTH_PROVIDER_NAME="Okta"
 
 Replace `YOUR_OKTA_CLIENT_ID`, `YOUR_OKTA_CLIENT_SECRET`, and `YOUR_OKTA_OIDC_DISCOVERY_URL` with the actual values from your Okta application configuration.
 
-To enable group synchronization based on Okta claims, set `ENABLE_OAUTH_GROUP_MANAGEMENT="true"` and ensure `OAUTH_GROUP_CLAIM` matches the claim name configured in Okta (default is `groups`).
+To enable group synchronization based on Okta claims, set `ENABLE_OAUTH_GROUP_MANAGEMENT="true"` and ensure `OAUTH_GROUPS_CLAIM` (the older `OAUTH_GROUP_CLAIM` is still read as a fallback) matches the claim name configured in Okta (default is `groups`).
 
 To *also* enable automatic Just-in-Time (JIT) creation of groups that exist in Okta but not yet in Open WebUI, set `ENABLE_OAUTH_GROUP_CREATION="true"`. You can leave this as `false` if you only want to manage memberships for groups that already exist in Open WebUI.
 
@@ -156,7 +156,7 @@ To *also* enable automatic Just-in-Time (JIT) creation of groups that exist in O
 Group Membership Management
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI will be **strictly synchronized** with the groups received in their Okta claims upon each login. This means:
 *   Users will be **added** to Open WebUI groups that match their Okta claims.
-*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their Okta claims for that login session.
+*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their Okta claims for that login session. If the claim is missing or empty, no memberships are touched, and groups matching `OAUTH_BLOCKED_GROUPS` are never added or removed.
 
 Ensure that all necessary groups are correctly configured and assigned within Okta and included in the group claim.
 
@@ -205,13 +205,13 @@ Restart your Open WebUI instance after setting these environment variables.
 1.  Navigate to your Open WebUI login page. You should see a button labeled "Login with Okta" (or whatever you set for `OAUTH_PROVIDER_NAME`).
 2.  Click the button and authenticate through the Okta login flow.
 3.  Upon successful authentication, you should be redirected back to Open WebUI and logged in.
-4.  If `ENABLE_OAUTH_GROUP_MANAGEMENT` is true, log in as a non-admin user. Their groups within Open WebUI should now strictly reflect their current group memberships in Okta (any memberships in groups *not* in the Okta claim will be removed). If `ENABLE_OAUTH_GROUP_CREATION` is also true, any groups present in the user's Okta claims that did not previously exist in Open WebUI should now have been created automatically. Note that admin users' groups are not automatically updated via SSO.
+4.  If `ENABLE_OAUTH_GROUP_MANAGEMENT` is true, log in as a non-admin user. Their groups within Open WebUI should now strictly reflect their current group memberships in Okta (any memberships in groups *not* in the Okta claim will be removed). If `ENABLE_OAUTH_GROUP_CREATION` is also true, any groups present in the user's Okta claims that did not previously exist in Open WebUI should now have been created automatically. Admin users' groups are synced the same way since v0.8.11.
 5.  Check the Open WebUI server logs for any OIDC or group-related errors if you encounter issues.
 
 ## Troubleshooting
 
 *   **400 Bad Request/Redirect URI Mismatch:** Double-check that the **Sign-in redirect URI** in your Okta application exactly matches `<your-open-webui-url>/oauth/oidc/callback`.
-*   **Groups Not Syncing:** Verify that the `OAUTH_GROUP_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Remember admin groups are not synced.
+*   **Groups Not Syncing:** Verify that the `OAUTH_GROUPS_CLAIM` environment variable matches the claim name configured in the Okta ID Token settings. Ensure the user has logged out and back in after group changes - a login flow is required to update OIDC. Admin groups are synced too since v0.8.11.
 *   **Configuration Errors:** Review the Open WebUI server logs for detailed error messages related to OIDC configuration.
 
 *   Refer to the official [Open WebUI SSO Documentation](/features/authentication-access/auth/sso).
