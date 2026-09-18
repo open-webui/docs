@@ -42,7 +42,7 @@ Restrict models to specific users or groups. A finance team sees their models; e
 
 ### Dynamic system prompts
 
-Use Jinja2-style variables like `{{ USER_NAME }}` and `{{ CURRENT_DATE }}` so the system prompt adapts to each user and session automatically.
+Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt adapts to each user and session automatically. Write them without spaces inside the braces: the spaced form reaches the model as literal text. Only the chat and user variables (`{{ chat.variables.x }}`, `{{ user.variables.x }}`) tolerate spaces.
 
 ---
 
@@ -51,7 +51,7 @@ Use Jinja2-style variables like `{{ USER_NAME }}` and `{{ CURRENT_DATE }}` so th
 | | |
 | :--- | :--- |
 | 🧩 **Model presets** | System prompt, tools, knowledge, skills, and parameters in one package |
-| 🏷️ **Dynamic variables** | `{{ USER_NAME }}`, `{{ CURRENT_DATE }}`, `{{ CURRENT_TIME }}` injected automatically |
+| 🏷️ **Dynamic variables** | `{{USER_NAME}}`, `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}` injected automatically |
 | 🔧 **Bound tools** | Force-enable specific tools per model |
 | 📚 **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
 | 🎭 **Skills** | Bind markdown instruction sets loaded on-demand via `view_skill` |
@@ -71,7 +71,7 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 | :--- | :--- |
 | **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
 | **Name and ID** | Display name and unique identifier |
-| **Base Model** | The actual model that powers this agent |
+| **Base Model (From)** | The actual model that powers this agent |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
 | **Visibility** | Private (specific users/groups) or public |
@@ -84,19 +84,19 @@ The system prompt defines the behavior and persona. Use dynamic variables for co
 
 | Variable | Output example |
 | :--- | :--- |
-| `{{ CURRENT_DATE }}` | `2024-10-27` |
-| `{{ CURRENT_TIME }}` | `14:30:05` |
-| `{{ USER_NAME }}` | `Admin` |
+| `{{CURRENT_DATE}}` | `2024-10-27` |
+| `{{CURRENT_TIME}}` | `14:30:05` |
+| `{{USER_NAME}}` | `Admin` |
 | `{{ USER_GROUPS }}` | `Engineering, Beta Testers` (comma-separated; empty if the user is in no groups) |
 
 ```
-You are a helpful assistant for {{ USER_NAME }}.
-The current date is {{ CURRENT_DATE }}.
+You are a helpful assistant for {{USER_NAME}}.
+The current date is {{CURRENT_DATE}}.
 ```
 
 :::note System prompts are instructions, not a guarantee
 
-Open WebUI does not require a special format for system prompts. Plain text, Markdown lists, and short structured sections all work; the only special syntax Open WebUI handles here is supported variables such as `{{ CURRENT_DATE }}` and chat/user variables.
+Open WebUI does not require a special format for system prompts. Plain text, Markdown lists, and short structured sections all work; the only special syntax Open WebUI handles here is supported variables such as `{{CURRENT_DATE}}` and chat/user variables.
 
 How closely the assistant follows the prompt depends on the selected **Base Model**, the provider or local server's chat template, the full conversation context, and any extra instructions added by tools, files, RAG, skills, memory, or filters. If a prompt is configured in the right place but the model still ignores rules, compare against a stronger instruction-following model and check the provider/backend request formatting before assuming the prompt needs a different Open WebUI-specific format.
 
@@ -128,7 +128,7 @@ Toggle what the model can do and bind resources:
 | **Citations** | Show the sources behind a reply, from knowledge, web search and the builtin tools that return them. On by default; with it off no sources are shown |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
-| **Builtin Tools** | Control which tool categories are available: Time, Memory, Chats, Notes, Knowledge, Channels, Files, Task Management, Automations |
+| **Builtin Tools** | Control which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents |
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **File Context** disappears from this editor since there is nothing to extract |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **TTS Voice** | Set a specific voice for this model's responses |
@@ -139,7 +139,7 @@ The request for token counts is added server-side, so it applies wherever the mo
 
 ### Advanced parameters
 
-- **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). Press Enter after each.
+- **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). One text field, comma-separated.
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
 
 What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
@@ -159,9 +159,10 @@ From the model list, click the ellipsis (**...**) on any model:
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Open the configuration panel |
-| **Hide** | Remove from the model selector without deleting |
+| **Hide Model** / **Show Model** | Remove from the model selector without deleting, or bring it back |
+| **Hide from Sidebar** / **Keep in Sidebar** | Toggle the model's pin in the sidebar |
 | **Clone** | Create an editable copy you can rename and reconfigure |
-| **Copy Link** | Copy a direct URL to the model settings |
+| **Copy Link** | Copy a chat URL (`/?model=<id>`) that opens a new chat on this model |
 | **Export** | Download the configuration as `.json` |
 | **Share** | Share to the Open WebUI community |
 | **Delete** | Permanently remove the preset |
