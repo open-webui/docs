@@ -13,14 +13,14 @@ Because you control that service, you also control what happens inside it. A few
 - **Split large documents into multiple retrievable pieces.** Return one chunk per sheet, page, or slide instead of one giant blob.
 - **Apply per-user logic.** Open WebUI forwards the requesting user's identity with every request, so your service can enforce access rules or route to a customer-specific backend.
 - **Forward custom headers with live values.** Configure headers like the requesting user's email or the file's name to be sent along with every extraction request, for routing, logging, or access control on your service. See [Headers](#the-contract) below.
-- **Process images and video.** The external engine is the only one that receives image and video uploads for extraction by default.
+- **Process images and video.** The external engine is the only one that receives image and video uploads for extraction by default. Once **Supported Media MIME Types** is set, media goes to whichever engine matches the list instead.
 
 ## Configuration
 
 In **Settings > Admin > Documents**, set **Content Extraction Engine** to **External**, then fill in:
 
 - **Document Loader URL**: the base URL of your service. Open WebUI appends `/process` to it.
-- **API Key** (optional): sent as a bearer token if your service checks for one.
+- **API Key**: sent as a bearer token. It is required. With the engine set to External but no key saved, Open WebUI silently falls back to its built-in loaders and never calls your service, and the admin panel does not warn about it.
 - **Headers** (optional): a JSON object of additional headers to send with every request, see [templating](#the-contract) below.
 
 The same settings are available as environment variables: [`CONTENT_EXTRACTION_ENGINE=external`](/reference/env-configuration#content_extraction_engine), [`EXTERNAL_DOCUMENT_LOADER_URL`](/reference/env-configuration#external_document_loader_url), [`EXTERNAL_DOCUMENT_LOADER_API_KEY`](/reference/env-configuration#external_document_loader_api_key), [`EXTERNAL_DOCUMENT_LOADER_HEADERS`](/reference/env-configuration#external_document_loader_headers).
@@ -36,7 +36,7 @@ PUT {EXTERNAL_DOCUMENT_LOADER_URL}/process
 - **Body**: the raw file bytes, unmodified.
 - **`Content-Type`**: the file's detected MIME type.
 - **`Authorization`**: `Bearer {EXTERNAL_DOCUMENT_LOADER_API_KEY}`, if an API key is configured.
-- **`X-Filename`**: the original filename, URL-encoded.
+- **`X-Filename`**: the stored filename, `<file id>_<original name>`, URL-encoded. Use the `{{FILE_NAME}}` placeholder in a custom header to receive the original name on its own.
 - Any headers set in **Headers** / [`EXTERNAL_DOCUMENT_LOADER_HEADERS`](/reference/env-configuration#external_document_loader_headers), a JSON object of custom headers with placeholder templating: `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}`, `{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{USER_GROUPS}}`, `{{USER_GROUP_IDS}}`.
 - User identity, forwarded automatically: a signed JWT in `X-OpenWebUI-User-Jwt` if [`FORWARD_USER_INFO_HEADER_JWT_SECRET`](/reference/env-configuration#forward_user_info_header_jwt_secret) is set, otherwise plain `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, and `X-OpenWebUI-User-Role` headers.
 
