@@ -78,7 +78,7 @@ environment variables, see our [logging documentation](https://docs.openwebui.co
 #### `WEBUI_URL`
 
 - Type: `str`
-- Default: `http://localhost:3000`
+- Default: Empty string (unset)
 - Description: Specifies the URL where your Open WebUI installation is reachable. Needed for search engine support and OAuth/SSO.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -202,7 +202,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 #### `DEFAULT_LOCALE`
 
 - Type: `str`
-- Default: `en`
+- Default: Empty string, which lets the browser's language pick the locale, with `en-US` as the fallback when no translation matches
 - Description: Sets the default locale for the application.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -900,15 +900,15 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 #### `AIOHTTP_CLIENT_TIMEOUT`
 
 - Type: `int`
-- Default: `300`
+- Default: Empty string (`None`, no timeout)
 - Description: Specifies the timeout duration in seconds for the AIOHTTP client. This impacts things
 such as connections to Ollama and OpenAI endpoints.
 
 :::info
 
 This is the maximum amount of time the client will wait for a response before timing out.
-If set to an empty string (' '), the timeout will be set to `None`, effectively disabling the timeout and
-allowing the client to wait indefinitely.
+When unset or empty, the timeout is `None` and the client waits indefinitely. A value that is not a
+whole number falls back to `300`.
 
 :::
 
@@ -1526,8 +1526,8 @@ Code execution and both of its engines are **legacy**. `pyodide` (browser/WebAss
 
 #### `CODE_EXECUTION_JUPYTER_TIMEOUT`
 
-- Type: `str`
-- Default: Empty string (' '), since `None` is set as default.
+- Type: `int`
+- Default: `60`
 - Description: Specifies the timeout for Jupyter code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1575,35 +1575,35 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 #### `CODE_INTERPRETER_JUPYTER_URL`
 
 - Type: `str`
-- Default: Empty string (' '), since `None` is set as default.
+- Default: The value of [`CODE_EXECUTION_JUPYTER_URL`](#code_execution_jupyter_url), otherwise empty
 - Description: Specifies the Jupyter URL to use for code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_INTERPRETER_JUPYTER_AUTH`
 
 - Type: `str`
-- Default: Empty string (' '), since `None` is set as default.
+- Default: The value of [`CODE_EXECUTION_JUPYTER_AUTH`](#code_execution_jupyter_auth), otherwise empty
 - Description: Specifies the Jupyter authentication method to use for code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_INTERPRETER_JUPYTER_AUTH_TOKEN`
 
 - Type: `str`
-- Default: Empty string (' '), since `None` is set as default.
+- Default: The value of [`CODE_EXECUTION_JUPYTER_AUTH_TOKEN`](#code_execution_jupyter_auth_token), otherwise empty
 - Description: Specifies the Jupyter authentication token to use for code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_INTERPRETER_JUPYTER_AUTH_PASSWORD`
 
 - Type: `str`
-- Default: Empty string (' '), since `None` is set as default.
+- Default: The value of [`CODE_EXECUTION_JUPYTER_AUTH_PASSWORD`](#code_execution_jupyter_auth_password), otherwise empty
 - Description: Specifies the Jupyter authentication password to use for code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_INTERPRETER_JUPYTER_TIMEOUT`
 
-- Type: `str`
-- Default: Empty string (' '), since `None` is set as default.
+- Type: `int`
+- Default: The value of [`CODE_EXECUTION_JUPYTER_TIMEOUT`](#code_execution_jupyter_timeout), otherwise `60`
 - Description: Specifies the timeout for the Jupyter code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1612,7 +1612,7 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 #### `ENABLE_DIRECT_CONNECTIONS`
 
 - Type: `bool`
-- Default: `True`
+- Default: `False`
 - Description: Enables or disables direct connections.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1740,7 +1740,7 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
 
 - Type: `bool`
-- Default: `True`
+- Default: `False`
 - Description: Enables or disables autocomplete generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -2543,14 +2543,14 @@ When configured, these custom schemes will be validated alongside `http` and `ht
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
-- Default: `False`
+- Default: `True`
 - Description: Determines whether to allow custom models defined on the Hub in their own modeling files.
 
 
 #### `RAG_RERANKING_MODEL_TRUST_REMOTE_CODE`
 
 - Type: `bool`
-- Default: `False`
+- Default: `True`
 - Description: Determines whether to allow custom models defined on the Hub in their own.
 modeling files for reranking.
 
@@ -2573,7 +2573,7 @@ modeling files for reranking.
 - Type: `str`
 - Options:
 - `chroma`, `elasticsearch`, `mariadb-vector`, `milvus`, `opengauss`, `opensearch`, `pgvector`, `qdrant`, `pinecone`, `s3vector`, `oracle23ai`, `weaviate`, `valkey`
-- Default: `chroma`
+- Default: `chroma`, or `pgvector` on the slim image (where `USE_SLIM_DOCKER` is set)
 - Description: Specifies which vector database system to use. This setting determines which vector storage system will be used for managing embeddings.
 
 :::danger ChromaDB (Default) Is Not Safe for Multi-Worker or Multi-Replica Deployments
@@ -3628,7 +3628,7 @@ Valkey is **opt-in and not bundled**. Install the client manually (`pip install 
 #### `TIKA_SERVER_URL`
 
 - Type: `str`
-- Default: `http://localhost:9998`
+- Default: `http://tika:9998`
 - Description: Sets the URL for the Apache Tika server.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4403,7 +4403,7 @@ Strictly return in JSON format:
 #### `DOCUMENT_INTELLIGENCE_MODEL`
 
 - Type: `str`
-- Default: `None`
+- Default: `prebuilt-layout`
 - Description: Specifies the model for document intelligence.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4429,11 +4429,18 @@ Strictly return in JSON format:
 - Default: `False`
 - Description: When enabled, injects RAG context into the **system message** instead of the user message. For models that support **KV prefix caching** or **Prompt Caching** (local engines like Ollama, llama.cpp or vLLM, and cloud providers like OpenAI and Vertex AI), this keeps the context at a stable position at the start of the conversation, so the cache can persist across turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
 
+#### `ENABLE_LOCAL_WEB_FETCH`
+
+- Type: `bool`
+- Default: `False`
+- Description: The current name of [`ENABLE_RAG_LOCAL_WEB_FETCH`](#enable_rag_local_web_fetch), which it overrides when both are set. See that entry for what the gate covers.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether outbound fetches can access URLs that resolve to private/local network IP addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading and OAuth profile-picture fetches.
+- Description: Deprecated alias of [`ENABLE_LOCAL_WEB_FETCH`](#enable_local_web_fetch), still honored when the new name is unset. Controls whether outbound fetches can access URLs that resolve to private/local network IP addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading and OAuth profile-picture fetches.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to private IP addresses, including:
@@ -4856,13 +4863,14 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 #### `BING_SEARCH_V7_ENDPOINT`
 
 - Type: `str`
+- Default: `https://api.bing.microsoft.com/v7.0/search`
 - Description: Sets the endpoint for Bing Search API.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `BING_SEARCH_V7_SUBSCRIPTION_KEY`
 
 - Type: `str`
-- Default: `https://api.bing.microsoft.com/v7.0/search`
+- Default: Empty string
 - Description: Sets the subscription key for Bing Search API.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -5176,7 +5184,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `PLAYWRIGHT_TIMEOUT`
 
 - Type: `int`
-- Default: Empty string (' '), since `None` is set as default.
+- Default: `10000` (milliseconds)
 - Description: Specifies the timeout for Playwright requests.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -5294,7 +5302,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 #### `AUDIO_STT_MODEL`
 
 - Type: `str`
-- Default: `whisper-1`
+- Default: Empty string. Set the model your endpoint expects, for example `whisper-1` for the OpenAI API
 - Description: Specifies the Speech-to-Text model to use for OpenAI-compatible endpoints.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -5642,8 +5650,8 @@ Strictly return in JSON format:
 
 #### `ENABLE_IMAGE_EDIT`
 
-- Type: `boolean`
-- Default: `true`
+- Type: `bool`
+- Default: `False`
 - Description: When disabled, Image Editing will not be used and instead, images will be created only using the image generation engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -6534,7 +6542,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: `groups`
-- Description: Specifies the group claim for OAuth authentication.
+- Description: Specifies the group claim for OAuth authentication. `OAUTH_GROUPS_CLAIM` is read as well and wins when both are set. The admin UI field and the persisted key keep the singular name.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_ROLE_MANAGEMENT`
@@ -7262,29 +7270,29 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_IMPORT`
 
-- Type: `str`
-- Default: `True`
+- Type: `bool`
+- Default: `False`
 - Description: Enables or disables user permission to import workspace models.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_EXPORT`
 
-- Type: `str`
-- Default: `True`
+- Type: `bool`
+- Default: `False`
 - Description: Enables or disables user permission to export workspace models.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_IMPORT`
 
-- Type: `str`
-- Default: `True`
+- Type: `bool`
+- Default: `False`
 - Description: Enables or disables user permission to import workspace prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_EXPORT`
 
-- Type: `str`
-- Default: `True`
+- Type: `bool`
+- Default: `False`
 - Description: Enables or disables user permission to export workspace prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -7855,7 +7863,7 @@ More information about this setting can be found [here](https://docs.sqlalchemy.
 #### `DATABASE_ENABLE_SQLITE_WAL`
 
 - Type: `bool`
-- Default: `False`
+- Default: `True`
 - Description: Enables or disables SQLite WAL (Write-Ahead Logging) mode. When enabled, SQLite transactions can be managed more efficiently, allowing multiple readers and one writer concurrently, which can improve database performance, especially under high concurrency. **This setting only applies to SQLite databases.**
 
 #### `DATABASE_SQLITE_PRAGMA_SYNCHRONOUS`
