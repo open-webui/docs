@@ -19,6 +19,7 @@ The following speech-to-text providers are supported:
 |---------|------------------|-------|
 | Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/chat-conversations/audio/speech-to-text/env-variables) |
 | OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/chat-conversations/audio/speech-to-text/openai-stt-integration) |
+| Self-hosted (OpenAI-compatible) | ✅ | [Self-Hosted STT Guide](/features/chat-conversations/audio/speech-to-text/self-hosted-stt) (uses an authenticated server) |
 | Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
 | Deepgram | ✅ | N/A |
 | Azure | ✅ | N/A |
