@@ -106,7 +106,7 @@ In the Cloud Run console, deploy `openwebui` with the same image, identity, VPC 
 | Concurrency | Start at `20` and tune with realistic chat/ingestion traffic. |
 | Request timeout | `3600` seconds; clients still need to reconnect. |
 | Session affinity | Enabled. |
-| Startup probe | HTTP `/health/db`, port `8080`, 10-second period, 5-second timeout, failure threshold `24`. |
+| Startup probe | HTTP `/ready` (503 until startup completes and the database and Redis answer), port `8080`, 10-second period, 5-second timeout, failure threshold `24`. |
 | Liveness probe | HTTP `/health`, port `8080`, with a suitable interval and failure threshold. |
 
 Keep startup within Cloud Run's [supported probe budget](https://docs.cloud.google.com/run/docs/configuring/healthchecks). Offloaded embeddings and a separate migration job reduce startup work. A successful probe does not validate the model provider or bucket permissions.
@@ -127,7 +127,7 @@ Open the approved HTTPS hostname and sign in with the initial administrator cred
 
 ## Verify Before Adding Users
 
-- Sign in with the initial administrator account and verify that open sign-up is disabled. Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
+- Sign in with the initial administrator account and verify that open sign-up is disabled (creating the admin from `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` turns it off automatically). Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
 - Select a model and stream a response. Reopen the saved conversation.
 - Upload a small document containing a distinctive fact. Confirm indexing completes and a question about that fact retrieves the source.
 - Replace an application instance and confirm the same account, conversation, and uploaded file remain available.

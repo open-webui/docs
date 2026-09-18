@@ -110,7 +110,7 @@ startupProbe:
   failureThreshold: 60
 readinessProbe:
   httpGet:
-    path: /health/db
+    path: /ready
     port: http
   periodSeconds: 10
   timeoutSeconds: 5
@@ -344,7 +344,7 @@ kubectl -n openwebui get pods,ingress
 
 This disables migrations on all replicas, applies the desired replica count, and enables ingress. Expect a brief restart. Point DNS at your ingress controller, then open your HTTPS hostname.
 
-Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Session affinity may be needed for Socket.IO polling. Affinity does not replace Redis; see [connection troubleshooting](/troubleshooting/connection-error).
+Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Socket.IO is served under `/ws/socket.io/`, so a path-based ingress must forward that prefix with upgrade headers. Session affinity may be needed for Socket.IO polling. Affinity does not replace Redis; see [connection troubleshooting](/troubleshooting/connection-error).
 
 On the NGINX Ingress Controller, sticky sessions are these annotations on the Ingress resource:
 
@@ -493,7 +493,7 @@ spec:
       app.kubernetes.io/name: open-webui
 ```
 
-Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count and prevent GitOps from fighting HPA changes to `spec.replicas`. Helm upgrades can also reset the replica count.
+Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count (`DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` per replica, plus `PGVECTOR_POOL_SIZE` for pgvector's own pool) and prevent GitOps from fighting HPA changes to `spec.replicas`. Helm upgrades can also reset the replica count.
 
 Before updates, remove this HPA with `kubectl -n openwebui delete hpa openwebui` and pause any controller that would recreate it. Reapply it only after verifying the restored deployment. A PDB limits voluntary evictions such as node drains; it does not prevent Deployment scale-down or the maintenance outage described above.
 
