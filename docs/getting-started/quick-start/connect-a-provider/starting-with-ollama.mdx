@@ -87,21 +87,20 @@ This is useful for freeing GPU/VRAM when juggling multiple large models, or for 
 
 ## Using Reasoning / Thinking Models
 
-If you're using reasoning models like **DeepSeek-R1** or **Qwen3** that output thinking/reasoning content in `<think>...</think>` tags, you'll need to configure Ollama with a **reasoning parser** for proper display.
+Ollama separates a model's thinking from its answer on its own. Since Ollama v0.9.0, models with thinking support (Qwen3, DeepSeek-R1, DeepSeek-V3.1, GPT-OSS) return the trace in a separate `thinking` field, and Open WebUI shows it in a collapsible section above the answer. No server-side flag is involved, and `ollama serve` takes none.
 
-### Configure the Reasoning Parser
+### Controlling Thinking
 
-Start Ollama with the `--reasoning-parser` flag:
+The **think (Ollama)** control under **Chat Controls > Advanced Params** (or per model in the model editor) is sent to Ollama as the `think` parameter:
 
-```bash
-ollama serve --reasoning-parser deepseek_r1
-```
+| Setting | What Ollama receives |
+|---|---|
+| **Default** | Nothing. Ollama's own default applies, which is thinking on for models that support it. |
+| **On** | `true` |
+| **Custom** | A thinking level: `low`, `medium`, `high` or `max`. GPT-OSS accepts only a level. |
+| **Off** | `false` |
 
-This ensures that thinking blocks are properly separated from the final answer and displayed in a collapsible section in Open WebUI.
-
-:::tip
-The `deepseek_r1` parser works for most reasoning models, including Qwen3. If you encounter issues, see our [Reasoning & Thinking Models Guide](/features/chat-conversations/chat-features/reasoning-models) for alternative parsers and detailed troubleshooting steps.
-:::
+A model that writes its reasoning inline as `<think>...</think>` text instead of using Ollama's thinking field is handled by the **Reasoning Tags** setting. See the [Reasoning & Thinking Models Guide](/features/chat-conversations/chat-features/reasoning-models) for both settings and the troubleshooting steps.
 
 ---
 
