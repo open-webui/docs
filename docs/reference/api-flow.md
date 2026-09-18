@@ -73,7 +73,7 @@ The `history` object must use `currentId` (**camelCase**, not `current_id`). Thi
 
 ### Critical Step: Enrich Chat Response with Assistant Message
 
-The assistant message needs to exist in the chat data as a critical prerequisite **before** triggering the completion. This step is essential because the Open WebUI frontend expects assistant messages to exist in a specific structure.
+For an existing `chat_id`, `POST /api/chat/completions` now inserts the assistant placeholder itself, linked under the user message, when you pass the assistant message's `id`, so pre-creating it is no longer required. Doing so is still harmless, and the structure below is what the frontend expects.
 
 The assistant message must appear in both locations:
 
@@ -97,7 +97,7 @@ The assistant message must appear in both locations:
 }
 ```
 
-Without this enrichment, the assistant's response will not appear in the frontend interface, even if the completion is successful.
+If you do pre-create it, use this structure; a malformed placeholder is worse than none.
 
 ## Step-by-Step Implementation
 
@@ -281,7 +281,7 @@ Assistant responses can be handled in two ways depending on your implementation 
 
 #### Option A: Stream Processing (Recommended)
 
-If using `stream: true` in the completion request, you can process the streamed response in real-time and wait for the stream to complete. This is the approach used by the OpenWebUI web interface and provides immediate feedback.
+Streaming over the HTTP response only happens when the request carries no `session_id` (or no `chat_id`). With both present, as in Step 2, the completion runs as a background task and the response body is `{"status": true, "task_ids": [...], "chat_id": "..."}`, returned immediately; the tokens go out over the Socket.IO session instead. To stream over HTTP, omit `session_id`; to track a background task, poll `GET /api/tasks/chat/{chat_id}` or the chat itself (Option B).
 
 #### Option B: Polling Approach
 
@@ -403,7 +403,7 @@ curl -X POST https://<host>/api/chat/completions \
 
 :::note
 
-When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, you can pass partial updates: existing messages that are not included in the update will be preserved.
+When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, the merge is per message, not per field: messages you omit are preserved, but a message you include replaces the stored one wholesale, so send full message objects. `childrenIds` is recomputed from each message's `parentId`, so you need not set it on the parent.
 
 :::
 

@@ -101,7 +101,7 @@ Four calls. This is what the web UI does, minus the browser.
 
 ### A1. Create the chat
 
-The completion has to attach to a chat and an assistant message that already exist. Create both up front:
+The completion endpoint can create the chat itself (send `"parent_id": null`, no `chat_id`, and a `user_message` object; the response carries the new `chat_id`) and inserts the assistant placeholder for the `id` you pass. Creating both up front, as below, still works and keeps the IDs in your hands:
 
 ```bash
 USER_MSG_ID=$(uuidgen)
