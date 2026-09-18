@@ -244,7 +244,7 @@ Two causes account for almost all of these:
    - Your SSH tunnel forwards the local port to the **remote host port that instance actually publishes**. Running several instances makes it easy to forward to the wrong one.
    - Quick test from the browser machine, through the tunnel: `curl http://localhost:3001/api/config`. JSON back means the backend is reachable, so look at cause 2. An empty reply or connection refused means the tunnel or port mapping is wrong.
 
-2. **A stale service worker serving a cached page.** Open WebUI registers a service worker, so the browser can display the cached UI shell while the live `/api/config` call fails, which produces this exact error. A normal hard refresh does not unregister the service worker. Clear it from **DevTools > Application > Service Workers > Unregister** for that origin, or open the instance in a fresh private/incognito window.
+2. **A stale service worker serving a cached page.** Open WebUI registers no service worker and unregisters any it finds on load, so a stale shell comes from the browser's HTTP cache or from a worker left by another app on the same origin while the live `/api/config` call fails, which produces this exact error. A normal hard refresh does not unregister the service worker. Clear it from **DevTools > Application > Service Workers > Unregister** for that origin, or open the instance in a fresh private/incognito window.
 
 This is a deployment and networking condition, not an Open WebUI bug.
 
@@ -319,7 +319,7 @@ If your Open WebUI takes a long time to load models, or the model selector spins
 
 When you configure multiple Ollama or OpenAI base URLs (for load balancing or redundancy), Open WebUI attempts to fetch models from **all** configured endpoints. If any endpoint is unreachable, the system waits for the full connection timeout before returning results.
 
-By default, Open WebUI waits **10 seconds** per unreachable endpoint when fetching the model list. With multiple bad endpoints, this delay compounds.
+By default, Open WebUI waits **10 seconds** per unreachable endpoint when fetching the model list. Endpoints are queried concurrently, so the wait is the slowest one, not the sum.
 
 ### Solution 1: Adjust the Timeout
 
@@ -359,7 +359,7 @@ ENABLE_PERSISTENT_CONFIG=false
 
 If using SQLite, stop the container and run:
 ```bash
-sqlite3 webui.db "DELETE FROM config WHERE id LIKE '%urls%';"
+sqlite3 webui.db "DELETE FROM config WHERE key IN ('ollama.base_urls','openai.api_base_urls');"
 ```
 
 :::warning
@@ -375,7 +375,7 @@ Manual database manipulation should be a last resort. Always back up your databa
 | `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER` | Inherits `AIOHTTP_CLIENT_TIMEOUT` | Timeout (seconds) for executing tool server API calls |
 | `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA` | `10` | Timeout (seconds) for loading tool server metadata/spec data |
 | `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` | `10` | Timeout (seconds) for fetching model lists |
-| `AIOHTTP_CLIENT_TIMEOUT` | `300` | General API request timeout |
+| `AIOHTTP_CLIENT_TIMEOUT` | unset (no timeout) | General API request timeout. `300` is only the fallback for a value that is not a whole number |
 | `RESET_CONFIG_ON_START` | `false` | Reset database config to env var values on startup |
 | `ENABLE_PERSISTENT_CONFIG` | `true` | Whether database config takes precedence over env vars |
 
@@ -383,7 +383,7 @@ See the [Environment Configuration](/reference/env-configuration#aiohttp_client_
 
 ## 🐢 Slow Performance or Timeouts on Low-Spec Hardware
 
-If you're experiencing slow page loads, API timeouts, or unresponsive UI, especially on resource-constrained systems, this may be related to database session sharing.
+If you're experiencing slow page loads, API timeouts, or unresponsive UI, especially on resource-constrained systems, this may be related to database session sharing, if you switched it on. It is off by default.
 
 ### Cause
 
@@ -391,7 +391,7 @@ Database session sharing can overwhelm low-spec hardware (Raspberry Pi, containe
 
 ### Solution
 
-Disable database session sharing:
+Turn database session sharing back off:
 
 ```bash
 DATABASE_ENABLE_SESSION_SHARING=false

@@ -10,7 +10,7 @@ When multiple people on your team need terminal access through Open WebUI, you h
 | | Single Container | Per-User Containers |
 | :--- | :--- | :--- |
 | **How** | One container, separate accounts inside | Each user gets their own container |
-| **Isolation** | Separate workspaces inside one shared container | A separate container per user, isolated from each other |
+| **Isolation** | Separate workspaces inside one shared container | A separate container per user, with its own files, processes, and resources. On the Docker backend the containers share one network |
 | **Setup** | One extra setting | Additional orchestration service |
 | **Best for** | Small teams where everyone is trusted equally | Production, larger teams, untrusted users |
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
@@ -20,7 +20,7 @@ If your Open WebUI instance has **more than one user account** and the same term
 
 **Option 1 separates workspaces. It is not a security boundary between users.** Everyone still shares one kernel, one process list, one network namespace and one set of system resources, and provisioning the per-user accounts requires elevated privileges inside that container, so a user who sets out to reach root inside it will get there. Run it where every user on the instance is trusted at the same level.
 
-For deployments with **untrusted users** (open signup, public-facing portals, users who are not trusted with each other's data), use **Option 2 (per-user containers via Terminals)**, which is the option that puts a real boundary between users. Layering `TERMINAL_PROXY_HEADERS` on top of Option 1 restricts what a proxied response can do in the user's browser, and it changes nothing about the shared container itself.
+For deployments with **untrusted users** (open signup, public-facing portals, users who are not trusted with each other's data), use **Option 2 (per-user containers via Terminals)** on its Kubernetes backend with a NetworkPolicy, which is the setup that puts a real boundary between users. Layering `TERMINAL_PROXY_HEADERS` on top of Option 1 restricts what a proxied response can do in the user's browser, and it changes nothing about the shared container itself.
 :::
 
 ---
@@ -67,7 +67,7 @@ Each user sees only their own files in the file browser.
 :::warning Good for small trusted teams, not production
 This mode gives everyone their own workspace, and they all run inside the same container. Resource pressure (memory, CPU) is shared. The network namespace is shared, so a port one user binds (e.g. `python -m http.server 8080`) is reachable from any other user's shell on that container. The port listing and the port proxy are scoped to the user who owns the port, so the port stays out of other users' file navigators, and reaching it takes a direct request from a shell. The process list is shared, so users can watch each other's running commands. Root inside the container is reachable from any account, because provisioning the accounts needs those privileges in the first place.
 
-Treat every user on one instance as equally trusted, and use **Option 2 (per-user containers)** below when users have to be protected from each other. Layering the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top locks proxied responses into a sandbox CSP in the browser, which is worth doing and does not change what happens inside the container.
+Treat every user on one instance as equally trusted, and use **Option 2 (per-user containers)** below, on its Kubernetes backend, when users have to be protected from each other. Layering the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top locks proxied responses into a sandbox CSP in the browser, which is worth doing and does not change what happens inside the container.
 :::
 
 ```mermaid
@@ -96,7 +96,7 @@ flowchart LR
 
 ## Option 2: Per-user containers with Terminals
 
-For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, completely separate from everyone else.
+For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, with files, processes, and resources separate from everyone else's.
 
 - **Full isolation**: each user's container is independent with its own files, processes, and resources
 - **On-demand provisioning**: containers are created when users start a session and cleaned up when idle
@@ -104,6 +104,7 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 - **Multiple environments**: different setups for different teams (e.g., data science, development)
 - **Kubernetes support**: works with Docker, Kubernetes, and k3s
 - **Scoped workspaces**: optionally give each saved chat or each automation its own workspace instead of one per user, via [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)
+- **One network on the Docker backend**: every workspace sits on the same Docker network so the orchestrator can reach each one by name, which also lets a workspace reach a port another user's workspace has opened. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
 
 ```mermaid
 flowchart LR
@@ -123,8 +124,8 @@ flowchart LR
 
 Two deployment backends are available:
 
-- **[Docker Backend](../terminals/)**: runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
-- **[Kubernetes Operator](../terminals/)**: production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
+- **[Docker Backend](../terminals/#deployment)**: runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
+- **[Kubernetes Operator](../terminals/#deployment)**: production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
 Terminals requires an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise). See the [Terminals repository](https://github.com/open-webui/terminals) for license details.
@@ -133,7 +134,7 @@ Terminals requires an [Open WebUI Enterprise License](https://docs.openwebui.com
 ## Related
 
 - [Terminals overview →](../terminals/)
-- [Terminals: Docker Backend →](../terminals/)
-- [Terminals: Kubernetes Operator →](../terminals/)
+- [Terminals: Docker Backend →](../terminals/#deployment)
+- [Terminals: Kubernetes Operator →](../terminals/#deployment)
 - [Security best practices →](./security.md)
 - [All configuration options →](./configuration.md)

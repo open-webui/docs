@@ -82,11 +82,11 @@ env:
 - Chats fail with "Model not found" intermittently.
 
 **Cause:**
-- **Configuration Sync:** Replicas are not synced. Open WebUI uses Redis Pub/Sub to broadcast configuration changes (like toggling a model) to all other instances.
-- **Missing Redis:** If `REDIS_URL` is not set, configuration changes stay local to the instance where the change was made.
+- **Configuration Sync:** Replicas are not synced. Since v0.10.0 every replica reads configuration from the shared database on each access, so settings changes need no Redis. Redis provides cross-replica stop commands, the optional base-model cache (`ENABLE_BASE_MODELS_CACHE`), the session store when `ENABLE_STAR_SESSIONS_MIDDLEWARE` is on, and the default for `WEBSOCKET_REDIS_URL`. The in-memory model registry is shared only with `WEBSOCKET_MANAGER=redis`.
+- **Missing Redis:** Configuration is read from the shared database on each access, so settings changes reach every replica without Redis. What stays local without `REDIS_URL` is the in-memory model registry (shared only with `WEBSOCKET_MANAGER=redis`), cross-replica stop commands, and the optional base-model cache.
 
 **Solution:**
-Set `REDIS_URL` to point to your shared Redis instance. This enables the Pub/Sub mechanism for real-time config syncing.
+Set `REDIS_URL` to point to your shared Redis instance for those pieces. There is no configuration Pub/Sub to enable: the database already carries the settings.
 
 ```bash
 REDIS_URL=redis://your-redis-host:6379/0
@@ -113,7 +113,7 @@ For the full mechanism (fsync latency + async concurrency + pool saturation + WA
 
 1. **Migrate to PostgreSQL (strongly recommended, required for multi-replica):**
    ```bash
-   DATABASE_URL=postgresql+asyncpg://user:password@postgres-host:5432/openwebui
+   DATABASE_URL=postgresql://user:password@postgres-host:5432/openwebui  # the async driver is psycopg v3 since v0.9.2. asyncpg is not installed, and a +asyncpg URL fails to load
    ```
    For Kubernetes / Docker Swarm this is effectively mandatory. Postgres manages its own I/O against its own local storage, so the network-`fsync` pathology disappears entirely. See [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql) for the full migration steps.
 

@@ -9,7 +9,7 @@ Open WebUI offers three distinct webhook integrations to help you stay informed 
 
 There are three types of webhooks available:
 
-1.  **Admin Webhook:** A system-wide webhook that notifies administrators about new user sign-ups.
+1.  **Event Webhooks:** admin-configured webhooks that receive events from the catalog (sign-ups, user changes, chats, channels, files, models, configuration, startup and shutdown), each with a name, URL, event filter and audience.
 2.  **User Webhook:** A personal webhook that notifies individual users when a response to their chat is ready, especially useful for long-running tasks.
 3.  **Channel Webhooks:** Incoming webhooks that allow external services to post messages into specific channels.
 
@@ -29,27 +29,32 @@ You can configure the admin webhook in two ways:
 
 1.  Log in as an administrator.
 2.  Navigate to **Settings > Admin > General**.
-3.  Locate the **"Webhook URL"** field.
+3.  Scroll to **Events** > **Webhooks** and click **+**. Give the webhook a name and URL, choose **Send events for** and **Events**, then save. Existing entries have **Configure** and **Delete**.
 4.  Enter the webhook URL provided by your external service (e.g., Discord, Slack).
 5.  Click **"Save"**.
 
 #### Option 2: Through Environment Variables
 
-You can also set the webhook URL using the `WEBHOOK_URL` environment variable. For more details, refer to the [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration/#webhook_url) documentation.
+A `WEBHOOK_URL` environment variable is migrated once at startup into a **Default webhook** subscribed to every event. Narrow it to `auth.signup` or `user.created` if you only want sign-ups. For more details, refer to the [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration/#webhook_url) documentation.
 
 ### Payload Format
 
-When a new user signs up, Open WebUI will send a `POST` request to the configured URL with a JSON payload containing the new user's details.
+When a matching event fires, Open WebUI sends a `POST` request to the configured URL. A form sign-up fires `user.created` and then `auth.signup`, so a webhook subscribed to every event posts twice. Users created through OAuth, LDAP, SCIM or by an admin fire only `user.created`, with `source` set accordingly. Generic URLs receive the event envelope; Slack and Google Chat get `{"text": ...}`, Discord `{"content": ...}`, and Teams a MessageCard.
 
 **Payload Example:**
 
 ```json
 {
-  "event": "new_user",
-  "user": {
-    "email": "tim@example.com",
-    "name": "Tim"
-  }
+  "schema": "0.11.3",
+  "id": "8b1f...",
+  "event": "auth.signup",
+  "resource": "auth",
+  "operation": "signup",
+  "created_at": 1758150000,
+  "source": "api",
+  "actor": {"type": "user", "id": "...", "name": "Tim", "email": "tim@example.com", "role": "pending"},
+  "subject": {"type": "user", "id": "..."},
+  "data": {"email": "tim@example.com"}
 }
 ```
 
@@ -59,7 +64,7 @@ This webhook lets individual users be notified when something they care about ha
 
 Each user configures one or more **notification targets** in **Settings > Notifications**, and chooses per target which events it receives and whether it fires only while they are away or always. The model can also send a notification itself through the `notify` tool.
 
-See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the four subscribable events, delivery modes, URL masking, and the `notify` tool.
+See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the five subscribable events, delivery modes, URL masking, and the `notify` tool.
 
 ### Use Case
 
@@ -80,7 +85,7 @@ This can be done in two ways:
     - Toggle the switch for **"User Webhooks"**.
 
 2.  **Using Environment Variables:**
-    - Set the environment variable `ENABLE_USER_WEBHOOKS` to `False` in your backend configuration. This will globally disable the feature and hide the setting from user profiles.
+    - The feature is off by default. `ENABLE_USER_WEBHOOKS` defaults to `False`, and so does the **User Webhooks** permission, so to offer it set `ENABLE_USER_WEBHOOKS=True` (or the toggle) and grant the permission. Setting it to `False` turns it back off and hides the setting from user profiles.
 
 Users also need the `features.webhooks` permission ([`USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`](/reference/env-configuration#user_permissions_features_user_webhooks)); admins always have it.
 
@@ -126,7 +131,7 @@ Only **channel managers** and **administrators** can create and manage webhooks 
 2.  Click the channel menu (⋮) and select **Edit Channel**.
 3.  In the channel settings modal, locate the **Webhooks** section.
 4.  Click **Manage** to open the Webhooks modal.
-5.  Click **New Webhook** to create a new webhook.
+5.  Click **New Webhook**. This creates a live webhook named "New Webhook" at once. **Save** only applies later name and image edits.
 6.  Configure the webhook:
     - **Name:** The display name that will appear as the message author
     - **Profile Image:** (Optional) Upload an image to represent this webhook
@@ -148,7 +153,7 @@ This URL is unique and contains an authentication token. Anyone with this URL ca
 3.  Modify the **Name** or **Profile Image** as needed.
 4.  Click **Save** to apply changes.
 
-The webhook URL remains the same when you update the name or image. Messages posted after the update will show the new name/image, but existing messages retain the webhook identity from when they were posted.
+The webhook URL remains the same when you update the name or image. All messages posted by the webhook, earlier ones included, show its current name and image.
 
 #### Deleting a Webhook
 
@@ -178,7 +183,7 @@ To post a message from an external service, send a `POST` request to the webhook
 #### Example: Using cURL
 
 ```bash
-curl -X POST "https://your-instance.com/api/channels/webhooks/{webhook_id}/{token}" \
+curl -X POST "https://your-instance.com/api/v1/channels/webhooks/{webhook_id}/{token}" \
   -H "Content-Type: application/json" \
   -d '{"content": "Deployment to production completed successfully! 🚀"}'
 ```
@@ -188,7 +193,7 @@ curl -X POST "https://your-instance.com/api/channels/webhooks/{webhook_id}/{toke
 ```python
 import requests
 
-webhook_url = "https://your-instance.com/api/channels/webhooks/{webhook_id}/{token}"
+webhook_url = "https://your-instance.com/api/v1/channels/webhooks/{webhook_id}/{token}"
 message = {
     "content": "Build #1234 failed: Unit tests did not pass."
 }
@@ -220,7 +225,7 @@ On success, the webhook will return:
 Messages posted via webhooks have a special identity system:
 - They appear with the webhook's **name** and **profile image**
 - The user role is marked as **"webhook"** to distinguish from regular users
-- If a webhook is deleted, its messages remain visible but show "Deleted Webhook" with the current webhook name no longer displayed
+- If a webhook is deleted, its messages remain visible but show "Deleted Webhook" with the default avatar
 - Each message stores the webhook ID in its metadata, allowing proper attribution even if the webhook is later modified or deleted
 
 ## Troubleshooting

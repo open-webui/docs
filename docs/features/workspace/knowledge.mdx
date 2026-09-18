@@ -92,7 +92,7 @@ Best for large document sets where only specific sections are relevant.
 
 ### 📄 Full Context
 
-Injects the complete content of the file into every message. No chunking, no semantic search. Always injected regardless of native function calling settings, so the model doesn't need to call any tools to access it.
+Injects the complete content of the file into every message. No chunking, no semantic search. For files and collections attached in the chat it is injected whatever the function calling mode, so the model needs no tool to reach it. A knowledge base attached to the model, though, is only injected in legacy function calling mode: with native function calling the model reaches model-attached knowledge through the knowledge tools, Full Context or not.
 
 Best for short reference documents, style guides, or context that's always relevant.
 
@@ -130,7 +130,7 @@ The two search tools complement each other:
 | **How it matches** | Semantic / vector retrieval (with optional BM25 + rerank when [`ENABLE_RAG_HYBRID_SEARCH`](/reference/env-configuration#enable_rag_hybrid_search) is on) | Exact string match, regex auto-detected (e.g. `error\|warn`, `version \d+`) |
 | **Returns** | Relevant chunks of content | Matching lines with file ID, filename, and 1-indexed line number |
 | **Use when** | "What does the documentation say about X?" for paraphrased questions, conceptual lookups | "Find every place we mention `OPENAI_API_KEY`" for literal identifiers, error strings, version numbers |
-| **Result cap** | Top K (default 5) | 50 matches ([`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
+| **Result cap** | The tool's own `count` argument, which the model sets (default 5). The admin Top K setting does not apply here | 50 matches ([`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | **Flags** | (none) | `case_insensitive`, `count_only`, `file_id` (single-file mode) |
 
 In agentic flows, a typical pattern is: `query_knowledge_files` to locate the relevant document, then `grep_knowledge_files` to pinpoint exact lines, then `view_file` (line-range mode below) to read the surrounding context.
@@ -246,11 +246,11 @@ Once you have more than a handful, the list can be reordered by clicking the **T
 
 ### Organizing into directories
 
-Knowledge bases support nested **directories** so larger document sets stay navigable. Create them from the **Add Content** menu (**+ New Directory**), then reorganize freely.
+Knowledge bases support nested **directories** so larger document sets stay navigable. Create them from the **Add Content** menu (**New directory**), then reorganize freely.
 
 **Creating and navigating**
 
-- **+ New Directory** lives next to file upload in the **Add Content** menu. Name uniqueness is enforced per parent: two siblings can't share a name, but you can reuse names in different parents.
+- **New directory** lives next to file upload in the **Add Content** menu, which also offers **Upload directory**, **Add webpage**, **Add text content** and **Reset** (which removes every file from the knowledge base). Name uniqueness is enforced per parent: two siblings can't share a name, but you can reuse names in different parents.
 - Click a directory to descend into it; the **breadcrumb trail** at the top of the view always reflects the current path and lets you jump back to any ancestor in one click.
 - Directories can be **renamed** or **moved to a different parent** without affecting the files inside them.
 
@@ -265,7 +265,7 @@ You can move items by dragging:
 
 Deleting a non-empty directory prompts for the action to take with its contents:
 
-- **Move files to parent** (default): the directory is removed but its files and subdirectories are re-parented one level up.
+- Leave **Delete all contents inside this directory** unchecked (the default) and the directory is removed while its files and subdirectories are re-parented one level up. The dialog is titled **Delete directory?** and has that one checkbox.
 - **Delete everything**: the directory and all files/subdirectories underneath it are permanently removed.
 
 **Effect on retrieval and tools**
@@ -281,10 +281,10 @@ Individual files can be renamed in place from the workspace via the file's item 
 
 ### Syncing a local directory
 
-The **Add Content → Sync Directory** action mirrors a local folder into the knowledge base **incrementally**: the client hashes each local file (SHA-256), the server compares hashes and paths against what is already stored, and only **new**, **modified**, and **deleted** files are touched. Unmodified files (the typical majority) are left alone: no re-upload, no re-embedding. The local folder's subdirectory structure is mirrored in the KB; missing subdirectories are created, and subdirectories that no longer exist locally are removed.
+The **Add Content → Sync directory** action mirrors a local folder into the knowledge base **incrementally**: the client hashes each local file (SHA-256), the server compares hashes and paths against what is already stored, and only **new**, **modified**, and **deleted** files are touched. Unmodified files (the typical majority) are left alone: no re-upload, no re-embedding. The local folder's subdirectory structure is mirrored in the KB; missing subdirectories are created, and subdirectories that no longer exist locally are removed.
 
 :::tip Syncing a lot of files? Use oikb instead
-The in-app **Sync Directory** runs in your browser: it enumerates, hashes and uploads every file client-side. That is fine for a modest folder, but on a **large** set (thousands of files or a multi-gigabyte vault) it gets slow and gives little progress feedback, often sitting for a long time before it even reports the file count. For large or frequently-changing libraries we **strongly recommend** the official [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync) tool instead: it runs natively with progress bars, parallel uploads and retries, built for exactly this. Point it at the top of your folder and it syncs the entire tree (every subdirectory, recursively) into one Knowledge Base.
+The in-app **Sync directory** runs in your browser: it enumerates, hashes and uploads every file client-side. That is fine for a modest folder, but on a **large** set (thousands of files or a multi-gigabyte vault) it gets slow and gives little progress feedback, often sitting for a long time before it even reports the file count. For large or frequently-changing libraries we **strongly recommend** the official [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync) tool instead: it runs natively with progress bars, parallel uploads and retries, built for exactly this. Point it at the top of your folder and it syncs the entire tree (every subdirectory, recursively) into one Knowledge Base.
 :::
 
 Behavior to be aware of:
@@ -297,7 +297,7 @@ Behavior to be aware of:
 For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
 
 :::tip Sync remote sources, or on a schedule
-The in-app **Sync Directory** action handles a local folder on your machine. To mirror a **remote** source instead (a GitHub repo, a Confluence space, an S3 bucket and [dozens more](/ecosystem/knowledge-base-sync#sources-and-connectors)), or to keep a Knowledge Base current **automatically** on a schedule or on every push, use the official [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync) companion tool. It drives these same endpoints for you.
+The in-app **Sync directory** action handles a local folder on your machine. To mirror a **remote** source instead (a GitHub repo, a Confluence space, an S3 bucket and [dozens more](/ecosystem/knowledge-base-sync#sources-and-connectors)), or to keep a Knowledge Base current **automatically** on a schedule or on every push, use the official [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync) companion tool. It drives these same endpoints for you.
 :::
 
 ### Exporting

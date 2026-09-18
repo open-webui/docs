@@ -45,7 +45,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 | `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails). |
 | `OAUTH_UPDATE_PICTURE_ON_LOGIN`       | `false`             | Update user profile pictures from OAuth provider with each login. |
 | `OAUTH_PICTURE_CLAIM`                 | `picture`          | Field in the claim containing the profile picture. Set to empty string to disable picture updates (users receive default icon).|
-| `ENABLE_PROFILE_IMAGE_URL_FORWARDING` | `true`             | When `true`, the backend issues a `302` redirect from `/api/v1/users/{id}/profile/image` to whatever external URL the IdP wrote into `profile_image_url`. Each browser then loads the avatar directly from that origin, leaking client IP, User-Agent, and Referer headers. Set to `false` to suppress the redirect; the IdP-supplied URL is still stored, but Open WebUI serves the bundled default image instead. **Recommendation:** disable unless your IdP returns avatars as `data:` URIs (which Open WebUI persists locally and is unaffected) or you accept the leak in exchange for showing IdP-hosted avatars. See [`ENABLE_PROFILE_IMAGE_URL_FORWARDING`](/reference/env-configuration#enable_profile_image_url_forwarding) for full semantics. |
+| `ENABLE_PROFILE_IMAGE_URL_FORWARDING` | `true`             | Does not affect SSO avatars: the OAuth flow downloads the IdP picture and stores it as a `data:` URI (or `/user.png`), so no IdP URL lands in `profile_image_url`. It governs URLs users set themselves. When `true`, the backend issues a `302` redirect from `/api/v1/users/{id}/profile/image` to an external URL stored in `profile_image_url`. Each browser then loads the avatar directly from that origin, leaking client IP, User-Agent, and Referer headers. Set to `false` to suppress the redirect; the IdP-supplied URL is still stored, but Open WebUI serves the bundled default image instead. **Recommendation:** disable unless your IdP returns avatars as `data:` URIs (which Open WebUI persists locally and is unaffected) or you accept the leak in exchange for showing IdP-hosted avatars. See [`ENABLE_PROFILE_IMAGE_URL_FORWARDING`](/reference/env-configuration#enable_profile_image_url_forwarding) for full semantics. |
 | `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`     | *empty*            | Redirect users to this URL after signout. E.g., `https://your-company.com/logout-success`                                      |
 | `WEBUI_SECRET_KEY`                    | *empty*            | MUST be set, especially in clustered environments. Otherwise session issues and weird OAuth issues will occur                 |
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
@@ -60,7 +60,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 
 **Critical Configuration Notes:**
 
-1. **WEBUI_URL Must Be Set First**: Configure `WEBUI_URL` in the Admin Panel before enabling OAuth, as it's used for redirect URIs.
+1. **WEBUI_URL and redirects**: The redirect URI a provider is sent comes from the provider's `*_REDIRECT_URI` variable, or, when that is unset, from the URL of the incoming request. `WEBUI_URL` is used afterwards to send the browser back to the sign-in page once the callback has run, and falls back to the request URL when empty. Set it when Open WebUI sits behind a proxy that changes what the request URL looks like.
 
 2. **Persistent Config Behavior**: When `ENABLE_OAUTH_PERSISTENT_CONFIG=true`, OAuth settings are stored in the database after first launch. To change environment variables after initial setup, either:
    - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
@@ -98,7 +98,7 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
 5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 
-**When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning names the provider in the logs. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
+**When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning is logged. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
 
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
@@ -152,7 +152,7 @@ The following environment variables are required:
 
 1. `GOOGLE_CLIENT_ID`: Google OAuth client ID
 1. `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
-1. `OPENID_PROVIDER_URL`: Must be set for logout to work properly. (Usually to `https://accounts.google.com/.well-known/openid-configuration`)
+1. `OPENID_PROVIDER_URL`: Not needed for Google. Sign-out resolves the discovery document from the provider the session was created with.
 
 Optional Google-specific setting:
 
@@ -174,8 +174,8 @@ The following environment variables are required:
 1. `MICROSOFT_CLIENT_ID`: Microsoft OAuth client ID
 1. `MICROSOFT_CLIENT_SECRET`: Microsoft OAuth client secret
 1. `MICROSOFT_CLIENT_TENANT_ID`: Microsoft tenant ID, use `9188040d-6c67-4c5b-b112-36a304b66dad` for personal accounts
-1. `MICROSOFT_REDIRECT_URI`: The redirect URI configured in your Microsoft OAuth application. This must be set to `<open-webui>/oauth/microsoft/callback`.
-1. `OPENID_PROVIDER_URL`: Must be set for logout to work properly.
+1. `MICROSOFT_REDIRECT_URI`: Optional override of the redirect URI. When empty, Open WebUI derives `<open-webui>/oauth/microsoft/callback` from the incoming request, and that is the value to register with Microsoft.
+1. `OPENID_PROVIDER_URL`: Not needed for Microsoft. Sign-out resolves the discovery document from the provider the session was created with.
 
 #### Token Refresh (`offline_access`)
 
@@ -200,7 +200,8 @@ Basic chat functionality (which uses Open WebUI's JWT) is **not** affected, but 
 
 - MCP tool servers using `auth_type: "system_oauth"`
 - OneDrive / SharePoint file access
-- Automatic profile picture refresh from Microsoft
+
+Profile pictures are unaffected: the picture is fetched during the login callback with the access token just issued, so it needs no refresh token.
 
 :::
 
@@ -212,7 +213,7 @@ No additional configuration is required in Microsoft Entra ID. The `offline_acce
 
 :::tip Role Mapping with Microsoft Entra ID
 
-If you use Entra ID **app roles** to control who gets `admin` vs `user` access in Open WebUI, you also need to configure [OAuth Role Management](#oauth-role-management) below. In particular, make sure you set `OAUTH_ALLOWED_ROLES` and `OAUTH_ADMIN_ROLES` in addition to `ENABLE_OAUTH_ROLE_MANAGEMENT=true`. Otherwise all users will be created with the default role regardless of their Entra ID assignment.
+If you use Entra ID **app roles** to control who gets `admin` vs `user` access in Open WebUI, you also need to configure [OAuth Role Management](#oauth-role-management) below. In particular, check `OAUTH_ALLOWED_ROLES` (default `user,admin`) and `OAUTH_ADMIN_ROLES` (default `admin`) against the app role values you assigned, in addition to `ENABLE_OAUTH_ROLE_MANAGEMENT=true`. When the claim carries roles that match neither list, the login is refused with 403. The default role is only used when the claim is absent or empty.
 
 :::
 
@@ -240,7 +241,7 @@ The following environment variables are used:
 1. `OPENID_PROVIDER_URL`: **Required.** OIDC well known URL, for example `https://accounts.google.com/.well-known/openid-configuration`
 1. `OAUTH_PROVIDER_NAME`: Name of the provider to show on the UI, defaults to SSO
 1. `OAUTH_SCOPES`: Scopes to request. Defaults to `openid email profile`
-1. `OPENID_REDIRECT_URI`: The redirect URI configured in your OIDC application. This must be set to `<open-webui>/oauth/oidc/callback`.
+1. `OPENID_REDIRECT_URI`: Optional override of the redirect URI. When empty, Open WebUI derives `<open-webui>/oauth/oidc/callback` from the incoming request, and that is the value to register with your provider.
 1. `OAUTH_AUDIENCE`: Optional `audience` value that will be passed to the oauth provider's authorization endpoint as an additional query parameter.
 
 :::warning
@@ -265,7 +266,7 @@ If you need to support both Microsoft and Google simultaneously, check out our *
 :::
 ### OAuth Role Management
 
-Any OAuth provider that can be configured to return roles in the access token can be used to manage roles in Open WebUI.
+Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. The access token is never decoded.
 To use this feature set `ENABLE_OAUTH_ROLE_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the roles returned by the OAuth provider:
 
@@ -289,7 +290,7 @@ To enable this synchronization, set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 
 You can configure the following environment variables:
 
-1. `OAUTH_GROUP_CLAIM`: The claim in the ID/access token containing the user's group memberships. Defaults to `groups`. Can also be nested, for example `user.memberOf`. Required if `ENABLE_OAUTH_GROUP_MANAGEMENT` is true.
+1. `OAUTH_GROUP_CLAIM`: The claim in the ID token or userinfo response containing the user's group memberships. Defaults to `groups`, so it only needs setting when your provider uses another name. Can also be nested, for example `user.memberOf`. `OAUTH_GROUPS_CLAIM` is the current name and is read first.
 1. `ENABLE_OAUTH_GROUP_CREATION`: If `true` (and `ENABLE_OAUTH_GROUP_MANAGEMENT` is also `true`), Open WebUI will perform **Just-in-Time (JIT) group creation**. This means it will automatically create groups during OAuth login if they are present in the user's OAuth claims but do not yet exist in the system. Defaults to `false`. If `false`, only memberships in *existing* Open WebUI groups will be managed.
 1. `OAUTH_GROUP_DEFAULT_SHARE`: Controls the default sharing permission for groups created via JIT group creation. Defaults to `true` (share with anyone). Set to `members` to restrict sharing to group members only, or `false` to disable sharing entirely. Only applies when `ENABLE_OAUTH_GROUP_CREATION` is enabled.
 
@@ -299,7 +300,7 @@ Strict Group Synchronization
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
 
 *   Users will be **added** to Open WebUI groups that match their OAuth claims.
-*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session.
+*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session. Removal and addition only happen when the claim is present and non-empty. An absent or empty groups claim leaves memberships untouched, and groups matching `OAUTH_BLOCKED_GROUPS` are never added or removed.
 
 Ensure all necessary groups are correctly configured in your OAuth provider and included in the group claim (`OAUTH_GROUP_CLAIM`).
 
@@ -308,7 +309,7 @@ Ensure all necessary groups are correctly configured in your OAuth provider and 
 :::warning
 
 Admin Users
-Admin users' group memberships are **not** automatically updated via OAuth group management.
+Admin users' group memberships are updated by OAuth group management like everyone else's. There is no role exemption.
 
 :::
 
@@ -341,7 +342,7 @@ For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing 
 Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
 If `WEBUI_AUTH_TRUSTED_NAME_HEADER` is not set, the email address is used as user name.
 
-The account created on a person's first request is given an identifier derived from their email address rather than a random one, so several requests arriving together for someone who has never signed in before all resolve to the same account. Previously each of those requests could create its own, leaving duplicate users for the same person, which is a realistic way for a first visit to begin when a page loads several resources at once.
+The account created on a person's first request is protected by the unique email constraint, so several requests arriving together for someone who has never signed in before all resolve to the same account: the request that loses the race re-reads the account by email instead of failing. Previously each of those requests could create its own, leaving duplicate users for the same person, which is a realistic way for a first visit to begin when a page loads several resources at once.
 
 #### Group Management
 

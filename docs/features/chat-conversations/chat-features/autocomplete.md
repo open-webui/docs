@@ -11,7 +11,7 @@ Open WebUI offers an **AI-powered Autocomplete** feature that suggests text comp
 
 When enabled, Open WebUI monitors your input in the chat box. When you pause typing, it sends your current text to a lightweight **Task Model**. This model predicts the likely next words or sentences, which appear as "ghost text" overlaying your input.
 
-- **Accept Suggestion**: Press `Tab` (or the `Right Arrow` key) to accept the suggestion.
+- **Accept Suggestion**: Press `Tab` to accept the suggestion. Right Arrow only moves the caret.
 - **Reject/Ignore**: Simply keep typing to overwrite the suggestion.
 
 :::info
@@ -57,7 +57,7 @@ If the Admin has disabled Autocomplete globally, users will **not** be able to e
 
 ### Why aren't suggestions appearing?
 1. **Check Settings**: Ensure it is enabled in **both** Admin and User settings.
-2. **Task Model**: Go to **Settings > Admin > Interface** and verify a **Task Model** is selected. If no model is selected, the feature cannot generate predictions.
+2. **Task Model**: Go to **Settings > Admin > Interface** and check which **Task Model** is selected. When none is set, the chat's current model generates the suggestions, so what blocks generation is having no model selected in the chat. Two fields sit under the admin toggle: **Autocomplete Generation Input Max Length** (`AUTOCOMPLETE_GENERATION_INPUT_MAX_LENGTH`, default `-1` for no limit) and **Autocomplete Generation Prompt**. The feature is off by default on both sides: the admin toggle (`ENABLE_AUTOCOMPLETE_GENERATION`, default `False`) and each user's **Prompt Autocompletion** switch.
 3. **Latency**: If your Task Model is large or running on slow hardware, predictions might arrive too late to be useful. Switch to a smaller model.
 4. **Reasoning Models**: Ensure you are **not** using a "Reasoning" model (like o1 or o3), as their internal thought process creates excessive latency that breaks real-time autocomplete. If you are stuck with one, you can turn its `reasoning_effort` down under **Task Model Parameters** in **Settings > Admin > Interface**. That setting is shared by every background task, so read [Task Models](/features/administration/task-models#task-model-parameters) first.
 

@@ -8,7 +8,7 @@ title: "Anthropic (Claude)"
 
 Open WebUI supports **Anthropic's Claude models** natively through their OpenAI-compatible endpoint. Just plug in your API key and start chatting: no middleware, no pipes, no extra setup required.
 
-Open WebUI includes a built-in compatibility layer that automatically detects Anthropic URLs, handles model discovery, and translates requests. Chat completions, streaming, and **tool calling** all work correctly out of the box.
+Open WebUI detects Anthropic URLs (any URL containing `api.anthropic.com`) and handles model discovery for them: the native models list is paged with `x-api-key` and reshaped into the OpenAI list format. Chat requests themselves are sent unchanged to Anthropic's OpenAI-compatible `/v1/chat/completions` with Bearer auth. Open WebUI also exposes its own Anthropic Messages endpoint at `/api/v1/messages`, and for a connection on `api.anthropic.com` those requests are passed through natively to `/v1/messages`, outside the chat pipeline.
 
 :::warning Anthropic's Compatibility Disclaimer
 Anthropic states that their OpenAI-compatible API is intended **for evaluation and testing**, not production workloads. In practice, everything (including tool calling) works as intended, but be aware of this official stance. For full Claude-native features (PDF processing, citations, extended thinking, prompt caching), Anthropic recommends their native `/v1/messages` API, which can be accessed via a [pipe function](/features/extensibility/plugin/functions/pipe) or a proxy like [LiteLLM](https://docs.litellm.ai/).
@@ -51,7 +51,7 @@ That's it! Open WebUI automatically detects the Anthropic endpoint and fetches a
 Streaming, multi-turn conversations, and tool calling all work seamlessly.
 
 :::info Optional: Filter Models
-If you want only specific models to appear, you can add model IDs to the **Model IDs (Filter)** allowlist in the connection settings. Common model IDs:
+If you want only specific models to appear, you can add model IDs to the **Model IDs** allowlist in the connection settings. Common model IDs:
 
 | Model | ID |
 |---|---|

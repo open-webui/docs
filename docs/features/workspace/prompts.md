@@ -39,7 +39,7 @@ Add typed input variables (dropdowns, date pickers, number fields, checkboxes) a
 
 ### Version history with rollback
 
-Every change creates a new version. Compare versions side-by-side, restore a previous version to production, and track who changed what.
+Every content change creates a new version. Browse the history, preview a version, set it live or delete it, and track who changed what. Untick **Set as Production** to save a version without making it live. Renaming, re-tagging or changing the command creates no version, and there is no side-by-side compare view in the editor (the diff endpoint is API-only).
 
 ### Controlled sharing
 
@@ -99,8 +99,8 @@ Automatically replaced with their value at runtime:
 | `{{USER_BIRTH_DATE}}` | Birth date from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_AGE}}` | Age calculated from birth date (unreplaced if not set) |
 | `{{USER_LANGUAGE}}` | Your selected language |
-| `{{USER_LOCATION}}` | Your location (requires HTTPS + Settings > Interface toggle) |
-| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to (empty if none). Resolved from the database only when the placeholder is present. |
+| `{{USER_LOCATION}}` | Your location. The browser asks for geolocation permission directly, which needs HTTPS. The Interface toggle only controls the location sent with chat requests |
+| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
 
 ### Custom input variables
 

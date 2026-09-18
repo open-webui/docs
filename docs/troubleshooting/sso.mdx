@@ -30,7 +30,7 @@ This is the **most common cause** of OAuth breakage. A misspelled, omitted, or i
 #### ❌ Non-Existent Variables People Often Use:
 - `OIDC_CONFIG` → Use `OPENID_PROVIDER_URL` instead
 - `WEBUI_OIDC_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
-- `WEBUI_ENABLE_SSO` → Use `ENABLE_OAUTH_SIGNUP` instead
+- `WEBUI_ENABLE_SSO` → OAuth is on by default through `ENABLE_OAUTH`. `ENABLE_OAUTH_SIGNUP` is only needed to let SSO create new accounts
 - `WEBUI_AUTH_TYPE` → This doesn't exist; configure provider-specific variables instead
 - `OPENID_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
 - `OPENID_CLIENT_SECRET` → Use `OAUTH_CLIENT_SECRET` instead
@@ -42,6 +42,8 @@ This is the **most common cause** of OAuth breakage. A misspelled, omitted, or i
 OAUTH_CLIENT_ID=your_client_id
 OAUTH_CLIENT_SECRET=your_client_secret
 OPENID_PROVIDER_URL=https://your-provider/.well-known/openid-configuration
+
+# Needed only for SSO to create accounts that do not exist yet
 ENABLE_OAUTH_SIGNUP=true
 
 # Optional but recommended
@@ -131,7 +133,7 @@ OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.w
 ```
 
 #### Other Required Variables by Provider:
-- **All OAuth providers:** `WEBUI_URL`, `ENABLE_OAUTH_SIGNUP=true`
+- **All OAuth providers:** `ENABLE_OAUTH` (on by default), plus `ENABLE_OAUTH_SIGNUP=true` when SSO should create accounts. `WEBUI_URL` only matters behind a proxy that changes the request URL
 - **Microsoft:** `MICROSOFT_CLIENT_ID`, `MICROSOFT_CLIENT_SECRET`, `MICROSOFT_CLIENT_TENANT_ID`
 - **Google:** `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
 - **OIDC:** `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `OPENID_PROVIDER_URL`
@@ -287,9 +289,9 @@ OAuth providers may be slow to respond, causing timeout errors during the authen
 **Solutions:**
 ```bash
 
-# Increase OAuth timeouts
-AIOHTTP_CLIENT_TIMEOUT=600         # Very high number is needed here, since model responses that take a lot of time also rely on this timeout variable (e.g., a model that is reasoning for 5+ minutes)
-AIOHTTP_CLIENT_TIMEOUT_OPENAI_MODEL_LIST=30
+# Increase the OAuth handshake timeout (seconds). AIOHTTP_CLIENT_TIMEOUT does not
+# affect the OAuth client, which is httpx-based.
+OAUTH_TIMEOUT=60
 ```
 
 ---
@@ -360,8 +362,8 @@ MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
 MICROSOFT_OAUTH_SCOPE=openid email profile
 MICROSOFT_REDIRECT_URI=https://your-domain/oauth/microsoft/callback
 
-# Also required for a working Microsoft setup
-OPENID_PROVIDER_URL=https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0/.well-known/openid-configuration
+# Needed only for SSO to create accounts that do not exist yet. OPENID_PROVIDER_URL is
+# not required for Microsoft: login and sign-out use the tenant's own discovery URL.
 ENABLE_OAUTH_SIGNUP=true
 ```
 
@@ -468,7 +470,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 ### Key Log Messages to Watch For:
 - `OAuth callback error: mismatching_state` → Session/cookie issue
 - `httpcore.ReadTimeout` → Network timeout issue
-- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established. Every callback failure is reported to the browser with this message, so read the backend log for the actual cause
+- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established. Token and claim failures are reported to the browser with this message, so read the backend log for the actual cause. A role mismatch or a signup-disabled case shows the access-prohibited text, a duplicate email shows the already-registered error, and other exceptions show `Error during OAuth process`
 - `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token and your version still rejects it. See [Providers that add their own parameters to the ID token](#providers-that-add-their-own-parameters-to-the-id-token)
 - `1 validation error for UserModel` on the `oauth` field → An old upgrade step stored the identity provider subject as text. See [Existing Accounts Cannot Sign In After a Long-Delayed Upgrade](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
 - `404` on callback URLs → Redirect URI misconfiguration

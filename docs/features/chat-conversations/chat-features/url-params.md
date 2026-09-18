@@ -22,6 +22,8 @@ The following table lists the available URL parameters, their function, and exam
 | `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions. | `/?temporary-chat=true`          |
 | `code-interpreter`    | Enables the code interpreter feature if set to `true`. | `/?code-interpreter=true`        |
 | `image-generation`    | Enables the image generation feature if set to `true`. | `/?image-generation=true`        |
+| `submit`              | With `q`, set to `false` to place the text in the input without sending it. | `/?q=Hello&submit=false`         |
+| `settings`            | Opens the settings dialog on a tab, `admin:` tabs for admins only. | `/?settings=admin:documents`     |
 
 ### 1. **Models and Model Selection**
 
@@ -73,7 +75,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Description**: The `q` parameter allows setting an initial query or prompt for the chat.
 - **How to Set**: Specify the query or prompt text as the parameter value.
 - **Example**: `/?q=Hello%20there`
-- **Behavior**: The chat starts with the specified prompt, automatically submitting it as the first message.
+- **Behavior**: The chat starts with the specified prompt, automatically submitting it as the first message. Add `submit=false` to leave the text in the input for the user to edit and send.
 
 ### 8. **Temporary Chat Sessions**
 
@@ -98,6 +100,27 @@ The following table lists the available URL parameters, their function, and exam
 - **How to Set**: Set this parameter to `true` to enable image generation for the chat.
 - **Example**: `/?image-generation=true`
 - **Behavior**: Activates the image generation button to generate an image.
+
+### 11. **Prefilled, Unsent Prompt**
+
+- **Description**: The `submit` parameter controls whether `q` is sent right away.
+- **How to Set**: Set it to `false` together with `q`. Any other value, or leaving it out, sends the prompt.
+- **Example**: `/?q=Summarize%20this&submit=false`
+- **Behavior**: The text lands in the message input, and the user decides when to send it.
+
+### 12. **Settings Deep Link**
+
+- **Description**: The `settings` parameter opens the settings dialog on a given tab and then removes itself from the URL.
+- **How to Set**: Use a user tab id (`general`, `interface`, `notifications`, `shortcuts`, `connections`, `tools`, `personalization`, `audio`, `data_controls`, `usage`, `archived_chats`, `account`, `about`) or an admin tab as `admin:<tab>` (`general`, `authentication`, `connections`, `models`, `subagents`, `evaluations`, `analytics`, `integrations`, `documents`, `web`, `code-execution`, `interface`, `audio`, `images`, `db`, `pipelines`).
+- **Example**: `/?settings=admin:documents`
+- **Behavior**: The dialog opens on that tab. A non-admin who follows an `admin:` link gets the General tab instead.
+
+### 13. **New Note**
+
+- **Description**: On the Notes pages, `title` and `content` prefill a new note.
+- **How to Set**: Open `/notes/new` (or `/notes`) with either parameter.
+- **Example**: `/notes/new?title=Meeting&content=Agenda%3A`
+- **Behavior**: A note editor opens with the given title and body. The title defaults to today's date when only `content` is given.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>

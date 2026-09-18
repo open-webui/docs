@@ -86,7 +86,7 @@ This is useful for:
 - **Cost allocation** - Attribute token consumption to business units
 - **Pilot programs** - Monitor adoption within test groups
 
-All metrics on the page update automatically when you change the time period or group filter.
+All metrics on the page update automatically when you change the time period or group filter, with one exception: with **Last 24 hours** selected, the timeline chart ignores the group filter and shows all users. The summary tiles and tables still honor it.
 
 ### Summary Statistics
 
@@ -129,7 +129,7 @@ A detailed breakdown of how each model is being used:
 | **%** | Percentage share of total messages |
 
 **Features:**
-- **Sortable columns** - Click column headers to sort by name or message count
+- **Sortable columns** - Click any column header to sort. The table also has **Users** (distinct users) and **Chats** (distinct chats) columns
 - **Model icons** - Visual identification with profile images
 - **Token tracking** - See which models consume the most resources
 - **Clickable rows** - Click any model to open the [Model Details Modal](#model-details-modal)
@@ -149,7 +149,7 @@ Clicking on any model row opens a detailed modal with two tabs:
 The Overview tab provides:
 
 - **Feedback Activity Chart** - Visual history of user feedback (thumbs up/down) over time
-  - Toggle between **30 days**, **1 year**, or **All time** views
+  - Toggle between **30D**, **1Y**, or **All** views
   - Weekly aggregation for longer time ranges
 - **Tags** - Most common chat tags associated with this model (top 10)
 
@@ -188,7 +188,7 @@ Track user engagement and token consumption per user:
 | **Tokens** | Total tokens consumed by this user |
 
 **Features:**
-- **Sortable columns** - Organize by name or activity level
+- **Sortable columns** - Sort by name, messages or tokens. The table shows the 50 users with the most messages in the period. The API's `limit` parameter raises that
 - **User identification** - Profile pictures and display names
 - **Token attribution** - See resource consumption per user
 
@@ -309,7 +309,7 @@ Analytics data is stored in the `chat_message` table, which contains:
 - **Token usage** - Input, output, and total tokens
 - **Relationships** - Links to parent messages and chats
 
-When you enable Analytics (via migration), Open WebUI:
+On upgrade, for every instance whether or not the flag is set, Open WebUI:
 1. Creates the `chat_message` table with optimized indexes
 2. **Backfills existing messages** from your chat history
 3. **Dual-writes** new messages to both the chat JSON and the message table
@@ -392,7 +392,7 @@ Analytics **does not** track:
 
 Analytics data follows your instance's chat retention policy. When you delete:
 - **A chat** - All associated messages are removed from analytics
-- **A user** - All their messages are disassociated
+- **A user** - Their chats and every message in them are deleted, so their history vanishes from analytics rather than being kept anonymously
 - **Message history** - Analytics data is also cleared
 
 ---
