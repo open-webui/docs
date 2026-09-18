@@ -61,6 +61,8 @@ class Tools:
         return string[::-1]
 ```
 
+Two rules follow from how the class is loaded. Every public callable on the instance is exposed to the model as a tool, so helper methods must start with `_`. And `__init__` has to set `self.valves = self.Valves()`: stored admin valves are only loaded onto an instance that already has a `valves` attribute, so without that line the tool runs on the class defaults no matter what the admin saved.
+
 ### Method Docstrings
 
 The docstring of each method is what the model reads before deciding to call it. The text above the first `:param` becomes the tool's own description, and each `:param name:` becomes the description of that argument in the JSON schema.
@@ -86,7 +88,10 @@ Here the model is told about the operators and the quoting rule as well as the f
 Only the reST `:param name:` form is read. A Google-style `Args:` block produces no parameter descriptions and lands in the tool's own description instead.
 
 ### Type Hints
-Each tool must have type hints for arguments. The types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. Tools without type hints will work with a lot less consistency.
+Each tool must have type hints for arguments. The types may also be nested, such as `queries_and_docs: list[tuple[str, int]]`. Those type hints are used to generate the JSON schema that is sent to the model. An argument without a type hint is typed as a string in the schema, so the model will always send a string. `Optional[X]` collapses to `X`, and a `None` default is dropped. Parameters whose names start with `__` are stripped from the schema along with their `:param` lines, so the model never sees the reserved arguments listed below.
+
+### Return Values
+A tool may return a `str`, a `dict` or a `list`. A `dict` is JSON-encoded for the model, a bare `list` is wrapped as `{"results": [...]}`, and anything else is converted with `str()`. A string that starts with `data:image/` is detached as an image attachment, and the model is told `<name>: Image file read successfully.` instead.
 
 ### Valves and UserValves (optional, but HIGHLY encouraged)
 
@@ -100,12 +105,19 @@ Below is a list of optional arguments your tools can depend on:
 - `__metadata__`: Dictionary with chat metadata
 - `__messages__`: List of previous messages
 - `__files__`: Attached files
-- `__model__`: A dictionary with model information
+- `__model__`: A dictionary with model information. For workspace tools this is the task model when one is configured under **Admin Panel > Settings > Interface**, and the chat model otherwise. Read `__metadata__["model"]` for the model the user is chatting with.
+- `__id__`: The tool's own id
+- `__chat_id__` and `__message_id__`: The current chat and message ids
+- `__request__`: The FastAPI request
 - `__oauth_token__`: A dictionary containing the user's valid, automatically refreshed OAuth token payload. This is the **new, recommended, and secure** way to access user tokens for making authenticated API calls. The dictionary typically contains `access_token`, `id_token`, and other provider-specific data.
 
 For more information about `__oauth_token__` and how to configure this token to be sent to tools, check out the OAuth section in the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/) and the [SSO documentation](https://docs.openwebui.com/features/auth/).
 
-Just add them as argument to any method of your Tool class just like `__user__` in the example above.
+Just add them as argument to any method of your Tool class just like `__user__` in the example above. `__messages__` and `__files__` are refreshed before every native tool call. The others are fixed when the request starts.
+
+#### `file_handler`
+
+A module-level `file_handler = True` tells Open WebUI to drop the attached files from the request once the tool has run, so the retrieval pipeline does not inject them as well. Only the Legacy function-calling path reads the flag. The Native loop ignores it.
 
 #### Using the OAuth Token in a Tool
 
@@ -1364,7 +1376,9 @@ Runtime installation is only suitable for **single-worker development or homelab
 
 :::note
 
-Keep in mind that pip runs in the same process as Open WebUI, so the **UI will be completely unresponsive** during installation.
+pip runs as a child process on a worker thread, so the rest of Open WebUI keeps serving requests during the install. Only the save that triggered it waits.
+
+Open WebUI also rewrites four import prefixes in the saved source, `from utils`, `from apps`, `from main` and `from config`, to their `open_webui.` forms, as plain substring replacements. `from configparser import ConfigParser` therefore becomes `from open_webui.configparser import ConfigParser` and fails. Write `import configparser` instead, and avoid those four prefixes anywhere in the file.
 
 No measures are taken to handle package conflicts with Open WebUI's own dependencies. Specifying requirements can break Open WebUI if you're not careful. You might be able to work around this by specifying `open-webui` itself as a requirement.
 
