@@ -4475,7 +4475,7 @@ Only enable this setting if you need to fetch content from internal network reso
 
 :::info
 
-When enabling `GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGLE_DRIVE_CLIENT_ID` and `GOOGLE_DRIVE_API_KEY` correctly, and have reviewed Google's terms of service and usage guidelines.
+When enabling `ENABLE_GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured `GOOGLE_DRIVE_CLIENT_ID` and `GOOGLE_DRIVE_API_KEY` correctly, and have reviewed Google's terms of service and usage guidelines.
 
 :::
 
@@ -5146,8 +5146,8 @@ If you use `perplexity`, this variable is not relevant to you.
 
 When using `playwright`, you have two options:
 
-1. If `PLAYWRIGHT_WS_URI` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
-2. If `PLAYWRIGHT_WS_URI` is set, Open WebUI will connect to a remote browser instance instead of installing dependencies locally.
+1. If `PLAYWRIGHT_WS_URL` is not set, Playwright with Chromium dependencies will be automatically installed in the Open WebUI container on launch.
+2. If `PLAYWRIGHT_WS_URL` is set, Open WebUI will connect to a remote browser instance instead of installing dependencies locally.
 
 :::
 
