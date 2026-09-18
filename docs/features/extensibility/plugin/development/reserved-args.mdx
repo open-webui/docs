@@ -72,7 +72,7 @@ A `dict` usually destined to go almost directly to the model. Although it is not
 
 ### `__user__`
 
-A `dict` with user information. It is the whole user record as `UserModel.model_dump()` returns it: `id`, `email`, `username`, `role`, `name`, `profile_image_url`, `profile_banner_image_url`, `bio`, `gender`, `date_of_birth`, `timezone`, `presence_state`, `status_emoji`, `status_message`, `status_expires_at`, `info`, `settings`, `oauth` (one entry per provider holding the `sub` the provider assigned), `scim`, `last_active_at`, `updated_at`, `created_at` and `is_active`. The user's `variables` are excluded from the dump. The example below shows only the fields most plugins read.
+A `dict` with user information. It is the whole user record as `UserModel.model_dump()` returns it: `id`, `email`, `username`, `role`, `name`, `profile_image_url`, `profile_banner_image_url`, `bio`, `gender`, `date_of_birth`, `timezone`, `presence_state`, `status_emoji`, `status_message`, `status_expires_at`, `info`, `settings`, `oauth` (one entry per provider holding the `sub` the provider assigned), `scim`, `last_active_at`, `updated_at` and `created_at`. The user's `variables` are excluded from the dump. The example below shows only the fields most plugins read.
 
 Note that if the `UserValves` class is defined, its instance has to be accessed via `__user__["valves"]`. Otherwise, the `valves` keyvalue is missing entirely from `__user__`.
 
