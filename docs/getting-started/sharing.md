@@ -38,8 +38,10 @@ A shared instance means shared knowledge.
 | | |
 | :--- | :--- |
 | **[Channels](/features/channels)** | Persistent spaces where your team and AI models work together in real time |
-| **Shared Chats** | Send an exact conversation snapshot to a colleague |
+| **Shared Chats** | Send an exact conversation snapshot to a colleague. A share link is private to the users and groups you grant; instance-wide or no-sign-in links need the public-sharing and open-sharing chat permissions, which are off by default |
 | **Global Prompts & Knowledge** | Build specialized agents and make them instantly available to everyone |
+
+The share dialog can also upload a chat to the Open WebUI Community site. Set `ENABLE_COMMUNITY_SHARING=false` to keep everything in-house.
 
 ### Shared Compute
 
@@ -89,7 +91,7 @@ Once your instance is network-accessible, you need to manage how users create ac
 
 ### The Pending Queue
 
-The first user to register becomes the **Administrator**. All subsequent sign-ups are placed in a **Pending** state and cannot access models or use the platform until an admin approves their account from the Admin Panel.
+The first user to register becomes the **Administrator**. All subsequent sign-ups are placed in a **Pending** state and cannot access models or use the platform until an admin approves their account from the Admin Panel. `DEFAULT_USER_ROLE=user` lets new accounts in without approval, and `ENABLE_SIGNUP=false` closes self-registration.
 
 ### Enterprise Single Sign-On (SSO)
 
