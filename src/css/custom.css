@@ -1075,10 +1075,12 @@ html[data-theme="dark"] .navbar {
 /* stylelint-enable no-descending-specificity */
 
 /* Timeline row marking the event where a CVE was officially rejected. */
+/* stylelint-disable-next-line no-descending-specificity */
 table tr:has(.cve-rejected) {
 	background-color: rgb(0 164 78 / 12%);
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 [data-theme="dark"] table tr:has(.cve-rejected) {
 	background-color: rgb(0 164 78 / 18%);
 }
@@ -1132,6 +1134,7 @@ table tr:has(.cve-rejected) {
 
 /* Counterpart to .cve-refutation: the CVE is withdrawn and the record agrees
    with us. Same weight, opposite colour, so the outcome reads at a glance. */
+/* stylelint-disable-next-line no-descending-specificity */
 .cve-resolved .theme-admonition {
 	border: 1px solid rgb(0 164 78 / 40%);
 	border-left-width: 6px;
