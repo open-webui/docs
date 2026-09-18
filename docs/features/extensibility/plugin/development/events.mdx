@@ -138,8 +138,8 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `chat:message:delta`,<br/>`message`          | Append content to the current message                | `{content: "text to append"}`                                                                        |
 | `chat:message`,<br/>`replace`                | Replace current message content completely           | `{content: "replacement text"}`                                                                      |
 | `chat:message:files`,<br/>`files`            | Set or overwrite message files (for uploads, output) | `{files: [...]}`                                                                                     |
-| `chat:title`                                 | Set (or update) the chat conversation title          | Topic string OR `{title: ...}`                                                                       |
-| `chat:tags`                                  | Update the set of tags for a chat                    | Tag array or object                                                                                  |
+| `chat:title`                                 | Set (or update) the chat conversation title          | The title string itself                                                                              |
+| `chat:tags`                                  | Tell the browser to reload the chat's tags           | Ignored. Write the tags to the database first, then emit                                             |
 | `source`,<br/>`citation`                     | Add a source/citation, or code execution result      | For code: See [below.](/features/extensibility/plugin/development/events#source-or-citation-and-code-execution) |
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
 | `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
@@ -371,15 +371,13 @@ await __event_emitter__(
 
 ### `chat:title`
 
-**Update the chat's title:**
+**Update the chat's title.** `data` is the title string itself, which is also how Open WebUI emits it after title generation. An object here would set the title to that object.
 
 ```python
 await __event_emitter__(
     {
         "type": "chat:title",
-        "data": {
-            "title": "Market Analysis Bot Session"
-        },
+        "data": "Market Analysis Bot Session",
     }
 )
 ```
@@ -388,17 +386,13 @@ await __event_emitter__(
 
 ### `chat:tags`
 
-**Update the chat's tags:**
+**Refresh the chat's tags.** The browser ignores `data` on this event and reloads the chat and the tag list from the server, which is also how Open WebUI uses it after tag generation. Write the tags to the database first, then emit the event as the refresh signal:
 
 ```python
-await __event_emitter__(
-    {
-        "type": "chat:tags",
-        "data": {
-            "tags": ["finance", "AI", "daily-report"]
-        },
-    }
-)
+from open_webui.models.chats import Chats
+
+await Chats.update_chat_tags_by_id(chat_id, ["finance", "AI", "daily-report"], user)
+await __event_emitter__({"type": "chat:tags", "data": {}})
 ```
 
 ---
@@ -444,6 +438,8 @@ await __event_emitter__(
 ---
 
 ### `notification`
+
+Notifications are dropped for internal requests, so an automation or a background task never shows a toast.
 
 **Show a toast notification:**
 
@@ -568,6 +564,10 @@ This uses the same `SensitiveInput` component used for user valve password field
 :::
 
 ---
+
+#### Select Input
+
+To offer a fixed set of choices instead of free text, pass `"input": {"type": "select", "options": ["a", "b"]}` in the data payload. Cancelling the dialog returns `false` rather than a string, so check for it before using the value.
 
 ### `execute` (works with both `__event_call__` and `__event_emitter__`)
 
@@ -700,6 +700,8 @@ The `execute` event and [Rich UI Embeds](/features/extensibility/plugin/developm
 Use `execute` for transient interactions (confirmations, custom dialogs, triggering downloads, reading page state) and Rich UI embeds for persistent visual content you want to stay in the conversation.
 
 :::warning
+If the JavaScript throws, the browser logs the error and never sends a reply, so an `__event_call__` waits until `WEBSOCKET_EVENT_CALLER_TIMEOUT` expires, which by default is forever. Wrap the code in `try` and `catch` and `return` an error value from the `catch` branch.
+
 Because `execute` runs unsandboxed JavaScript in the user's browser session, it has full access to the Open WebUI page context. Only use this in trusted functions. Never execute untrusted or user-provided code through this event.
 :::
 
@@ -787,7 +789,7 @@ response = await __event_call__({
 Yes, use the `"files"` or `"chat:message:files"` event type with a `{files: [...]}` payload.
 
 ### Q: Can I update the conversation title or tags?
-Absolutely: use `"chat:title"` or `"chat:tags"` accordingly.
+The title, yes: emit `"chat:title"` with the new title string as `data`. Tags are different. `"chat:tags"` only makes the browser reload the tags from the server, so write them to the chat first and then emit it.
 
 ### Q: Can I stream responses (partial tokens) to the user?
 Yes, emit `"chat:message:delta"` events in a loop, then finish with `"chat:message"`.
@@ -954,6 +956,8 @@ There is **no timeout** on pipe, tool, or action execution. Your code can run fo
 The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**. These writes are independent of the `ENABLE_REALTIME_CHAT_SAVE` setting.
 
 #### ✅ Persisted (survive tab close)
+
+Nothing below is written for a temporary chat or a channel message, since neither has a saved chat to write to.
 
 | Type | What's saved |
 |------|-------------|
