@@ -11,7 +11,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 # Special Arguments
 
-When developping your own `Tools`, `Functions` (`Filters`, `Pipes` or `Actions`), `Pipelines` etc, you can use special arguments explore the full spectrum of what Open-WebUI has to offer.
+When developing your own `Tools`, `Functions` (`Filters`, `Pipes` or `Actions`), `Pipelines` etc, you can use special arguments to explore the full spectrum of what Open WebUI has to offer.
 
 This page aims to detail the type and structure of each special argument as well as provide an example.
 
@@ -72,7 +72,7 @@ A `dict` usually destined to go almost directly to the model. Although it is not
 
 ### `__user__`
 
-A `dict` with user information.
+A `dict` with user information. It is the whole user record as `UserModel.model_dump()` returns it: `id`, `email`, `username`, `role`, `name`, `profile_image_url`, `profile_banner_image_url`, `bio`, `gender`, `date_of_birth`, `timezone`, `presence_state`, `status_emoji`, `status_message`, `status_expires_at`, `info`, `settings`, `oauth` (one entry per provider holding the `sub` the provider assigned), `scim`, `last_active_at`, `updated_at`, `created_at` and `is_active`. The user's `variables` are excluded from the dump. The example below shows only the fields most plugins read.
 
 Note that if the `UserValves` class is defined, its instance has to be accessed via `__user__["valves"]`. Otherwise, the `valves` keyvalue is missing entirely from `__user__`.
 
@@ -105,6 +105,20 @@ A `dict` with wide ranging information about the chat, model, files, etc.
   "chat_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "session_id": "xxxxxxxxxxxxxxxxxxxx",
+  "user_agent": "Mozilla/5.0 ...",
+  # the caller's User-Agent header, or "" when absent.
+  "internal": false,
+  # true when the server made the request itself (a task or an automation), not a client.
+  "user_message": "[the latest user message dict from body['messages']]",
+  "user_message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "assistant_message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "automation_id": null,
+  # set when an automation started the turn.
+  "folder_id": null,
+  "filter_ids": [],
+  # filters selected for this request, on top of the model's own.
+  "chat_variables": {},
+  # variables stored on the chat itself, as opposed to the request-level "variables" below.
   "user_prompt": "What is in this picture?",
   # the user's most recent message, captured before any source citation wrap.
   # this is what the native tool call loop and Pipes should read.
@@ -139,8 +153,14 @@ A `dict` with wide ranging information about the chat, model, files, etc.
     "stream_delta_chunk_size": 1,
     "reasoning_tags": null,
     "compact_token_threshold": null,
-    "function_calling": "native"
-  }
+    "function_calling": "native",
+    "tool_approval_mode": "full"
+    # "full" unless tool permissions are enabled and the request chose otherwise.
+    # Always "full" for automations and channel messages.
+  },
+  "tools": "[the same dict as __tools__, present once tools have been loaded]",
+  "task": "[the task name for internal task calls, see __task__ below]",
+  "task_body": "[the task's body for internal task calls, see __task_body__ below]"
 }
 
 ```
@@ -428,3 +448,19 @@ Its structure is the same as `body` above, with modifications like using the app
 A `dict` keyed by tool function name, injected for Pipes only. Each value carries `tool_id`, `callable` (the awaitable that runs the tool) and `spec` (the OpenAI function spec sent to the model). Entries for local Python tools also carry `metadata`, while builtin and external tool-server entries instead carry a `type` of `builtin` or `external`.
 
 The dict is assembled by `get_tools()` in [tools.py](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/tools.py).
+
+### `__oauth_token__`
+
+A `dict` with the signed-in user's OAuth token data (`access_token` and the rest of what the provider returned, refreshed when it has expired), or `None` when the user did not sign in through OAuth or no session token is stored. Pipes, Tools and a Filter's `inlet()` and `request()` receive it. The token comes from the browser's OAuth session cookie, and falls back to the user's most recent stored OAuth session for automations and API calls made without one.
+
+### `__id__`
+
+The `str` id of the plugin itself: the tool id for Tools, the filter id for Filters, and the action id for Actions (the sub-action id when a sub-action was clicked). Pipes do not receive it.
+
+### `__body__`
+
+Filters only. `stream()` receives each chunk as `event` rather than `body`, so `__body__` carries the request body the turn was started with, as it stands after the `inlet()` filters ran.
+
+### `__features__`
+
+Tools only. The `features` dict from the request (`web_search`, `image_generation`, `code_interpreter` and any other toggles the client sent), taken from the body after the `inlet()` filters ran, so a Tool can see which toggles the user switched on.
