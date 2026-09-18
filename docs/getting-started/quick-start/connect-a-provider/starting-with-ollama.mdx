@@ -109,7 +109,7 @@ The `deepseek_r1` parser works for most reasoning models, including Qwen3. If yo
 
 How much of your conversation a model actually sees is set by the **context length**, and for Ollama it can come from two places, one of which quietly overrides the other:
 
-- **`OLLAMA_CONTEXT_LENGTH`** is set on the **Ollama server** and is the default context length Ollama uses for a model. Ollama itself defaults this to a small value (historically `2048`, `4096` on newer builds).
+- **`OLLAMA_CONTEXT_LENGTH`** is set on the **Ollama server** and is the default context length Ollama uses for a model. Since Ollama v0.15.5, Ollama picks this default from available VRAM: `4096` below 24 GiB, `32768` from 24 to 48 GiB, and `262144` at 48 GiB and above (see [Ollama's context length documentation](https://docs.ollama.com/context-length)).
 - **`num_ctx`** is an **Open WebUI advanced parameter** (Chat Controls > Advanced Parameters, or per model in the model editor). It is **unset by default**, so out of the box Ollama's `OLLAMA_CONTEXT_LENGTH` applies.
 
 :::warning `num_ctx` overrides `OLLAMA_CONTEXT_LENGTH`
@@ -121,7 +121,7 @@ A context that is too small silently truncates the prompt. This is most visible 
 **What to do:**
 
 - To set a default for all Ollama models, set `OLLAMA_CONTEXT_LENGTH` on the **Ollama server** and **leave `num_ctx` unset** in Open WebUI so it is not overridden.
-- To set it per model or per chat, set `num_ctx` to a realistic value for the model (for example `8192`, `16384` or the model's maximum), not the `2048` default. Remember it overrides `OLLAMA_CONTEXT_LENGTH`.
+- To set it per model or per chat, set `num_ctx` to a realistic value for the model (for example `8192`, `16384` or the model's maximum), not the `2048` pre-fill. Remember it overrides `OLLAMA_CONTEXT_LENGTH`.
 - A larger context uses more VRAM and RAM, so size it to what your hardware can hold.
 
 ---

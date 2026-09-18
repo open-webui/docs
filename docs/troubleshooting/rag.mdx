@@ -106,7 +106,7 @@ Try uploading a document and preview the extracted content. If it's blank or mis
 
 ### 2. Only a Small Part of the Document is Being Used
 
-Open WebUI is designed to work with models that have limited context windows by default. For instance, many local models (e.g., Ollama's default models) are limited to 2048 tokens. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
+Open WebUI is designed to work with models that have limited context windows by default. For instance, Ollama picks a model's default context length from available VRAM, and on GPUs with less than 24 GiB that is 4096 tokens (see [Ollama's context length documentation](https://docs.ollama.com/context-length)), well below what most models support. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
 
 **Solutions:**
 
@@ -127,7 +127,7 @@ Be mindful of context limits: if your model can't handle more tokens, content wi
 
 Even if retrieval works, your model might still not process all the content it receives, because it simply can't.
 
-By default, many models (especially Ollama-hosted LLMs) are limited to a 2048-token context window. That means only a fraction of your retrieved data will actually be used.
+By default, Ollama-hosted models on GPUs with less than 24 GiB of VRAM run with a 4096-token context window (Ollama picks the default from available VRAM: 4096 below 24 GiB, 32768 from 24 to 48 GiB, and 262144 at 48 GiB and above). That means only a fraction of your retrieved data will actually be used.
 
 **Why Web Search Especially Needs Larger Context Windows:**
 Web pages are particularly challenging for small context windows because they contain far more content than typical documents. A single web page often includes:
@@ -137,7 +137,7 @@ Web pages are particularly challenging for small context windows because they co
 - Comments sections and related links
 - Metadata and embedded scripts
 
-Even after content extraction and cleaning, web pages easily consume 4,000-8,000+ tokens of context. With a 2048-token limit, you're getting less than half the content, often missing the most relevant information that appears later in the page. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
+Even after content extraction and cleaning, web pages easily consume 4,000-8,000+ tokens of context. With a 4096-token limit, you're often getting only half the content, missing the most relevant information that appears later in the page. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
 **Solutions:**
 
@@ -148,7 +148,7 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 
 - **For OpenAI and Other Integrated Models**: These models typically have their own context limits that cannot be modified through Open WebUI settings. Ensure you're using a model with sufficient context length.
 
-The 2048-token default is a significant limiter for web search. For better RAG results with web content, use at least 8192 tokens, with 16384+ being ideal for complex web pages.
+Ollama's 4096-token default on smaller GPUs is a significant limiter for web search. For better RAG results with web content, use at least 8192 tokens, with 16384+ being ideal for complex web pages.
 
 **Alternative:** Use an external LLM with larger context capacity (e.g., GPT-5.6, Claude, Gemini with 8k+ context). Comparing results with a large-context model is a good way to isolate whether token limits are the bottleneck.
 
@@ -245,7 +245,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 |--------|------|
 | 🤔 Model can't "see" content | Check document extractor settings |
 | 🧹 Only part of content used | Enable Full Context Mode or Bypass Embedding |
-| ⏱ Limited by 2048 token cap | Increase model context length or use large-context LLM |
+| ⏱ Limited by a small context length | Increase model context length or use large-context LLM |
 | 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
 | ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`); Knowledge Base limits are separate |
 | 🧩 Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
