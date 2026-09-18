@@ -38,6 +38,8 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
      - `BASE_URL` set to `/docs` (or your chosen base URL for the fork).
      - `SITE_URL` set to `https://<your-github-username>.github.io/`.
 
+   These variables take effect only after the workflow and config edits in the next section: the upstream `gh-pages.yml` build step sets no `env`, and `docusaurus.config.ts` hard-codes `url` and `baseUrl`.
+
 ### 📝 Updating the GitHub Pages Workflow and Config File
 
 If you need to adjust deployment settings to fit your custom setup, here’s what to do:
@@ -63,7 +65,7 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
        title: "Open WebUI",
        tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
        favicon: "images/favicon.png",
-       url: process.env.SITE_URL || "https://openwebui.com",
+       url: process.env.SITE_URL || "https://docs.openwebui.com",
        baseUrl: process.env.BASE_URL || "/",
        ...
      };
@@ -82,7 +84,7 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
 
 7. **Draft Your Changes**
 
-   - In your forked repository, navigate to the appropriate directory (e.g., `docs/tutorial/`).
+   - In your forked repository, navigate to the appropriate directory (e.g., `docs/tutorials/`).
    - Create a new markdown file for your tutorial or edit existing ones.
    - Ensure that your tutorial includes the unsupported warning banner.
 
