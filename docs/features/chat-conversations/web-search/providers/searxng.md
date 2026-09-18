@@ -215,7 +215,7 @@ services:
       WEB_SEARCH_ENGINE: "searxng"
       WEB_SEARCH_RESULT_COUNT: 3
       WEB_SEARCH_CONCURRENT_REQUESTS: 10
-      SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
+      SEARXNG_QUERY_URL: "http://searxng:8080/search"
 ```
 
 Create a `.env` file for SearXNG:
@@ -332,13 +332,15 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
 
-- `http://localhost:8080/search?q=<query>` (using the host and host port, suitable for Docker-based setups)
-- `http://searxng:8080/search?q=<query>` (using the container name and exposed port, suitable for Docker-based setups)
-- `http://host.docker.internal:8080/search?q=<query>` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
-- `http://<searxng.local>/search?q=<query>` (using a local domain name, suitable for local network access)
-- `https://<search.domain.com>/search?q=<query>` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
+- `http://localhost:8080/search` (using the host and host port, suitable for Docker-based setups)
+- `http://searxng:8080/search` (using the container name and exposed port, suitable for Docker-based setups)
+- `http://host.docker.internal:8080/search` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
+- `http://<searxng.local>/search` (using a local domain name, suitable for local network access)
+- `https://<search.domain.com>/search` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
 
-**Do note the `/search?q=<query>` part is mandatory.**
+Point the URL at the `/search` endpoint. Open WebUI adds the query parameters itself (`q`, `format=json`, `language` and the rest). The older `/search?q=<query>` form still works, since Open WebUI strips the query string when it sees `<query>`, but it is not required.
+
+A **Searxng search language** field (`SEARXNG_LANGUAGE`, default `all`) is sent as SearXNG's `language` parameter.
 
 5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
 6. Save changes

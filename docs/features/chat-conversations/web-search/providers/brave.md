@@ -28,7 +28,7 @@ Open WebUI ships with two Brave-backed search engines that share the same API ke
 | Engine | Endpoint | Behavior |
 | :--- | :--- | :--- |
 | `brave` | `/res/v1/web/search` | Classic web search. Returns short snippets; Open WebUI then scrapes each result URL to build the LLM context. |
-| `brave_llm_context` | `/res/v1/llm/context` | LLM-optimized search. Returns full pre-extracted, relevance-scored page passages directly. Skips the post-search scrape entirely. Pull size is bounded by [`BRAVE_SEARCH_CONTEXT_TOKENS`](/reference/env-configuration#brave_search_context_tokens) (default `8192`, range `1024` to `32768`). |
+| `brave_llm_context` | `/res/v1/llm/context` | LLM-optimized search. Returns full pre-extracted, relevance-scored page passages directly as each result's snippet. The page fetch that follows a search is governed by **Bypass Web Loader** for every engine, so turn that on to skip the scrape and use the passages as they are. Pull size is bounded by [`BRAVE_SEARCH_CONTEXT_TOKENS`](/reference/env-configuration#brave_search_context_tokens) (default `8192`, range `1024` to `32768`). |
 
 Pick `brave_llm_context` when you want fewer round-trips and higher-fidelity passages without the scraping step; pick `brave` when you need the classic snippet-then-scrape flow (e.g. when scraping is doing useful normalization in your pipeline). Both engines automatically retry once after HTTP 429 with a 1-second backoff.
 
@@ -76,7 +76,7 @@ If you are on Brave's paid tier with higher rate limits, you can increase `WEB_S
 The `WEB_SEARCH_CONCURRENT_REQUESTS` setting controls concurrency **per individual search request**, not globally across the entire application.
 
 - **When this is NOT an issue**: For single-user instances or low-traffic setups where users rarely hit "Enter" at the exact same second, setting concurrency to `1` is usually sufficient to stay within the Free Tier limits (1 req/sec).
-- **When this IS an issue**: If multiple users trigger web searches at the exact same moment (e.g., 3 users searching in the same second), Open WebUI will process these requests in parallel. Each user's request creates its own connection pool, meaning 3 requests will be sent to the API simultaneously, triggering a rate limit error on the Free Tier.
+- **When this IS an issue**: If multiple users trigger web searches at the exact same moment (e.g., 3 users searching in the same second), Open WebUI will process these requests in parallel. All Brave calls share one HTTP session, but the concurrency limit is created per search, so three searches from three users are not throttled against each other and 3 requests reach the API simultaneously, triggering a rate limit error on the Free Tier.
 
 **Note:** If you are running an environment with multiple concurrent users actively using web search, it is highly recommended to upgrade to a paid API tier. The Free Tier is not designed to support the throughput of a multi-user deployment.
 :::
