@@ -24,7 +24,7 @@ Regardless of which deployment pattern you choose, every scaled Open WebUI deplo
 | Component | Why It's Required | Options |
 | :--- | :--- | :--- |
 | **PostgreSQL** | Multi-instance deployments require a real database. SQLite does not support concurrent writes from multiple processes. | Self-managed, Amazon RDS, Azure Database for PostgreSQL, Google Cloud SQL |
-| **Redis** | Session management, WebSocket coordination, and configuration sync across instances. | Self-managed, Amazon ElastiCache, Azure Cache for Redis, Google Memorystore |
+| **Redis** | WebSocket coordination, token revocation, and shared caches across instances (configuration is shared through PostgreSQL). | Self-managed, Amazon ElastiCache, Azure Cache for Redis, Google Memorystore |
 | **Vector Database** | The default ChromaDB uses a local SQLite backend that is not safe for multi-process access. | PGVector (shares PostgreSQL), Milvus, Qdrant, or ChromaDB in HTTP server mode |
 | **Shared Storage** | Uploaded files must be accessible from every instance. | Shared filesystem (NFS, EFS, CephFS) or object storage (`S3`, `GCS`, `Azure Blob`) |
 | **Content Extraction** | The default `pypdf` extractor leaks memory under sustained load. | Apache Tika or Docling as a sidecar service |
@@ -118,7 +118,8 @@ Production deployments should include monitoring and observability regardless of
 ### Health Checks
 
 - **`/health`**: Basic liveness check. Returns HTTP 200 when the application is running. Use this for load balancer and auto-scaler health checks.
-- **`/api/models`**: Verifies the application can connect to configured model backends. Requires an API key.
+- **`/ready`**: Readiness check. Returns 503 until startup has finished and the database and Redis (if configured) answer a ping; use it for readiness probes.
+- **`/api/models`**: Lists the models the caller can use. It still returns 200 when a model backend is unreachable, so it does not prove backend health. Requires an authenticated user token; API keys work only after an admin enables them (`ENABLE_API_KEYS`, off by default).
 
 ### OpenTelemetry
 
@@ -126,11 +127,14 @@ Open WebUI supports **OpenTelemetry** for distributed tracing and HTTP metrics. 
 
 ```bash
 ENABLE_OTEL=true
-OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4318
+ENABLE_OTEL_TRACES=true
+ENABLE_OTEL_METRICS=true
+OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
+OTEL_EXPORTER_OTLP_INSECURE=true
 OTEL_SERVICE_NAME=open-webui
 ```
 
-This auto-instruments FastAPI, SQLAlchemy, Redis, and HTTP clients, giving visibility into request latency, database query performance, and cross-service traces.
+This auto-instruments FastAPI, SQLAlchemy, Redis, and HTTP clients, giving visibility into request latency, database query performance, and cross-service traces. `ENABLE_OTEL` alone exports nothing; each signal has its own switch (`ENABLE_OTEL_LOGS` for logs). The exporter speaks OTLP over gRPC by default, which is why the endpoint uses port 4317. Set `OTEL_EXPORTER_OTLP_INSECURE=true` when the collector's gRPC port has no TLS; Open WebUI passes this flag explicitly, so an `http://` endpoint alone does not disable TLS. To use an HTTP collector instead, set `OTEL_OTLP_SPAN_EXPORTER=http` and give the full signal URL, for example `http://your-collector:4318/v1/traces` (and `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT` and `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT` ending in `/v1/metrics` and `/v1/logs`), because Open WebUI passes the endpoint to the exporter unchanged.
 
 ### Structured Logging
 
