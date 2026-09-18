@@ -20,7 +20,7 @@ The **Tasks** section holds two pickers. Open WebUI picks between them based on 
 | Field | Environment variable | Used when the chat model comes from |
 | :--- | :--- | :--- |
 | **Local Task Model** | [`TASK_MODEL`](/reference/env-configuration#task_model) | a connection typed **Local** (Ollama and anything else you marked local) |
-| **External Task Model** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | a connection typed **External** (OpenAI-compatible providers) |
+| **External Task Model** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | every chat model not typed **Local**, including pipe and function models and models with no connection type |
 
 Both default to **Current Model**, which means background work runs on the chat's own model. If you name a model that is no longer available, background work falls back to the chat's model rather than failing.
 
@@ -39,7 +39,7 @@ The main chat experience does not change. The background work just stops draggin
 
 **Task Model Parameters > Configure**, in the same **Tasks** section, opens the advanced parameter controls you already know from a model and applies them to every background request. The equivalent environment variable is [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params), which takes a JSON object such as `{"max_tokens":4000,"temperature":0.3}`.
 
-Leave it empty and background requests behave as they always have: title generation and context compaction summaries stop at 1000 output tokens, and every other background task sends no parameters at all.
+Leave it empty and background requests behave as they always have: task calls use the task model's own `max_tokens` from its model editor when one is set, and 1000 output tokens when none is, and every other parameter is left out. Context compaction has its own **Context Compaction Model** picker under **Chat** (`CONTEXT_COMPACTION_MODEL`, default Current Model) and does not use the Local or External task model.
 
 Reach for it when:
 
@@ -53,7 +53,7 @@ As soon as you set a single parameter, the built-in 1000-token limit on titles a
 
 Five of the controls in the panel have no effect on background requests: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Setting them here changes nothing.
 
-This is the only place background requests get parameters from. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
+Background requests also receive the task model's own per-model parameters from its model editor, with `TASK_MODEL_PARAMS` winning on conflicting keys. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
 
 ---
 
@@ -80,6 +80,6 @@ Autocomplete is the first thing to turn off. It fires as users type, so a slow t
 
 ## Changing the prompts
 
-Every task's prompt sits next to its toggle under **Generation**, and each one is empty by default, meaning the built-in prompt is used. The [Tasks section of the environment configuration reference](/reference/env-configuration#tasks) has the full text of each built-in prompt and the placeholders it accepts.
+Most tasks' prompts sit under **Generation**, each empty by default, meaning the built-in prompt is used. Retrieval and web search share one **Query Generation Prompt**, the **Image Prompt Generation Prompt** sits under Generation while its toggle is on the Images tab, and the **Context Compaction Prompt** is under **Chat**. The [Tasks section of the environment configuration reference](/reference/env-configuration#tasks) has the full text of each built-in prompt and the placeholders it accepts.
 
 [Prompt modifiers](/features/workspace/prompts) are worth knowing about here, since task prompts often have to cope with pasted documents and long code blocks.
