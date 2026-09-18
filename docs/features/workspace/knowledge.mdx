@@ -1,12 +1,14 @@
 ---
 sidebar_position: 4
-title: "Knowledge"
+title: "Knowledge Bases and Document Chat"
+sidebar_label: "Knowledge"
+description: "Upload documents to a knowledge base, ask questions about their contents, and choose how to retrieve and share them in Open WebUI."
 ---
 
 import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-# Knowledge
+# Knowledge Bases and Document Chat {#knowledge}
 
 <ThemedImage
   alt="Workspace map with the Knowledge cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
@@ -17,11 +19,27 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Give your AI access to your documents and let it find what matters.**
+Use Knowledge Bases to ask questions across PDFs, documents, and other files in Open WebUI. Upload your files, attach the collection to a model or conversation, and ask a question. Where document content is processed depends on your extraction, embedding, and model providers; see [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption).
 
-Knowledge is where you store the files and collections that your AI can search, read, and reason over. Upload PDFs, spreadsheets, code, or any text-based document. Build collections around projects, teams, or topics. When a model needs an answer, it pulls from your knowledge base instead of guessing.
+## Ask your first document question
 
-Unlike [Notes](/features/notes), which inject full content into every message, Knowledge uses retrieval (RAG) to find the relevant chunks on demand. This makes it the right choice for large document sets where injecting everything would exceed the context window.
+Start with a running Open WebUI instance, a connected model, and permission to create knowledge bases and upload files. For focused retrieval, use a model that supports [Native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native), with **Builtin Tools** and the **Knowledge Base** tool category enabled. Native is the default mode; the model must use its tools to retrieve attached knowledge.
+
+1. Click **Workspace > Knowledge**, then **Create**. Give the knowledge base a name and description.
+2. Upload a small text-based PDF or text file. Wait for processing to finish before asking about it.
+3. Reference the knowledge base in chat with `#`, or attach it to a model in **Workspace > Models > Edit** and start a conversation with that model.
+4. Ask a question whose answer is in the file, such as: "Use the attached handbook to find the office opening hours. Quote the relevant passage."
+5. Compare the answer and any source references with the original document. If the model cannot find the content, follow [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working).
+
+## Choose how to work with files
+
+| Need | Use |
+| :--- | :--- |
+| Ask about one file in one conversation | [Upload a file to the chat](/features/chat-conversations/data-controls/files#using-files-in-open-webui) |
+| Reuse a document collection across conversations | A Knowledge Base, using the steps above |
+| Analyze spreadsheets or create files through code | [Open Terminal's file-analysis guide](/features/open-terminal/use-cases/file-analysis) |
+
+Unlike [Notes](/features/notes), which inject full content into every message, Knowledge can retrieve relevant passages on demand. This makes it useful for document sets that would exceed the model's context window if sent in full. For local-only document chat, also follow [Run Open WebUI Offline](/tutorials/maintenance/offline-mode).
 
 ---
 
@@ -214,7 +232,7 @@ For the full list of built-in agentic tools, see the [Native/Agentic Mode Tools 
 When native function calling is enabled, attached knowledge is **not automatically injected**. The model must call the knowledge tools to search and retrieve. If your model isn't using attached knowledge:
 
 1. **Add system prompt instructions** telling the model to use `list_knowledge` and `query_knowledge_files`.
-2. **Disable native function calling** for that model to restore automatic RAG injection.
+2. **Check the model's tool capabilities and retrieval setup** using [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working). Keep Native mode enabled and use a model that can call tools reliably.
 3. **Switch to Full Context mode** for the attachment to bypass RAG entirely.
 :::
 
@@ -222,10 +240,7 @@ When native function calling is enabled, attached knowledge is **not automatical
 
 ## Setting Up a Knowledge Base
 
-1. Click **Workspace** in the sidebar, then select **Knowledge**.
-2. Click **Create** in the Workspace header and give it a name and description.
-3. Upload files or add existing documents.
-4. Attach the knowledge base to a model in **Workspace > Models > Edit**, or reference it in chat with `#`.
+For the initial create, upload, and chat steps, see [Ask your first document question](#ask-your-first-document-question). The sections below cover managing the collection after setup.
 
 Once you have more than a handful, the list can be reordered by clicking the **Title** or **Updated at** column headers. Clicking the header you are already sorted by reverses the direction. The list starts on **Updated at**, newest first.
 

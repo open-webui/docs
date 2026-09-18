@@ -1,9 +1,13 @@
 ---
 sidebar_position: 300
-title: "Offline Mode"
+title: "Run Open WebUI Offline"
+sidebar_label: "Offline Mode"
+description: "Prepare local models and document processing, enable offline settings, restrict network access, and verify Open WebUI without internet access."
 ---
 
-# Running Open WebUI in offline mode
+# Run Open WebUI Offline {#running-open-webui-in-offline-mode}
+
+To use Open WebUI without an internet connection, prepare local inference, embedding, and document extraction services before disconnecting. Running the interface locally does not make those services local. Offline settings prevent selected downloads and update checks; preventing external network access requires separate network controls.
 
 :::warning
 
@@ -11,144 +15,122 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-If you want to run Open WebUI in offline mode, you have to consider your installation approach and adjust your desired features accordingly. In this guide, we will go over the different ways of achieving a mostly similar setup to the online version.
+## What must be available locally {#what-does-offline-mode-mean}
 
-## What does offline mode mean?
+Start with a working Open WebUI installation and administrator access. The machine, container, and any services it uses must have the files and dependencies they need before internet access is removed:
 
-The offline mode of Open WebUI lets you run the application without the need for an active internet connection. This allows you to create an 'air-gapped' environment for your LLMs and tools (a fully 'air-gapped' environment requires isolating the instance from the internet).
+- **Chat:** a local inference server and downloaded model. Follow the existing [Ollama connection guide](/getting-started/quick-start/connect-a-provider/starting-with-ollama), then select a local model rather than an Ollama cloud model or another hosted endpoint.
+- **Document retrieval:** a downloaded embedding model or reachable local embedding service, local document extraction, and a local reranker if you enable reranking. Check the providers selected in **Admin Settings → Documents**; a local chat model alone does not keep document processing local.
+- **Installation and storage:** the Open WebUI image or packages, required dependencies, and persistent model caches. Any optional extraction or tool service needs its own installation files and dependencies too.
+- **Sign-in:** an authentication method that remains reachable on the isolated network. Test it before removing access to an external identity provider.
+- **Speech, if needed:** local speech models, voices, and dependencies. Speech features are optional for chat and document retrieval.
 
-:::info
+Cloud models, hosted web search, external authentication, and other internet services may stop working when network access is removed. See [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption) for how configured services affect data flow.
 
-**Disabled functionality when offline mode is enabled:**
+## Prepare while connected {#approach-ii}
 
-- Automatic version update checks (controlled by `ENABLE_VERSION_UPDATE_CHECK`)
-- Downloads of embedding models from Hugging Face Hub (controlled by `HF_HUB_OFFLINE`)
-  - If you did not download an embedding model prior to activating offline mode, RAG, web search and document analysis functionality will not work properly
-- Automatic model updates for embeddings, reranking, and Whisper models
-- Update notifications in the UI
+### Download and test dependencies {#running-open-webui-with-internet-connection-during-setup}
 
-**Still functional:**
+If the machine can connect to the internet during setup, prepare the same installation you will run offline:
 
-- External LLM API connections (OpenAI, etc.)
-- OAuth authentication providers
-- Web search and RAG with external APIs
+1. Install Open WebUI and connect a local inference server using the [Ollama guide](/getting-started/quick-start/connect-a-provider/starting-with-ollama). Download the model you intend to use and send a test message.
+2. Configure local document extraction and embeddings. Download and exercise any optional reranking or speech models you need.
+3. Keep the application data and model caches in persistent storage. Restart once while still connected to confirm the installation uses that storage.
 
-:::
+### Prepare embeddings {#ii-embedding-model}
 
-## How to enable offline mode?
+In **Admin Settings → Documents**, select your local embedding model, such as [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), and use the download control. If you use a separate local embedding service, prepare its model and confirm Open WebUI can reach it.
 
-Offline mode requires setting multiple environment variables to fully disconnect Open WebUI from external network dependencies. The primary variables are:
+Upload a small text-based PDF or text file, wait for processing, and ask a question whose answer is in the file. Follow the [document-question quickstart](/features/workspace/knowledge#ask-your-first-document-question) for the complete workflow. A successful ordinary chat does not confirm that document processing is ready.
 
-**Required Environment Variables:**
+## Prepare a machine that is already offline {#approach-i}
 
-- `OFFLINE_MODE=true` - Disables version checks and prevents automatic model downloads
-- `HF_HUB_OFFLINE=1` - Tells Hugging Face Hub to operate in offline mode, preventing all automatic downloads
+Use a connected staging machine to download the application image or packages, model files, and dependencies for the target machine's operating system and hardware. Transfer them through your approved process. Keep model cache directory structures intact, including any symlinks and their targets, and ensure the Open WebUI process can read the transferred files.
 
-**Optional but Recommended:**
+Prepare the inference server and its models using the [Ollama guide](/getting-started/quick-start/connect-a-provider/starting-with-ollama). For Open WebUI's local processing models, the examples below download caches on the connected staging machine. The destination paths shown are defaults for the Docker installation; adapt them if you use a different data directory.
 
-- `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of embedding models
-- `RAG_RERANKING_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of reranking models
-- `WHISPER_MODEL_AUTO_UPDATE=false` - Prevents automatic updates of Whisper models
+### Optional speech-to-text {#i-speech-to-text}
 
-Apply these environment variables depending on your deployment method.
-
-:::warning Critical: HF_HUB_OFFLINE Behavior
-
-When `HF_HUB_OFFLINE=1` is set:
-- **Downloads of models, sentence transformers, and other Hugging Face content will NOT WORK**
-- RAG will not work on a default installation if this is enabled without pre-downloading models
-- Only pre-downloaded models in the correct cache directories will be accessible
-
-This variable provides the strictest offline enforcement but requires careful preparation.
-
-:::
-
-:::tip
-
-Consider if you need to start the application offline from the beginning of your deployment. If your use case does not require immediate offline capability, follow **approach II** for an easier setup.
-
-:::
-
-## Approach I
-
-### I: Speech-To-Text
-
-The local `whisper` installation does not include the model by default. In this regard, you can follow the [guide](/features/chat-conversations/audio/speech-to-text/stt-config) only partially if you want to use an external model/provider. To use the local `whisper` application, you must first download the model of your choice (e.g. [Hugging Face - Systran](https://huggingface.co/Systran)).
-
-```python
-from faster_whisper import WhisperModel
-
-faster_whisper_kwargs = {
-    "model_size_or_path": "Systran/faster-whisper-large-v3",
-    "device": "cuda", # set this to download the cuda adjusted model
-    "compute_type": "int8",
-    "download_root": "/path/of/your/choice"
-}
-
-WhisperModel(**faster_whisper_kwargs)
-```
-
-The contents of the download directory must be copied to `/app/backend/data/cache/whisper/models/` within your Open WebUI deployment. It makes sense to directly declare your `whisper` model via the [environment variable](https://docs.openwebui.com/reference/env-configuration#whisper_model), like this: `WHISPER_MODEL=Systran/faster-whisper-large-v3`.
-
-### I: Text-To-Speech
-
-The default local transformer can already handle the text-to-speech function. If you prefer a different approach, follow one of the [guides](https://docs.openwebui.com/category/%EF%B8%8F-text-to-speech).
-
-### I: Embedding Model
-
-For various purposes, you will need an embedding model (e.g. [RAG](/features/chat-conversations/rag)). You will first have to download such a model of your choice (e.g. [Hugging Face - sentence-transformers](https://huggingface.co/sentence-transformers)).
+Local Whisper requires downloaded model files. With `huggingface_hub` installed on the connected machine, download the chosen faster-whisper model:
 
 ```python
 from huggingface_hub import snapshot_download
 
-snapshot_download(repo_id="sentence-transformers/all-MiniLM-L6-v2", cache_dir="/path/of/your/choice")
+snapshot_download(
+    repo_id="Systran/faster-whisper-large-v3",
+    cache_dir="/path/to/whisper-cache",
+)
 ```
 
-The contents of the download directory must be copied to `/app/backend/data/cache/embedding/models/` within your Open WebUI deployment. It makes sense to directly declare your embedding model via the [environment variable](https://docs.openwebui.com/reference/env-configuration#rag_embedding_model), like this: `RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2`.
+Copy the contents of that cache directory to `/app/backend/data/cache/whisper/models/` in the target deployment, preserving its structure. Configure `WHISPER_MODEL=Systran/faster-whisper-large-v3`, or choose a smaller model and use its matching identifier. See [speech-to-text configuration](/features/chat-conversations/audio/speech-to-text/stt-config) and [`WHISPER_MODEL_DIR`](/reference/env-configuration#whisper_model_dir) for custom cache locations.
 
-## Approach II
+### Optional text-to-speech {#i-text-to-speech}
 
-### Running Open WebUI with internet connection during setup
+If you need speech output, prepare a local service such as [Openedai-speech](/features/chat-conversations/audio/text-to-speech/openedai-speech-integration), including its voices, model files, and dependencies. Confirm it works without downloading anything at runtime. Browser speech availability depends on the browser and installed voices; test it on the client devices you will use offline.
 
-This is the easiest approach to achieving the offline setup with almost all features available in the online version. Apply only the features you want to use for your deployment.
+### Embedding model {#i-embedding-model}
 
-### II: Embedding Model
+For document retrieval with Open WebUI's local embedding engine, download the selected model on the connected machine:
 
-In your Open WebUI installation, navigate to `Admin Settings` > `Settings` > `Documents` and select the embedding model you would like to use (e.g. [sentence-transformer/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)). After the selection, click the download button next to it.
+```python
+from huggingface_hub import snapshot_download
 
----
+snapshot_download(
+    repo_id="sentence-transformers/all-MiniLM-L6-v2",
+    cache_dir="/path/to/embedding-cache",
+)
+```
 
-After you have installed all your desired features, set the environment variable `OFFLINE_MODE=True` depending on your type of Open WebUI deployment.
+Copy the contents of that cache directory to `/app/backend/data/cache/embedding/models/` in the target deployment, preserving its structure. Set [`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model) to the matching model identifier. If you use a separate local embedding service, prepare its model cache according to that service's instructions instead. Prepare any enabled reranking or extraction models in the same way using their service's cache requirements.
 
-## Sidenote
+## Enable offline settings {#how-to-enable-offline-mode}
 
-As previously mentioned, to achieve a fully offline experience with Open WebUI, you must disconnect your instance from the internet. The offline mode only prevents errors within Open WebUI when there is no internet connection.
+After preparing the models and dependencies, set these variables using your deployment's environment configuration and restart Open WebUI:
 
-How you disconnect your instance is your choice. Here is an example via Docker Compose:
+```bash
+OFFLINE_MODE=true
+HF_HUB_OFFLINE=1
+RAG_EMBEDDING_MODEL_AUTO_UPDATE=false
+RAG_RERANKING_MODEL_AUTO_UPDATE=false
+WHISPER_MODEL_AUTO_UPDATE=false
+```
+
+`OFFLINE_MODE` disables version checks and automatic model updates/downloads covered by that setting. `HF_HUB_OFFLINE` prevents Hugging Face Hub downloads. The three explicit model-update flags document that those caches should not update automatically. See the [offline configuration reference](/reference/env-configuration#offline_mode) for the full behavior.
+
+:::warning Prepare caches before enabling offline settings
+
+With `HF_HUB_OFFLINE=1`, missing models cannot be downloaded. A fresh installation may start successfully but fail when you first upload or query a document. If you see **No embedding model is loaded**, check the [offline embedding troubleshooting steps](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install).
+
+:::
+
+These variables do not block outbound connections. External model APIs, OAuth providers, web search, tools, and other configured services can still make network requests if the network permits them.
+
+## Restrict external network access {#sidenote}
+
+Use firewall rules, container networking, or physical network isolation appropriate to your deployment to prevent external access. Keep the required local paths reachable: the browser must reach Open WebUI, and Open WebUI must reach its local inference and processing services.
+
+The following Docker Compose fragment is an **example of an internal container network**, not a complete deployment. It assumes the image is already present, the model-cache directories contain the prepared caches, and you provide a reverse proxy connected to this network. Your local model server and any extraction or embedding services must also be reachable from this network; an isolated Open WebUI container cannot use a model server on an unrelated network. Adapt and test connectivity before relying on this example for isolation.
 
 ```yaml
 services:
-  # requires a reverse-proxy
+  # Requires a reverse proxy and reachable local model/processing services.
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     restart: unless-stopped
     environment:
-      # Core offline mode settings
       - OFFLINE_MODE=true
       - HF_HUB_OFFLINE=1
-      
-      # Disable automatic model updates
       - RAG_EMBEDDING_MODEL_AUTO_UPDATE=false
       - RAG_RERANKING_MODEL_AUTO_UPDATE=false
       - WHISPER_MODEL_AUTO_UPDATE=false
-      
-      # Specify pre-downloaded models
       - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      # Optional: only needed when using local speech-to-text.
       - WHISPER_MODEL=Systran/faster-whisper-large-v3
     volumes:
       - ./open-webui-data:/app/backend/data
-      - ./models/sentence-transformers/all-MiniLM-L6-v2:/app/backend/data/cache/embedding/models/
-      - ./models/Systran/faster-whisper-large-v3:/app/backend/data/cache/whisper/models/
+      - ./models/embedding-cache:/app/backend/data/cache/embedding/models/
+      # Optional: prepared Whisper cache.
+      - ./models/whisper-cache:/app/backend/data/cache/whisper/models/
     networks:
       - open-webui-internal
 
@@ -158,3 +140,15 @@ networks:
     driver: bridge
     internal: true
 ```
+
+## Verify chat and document retrieval
+
+With internet access blocked and the required local services still reachable:
+
+1. **Restart Open WebUI and its local services.** Check the logs for missing dependencies or attempted downloads, then sign in using the intended offline authentication method.
+2. **Send a normal chat message.** Select your local model and confirm it responds after the restart.
+3. **Upload a new small document.** Use a text file or text-based PDF containing a distinctive fact, such as “The test office opens at 09:15.” Wait for processing to finish.
+4. **Ask about that fact.** Attach the file or knowledge base, ask when the test office opens, and compare the answer with the document. See [Knowledge Bases](/features/workspace/knowledge#ask-your-first-document-question) for attachment steps and prerequisites.
+5. **Check network controls separately.** Confirm through your firewall or network monitoring that external access is blocked. Successful chat and retrieval demonstrate those workflows work offline; they do not by themselves prove network isolation.
+
+If chat works but the document test fails, check the selected extraction and embedding providers, cache permissions, and the [document retrieval troubleshooting guide](/troubleshooting/rag). Test speech separately if you enabled it.

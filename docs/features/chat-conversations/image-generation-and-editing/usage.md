@@ -1,7 +1,11 @@
 ---
 sidebar_position: 1
-title: "Usage"
+title: "Generate and Edit Images in Chat"
+sidebar_label: "Usage"
+description: "Enable image generation in a conversation, create images from prompts, and edit or combine uploaded images in Open WebUI."
 ---
+
+Generate images from a prompt, or upload images and describe the changes you want, in an Open WebUI conversation. An administrator must first configure an [image provider](/features/chat-conversations/image-generation-and-editing); keep your normal chat model selected while using it.
 
 Image generation is only available in a chat when all of the following are true:
 

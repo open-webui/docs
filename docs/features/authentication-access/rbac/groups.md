@@ -77,6 +77,26 @@ Their row in the **Access List** is where you change what someone already has. E
 Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for details.
 :::
 
+### What Private Means for Each Resource Type
+
+Two kinds of resource share the same access control dropdown, and **Private** with an empty access list means something different for each.
+
+**Workspace items have an owner.** Every model, knowledge base, prompt, tool, skill, note, folder, and shared chat has an owner, the account that created it. Private with no grants means only the owner can see and use the item. Other admins are not let in on role alone: they see the item when `BYPASS_ADMIN_ACCESS_CONTROL` is on (the default) or when a grant names them or one of their groups. The **No access grants. Private to you.** message in the modal describes this case.
+
+**Admin-configured resources have no owner.** External tool servers, MCP servers, Open Terminal connections, and arena models are instance configuration, added and edited only by admins. Private with no grants means admin-only: every admin can see and use the resource, and no regular user can, until you grant a group or a user. Turning `BYPASS_ADMIN_ACCESS_CONTROL` off does not change this, because there is no owner to fall back to.
+
+### Combining Public with the Access List
+
+**Public** is stored as one more grant: read access for every signed-in user. Choosing Public or Private in the dropdown adds or removes only that grant. Rows in the access list stay where they are, so switching a resource back to Private later makes the rows take effect again at once.
+
+The rows behave like this on a Public resource:
+
+*   A **Read** row adds nothing while the resource stays Public, since everyone already has read access. It matters again the moment you switch back to Private.
+*   A **Write** row is the useful combination: everyone can view and use the resource, and that user or group can also update or delete it. Choosing Write on a row stores read and write together.
+*   **Allow public write access**, on resources that offer it, stores write access for every signed-in user. With it on, the rows add nothing, but they stay for the day you switch it off.
+
+Public means every signed-in user. It does not open the resource to visitors without an account.
+
 ### Access Grant System
 At a deeper level, resource access is managed through normalized **access grants** stored in the database. Each grant specifies:
 

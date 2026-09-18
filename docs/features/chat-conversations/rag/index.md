@@ -17,7 +17,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 :::warning
 
-If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
+If you're using **Ollama**, note that it **picks a model's default context length from your GPU's VRAM, and on GPUs with less than 24 GiB that is 4096 tokens** (see [Ollama's context length documentation](https://docs.ollama.com/context-length)). This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
 
 :::
 
@@ -82,7 +82,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 ## Web Search for RAG
 
 :::warning
-**Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 2048 tokens available, you're getting less than half the page content, often missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
+**Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 4096 tokens available, you're often getting half the page content, missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
 **To Fix This:** Navigate to **Settings > Admin > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
 :::
@@ -119,7 +119,7 @@ Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Documen
 
 Open WebUI allows you to fine-tune how documents are split into chunks for embedding. This is crucial for optimal retrieval performance.
 
-- **Text Splitter**: Choose how chunk size is measured. [`RAG_TEXT_SPLITTER`](/reference/env-configuration#rag_text_splitter) is `character` (default, RecursiveCharacterTextSplitter) or `token`. The `token` splitter counts tokens with Tiktoken by default; set [`RAG_TOKENIZER_MODEL`](/reference/env-configuration#rag_tokenizer_model) to a HuggingFace tokenizer (e.g. `bert-base-uncased`) to match chunk boundaries to your embedding model's own tokenizer.
+- **Text Splitter**: Choose how chunk size is measured. [`RAG_TEXT_SPLITTER`](/reference/env-configuration#rag_text_splitter) is `character` (default, RecursiveCharacterTextSplitter), `token`, or `token_transformers`. The `token` splitter counts tokens with Tiktoken. The `token_transformers` splitter counts them with the HuggingFace tokenizer named by [`RAG_TOKENIZER_MODEL`](/reference/env-configuration#rag_tokenizer_model) (e.g. `bert-base-uncased`), which matches chunk boundaries to your embedding model's own tokenizer. It is unavailable on the slim image.
 - **Chunk Size**: Sets the maximum number of characters (or tokens) per chunk.
 - **Chunk Overlap**: Specifies how much content is shared between adjacent chunks to maintain context.
 - **Chunk Min Size Target**: Although [Markdown Header Splitting](#markdown-header-splitting) is excellent for preserving structure, it can often create tiny, fragmented chunks (e.g., a standalone sub-header, a table of contents entry, a single-sentence paragraph, or a short list item) that lack enough semantic context for high-quality embedding. You can counteract this by setting the **Chunk Min Size Target** to intelligently merge these small pieces with their neighbors.

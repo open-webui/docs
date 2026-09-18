@@ -1,9 +1,11 @@
 ---
 sidebar_position: 4
-title: "Web Search"
+title: "Troubleshoot Web Search"
+sidebar_label: "Web Search"
+description: "Fix web search connection failures, empty page content, proxy errors, and missing search tool calls in Open WebUI."
 ---
 
-Web Search in Open WebUI allows language models to access real-time information from the internet. When things don't work as expected, this guide will help you diagnose and fix common issues.
+If web search fails, first distinguish a failed search request from a failure to read the returned pages. This guide covers proxy settings, provider errors, empty content, timeouts, and models that do not call the search tool.
 
 ## Common Web Search Issues
 
@@ -64,7 +66,7 @@ If web search returns empty content or poor quality results, the issue is often 
 
 ✅ **Solutions:**
 
-- **Increase context length**: Web pages often contain 4,000-8,000+ tokens. If your model has a 2048-token limit, you're missing most of the content. Increase to 16384+ tokens in **Settings > Admin > Models > Edit** the model **> Advanced Params** (anything below will be subpar for web content).
+- **Increase context length**: Web pages often contain 4,000-8,000+ tokens. If your model runs at Ollama's 4096-token default for GPUs under 24 GiB, you're missing most of the content. Increase to 16384+ tokens in **Settings > Admin > Models > Edit** the model **> Advanced Params** (anything below will be subpar for web content).
 
 - **Check result count**: Adjust `WEB_SEARCH_RESULT_COUNT` to control how many results are fetched.
 

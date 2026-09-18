@@ -1,7 +1,23 @@
 ---
 sidebar_position: 1
 title: "SSO (OAuth, OIDC, Trusted Header)"
+description: "Connect Open WebUI to an identity provider using OAuth, OpenID Connect, or trusted-header authentication, with links to provider setup guides."
 ---
+
+Open WebUI supports provider sign-in through OAuth and OpenID Connect (OIDC), or trusted-header authentication behind an authentication proxy. Choose the approach used by your organization, then configure account creation, roles, and group access for your users.
+
+## Choose your setup
+
+- **Built-in providers:** [Google](#google), [Microsoft](#microsoft), or [GitHub](#github).
+- **Other OpenID Connect providers:** start with [OIDC](#oidc), or follow the [Okta](/tutorials/auth-sso/okta-oidc-sso) or [Keycloak](/features/authentication-access/auth/sso/keycloak) tutorial.
+- **Authentication handled by a proxy:** use [Trusted Header](#trusted-header) and ensure only the trusted proxy can reach Open WebUI.
+
+:::danger Only One OIDC Provider Supported
+Right now, you can only configure **one** OpenID Connect (OIDC) provider at a time via `OPENID_PROVIDER_URL`.
+You cannot have Microsoft **and** Google as OIDC providers simultaneously.
+
+*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/auth-sso/dual-oauth-configuration) for more details.*
+:::
 
 :::info
 
@@ -15,13 +31,6 @@ It is highly recommended to check the environment variable page, to get more det
 Need help with troubleshooting your SSO setup?
 Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting/sso)
 
-:::
-
-:::danger Only One OIDC Provider Supported
-Right now, you can only configure **one** OpenID Connect (OIDC) provider at a time via `OPENID_PROVIDER_URL`.
-You cannot have Microsoft **and** Google as OIDC providers simultaneously.
-
-*However, there is a community workaround for using both! See our [Dual OAuth Tutorial](/tutorials/auth-sso/dual-oauth-configuration) for more details.*
 :::
 
 ## OAuth Configuration Overview

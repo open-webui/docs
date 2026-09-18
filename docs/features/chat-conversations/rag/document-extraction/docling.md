@@ -84,14 +84,15 @@ When using `UVICORN_WORKERS` greater than 1 with the default `LocalOrchestrator`
 ### Step 2: Configure Open WebUI
 
 1. Log in to your Open WebUI instance
-2. Navigate to **Settings** → **Admin** → **Tools** → **Documents**
+2. Navigate to **Settings** → **Admin** → **Documents**
 3. Change the **Default** content extraction engine dropdown to **Docling**
-4. Set the extraction engine URL to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native)
-5. Save the changes
+4. Set **Docling Server URL** to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native). The default is `http://docling:5001`.
+5. Optionally set **API Key** (`DOCLING_API_KEY`), which is sent to docling-serve as the `X-Api-Key` header
+6. Save the changes
 
 ### Step 3: Configure Picture Description (Optional)
 
-To enable AI-powered image description within documents, add the picture description options to the **Docling Parameters** JSON field in the **Documents** tab. Two modes are available:
+To enable AI-powered image description within documents, add the picture description options to the **Parameters** JSON field under the Docling settings in the **Documents** tab. Two modes are available:
 
 - **local**: Vision model runs within the Docling container itself, configured via `picture_description_local`
 - **API**: Docling calls an external service (e.g., Ollama, OpenAI-compatible endpoint), configured via `picture_description_api`

@@ -1,15 +1,29 @@
 ---
 sidebar_position: 15
-title: "Sharing Open WebUI"
+title: "Share Open WebUI with Your Team"
+sidebar_label: "Sharing Open WebUI"
+description: "Give a team access to one Open WebUI instance, configure accounts and resource permissions, and verify access as a regular user."
 ---
 
-# Sharing Open WebUI
+# Share Open WebUI with Your Team {#sharing-open-webui}
 
-**Deploy once, give your entire team access.**
+Share one Open WebUI instance so your team can use connected models from their browsers. Configure network access, accounts, and permissions before inviting users.
 
 Open WebUI is built to be shared. A single instance can serve your whole organization. Users just open a browser and start chatting. No per-seat installs, no client-side dependencies, no fragmented data across machines.
 
 ---
+
+## Set up a small team
+
+Start with an administrator account and a model endpoint the Open WebUI server can reach. A small team can begin with one instance; use the [scaling guide](/getting-started/advanced-topics/scaling) when your workload requires more capacity.
+
+1. [Install Open WebUI](/getting-started/quick-start) and [connect a model](/getting-started/quick-start/connect-a-provider). Confirm that the administrator can send a message and receive an answer.
+2. Choose a [network-access option](#opening-your-instance-to-the-team) below and check that a teammate can reach the login page. Use HTTPS for remote access.
+3. [Approve user accounts](#the-pending-queue) or [configure SSO](/features/authentication-access/auth/sso) with your identity provider.
+4. Create [groups](/features/authentication-access/rbac/groups) and grant access to the appropriate [models](/features/workspace/models) and [knowledge bases](/features/workspace/knowledge). Review [default and group permissions](/features/authentication-access/rbac/permissions) together: permissions are additive.
+5. Sign in as a regular user and follow the [access checks](#verify-team-access) at the end of this page. An administrator's view does not prove that a teammate has the intended access.
+
+Sharing an instance does not automatically share everyone's documents or conversations. Grant access to knowledge bases explicitly, and use [chat sharing](/features/chat-conversations/chat-features/chatshare) when you want to share a conversation snapshot.
 
 ## Built for Teams
 
@@ -88,3 +102,13 @@ For organizations where manual approval doesn't scale, Open WebUI integrates wit
 | **[SCIM 2.0](/features/authentication-access/auth/scim)** | Automated user and group provisioning and deprovisioning |
 
 [**Learn how to set up SSO →**](/features/authentication-access/auth/sso)
+
+## Verify team access
+
+Using a regular account in the intended group, check that:
+
+- The permitted model is visible and answers a test message.
+- The shared knowledge base is accessible and answers a question from a test document.
+- A restricted model and a restricted knowledge base are unavailable to that account, including through a direct link.
+
+Repeat with an account outside the group to confirm the restricted resources remain unavailable. Review [groups and resource access](/features/authentication-access/rbac/groups#resource-access-rbac) if either account sees more than intended.
