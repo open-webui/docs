@@ -109,9 +109,9 @@ Something added in `inlet` reaches the first call and can be dropped from later 
 
 `inlet` runs near the start of the turn; `request` runs at the end, on the payload as it is about to leave. Everything the pipeline does happens between them, and that changes what is in the `body` you receive.
 
-**Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `variables`, `tool_ids`, `terminal_id`, `files`, `folder_id`, `skill_ids` and `regeneration_prompt`. A filter that needs any of these has to be an `inlet`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
+**Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `tool_ids`, `terminal_id`, `files`, `folder_id` and `skill_ids`. A filter that needs any of these has to be an `inlet`. `variables`, `regeneration_prompt` and `params` are popped even earlier, before `inlet` runs, and `variables` stays readable as `__metadata__["variables"]`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
 
-**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the applied system prompt, and memory or web-search context. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
+**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the chat-controls system message and the folder system prompt (the workspace model's own System Prompt is added by the provider router after `request` returns), and memory or web-search context. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
 
 Provider-shape normalization happens after `request` returns, so you still see Open WebUI's internal message shapes, not the provider's.
 
@@ -139,7 +139,7 @@ Transformations that are naturally idempotent (clamping a value, downscaling an 
 
 `request` runs on every provider call, so anything expensive in it is paid for repeatedly inside a single answer. Because each call re-scans the full history, cost grows with both conversation length and tool-call count. Cache on a content hash if the work is heavy.
 
-Raising from `request` aborts the whole completion, exactly as it does from `outlet` and `stream`. Only `inlet` failures are logged at debug level and otherwise treated gently; every other filter type re-raises and the call site turns it into a failed turn. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
+What a raised exception does depends on the hook. From `inlet`, or from the first `request` call of a turn, it aborts the turn. From `request` on a later tool-loop hop it ends the loop with an error while what was already streamed stays. From `stream` it drops that one event in the WebUI path, but ends the whole stream for a direct API streaming caller. From `outlet` it is logged at debug level and otherwise ignored, except through `/api/chat/completed`, where it becomes an HTTP 400. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
 
 `file_handler` has no effect on a `request` filter; see [the note below](#owning-retrieval-with-file_handler).
 
@@ -224,14 +224,11 @@ By default, when a user attaches a knowledge collection or uploads a file to a c
 
 This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file/collection *references* (IDs, names, types). **The chunk text doesn't exist yet**: retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough. The data you want isn't there yet.
 
-**`file_handler = True`** is the opt-in escape hatch for exactly this case. Declared as a **module-level attribute** at the top of your filter file, it tells Open WebUI "I am handling retrieval and chunk injection myself, skip the built-in RAG step." When set, the backend strips `body["metadata"]["files"]` and `body["files"]` after your `inlet()` returns, so the chat-completion handler finds no files to retrieve over and goes straight to the LLM with whatever you injected.
+**`file_handler = True`** is the opt-in escape hatch for exactly this case. Declared on the `Filter` instance, as `self.file_handler = True` in `__init__` or as a class attribute, it tells Open WebUI "I am handling retrieval and chunk injection myself, skip the built-in RAG step." When set, the backend strips `body["metadata"]["files"]` and `body["files"]` after your `inlet()` returns, so the chat-completion handler finds no files to retrieve over and goes straight to the LLM with whatever you injected.
 
 ```python
 from pydantic import BaseModel
 from typing import Optional
-
-# Module-level attribute, sits OUTSIDE the Filter class, alongside imports.
-file_handler = True
 
 class Filter:
     class Valves(BaseModel):
@@ -239,6 +236,8 @@ class Filter:
 
     def __init__(self):
         self.valves = self.Valves()
+        # Read from the instance before each inlet() call.
+        self.file_handler = True
 
     async def inlet(
         self,
@@ -253,8 +252,8 @@ class Filter:
         return body
 ```
 
-:::warning Module attribute, not `self.file_handler`
-Open WebUI reads `file_handler` from the **module object** (the file your filter lives in), not from the `Filter` instance. Setting `self.file_handler = True` inside `__init__` is silently ignored. Put the assignment at the top of the file, alongside your imports, exactly as shown above.
+:::warning Instance attribute, not a module-level variable
+Open WebUI reads `file_handler` from the `Filter` instance, the same way it reads `toggle` and `icon`. A bare `file_handler = True` at the top of the file is silently ignored. Set `self.file_handler = True` in `__init__`, or declare it as a class attribute, exactly as shown above.
 :::
 
 :::note `file_handler` applies to `inlet` only
@@ -289,7 +288,7 @@ The flag is read exclusively on the `inlet` pass, and the file references are st
 
 #### Caveat: it's static, all-or-nothing per filter
 
-`file_handler` is read **once per filter, at the module level**. It is not a per-request signal and cannot be flipped based on the model, user, or chat from inside `inlet()`. When set, the built-in RAG is **always** skipped for any request where this filter is invoked, regardless of whether your `inlet()` actually called any retrieval logic on that particular request.
+`file_handler` is read from the cached `Filter` instance before each `inlet()` call. It is not a per-request signal: a value changed inside `inlet()` applies from the next request, not the one being processed, and it cannot be flipped based on the model, user, or chat of the current request. When set, the built-in RAG is **always** skipped for any request where this filter is invoked, regardless of whether your `inlet()` actually called any retrieval logic on that particular request.
 
 In practice this means: if you use `file_handler = True`, your filter must handle retrieval for **every** scenario where files would normally be retrieved by the built-in path, including the cases where you'd have been happy with the default behavior. The retrieval call itself is identical in both cases; only any conditional *transformation* (e.g. "only redact for remote models") branches on context.
 
@@ -327,14 +326,14 @@ When a filter is set as **Global** (`is_global=True`) and **Active** (`is_active
 
 #### Admin Panel: Making a Filter Global
 
-**Location:** Admin Panel > Functions > Filter Management
+**Location:** Admin Panel > Functions
 
 To make a filter global:
 1. Navigate to the Admin Panel
 2. Click on **Functions** in the sidebar
 3. Find your filter in the list
 4. Click the **three-dot menu (⋮)** next to the filter
-5. Click the **🌐 Globe icon** to toggle `is_global`
+5. Flip the **Global** switch in that menu
 6. Ensure the filter is also **Active** (green toggle switch)
 
 **API Endpoint:**
@@ -344,7 +343,7 @@ POST /api/v1/functions/id/{filter_id}/toggle/global
 
 **Visual Indicators:**
 - 🟢 Green toggle = `is_active=True` (filter is active)
-- 🌐 Highlighted globe icon = `is_global=True` (applies to all models)
+- The list itself does not show whether a filter is global. Open the ⋮ menu to read the **Global** switch.
 
 ---
 
@@ -551,27 +550,23 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 
 #### Key Behavioral Differences
 
-| Function | WebUI Request | Direct API, stable (`main`) | Direct API, pre-release (`dev`) |
-|----------|--------------|------------------------------|-----------------------------------|
-| `inlet()` | ✅ Always called | ✅ Always called | ✅ Always called |
-| `request()` | ✅ Called before every provider call | ✅ Called before every provider call | ✅ Called before every provider call |
-| `stream()` | ✅ Called during streaming | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ❌ Not called by `/api/chat/completions`, only by `/api/chat/completed` | ✅ Runs by default for API callers, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
-| `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Inert for pure API callers | ⚠️ Inert for pure API callers |
+| Function | WebUI Request | Direct API |
+|----------|--------------|------------|
+| `inlet()` | ✅ Always called | ✅ Always called |
+| `request()` | ✅ Called before every provider call | ✅ Called before every provider call |
+| `stream()` | ✅ Called during streaming | ✅ Called during streaming |
+| `outlet()` | ✅ Called after response | ✅ Runs by default since v0.10.0, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
+| `__event_emitter__` | ✅ Shows UI feedback | ⚠️ A real but invisible callable in `inlet()` and the first `request()`, and `None` in `stream()` and `outlet()` |
 
 :::info outlet() on Direct API Calls
-This behavior **changed on `dev`** (shipping in an upcoming release). The two cases differ:
+Since v0.10.0, `outlet()` runs for direct `/api/chat/completions` callers **by default**, on **both** the non-streaming and streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). On the streaming path the server accumulates the full response and runs `outlet()` once the stream completes. Set `ENABLE_API_OUTLET_FILTERS=False` to skip outlet filters on direct API traffic.
 
-**On `dev` / upcoming release:** `outlet()` runs for direct `/api/chat/completions` callers **by default**, on **both** the non-streaming and streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). On the streaming path the server accumulates the full response and runs `outlet()` once the stream completes. Set `ENABLE_API_OUTLET_FILTERS=False` to skip outlet filters on direct API traffic.
-
-**On tagged releases / `main`:** `outlet()` is **not** invoked by `/api/chat/completions`; it runs only when the caller performs the second POST to `/api/chat/completed`. API integrations that need `outlet()` on these releases must make both calls.
-
-**Response visibility (both cases):** `outlet()`'s side effects run (DB update, `__event_emitter__`, external calls like logging/tracing), but it does **not** rewrite the HTTP response body, and a streaming client has already received the stream before `outlet()` fires. To observe `outlet()`'s output, read the chat record back, subscribe to the `chat:outlet` WebSocket event, or use `/api/chat/completed`. `__event_emitter__` remains inert for pure API callers (no UI to receive it).
+**Response visibility:** `outlet()`'s side effects run (DB update, `__event_emitter__`, external calls like logging/tracing), but it does **not** rewrite the HTTP response body, and a streaming client has already received the stream before `outlet()` fires. To observe `outlet()`'s output, read the chat record back, subscribe to the `chat:outlet` WebSocket event, or use `/api/chat/completed`. `__event_emitter__` is `None` in `outlet()` for pure API callers.
 :::
 
 #### Inlet ↔ Outlet Correlation via `__metadata__`
 
-`__metadata__` is a live dict passed through the request lifecycle, so anything your filter stashes in `inlet()` is visible in `outlet()` on the *same request*. This is useful for things like start-time tracking, correlation IDs, or per-call valves, *when `outlet()` actually runs*. That covers WebUI requests, the `/api/chat/completed` handler, and, on `dev`/upcoming releases with `ENABLE_API_OUTLET_FILTERS` enabled, direct `/api/chat/completions` API calls.
+`__metadata__` is a live dict passed through the request lifecycle, so anything your filter stashes in `inlet()` is visible in `outlet()` on the *same request*. This is useful for things like start-time tracking, correlation IDs, or per-call valves, *when `outlet()` actually runs*. That covers WebUI requests and the inline outlet for direct `/api/chat/completions` calls, where the same dict object flows from `inlet()` to `outlet()`. It does not cover `/api/chat/completed`, which builds a fresh metadata dict holding only `chat_id`, `message_id`, `filter_ids`, `session_id` and `user_id`.
 
 ```python
 import time
@@ -602,7 +597,7 @@ Older versions of this page suggested synthesizing a temporary-chat `chat_id` (`
 
 #### Running outlet() for API Callers: `/api/chat/completed`
 
-The reliable, supported way to run `outlet()` for a direct API integration is to follow up `/api/chat/completions` with `POST /api/chat/completed`, passing the full conversation (including the assistant response) in `messages`. The endpoint runs pipeline outlet filters and Function `outlet()` handlers unconditionally and returns the filtered payload.
+The reliable, supported way to run `outlet()` for a direct API integration is to follow up `/api/chat/completions` with `POST /api/chat/completed`, passing the full conversation (including the assistant response) in `messages`. The body must also carry `id`, the assistant message id, and the `chat_id` and `session_id` keys (their values may be empty, but a non-empty `chat_id` must be a chat you own). The endpoint runs pipeline outlet filters and Function `outlet()` handlers unconditionally and returns the filtered payload. Errors come back as HTTP 400.
 
 ```bash
 # Step 2: run outlet() after /api/chat/completions returned a response.
@@ -615,13 +610,14 @@ curl -X POST http://localhost:3000/api/chat/completed \
       {"role": "user", "content": "Hello"},
       {"role": "assistant", "content": "Hi there! How can I help you?"}
     ],
-    "chat_id": "optional-chat-id",
-    "session_id": "optional-session-id"
+    "id": "the-assistant-message-id",
+    "chat_id": "a-chat-id-you-own",
+    "session_id": ""
   }'
 ```
 
 :::info
-On `dev` this endpoint is labeled deprecated in favor of inline execution, but because inline execution does not return the filtered payload over HTTP to pure API callers, `/api/chat/completed` is still the correct choice for most API integrations today.
+This endpoint is labeled deprecated in favor of inline execution, but because inline execution does not return the filtered payload over HTTP to pure API callers, `/api/chat/completed` is still the correct choice for most API integrations today.
 :::
 
 #### Detecting API vs WebUI Requests
@@ -712,7 +708,7 @@ class Filter:
 ```
 
 :::note Event Emitter Behavior
-Filters that use `__event_emitter__` will still execute for API requests, but since there's no WebUI to display the events, the status messages won't be visible. The filter logic still runs; only the visual feedback is missing.
+Filters that use `__event_emitter__` will still execute for API requests, but since there's no WebUI to display the events, the status messages won't be visible. In `inlet()` and the first `request()` the emitter is a real callable, so awaiting it is harmless. In `stream()` and `outlet()` it is `None` for pure API callers, so guard with `if __event_emitter__:` before awaiting it.
 :::
 
 ---
@@ -874,15 +870,20 @@ Filters can declare any of these parameters in their function signature to recei
 | Parameter | What it provides |
 |-----------|-----------------|
 | `__model__` | Full model dict (including `info.base_model_id` for workspace models) |
-| `__user__` | User data (`id`, `email`, `name`, `role`) |
+| `__user__` | The full user record (`UserModel.model_dump()`), with `valves` added when the filter defines `UserValves` |
 | `__metadata__` | Request metadata (`chat_id`, `session_id`, `user_id`, `files`, `features`, `params`, etc.) |
 | `__event_emitter__` | Function to send status updates, embeds, etc. to the client |
-| `__chat_id__` | Chat session ID |
+| `__event_call__` | Function that sends an event and waits for the browser's answer |
+| `__chat_id__` | Chat session ID. Not passed to `outlet()`, which reads it from `body["chat_id"]` |
+| `__message_id__` | Id of the assistant message being produced. Not passed to `outlet()` |
+| `__oauth_token__` | The user's OAuth token data, or `None`. Not passed to `outlet()` |
+| `__id__` | The filter's own function id |
+| `__body__` | `stream()` only: the request body being answered, since `stream()` receives the chunk as `event` |
 | `__request__` | The raw FastAPI `Request` object |
 
 Only parameters you declare in your function signature are injected. Open WebUI inspects the signature at runtime to determine what to pass.
 
-`request()` is handed the **same set** as `inlet()`, so `__model__` resolves workspace models there exactly as shown above. The one extra is `__features__`, which carries the `features` dict after the pipeline has popped it off the body.
+`request()` is handed the same set as `inlet()` on the first call of a turn, so `__model__` resolves workspace models there exactly as shown above, plus `__features__`, which carries the `features` dict after the pipeline has popped it off the body. On the later tool-loop hops `__features__` is absent, so give it a default.
 
 ---
 
@@ -894,8 +895,7 @@ Only parameters you declare in your function signature are injected. Open WebUI 
 |-----------|---------|
 | 🟢 Green toggle | Filter is active (`is_active=True`) |
 | ⚪ Grey toggle | Filter is inactive (`is_active=False`) |
-| 🌐 Highlighted globe | Filter is global (`is_global=True`) |
-| 🌐 Unhighlighted globe | Filter is not global (`is_global=False`) |
+| **Global** switch in the ⋮ menu | Filter is global (`is_global=True`) when on |
 
 #### In Model Settings (FiltersSelector)
 
@@ -911,8 +911,7 @@ Only parameters you declare in your function signature are injected. Open WebUI 
 |---------|-------------|
 | Filter name | Shows the filter's display name |
 | Custom icon | SVG icon from `self.icon` (if provided) |
-| Toggle switch | Enable/disable the filter for this chat |
-| Status badge | Shows if filter is currently active |
+| Toggle switch | Enable/disable the filter for this chat, and the only indicator of its state |
 
 ---
 
