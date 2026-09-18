@@ -27,7 +27,7 @@ Unlike a one-time upload, which is stale the moment the source changes, oikb doe
 It is a separate program (a command-line tool plus an optional long-running [daemon](/ecosystem/knowledge-base-sync/daemon)), not part of the Open WebUI server, but it is built for Open WebUI and talks to it over the normal REST API.
 
 :::info Requires Open WebUI 0.9.6+
-oikb drives the incremental sync endpoints (`/sync/diff` and `/sync/cleanup`) that landed in **v0.9.6**. Against an older server there is nothing for it to call. The server side of these endpoints is documented under [Knowledge → Syncing a local directory](/features/workspace/knowledge#syncing-a-local-directory).
+oikb drives the incremental sync endpoints (`POST /api/v1/knowledge/{id}/sync/diff` and `.../sync/cleanup`) that landed in **v0.9.6**. Against an older server there is nothing for it to call. The server side of these endpoints is documented under [Knowledge → Syncing a local directory](/features/workspace/knowledge#syncing-a-local-directory).
 :::
 
 ---
@@ -151,8 +151,8 @@ Saved to `~/.config/oikb/config.yaml` (override the directory with `OIKB_CONFIG_
 ## How incremental sync works
 
 1. oikb scans the source and computes a **SHA-256** checksum for every file.
-2. It sends that manifest (path, filename and checksum, **not** the file contents) to Open WebUI's `/sync/diff`, which replies with exactly what is **added**, **modified** and **deleted**, plus which directories to create or remove. This call is read-only; it does not change the Knowledge Base.
-3. oikb deletes the stale files (and now-empty directories), creates any missing directories, then uploads only the **new** and **modified** files, each tagged with its hash so the server skips re-hashing.
+2. It sends that manifest (path, filename, checksum and size, **not** the file contents) to Open WebUI's `/sync/diff`, which replies with exactly what is **added**, **modified** and **deleted**, plus which directories to create or remove. This call is read-only; it does not change the Knowledge Base.
+3. oikb deletes the stale files (and now-empty directories), creates any missing directories, then uploads only the **new** and **modified** files, each tagged with its hash so the server skips re-hashing. On the server, cleanup also deletes a stale file's record and stored bytes unless `ENABLE_KNOWLEDGE_FILE_RETENTION=true`, the file is still linked to another Knowledge Base, or the key's user is neither the file's owner nor an admin. A file uploaded before 0.9.6, or by a client that stored no hash, has no stored checksum and is reported as modified on the first sync, so it is replaced once and unchanged after that.
 
 Because the diff is by content hash, an unchanged repository re-syncs almost instantly: nothing is re-uploaded, re-extracted or re-embedded, so there is no cost to running it often. Only real changes do any work.
 
@@ -238,7 +238,7 @@ sources:
       max-size: 50mb                        # skip anything larger
 ```
 
-`max-size` accepts `b`, `kb`, `mb`, `gb`. Oversized files are warned about and skipped before the diff, so they never upload. It is also available as a CLI flag: `oikb sync ./docs --kb-id abc --max-file-size 50mb`.
+`max-size` accepts `b`, `kb`, `mb`, `gb`. Oversized files are warned about and skipped before the diff, so they never upload. It is also available as a CLI flag: `oikb sync ./docs --kb-id abc --max-file-size 50mb`. Open WebUI enforces its own limits on every upload as well: files larger than the admin's Max Upload Size (`RAG_FILE_MAX_SIZE`, in MB) are rejected with HTTP 413, and extensions outside Allowed File Extensions (`RAG_ALLOWED_FILE_EXTENSIONS`) with HTTP 400, so such files fail on every sync until you filter them out here.
 
 To route different parts of one source into different Knowledge Bases, use separate entries with different `filter.include` and `kb-id`:
 
@@ -354,13 +354,15 @@ Scheduling and the per-KB locks live in a single process, so the [daemon](/ecosy
 
 ### Indexing still happens server-side
 
-oikb uploads fast, but Open WebUI extracts and embeds each new file asynchronously. A just-synced file is in the Knowledge Base, but it may take a moment before it is queryable.
+oikb uploads fast, but Open WebUI extracts and embeds each new file asynchronously. Upload returns as soon as the file is stored; extraction, embedding and the link into the Knowledge Base happen in a background task, and `GET /api/v1/files/{id}/process/status` reports when a file is `completed` or `failed`. Until then it does not appear in the Knowledge Base's file list.
 
 ---
 
 ## Troubleshooting
 
-**`Connection refused` or `401 Unauthorized`**: the URL or key is wrong or unset. Check with `oikb config get`, or `echo $OPEN_WEBUI_URL` and `echo $OPEN_WEBUI_API_KEY`. The key must be a valid Open WebUI API key (Settings → Account).
+**`Connection refused` or `401 Unauthorized`**: the URL or key is wrong or unset. Check with `oikb config get`, or `echo $OPEN_WEBUI_URL` and `echo $OPEN_WEBUI_API_KEY`. The key must be a valid Open WebUI API key (Settings → Account). API keys are off by default: an admin must enable them (`ENABLE_API_KEYS`), and non-admin users also need the API Keys permission, or the Account page shows no API keys section.
+
+**`403 Forbidden`**: the key is valid but API keys are disabled on the server, your user lacks the API Keys permission, or endpoint restrictions are on (`ENABLE_API_KEYS_ENDPOINT_RESTRICTIONS`) and `API_KEYS_ALLOWED_ENDPOINTS` does not include `/api/v1/knowledge` and `/api/v1/files`.
 
 **`No source specified and no .oikb.yaml found`**: you ran `oikb sync` with no source and there is no `.oikb.yaml` in the current directory. Either pass a source (`oikb sync ./docs --kb-id ...`) or create a config with `oikb init`.
 
