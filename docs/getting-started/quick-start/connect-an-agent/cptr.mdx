@@ -138,7 +138,7 @@ echo "anthropic/claude-sonnet-5" > /path/to/workspace/.cptr/model
 
 ### Connection test passes but no models load
 
-Almost always the missing `/v1` suffix. Open WebUI's connection test checks basic connectivity, not model discovery.
+Open WebUI's connection test requests `GET <URL>/models` with your key, so a URL without the `/v1` suffix normally fails the test itself. If the test passes but no models load, the `/models` response had no `data` list, or the connection is disabled or its model filter hides them.
 
 ### Docker networking issues
 
