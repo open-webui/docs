@@ -44,7 +44,7 @@ You can use a [LiteLLM](https://docs.litellm.ai/) proxy instance as your search 
 To configure this:
 
 1. Follow the setup steps above, selecting `perplexity_search` as the engine.
-2. Under the **Perplexity Search API Base URL** field, replace the default URL with your LiteLLM endpoint.
+2. Under the **Perplexity Search API URL** field (`PERPLEXITY_SEARCH_API_URL`, default `https://api.perplexity.ai/search`), replace the default with your LiteLLM endpoint. The field holds the full search endpoint, not a base URL.
 3. The URL must follow this specific format: `http://<your-litellm-url>/search/<your-search-provider-name>` - Ensurethe search provider name matches the provider name you configured in your LiteLLM setup.
 
 **Example:**
