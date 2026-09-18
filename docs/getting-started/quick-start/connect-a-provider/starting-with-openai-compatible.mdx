@@ -30,11 +30,11 @@ For a detailed explanation of this architectural decision, see our **[FAQ on pro
 
 :::warning Important: Connection Verification May Fail for Some Providers
 
-When you add a connection, Open WebUI verifies it by calling the provider's `/models` endpoint using a standard `Bearer` token. **Some providers do not implement the `/models` endpoint** at all or use non-standard authentication for it. In these cases:
+Saving a connection does not test it. Clicking the **Verify Connection** button beside the URL field calls the provider's `/models` endpoint using a standard `Bearer` token and reports **Server connection verified**. **Some providers do not implement the `/models` endpoint** at all or use non-standard authentication for it. In these cases:
 
 - The connection verification will **fail with an error** (e.g., 400, 401 or 403).
 - This does **not** mean the provider is incompatible: **chat completions will still work**.
-- You just need to **manually add model names** to the **Model IDs (Filter)** allowlist in the connection settings.
+- You just need to **manually add model names** to the **Model IDs** allowlist in the connection settings.
 
 **Providers with known `/models` issues:**
 
@@ -51,7 +51,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
 
-**How to add models manually**: In the connection settings, find **Model IDs (Filter)**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error. Each ID goes on the list once; typing one that is already there is refused with **Model ID is already added**, and any spaces around what you type are stripped off first.
+**How to add models manually**: In the connection settings, find **Model IDs**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error. Each ID goes on the list once; typing one that is already there is refused with **Model ID is already added**, and any spaces around what you type are stripped off first.
 
 :::
 
@@ -63,7 +63,7 @@ When you add a connection, Open WebUI verifies it by calling the provider's `/mo
 2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
 3. Click ➕ **Add Connection**.
 4. Fill in the **URL** and **API Key** for your provider (see tabs below). The URL field will **suggest common provider endpoints** as you type.
-5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs (Filter)** allowlist.
+5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs** allowlist.
 6. Click **Save**.
 
 :::tip
@@ -223,7 +223,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   2. Click the **+** (plus) icon under the **OpenAI API** section.
   3. Enter the URL and API Key from the table above.
   4. **Important**: MiniMax does not expose a `/models` endpoint, so you must add the model manually.
-  5. In the **Model IDs (Filter)**, type `MiniMax-M3` and click the **+** icon.
+  5. In the **Model IDs**, type `MiniMax-M3` and click the **+** icon.
   6. Click **Verify Connection** (you should see a success alert).
   7. Click **Save**.
 
@@ -678,8 +678,8 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 If your server is slow to start or you're connecting over a high-latency network, you can adjust the model list fetch timeout:
 
 ```bash
-# Adjust timeout for slower connections (default is 10 seconds)
-AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=5
+# Raise the timeout for slower connections. The default is 10 seconds, and an empty value disables it
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
 ```
 
 If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
