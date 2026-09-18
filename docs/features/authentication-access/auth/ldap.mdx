@@ -118,9 +118,9 @@ ENABLE_LDAP="true"
 # --- Server Settings ---
 LDAP_SERVER_LABEL="OpenLDAP"
 LDAP_SERVER_HOST="localhost"  # Or the IP/hostname of your LDAP server
-LDAP_SERVER_PORT="389"        # Use 389 for plaintext/StartTLS, 636 for LDAPS
-LDAP_USE_TLS="false"          # Set to "true" for LDAPS or StartTLS
-LDAP_VALIDATE_CERT="false"    # Set to "true" in production with valid certs
+LDAP_SERVER_PORT="389"        # Use 389 for plaintext, 636 for LDAPS
+LDAP_USE_TLS="false"          # Set to "true" for LDAPS (the default is "true")
+LDAP_VALIDATE_CERT="false"    # Set to "true" in production with valid certs (the default is "true")
 
 # --- Bind Credentials ---
 LDAP_APP_DN="cn=admin,dc=example,dc=org"
@@ -142,10 +142,10 @@ LDAP_ATTRIBUTE_FOR_MAIL="mail"
 Alternatively, you can configure these settings directly in the UI:
 
 1. Log in as an administrator.
-2. Navigate to **Settings** > **General**.
-3. Enable **LDAP Authentication**.
+2. Open the **Admin Panel**, go to **Settings** > **Authentication**, and find the **LDAP** section.
+3. Turn on the **LDAP** switch.
 4. Fill in the fields corresponding to the environment variables above.
-5. Save the settings and restart Open WebUI.
+5. Save the settings. They apply to the next login attempt, with no restart.
 
 ## 5. Logging In
 
@@ -154,7 +154,7 @@ Open a new incognito browser window and navigate to your Open WebUI instance.
 -   **Login ID:** `jdoe`
 -   **Password:** `password123` (or the password you set)
 
-Upon successful login, a new user account with "User" role will be created automatically in Open WebUI. An administrator can later elevate the user's role if needed.
+Upon successful login, a new user account is created automatically in Open WebUI with the instance's default role, which is `pending` unless an administrator changed it under **Settings** > **Authentication**. The very first account on an instance becomes an administrator. An administrator can later change the user's role if needed.
 
 ## 6. Troubleshooting Common Errors
 
@@ -183,7 +183,7 @@ ERROR | LDAP authentication error: ("('socket ssl wrapping error: [SSL: UNEXPECT
 **Solution:**
 -   **If you don't intend to use TLS:** Set `LDAP_USE_TLS="false"` and connect to the standard plaintext port `389`.
 -   **If you intend to use LDAPS:** Ensure your LDAP server is configured for TLS and listening on port `636`. Set `LDAP_SERVER_PORT="636"` and `LDAP_USE_TLS="true"`.
--   **If you intend to use StartTLS:** Your LDAP server must support the StartTLS extension. Connect on port `389` and set `LDAP_USE_TLS="true"`.
+-   **StartTLS is not supported.** `LDAP_USE_TLS` opens an implicit TLS connection only, so `"true"` against a plain listener on port `389` fails. Use LDAPS on `636` or plaintext on `389`.
 
 ### `err=49 text=` (Invalid Credentials)
 
