@@ -43,8 +43,13 @@ Regardless of which approach you choose, keep these in mind:
 
 | Setting | Why it matters |
 | :--- | :--- |
-| `WEBUI_URL` | Set this to your public HTTPS URL so OAuth callbacks and internal links resolve correctly |
-| `CORS_ALLOW_ORIGIN` | Must match your public URL, or WebSocket connections will fail silently |
-| Proxy buffering **off** | Required for SSE streaming. Buffering breaks markdown rendering in chat responses |
-| WebSocket support | Ensure your proxy passes `Upgrade` and `Connection` headers for real-time features |
-| Extended timeouts | LLM responses can take minutes. Set proxy read timeouts to at least 300s |
+| `WEBUI_URL` | Set this to your public HTTPS URL so OAuth callbacks and internal links resolve correctly. It is persisted config: once saved in Admin Settings > General, the stored value wins over the env var. When it is empty, OAuth falls back to the request's own URL, which is right only if the proxy forwards `Host` and `X-Forwarded-Proto` |
+| `CORS_ALLOW_ORIGIN` | Defaults to `*`, so leaving it unset never breaks WebSocket. If you set it, it must include your exact public origin (scheme, host, port), or browser and WebSocket requests fail |
+| Proxy buffering **off** | Keeps SSE streaming for API clients and the Socket.IO polling fallback. The web UI streams chat tokens over `/ws/socket.io`, so buffering does not affect it while WebSocket works |
+| WebSocket support | Proxy `/ws/socket.io` with `Upgrade` and `Connection` headers. By default the browser uses the WebSocket transport only, with no polling fallback; behind a proxy that cannot upgrade, set `ENABLE_WEBSOCKET_SUPPORT=false` to switch server and client to long-polling |
+| Forwarded headers | Forward `X-Forwarded-For` and `X-Forwarded-Proto`. Audit-log client IPs, the sign-in rate limiter and OAuth redirects (when `WEBUI_URL` is empty) come from them, and Uvicorn trusts them from any peer unless `FORWARDED_ALLOW_IPS` names the proxy's address. `X-Real-IP` is not read |
+| Secure cookies | The `token` and `owui-session` cookies are sent without `Secure` by default. Once TLS is in front, set `WEBUI_AUTH_COOKIE_SECURE=true` and `WEBUI_SESSION_COOKIE_SECURE=true` |
+| Extended timeouts | API clients streaming from `/api/chat/completions` and long non-streaming requests (uploads with processing, web fetch, transcription) can take minutes; set proxy read timeouts to at least 300s. The Socket.IO connection pings every 25s, so it survives any idle timeout above about 45s |
+| Upload size | The app has no upload cap until Max Upload Size is set in Admin Settings > Documents, so the proxy's body-size limit is what returns 413; set it at or above the value you configure there |
+| Health checks | Point load balancers at `/health` (liveness) or `/ready` (readiness: startup finished, database and Redis reachable) |
+| Several instances | Socket.IO state lives in-process. Balancing across instances, or running `UVICORN_WORKERS` above 1, needs `WEBSOCKET_MANAGER=redis` with `REDIS_URL` and a shared database |
