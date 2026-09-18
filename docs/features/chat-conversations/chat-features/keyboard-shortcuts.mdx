@@ -21,7 +21,7 @@ Nothing locks you out: the **Settings > Keyboard** tab keeps working while short
 
 ## Configurable Shortcuts
 
-These eighteen can be rebound:
+These twenty can be rebound:
 
 | Action | Default |
 |---|---|
@@ -47,6 +47,21 @@ These eighteen can be rebound:
 | Copy last response | `Cmd+Shift+C` |
 
 Anything not listed here is fixed and cannot be reassigned.
+
+## Fixed Shortcuts
+
+These eight are built in and cannot be rebound. **Settings > Keyboard** lists them for reference.
+
+| Action | Key | Active when |
+|---|---|---|
+| Accept autocomplete generation, jump to prompt variable | `Tab` | The chat input is focused |
+| Prevent file creation | `Cmd+Shift+V` | Pasting while **Paste Large Text as File** is on |
+| Attach file from knowledge | `#` | Typed in the chat input |
+| Add custom prompt | `/` | Typed in the chat input |
+| Talk to model | `@` | Typed in the chat input |
+| Stop generating | `Escape` | The chat input is focused and a response is being generated |
+| Edit last message | `ArrowUp` | The chat input is focused |
+| Toggle mute | `M` | Voice mode |
 
 **Allow tool call** and **Deny tool call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
 
