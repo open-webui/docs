@@ -3,7 +3,7 @@ sidebar_position: 310
 title: "Exporting & Importing DB"
 ---
 
-If you need to migrate your **Open WebUI** data (e.g., chat histories, configurations, etc.) from one server to another or back it up for later use, you can export and import the database. This guide assumes you're running Open WebUI using the internal SQLite database (not PostgreSQL).
+If you need to migrate your **Open WebUI** data (e.g., chat histories, configurations, etc.) from one server to another or back it up for later use, you can export and import the database. This guide assumes you're running Open WebUI using the internal SQLite database (not PostgreSQL). Copying `webui.db` moves everything stored in the database (accounts, chats, settings, file and knowledge records) but not the files themselves: uploaded files under `/app/backend/data/uploads` and the vector store under `/app/backend/data/vector_db` stay behind, so chats that reference files will point at missing objects. Copy the whole `/app/backend/data` directory (see the [backups guide](/tutorials/maintenance/backups)) and keep the same `WEBUI_SECRET_KEY` for a complete move; the Docker image writes its auto-generated key to `/app/backend/.webui_secret_key`, outside that directory. With an external vector database such as PGVector, the vectors live there instead of in `vector_db`.
 
 Follow the steps below to export and import the `webui.db` file, which contains your database.
 
