@@ -29,7 +29,7 @@ Unzip the file and move the application into your **Applications** folder.
 
 ### 2. Generate your Open WebUI API key
 
-To authenticate with your Open WebUI instance, you'll need to generate an API key.
+To authenticate with your Open WebUI instance, you'll need to generate an API key. API keys are off by default: an admin must enable them (`ENABLE_API_KEYS`), and if endpoint restrictions are on, `/api/chat/completions` and `/api/models` must be listed in `API_KEYS_ALLOWED_ENDPOINTS`.
 Follow the instructions in the [API Endpoints guide](/reference/api-endpoints) to create it.
 
 ## Configuration
