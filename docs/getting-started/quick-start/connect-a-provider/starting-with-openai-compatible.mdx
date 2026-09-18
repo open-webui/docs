@@ -273,85 +273,82 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Amazon Bedrock** is a fully managed AWS service that provides access to foundation models from leading AI companies (Anthropic, Meta, Mistral, Cohere, Stability AI, Amazon, and more) through a single API.
 
-  There are multiple OpenAI-compatible ways to connect Open WebUI to AWS Bedrock:
+  There are several OpenAI-compatible ways to connect Open WebUI to Bedrock:
 
-  * **Bedrock Access Gateway** (BAG)
-  * **stdapi.ai**
-  * **LiteLLM** with its Bedrock provider (LiteLLM is not dedicated to AWS).
-  * **Bedrock Mantle**: AWS native solution, no installation required
+  * **Amazon Bedrock native endpoints** — AWS serves the OpenAI Chat Completions API itself. Nothing to deploy.
+  * **[stdapi.ai](https://stdapi.ai/)** — an AWS-focused gateway you run in your own AWS account or locally.
+  * **[LiteLLM](https://docs.litellm.ai/)** — a general-purpose multi-provider proxy; AWS is one of the 100+ backends it routes to.
+  * **[Bedrock Access Gateway](https://github.com/aws-samples/bedrock-access-gateway) (BAG)** — an AWS sample, **deprecated since 2026-09-04**.
+
+  :::caution Bedrock Access Gateway is deprecated
+  AWS deprecated and archived the Bedrock Access Gateway on **2026-09-04**, on the grounds that Bedrock now serves OpenAI-compatible and Anthropic-compatible APIs natively, which is the reason the proxy existed. Existing deployments keep working as an Open WebUI connection, but the project receives no further updates and is not a good basis for a new setup. AWS's documented replacement is the native endpoints described below.
+  :::
 
   #### Feature Comparison
 
-  | Capability                   | Bedrock Access Gateway (BAG) | stdapi.ai | LiteLLM (Bedrock provider) | AWS Bedrock Mantle |
-  |------------------------------| --- | --- | --- | --- |
-  | Automatic models discovery   | ✅ | ✅ | ❌ | ✅ |
-  | Chat completion              | ✅ | ✅ | ✅ | ✅ |
-  | Embeddings                   | ✅ | ✅ | ✅ | ❌ |
-  | Text to speech               | ❌ | ✅ | ❌ | ❌ |
-  | Speech to text               | ❌ | ✅ | ❌ | ❌ |
-  | Image generation             | ❌ | ✅ | ✅ | ❌ |
-  | Image editing                | ❌ | ✅ | ❌ | ❌ |
-  | Models from multiple regions | ❌ | ✅ | ✅ | ❌ |
-  | No installation required     | ❌ | ❌ | ❌ | ✅ |
-  | License                      | MIT | AGPL or Commercial | MIT or Commercial | AWS Service |
+  What each option can serve to Open WebUI with Bedrock (and other AWS AI services) as the backend:
 
-  #### Solution 1: Bedrock Access Gateway (BAG)
+  | Open WebUI capability | Native Bedrock endpoints | stdapi.ai | LiteLLM (AWS backends) | BAG (deprecated) |
+  |---|---|---|---|---|
+  | Chat completions | ✅ | ✅ | ✅ | ✅ |
+  | Model auto-discovery (`/models`) | `bedrock-mantle` only | ✅ | ✅, limited to the models declared in LiteLLM's config | ✅, single region |
+  | Model coverage | Subset of Bedrock models, and it differs per endpoint | Full Bedrock catalog | Whatever you declare | Subset of Bedrock models |
+  | RAG embeddings | ❌ | ✅ | ✅ | ✅ |
+  | RAG external reranker | ❌ | ✅ | ✅ | ❌ |
+  | Image generation | ❌ | ✅ | ✅ | ❌ |
+  | Image editing | ❌ | ✅ | ✅ | ❌ |
+  | Speech to text | ❌ | ✅, Amazon Transcribe or Bedrock speech models | ❌, no AWS transcription backend | ❌ |
+  | Text to speech | ❌ | ✅, Amazon Polly | ✅, Amazon Polly | ❌ |
+  | Models from several AWS regions in one connection | ❌ | ✅ | Manual, one entry per model and region | ❌ |
+  | Non-AWS providers | ❌ | ❌ | ✅ | ❌ |
+  | Infrastructure you run | None | A container you host | A container you host | A container you host |
+  | License | AWS service | AGPL-3.0 or commercial | MIT, plus a commercial tier | MIT-0, archived |
+
+  A ❌ in a row is not a dead end for that feature in Open WebUI: each engine (RAG, images, audio) is configured separately, so you can pair a chat connection with a different backend for the rest.
+
+  #### Solution 1: Amazon Bedrock Native Endpoints
+
+  Amazon Bedrock serves the OpenAI Chat Completions API itself, so Open WebUI can point straight at AWS with no gateway in between. AWS offers this on two endpoints:
+
+  | Endpoint | Base URL | Notes |
+  |---|---|---|
+  | `bedrock-runtime` | `https://bedrock-runtime.{region}.amazonaws.com/openai/v1` | [AWS recommends this one for new applications](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-chat-completions.html). Bedrock Guardrails, intelligent prompt routing and cross-region inference profiles are available here. |
+  | `bedrock-mantle` | `https://bedrock-mantle.{region}.api.aws/v1` | Serves models and capabilities `bedrock-runtime` does not, and is the only one of the two with an OpenAI-compatible `/models` endpoint. |
 
   **Prerequisites**
 
   - An active AWS account
-  - An active AWS Access Key and Secret Key
-  - IAM permissions in AWS to enable Bedrock models (or already enabled models)
-  - Docker installed on your system
+  - An [Amazon Bedrock API key](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html)
+  - IAM permissions to invoke the models you want
 
-  **Step 1: Configure the Bedrock Access Gateway**
+  **Configuration**
 
-  The BAG is a proxy developed by AWS that wraps around the native Bedrock SDK and exposes OpenAI-compatible endpoints. Here's the endpoint mapping:
-
-  | OpenAI Endpoint | Bedrock Method |
-  |---|---|
-  | `/models` | `list_inference_profiles` |
-  | `/models/{model_id}` | `list_inference_profiles` |
-  | `/chat/completions` | `converse` or `converse_stream` |
-  | `/embeddings` | `invoke_model` |
-
-  Set up the BAG from the [Bedrock Access Gateway repo](https://github.com/aws-samples/bedrock-access-gateway):
+  Configure Open WebUI using environment variables, or set the same values from the admin panel:
 
   ```bash
-  git clone https://github.com/aws-samples/bedrock-access-gateway
-  cd bedrock-access-gateway
-  # Use the ECS Dockerfile
-  mv Dockerfile_ecs Dockerfile
-  docker build . -f Dockerfile -t bedrock-gateway
-  docker run -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-             -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-             -e AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN \
-             -e AWS_REGION=us-east-1 \
-             -d -p 8000:80 bedrock-gateway
+  # bedrock-runtime, the endpoint AWS recommends for new applications
+  OPENAI_API_BASE_URL=https://bedrock-runtime.us-east-1.amazonaws.com/openai/v1
+  OPENAI_API_KEY=your_bedrock_api_key
   ```
 
-  Verify the gateway is running by visiting the Swagger page at `http://localhost:8000/docs`.
+  ```bash
+  # bedrock-mantle, for models or capabilities bedrock-runtime does not serve
+  OPENAI_API_BASE_URL=https://bedrock-mantle.us-east-1.api.aws/v1
+  OPENAI_API_KEY=your_bedrock_api_key
+  ```
 
-  :::warning Troubleshooting: Container Exits Immediately
-  If the container starts and immediately exits (especially on Windows), check the logs with `docker logs <container_id>`. If you see Python/Uvicorn errors, this is likely a **Python 3.13 compatibility issue**. Edit the `Dockerfile` before building and change `python:3.13-slim` to `python:3.12-slim`, then rebuild.
+  Replace `us-east-1` with your preferred AWS region, and `your_bedrock_api_key` with your Bedrock API key.
+
+  :::info Model discovery differs between the two endpoints
+  The OpenAI-compatible `/models` endpoint is [served on `bedrock-mantle` only](https://docs.aws.amazon.com/bedrock/latest/userguide/inference-chat-completions.html). On `bedrock-runtime`, connection verification fails and no models are auto-detected, so add your model IDs to the **Model IDs** allowlist manually.
+
+  The two endpoints also serve different model sets, and a given model does not necessarily answer the same APIs on both. Check [endpoint availability](https://docs.aws.amazon.com/bedrock/latest/userguide/models-endpoint-availability.html) and the [API compatibility matrix](https://docs.aws.amazon.com/bedrock/latest/userguide/models-api-compatibility.html) before picking a model ID.
   :::
 
-  ![Bedrock Access Gateway Swagger](/images/tutorials/amazon-bedrock/amazon-bedrock-proxy-api.png)
+  **Trade-offs**
 
-  **Step 2: Add Connection in Open WebUI**
-
-  1. Go to **Settings > Admin > Connections**.
-  2. Use the **+** button to add a new connection under OpenAI.
-  3. For the URL, use `http://host.docker.internal:8000/api/v1`.
-  4. For the API Key, the default key defined in BAG is `bedrock` (you can change this via `DEFAULT_API_KEYS` in BAG settings).
-  5. Click **Verify Connection**. You should see a "Server connection verified" alert.
-
-  ![Add New Connection](/images/tutorials/amazon-bedrock/amazon-bedrock-proxy-connection.png)
-
-  **Other Helpful Tutorials**
-
-  - [Connecting Open WebUI to AWS Bedrock](https://gauravve.medium.com/connecting-open-webui-to-aws-bedrock-a1f0082c8cb2)
-  - [Using Amazon Bedrock with Open WebUI for Sensitive Data](https://jrpospos.blog/posts/2024/08/using-amazon-bedrock-with-openwebui-when-working-with-sensitive-data/)
+  - **In its favour:** no infrastructure to run, patch or pay for; requests run under your own IAM policies and are logged in CloudTrail; backed by the AWS SLA.
+  - **Against:** chat completions only. Open WebUI's RAG embeddings, reranking, image generation and editing, and voice input/output all need a different backend. Each connection reaches one region, and only part of the Bedrock catalog is exposed.
 
   #### Solution 2: stdapi.ai
 
@@ -421,6 +418,16 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   RAG_EMBEDDING_MODEL=cohere.embed-v4:0
   ```
 
+  RAG reranking, which reorders retrieved chunks before they reach the model:
+
+  ```bash
+  ENABLE_RAG_HYBRID_SEARCH=true
+  RAG_RERANKING_ENGINE=external
+  RAG_EXTERNAL_RERANKER_URL=YOUR_STDAPI_URL/cohere/v2/rerank
+  RAG_EXTERNAL_RERANKER_API_KEY=YOUR_STDAPI_KEY
+  RAG_RERANKING_MODEL=cohere.rerank-v3-5:0
+  ```
+
   Image generation:
 
   ```bash
@@ -461,44 +468,55 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   If you see inconsistent auto-detection for TTS languages, set a fixed language in stdapi.ai (for example, `DEFAULT_TTS_LANGUAGE=en-US`).
 
-  #### Solution 3: AWS Bedrock Mantle
+  **Trade-offs**
 
-  [Bedrock Mantle](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-mantle.html) is an AWS-native solution that provides an OpenAI-compatible API endpoint for Amazon Bedrock without requiring any additional infrastructure or installation. This makes it the simplest integration option for accessing Bedrock models.
+  - **In its favour:** covers every Open WebUI engine from one connection (chat, embeddings, reranking, images, STT, TTS); auto-discovers the full Bedrock catalog, including across several regions at once; ships Terraform samples for the whole stack.
+  - **Against:** another service to deploy and operate; AWS-only, so it cannot be the single gateway in front of non-AWS providers; the community image is AGPL-3.0, with a separate commercial licence.
 
-  **Key Advantages**
+  :::note The model selector lists every model, not only the chat ones
+  stdapi.ai answers `GET /v1/models` with everything it serves across every modality, as OpenAI's own endpoint does, so embedding, image, speech and moderation models appear beside the chat ones and picking one fails on the first message. Disable the ones you do not want in **Settings > Admin > Models**, or restrict the connection's **Model IDs** allowlist.
+  :::
 
-  - No installation required: Uses AWS-managed endpoints directly
-  - Simple configuration: Just requires an API key
-  - Native AWS integration: Fully managed by AWS
+  #### Solution 3: LiteLLM
 
-  **Limitations**
+  [LiteLLM](https://docs.litellm.ai/) is a general-purpose proxy that routes to 100+ providers; Bedrock and other AWS services are among them. See the **LiteLLM** tab above for the Open WebUI connection settings; the AWS-specific part is the proxy's own configuration.
 
-  - Chat completion only: Does not support embeddings, image generation, or other features
-  - Subset of models: Only provides access to a limited selection of Bedrock models (Open weight models)
-  - Single region: Does not support multi-region access
+  Unlike the other options here, LiteLLM does not discover the Bedrock catalog: every model is an entry in `litellm_config.yaml`, and Open WebUI then auto-detects whatever that file declares.
 
-  **Prerequisites**
-
-  - An active AWS account
-  - An [Amazon Bedrock API key](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html) (create one from the AWS console)
-  - IAM permissions to use Bedrock models (recommended: `AmazonBedrockMantleInferenceAccess` IAM policy)
-
-  **Configuration**
-
-  Configure Open WebUI using environment variables:
-
-  ```bash
-  OPENAI_API_BASE_URL=https://bedrock-mantle.us-east-1.api.aws/v1
-  OPENAI_API_KEY=your_bedrock_api_key
+  ```yaml
+  model_list:
+    - model_name: claude-sonnet-5
+      litellm_params:
+        model: bedrock/us.anthropic.claude-sonnet-5
+        aws_region_name: us-east-1
+    - model_name: cohere-embed
+      litellm_params:
+        model: bedrock/cohere.embed-v4:0
+        aws_region_name: us-east-1
   ```
 
-  Replace `your_bedrock_api_key` with the [Amazon Bedrock API key](https://docs.aws.amazon.com/bedrock/latest/userguide/api-keys.html) you created.
+  Beyond chat, the AWS-backed engines LiteLLM can serve Open WebUI are embeddings, [image generation and editing](https://docs.litellm.ai/docs/image_edits), [Cohere-format reranking](https://docs.litellm.ai/docs/providers/bedrock_rerank), and [text-to-speech through Amazon Polly](https://docs.litellm.ai/docs/text_to_speech). Which Bedrock models are wired to each of those is LiteLLM's business and changes over time; check its provider docs. Point each engine at the proxy the same way, for example the reranker:
 
-  Replace `us-east-1` in the URL with your preferred AWS region (e.g., `us-west-2`, `eu-west-1`, etc.).
+  ```bash
+  ENABLE_RAG_HYBRID_SEARCH=true
+  RAG_RERANKING_ENGINE=external
+  RAG_EXTERNAL_RERANKER_URL=http://localhost:4000/rerank
+  RAG_EXTERNAL_RERANKER_API_KEY=your_litellm_key
+  RAG_RERANKING_MODEL=the-model_name-you-declared
+  ```
 
-  You can also set the same values from the Open WebUI admin panel.
+  [Speech-to-text has no AWS backend in LiteLLM](https://docs.litellm.ai/docs/audio_transcription): its transcription providers are all non-AWS.
 
-  For more information, see the [Bedrock Mantle documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-mantle.html).
+  **Trade-offs**
+
+  - **In its favour:** one gateway in front of AWS *and* non-AWS providers, with routing, fallbacks, per-key budgets and spend tracking; MIT-licensed with a large community; also the choice behind AWS's own [Generative AI Gateway](https://aws.amazon.com/solutions/) solution.
+  - **Against:** no Bedrock model discovery, so the catalog is a config file you maintain; multi-region means one entry per model per region; AWS coverage is uneven (no AWS transcription backend), and AWS-specific features can lag behind a dedicated gateway.
+
+  #### Solution 4: Bedrock Access Gateway (deprecated)
+
+  The [Bedrock Access Gateway](https://github.com/aws-samples/bedrock-access-gateway) is an AWS sample (MIT-0) that wraps the Bedrock SDK and exposes `/models`, `/chat/completions` and `/embeddings`. AWS archived it on **2026-09-04** with the note that Bedrock now serves OpenAI-compatible APIs natively and that callers should use Bedrock directly.
+
+  If you already run one, it stays a valid Open WebUI connection: add it under **Settings > Admin > Connections** with the gateway's URL (`http://host.docker.internal:8000/api/v1` for a local container) and the API key from its `DEFAULT_API_KEYS` setting, which defaults to `bedrock`. For anything new, use one of the three solutions above; the deployment instructions that used to live here have been removed so they are not mistaken for current guidance.
 
   #### Start using Bedrock Base Models
 
