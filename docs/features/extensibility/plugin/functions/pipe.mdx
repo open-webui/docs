@@ -59,6 +59,8 @@ class Pipe:
 
 **Metaphor**: Think of Valves as the knobs on a real-world pipe system that control the flow of water. In your Pipe, Valves allow users to adjust settings that influence how the data flows and is processed.
 
+A second nested class, `UserValves`, holds settings each user sets for themselves. Its values arrive as `__user__["valves"]` when `__user__` is in the `pipe` signature. Admin `Valves` are reloaded from the database on every request, so a change in the admin panel applies to the next message.
+
 ### The `__init__` Method
 
 - **Definition**: The constructor method for the `Pipe` class.
@@ -74,8 +76,10 @@ def __init__(self):
 
 - **Definition**: The core function where your custom logic resides.
 - **Parameters**:
-  - `body`: A dictionary containing the input data.
+  - `body`: A dictionary containing the input data, the chat completion request with `metadata` removed. When the request went through a workspace model built on the pipe, `model` is already rewritten to the pipe's own id and the workspace model's parameters and system prompt are merged in.
+  - Any of `__user__`, `__request__`, `__event_emitter__`, `__event_call__`, `__chat_id__`, `__session_id__`, `__message_id__`, `__task__`, `__task_body__`, `__files__`, `__metadata__`, `__oauth_token__` and `__tools__`, each passed only when it is named in the signature. `__event_emitter__` and `__event_call__` are `None` when the request carries no `session_id`, `chat_id` and `message_id`, which is the case for plain API calls. See [Special Arguments](/features/extensibility/plugin/development/reserved-args).
 - **Purpose**: Processes the input data using your custom logic and returns the result.
+- **Return value**: For a streaming request, a `str` becomes one chunk, a sync or async generator is streamed item by item (a `dict` or Pydantic model as JSON, a `str` that already starts with `data:` untouched, any other `str` wrapped as a chat chunk), and Open WebUI appends a `finish_reason: stop` chunk and `data: [DONE]`. A `StreamingResponse` is forwarded as is, and a `dict` is sent as a single line with nothing appended. For a non-streaming request a `dict` or `StreamingResponse` is returned as is, a Pydantic model is dumped, and a `str` or generator is joined into one completion. An exception that escapes `pipe()` is returned as `{"error": {"detail": ...}}` and shown as an error on the message.
 
 ```python
 async def pipe(self, body: dict):
@@ -121,13 +125,15 @@ class Pipe:
 ### Explanation
 
 - **`pipes` Function**:
-  - Returns a list of dictionaries.
-  - Each dictionary represents a model with unique `id` and `name` keys.
+  - Returns a list of dictionaries. `pipes` may also be a plain list attribute, or an async function.
+  - Each dictionary represents a model with unique `id` and `name` keys. The model id becomes `<function id>.<id>`, and Open WebUI recovers the function id by splitting on the first dot, so sub ids may contain dots themselves. A `name` attribute on the class is prepended to every sub-model name.
   - These models will show up individually in the Open WebUI model selector.
+  - If `pipes()` raises, the function contributes no models. If any entry lacks `id` or `name`, the whole function is skipped.
+  - The function id itself must be a valid Python identifier and is stored lowercased.
 
 - **Updated `pipe` Function**:
   - Processes input based on the selected model.
-  - In this example, it includes the model name in the returned string.
+  - In this example, it includes the model id in the returned string.
 
 ---
 
@@ -198,7 +204,7 @@ class Pipe:
             "Content-Type": "application/json",
         }
 
-        # Extract model id from the model name
+        # Strip the function id prefix from the model id
         model_id = body["model"][body["model"].find(".") + 1 :]
 
         # Update the model id in the body
@@ -376,13 +382,13 @@ class Pipe:
 
 ### Q6: How can I handle errors in my Pipe?
 
-**A**: Use try-except blocks within your `pipe` and `pipes` functions to catch exceptions. Return meaningful error messages or handle the errors gracefully to ensure the user is informed about what went wrong.
+**A**: Use try-except blocks within your `pipe` and `pipes` functions to catch exceptions. An exception that escapes `pipe()` is caught by Open WebUI and shown as an error on the message, with `str(e)` as the text. A string you return instead, such as `f"Error: {e}"`, renders as ordinary assistant text. An exception in `pipes()` removes the function's models from the selector until it succeeds again.
 
 ---
 
 ### Q7: Can I use external libraries in my Pipe?
 
-**A**: Yes, you can import and use external libraries as needed. Ensure that any dependencies are properly installed and managed within your environment.
+**A**: Yes, you can import and use external libraries as needed. List them in the frontmatter as `requirements: package-one, package-two` and Open WebUI installs them with pip when the function is saved, unless `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS` is off or `OFFLINE_MODE` is on. The docstring holding the frontmatter has to be the very first line of the file.
 
 ---
 
