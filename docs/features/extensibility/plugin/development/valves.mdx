@@ -76,6 +76,8 @@ class Filter:
 
 Valves support special input types that change how fields are rendered in the UI. You can configure these using `json_schema_extra` with the `input` key in your Pydantic `Field` definitions.
 
+The renderer picks the control in a fixed order. A `Literal` or enum field always renders as a select, a `bool` as a switch, a multiselect as its own control, and any other non-string type as a plain text box that ignores `input.type`. The `password` and `select` input types therefore only take effect on `str` fields.
+
 ### Password Input (Masked Fields)
 
 For sensitive fields like passwords, API keys, or secrets, you can use the password input type to mask the value in the UI. This prevents the password from being visible on screen (protecting against shoulder surfing).
@@ -157,7 +159,7 @@ class Tools:
 
 #### Dynamic Options
 
-For options that need to be generated at runtime (e.g., fetching available models, databases, or user-specific resources), specify a method name as a string. The method will be called when the configuration UI is rendered:
+For options that need to be generated at runtime (e.g., fetching available models, databases, or user-specific resources), specify a method name as a string. The method is called synchronously each time the valves dialog opens, and it must return a list. An `async def` returns a coroutine, which fails that check and leaves the field with no options and a warning in the log. The method may take a `__user__` or `user` argument to receive the current user as a dict:
 
 ```python
 from pydantic import BaseModel, Field
