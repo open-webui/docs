@@ -5,7 +5,7 @@ title: "Customizable Banners"
 
 ## Overview
 
-Open WebUI allows administrators to display custom banners to logged-in users. Banners are useful for announcements, system-wide alerts, maintenance notices, and other important messages.
+Open WebUI allows administrators to display custom banners on the new-chat screen. They are shown under the chat header only while no chat is open, and not on workspace, admin or other pages. Banners are useful for announcements, system-wide alerts, maintenance notices, and other important messages.
 
 Banners are persistent and can optionally be **dismissible** by users. You can configure banners in two ways:
 
@@ -48,7 +48,7 @@ You can configure the following options for each banner:
   - `warning` (Yellow)
   - `error` (Red)
 - **Title:** The main heading of the banner.
-- **Content:** The main message (HTML only).
+- **Content:** The main message. Markdown is rendered and inline HTML is allowed, both passed through a sanitizer. Every newline becomes a line break before parsing, so multi-line Markdown blocks (lists, tables, blockquotes) do not form. Use their HTML forms for those.
 - **Dismissible:** If enabled, users can close the banner.
 
 #### How dismissing works
@@ -95,7 +95,7 @@ Each banner object supports the following properties:
 - `id` (string, required): Unique identifier for the banner. Used to track whether a user has dismissed it.
 - `type` (string, required): Banner style. Must be one of: `info`, `success`, `warning`, `error`.
 - `title` (string, optional): Title text.
-- `content` (string, required): Main banner message (HTML only).
+- `content` (string, required): Main banner message (Markdown, inline HTML allowed).
 - `dismissible` (boolean, required): Whether the user can dismiss the banner.
 - `timestamp` (integer, required): Present in configuration, but currently not used by the frontend to control display timing.
 
@@ -111,9 +111,9 @@ If users dismissed a banner and you want them to see an updated message, change 
 
 ---
 
-## Supported content formatting (HTML only)
+## Supported content formatting
 
-Banner `title` and `content` support a subset of **HTML only**: Markdown syntax is not rendered. Unsupported tags may render as plain text or break the layout.
+Banner `content` is parsed as Markdown and then sanitized, so inline Markdown (`**bold**`, `[link](url)`, backticks) and inline HTML both render. Because every newline is turned into a line break before parsing, block Markdown that spans lines (multi-line lists, tables, blockquotes, a heading on a later line) does not form. HTML lists, headings, tables and blockquotes do render. `title` is accepted in the JSON but never shown: the editor has no Title field, and the banner displays the type label plus the content.
 
 ### Text formatting
 
@@ -141,7 +141,7 @@ Banner `title` and `content` support a subset of **HTML only**: Markdown syntax 
 
 | HTML | Effect |
 | --- | --- |
-| `<a href="..." target="_blank">` | Clickable link |
+| `<a href="...">` | Clickable link. The sanitizer strips `target`, so links open in the same tab |
 | `<img src="..." width="16" height="16">` | Inline image |
 
 ### Custom styling
@@ -271,7 +271,7 @@ Use this exact pattern:
 
 **Recommendations:**
 - Always close anchor tags with `</a>`.
-- Use `target="_blank"` (underscore included).
+- `target="_blank"` is stripped by the sanitizer, so it has no effect. Links open in the same tab.
 - If your URL contains query parameters, escape `&` as `&amp;` inside the `href` attribute:
   ```html
   <a href="https://example.com/page?x=1&amp;y=2" target="_blank">Example</a>
@@ -395,7 +395,7 @@ If you keep adding banners without removing old ones, users may ignore them. Rem
 ### Banner cannot be dismissed
 
 - Verify that `dismissible` is set to `true`.
-- If `dismissible` is `false`, the banner is intentionally always visible.
+- Every banner can be closed with its × button. `dismissible: true` (the **Remember Dismissal** switch in the editor) remembers the closure in the browser, so the banner stays gone. `false` hides it only until the page is reloaded. There is no way to make a banner unclosable.
 
 ### Banner layout looks broken or too tall
 
@@ -409,7 +409,7 @@ If you keep adding banners without removing old ones, users may ignore them. Rem
 
 ### Can I use Markdown in banner content?
 
-No. Banner content supports **HTML only**. Markdown syntax is not rendered.
+Yes, for inline Markdown. Content is parsed with Markdown, then sanitized. Multi-line Markdown blocks do not form because newlines become line breaks first, so use HTML for lists, tables and headings that need more than one line.
 
 ### Does `timestamp` control when a banner shows?
 
