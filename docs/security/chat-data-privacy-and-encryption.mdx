@@ -20,12 +20,12 @@ Open WebUI's standard experience is designed for self-hosted control, auditabili
 | Scope admin workspace list/selector visibility | Set `BYPASS_ADMIN_ACCESS_CONTROL=false` |
 | Production database storage exposure | Use PostgreSQL with encrypted volumes, provider encryption, TDE where available, TLS, and encrypted backups |
 | SQLite-only deployments | Use SQLCipher with `DATABASE_TYPE=sqlite+sqlcipher` |
-| Employees asking sensitive or personal questions | Use Temporary Chat, or force Temporary Chat for all users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` |
+| Employees asking sensitive or personal questions | Use Temporary Chat, or make it the default for non-admin users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` (applied by the web UI; the API is not blocked) |
 | Keep prompts inside your infrastructure | Use local or private model endpoints and restrict approved models by group |
-| Sensitive documents being uploaded or indexed | Keep file upload and knowledge permissions off by default; grant only by group |
+| Sensitive documents being uploaded or indexed | Turn the file upload permission off (it is on by default) and keep the knowledge permission off; grant only by group |
 | Control server-side code execution | Keep Tools and Functions restricted to trusted admins |
 | Chat content appearing in logs | Keep audit logging at metadata level unless body logging is explicitly approved |
-| Sharing control | Keep community sharing off by default and review chat-sharing permissions |
+| Sharing control | Turn community sharing off (it is on by default) and review chat-sharing permissions |
 | Different teams needing different trust boundaries | Run separate Open WebUI instances with separate databases, backups, credentials, operators, and model providers |
 
 ## Recommended Baseline
@@ -78,11 +78,13 @@ To make Temporary Chat available by default:
 USER_PERMISSIONS_CHAT_TEMPORARY=true
 ```
 
-To force Temporary Chat for all users by default:
+To make Temporary Chat the default for non-admin users:
 
 ```bash
 USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true
 ```
+
+The web UI applies this setting; admins are exempt, and the API does not refuse to save chats, so treat it as a UI default rather than a server-side guarantee.
 
 Relevant permissions:
 
@@ -118,6 +120,8 @@ LOG_FORMAT=json
 
 Use `REQUEST` or `REQUEST_RESPONSE` audit logging only when your log platform is approved for chat content.
 
+Audit logging is off by default (`AUDIT_LOG_LEVEL=NONE`). Chat and chat-completion paths are excluded at every level unless `AUDIT_EXCLUDED_PATHS` is changed, bodies are truncated to 2048 bytes, and the file sink writes to `DATA_DIR/audit.log` inside the data volume.
+
 ## Who Can Read Chat Data?
 
 ### Regular Users
@@ -126,7 +130,7 @@ Regular users can read their own chats and chats explicitly shared with them. Ac
 
 ### Admin Users
 
-Admins have broad control by design. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` prevent casual access through Open WebUI product surfaces. Infrastructure-level access should be handled through operator trust, access review, and separation of duties.
+Admins have broad control by design. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` prevent casual access through Open WebUI product surfaces; with the flag off, admins can still open chats flagged internal and chats explicitly shared with them. Infrastructure-level access should be handled through operator trust, access review, and separation of duties.
 
 ### Database, Host, and Backup Operators
 
@@ -140,6 +144,8 @@ If an external model provider is configured, prompts and context sent for infere
 
 ## What Encryption Protects
 
+Open WebUI stores chat titles and content as plain JSON in the database, uploaded files unencrypted under `DATA_DIR/uploads` (or the configured object store), and document chunks in plain text in the vector store, so at-rest protection comes from the database, volume or storage layer (pgvector can encrypt chunk text with `PGVECTOR_PGCRYPTO=true`).
+
 Encryption at rest helps protect against:
 
 - Lost or stolen disks.
@@ -150,7 +156,7 @@ Encryption at rest helps protect against:
 
 Keep these paths inside your operational trust boundary:
 
-- The running Open WebUI application and its database key.
+- The running Open WebUI application, its database key, and `WEBUI_SECRET_KEY`, which signs sessions and by default encrypts stored OAuth tokens and client secrets (it does not encrypt chat data).
 - Database administrators with live query access.
 - Host operators with access to environment variables or mounted secrets.
 - Exports, logs, traces, and backups that contain chat data.
@@ -172,7 +178,7 @@ For sensitive departments such as HR, legal, or regulated workloads:
 - Use a separate database and backups.
 - Use separate operators and credentials.
 - Use private/local models.
-- Consider Enforced Temporary Chat, or enable it by default with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true`.
+- Consider Enforced Temporary Chat for non-admin users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true`.
 
 For personal or highly sensitive employee questions:
 
