@@ -4434,14 +4434,14 @@ Strictly return in JSON format:
 - Type: `bool`
 - Default: `False`
 - Description: The current name of [`ENABLE_RAG_LOCAL_WEB_FETCH`](#enable_rag_local_web_fetch), which it overrides when both are set. See that entry for what the gate covers.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ENABLE_RAG_LOCAL_WEB_FETCH`
 
 - Type: `bool`
 - Default: `False`
 - Description: Deprecated alias of [`ENABLE_LOCAL_WEB_FETCH`](#enable_local_web_fetch), still honored when the new name is unset. Controls whether outbound fetches can access URLs that resolve to private/local network IP addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading and OAuth profile-picture fetches.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to private IP addresses, including:
 
