@@ -581,6 +581,12 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 
 :::
 
+#### `THREAD_POOL_THREAD_NAME_PREFIX`
+
+- Type: `str`
+- Default: Empty string
+- Description: Prefix for the names of the worker threads in the pool sized by [`THREAD_POOL_SIZE`](#thread_pool_size), so they can be told apart from other threads in thread dumps and profilers. Empty keeps Python's default `ThreadPoolExecutor-N_M` naming.
+
 #### `ENABLE_CUSTOM_MODEL_FALLBACK`
 
 - Type: `bool`
@@ -652,6 +658,18 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 - Default: `Open WebUI`
 - Description: Sets the main WebUI name. Appends `(Open WebUI)` if overridden.
 
+
+#### `DEPLOYMENT_ID`
+
+- Type: `str`
+- Default: Empty string
+- Description: Free-form label for this deployment. It is returned as `deployment_id` by `GET /api/version`, so clients and monitors can tell deployments apart.
+
+#### `INSTANCE_ID`
+
+- Type: `str`
+- Default: A random UUID generated at each start
+- Description: Identifies the backend process. It is stamped as `instance_id` on every event envelope Open WebUI emits, so a multi-replica deployment can see which replica produced an event. Set it explicitly to keep the value stable across restarts.
 
 #### `PORT`
 
@@ -810,6 +828,12 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Default: `False`
 - Description: Builds the Docker image with NVIDIA CUDA support. Enables GPU acceleration for local Whisper and embeddings.
 
+#### `USE_SLIM_DOCKER`
+
+- Type: `bool`
+- Default: `False`
+- Description: Set to `true` by the slim Docker image build. It marks a build without the local machine-learning stack: CUDA detection is skipped, [`VECTOR_DB`](#vector_db) defaults to `pgvector`, audio preprocessing with pydub is bypassed, and the evaluation leaderboard's local embedding model is not loaded.
+
 #### `DOCKER`
 
 - Type: `bool`
@@ -847,6 +871,18 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Default: `None`
 - Description: Specifies the license key to use (for Enterprise users only).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `LICENSE_BLOB_PATH`
+
+- Type: `str`
+- Default: `${DATA_DIR}/l.data`
+- Description: Path of the license blob file read once at startup (Enterprise). When the file exists, its contents are loaded alongside [`LICENSE_KEY`](#license_key).
+
+#### `LICENSE_PUBLIC_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: Body of the PEM public key used to verify the license (Enterprise), without the `BEGIN` and `END` lines. Leave unset unless Open WebUI has given you a value.
 
 #### `SSL_ASSERT_FINGERPRINT`
 
@@ -1830,6 +1866,12 @@ Output:
 - Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Admin > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) and saving it collapses the duplicates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `AUXILIARY_EMBEDDING_MODEL`
+
+- Type: `str`
+- Default: `TaylorAI/bge-micro-v2`
+- Description: SentenceTransformers model the evaluation leaderboard loads to weight each feedback entry by how closely its tags match the leaderboard's query filter. It is not loaded on the slim image, where the query filter leaves the rankings unweighted.
+
 #### `ENABLE_MESSAGE_RATING`
 
 - Type: `bool`
@@ -2296,6 +2338,12 @@ any existing users. If there are already users registered, you cannot disable au
 directly. Ensure that no users are present in the database if you intend to turn off `WEBUI_AUTH`.
 
 :::
+
+#### `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`
+
+- Type: `str`
+- Default: `None`
+- Description: URL the browser is sent to after signing out. The sign-out endpoint returns it as `redirect_url`, and for OpenID providers with an end-session endpoint it is passed along as `post_logout_redirect_uri`.
 
 #### `ENABLE_PASSWORD_VALIDATION`
 
@@ -3742,6 +3790,108 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 :::
 
+#### `DATALAB_MARKER_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key for the Datalab Marker service. Required when [`CONTENT_EXTRACTION_ENGINE`](#content_extraction_engine) is `datalab_marker`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_API_BASE_URL`
+
+- Type: `str`
+- Default: Empty string, which uses `https://www.datalab.to/api/v1/marker`
+- Description: Base URL of the Marker API. Point it at a self-hosted Marker server, or leave it empty for Datalab's hosted endpoint.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+:::info
+Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now marks as deprecated in favor of `/convert`. The `/convert` reference no longer lists `use_llm`, `force_ocr`, `strip_existing_ocr` or `format_lines`, but Open WebUI still sends the four settings below.
+:::
+
+#### `DATALAB_MARKER_ADDITIONAL_CONFIG`
+
+- Type: `str`
+- Default: Empty string
+- Description: Extra Marker settings passed through unchanged as the `additional_config` JSON string. Datalab's reference lists `keep_pageheader_in_output`, `keep_pagefooter_in_output` and `keep_spreadsheet_formatting` as supported keys.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_USE_LLM`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `use_llm`, which asks Marker to run an LLM pass for higher accuracy on tables, forms and math at higher cost and latency.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_SKIP_CACHE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `skip_cache`, which makes Datalab re-run the conversion instead of returning a cached result for a file it has seen before.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_FORCE_OCR`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `force_ocr`, which OCRs every page, including pages that already carry an extractable text layer.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_PAGINATE`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `paginate`, which separates pages in the output with a horizontal rule carrying the page number.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_STRIP_EXISTING_OCR`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `strip_existing_ocr`, which discards a document's existing OCR text layer and OCRs it again.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_DISABLE_IMAGE_EXTRACTION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `disable_image_extraction`, which skips image extraction from the document.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_FORMAT_LINES`
+
+- Type: `bool`
+- Default: `False`
+- Description: Sends `format_lines`, which reformats lines with an OCR pass to improve inline math and text formatting.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `DATALAB_MARKER_OUTPUT_FORMAT`
+
+- Type: `str`
+- Default: `markdown`
+- Description: Output format requested from Marker. Datalab accepts `markdown`, `html`, `json` and `chunks`. Open WebUI ingests the returned text, so keep `markdown` unless you have a reason not to.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MINERU_API_MODE`
+
+- Type: `str`
+- Default: `local`
+- Description: `local` posts each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MINERU_API_URL`
+
+- Type: `str`
+- Default: `http://localhost:8000`
+- Description: Base URL of the MinerU API: your self-hosted server in `local` mode, or MinerU's cloud API base in `cloud` mode.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MINERU_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key for the MinerU cloud service. Required in `cloud` mode.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `MINERU_API_TIMEOUT`
 
 - Type: `str`
@@ -4826,6 +4976,12 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Description: Sets the API key for Tavily search API.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `TAVILY_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.tavily.com`
+- Description: Base URL for Tavily search and extract requests. A trailing slash is stripped. Point it at a proxy or a regional endpoint if you use one.
+
 #### `LINKUP_API_KEY`
 
 - Type: `str`
@@ -5749,6 +5905,18 @@ For a detailed setup guide and example configuration, please refer to the [Gemin
 
 #### Image Generation
 
+##### `GEMINI_API_BASE_URL`
+
+- Type: `str`
+- Default: Empty string
+- Description: Base URL that [`IMAGES_GEMINI_API_BASE_URL`](#images_gemini_api_base_url) and [`IMAGES_EDIT_GEMINI_API_BASE_URL`](#images_edit_gemini_api_base_url) fall back to when they are unset. Nothing else reads it.
+
+##### `GEMINI_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key that [`IMAGES_GEMINI_API_KEY`](#images_gemini_api_key) and [`IMAGES_EDIT_GEMINI_API_KEY`](#images_edit_gemini_api_key) fall back to when they are unset. Nothing else reads it.
+
 ##### `IMAGES_GEMINI_API_BASE_URL`
 
 - Type: `str`
@@ -6090,6 +6258,20 @@ For most standard OAuth providers (Google, Microsoft, GitHub, etc.), this settin
 If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` (empty string), then setting this variable to `true` will not update the user profile pictures.
 
 :::
+
+#### `OAUTH_UPDATE_NAME_ON_LOGIN`
+
+- Type: `bool`
+- Default: `False`
+- Description: If enabled, replaces the local user's name with the value of [`OAUTH_USERNAME_CLAIM`](#oauth_username_claim) on every OAuth login when the two differ.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `OAUTH_UPDATE_EMAIL_ON_LOGIN`
+
+- Type: `bool`
+- Default: `False`
+- Description: If enabled, replaces the local user's email with the value of [`OAUTH_EMAIL_CLAIM`](#oauth_email_claim) on every OAuth login when the two differ. The update is skipped, and an error logged, when another account already uses the new address.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_EMAIL_FALLBACK`
 
@@ -6496,6 +6678,13 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 - Description: Specifies the code challenge method for OAuth authentication. Set to `S256` when PKCE is required by the provider. This now applies to **every** sign-in provider, Google, Microsoft and GitHub as well as generic OpenID Connect, where it previously took effect on the OIDC provider alone. Any value other than `S256` is rejected at startup.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `OAUTH_CLIENT_TIMEOUT`
+
+- Type: `int`
+- Default: Empty string (the HTTP client's own default)
+- Description: Timeout in seconds for the HTTP client the OAuth login flow uses to reach the provider's token and userinfo endpoints.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `OAUTH_PROVIDER_NAME`
 
 - Type: `str`
@@ -6627,6 +6816,12 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 This is useful when you need a JWT access token for downstream validation or when your OAuth provider requires an audience hint for proper token generation. For Auth0, this is typically your API identifier (e.g., `https://your-api.auth0.com/api/v2/`). For Ory, specify the resource server you want to access.
 
 :::
+
+#### `OAUTH_ACCESS_TOKEN_REQUEST_INCLUDE_CLIENT_ID`
+
+- Type: `bool`
+- Default: `False`
+- Description: If enabled, adds `client_id` to the token request that exchanges the authorization code. Some providers reject the exchange without it.
 
 #### `OAUTH_AUTHORIZE_PARAMS`
 
