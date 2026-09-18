@@ -57,7 +57,7 @@ To remove Open WebUI when running with `uvx`:
     ```
 
 4.  **Remove Data (WARNING: Deletes all data):**
-    Delete your data directory (default is `~/.open-webui` or the path set in `DATA_DIR`):
+    Delete the directory you set as `DATA_DIR`. Without it, the data was inside the cached tool environment cleared above, which is why the tip at the top tells you to set one:
     ```bash
     rm -rf ~/.open-webui
     ```

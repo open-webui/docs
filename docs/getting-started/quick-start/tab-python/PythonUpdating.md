@@ -22,6 +22,8 @@ If you run Open WebUI with `UVICORN_WORKERS > 1` (e.g., in a production environm
 2. Start the application with `UVICORN_WORKERS=1` environment variable set.
 3. Wait for the application to fully start and complete migrations.
 4. Stop and restart the application with your desired number of workers.
+
+Migrations run at import time in every worker. As an alternative, set `ENABLE_DB_MIGRATIONS=false` on every worker or replica except one, so only that one ever runs them.
 :::
 
 For version pinning, rollback, and backup procedures, see the [full update guide](/getting-started/updating).
