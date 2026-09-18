@@ -128,11 +128,8 @@ Symptoms:
 
 Checks:
 - Ensure proxy forwards WebSocket upgrade headers.
-- Ensure subpath routing is consistent (strip or rewrite prefix before forwarding).
-- Set `WEBUI_URL` without trailing slash, for example:
-  - `WEBUI_URL=https://example.com/openwebui`
-- If subpath remains unstable, prefer a subdomain:
-  - `WEBUI_URL=https://ai.example.com`
+- Open WebUI has no base-path setting, so a subpath such as `/openwebui` cannot work: the frontend requests `/api/...`, `/ws/socket.io` and `/_app/...` from the domain root. Serve it on a subdomain or at the root instead.
+- Set `WEBUI_URL` to that public URL without a trailing slash, for example `WEBUI_URL=https://ai.example.com`; it feeds OAuth redirects and links, not routing. On an install that has already started, change **WebUI URL** in Admin Panel > Settings > General instead, since the environment variable only sets it on the first start.
 
 For broader reverse-proxy debugging, see [Connection Errors](/troubleshooting/connection-error).
 
