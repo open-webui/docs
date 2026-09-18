@@ -40,7 +40,7 @@ In Key Vault, store the credentials below. Use Container Apps secret references 
 | `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` | Initial administrator credentials for an empty database. Keep the password in the secret store. |
 | `LICENSE_KEY` | Optional issued Enterprise license key. |
 
-Also store `AZURE_STORAGE_KEY` as a secret. This example uses an account key for Blob Storage; managed identity access to Key Vault does not automatically authenticate Open WebUI to the blob account.
+Also store `AZURE_STORAGE_KEY` as a secret if you use an account key. Leave it unset and Open WebUI authenticates to Blob Storage with `DefaultAzureCredential`, so the Container App's managed identity works when it holds a Blob data role on the storage account; managed identity access to Key Vault alone does not grant that.
 
 Map each secret to its environment variable in the app configuration. Replace the non-secret values below:
 
@@ -105,7 +105,7 @@ Create `openwebui` in the same environment, using the pinned image and the envir
 | Scale | Minimum `1`, maximum `1` until verification passes. |
 | Ingress | HTTP, target port `8080`, transport `auto`, HTTPS only. Choose exposure consistent with the environment's access policy. |
 | Startup probe | HTTP `/health` on `8080`; allow for measured startup time. |
-| Readiness probe | HTTP `/health/db` on `8080`. |
+| Readiness probe | HTTP `/ready` on `8080`; it returns 503 until startup completes and the database and Redis answer. |
 | Liveness probe | HTTP `/health` on `8080`. |
 
 Configure probes explicitly rather than relying on generic defaults. A starting startup-probe budget is 60 failures at 10-second intervals; use a 5-second probe timeout. Tune it after measuring startup and external-service latency.
@@ -124,7 +124,7 @@ Open your approved HTTPS hostname and sign in with the initial administrator cre
 
 ## Verify Before Adding Users
 
-- Sign in with the initial administrator account and verify that open sign-up is disabled. Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
+- Sign in with the initial administrator account and verify that open sign-up is disabled (creating the admin from `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` turns it off automatically). Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
 - Select a model and stream a response. Reopen the saved conversation.
 - Upload a small document containing a distinctive fact. Confirm indexing completes and a question about that fact retrieves the source.
 - Replace an application instance and confirm the same account, conversation, and uploaded file remain available.
