@@ -24,7 +24,7 @@ The Admin role is designed for system maintainers.
 While Administrators generally have unrestricted access, certain system configurations can limit their capabilities for security and privacy:
 *   **Privacy Controls**: Environment variables like `ENABLE_ADMIN_CHAT_ACCESS=False` can prevent Admins from viewing user chats.
 *   **Feature-Specific Exceptions May Apply**: Some features can enforce additional checks beyond the standard admin bypass behavior. For API keys specifically, admins can generate keys whenever `ENABLE_API_KEYS` is enabled.
-*   **Access Control Exceptions**: If `BYPASS_ADMIN_ACCESS_CONTROL` is disabled, Admins may require explicit permissions to access private model/knowledge/notes resources.
+*   **Access Control Exceptions**: If `BYPASS_ADMIN_ACCESS_CONTROL` is disabled, Admins are checked against access grants like everyone else. A private workspace item (model, knowledge base, prompt, tool, skill, note) is visible only to its owner and to the people it is shared with. Admin-configured connections and arena models with no grants stay admin-only. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
 
 For a robust security posture, we recommend including Admins in your permission schema (via Groups) rather than relying solely on the role's implicit bypasses. This ensures consistent access if bypass limitations are ever enabled.
 :::

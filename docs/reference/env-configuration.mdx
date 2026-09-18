@@ -544,6 +544,8 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
   Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
+  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers, Open Terminal connections, and arena models. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
+
   This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`, switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
 #### `ENABLE_USER_WEBHOOKS`
