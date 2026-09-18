@@ -118,9 +118,9 @@ Use **Run new task**, select Fargate, set task count to `1`, and use the applica
 
 Create an ECS service using the **application** task definition, with `ENABLE_DB_MIGRATIONS=false` and its normal command. Start with desired task count `1` and connect the ALB target group to container `openwebui`, port `8080`.
 
-Set the target group's health-check path to `/health/db`. Start with a service health-check grace period of 300 seconds and adjust based on measured startup time. `/health` can be used for a separate process-liveness check. Neither endpoint verifies model APIs or S3 permissions.
+Set the target group's health-check path to `/ready`, which returns 200 only after application startup (config seeding, admin creation) has finished and the database and Redis (when configured) answer a ping; `/health/db` only pings the database. Start with a service health-check grace period of 300 seconds and adjust based on measured startup time. `/health` can be used for a separate process-liveness check. None of these endpoints verifies model APIs or S3 permissions.
 
-Set ALB idle timeouts for your streaming workload and enable target-group stickiness if your Socket.IO transport needs affinity. Verify WebSockets and streamed responses through the ALB rather than relying on direct-container checks.
+Set ALB idle timeouts for your streaming workload and enable target-group stickiness if your Socket.IO transport needs affinity. Verify WebSockets and streamed responses through the ALB rather than relying on direct-container checks. Socket.IO is served under `/ws/socket.io/`.
 
 Use the AWS CLI to wait and inspect service events, replacing the identifiers:
 
@@ -130,11 +130,11 @@ aws ecs describe-services --cluster CLUSTER --services openwebui \
   --query 'services[0].{running:runningCount,desired:desiredCount,events:events[0:5]}'
 ```
 
-Open the HTTPS hostname configured in `WEBUI_URL`. The initial administrator credentials create the first account during startup. Once verification passes, increase the desired count and optionally configure Service Auto Scaling. Budget PostgreSQL and Redis connections for the maximum task count.
+Open the HTTPS hostname configured in `WEBUI_URL`. The initial administrator credentials create the first account during startup. Once verification passes, increase the desired count and optionally configure Service Auto Scaling. Budget PostgreSQL and Redis connections for the maximum task count: each Open WebUI worker process has two database engines (sync and async), each able to open up to `DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW` connections when `DATABASE_POOL_SIZE` is set above 0 (SQLAlchemy's default of 5 + 10 when it is unset), and with `VECTOR_DB=pgvector` pgvector opens its own pool of `PGVECTOR_POOL_SIZE` + `PGVECTOR_POOL_MAX_OVERFLOW` (also 5 + 10 when unset), even when `PGVECTOR_DB_URL` equals `DATABASE_URL`.
 
 ## Verify Before Adding Users
 
-- Sign in with the initial administrator account and verify that open sign-up is disabled. Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
+- Sign in with the initial administrator account and verify that open sign-up is disabled (creating the admin from `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` turns it off automatically). Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
 - Select a model and stream a response. Reopen the saved conversation.
 - Upload a small document containing a distinctive fact. Confirm indexing completes and a question about that fact retrieves the source.
 - Replace an application instance and confirm the same account, conversation, and uploaded file remain available.
@@ -160,7 +160,7 @@ An ECS rollback changes the image, not the database schema. Do not enable automa
 | Symptom | Check |
 | :--- | :--- |
 | Task cannot start or pull image | Execution role, ECR permissions, subnet egress/VPC endpoints, architecture, and Secrets Manager access. |
-| ALB reports unhealthy targets | IP target type, container port, task security group, `/health/db`, startup logs, and database connectivity. |
+| ALB reports unhealthy targets | IP target type, container port, task security group, `/ready`, startup logs, and database connectivity. |
 | Chats work but uploads fail | Task-role S3 permissions, bucket name/region, and extraction/embedding endpoints. |
 | Login loops across tasks | Shared signing key, common database, and both Redis URLs. |
 | Streams disconnect | ALB idle timeout, client reconnection, Redis mode, and target-group affinity. |

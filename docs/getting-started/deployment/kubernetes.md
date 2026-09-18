@@ -110,7 +110,7 @@ startupProbe:
   failureThreshold: 60
 readinessProbe:
   httpGet:
-    path: /health/db
+    path: /ready
     port: http
   periodSeconds: 10
   timeoutSeconds: 5
@@ -344,7 +344,7 @@ kubectl -n openwebui get pods,ingress
 
 This disables migrations on all replicas, applies the desired replica count, and enables ingress. Expect a brief restart. Point DNS at your ingress controller, then open your HTTPS hostname.
 
-Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Session affinity may be needed for Socket.IO polling. Affinity does not replace Redis; see [connection troubleshooting](/troubleshooting/connection-error).
+Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Socket.IO is served under `/ws/socket.io/`, so a path-based ingress must forward that prefix with upgrade headers. Session affinity may be needed for Socket.IO polling. Affinity does not replace Redis; see [connection troubleshooting](/troubleshooting/connection-error).
 
 On the NGINX Ingress Controller, sticky sessions are these annotations on the Ingress resource:
 
@@ -366,7 +366,7 @@ They keep a user on the same pod, which steadies WebSocket connections across re
 - **Production documents:** Upload a small document containing a distinctive fact. Confirm indexing finishes and a question about that fact retrieves the correct source. Check that the uploaded object exists in the bucket.
 - **Multiple replicas:** Port-forward two different pods on different local ports, sign in to each, and verify that both can access the same saved conversation and uploaded file. Also test through ingress. A stream on a replaced pod may need to be retried.
 
-A ready pod checks application/database health; it does not prove model APIs, Redis, storage, or licensing work. Many application settings persist after first startup, so later environment changes may not override them. See [configuration persistence](/reference/env-configuration#important-note-on-configvar-environment-variables).
+A ready pod has finished startup and reached the database and Redis (when configured); it does not prove model APIs, storage, or licensing work. Many application settings persist after first startup, so later environment changes may not override them. See [configuration persistence](/reference/env-configuration#important-note-on-configvar-environment-variables).
 
 ## Enterprise Licensing and Branding
 
@@ -493,7 +493,7 @@ spec:
       app.kubernetes.io/name: open-webui
 ```
 
-Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count and prevent GitOps from fighting HPA changes to `spec.replicas`. Helm upgrades can also reset the replica count.
+Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count (each Open WebUI worker process has two database engines (sync and async), each able to open up to `DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW` connections when `DATABASE_POOL_SIZE` is set above 0 (SQLAlchemy's default of 5 + 10 when it is unset), and with `VECTOR_DB=pgvector` pgvector opens its own pool of `PGVECTOR_POOL_SIZE` + `PGVECTOR_POOL_MAX_OVERFLOW` (also 5 + 10 when unset), even when `PGVECTOR_DB_URL` equals `DATABASE_URL`) and prevent GitOps from fighting HPA changes to `spec.replicas`. Helm upgrades can also reset the replica count.
 
 Before updates, remove this HPA with `kubectl -n openwebui delete hpa openwebui` and pause any controller that would recreate it. Reapply it only after verifying the restored deployment. A PDB limits voluntary evictions such as node drains; it does not prevent Deployment scale-down or the maintenance outage described above.
 
