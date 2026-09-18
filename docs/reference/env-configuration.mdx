@@ -1671,7 +1671,7 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Admin > Connections > Direct Integrations**. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is no longer enough. Connections that already exist keep being used while the tab is hidden, so switching this off takes the entry point away without breaking anything already wired up.
+- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Admin > Integrations**, in the **User Connections** section. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is no longer enough. Connections that already exist keep being used while the tab is hidden, so switching this off takes the entry point away without breaking anything already wired up.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TOOL_SERVER_CONNECTIONS`
@@ -3193,6 +3193,18 @@ When choosing an index method, consider your dataset size and query patterns. HN
 - Default: `100`
 - Description: IVFFlat index parameter that specifies the number of inverted lists (clusters) to create. A good starting point is `rows / 1000` for up to 1M rows and `sqrt(rows)` for over 1M rows. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `ivfflat`.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::info IVFFlat waits for rows before it builds
+IVFFlat decides where its clusters sit by looking at the rows present when the index is built, and it needs 50 rows per list to place them, so 5,000 rows at the default of `100` lists. Open WebUI now waits for the `document_chunk` table to hold that many before creating the index, and logs that it is waiting. Searches run as an exact scan until then, which is correct and fast at that size.
+
+An instance created on an earlier version built the index straight after the table, when it was empty, so its clusters were placed on nothing and every chunk added afterwards was filed against them. On a 20,000-row table that returns fewer than half the right chunks, recall at 10 of 0.480 against 1.000 once the index is built on real rows, at the same query time of about 5 ms. Repair it once with:
+
+```sql
+REINDEX INDEX idx_document_chunk_vector;
+```
+
+The build itself now happens on whichever startup crosses the threshold, so an instance that filled up in the meantime pays that cost once. `hnsw` builds as it always did and needs none of this.
+:::
 
 :::info
 
@@ -5012,6 +5024,27 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str`
 - Description: Sets the SearchAPI engine.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `STAAN_API_KEY`
+
+- Type: `str`
+- Default: `` (empty string)
+- Description: Sets the API key for [Staan](/features/chat-conversations/web-search/providers/staan), a web search API that keeps its data in the EU.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `STAAN_MARKET`
+
+- Type: `str`
+- Default: `en-us`
+- Description: Picks the region and language Staan returns results for, written as a language and country pair such as `de-de`.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `STAAN_MAX_SNIPPETS`
+
+- Type: `int`
+- Default: `0`
+- Description: How many extra passages Staan returns per result. At `0` the plain search endpoint answers with a title, a URL and one snippet. Above `0`, Staan fetches each result page, scores its passages against the query and returns up to this many chunks, which Open WebUI joins onto that result's snippet so the model reads the relevant parts of the page. Fetching pages costs more time per search than the plain endpoint.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TAVILY_API_KEY`
