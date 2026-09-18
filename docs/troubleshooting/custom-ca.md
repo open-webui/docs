@@ -26,7 +26,7 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     volumes:
       - /var/containers/openwebui:/app/backend/data:rw
-      - /etc/containers/openwebui/compusrv.crt:/etc/ssl/certs/ca-certificates.crt:ro
+      - /etc/ssl/certs/ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt:ro # mount the full host bundle, not a single certificate, or every public root disappears from the container
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     environment:
@@ -50,7 +50,7 @@ Since the build happens in [multiple stages](https://docs.docker.com/build/build
 ```dockerfile
 COPY package.json package-lock.json <YourRootCert>.crt ./
 ENV NODE_EXTRA_CA_CERTS=/app/<YourRootCert>.crt
-RUN npm ci
+RUN npm ci --force
 ```
 
 2. Backend (`base` stage):
@@ -58,6 +58,7 @@ RUN npm ci
 ```dockerfile
 COPY <CorporateSSL.crt> /usr/local/share/ca-certificates/
 RUN update-ca-certificates
-ENV PIP_CERT=/etc/ssl/certs/ca-certificates.crt \
+ENV PIP_CERT=/etc/ssl/certs/ca-certificates.crt
+ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
     REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
 ```

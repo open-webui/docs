@@ -37,7 +37,7 @@ Individual users can customize their audio experience:
 User-level options include:
 - **STT Engine Override**: Use "Web API" for browser-based speech recognition
 - **STT Language**: Set preferred language for transcription
-- **TTS Engine**: Choose "Browser Kokoro" for local in-browser TTS
+- **TTS Engine**: Choose **Kokoro.js (Browser)** for local in-browser TTS
 - **TTS Voice**: Select from available voices
 - **Auto-playback**: Automatically play AI responses
 - **Playback Speed**: Adjust audio speed
@@ -76,8 +76,8 @@ environment:
 If you prefer Mistral's audio stack:
 
 **In Settings → Admin → Audio:**
-- **STT Engine:** `MistralAI` | **Model:** `voxtral-mini-2602`
-- **TTS Engine:** `MistralAI` | **Model:** `voxtral-tts-26-03` | **Voice:** choose from list
+- **STT Engine:** `MistralAI` | **Model:** leave empty for `voxtral-mini-latest`, or name another Voxtral model (any id is passed through unchanged)
+- **TTS Engine:** `MistralAI` | **Model:** `voxtral-mini-tts-2603` | **Voice:** choose from list
 - Enter your Mistral API key in both sections
 
 Or via environment variables:
@@ -87,7 +87,7 @@ environment:
   - AUDIO_STT_MISTRAL_API_KEY=...
   - AUDIO_TTS_ENGINE=mistral
   - AUDIO_TTS_MISTRAL_API_KEY=...
-  - AUDIO_TTS_MODEL=voxtral-tts-26-03
+  - AUDIO_TTS_MODEL=voxtral-mini-tts-2603
 ```
 
 → See guides: [Mistral Voxtral STT](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) | [Mistral TTS](/features/chat-conversations/audio/text-to-speech/mistral-tts-integration)
@@ -125,7 +125,7 @@ For basic functionality without any server-side audio processing:
 
 **In User Settings → Audio:**
 - **STT Engine:** `Web API` (uses the browser's built-in speech recognition; **does not call the backend STT endpoint**)
-- **TTS Engine:** `Web API` or `Browser Kokoro` (uses browser's built-in text-to-speech or client-side Kokoro; **does not call the backend TTS endpoint**)
+- **TTS Engine:** `Web API` or `Kokoro.js (Browser)` (uses browser's built-in text-to-speech or client-side Kokoro; **does not call the backend TTS endpoint**)
 
 :::note
 When the admin leaves `AUDIO_TTS_ENGINE` as an empty string (the default), no backend TTS service is available. All TTS is handled client-side. Similarly, if users select "Web API" for STT in their user settings, the backend's local Whisper is not used.
@@ -200,7 +200,9 @@ docker exec open-webui bash -lc "pip install datasets==3.6.0" && docker restart 
 Add this to your `docker-compose.yml`:
 ```yaml
 environment:
-  - EXTRA_PIP_PACKAGES=datasets==3.6.0
+  - # Open WebUI has no EXTRA_PIP_PACKAGES hook. Build a derived image instead:
+# FROM ghcr.io/open-webui/open-webui:main
+# RUN pip install datasets==3.6.0
 ```
 
 **Verify the installed version:**
@@ -271,7 +273,7 @@ If Open WebUI can't reach your TTS service:
 **Solutions:**
 
 #### 1. Upgrade to the Latest Version (Recommended)
-The most reliable fix is to upgrade to the latest version of Open WebUI. Recent updates ensure that `WHISPER_COMPUTE_TYPE` is correctly respected and provides optimized defaults for CUDA environments.
+The most reliable fix is to upgrade to the latest version of Open WebUI. `WHISPER_COMPUTE_TYPE` defaults to `int8` on every image, the `:cuda` image included. There is no CUDA-specific default, so on a GPU set `WHISPER_COMPUTE_TYPE=float16` (or `int8_float16`) yourself.
 
 #### 2. Manually Set Compute Type
 If you are on an affected version or still experiencing issues on GPU, explicitly set the compute type to `float16`:
@@ -316,7 +318,7 @@ environment:
 
 :::info Default Behavior
 - **CPU mode:** Defaults to `int8` for best performance
-- **CUDA mode:** The `:cuda` image may default to `int8`, which can cause errors on older GPUs. Set `float16` explicitly for GPUs.
+- **CUDA mode:** The `:cuda` image defaults to `int8` like every other image, which can cause errors on older GPUs. Set `float16` explicitly for GPUs.
 :::
 
 ### STT Not Recognizing Speech Correctly
@@ -347,7 +349,7 @@ environment:
 If your STT or TTS engine is hosted behind a self-signed certificate or an internal CA and requests fail with TLS verification errors (e.g. `SSLCertVerificationError`, `certificate verify failed`):
 
 - Set [`AIOHTTP_CLIENT_SESSION_SSL=False`](/reference/env-configuration#aiohttp_client_session_ssl) to disable certificate verification for these upstream calls.
-- As of v0.9.6 the audio endpoints honor this setting (previously STT/TTS ignored it and always verified, so this configuration had no effect on audio engines). If it still appears ignored, confirm you are on v0.9.6 or later.
+- Text-to-speech has honored this setting since May 2025, and speech-to-text since v0.9.6 (before that STT ignored it and always verified). If it still appears ignored, confirm you are on v0.9.6 or later.
 - Prefer installing the internal CA into the container's trust store where possible; disabling verification removes protection against man-in-the-middle interception on that connection.
 
 ---
