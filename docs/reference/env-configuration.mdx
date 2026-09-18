@@ -380,7 +380,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Type: `str` (duration)
 - Default: `1h`
 - Description: Lifetime of the short-lived auth token an automation uses to call back into Open WebUI while running headless (so a scheduled run can reach session-authenticated tools and terminals). Accepts duration strings like `30m`, `1h`, `24h`.
-- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip Common values for AUTOMATION_MIN_INTERVAL
 
@@ -599,7 +599,7 @@ The AnyIO default of `40` is far too low for production. When more than `THREAD_
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether the active user count is visible to all users or restricted to administrators only. When set to `False`, only admin users can see how many users are currently active, reducing backend load and addressing privacy concerns in large deployments.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ENABLE_USER_STATUS`
 
@@ -846,14 +846,14 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 - Type: `str`
 - Default: `None`
 - Description: Specifies the license key to use (for Enterprise users only).
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `SSL_ASSERT_FINGERPRINT`
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the SSL assert fingerprint to use.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ENABLE_COMPRESSION_MIDDLEWARE`
 
@@ -1372,6 +1372,7 @@ Several parameters have no effect on background requests wherever you set them: 
 - Type: `str`
 - Description: Prompt to use when generating chat titles.
 - Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TITLE_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 Built-in template:
 
@@ -1414,6 +1415,7 @@ JSON format: { "title": "your concise title here" }
 - Type: `str`
 - Description: Prompt to use for generating several relevant follow-up questions.
 - Default: The value of `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`:
 
@@ -1761,6 +1763,7 @@ When enabling `ENABLE_AUTOCOMPLETE_GENERATION`, ensure that you also configure `
 
 - Type: `str`
 - Default: The value of the `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_AUTOCOMPLETE_GENERATION_PROMPT_TEMPLATE`:
 
@@ -1870,6 +1873,7 @@ When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons
 
 - Type: `str`
 - Default: The value of `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE`:
 
@@ -2672,49 +2676,49 @@ For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HO
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the Elasticsearch API key.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ELASTICSEARCH_CA_CERTS`
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the path to the CA certificates for Elasticsearch.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ELASTICSEARCH_CLOUD_ID`
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the Elasticsearch cloud ID.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ELASTICSEARCH_INDEX_PREFIX`
 
 - Type: `str`
 - Default: `open_webui_collections`
 - Description: Specifies the prefix for the Elasticsearch index.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ELASTICSEARCH_PASSWORD`
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the password for Elasticsearch.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ELASTICSEARCH_URL`
 
 - Type: `str`
 - Default: `https://localhost:9200`
 - Description: Specifies the URL for the Elasticsearch instance.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ELASTICSEARCH_USERNAME`
 
 - Type: `str`
 - Default: Empty string (' '), since `None` is set as default.
 - Description: Specifies the username for Elasticsearch.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ### Milvus
 
@@ -2766,7 +2770,7 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Default: `HNSW`
 - Options: `AUTOINDEX`, `FLAT`, `IVF_FLAT`, `HNSW`, `DISKANN`
 - Description: Specifies the index type to use when creating a new collection in Milvus. `AUTOINDEX` is generally recommended for Milvus standalone. `HNSW` may offer better performance but requires a clustered Milvus setup and is not meant for standalone setups.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_METRIC_TYPE`
 
@@ -2774,28 +2778,28 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Default: `COSINE`
 - Options: `COSINE`, `IP`, `L2`
 - Description: Specifies the metric type for vector similarity search in Milvus.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_HNSW_M`
 
 - Type: `int`
 - Default: `16`
 - Description: Specifies the `M` parameter for the HNSW index type in Milvus. This influences the number of bi-directional links created for each new element during construction. Only applicable if `MILVUS_INDEX_TYPE` is `HNSW`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_HNSW_EFCONSTRUCTION`
 
 - Type: `int`
 - Default: `100`
 - Description: Specifies the `efConstruction` parameter for the HNSW index type in Milvus. This influences the size of the dynamic list for the nearest neighbors during index construction. Only applicable if `MILVUS_INDEX_TYPE` is `HNSW`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_IVF_FLAT_NLIST`
 
 - Type: `int`
 - Default: `128`
 - Description: Specifies the `nlist` parameter for the IVF_FLAT index type in Milvus. This is the number of cluster units. Only applicable if `MILVUS_INDEX_TYPE` is `IVF_FLAT`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_DISKANN_MAX_DEGREE`
 
@@ -3081,7 +3085,7 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
   - `hnsw`: Uses Hierarchical Navigable Small World graphs, generally provides better query performance.
 - Default: Not specified (pgvector will use its default)
 - Description: Specifies the index method for pgvector. The choice affects query performance and index build time.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::info
 
@@ -3094,21 +3098,21 @@ When choosing an index method, consider your dataset size and query patterns. HN
 - Type: `int`
 - Default: `16`
 - Description: HNSW index parameter that controls the maximum number of bi-directional connections per layer during index construction. Higher values improve recall but increase index size and build time. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `hnsw`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `PGVECTOR_HNSW_EF_CONSTRUCTION`
 
 - Type: `int`
 - Default: `64`
 - Description: HNSW index parameter that controls the size of the dynamic candidate list during index construction. Higher values improve index quality but increase build time. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `hnsw`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `PGVECTOR_IVFFLAT_LISTS`
 
 - Type: `int`
 - Default: `100`
 - Description: IVFFlat index parameter that specifies the number of inverted lists (clusters) to create. A good starting point is `rows / 1000` for up to 1M rows and `sqrt(rows)` for over 1M rows. Only applicable when `PGVECTOR_INDEX_METHOD` is set to `ivfflat`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::info
 
@@ -3934,6 +3938,7 @@ Enabling this feature increases the text volume indexed by BM25, which may impac
 
 - Type: `str`
 - Default: The value of `DEFAULT_RAG_TEMPLATE` environment variable.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_RAG_TEMPLATE`:
 
@@ -4352,6 +4357,7 @@ You **MUST** provide the full URL, including the endpoint path (e.g., `https://a
 
 - Type: `str`
 - Default: The value of `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE`:
 
@@ -4511,14 +4517,14 @@ The authentication flow also depends on a browser pop-up window. Please ensure t
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether the "Personal OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_PERSONAL` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured. Without a client ID, the option stays hidden even if this variable is `True`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ENABLE_ONEDRIVE_BUSINESS`
 
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether the "Work/School OneDrive" option appears in the attachment menu. The option is only shown when `ONEDRIVE_CLIENT_ID_BUSINESS` (or the legacy `ONEDRIVE_CLIENT_ID`) is configured. Without a client ID, the option stays hidden even if this variable is `True`.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ONEDRIVE_CLIENT_ID`
 
@@ -5545,7 +5551,7 @@ When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `mistral-tts-latest` when `AUDI
 - Type: `str`
 - Default: `https://api.elevenlabs.io`
 - Description: Configures custom ElevenLabs API endpoints, enabling support for EU residency API requirements and other regional deployments.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ## Image Generation
 
@@ -5718,7 +5724,7 @@ Strictly return in JSON format:
 
 - Type: `str` (JSON)
 - Default: `{}`
-- Description: Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters for DALL-E models (e.g., `{"quality": "hd"}` for dall-e-3).
+- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters for DALL-E models (e.g., `{"quality": "hd"}` for dall-e-3).
 - Example: `{"quality": "hd", "style": "vivid"}`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -5976,24 +5982,6 @@ For a detailed setup guide and example configuration, please refer to the [Gemin
 You can only configure one OAUTH provider at a time. You cannot have two or more OAUTH providers configured simultaneously.
 
 :::
-
-#### `ENABLE_SCIM`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables the SCIM 2.0 endpoints at `/api/v1/scim/v2`, so an identity provider can create, update and deactivate users and groups in Open WebUI automatically. Included in the free edition with no licence key and no user limit. Also accepts the older name `SCIM_ENABLED`.
-
-#### `SCIM_TOKEN`
-
-- Type: `str`
-- Default: Empty string
-- Description: Bearer token your identity provider must present on SCIM requests. Treat it as a credential with user and group management rights, and set it whenever SCIM is enabled.
-
-#### `SCIM_AUTH_PROVIDER`
-
-- Type: `str`
-- Default: Empty string
-- Description: Name of the OAuth provider that SCIM-provisioned identities correspond to, for example `microsoft` or `oidc`, which lets Open WebUI store the provider's `externalId` against each user. Leaving it unset while SCIM is enabled logs a warning at startup and skips `externalId` storage, so provisioned accounts may not line up with the same users signing in through SSO.
 
 #### `ENABLE_OAUTH`
 
@@ -6629,6 +6617,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Type: `str`
 - Default: Empty string (' ')
 - Description: Specifies an audience parameter passed to the OAuth provider's authorization endpoint during login. Some providers (such as Auth0 and Ory) use this value to determine the type of access token returned. Without it, providers typically return an opaque token, while with it, they return a JWT that can be decoded and validated. This parameter is not part of the official OAuth/OIDC spec for authorization endpoints but is widely supported by some providers.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
 
@@ -6801,25 +6790,26 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 ## SCIM
 
-#### `SCIM_ENABLED`
+#### `ENABLE_SCIM`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables SCIM 2.0 (System for Cross-domain Identity Management) support for automated user and group provisioning from identity providers like Okta, Azure AD, and Google Workspace.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Description: Enables the SCIM 2.0 endpoints at `/api/v1/scim/v2`, so an identity provider can create, update and deactivate users and groups in Open WebUI automatically. Included in the free edition with no license key and no user limit. Also accepts the older name `SCIM_ENABLED`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `SCIM_TOKEN`
 
 - Type: `str`
-- Default: `""`
-- Description: Sets the bearer token for SCIM authentication. This token must be provided by identity providers when making SCIM API requests. Generate a secure random token (e.g., using `openssl rand -base64 32`) and configure it in both Open WebUI and your identity provider.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Default: Empty string
+- Description: Bearer token your identity provider must present on SCIM requests. Treat it as a credential with user and group management rights, and set it whenever SCIM is enabled.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `SCIM_AUTH_PROVIDER`
 
 - Type: `str`
-- Default: `""`
-- Description: Specifies the OAuth provider name to associate with SCIM `externalId` values (e.g., `microsoft`, `oidc`). When set, SCIM operations store and look up `externalId` under this provider key in the user's `scim` JSON field, enabling account linking between SCIM-provisioned identities and OAuth logins. A warning is logged on startup if SCIM is enabled but this variable is not set.
+- Default: Empty string
+- Description: Name of the OAuth provider that SCIM-provisioned identities correspond to, for example `microsoft` or `oidc`, which lets Open WebUI store the provider's `externalId` against each user. Leaving it unset while SCIM is enabled logs a warning at startup and skips `externalId` storage, so provisioned accounts may not line up with the same users signing in through SSO.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ## User Permissions
 
