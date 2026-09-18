@@ -108,7 +108,7 @@ More detail: [Prompt Caching (KV Cache) Optimization](/features/chat-conversatio
 ## Task models
 
 :::info Good to know
-By default, background tasks (titles, tags, autocomplete) use your main chat model. Setting a dedicated task model is the easiest way to improve speed and reduce unnecessary API costs.
+By default, background tasks (titles, tags, follow-ups) use your main chat model, and autocomplete is off until an admin turns it on. Setting a dedicated task model is the easiest way to improve speed and reduce unnecessary API costs.
 :::
 
 Every time Open WebUI needs a short piece of "thinking" for a UI feature (writing a chat **title** for the sidebar, generating **tags**, suggesting **follow-up questions**, powering the **autocomplete** in the prompt box) it calls a **Task Model**. By default that task model is whatever main model you are currently chatting with, which means:
@@ -140,7 +140,7 @@ While you are in the Interface settings, you can also disable these chores entir
 | Tag generation | **Tags Generation** | `ENABLE_TAGS_GENERATION=False` |
 
 :::tip Performance on weak hardware
-Autocomplete is the single biggest "make it snappy" toggle on weak hardware. It fires on every keystroke, so a slow task model turns the whole prompt box into molasses. Disable it first if the UI feels sluggish.
+Autocomplete is off by default. Once enabled, it is the single biggest "make it snappy" toggle on weak hardware. It fires on every keystroke, so a slow task model turns the whole prompt box into molasses. Disable it first if the UI feels sluggish.
 :::
 
 More detail: [Task Models](/features/administration/task-models) and [Performance & RAM: Dedicated Task Models](/troubleshooting/performance#1-dedicated-task-models).
@@ -195,7 +195,7 @@ The defaults are reasonable for getting started. When you outgrow them, there ar
 
 - **Embedding engine.** The default (SentenceTransformers `all-MiniLM-L6-v2`) runs locally on CPU and consumes roughly 500 MB of RAM per worker. For any multi-user deployment, point at an external embeddings API (OpenAI, or Ollama with `nomic-embed-text`) via `RAG_EMBEDDING_ENGINE`.
 - **Content extraction engine.** The default uses `pypdf`, which leaks memory during heavy ingestion. For anything beyond casual use, switch to **Tika** or **Docling** via `CONTENT_EXTRACTION_ENGINE`, or point it at your own service with the [external engine](/features/chat-conversations/rag/document-extraction/external) if you need per-file-type routing or custom logic.
-- **Vector database.** The default ChromaDB (local SQLite-backed) does not tolerate multi-worker deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available as non-core integrations: they may break on upgrades, and fixes come from outside the core Open WebUI maintenance path. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the integration disclaimers on each provider.
+- **Vector database.** The default ChromaDB (local SQLite-backed; the `:slim` image defaults to PGVector instead) does not tolerate multi-worker deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available as non-core integrations: they may break on upgrades, and fixes come from outside the core Open WebUI maintenance path. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the integration disclaimers on each provider.
 
 :::note When to worry about this
 None of these matter for "a single user with a handful of PDFs." All of them start mattering the moment you have 100 documents or 10 concurrent users.
