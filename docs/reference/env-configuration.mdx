@@ -3212,6 +3212,18 @@ For IVFFlat indexes, choosing the right number of lists is crucial for query per
 
 :::
 
+#### `PGVECTOR_ITERATIVE_SCAN`
+
+- Type: `str`
+- Options: `relaxed_order`, `strict_order`, `off`
+- Default: `relaxed_order`
+- Description: Tells pgvector to keep walking the index when a search has not yet found enough rows that match the filter. Every collection's chunks live in one table under one vector index, and the collection is filtered after the index walk, so without this a knowledge base holding a small share of the rows gets almost none of its real neighbours back: the index returns its globally nearest rows, and the filter throws nearly all of them away. On a 101,500-row table where the collection held 1.5% of the rows, recall at 10 measured **0.070 at 4.9 ms** with the scan off and **0.970 at 7.2 ms** with it on (hnsw, `m=16`). `strict_order` keeps results in exact distance order at more cost; `off` returns to the old behaviour.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::info Applies only on pgvector 0.8 and newer
+The setting is sent per search, and only when the installed pgvector extension is 0.8 or newer. On 0.7 it is skipped and noted in the log, because setting it there makes every search fail. `ivfflat` accepts only `relaxed_order`, so it is used whatever this is set to.
+:::
+
 #### `PGVECTOR_USE_HALFVEC`
 
 - Type: `bool`
