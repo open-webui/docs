@@ -90,7 +90,7 @@ However your instance is provisioned, it's worth inspecting the app's data store
 | File/Directory | Description |
 |---|---|
 | `audit.log` | Log file for auditing events. |
-| `cache/` | Directory for storing cached data. |
+| `cache/` | Downloaded models for embeddings and speech (a Hugging Face cache). Re-downloaded on demand, so safe to exclude from backups; on a fresh instance it is already larger than everything else here put together, and it contains symlinks. Two of the three example scripts below exclude it. |
 | `uploads/` | Directory for storing user-uploaded files. |
 | `vector_db/` | Directory containing the ChromaDB vector database. |
 | `webui.db` | SQLite database for persistent storage of other instance data |
@@ -397,6 +397,22 @@ This backup plan is a little more complicated but also more comprehensive .. it 
 | Daily Incremental | Cloud Storage (S3) | rsync | Daily incremental backup pushed to an S3 cloud storage bucket. |
 | Daily Incremental | Cloud Storage (B2) | rsync | Daily incremental backup pushed to a Backblaze B2 cloud storage bucket. |
 | Weekly Incremental | On-site Storage (Home NAS) | rsync | Weekly incremental backup pulled from the server to on-site storage (e.g., a home NAS). |
+
+# Restoring
+
+Restoring is the mirror of the backup: stop the stack, put the data directory back, start the stack.
+
+```bash
+docker compose down
+# replace the contents of the persistent data directory (the volume, or the
+# host path you bound) with the backup, keeping the same ownership
+docker compose up -d
+```
+
+Two things to check before starting it again:
+
+- if you copied files individually rather than the whole directory, `webui.db-wal` and `webui.db-shm` have to come with `webui.db`, or the newest writes are missing; a copy taken with SQLite's `.backup` command does not have this problem;
+- `cache/` does not need to be restored - Open WebUI downloads the models again on first use.
 
 # Additional Topics
 
