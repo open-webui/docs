@@ -8289,6 +8289,13 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 - Description: A safety net on the entries Redis holds while a response is streaming, which let a reconnecting browser pick a reply back up where it left off. An entry is deleted as soon as its response finishes, so this timeout is not the normal lifetime of one. It catches the entries whose cleanup never ran, a worker killed mid-stream or a process that died, which previously stayed in Redis forever and accumulated. Lower it to reclaim that memory sooner, raise it if a long-running response could legitimately outlive the default hour, or set `0` to keep orphaned entries indefinitely as before. Applies only when Redis is in use.
 - Persistence: No
 
+#### `REDIS_TASK_TTL`
+
+- Type: `int` (seconds)
+- Default: `300`
+- Description: How long a background task's Redis entry survives without a heartbeat from the worker that owns it. Each worker refreshes its own tasks at a quarter of this interval, so a task is cleaned up only when its worker has gone silent past the full timeout, a crash among them; this stops tasks from a dead worker blocking a stop request forever on multi-worker deployments. The listing of active tasks keeps entries whose key has already expired. Set `0` to keep task entries indefinitely as before, which also skips the heartbeat. Values below `60` fall back to the default. Applies only when Redis is in use.
+- Persistence: No
+
 #### `REDIS_SOCKET_CONNECT_TIMEOUT`
 
 - Type: `float` (seconds) or empty string for None

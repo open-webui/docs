@@ -92,7 +92,7 @@ For complete details on all built-in agentic tools (including memory, web search
 Administrators have full control over the Memory feature, including the ability to disable it globally or restrict it to specific user groups.
 
 ### Global Toggle
-The Memory feature can be toggled on or off for the entire instance. When disabled, the "Personalization" tab is hidden from all users, and the memory-related API endpoints are blocked.
+The Memory feature can be toggled on or off for the entire instance. When disabled, the "Personalization" tab is hidden from all users, the memory-related API endpoints are blocked, stored memories are no longer injected into the system context and the model is no longer given the memory tools.
 - **Admin UI**: Settings > Admin > General > Features > **Memories**
 - **Environment Variable**: [`ENABLE_MEMORIES`](/reference/env-configuration#enable_memories) (Default: `True`)
 
