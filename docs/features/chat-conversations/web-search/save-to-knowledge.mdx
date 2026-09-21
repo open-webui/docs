@@ -27,6 +27,10 @@ The "Add Web Sources to Knowledge" feature is implemented as a **Function Action
 
 ## How to Use
 
+:::warning Native mode lists fetched pages only
+In Native (agentic) tool calling, search hits are not sources, so the only web entries this action can offer are pages the model opened with `fetch_url`. A reply where the model answered from snippets alone has nothing for it to save. Legacy tool calling is unchanged and still lists every retrieved search result. See [Agentic Search](/features/chat-conversations/web-search/agentic-search).
+:::
+
 1.  **Trigger Web Search**: Ask a question that triggers web search (e.g., using DDGS, Google PSE, etc.).
 2.  **Click the Action Button**: Once the model returns citations, click the **folder+** icon in the message toolbar.
 3.  **Select Sources**: A dialog will appear. Enter the numbers of the sources you wish to save (e.g., `1,3,5` or `1-3` or `all`).
@@ -61,4 +65,4 @@ Set your **Default Knowledge Base** and enable **Skip Confirmation** in your Use
 ## Troubleshooting
 
 - **Content Quality**: The quality of the saved content depends on your **Web Loader Engine** settings (Admin > Settings > Documents). For JavaScript-heavy sites, consider using **Firecrawl** or **Playwright**.
-- **No URLs Found**: This action works with web search results that return structured citations. If no URLs are detected, ensure web search is properly enabled and returning results.
+- **No URLs Found**: This action reads the sources attached to the message. If no URLs are detected, check that web search is enabled and returning results, and in Native mode that the model actually opened a page with `fetch_url`, since search hits alone are not sources.

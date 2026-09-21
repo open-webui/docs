@@ -47,6 +47,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | **API Key** | The password you chose during installation |
 | **Auth Type** | Leave as `Bearer` (the default) |
 | **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
+| **Forward cookies** | Under **Advanced**, off by default. Only turn it on for a terminal server that authenticates by cookie, since every cookie the browser holds for your Open WebUI domain travels with the request |
 
 ![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
 

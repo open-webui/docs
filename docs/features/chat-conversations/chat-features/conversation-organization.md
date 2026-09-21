@@ -127,7 +127,7 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 2. Select **Share**.
 3. Add the users or groups to share with and choose their access:
    - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it, and dragging a chat over it in the sidebar does not offer it as a drop target.
-   - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
+   - **Write**: they can also rename the folder, start chats in it, move their own chats into it, create subfolders inside it and change who the folder is shared with. It highlights and takes the chat when they drag one onto it in the sidebar.
 4. Save.
 
 The **Add Access** picker lists only the people and groups the folder is not already shared with, so you cannot add the same person twice and the list shrinks as you go. To move someone between **Read** and **Write**, or to drop them entirely, use their row in the **Access List** instead.

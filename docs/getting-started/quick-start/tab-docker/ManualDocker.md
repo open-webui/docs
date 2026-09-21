@@ -20,7 +20,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 |-----|----------|
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
-| `:main-slim` | Small image for deployments that use external services for embeddings, speech and vector storage, see [What slim leaves out](#what-slim-leaves-out) |
+| `:main-slim` | Smaller image with the local machine-learning stack removed, see [What slim leaves out](#what-slim-leaves-out) |
 | `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
@@ -29,29 +29,51 @@ Channel and variant combine: `:dev-slim`, `:dev-cuda`, `:dev-cuda126` and `:dev-
 
 ### What slim leaves out
 
-:::info Two generations of slim
-The `dev` builds after v0.11.3 rebuilt slim from the ground up, and this section describes that build. It is what `:dev-slim` serves today and what `:main-slim` becomes with the next release. Until then, `:main-slim` is still the previous slim, which is the standard image with only the pre-downloaded model files removed, about 1.5 GB compressed on amd64.
-:::
+Slim is the standard image with the local machine-learning stack removed: no `torch`, no `sentence-transformers`, no `transformers`, no `faster-whisper`, no `unstructured`, and no `ffmpeg`, `pandoc` or build toolchain in the base system. It also carries one client where the standard image carries many: PostgreSQL and pgvector for data and vectors, local files for storage, and no Playwright browser. Dozens of Python packages are gone, `torch` among them, which is where the size saving comes from.
 
-The rebuilt slim image is about 170 MB compressed per architecture, against about 1.6 GB for the standard image on amd64. It gets there by leaving out every local machine learning runtime and the packages that depend on one, so it is an image for deployments where those jobs are done by other services.
+**Nothing extra is required to run it.** It starts on its own and chatting works exactly as it does on `:main`, with the model provider you were going to configure anyway. What changes is that the work slim can no longer do itself has to come from a service you point it at, and only for the features you actually use.
 
-| Left out | What to use instead |
-|---|---|
-| Local embedding model (`sentence-transformers`, `transformers`, torch) | Set `RAG_EMBEDDING_ENGINE` to `ollama`, `openai` or `azure_openai`. Until you do, document upload and retrieval answer `503 Configure an external embedding engine`. |
-| Local speech-to-text (`faster-whisper`) | Pick an external speech-to-text engine in the admin settings, or leave it unused. |
-| Local reranking | Use an external reranker, or clear the reranking model to fall back to cosine scoring. |
-| Embedded Chroma and every vector database client except pgvector | `VECTOR_DB` defaults to `pgvector`. Point `PGVECTOR_DB_URL`, or `DATABASE_URL`, at a PostgreSQL server with the pgvector extension. Any other `VECTOR_DB` value fails with a 503 that says so. |
-| Document loaders for PDF and Office files, plus `ffmpeg` and `pandoc` | Plain text, Markdown, reStructuredText, XML, CSV and HTML files still load locally. For anything else, set an external content extraction engine such as Tika, Docling or Azure Document Intelligence. |
-| Cloud storage clients for S3, Google Cloud Storage and Azure Blob | Local storage only. |
-| `git` and the build toolchain | Tools and functions whose requirements install from git need the standard image. |
+#### What it will not start without
 
-Slim is a variant of its own. It cannot be combined with `USE_CUDA` or `USE_OLLAMA`, so there is no CUDA or Ollama flavor of it.
+Two settings are checked at boot, and slim refuses to start rather than failing later:
 
-### When slim saves anything
+- **The application database** has to be SQLite or PostgreSQL. MySQL, MariaDB and Oracle need the standard image, and so does AWS RDS IAM authentication.
+- **File storage** has to be local. S3, Azure Blob and Google Cloud Storage need the standard image.
 
-Always, with this build. There are no model files to fetch, so nothing is downloaded at first start or on first use, and `OFFLINE_MODE=true` has nothing left to block. The one exception is the `token` text splitter, which fetches the tiktoken encoding the first time it is selected.
+Neither matters on a default install, which is SQLite and local files. They matter when you move a standard-image deployment onto slim.
 
-If you were running the previous slim to save a download, note that the trade has changed. That image kept every feature and fetched the models on demand. This one keeps the download small by handing embeddings, speech, reranking, vector storage and document parsing to services you run or subscribe to. A single-container setup that relies on the built-in local models wants `:main`.
+#### What each feature needs
+
+| If you want | Point slim at | Otherwise |
+|---|---|---|
+| **Documents, knowledge or RAG** | An embedding provider: `RAG_EMBEDDING_ENGINE` set to `ollama`, `openai` or `azure_openai` | Embedding calls fail with 503, and the admin panel refuses to save the local engine |
+| | PostgreSQL with pgvector: `VECTOR_DB=pgvector` and `PGVECTOR_DB_URL`. It is the only vector store slim carries a client for | 503 the first time retrieval runs. Nothing else is affected, the store is only opened when it is used |
+| **PDFs and Office files** | Tika, Docling, an external extractor or a cloud engine | Uploading one returns 503. Plain text formats are still read by slim itself |
+| **Voice input** | Any external speech-to-text engine: OpenAI, Deepgram, Azure, Mistral and so on | Local Whisper is not offered, and the admin panel refuses to select it |
+| **Spoken replies** | Any external text-to-speech engine | The local Transformers voice is not offered, and requesting speech returns 503 |
+| **Web search** | Any provider other than DDGS | DDGS is greyed out in the admin panel and refused on save |
+| **Reranking** | An external reranker | Selecting a local reranking model is refused |
+| **Code interpreter** | Nothing, but the browser fetches the Python packages from `cdn.jsdelivr.net` rather than from your instance | Running code fails where the browser cannot reach that CDN |
+
+Also unavailable: the **Playwright** web loader, so pages are fetched over plain HTTP or by an external web loader, and the **Transformers** text splitter, so use the character or the tiktoken token splitter. Slim carries no `git` either, so a tool or function whose requirements install straight from a repository needs the standard image.
+
+If you use Open WebUI as a chat front end for hosted models, none of the above applies and slim is simply the smaller image.
+
+#### What still works without a service
+
+- **Plain text extraction.** `csv`, `html`, `txt`, `md`, `markdown`, `rst`, `xml` and anything else detected as text are read by slim itself.
+- **Reranking, in a fashion.** Leave the reranking model empty and results are scored by cosine similarity against the embeddings you already have, which needs no model runtime.
+- **Audio passthrough.** Speech from an external provider is served in the format that provider returned, since slim cannot transcode. A provider that answers with something a browser cannot play is rejected rather than stored.
+
+#### Building it yourself
+
+`USE_SLIM=true` cannot be combined with `USE_CUDA=true` or `USE_OLLAMA=true`. The build stops with an error rather than producing an image whose GPU support or bundled model server has nothing to run.
+
+#### Offline and air-gapped
+
+Slim never downloads a model, because it cannot run one, and an air-gapped deployment otherwise only has to reach whichever services it uses on your own network. `OFFLINE_MODE=true` still blocks the Hugging Face traffic and the version check.
+
+The one exception is the **code interpreter**. The standard image bundles the Python packages it runs; slim ships only the Pyodide runtime and points the package list at `cdn.jsdelivr.net`, so the browser pulls them from the internet on first use. Air-gapped instances should leave the code interpreter off, or use the standard image.
 
 ### How the tags update
 

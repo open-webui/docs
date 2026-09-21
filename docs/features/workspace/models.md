@@ -58,6 +58,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | 👥 **Access control** | Restrict to specific users or groups |
 | 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
 | 🔊 **Per-model TTS voice** | Give each persona its own voice |
+| 🌐 **Translations** | Per-language name, description and prompt suggestions |
 
 ---
 
@@ -70,13 +71,23 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 | Field | Description |
 | :--- | :--- |
 | **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
-| **Name and ID** | Display name and unique identifier |
+| **Background** | An image shown behind the chat whenever this model is in use. It has to be uploaded here, since only a file held by this instance is accepted: an external URL or a pasted data URI is refused outright. PNG, JPEG, WebP or GIF, at most 5 MiB and 25 megapixels |
+| **Name and ID** | Display name and unique identifier. An ID holds no spaces or tabs and is at most 256 characters |
 | **Base Model (From)** | The actual model that powers this agent |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
 | **Visibility** | Private (specific users/groups) or public |
+| **Language** | The globe selector beside the name switches the editor to a translation of the name, description and prompt suggestions. See [Translations](#translations) |
 
 ![The model editor with base model, description and system prompt](/images/workspace/model-editor.png)
+
+:::warning A model saved with a space in its ID
+
+IDs with whitespace are refused now, in the editor, on the API and on import, where such a model is skipped rather than created.
+
+A model already stored with a space in its ID keeps answering requests, but saving it or changing its access grants fails, because both go through the same check. Recreate it under an ID without whitespace and delete the old one.
+
+:::
 
 ### System prompt and variables
 
@@ -119,13 +130,13 @@ Toggle what the model can do and bind resources:
 | **Skills** | Bind [Skills](/features/workspace/skills) so their manifests are always injected |
 | **Filters** | Attach pipeline filters (e.g., PII redaction) |
 | **Actions** | Attach action scripts (e.g., "Add to Memories") |
-| **Vision** | Enable image analysis (requires a vision-capable base model) |
+| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text |
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
 | **Image Generation** | Enable image generation |
 | **Usage** | Ask the provider to report token counts on streamed replies (`stream_options.include_usage`). Off by default. Most OpenAI-compatible providers report nothing unless asked, so without it a response has no token figures to show and none to aggregate in [Analytics](/features/administration/analytics) |
-| **Citations** | Show the sources behind a reply, from knowledge, web search and the builtin tools that return them. On by default; with it off no sources are shown |
+| **Citations** | Show the sources behind a reply, from knowledge, file retrieval and the builtin tools that return them. On by default; with it off no sources are shown. Web search hits are not sources in Native mode, see [Agentic Search](/features/chat-conversations/web-search/agentic-search) |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
 | **Builtin Tools** | Control which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents |
@@ -146,7 +157,15 @@ What you set here applies to every chat that does not set the same parameter its
 
 ### Prompt suggestions
 
-Clickable starter chips that appear when a user opens a fresh chat with this model. Add phrases like "Explain this code step-by-step" or "Summarize this document" to guide users.
+Clickable starter chips that appear when a user opens a fresh chat with this model. Add phrases like "Explain this code step-by-step" or "Summarize this document" to guide users. They can be translated per language, see below.
+
+### Translations
+
+The name, the description and the prompt suggestions can each carry a version per language, so someone using Open WebUI in German sees a German model name and German starter chips while everyone else keeps the original text.
+
+Pick a language from the globe selector beside the model name and the editor switches to editing that language, with the original shown as placeholder text. A user gets the version matching their own interface language, and the original wherever you have not translated anything.
+
+The same works for tools, skills, functions, banners and arena models. See [Translations](/features/administration/translations) for the full picture, including how to translate valve labels.
 
 ---
 
@@ -179,6 +198,8 @@ Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** an
 - **Export**: Download all custom model configurations as a single `.json`
 - **Discover**: Browse community presets at the bottom of the page
 
+A model's background image travels with it. Export carries the image inside the file, and import stores it on the target instance as a fresh upload, so a model moved between instances keeps its background without you moving files by hand. See the [API endpoints reference](/reference/api-endpoints) for the export and import calls.
+
 :::info Downloading base models
 To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
 :::
@@ -191,6 +212,7 @@ Administrators can set baseline capabilities and parameters that apply to all mo
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, file context, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
+- **Prompt suggestions**: the starter chips shown when a model has none of its own. The globe selector translates them per language, the same way a model's own suggestions are translated. See [Translations](#translations).
 
 These cover chat completions. Background task requests (titles, tags, follow-ups, search queries, autocomplete, context compaction summaries) do not go through them; their parameters are set separately, in [Task Models](/features/administration/task-models).
 
@@ -255,7 +277,7 @@ Hold **Shift** while the model list is open and every row exposes inline icon bu
 
 ### Reviewing what is configured
 
-Open the view filter (the **All** dropdown next to **Actions**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by Enabled, Disabled, Visible, Hidden, Public and Private.
+Open the view filter (the **All** dropdown next to **Actions**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here.
 
 ![The view filter with the Selected and Pinned options](/images/features/models/model-view-filter.png)
 

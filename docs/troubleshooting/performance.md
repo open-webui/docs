@@ -220,6 +220,16 @@ By default, Open WebUI compresses HTTP responses (JSON API responses and the sta
 
 See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
 
+#### Streamed Response Assembly
+Open WebUI rebuilds a response's text on every chunk that arrives, copying everything received so far each time. The cost grows with the square of the answer length, and it is spent on the event loop, so one worker assembling a very long answer holds up every other stream it is serving. Growing the text in place instead removes the copying, and lowers peak memory with it, since a copy needs the old and the new string in memory at once.
+
+- **Env Var**: `ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND=true`
+
+*   *Recommendation*: turn it on wherever long answers are normal (agent transcripts, large code dumps, long tool output) and several of them stream at once. An ordinary chat answer is sub-millisecond either way, so a small instance will not notice.
+*   *What you give up*: if an append fails because memory is exhausted, that one message is left empty instead of holding the text collected so far. Getting there needs an allocation to be refused rather than the process being killed, which a container memory limit does not do, and the default path needs more memory at that point anyway.
+
+See [`ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND`](/reference/env-configuration#enable_chat_response_stream_inplace_append) for the full description.
+
 #### WebSocket Frame Compression
 The HTTP middleware above never touches WebSocket traffic, but the WebSocket server compresses frames on its own, and that is the one worth disabling under streaming load. Chat responses arrive as a very small frame per token, so each is compressed separately, for every subscriber, with almost nothing to gain at that size. Under heavy streaming this shows up as measurable worker CPU.
 

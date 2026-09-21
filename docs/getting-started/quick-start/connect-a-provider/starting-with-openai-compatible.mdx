@@ -688,6 +688,16 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 ---
 
+:::info Forward cookies
+
+**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default and applies to admin-configured connections; a user's own direct connections never forward cookies.
+
+Turn it on only for a server you control that authenticates the person behind the request by cookie, typically one sitting inside your own network behind the same sign-on. Everything the browser holds for your Open WebUI domain goes with the request, session cookie included, so a third-party endpoint should never have this on.
+
+**This changed:** connections using the **Session** or **System OAuth** auth types used to forward cookies unconditionally. They no longer do. If such a connection stops authenticating after an upgrade, switch this on.
+
+:::
+
 ## The Provider Setting
 
 Every OpenAI connection has a **Provider** dropdown, hidden behind **Advanced** in the connection dialog. It is a hint about what the server on the other end actually is. Open WebUI cannot tell a llama.cpp server from a LiteLLM proxy by looking at `/v1/chat/completions`, since both answer it the same way, so the dropdown is how you tell it, and each option switches on the extras that server supports.

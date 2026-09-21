@@ -50,7 +50,7 @@ The attachment metadata block is intentionally **metadata only** (no file conten
 :::
 
 :::danger Citations are the biggest cache-breaker in an agentic setup
-It is tempting to assume that moving retrieval into tools makes citations harmless, because tool results are appended at the end. It does not. When the **Citations** capability is on and a tool round returns sources (`query_chat_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file`, `search_web`, `fetch_url`), Open WebUI restores the pre-RAG system and user messages and then **re-applies the RAG template with the accumulated source list into the system message and the last user message**. That happens **after every tool-calling iteration**, and the source list grows as the model calls more tools.
+It is tempting to assume that moving retrieval into tools makes citations harmless, because tool results are appended at the end. It does not. When the **Citations** capability is on and a tool round returns sources (`query_chat_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file`, `fetch_url`), Open WebUI restores the pre-RAG system and user messages and then **re-applies the RAG template with the accumulated source list into the system message and the last user message**. That happens **after every tool-calling iteration**, and the source list grows as the model calls more tools.
 
 The practical effect: the cached prefix is invalidated on every single tool round, which is exactly the thing an agentic setup does most. Turning File Context off but leaving Citations on gives you most of the cost of the old setup with none of the benefit.
 :::

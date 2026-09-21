@@ -79,6 +79,14 @@ Open WebUI's SCIM implementation supports the following operations:
 - **Delete User** (`DELETE /Users/{id}`): Deactivate a user account
 - **List Users** (`GET /Users`): List externally provisioned users, with filtering support
 
+#### PATCH operations
+
+`add`, `replace` and `remove` are all applied. An operation either names a `path`, or carries an attribute object with no path, in which case every attribute in that object is applied in turn. `remove` requires a path and covers `externalId`, which it clears.
+
+The paths Open WebUI acts on are `userName`, `displayName`, `name.formatted`, `emails[primary eq true].value`, `active` and `externalId`.
+
+A request that asks for something outside that surface is answered with a SCIM error and changes nothing, since every operation is validated before anything is written: `invalidValue` for a value of the wrong type, `invalidPath` for an attribute that is not listed above, `mutability` for removing anything other than `externalId`, and `noTarget` for a `remove` with no path.
+
 :::info Only externally provisioned accounts are visible over SCIM
 Every user operation is scoped to accounts that arrived through an identity provider, meaning those created by SCIM itself or by an OAuth or OIDC sign-in. An account created locally, such as the first administrator or anyone added by hand, is not returned by a listing and is not addressable by id, so a read, update or delete against it answers `404`.
 

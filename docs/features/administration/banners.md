@@ -51,6 +51,8 @@ You can configure the following options for each banner:
 - **Content:** The main message. Markdown is rendered and inline HTML is allowed, both passed through a sanitizer. Every newline becomes a line break before parsing, so multi-line Markdown blocks (lists, tables, blockquotes) do not form. Use their HTML forms for those.
 - **Dismissible:** If enabled, users can close the banner.
 
+The globe selector next to the **Banners** heading stores the content per language, so each user reads the banner in the language their interface is set to. See [Translations](/features/administration/translations#banners).
+
 #### How dismissing works
 
 Dismissed banners are stored in the user’s browser (client-side). This means:
@@ -98,6 +100,7 @@ Each banner object supports the following properties:
 - `content` (string, required): Main banner message (Markdown, inline HTML allowed).
 - `dismissible` (boolean, required): Whether the user can dismiss the banner.
 - `timestamp` (integer, required): Present in configuration, but currently not used by the frontend to control display timing.
+- `i18n` (object, optional): Translated content, keyed by language, each entry holding a `content` string. A user is shown the entry matching their interface language, falling back to `content`. See [Translations](/features/administration/translations#banners).
 
 ### Recommended `id` strategy (important)
 
@@ -417,4 +420,4 @@ No. The `timestamp` field is currently not used by the frontend to control wheth
 
 ### Can I show content in multiple languages?
 
-Yes. You can include multiple languages in `content`. If you want to keep the banner short, place the secondary language in a `<details>` block.
+Yes, and the better way is to translate the banner rather than stacking languages in one message: use the globe selector next to the **Banners** heading and each user reads only their own language. See [Translations](/features/administration/translations#banners). Banners set through `WEBUI_BANNERS` can carry the same thing as an `i18n` object on the banner, keyed by language, with a `content` string in each entry.

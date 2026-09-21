@@ -86,7 +86,7 @@ If you understand the risk and need it, the per-user **Settings > Interface > if
 
 ## Uploading files
 
-**Drag and drop** files from your computer directly onto the file browser to upload them. This is how you share data with the AI: drop a spreadsheet, a PDF, an image, or any file you want the AI to work with.
+**Drag and drop** files or whole folders from your computer directly onto the file browser to upload them. A folder keeps its shape: every subfolder is recreated on the terminal. **Upload Folder**, in the toolbar and in the right-click menu, does the same through a picker. This is how you share data with the AI: drop a spreadsheet, a PDF, an image, or any file you want the AI to work with.
 
 ![Files listed in the browser with their names and sizes](/images/open-terminal-file-browser-documents.png)
 
@@ -101,6 +101,16 @@ Uploading is switched off in a folder marked **Read-only**, and dropping files o
 Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the current working directory and show up here like anything else, and the model opens them with the terminal's tools rather than reading extracted text. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 ---
+
+## Comparing two files
+
+Select two files, with the checkboxes or `Ctrl`-click, and pick **Compare**. The two are shown side by side with the differences marked.
+
+It compares the **text of each file**, not the raw bytes, so it works on documents as well as source: a Word file against a PDF, or yesterday's spreadsheet against today's, are all fair game.
+
+:::info Needs a recent Open Terminal
+Comparing runs on the terminal server. An older one does not offer it and the browser says **"File comparison is not available on this terminal. Update Open Terminal to use Compare."** See [Updating](./setup/updating.mdx).
+:::
 
 ## Downloading files
 
@@ -176,6 +186,10 @@ When the AI creates or changes files, the file browser refreshes automatically. 
 
 :::tip Remembers where you were
 The file browser remembers which folder you were in, even when you switch between chats or terminals.
+:::
+
+:::tip The terminal sits below it
+The bottom of the same sidebar holds the [terminal pane](./terminal-pane.md): your own shell, plus a tab per command the AI runs.
 :::
 
 :::tip Multiple terminals

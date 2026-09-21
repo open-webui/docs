@@ -46,6 +46,7 @@ A residual whose practical impact is dominated by network and scheduling noise, 
 
 | Risk | Class | Mitigation | Status |
 | :--- | :--- | :--- | :--- |
+| [First-run admin promotion](./first-run-bootstrap-window.mdx) | CWE-362, Race Condition | Role decided after the account is inserted, so a contested first registration promotes nobody instead of everybody | Fixed in 0.9.0, residual fails closed and is accepted |
 | [OAuth token exchange client trust](./oauth-token-exchange-client-trust.mdx) | CWE-287, Improper Authentication | Issuing client verified through RFC 7662 token introspection when `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` is set | Control available since 0.11.0, opt-in, residual accepted |
 | [Agentic application risks](./agentic-application-risks.mdx) | Inherent agentic-system behavior (OWASP Top 10 for Agentic Applications) | Capability gated by permissions; agent bound by caller's privileges; isolated execution | Inherent to autonomous agents; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy.mdx)) |
 | [LLM output unpredictability](./llm-output-unpredictability.mdx) | Inherent model behavior (OWASP LLM Top 10) | System hardened around the model; model bound by caller's privileges | Inherent to LLMs; out of scope on its own, unless chained with a legitimate vulnerability (see [Security Policy](../security-policy.mdx)) |

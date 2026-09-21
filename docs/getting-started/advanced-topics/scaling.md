@@ -94,6 +94,10 @@ The short version: sync backends throttled concurrency through thread pools, so 
 
 Redis acts as a **shared state store** so that all your Open WebUI instances can coordinate sessions, websocket connections, and application state. Without it, users would see inconsistent behavior depending on which instance handles their request.
 
+Open WebUI talks to Redis through the standard client and uses ordinary commands, so a Redis-protocol server should work in its place. [**Valkey**](/tutorials/integrations/valkey), the BSD-licensed fork most distributions now ship, and **Dragonfly** both fit that description: same `REDIS_*` settings, same URL scheme, only the image changes.
+
+Neither is part of what Open WebUI tests, so neither is officially supported yet. If you run one, use a **recent release**. Newer versions carry the per-field hash expiry Open WebUI expects, without which entries for interrupted responses are never reclaimed, and older Dragonfly builds report a version string the pinned client refuses. Run Dragonfly standalone as well, since its cluster mode does not carry pub/sub, which is what coordinates websockets.
+
 **What to do:**
 
 Set these environment variables:
@@ -501,6 +505,10 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 # Faster JSON encoder (v0.11.0+): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
+
+# Grow streamed responses in place instead of re-copying them per chunk.
+# Pays off with long answers under concurrency; also lowers peak memory
+ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND=True
 
 # Faster name lookups: removes the queueing delay in front of every outbound
 # request. Verify your names still resolve after enabling it; see Step 3

@@ -181,6 +181,7 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 | `{{USER_NAME}}` | The calling user's display name. |
 | `{{USER_EMAIL}}` | The calling user's email address. |
 | `{{USER_ROLE}}` | The calling user's role (e.g. `admin`, `user`). |
+| `{{AUTH_TYPE}}` | How the caller authenticated: `jwt` for a browser session, `api_key` for an API key. |
 | `{{USER_GROUPS}}` | Comma-separated names of the groups the caller belongs to (empty if none). |
 | `{{USER_GROUP_IDS}}` | Comma-separated IDs of those same groups. |
 | `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |

@@ -16,6 +16,10 @@ You can configure them in two ways:
 
 ---
 
+:::tip Renaming what the interface says
+These settings decide the starting values of the options users see. To change the wording of the interface itself, a label or a button, use **UI Translations** on the same admin page. See [Translations](/features/administration/translations#interface-text).
+:::
+
 ## How a value is decided
 
 1. If the person has set that option themselves, their value is used.

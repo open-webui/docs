@@ -82,6 +82,21 @@ Skills bound to a model use lazy loading:
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
+The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, in full.
+
+### Skills from a terminal server
+
+A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the full content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace.
+
+Writing a terminal server of your own means answering two endpoints:
+
+| Endpoint | Returns |
+| :--- | :--- |
+| `GET /skills` | A JSON array, one entry per skill, each with `id` (prefixed `terminal:`, the name url-encoded), `name`, `description` and `location` (or `path`). |
+| `GET /skills/{name}` | One skill: `name`, `description`, `content` (the Markdown instructions), `location` (or `path`) and `resources`, an array of file paths shipped with the skill. |
+
+Both carry the connection's bearer key and `Accept: application/json`. Calls made by the server also send `X-User-Id`, `X-Session-Id` (the chat id) and `X-Terminal-Context-Id`, the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs.
+
 ---
 
 ## Creating a Skill
@@ -94,6 +109,8 @@ Navigate to **Workspace > Skills** and click **Create** in the Workspace header.
 | **Skill ID** | Unique slug, auto-generated from the name. Editable during creation, read-only afterwards |
 | **Description** | Short summary shown in the manifest. For model-attached skills, the model uses this to decide whether to load the full instructions |
 | **Content** | Full skill instructions in Markdown |
+
+The globe selector beside the name translates the **Name** and **Description** per language, so a skill reads in the user's own language wherever it is listed. See [Translations](/features/administration/translations).
 
 ### Importing from Markdown
 
@@ -109,6 +126,44 @@ description: Step-by-step instructions for thorough code reviews
 
 1. Check for correctness...
 ```
+
+### From a chat with `/skills:create`
+
+A workflow you just worked through in a chat can be turned into a skill without writing it out yourself. Type `/skills:create` in that chat, optionally followed by what the skill should cover, and the model gathers the material, authors one `SKILL.md` to the standard below and saves it on the selected terminal at `<terminal-home>/.agents/skills/<skill-name>/SKILL.md`, with any supporting files under `scripts/`, `references/`, `templates/` or `assets/`. It reports the name, the location and a one-line summary when it is done.
+
+Anything you write after the command is treated as authoring guidance, all of it. Sources to pull from (paths, URLs, "what we just did", pasted notes) and requirements that shape the result (focus, exclusions, naming, style) can be mixed freely in one request.
+
+The command needs a **selected Open Terminal** and a chat that **already has content**, since the chat is the raw material. Both are checked on the server, so a skill is never written when one is missing, and the `/` menu leaves the command out until both hold.
+
+---
+
+## Skill Authoring Standard
+
+This is the standard Open WebUI itself follows when it writes a skill through `/skills:create`, and the one to hold your own skills to.
+
+**Frontmatter**
+
+| Key | Rule |
+| :--- | :--- |
+| `name` | Lowercase and hyphenated, no spaces, 64 characters at most. |
+| `description` | One sentence, **60 characters at most**, ending in a period. Name the capability, skip the implementation, do not repeat the skill name, and leave out words like powerful, comprehensive, seamless, advanced or robust. Count the characters before saving. |
+| `version` | Starts at `0.1.0`. |
+| `platforms` | `[macos]`, `[linux]` or `[windows]`, and only when the skill uses something OS-bound. Omit it for portable skills. |
+
+**Body sections, in this order**
+
+1. `# <Human Title>` and a short intro: what it does, what it does not do, what it assumes is installed.
+2. `## When to Use`, with concrete trigger phrases.
+3. `## Prerequisites`: exact environment variables, credentials and install steps, or `None`.
+4. `## How to Run`: the canonical workflow, framed through the tools the model actually has.
+5. `## Quick Reference`: flat list of commands, routes, files or APIs.
+6. `## Procedure`: numbered steps, copy-paste exact.
+7. `## Pitfalls`: known limits and failure modes.
+8. `## Verification`: one focused check that proves the skill works.
+
+**Framing the tools.** Name tools in backticks, `run_command`, `write_file` and `view_skill` among them, and describe shell work as run through `run_command`. Prefer the read and search tools over raw shell utilities where one exists. Third-party CLIs are fine inside a procedure as long as it is clear the agent invokes them through `run_command`.
+
+**Quality bar.** Use commands, routes, paths, function names, config keys and error text exactly as they appear in the source; invented flags or APIs are the main way a skill goes wrong. Keep `SKILL.md` scannable, roughly 100 lines for a simple workflow and 200 for a complex one, and put the bulk elsewhere: larger scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/`, binary or visual assets in `assets/`. A skill that only points at other skills is worth nothing; write the one that does the work.
 
 ---
 

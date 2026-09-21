@@ -168,12 +168,13 @@ It is **off by default** and still experimental, but for an enhanced agentic RAG
 | Command | Purpose |
 |---------|---------|
 | `ls`, `ls <dir>/`, `ls -a` | List the current level / a subdirectory / a flat view of every file with full paths |
+| `ls -t`, `ls -S`, `ls -r` | Sort the listing: newest first, largest first, or reverse whichever order is in effect |
 | `tree`, `tree <dir>/` | Recursive directory tree |
 | `cat -n <file>` | Read a file (optionally with line numbers) |
 | `head -N <file>` / `tail -N <file>` | First or last N lines |
 | `sed -n '<a>,<b>p' <file>` | Print lines `<a>` through `<b>` |
 | `grep "<pattern>" [<dir>/\|<file>\|*.ext]` | Exact / regex search; flags `-i` (case-insensitive), `-l` (filenames only), `-c` (counts) |
-| `find [<dir>/] "<glob>"` | Find files by glob |
+| `find [<dir>/] "<glob>"` | Find files by glob, and it takes the same sort flags as `ls` |
 | `wc <file>` | Line / word / char counts |
 | `stat <file>` | File metadata |
 
@@ -194,6 +195,12 @@ Files can be addressed three ways, pick whichever is unambiguous:
 - **Path**: `docs/api/auth.md` (relative to the knowledge base root; resolves through the directory tree)
 - **Filename**: `auth.md` (errors with an "ambiguous filename" hint when the same name exists in multiple directories or KBs)
 - **File ID**: the UUID returned by `ls`, `find`, or `grep`
+
+**Sorting**
+
+`ls`, `find` and `tree` list files by path, so a listing is stable and comparable between calls. Three flags change that: `-t` puts the most recently updated first, `-S` puts the largest first, and `-r` reverses whichever order applies, so `ls -tr` is oldest first. They combine with everything else, for example `ls -a -t` or `find docs/ "*.md" -S`.
+
+Asking "what changed lately" in a knowledge base of a few thousand files is `ls -a -t | head -20` rather than reading the whole listing.
 
 **Behavior notes**
 

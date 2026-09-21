@@ -78,6 +78,10 @@ Never import a Tool you don’t recognize or trust. These are Python scripts and
 
 ---
 
+### Translating a tool
+
+The globe selector in the tool editor stores a name, a description and valve labels per language. User valve labels are the ones worth translating first, since those are what ordinary users see in Chat Controls. See [Translations](/features/administration/translations).
+
 ## How to Use Tools in Chat
 
 🔧 Once installed or connected, here’s how to enable them for your conversations:
@@ -414,7 +418,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional, single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches by default, see [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable), `line_numbers` (default: false), `start_line` / `end_line` (optional; line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}`, includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
 | `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable) | `{id, filename, content, knowledge_id, knowledge_name}`, includes pagination metadata when truncated |
-| `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
+| `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required) | `{status, message, images}`, auto-displayed |
 | `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}`, auto-displayed |

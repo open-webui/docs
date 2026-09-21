@@ -90,7 +90,7 @@ If all authentication is handled by an OAuth/OIDC provider, you can hide the loc
 ENABLE_LOGIN_FORM=false
 ```
 
-This removes the email/password form from the UI, steering all users through your SSO flow. You can also disable local password authentication at the backend level:
+This removes the email/password form from the UI and refuses local sign-ups, steering all users through your SSO flow. The same switch is **Login Form** in **Settings > Admin > Authentication**, so it can be turned off without a restart once SSO works. You can also disable local password authentication at the backend level:
 
 ```bash
 ENABLE_PASSWORD_AUTH=false
@@ -146,6 +146,8 @@ Without Redis, **signing out does not invalidate a user's token**. The token rem
 - OIDC back-channel logout cannot revoke tokens
 
 With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.
+
+**Revocation checks fail open.** A revocation check that cannot reach Redis accepts the token and logs `Revocation check failed; accepting token` at most once a minute per worker process. A Redis outage therefore puts the instance back into the no-Redis behavior listed above for as long as it lasts, with sign-outs and password changes taking no effect, so treat Redis availability as part of your auth surface and alert on that log line.
 
 **If you cannot deploy Redis**, shorten `JWT_EXPIRES_IN` (e.g., `1h` or `4h`) to limit the window of exposure. See the [Redis tutorial](/tutorials/integrations/redis) for setup instructions.
 

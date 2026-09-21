@@ -114,6 +114,14 @@ Use `@username` to notify teammates. The suggestion list puts the channel's own 
 
 Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation.
 
+### Bots posting as a model
+
+Any account can post into a channel over the API, which is how bot integrations work: the bot runs under its own account and posts like any other member. [open-webui/bot](https://github.com/open-webui/bot) is an experimental starting point for building one.
+
+A posted message can carry an optional model identity, and the interface then renders that message under the model's name and avatar in place of the posting account's. A bot that answers on behalf of a model sets this so its replies are presented as that model's replies.
+
+That identity is a label chosen by whoever posts the message, and it is not evidence that the server ran the model. The account that posted stays the recorded author and is what the API returns for the message, so the real sender can always be recovered. Anyone who can post in a channel can set the label, so treat the model name next to a message as presentation only.
+
 ### Direct messages
 
 A direct message is a conversation between you and the people you pick, and there is one of them per set of participants. Start one from the **Message** button on someone's profile card in a channel, or from **(+)** in the sidebar's **Channels** section with **Channel Type** set to **Direct Message**. Messaging someone you have messaged before reopens the conversation you already have with them, with its history, instead of adding a second one beside it. A name is optional on a direct message; without one it is listed under the names of the other participants.

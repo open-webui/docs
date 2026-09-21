@@ -54,6 +54,12 @@ Then open [http://localhost:3000](http://localhost:3000).
 
 For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
 
+:::tip Pick the right image
+`:main` above is the batteries-included one: it carries the embedding, speech and reranking models, document extraction and every database client, so retrieval, uploads and voice work the moment it starts.
+
+`:main-slim` is a fraction of that size and leaves the machine learning stack out. Chatting with a hosted model is identical, and the features that used local models run on services you point it at instead. Pick it when you want a small install, few dependencies, or Open WebUI purely as a front end. See [What slim leaves out](/getting-started/quick-start#what-slim-leaves-out).
+:::
+
   </TabItem>
   <TabItem value="pip" label="pip">
 
@@ -111,6 +117,14 @@ Installed Open WebUI but not sure where to start? The [**Essentials for Open Web
 - [**FAQ**](/faq): Common questions answered
 - [**Troubleshooting**](/troubleshooting): Fix common issues
 - [**Reference**](/reference): Environment variables and API details
+
+---
+
+## Agentic Execution with Open Terminal
+
+[**Open Terminal**](/features/open-terminal) gives an agent a real terminal and filesystem, so it can carry out multi-step work instead of only describing it: analyze data, run scripts, fix its own errors, and hand you the files it produced, all inside the chat. A [file browser](/features/open-terminal/file-browser) beside the conversation shows everything it creates.
+
+For teams, [**Terminals**](/features/open-terminal/terminals) is the enterprise layer on top, giving every user an isolated environment with resource limits and automatic lifecycle management.
 
 ---
 

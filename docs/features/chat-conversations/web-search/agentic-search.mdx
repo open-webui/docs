@@ -60,11 +60,19 @@ When the model invokes `search_web`:
 *   **Result Count Behavior**: If the model omits `count`, Open WebUI uses the admin-configured `WEB_SEARCH_RESULT_COUNT`. If the model provides `count`, the value is capped at the same admin maximum.
 *   **No RAG**: Unlike traditional search, **no data is stored in a Vector DB**. No chunking or embedding occurs.
 *   **Result**: The model sees exactly what a human sees on a search results page. If the snippet contains the answer, the model responds. If not, the model must decide to "deep dive" into a link.
+*   **Not a source**: search hits are not listed in the citations panel and the model is not told to cite them. Nothing has opened those pages, so there is nothing to cite. The results still reach the model as tool output and it can name a link in its answer like any other text.
+
+:::info Changes in this release
+Search results used to be emitted as citation sources, one empty entry per hit, all named `search_web`. Models regularly attached a result id to text taken from a different result, and the panel resolved that id to a title that looked right, so a wrong attribution was indistinguishable from a correct one. Search results are no longer offered as citations. To get a citation, the model has to open the page with `fetch_url`.
+
+This applies to the Native tool-calling path. Legacy mode still runs the old RAG-style web search and still cites what it retrieves.
+:::
 
 ### `fetch_url` (Full Page Context)
 If the model determines that a search snippet is insufficient, it will call `fetch_url`:
 *   **Direct Access**: The tool visits the specific URL and extracts the main text using your configured **Web Loader**.
 *   **Raw Context**: The extracted text is injected **directly into the model's context window** (hard-coded truncation at exactly 50,000 characters to prevent context overflow).
+*   **Citable**: a fetched page appears in the citations panel as a source named by its URL. This is the only way a web page becomes a citation in Native mode, and it is a page the model has actually read.
 *   **Agentic Advantage**: Because it doesn't use RAG, the model has the "full picture" of the page rather than isolated fragments. This allows it to follow complex instructions on specific pages (e.g., "Summarize the technical specifications table from this documentation link").
 
 :::tip

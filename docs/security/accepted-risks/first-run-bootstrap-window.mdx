@@ -1,0 +1,62 @@
+---
+title: "First-Run Admin Promotion"
+---
+
+# First-Run Admin Promotion
+
+|  |  |
+| :--- | :--- |
+| **Class** | CWE-362, Race Condition |
+| **Status** | Exploitable outcome fixed in 0.9.0; residual fails closed and is accepted |
+| **Tracked as** | [GHSA-h3ww-q6xx-w7x3](https://github.com/open-webui/open-webui/security/advisories/GHSA-h3ww-q6xx-w7x3) / [CVE-2026-45675](https://www.cve.org/CVERecord?id=CVE-2026-45675) |
+
+---
+
+## Summary
+
+A new Open WebUI instance has no administrator until the first account is created. That first account is promoted to administrator automatically, and sign-up then closes.
+
+The original implementation checked whether any users existed, decided the role from that answer, and only then inserted the account. Two registrations arriving together could both read an empty table and both be inserted as administrators. That was reported to us, fixed, and published as [CVE-2026-45675](https://www.cve.org/CVERecord?id=CVE-2026-45675).
+
+## What we fixed
+
+The order was inverted. The account is now inserted with the default role first, and promoted afterwards only if it turns out to be the only account present:
+
+```python
+# before: decide the role from a check that another request can invalidate
+has_users = Users.has_users(db=db)
+role = "admin" if not has_users else DEFAULT_USER_ROLE
+user = Auths.insert_new_auth(..., role=role)
+```
+
+```python
+# after: insert first, promote only if this account is the only one
+user = Auths.insert_new_auth(..., role=DEFAULT_USER_ROLE)
+if Users.get_num_users(db=db) == 1:
+    Users.update_user_role_by_id(user.id, "admin", db=db)
+    ENABLE_SIGNUP = False
+```
+
+The sign-up path was changed this way in **0.8.4**, and the LDAP and OAuth registration paths in **0.9.0**, which is the patched version for the advisory above.
+
+## What remains
+
+The insert and the count that follows it do not share a single database transaction. On deployments using PostgreSQL, two registrations arriving at the same instant can therefore each see the other already present, so the count returns two on both and neither account is promoted. The instance is left with accounts but no administrator.
+
+This is the direction the fix was built to fail in. The behaviour it replaced handed the administrator role to every request that raced for it. What is left hands it to none of them, so nobody gains anything they should not have, and there is nothing on the instance to take: no chats, no settings, no other accounts, because this can only happen on the very first registrations against an empty database. An operator who lands in this state deletes the empty database and starts again, and has lost nothing.
+
+Deployments on the default SQLite backend are not affected, because its write locking prevents the two registrations from overlapping in this way.
+
+## Why it is accepted
+
+A residual that fails closed, on an instance that holds nothing, is preferable to the alternative it replaced. Removing it entirely would mean rewriting the promotion to run inside the same transaction as the insert, which buys no security benefit over the current failure mode, because the current failure mode already denies the role to everyone rather than granting it.
+
+The other half of this window is not a residual at all, it is a deployment decision. Whoever registers first becomes the administrator, and on an instance that has been made reachable before it was set up, that need not be the operator. **Open WebUI is built for private, trusted networks, and we do not recommend exposing an unconfigured instance to a public network under any circumstances.** Complete the setup over a private network, a VPN or a local port first. See [Network Placement](/getting-started/advanced-topics/hardening#network-placement) in the hardening guide.
+
+Where an instance must be reachable immediately, create the administrator at startup instead of through the interface, by setting `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` before the first start. The account is created during startup, sign-up is disabled automatically, and any other registration attempt is refused. See [Admin account from environment variables](/getting-started/advanced-topics/hardening#admin-account-from-environment-variables).
+
+## References
+
+- [CWE-362: Concurrent Execution using Shared Resource with Improper Synchronization](https://cwe.mitre.org/data/definitions/362.html)
+- [Hardening Open WebUI](/getting-started/advanced-topics/hardening)
+- [Open WebUI Security Policy](../security-policy.mdx)

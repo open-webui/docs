@@ -42,6 +42,14 @@ Controls what happens when you click a follow-up prompt.
 - **On**: Clicking a follow-up inserts the text into the input field, allowing you to edit it before sending
 - **Off**: Clicking a follow-up immediately sends it as your next message
 
+## Taking one with Tab
+
+When a reply finishes, the first follow-up also appears as grey ghost text in the empty message box. Press **Tab** to write it into the input, then edit or send it. Type anything else and it disappears, so it never gets in the way of writing your own message.
+
+It shows only while the box is empty and the last message is a finished reply, and it goes away as soon as the model starts generating again. The chips under the reply are unchanged, and this is the same suggestion as the first of them.
+
+It needs the rich text input, which is on by default and lives at **Settings > Interface > Rich Text Input for Chat**. With that off, the box is a plain text field and no ghost text appears.
+
 ## Regenerating Follow-Ups
 
 If you want to regenerate follow-up suggestions for a specific response, you can use the [Regenerate Follow-ups](https://openwebui.com/posts/9b5ac6d6-dfd6-4cad-bc1d-5518b138f22d) action button from the community.

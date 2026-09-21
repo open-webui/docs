@@ -142,7 +142,7 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 | `search_notes` | Search your notes by title and content |
 | `view_note` | Read the full content of a note |
 | `write_note` | Create a new note |
-| `replace_note_content` | Update an existing note |
+| `replace_note_content` | Update an existing note, either replacing the whole content or editing a range of it in place |
 
 > **You:** Search my "Project X" notes and find the database schema.
 >
@@ -205,6 +205,12 @@ Two things to know:
 * **Images uploaded from the menu are invisible.** They are stored on the note but are neither shown as a chip nor placed in the text. To get an image into the note, paste it into the editor, which inserts it where the cursor is. Dropping files onto a note does nothing in this release.
 * Attached files feed the note's chat. Every non-image attachment is added as retrieval context on every message you send in a chat opened from this note.
 
+### Formatting
+
+**Formatting** in the **More (...)** menu decides whether the editor formats as you type and paste. It is on, and needs write access to change.
+
+Turn it off and Markdown characters stay as characters, a pasted URL stays text rather than becoming a link, and pasting brings the plain text without the source's styling. Anything already formatted in the note stays formatted, so this changes what happens next instead of stripping what is there.
+
 ### Quick creation
 
 * Navigate to `/notes/new` to open a blank note
@@ -215,6 +221,10 @@ Two things to know:
 ### View options
 
 Toggle between **Created by you** and **Shared with you** filters, and switch between **List** and **Grid** layouts.
+
+### Quick delete
+
+Hold **Shift** while the Notes list is open and every note's **⋯** menu button turns into a delete button. Clicking it deletes that note straight away, with no menu and no confirmation prompt. It works in both **List** and **Grid** layouts, and holding Shift closes any note menu that is already open. Release Shift, or click away from the window, and the menu button comes back. Without Shift nothing changes: delete still goes through the menu and asks you to confirm.
 
 :::info Admin Visibility
 Notes are workspace items. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), administrators can see all users' notes. Set `BYPASS_ADMIN_ACCESS_CONTROL` to `False` to restrict this. See [Environment Configuration](/reference/env-configuration#bypass_admin_access_control) for details.
@@ -247,3 +257,7 @@ Attaching a note injects the full text. A very large note attached to a model wi
 ### Write access
 
 When manually attached, notes are **read-only**. In **Native Mode** with the `replace_note_content` tool enabled, models can modify your notes. Review changes and use **Undo/Redo** if needed.
+
+The tool has two modes. Passing whole `content` replaces the entire note, so anything the model leaves out is gone. Passing `replace_range` operations changes only the given character range and leaves the rest of the note untouched; each operation carries an `expected` field with the current text of that range, and a mismatch rejects the edit instead of applying it. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for range operations.
+
+Notes keep no server-side history. **Undo/Redo** only walks the versions the editor recorded, which happens when you insert a chat response into the note or step through versions, so a tool edit on a note without such versions cannot be undone there. The previous text is still in the chat: the model reads the note with `view_note` before editing, and that tool result stays in the chat message. Expand the tool call in that message to copy the old content back.

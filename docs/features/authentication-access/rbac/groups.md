@@ -107,7 +107,7 @@ At a deeper level, resource access is managed through normalized **access grants
 For example, granting the "Marketing" group read access and a specific editor user write access to a model would create two separate grant entries. Public access is represented by a user grant with a wildcard (`*`) principal.
 
 *   **Read**: Users can view and use the resource.
-*   **Write**: Users can update or delete the resource.
+*   **Write**: Owner-equivalent access to that resource. Users can update or delete it, and manage its access list, which includes sharing it onward with other users and groups. Grant write only to people you would trust with the resource as if it were their own.
 
 ### Previewing Access (Audit)
 

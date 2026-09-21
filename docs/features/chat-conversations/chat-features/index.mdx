@@ -98,6 +98,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
+  | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved on the selected terminal. Offered only when an Open Terminal is selected and the chat already has content, and anything you type after it steers what the skill covers. |
   | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
   `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` and `/settings` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.
@@ -107,6 +108,8 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   `/fork` requires the **Chat Import** permission (`chat.import`, allowed by default; admins always pass). Without it the command is left out of the `/` menu, alongside the **Fork chat** action on a message. Typing `/fork` out by hand and sending it still runs the built-in command, which reports **Access prohibited**.
 
   Choosing **Model** from the `/` menu opens the model picker rather than running the command, with the search box focused (on desktop), so you can change model from the keyboard alone. Typing an id matches a model's **id** exactly, never its display name, and an id you do not have reports `Model not found: <id>` and changes nothing. A successful switch replaces the current selection outright, so a multi-model chat drops back to the single model you named.
+
+- **🔗 Link Rendering**: Links in responses, citations and web search results become clickable only for `http`, `https`, `mailto`, `tel` and relative URLs. Any other scheme, `ftp:`, `sms:` and application deep links such as `obsidian://` or `vscode://`, renders as plain text with its label intact, so a model cannot hand you a one-click jump into a local application.
 
 - **Writing & Content Blocks**: Responses from models that include colon-fence blocks (e.g., `:::writing`, `:::code_execution`, `:::search_results`) are automatically rendered as formatted content in a styled container with a copy button. This is commonly used by newer OpenAI models to distinguish different types of output (prose, code results, search results) from the main response text.
 
