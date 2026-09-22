@@ -1344,61 +1344,32 @@ erDiagram
 
 ## Database Encryption with SQLCipher
 
-For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
+:::danger Removed in v0.9.0
 
-### Prerequisites
+SQLCipher is not supported since v0.9.0. The async database layer introduced in that release has no SQLCipher driver, so Open WebUI refuses to start when `DATABASE_TYPE=sqlite+sqlcipher` or a `sqlite+sqlcipher://` URL is set.
 
-SQLCipher encryption requires additional dependencies that are **not included by default**. Before using this feature, you must install:
+:::
 
-- The **SQLCipher system library** (e.g., `libsqlcipher-dev` on Debian/Ubuntu, `sqlcipher` on macOS via Homebrew)
-- The **`sqlcipher3-wheels`** Python package (`pip install sqlcipher3-wheels`)
+For encryption at rest, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS), or use PostgreSQL with encrypted storage.
 
-For Docker users, this means building a custom image with these dependencies included.
+### Upgrading an Existing SQLCipher Database
 
-### Configuration
+Decrypt the database into a plain SQLite file with the `sqlcipher` CLI before starting v0.9.0 or later:
 
-To enable encryption, set the following environment variables:
-
-```bash
-# Required: Set the database type to use SQLCipher
-DATABASE_TYPE=sqlite+sqlcipher
-
-# Required: Set a secure password for database encryption
-DATABASE_PASSWORD=your-secure-password
+```sql
+-- run inside: sqlcipher webui.db
+PRAGMA key = 'your-secure-password';
+ATTACH DATABASE 'webui-plain.db' AS plaintext KEY '';
+SELECT sqlcipher_export('plaintext');
+DETACH DATABASE plaintext;
 ```
 
-When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
-
-### Important Notes
-
-:::danger
-
-- The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
-- The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
-- **Keep the password secure**, as it is needed to decrypt and access all application data.
-- **Losing the password means losing access to all data** in the encrypted database.
-
-:::
-
-:::warning Migrating Existing Data to SQLCipher
-
-**Open WebUI does not support automatic migration from an unencrypted SQLite database to an encrypted SQLCipher database.** If you enable SQLCipher on an existing installation, the application will fail to read your existing unencrypted data.
-
-To use SQLCipher with existing data, you must either:
-
-1. **Start fresh**: Enable SQLCipher on a new installation and have users export/re-import their chats manually
-2. **Manual database migration**: Use external SQLite/SQLCipher tools to export data from the unencrypted database and import it into a new encrypted database (advanced users only)
-3. **Use filesystem-level encryption**: Consider alternatives like LUKS (Linux) or BitLocker (Windows) for at-rest encryption without database-level changes
-4. **Switch to PostgreSQL**: For multi-user deployments, PostgreSQL with TLS provides encryption in transit and can be combined with encrypted storage
-
-:::
+Replace `webui.db` with `webui-plain.db`, then set `DATABASE_TYPE=sqlite` (or unset it) and remove `DATABASE_PASSWORD`.
 
 ### Related Database Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_TYPE` | `None` | Set to `sqlite+sqlcipher` for encrypted SQLite |
-| `DATABASE_PASSWORD` | - | Encryption password (required for SQLCipher) |
 | `DATABASE_ENABLE_SQLITE_WAL` | `False` | Enable Write-Ahead Logging for better performance |
 | `DATABASE_SQLITE_PRAGMA_SYNCHRONOUS` | `NORMAL` | SQLite sync mode (safe with WAL, avoids fsync per txn) |
 | `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT` | `5000` | Write-lock wait time in milliseconds |

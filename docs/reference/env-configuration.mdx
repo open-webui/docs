@@ -7844,7 +7844,7 @@ pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 :::info
 
 **For PostgreSQL support, ensure you installed with `pip install open-webui[all]` instead of the basic installation.**
-Supports SQLite, Postgres, and encrypted SQLite via SQLCipher.
+Supports SQLite and Postgres.
 **Changing the URL does not migrate data between databases.**
 
 Documentation on the URL scheme is available [here](https://docs.sqlalchemy.org/en/20/core/engines.html#database-urls).
@@ -7892,7 +7892,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 - Type: `str`
 - Default: `None` (automatically set to `sqlite` if `DATABASE_URL` uses default SQLite path)
-- Description: Specifies the database type (e.g., `sqlite`, `postgresql`, `sqlite+sqlcipher`). This is used in conjunction with other individual parameters to construct the `DATABASE_URL` if a complete `DATABASE_URL` is not explicitly defined.
+- Description: Specifies the database type (e.g., `sqlite`, `postgresql`). This is used in conjunction with other individual parameters to construct the `DATABASE_URL` if a complete `DATABASE_URL` is not explicitly defined.
 - Persistence: No
 
 #### `DATABASE_USER`
@@ -7983,40 +7983,9 @@ Enabling this on low-spec hardware (e.g., Raspberry Pi, containers with limited 
 
 ### Encrypted SQLite with SQLCipher
 
-For enhanced security, Open WebUI supports at-rest encryption for its primary SQLite database using SQLCipher. This is recommended for deployments handling sensitive data where using a larger database like PostgreSQL is not needed.
+:::danger Removed in v0.9.0
 
-:::warning Additional Dependencies Required
-
-SQLCipher encryption requires additional dependencies that are **not included by default**. Before using this feature, you must install:
-
-- The **SQLCipher system library** (e.g., `libsqlcipher-dev` on Debian/Ubuntu, `sqlcipher` on macOS via Homebrew)
-- The **`sqlcipher3-wheels`** Python package (`pip install sqlcipher3-wheels`)
-
-For Docker users, this means building a custom image with these dependencies included.
-
-:::
-
-To enable encryption, you must configure two environment variables:
-
-1. Set `DATABASE_TYPE="sqlite+sqlcipher"`.
-2. Set `DATABASE_PASSWORD="your-secure-password"`.
-
-When these are set and a full `DATABASE_URL` is **not** explicitly defined, Open WebUI will automatically create and use an encrypted database file at `./data/webui.db`.
-
-:::danger
-
-- The **`DATABASE_PASSWORD`** environment variable is **required** when using `sqlite+sqlcipher`.
-- The **`DATABASE_TYPE`** variable tells Open WebUI which connection logic to use. Setting it to `sqlite+sqlcipher` activates the encryption feature.
-
-Ensure the database password is kept secure, as it is needed to decrypt and access all application data.
-
-:::
-
-:::warning Migrating Existing Data to SQLCipher
-
-**Open WebUI does not support automatic migration from an unencrypted SQLite database to an encrypted SQLCipher database.** If you enable SQLCipher on an existing installation, the application will fail to read your existing unencrypted data.
-
-To use SQLCipher with existing data, you must either start fresh (with users exporting/re-importing chats), manually migrate the database using external SQLite/SQLCipher tools, use filesystem-level encryption (LUKS/BitLocker) instead, or switch to PostgreSQL.
+SQLCipher is not supported since v0.9.0. The async database layer introduced in that release has no SQLCipher driver, so Open WebUI refuses to start when `DATABASE_TYPE=sqlite+sqlcipher` or a `sqlite+sqlcipher://` URL is set. For encryption at rest, use an encrypted filesystem or PostgreSQL with encrypted storage. To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
 
 :::
 

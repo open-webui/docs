@@ -56,7 +56,7 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 A good starting point for tuning is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`. Keep the combined total per instance well below your PostgreSQL `max_connections` limit (default is 100).
 :::
 
-For credential handling and the SQLCipher-encrypted SQLite option, see the [Database section of the Hardening guide](/getting-started/advanced-topics/hardening#database).
+For credential handling and encryption at rest, see the [Database section of the Hardening guide](/getting-started/advanced-topics/hardening#database).
 
 ### Why SQLite on network storage fails the moment you scale (or upgrade)
 
