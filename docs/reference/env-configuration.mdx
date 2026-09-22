@@ -8429,13 +8429,13 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 - Type: `bool`
 - Default: `True`
-- Description: Takes effect when `WEBSOCKET_MANAGER=redis`. Live updates addressed to a user, chat, channel or note are published on a Redis channel of their own, and each instance skips updates for rooms none of its connected clients have joined. This saves the CPU each instance would spend decoding every update, which adds up on multi-instance deployments. Acknowledgements and control messages stay on the shared channel. Set to `False` to send everything through the one shared channel.
+- Description: Takes effect when `WEBSOCKET_MANAGER=redis`. Live updates addressed to a specific user, channel or note are published on a Redis channel of their own, and each instance skips updates for rooms none of its connected clients have joined. This saves the CPU each instance would spend decoding every update, which adds up on multi-instance deployments. Acknowledgements and control messages stay on the shared channel. Set to `False` to send everything through the one shared channel.
 
 :::warning
 
 **Every Instance Must Run the Same Mode**
 
-Changing this setting, or upgrading from a version before 0.11.5, requires stopping or updating all instances together. A rolling update leaves a mixed fleet: updates from instances in the per-room mode do not reach instances still in the shared-channel mode, so users on those instances miss live updates until every instance matches.
+Changing this setting requires stopping or updating all instances together.
 
 :::
 
