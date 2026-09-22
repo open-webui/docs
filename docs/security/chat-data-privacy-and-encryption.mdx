@@ -19,7 +19,7 @@ Open WebUI's standard experience is designed for self-hosted control, auditabili
 | Control admin product exports | Set `ENABLE_ADMIN_EXPORT=false` |
 | Scope admin workspace list/selector visibility | Set `BYPASS_ADMIN_ACCESS_CONTROL=false` |
 | Production database storage exposure | Use PostgreSQL with encrypted volumes, provider encryption, TDE where available, TLS, and encrypted backups |
-| SQLite-only deployments | Use SQLCipher with `DATABASE_TYPE=sqlite+sqlcipher` |
+| SQLite-only deployments | Put the data directory on an encrypted filesystem (LUKS, BitLocker, FileVault) |
 | Employees asking sensitive or personal questions | Use Temporary Chat, or force Temporary Chat for all users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` |
 | Keep prompts inside your infrastructure | Use local or private model endpoints and restrict approved models by group |
 | Sensitive documents being uploaded or indexed | Keep file upload and knowledge permissions off by default; grant only by group |
@@ -40,12 +40,7 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
 Database encryption protects data at rest. The running Open WebUI application uses the database key to serve authenticated users and normal product workflows.
 
-For SQLite-only deployments, SQLCipher can encrypt the local SQLite database file:
-
-```bash
-DATABASE_TYPE=sqlite+sqlcipher
-DATABASE_PASSWORD=your-secure-password
-```
+For SQLite-only deployments, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). SQLCipher is not supported since v0.9.0.
 
 ### Limit Admin Chat and Export Surfaces
 
@@ -185,7 +180,6 @@ For personal or highly sensitive employee questions:
 
 - [Hardening Open WebUI](/getting-started/advanced-topics/hardening)
 - [HTTPS Reference](/reference/https)
-- [Database Encryption with SQLCipher](/reference/database-schema#database-encryption-with-sqlcipher)
 - [Authentication & Access](/features/authentication-access)
 - [RBAC Permissions](/features/authentication-access/rbac/permissions)
 - [Temporary Chat URL Parameter](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions)

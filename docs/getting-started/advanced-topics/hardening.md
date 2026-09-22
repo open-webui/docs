@@ -350,11 +350,7 @@ See the [Scaling Guide](/getting-started/advanced-topics/scaling#step-1-switch-t
 
 ### SQLCipher
 
-For SQLite deployments that need encryption at rest, Open WebUI supports SQLCipher:
-
-```bash
-DATABASE_TYPE=sqlite+sqlcipher
-```
+SQLCipher is not supported since v0.9.0, and Open WebUI refuses to start with `DATABASE_TYPE=sqlite+sqlcipher`. For SQLite deployments that need encryption at rest, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
 
 ### Connection pool tuning
 
@@ -830,7 +826,7 @@ For organizations where security is a priority, the following practices define t
 
 9. **Restrict data sharing, file uploads, and API key access.** Set maximum file sizes, file count limits, and restrict allowed file extensions. Disable community sharing (`ENABLE_COMMUNITY_SHARING=false`) and admin bulk export (`ENABLE_ADMIN_EXPORT=false`) if not operationally needed. Keep API key creation restricted to administrators and enable endpoint restrictions to limit which routes each key can access. [Details](#data-sharing-and-export)
 
-10. **Encrypt data at rest and maintain regular backups.** For SQLite, use SQLCipher. For PostgreSQL, use disk-level or Transparent Data Encryption. Maintain regular backups, store them in a separate security domain, and periodically test your restore procedure. [Details](#sqlcipher)
+10. **Encrypt data at rest and maintain regular backups.** For SQLite, use an encrypted filesystem. For PostgreSQL, use disk-level or Transparent Data Encryption. Maintain regular backups, store them in a separate security domain, and periodically test your restore procedure. [Details](#sqlcipher)
 
 ### Outbound Network Controls
 
