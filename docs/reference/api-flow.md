@@ -193,6 +193,15 @@ curl -X POST https://<host>/api/chat/completions \
   -d '{
     "chat_id": "<chatId>",
     "id": "'"$ASSISTANT_MSG_ID"'",
+    "user_message": {
+      "id": "'"$USER_MSG_ID"'",
+      "role": "user",
+      "content": "Hi, what is the capital of France?",
+      "parentId": null,
+      "childrenIds": ["'"$ASSISTANT_MSG_ID"'"],
+      "timestamp": '"$TIMESTAMP"',
+      "models": ["gpt-5.6-sol"]
+    },
     "messages": [
       {
         "role": "user",
@@ -228,6 +237,12 @@ The `session_id` should be a unique UUID that you generate for this session. It 
 
 :::
 
+:::warning Include `user_message`
+
+`user_message` carries the user message this completion answers, the same object you stored in Step 1. The backend saves the assistant message with its `parentId` set to that message's `id`, which keeps the user message in the thread. Sent without it, the assistant message is saved with no parent, and after a page reload the chat shows only the assistant reply.
+
+:::
+
 #### Step 2.1: Trigger Assistant Completion with Knowledge Integration (RAG)
 
 For advanced use cases involving knowledge bases or document collections, include knowledge files in the completion request:
@@ -239,6 +254,15 @@ curl -X POST https://<host>/api/chat/completions \
   -d '{
     "chat_id": "<chatId>",
     "id": "'"$ASSISTANT_MSG_ID"'",
+    "user_message": {
+      "id": "'"$USER_MSG_ID"'",
+      "role": "user",
+      "content": "Hi, what is the capital of France?",
+      "parentId": null,
+      "childrenIds": ["'"$ASSISTANT_MSG_ID"'"],
+      "timestamp": '"$TIMESTAMP"',
+      "models": ["gpt-5.6-sol"]
+    },
     "messages": [
       {
         "role": "user",
@@ -390,6 +414,14 @@ curl -X POST https://<host>/api/chat/completions \
   -d '{
     "chat_id": "<chatId>",
     "id": "'"$NEW_ASSISTANT_MSG_ID"'",
+    "user_message": {
+      "id": "'"$NEW_USER_MSG_ID"'",
+      "role": "user",
+      "content": "Can you tell me more about Paris?",
+      "parentId": "'"$ASSISTANT_MSG_ID"'",
+      "childrenIds": ["'"$NEW_ASSISTANT_MSG_ID"'"],
+      "models": ["gpt-5.6-sol"]
+    },
     "messages": [
       { "role": "user", "content": "Hi, what is the capital of France?" },
       { "role": "assistant", "content": "The capital of France is Paris." },
@@ -511,6 +543,15 @@ This cleaning process handles:
 {
   "chat_id": "chat-uuid-12345",
   "id": "assistant-msg-id",
+  "user_message": {
+    "id": "user-msg-id",
+    "role": "user",
+    "content": "Hi, what is the capital of France?",
+    "parentId": null,
+    "childrenIds": ["assistant-msg-id"],
+    "timestamp": 1720000000,
+    "models": ["gpt-5.6-sol"]
+  },
   "messages": [
     {
       "role": "user",
@@ -856,6 +897,7 @@ This cleaning process handles:
 | Chat shows "How can I help you today?" | Using `current_id` instead of `currentId` | Use camelCase `currentId` in the history object |
 | Completion works but response only appears as notification | Assistant message not in chat history before triggering completion | Include empty assistant placeholder in Step 1 |
 | Messages exist in DB but frontend shows empty chat | Missing `parentId` or broken tree linkage | Ensure every message has correct `parentId` and parent's `childrenIds` includes the child |
+| User message disappears after a page reload once the completion ran | `user_message` missing from the `/api/chat/completions` request, so the assistant message is saved with no parent | Send `user_message` with the user message's `id` in the completion request (Step 2) |
 
 ## Summary
 
