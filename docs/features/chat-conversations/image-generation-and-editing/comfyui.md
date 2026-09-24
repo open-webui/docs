@@ -95,7 +95,9 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
     **Note:** Required parameters are marked with an asterisk (*). Only the prompt node ID is strictly required.
 
-    You can find the node ID by clicking on a node in ComfyUI and viewing its details.
+    Open WebUI returns the images from the workflow's **Save Image**, **Save Image (Advanced)** and **Preview Image** nodes.
+
+You can find the node ID by clicking on a node in ComfyUI and viewing its details.
 
     ![Screenshot of the ComfyUI Workflow Nodes section in Open WebUI, showing the mapping fields.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 

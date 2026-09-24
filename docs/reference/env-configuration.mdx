@@ -1056,7 +1056,7 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 
 - Type: `str`
 - Default: `""` (unset, falls back to the underlying library default, typically `python-requests/2.x`)
-- Description: Overrides the `User-Agent` header that the web loader (`SafeWebBaseLoader`) sends on outbound fetches for web search and the `fetch_url` tool. The default Python library UA is aggressively blocked by Cloudflare, Wikipedia, and similar bot-detection layers, which manifests as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access. Applies to both the synchronous `_scrape()` and the async `_fetch()` code paths.
+- Description: Overrides the `User-Agent` header that the web loader (`SafeWebBaseLoader`) sends on outbound fetches for web search and the `fetch_url` tool. The default Python library UA is aggressively blocked by Cloudflare, Wikipedia, and similar bot-detection layers, which manifests as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access. Applies to both the synchronous `_scrape()` and the async `_fetch()` code paths, and to the first request **Attach Webpage** sends to check whether a URL is a page or a file.
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
 

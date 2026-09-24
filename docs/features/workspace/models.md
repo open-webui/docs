@@ -239,7 +239,7 @@ See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-atta
 
 ### Bulk management
 
-Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Manual drag-to-reorder is only available with no search text and no filter applied.
+Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Drag-to-reorder works in a filtered view too: the model you move lands next to the visible model you dropped it by, and every model the filter hides keeps its place.
 
 ---
 

@@ -165,6 +165,9 @@ Pyodide includes the following packages, which are auto-detected from import sta
 | sympy | Symbolic mathematics |
 | tiktoken | Token counting for LLMs |
 | pytz | Timezone handling |
+| openpyxl | Excel files (also loaded by `pandas.read_excel` and `to_excel`) |
+| python-pptx | PowerPoint files |
+| python-docx | Word files |
 
 The Python standard library is also fully available (json, csv, math, datetime, os, io, etc.).
 
