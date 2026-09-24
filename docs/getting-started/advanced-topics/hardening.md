@@ -706,7 +706,7 @@ docker build --build-arg USE_PERMISSION_HARDENING=true .
 
 ### Data directory
 
-The data directory (`/app/backend/data`) contains the database, uploaded files, cached plugins, and the auto-generated secret key. Protect this directory with appropriate filesystem permissions and include it in your backup strategy.
+The data directory (`/app/backend/data`) contains the database, uploaded files and cached plugins. The auto-generated secret key is written to `/app/backend/.webui_secret_key`, outside this directory, so set [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) or point [`WEBUI_SECRET_KEY_FILE`](/reference/env-configuration#webui_secret_key_file) into the data directory to keep it across container recreation. Protect this directory with appropriate filesystem permissions and include it in your backup strategy.
 
 ### Development features
 
