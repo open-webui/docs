@@ -185,7 +185,7 @@ Taking this permission away hides the **Interface** page, so the people affected
 
 It reaches no further than that. A save that carries Interface fields anyway, from an older client or a script, is not rejected: those fields are dropped and the rest of the request is saved. Everything outside the Interface page keeps working, so a person without this permission still saves a system prompt (with **Allow Chat Controls** and **Allow Chat System Prompt**), pinned models, audio, notifications and keyboard shortcuts. **Allow Chat System Prompt** and **Allow Chat Params** behave the same way, dropping their own part of a save rather than failing the whole of it.
 
-The one thing that travels with the Interface page is the **default model** selection, which is an Interface field, so it stops being saved when this permission is off.
+The one exception is the **default model** a person saves with **Set as default** in the model selector. It is stored as an Interface field, so it stops being saved when this permission is off.
 
 There is no permission that locks personal settings as a whole. This one hides a page and filters that page's fields, nothing more.
 
