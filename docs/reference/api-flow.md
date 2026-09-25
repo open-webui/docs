@@ -71,11 +71,11 @@ The `history` object must use `currentId` (**camelCase**, not `current_id`). Thi
 
 ## Implementation Guide
 
-### Critical Step: Enrich Chat Response with Assistant Message
+### Pre-creating the Assistant Message (Optional)
 
-The assistant message needs to exist in the chat data as a critical prerequisite **before** triggering the completion. This step is essential because the Open WebUI frontend expects assistant messages to exist in a specific structure.
+For an existing `chat_id`, `POST /api/chat/completions` inserts the assistant placeholder itself when you pass the assistant message's `id`, and links it under the user message you send as `user_message` (Step 2), so pre-creating it is no longer required. If you do pre-create it, always send `user_message`: the backend overwrites the stored placeholder's `parentId` with that message's `id`, or with null when `user_message` is missing.
 
-The assistant message must appear in both locations:
+A pre-created assistant message must appear in both locations:
 
 - `chat.messages[]`: The main message array (used for legacy compatibility)
 - `chat.history.messages[<assistantId>]`: The indexed message history (used by the frontend to render the tree)
@@ -97,7 +97,7 @@ The assistant message must appear in both locations:
 }
 ```
 
-Without this enrichment, the assistant's response will not appear in the frontend interface, even if the completion is successful.
+If you do pre-create it, use this structure.
 
 ## Step-by-Step Implementation
 
@@ -107,7 +107,7 @@ This creates the chat with **both** the user message and an empty assistant plac
 
 :::tip
 
-You can combine chat creation and assistant enrichment into this single step. The key is to include both the user message and an empty assistant message in the initial payload, with proper `parentId`, `childrenIds`, and `currentId` fields.
+You can combine chat creation and the assistant placeholder into this single step. The key is to include both the user message and an empty assistant message in the initial payload, with proper `parentId`, `childrenIds`, and `currentId` fields.
 
 :::
 
@@ -303,9 +303,9 @@ curl -X POST https://<host>/api/chat/completions \
 
 Assistant responses can be handled in two ways depending on your implementation needs:
 
-#### Option A: Stream Processing (Recommended)
+#### Option A: Stream Processing
 
-If using `stream: true` in the completion request, you can process the streamed response in real-time and wait for the stream to complete. This is the approach used by the OpenWebUI web interface and provides immediate feedback.
+Streaming over the HTTP response only happens when the request carries no `session_id` (or no `chat_id`). With both present, as in Step 2, the completion runs as a background task and the response body is `{"status": true, "task_ids": [...], "chat_id": "..."}`, returned immediately; the output goes out as Socket.IO `events` to the `user:<id>` room (every socket signed in as that user), not to the `session_id`. To stream over HTTP, omit `session_id`; to track a background task, poll `GET /api/tasks/chat/{chat_id}` or the chat itself (Option B).
 
 #### Option B: Polling Approach
 
@@ -362,14 +362,14 @@ curl -X GET https://<host>/api/v1/models/model?id=<model-name> \
 
 ### Send Additional Messages to an Existing Chat
 
-For multi-turn conversations, you can add new messages to an existing chat. You must include the full updated message tree with proper `parentId` and `childrenIds` linkage:
+For multi-turn conversations, add the new user message and assistant placeholder to the existing chat, each with the correct `parentId`:
 
 ```bash
 NEW_USER_MSG_ID=$(uuidgen || python3 -c "import uuid; print(uuid.uuid4())")
 NEW_ASSISTANT_MSG_ID=$(uuidgen || python3 -c "import uuid; print(uuid.uuid4())")
 
 # First: update the chat to add the new user + assistant placeholder
-# You need to link the previous assistant message to the new user message via childrenIds
+# childrenIds is recomputed from parentId, so the previous assistant message need not be resent
 curl -X POST https://<host>/api/v1/chats/<chatId> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
@@ -378,9 +378,6 @@ curl -X POST https://<host>/api/v1/chats/<chatId> \
       "history": {
         "currentId": "'"$NEW_ASSISTANT_MSG_ID"'",
         "messages": {
-          "'"$ASSISTANT_MSG_ID"'": {
-            "childrenIds": ["'"$NEW_USER_MSG_ID"'"]
-          },
           "'"$NEW_USER_MSG_ID"'": {
             "id": "'"$NEW_USER_MSG_ID"'",
             "role": "user",
@@ -435,7 +432,7 @@ curl -X POST https://<host>/api/chat/completions \
 
 :::note
 
-When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, you can pass partial updates: existing messages that are not included in the update will be preserved.
+When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, the merge is per message, not per field: messages you omit are preserved, but a message you include replaces the stored one wholesale, so send full message objects. `childrenIds` is recomputed from each message's `parentId`, so you need not set it on the parent.
 
 :::
 
@@ -835,10 +832,10 @@ This cleaning process handles:
 - `id`: Assistant message ID
 - `messages`: Array of ChatCompletionMessage
 - `model`: Model identifier
-- `session_id`: Session identifier (caller-generated UUID)
 
 **ChatCompletionsRequest - Optional Fields:**
 
+- `session_id`: Session identifier (caller-generated). Together with `chat_id` it runs the completion as a background task that returns `task_ids`; omit it to stream over HTTP.
 - `stream`: Enable streaming (defaults to false)
 - `background_tasks`: Control automatic tasks
 - `features`: Enable/disable features
@@ -895,7 +892,7 @@ This cleaning process handles:
 |---|---|---|
 | Chat created but messages don't appear in UI | Missing `childrenIds` on messages | Add `childrenIds` array linking parent → child messages |
 | Chat shows "How can I help you today?" | Using `current_id` instead of `currentId` | Use camelCase `currentId` in the history object |
-| Completion works but response only appears as notification | Assistant message not in chat history before triggering completion | Include empty assistant placeholder in Step 1 |
+| Completion works but response only appears as notification | Assistant message not in chat history before triggering completion | Pass the assistant message's `id` and `user_message` in the completion request (Step 2), or include the assistant placeholder in Step 1 |
 | Messages exist in DB but frontend shows empty chat | Missing `parentId` or broken tree linkage | Ensure every message has correct `parentId` and parent's `childrenIds` includes the child |
 | User message disappears after a page reload once the completion ran | `user_message` missing from the `/api/chat/completions` request, so the assistant message is saved with no parent | Send `user_message` with the user message's `id` in the completion request (Step 2) |
 
