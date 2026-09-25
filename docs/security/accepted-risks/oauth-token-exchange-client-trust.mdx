@@ -16,7 +16,7 @@ title: "OAuth Token Exchange Client Trust"
 
 The OAuth token exchange endpoint accepts a provider access token and issues an Open WebUI session for the user that token identifies. A provider's userinfo endpoint confirms that a token is valid but never reveals which OAuth client it was issued to, so without an additional check the endpoint accepts a token minted for any client registered with the same provider, including applications the operator does not control.
 
-The endpoint is off unless an operator sets [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) to `True`, which is not the default, so no default deployment is affected. Everything below concerns deployments that have deliberately turned it on.
+The endpoint is off unless an operator sets [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) to `True`, which is not the default, so no default deployment is affected. Everything below concerns deployments that have deliberately turned it on. The endpoint never creates accounts: the user must already exist, matched by provider subject or, when `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` is on, by email. A per-address rate limit for it (`OAUTH_TOKEN_EXCHANGE_RATE_LIMIT` and `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT_WINDOW`) exists and is off until set.
 
 ## What we mitigated
 

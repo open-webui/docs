@@ -12,7 +12,7 @@ If a database or scan report shows a CVE against Open WebUI, check whether the i
 :::
 
 :::info The short version
-None of the indicators these scanners raise against Open WebUI correspond to a named vulnerability, a CVE or confirmed malicious code. Most are automated behavioral heuristics that flag capabilities the software has by design. Some go further and publish alarming, unsubstantiated claims, most notably a "potential malware" banner, without identifying any specific file, function or line and without providing any evidence for the claim. No malicious code has been identified in Open WebUI. Because every published artifact is built from the public source in [open-webui/open-webui](https://github.com/open-webui/open-webui) and is reproducible from it, every one of these claims can be checked against the code directly.
+None of the indicators these scanners raise against Open WebUI correspond to a named vulnerability, a CVE or confirmed malicious code. Most are automated behavioral heuristics that flag capabilities the software has by design. Some go further and publish alarming, unsubstantiated claims, most notably a "potential malware" banner, without identifying any specific file, function or line and without providing any evidence for the claim. No malicious code has been identified in Open WebUI. Because every published artifact is built from the public source in [open-webui/open-webui](https://github.com/open-webui/open-webui) and can be checked against it, every one of these claims can be checked against the code directly.
 :::
 
 ## What these scanners measure
@@ -46,7 +46,7 @@ Because Open WebUI's published packages are built entirely from the public sourc
 
 ### Dependency alerts and "obfuscated code"
 
-These originate in transitive dependencies and in the pre-built, minified front-end assets bundled in the distribution. Minified JavaScript is routinely classified as "obfuscated" by scanners because it is not human-readable, but it is ordinary compiled front-end code, not hand-obfuscated logic in Open WebUI's source. Dependency alerts track the wider ecosystem and are handled through routine dependency maintenance.
+These originate in transitive dependencies and in the pre-built, minified front-end assets bundled in the distribution. Minified JavaScript is routinely classified as "obfuscated" by scanners because it is not human-readable, but it is ordinary compiled front-end code, not hand-obfuscated logic in Open WebUI's source. Dependency alerts track the wider ecosystem and are handled through routine dependency maintenance: Python dependencies are exact-pinned with a lockfile, npm has its lockfile, and Dependabot runs monthly for four ecosystems.
 
 Container-image CVEs are a separate matter: those originate in the base image, are addressed by rebuilding on updated bases and are not part of the PyPI package scan discussed here.
 
