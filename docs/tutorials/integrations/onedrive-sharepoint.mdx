@@ -101,7 +101,7 @@ ONEDRIVE_SHAREPOINT_URL="https://your-tenant-name.sharepoint.com"
 
 :::info
 
-After setting these variables and restarting Open WebUI, you must also enable the OneDrive toggle in the admin panel. See the Final Step section below for details.
+After setting these variables and restarting Open WebUI, check the OneDrive toggle in the admin panel; see the Final Step section below.
 
 :::
 
@@ -140,7 +140,7 @@ ONEDRIVE_CLIENT_ID_PERSONAL="zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz"
 
 ## Final Step: Enable OneDrive Integration in Admin Settings
 
-After setting your environment variables and restarting your Open WebUI instance, you must explicitly enable the feature in the admin panel. **The environment variables alone do not activate the integration.**
+After setting your environment variables and restarting your Open WebUI instance, check that the feature is enabled in the admin panel. On a fresh database `ENABLE_ONEDRIVE_INTEGRATION=true` seeds the toggle on; on a database that already holds the setting from an earlier start, the stored value wins over the environment variable and the toggle must be switched on here.
 
 1. Navigate to **Settings → Admin → Documents**.
 2. Toggle on the **"OneDrive"** switch.
@@ -148,9 +148,9 @@ After setting your environment variables and restarting your Open WebUI instance
 
 :::warning
 
-Admin Toggle is Required
+Check the Admin Toggle
 
-This step is mandatory even though you've set `ENABLE_ONEDRIVE_INTEGRATION=true` in your environment. Some configuration options in Open WebUI are persistent database settings that are initialized on first startup but must be activated through the admin interface.
+This matters when `ENABLE_ONEDRIVE_INTEGRATION=true` was added after the first start: the toggle is a persistent database setting that the environment variable seeds only once, so a value stored by an earlier start is what applies until you change it here.
 
 :::
 
