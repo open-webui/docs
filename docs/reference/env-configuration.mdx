@@ -6802,7 +6802,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, groups from OAuth claims that don't exist in Open WebUI will be automatically created.
+- Description: When enabled, groups from OAuth claims that don't exist in Open WebUI will be automatically created. Groups matching [`OAUTH_BLOCKED_GROUPS`](#oauth_blocked_groups) are never created.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_GROUP_DEFAULT_SHARE`
@@ -6820,7 +6820,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 - Type: `str`
 - Default: `[]`
-- Description: JSON array of group names that are blocked from accessing the application. Users belonging to these groups will be denied access even if they have valid OAuth credentials.
+- Description: JSON array of OAuth group names that group management leaves alone. At sign-in, a matching group is never created (with `ENABLE_OAUTH_GROUP_CREATION`), and users are never added to or removed from it (with `ENABLE_OAUTH_GROUP_MANAGEMENT`). Each entry matches exactly, as a shell-style wildcard (`*`, `?`) or as a regular expression. To deny sign-in by role, use [`OAUTH_ALLOWED_ROLES`](#oauth_allowed_roles).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_ROLES_CLAIM`

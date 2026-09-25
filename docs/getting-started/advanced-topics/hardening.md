@@ -269,7 +269,7 @@ If you use an OAuth/OIDC provider for authentication, several options help you c
 # Only allow users with email addresses from specific domains
 OAUTH_ALLOWED_DOMAINS=yourcompany.com
 
-# Block specific IdP groups
+# Keep specific IdP groups out of group sync: never created, joined or left
 OAUTH_BLOCKED_GROUPS='["contractors-external", "temp-accounts"]'
 ```
 

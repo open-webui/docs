@@ -300,7 +300,7 @@ Strict Group Synchronization
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
 
 *   Users will be **added** to Open WebUI groups that match their OAuth claims.
-*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session. Removal and addition only happen when the claim is present and non-empty. An absent or empty groups claim leaves memberships untouched, and groups matching `OAUTH_BLOCKED_GROUPS` are never added or removed.
+*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session. Removal and addition only happen when the claim is present and non-empty. An absent or empty groups claim leaves memberships untouched, and groups matching `OAUTH_BLOCKED_GROUPS` are never created, added or removed.
 
 Ensure all necessary groups are correctly configured in your OAuth provider and included in the group claim (`OAUTH_GROUP_CLAIM`).
 
