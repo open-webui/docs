@@ -93,9 +93,11 @@ Writing a terminal server of your own means answering two endpoints:
 | Endpoint | Returns |
 | :--- | :--- |
 | `GET /skills` | A JSON array, one entry per skill, each with `id` (prefixed `terminal:`, the name url-encoded), `name`, `description` and `location` (or `path`). |
-| `GET /skills/{name}` | One skill: `name`, `description`, `content` (the Markdown instructions), `location` (or `path`) and `resources`, an array of file paths shipped with the skill. |
+| `GET /skills/read?name=<name>` | One skill: `name`, `description`, `content` (the Markdown instructions), `location` (or `path`) and `resources`, an array of file paths shipped with the skill. |
 
-Both carry the connection's bearer key and `Accept: application/json`. Calls made by the server also send `X-User-Id`, `X-Session-Id` (the chat id) and `X-Terminal-Context-Id`, the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs.
+Open Terminal serves both from v0.13.0.
+
+A terminal an admin configured is called by the Open WebUI server, with the connection's auth, `Accept: application/json`, `X-User-Id`, `X-Session-Id` (the chat id) and `X-Terminal-Context-Id`, the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs. Redirects are not followed. A terminal a user added in their own settings is called from that user's browser, with the bearer key and `X-Session-Id`. It only has to be reachable from the browser, so a terminal on the user's own machine, such as `http://127.0.0.1:8000`, works with Open WebUI hosted elsewhere.
 
 ---
 

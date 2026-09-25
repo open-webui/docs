@@ -181,7 +181,7 @@ Access management options via the **More (...)** menu in the top right corner.
 ### Export
 
 * **Plain text (.txt)** or **Markdown (.md)** for raw content
-* **PDF (.pdf)** with visual formatting (dark mode detected automatically)
+* **PDF (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
 
 ### Sharing
 
