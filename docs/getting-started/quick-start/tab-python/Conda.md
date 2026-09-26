@@ -38,7 +38,7 @@ If your terminal says the command doesn't exist:
     ```
 
 2.  **Remove Data (WARNING: Deletes all data):**
-    Delete your data directory (usually `~/.open-webui` unless configured otherwise):
+    Without `DATA_DIR`, the data directory sits inside the environment (`.../site-packages/open_webui/data`), so removing the environment above already deletes it. If you set `DATA_DIR`, delete that directory:
     ```bash
     rm -rf ~/.open-webui
     ```
