@@ -41,4 +41,4 @@ The **Shared Chats** modal provides a unified interface for your public content:
 **A:** No. This dashboard manages links generated on your local instance. For community-shared content, see [Deleting Shared Chats](/features/chat-conversations/chat-features/chatshare#deleting-shared-chats).
 
 **Q: If I delete my original chat, what happens to the shared link?**  
-**A:** Deleting a chat also immediately invalidates and deletes any associated share links.
+**A:** Deleting a chat also immediately invalidates and deletes any associated share links, including when the chat is deleted together with its folder.

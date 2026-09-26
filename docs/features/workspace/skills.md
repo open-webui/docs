@@ -67,7 +67,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 ### User-selected skills ($ mention)
 
-Type `$` in the chat input to open the skill picker. Select a skill, and its **full content is injected directly** into the system prompt, in both function calling modes. The model has immediate access to the complete instructions. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
+Type `$` in the chat input to open the skill picker, or pick the skill from the `/` menu. Select a skill, and its **full content is injected directly** into the system prompt, in both function calling modes. The model has immediate access to the complete instructions. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
 
 ### Per-chat skills (Integrations menu)
 
