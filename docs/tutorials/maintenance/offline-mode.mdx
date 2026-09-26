@@ -95,7 +95,7 @@ RAG_RERANKING_MODEL_AUTO_UPDATE=false
 WHISPER_MODEL_AUTO_UPDATE=false
 ```
 
-`OFFLINE_MODE` disables version checks and automatic model updates/downloads covered by that setting. `HF_HUB_OFFLINE` prevents Hugging Face Hub downloads. The three explicit model-update flags document that those caches should not update automatically. See the [offline configuration reference](/reference/env-configuration#offline_mode) for the full behavior.
+`OFFLINE_MODE=true` on its own sets `HF_HUB_OFFLINE=1`, disables the version check and forces all three `*_AUTO_UPDATE` flags to false, so the four extra lines are redundant but harmless; `ENABLE_VERSION_UPDATE_CHECK=false` is the standalone switch for the version check alone. `WHISPER_MODEL_AUTO_UPDATE=false` does not by itself stop a download: if the Whisper model is missing from the cache, Open WebUI retries with downloads enabled, and only `HF_HUB_OFFLINE=1` blocks that attempt, which is why the cache must be prepared first. See the [offline configuration reference](/reference/env-configuration#offline_mode) for the full behavior.
 
 :::warning Prepare caches before enabling offline settings
 
