@@ -114,7 +114,7 @@ http {
 
             proxy_buffering off;
             proxy_cache off;
-            client_max_body_size 20M;
+            client_max_body_size 20M; # the app sets no upload cap of its own until Max Upload Size (Admin Settings > Documents, or RAG_FILE_MAX_SIZE) is set; this limit is what returns 413
             proxy_read_timeout 10m;
 
             add_header Cache-Control "no-store, no-cache, must-revalidate" always;
@@ -155,7 +155,7 @@ http {
 
             proxy_buffering off;
             proxy_cache off;
-            client_max_body_size 20M;
+            client_max_body_size 20M; # the app sets no upload cap of its own until Max Upload Size (Admin Settings > Documents, or RAG_FILE_MAX_SIZE) is set; this limit is what returns 413
             
             # Extended timeout for long LLM completions (30 minutes)
             proxy_read_timeout 1800;
