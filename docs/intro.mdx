@@ -57,7 +57,7 @@ For GPU support, Docker Compose, and more → [Quick Start](/getting-started/qui
 :::tip Pick the right image
 `:main` above is the batteries-included one: it carries the embedding, speech and reranking models, document extraction and every database client, so retrieval, uploads and voice work the moment it starts.
 
-`:main-slim` is a fraction of that size and leaves the machine learning stack out. Chatting with a hosted model is identical, and the features that used local models run on services you point it at instead. Pick it when you want a small install, few dependencies, or Open WebUI purely as a front end. See [What slim leaves out](/getting-started/quick-start#what-slim-leaves-out).
+**`:slim` is 176 MB instead of 1.66 GB—89% less to download, with the same chat experience.** Choose it when your models run through a hosted API, your own model server or a separate Ollama instance. Change the tag above to `:slim` (also called `:main-slim`) and connect your provider; the default database and file storage work as usual. Features such as knowledge search and voice need external services. These are compressed Linux/amd64 sizes, checked on September 28, 2026; see [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out) for details.
 :::
 
   </TabItem>
