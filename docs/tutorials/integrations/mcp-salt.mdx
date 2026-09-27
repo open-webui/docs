@@ -1,0 +1,98 @@
+---
+title: Salt (MCP)
+sidebar_label: Salt MCP Integration
+sidebar_position: 52
+description: Connect Open WebUI to Salt's hosted MCP endpoint to message contacts, ask a human a question with tappable buttons, and send or pay an invoice, all inside an end-to-end encrypted chat.
+keywords: [salt, mcp, model context protocol, integration, agents, payments, streamable http, oauth]
+---
+
+:::warning Community Contribution
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/tutorials/contributing-tutorial/).
+
+:::
+
+[Salt](https://saltapp.ai) hosts a remote MCP server at `https://mcp.saltapp.ai/mcp` that Open WebUI connects to natively via **Streamable HTTP**. Salt is an end-to-end encrypted chat where humans and AI agents are equal contacts: an agent can message, ask a human with tappable buttons, and send or settle an invoice, all inside the chat. Authentication is handled through Salt's OAuth 2.1 flow (PKCE, dynamic client registration): no API keys, no proxies, no extra containers.
+
+## Setup
+
+:::danger Prerequisite: WEBUI_SECRET_KEY
+You **MUST** set the `WEBUI_SECRET_KEY` environment variable to a persistent value. Without it, your OAuth session breaks every time the container restarts, forcing re-authentication. See the [MCP feature docs](/features/extensibility/mcp) for details.
+:::
+
+### 1. Add the tool
+
+Go to **Settings > Admin > Integrations** and click **+** to add a new connection. Fill in the following:
+
+| Field | Value |
+|-------|-------|
+| **Type** | MCP Streamable HTTP |
+| **URL** | `https://mcp.saltapp.ai/mcp` |
+| **Auth** | OAuth 2.1 |
+| **ID** | `salt` |
+| **Name** | `Salt` |
+
+Click **Register Client**, then **Save**.
+
+<details>
+<summary>Alternative: Import JSON</summary>
+
+You can also click **Import** in the modal and paste this configuration:
+
+```json
+[
+  {
+    "type": "mcp",
+    "url": "https://mcp.saltapp.ai/mcp",
+    "spec_type": "url",
+    "spec": "",
+    "path": "openapi.json",
+    "auth_type": "oauth_2.1",
+    "key": "",
+    "info": {
+      "id": "salt",
+      "name": "Salt",
+      "description": "Message contacts, ask a human with tappable buttons, and send or pay invoices in an end-to-end encrypted chat."
+    }
+  }
+]
+```
+
+</details>
+
+### 2. Authorize
+
+In any chat, open **+ > Integrations > Tools** and toggle **Salt** on. You'll be redirected to Salt's OAuth flow. At the consent screen, choose the `chat` and/or `money` scope and sign in to (or create) your Salt account.
+
+:::warning OAuth 2.1 tools cannot be pre-enabled
+Do **not** set this as a default tool on a model. OAuth 2.1 requires an interactive browser redirect that cannot happen mid-request. Users must enable it manually per-chat via the **+** button. See [MCP docs](/features/extensibility/mcp) for details.
+:::
+
+:::note Re-authentication
+Salt's OAuth session may expire after inactivity or container restarts. If you see `Failed to connect to MCP server 'salt'`, re-toggle the tool in any chat to trigger the authorization flow again.
+:::
+
+## Example usage
+
+Once Salt is enabled for a chat, you can ask the model to work with your contacts:
+
+- "Message my contact Dana on Salt and tell them the deploy finished."
+- "Post a card in the chat with Dana asking 'Ship it?' with Yes/No buttons, and tell me what they tap."
+- "Send Dana an invoice for 25 USDC for this month's consulting."
+
+## Troubleshooting
+
+### `Failed to connect to MCP server 'salt'`
+
+Your OAuth session has expired. Re-toggle the Salt tool in any chat (**+ > Integrations > Tools**) to re-authorize.
+
+### `OAuth callback failed: OAuth callback state is invalid or expired`
+
+You're accessing Open WebUI via `localhost`, but `WEBUI_URL` is set to a public domain, so Salt sends you back to an address that knows nothing about the authorization you started. Access your instance using the **exact URL** from `WEBUI_URL` and authorize again.
+
+## Resources
+
+- Website: [saltapp.ai](https://saltapp.ai)
+- OpenAPI spec: [saltapp.ai/api/openapi.json](https://saltapp.ai/api/openapi.json)
+- Agent-facing docs: [saltapp.ai/agents.md](https://saltapp.ai/agents.md)
+- Source: [github.com/0000F8](https://github.com/0000F8)

@@ -47,5 +47,6 @@ These community-contributed guides cover specific integration scenarios with ste
 | Tutorial | What you'll achieve | Details |
 |----------|-------------------|---------|
 | [Notion (MCP)](./mcp-notion) | Connect Notion via Model Context Protocol | 👤 User · ⏱️ 5 min |
+| [Salt (MCP)](./mcp-salt) | Message contacts and send or pay invoices via Model Context Protocol | 👤 User · ⏱️ 5 min |
 | [OneDrive & SharePoint](./onedrive-sharepoint) | Pull Microsoft 365 documents into Open WebUI | 👤 Admin · ⏱️ 30 min |
 | [LibreTranslate](./libre-translate) | Add self-hosted translation capabilities | 👤 Admin · ⏱️ 15 min |
