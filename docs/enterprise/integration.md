@@ -39,7 +39,7 @@ Enterprise software ecosystems are complex. The last thing you need is another s
 
 | Integration Type | Examples |
 | :--- | :--- |
-| **Identity Systems** | LDAP, Active Directory, SSO providers (SAML, OIDC). |
+| **Identity Systems** | LDAP, Active Directory, SSO providers (OIDC and OAuth 2.0: Google, Microsoft Entra, GitHub, and any OIDC provider). |
 | **Enterprise Tools** | Connect to internal APIs, databases, and business systems. |
 | **Workflow Automation** | Integrate with existing automation pipelines and orchestration tools. |
 | **Observability** | Feed logs and metrics into your existing monitoring stack. |

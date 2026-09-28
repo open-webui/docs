@@ -34,7 +34,7 @@ Many organizations evaluating AI platforms operate under regulatory frameworks s
 
 * **Self-hosted data pipeline** ,  Your data stays within your infrastructure by default, unless you configure external model providers.
 * **Identity integration** ,  SSO, LDAP, RBAC to enforce your access policies.
-* **Audit-ready logging** ,  Container-native log streams compatible with enterprise SIEM tools.
+* **Audit-ready logging** ,  Container-native log streams compatible with enterprise SIEM tools. The request audit log is off by default (`AUDIT_LOG_LEVEL=NONE`) and, when enabled, is written to `DATA_DIR/audit.log`; set `ENABLE_AUDIT_STDOUT=true` to send it to the container's stdout as well.
 * **Data residency control** ,  You choose where your data physically resides.
 
 :::warning Compliance Responsibility
@@ -54,8 +54,8 @@ Seamless integration with your existing identity infrastructure reduces friction
 Open WebUI integrates with the identity systems your organization already uses:
 
 * **LDAP & Active Directory** ,  Connect directly to your existing directory services for user authentication and management.
-* **Single Sign-On (SSO)** ,  Support for SAML and OIDC protocols, enabling users to access Open WebUI with their existing corporate credentials.
-* **Multi-Factor Authentication (MFA)** ,  Layer additional security on top of primary authentication.
+* **Single Sign-On (SSO)** ,  Support for OIDC and OAuth 2.0 (Google, Microsoft Entra, GitHub, and any OIDC provider), enabling users to access Open WebUI with their existing corporate credentials.
+* **Multi-Factor Authentication (MFA)** ,  Enforced by your identity provider when sign-in is delegated to it through SSO; Open WebUI has no MFA of its own for password logins.
 
 #### Access Control & Permissions
 

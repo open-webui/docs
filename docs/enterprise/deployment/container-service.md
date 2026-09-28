@@ -49,12 +49,12 @@ Use **versioned tags** for production stability:
 ghcr.io/open-webui/open-webui:v0.x.x
 ```
 
-Avoid the `:main` tag in production. It tracks the latest development build and can introduce breaking changes without warning. Check the [Open WebUI releases](https://github.com/open-webui/open-webui/releases) for the latest stable version.
+Avoid the `:main` tag in production. It follows the `main` branch (and doubles as `:latest`), so it moves on every release; `:dev` is the development build. Pin a `v0.x.y` tag for reproducible deployments. Check the [Open WebUI releases](https://github.com/open-webui/open-webui/releases) for the latest stable version.
 
 ## Scaling Strategy
 
 - **Platform-native auto-scaling**: Configure your container service to scale on CPU utilization, memory, or request count.
-- **Health checks**: Use the `/health` endpoint for both liveness and readiness probes.
+- **Health checks**: Use `/health` for liveness and `/ready` for readiness; `/ready` waits for startup to finish and checks database and Redis connectivity.
 - **Task-level env vars**: Pass all shared infrastructure configuration as environment variables or secrets in your task definition.
 - **Session affinity**: Enable sticky sessions on your load balancer for WebSocket stability. While Redis handles cross-instance coordination, session affinity reduces unnecessary session handoffs.
 

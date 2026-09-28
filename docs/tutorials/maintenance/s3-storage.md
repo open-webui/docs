@@ -18,7 +18,7 @@ This guide provides instructions on how to switch the default `local` storage in
 In order to follow this tutorial, you must have the following:
 
 - An active AWS account
-- An active AWS Access Key and Secret Key
+- An AWS Access Key and Secret Key, or another credential the default AWS credential chain can find (an IAM role, for example)
 - IAM permissions in AWS to create and put objects in S3
 - Docker installed on your system
 
@@ -32,9 +32,9 @@ To learn more about S3, visit: [Amazon S3's Official Page](https://aws.amazon.co
 
 # How to Set-Up
 
-## 1. Required environment variables
+## 1. S3 environment variables
 
-In order to configure this option, you need to gather the following environment variables:
+In order to configure this option, gather the following environment variables (only `S3_BUCKET_NAME` is strictly required; see Step 2):
 
 | **Open-WebUI Environment Variable** | **Example Value**                           |
 |-------------------------------------|---------------------------------------------|
@@ -56,15 +56,16 @@ See all the `Cloud Storage` configuration options in the [Open-WebUI Cloud Stora
 
 ## 2. Run Open-WebUI
 
-Before we launch our instance of Open-WebUI, there is one final environment variable called `STORAGE_PROVIDER` we need to set. This variable tells Open-WebUI which provider you want to use. By default, `STORAGE_PROVIDER` is empty which means Open-WebUI uses local storage.
+Before we launch our instance of Open-WebUI, there is one final environment variable called `STORAGE_PROVIDER` we need to set. This variable tells Open-WebUI which provider you want to use. By default, `STORAGE_PROVIDER` is `local`; an empty or unknown value stops startup with "Unsupported storage provider". With `s3`, every upload is first written to `/app/backend/data/uploads` and then copied to the bucket, and each read downloads the object back there, so the local data volume is still needed.
 
 | **Storage Provider** | **Type** | **Description**                                                                                 | **Default** |
 |----------------------|----------|-------------------------------------------------------------------------------------------------|-------------|
-| `local`              | str      | Defaults to local storage if an empty string (`' '`) is provided                                | Yes         |
+| `local`              | str      | Files stay under `/app/backend/data/uploads`                                                    | Yes         |
 | `s3`                 | str      | Uses S3 client library and related environment variables mentioned in Amazon S3 Storage         | No          |
 | `gcs`                | str      | Uses GCS client library and related environment variables mentioned in Google Cloud Storage     | No          |
+| `azure`              | str      | Uses the Azure Blob Storage client with `AZURE_STORAGE_ENDPOINT` and `AZURE_STORAGE_CONTAINER_NAME`, plus `AZURE_STORAGE_KEY` or, without it, the default Azure credential | No          |
 
-To use Amazon S3, we need to set `STORAGE_PROVIDER` to "S3" along with all the environment variables we gathered in Step 1 (`S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`, `S3_ENDPOINT_URL`, `S3_REGION_NAME`, `S3_BUCKET_NAME`).
+To use Amazon S3, we need to set `STORAGE_PROVIDER` to `s3` (lowercase; the value is matched exactly) along with the environment variables we gathered in Step 1. Only `S3_BUCKET_NAME` is strictly required, with `S3_REGION_NAME` normally needed too: without `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` the default AWS credential chain (an IAM role, for example) is used, and `S3_ENDPOINT_URL` is only needed for S3-compatible services. `S3_KEY_PREFIX`, `S3_ADDRESSING_STYLE` (`path` for MinIO-style endpoints), `S3_USE_ACCELERATE_ENDPOINT` and `S3_ENABLE_TAGGING` are also available.
 
 Here, I'm also setting the `ENV` to "dev", which will allow us to see the Open-WebUI Swagger docs so we can further test and confirm the S3 storage set-up is working as expected.
 
@@ -93,7 +94,7 @@ And confirm that we're getting a response from the selected LLM.
 
 ![Get a response in Open-WebUI](/images/tutorials/amazon-s3/amazon-s3-oui-response.png)
 
-Great! Looks like everything is worked as expected in Open-WebUI. Now let's verify that the text file was indeed uploaded and stored in the specified S3 bucket. Using the AWS Management Console, we can see that there is now a file in the S3 bucket. In addition to the name of the file we uploaded (`hello.txt`) you can see the object's name was appended with a unique ID. This is how Open-WebUI tracks all the files uploaded.
+Great! Looks like everything is worked as expected in Open-WebUI. Now let's verify that the text file was indeed uploaded and stored in the specified S3 bucket. Using the AWS Management Console, we can see that there is now a file in the S3 bucket. In addition to the name of the file we uploaded (`hello.txt`) you can see the object's name was prefixed with a unique ID (`<file-id>_hello.txt`, under `S3_KEY_PREFIX` if set). This is how Open-WebUI tracks all the files uploaded.
 
 ![Get a response in Open-WebUI](/images/tutorials/amazon-s3/amazon-s3-object-in-bucket.png)
 

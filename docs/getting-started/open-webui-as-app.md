@@ -13,7 +13,7 @@ Every Open WebUI instance is a **Progressive Web App (PWA)**. You can install it
 - **Full-screen experience** with no browser toolbar or address bar
 - **Standalone window** on desktop, full-screen on mobile
 - **Separate from the browser** with its own window and task entry
-- **Push notifications** (when enabled by your admin)
+- **Browser notifications** for finished responses, channel messages and calendar reminders, once you turn on **Browser Notifications** in Settings > Notifications. They fire only while the app is open; there is no push service. If your admin enables user webhooks (and, for non-admin users, grants the webhooks feature permission), **Notification Targets** in the same tab can send chat finished or failed, channel message, calendar and file-processing-failure alerts to a webhook, either only while you are away or always.
 
 ---
 
@@ -53,4 +53,4 @@ Safari is the only browser that supports PWA installation on iOS. Chrome and Fir
 
 ## Customizing the PWA (Admins)
 
-Admins can white-label the PWA by pointing to a custom manifest with the [`EXTERNAL_PWA_MANIFEST_URL`](/reference/env-configuration#external_pwa_manifest_url) environment variable. This lets you set a custom app name, icon, and theme color.
+Admins can white-label the PWA by pointing to a custom manifest with the [`EXTERNAL_PWA_MANIFEST_URL`](/reference/env-configuration#external_pwa_manifest_url) environment variable. This lets you set a custom app name, icon, and theme color. The server fetches that URL itself on every `/manifest.json` request, so it must be reachable from the server, not only from the browser. Without it, the manifest uses `WEBUI_NAME` as the app name (with ` (Open WebUI)` appended when it is not the default) and the Open WebUI logo as its icon.

@@ -20,27 +20,35 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 |-----|----------|
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
-| `:main-slim` | Smaller image with the local machine-learning stack removed, see [What slim leaves out](#what-slim-leaves-out) |
+| `:slim`, `:main-slim` | About **176 MB instead of 1.66 GB** to download—**89% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
 | `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
 
-Channel and variant combine: `:dev-slim`, `:dev-cuda`, `:dev-cuda126` and `:dev-ollama` all exist. Slim is a variant of its own, so there is no `cuda-slim` or `ollama-slim`. The bare variant names `:slim`, `:cuda`, `:cuda126` and `:ollama` are aliases of the `main` build.
+Each variant also has a development build: `:dev-slim`, `:dev-cuda`, `:dev-cuda126` and `:dev-ollama`. The short tags `:slim`, `:cuda`, `:cuda126` and `:ollama` follow `main`. Choose one variant; slim does not combine with CUDA or bundled Ollama.
 
-### What slim leaves out
+### Why choose slim? {#what-slim-leaves-out}
 
-Slim is the standard image with the local machine-learning stack removed: no `torch`, no `sentence-transformers`, no `transformers`, no `faster-whisper`, no `unstructured`, and no `ffmpeg`, `pandoc` or build toolchain in the base system. It also carries one client where the standard image carries many: PostgreSQL and pgvector for data and vectors, local files for storage, and no Playwright browser. Dozens of Python packages are gone, `torch` among them, which is where the size saving comes from.
+**176 MB instead of 1.66 GB. Same chat experience.** The `:slim` image is **89% smaller** than `:main`, saving about **1.48 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
 
-**Nothing extra is required to run it.** It starts on its own and chatting works exactly as it does on `:main`, with the model provider you were going to configure anyway. What changes is that the work slim can no longer do itself has to come from a service you point it at, and only for the features you actually use.
+These are compressed download sizes for Linux/amd64, checked on September 28, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
 
-#### What it will not start without
+<!-- Verified from GHCR manifest layer sizes. main linux/amd64: sha256:34d884bba14a22a9745b00303f343cbdcfcbc16c004b4fe78af07c275b99a236 = 1,656,050,501 bytes; slim linux/amd64: sha256:c40d017d15da9945326e9e779d5988e513abfa56e0a3e9f633ab9a0f76c57afc = 176,489,702 bytes. slim and main-slim index digest: sha256:e8adae70e1db7a838d5d6cdfe2a66a4c1d293a0361b304ccc20df179b17aeead. -->
 
-Two settings are checked at boot, and slim refuses to start rather than failing later:
+The saving comes from leaving out the bundled machine-learning stack, including PyTorch, local embedding and speech runtimes, plus document-processing tools and optional database and storage clients. If you use Open WebUI to chat with models through an API, those dependencies would otherwise sit unused in your container.
 
-- **The application database** has to be SQLite or PostgreSQL. MySQL, MariaDB and Oracle need the standard image, and so does AWS RDS IAM authentication.
-- **File storage** has to be local. S3, Azure Blob and Google Cloud Storage need the standard image.
+**To get started, change `:main` to `:slim` in the Docker command above.** The default SQLite database and local file storage work as usual. Connect your model provider and start chatting; no extra services are needed for a basic chat setup.
 
-Neither matters on a default install, which is SQLite and local files. They matter when you move a standard-image deployment onto slim.
+For knowledge search, document extraction or voice, slim connects to services that do that work. It is a good fit if you already use those services or only need chat. Choose the standard image if you want Open WebUI to handle embeddings, speech recognition and document extraction inside its own container. The table below covers the setup for each feature.
+
+#### Moving an existing deployment to slim
+
+Check your database and file storage before switching:
+
+- **Database:** SQLite and PostgreSQL are supported. MySQL, MariaDB, Oracle and AWS RDS IAM authentication require the standard image.
+- **File storage:** Local files are supported. S3, Azure Blob and Google Cloud Storage require the standard image.
+
+Slim checks these settings at startup and reports an error for unsupported configurations. Default installs already use SQLite and local files.
 
 #### What each feature needs
 
@@ -196,4 +204,3 @@ If Docker is not your preference, follow the [Developing Open WebUI](/getting-st
     ```bash
     docker volume rm open-webui
     ```
-

@@ -28,8 +28,7 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 3. **Enable GitHub Pages**
 
    - Go to **Settings** > **Pages** in your forked repository.
-   - Under **Branch**, select the branch you want to deploy (e.g., `main`) and the folder (e.g.,`/docs`).
-   - Click **Save** to enable GitHub Pages.
+   - Under **Build and deployment** > **Source**, select **GitHub Actions**. The workflow builds the site and publishes it itself, so there is no branch or folder to choose.
 
 4. **Configure GitHub Environment Variables**
 
@@ -37,6 +36,8 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
    - Add the following environment variables:
      - `BASE_URL` set to `/docs` (or your chosen base URL for the fork).
      - `SITE_URL` set to `https://<your-github-username>.github.io/`.
+
+   These variables take effect only after the workflow and config edits in the next section: the upstream `gh-pages.yml` build step sets no `env`, and `docusaurus.config.ts` hard-codes `url` and `baseUrl`.
 
 ### 📝 Updating the GitHub Pages Workflow and Config File
 
@@ -61,9 +62,9 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
      ```typescript
      const config: Config = {
        title: "Open WebUI",
-       tagline: "ChatGPT-Style WebUI for LLMs (Formerly Ollama WebUI)",
+       tagline: "On a mission to build the best AI interface",
        favicon: "images/favicon.png",
-       url: process.env.SITE_URL || "https://openwebui.com",
+       url: process.env.SITE_URL || "https://docs.openwebui.com",
        baseUrl: process.env.BASE_URL || "/",
        ...
      };
@@ -71,9 +72,9 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
 
 - This setup ensures consistent deployment behavior for forks and custom setups.
 
-5. **Run the `gh-pages` GitHub Workflow**
+5. **Run the Deploy site to Pages Workflow**
 
-   - In the **Actions** tab, locate the `gh-pages` workflow.
+   - In the **Actions** tab, locate the **Deploy site to Pages** workflow (`gh-pages.yml`).
    - Trigger the workflow manually if necessary, or it may run automatically based on your setup.
 
 6. **Browse to Your Forked Copy**
@@ -82,7 +83,7 @@ b. **Modify `docusaurus.config.ts` to Use Environment Variables**
 
 7. **Draft Your Changes**
 
-   - In your forked repository, navigate to the appropriate directory (e.g., `docs/tutorial/`).
+   - In your forked repository, navigate to the appropriate directory (e.g., `docs/tutorials/`).
    - Create a new markdown file for your tutorial or edit existing ones.
    - Ensure that your tutorial includes the unsupported warning banner.
 
