@@ -5202,6 +5202,14 @@ The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and th
 - Description: Specifies the extract depth for Tavily search results.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `TAVILY_SEARCH_DEPTH`
+
+- Type: `str`
+- Default: `basic`
+- Options: `ultra-fast`, `fast`, `basic`, `advanced`
+- Description: Sets the `search_depth` sent with every Tavily search, from `ultra-fast` (quickest) to `advanced` (most thorough). Also set under **Tavily Search Depth** in **Settings > Admin > Web Search**. It is separate from `TAVILY_EXTRACT_DEPTH`, so search and extraction depth can be set independently.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `YACY_QUERY_URL`
 - Type: `str`
 - Default: Empty string (' ')
