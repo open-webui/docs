@@ -204,7 +204,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string, which lets the browser's language pick the locale, with `en-US` as the fallback when no translation matches
-- Description: Sets the default locale for the application.
+- Description: Sets the language a browser starts in on its first visit, overriding the browser's own language. A `?lang=` URL parameter and a language picked under **Settings > General > Language** take precedence over it. The first visit saves the language in that browser, so changing this value later only affects browsers that have not opened Open WebUI yet.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DEFAULT_MODELS`
