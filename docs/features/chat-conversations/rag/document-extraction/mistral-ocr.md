@@ -52,7 +52,7 @@ Open WebUI sends only `.pdf` uploads to Mistral OCR. Every other file type, imag
 
 ## Verifying Mistral OCR
 
-To verify that Mistral OCR is working correctly in script, please refer to `https://docs.mistral.ai/capabilities/document/`
+To verify that Mistral OCR is working correctly in script, please refer to `https://docs.mistral.ai/capabilities/document_ai/basic_ocr/`
 
 ### Conclusion
 

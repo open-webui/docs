@@ -36,7 +36,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::info
 
-Chatterbox can use a good deal of memory and has hardware requirements that might be higher than you're used to with other local TTS solutions. If you have trouble meeting the requirements, you might find [OpenAI Edge TTS](https://docs.openwebui.com/tutorials/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](https://docs.openwebui.com/tutorials/text-to-speech/Kokoro-FastAPI-integration) to be suitable replacements.
+Chatterbox can use a good deal of memory and has hardware requirements that might be higher than you're used to with other local TTS solutions. If you have trouble meeting the requirements, you might find [OpenAI Edge TTS](https://docs.openwebui.com/features/chat-conversations/audio/text-to-speech/openai-edge-tts-integration) or [Kokoro-FastAPI](https://docs.openwebui.com/features/chat-conversations/audio/text-to-speech/Kokoro-FastAPI-integration) to be suitable replacements.
 
 :::
 
