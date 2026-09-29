@@ -20,23 +20,29 @@ Copy the database file yourself as described below. The **Database** download in
 To export the database from your current Open WebUI instance:
 
 1. **Stop Open WebUI before copying the database**:
-   SQLite can use write-ahead logging (WAL), which may keep recent committed changes in sidecar files while the application is running. Stop the container first so the database is in a consistent state before export:
+   Open WebUI runs SQLite in write-ahead logging (WAL) mode by default, so recent committed changes are kept in `webui.db-wal` next to `webui.db`. Stop the container first so nothing writes to the database during the export:
    ```bash
    docker stop open-webui
    ```
 
-2. **Use `docker cp` to copy the database file**:
+2. **Write the pending changes into `webui.db`**:
+   Stopping the container leaves those changes in `webui.db-wal`, so a copy of `webui.db` alone can be missing them. Run a checkpoint from the same image while the container is stopped:
+   ```bash
+   docker run --rm --volumes-from open-webui --entrypoint python3 "$(docker inspect -f '{{.Config.Image}}' open-webui)" -c "import sqlite3; db = sqlite3.connect('/app/backend/data/webui.db'); db.execute('PRAGMA wal_checkpoint(TRUNCATE)'); db.close()"
+   ```
+
+3. **Use `docker cp` to copy the database file**:
    The `webui.db` file is located in the container inside the directory `/app/backend/data`. Run the following command to copy it into your local machine:
    ```bash
    docker cp open-webui:/app/backend/data/webui.db ./webui.db
    ```
 
-3. **Start Open WebUI again on the source server**:
+4. **Start Open WebUI again on the source server**:
    ```bash
    docker start open-webui
    ```
 
-4. **Transfer the exported file to the new server**:
+5. **Transfer the exported file to the new server**:
    You can use **FileZilla** or any other file transfer tool of your choice to move the `webui.db` file to the new server.
 
    :::info
@@ -99,6 +105,7 @@ This approach is particularly useful when:
 
 # Export:
 docker stop open-webui
+docker run --rm --volumes-from open-webui --entrypoint python3 "$(docker inspect -f '{{.Config.Image}}' open-webui)" -c "import sqlite3; db = sqlite3.connect('/app/backend/data/webui.db'); db.execute('PRAGMA wal_checkpoint(TRUNCATE)'); db.close()"
 docker cp open-webui:/app/backend/data/webui.db ./webui.db
 docker start open-webui
 
