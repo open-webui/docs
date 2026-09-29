@@ -24,7 +24,7 @@ For comprehensive information about all built-in agentic tools (including web se
 | **Search Decision** | Open WebUI decides based on prompt analysis. | The **Model** decides if and when it needs to search. |
 | **Data Processing** | Fetches ALL results, chunks them, and performs **RAG**. | Returns **Snippets** directly; no chunking or Vector DB. |
 | **Link Following** | Snippets from top results are injected. | Model uses `fetch_url` to read a **Full Page** directly. |
-| **Model Context** | Only gets relevant fragments (Top-K chunks). | Gets the **whole text** (up to ~50k chars) via `fetch_url`. |
+| **Model Context** | Only gets relevant fragments (Top-K chunks). | Gets the **whole text** via `fetch_url`, up to the limit you set. |
 | **Reasoning** | Model processes data *after* system injection. | Model can search, read, check, and search again. |
 
 ## How to Enable Agentic Behavior
@@ -71,7 +71,7 @@ This applies to the Native tool-calling path. Legacy mode still runs the old RAG
 ### `fetch_url` (Full Page Context)
 If the model determines that a search snippet is insufficient, it will call `fetch_url`:
 *   **Direct Access**: The tool visits the specific URL and extracts the main text using your configured **Web Loader**.
-*   **Raw Context**: The extracted text is injected **directly into the model's context window** (hard-coded truncation at exactly 50,000 characters to prevent context overflow).
+*   **Raw Context**: The extracted text is injected **directly into the model's context window** By default the whole page goes in. To cap it, set **Fetch URL Content Length Limit** in **Settings > Admin > Web Search** or [`WEB_FETCH_MAX_CONTENT_LENGTH`](/reference/env-configuration#web_fetch_max_content_length); a longer page is cut at that many characters and ends with `[Content truncated...]`.
 *   **Citable**: a fetched page appears in the citations panel as a source named by its URL. This is the only way a web page becomes a citation in Native mode, and it is a page the model has actually read.
 *   **Agentic Advantage**: Because it doesn't use RAG, the model has the "full picture" of the page rather than isolated fragments. This allows it to follow complex instructions on specific pages (e.g., "Summarize the technical specifications table from this documentation link").
 
@@ -109,7 +109,7 @@ Model calls: search_web("React security vulnerabilities 2026")
 ```
 Model calls: fetch_url("https://example.com/react-security-advisory-2026")
 ```
-- Reads full 50k characters of detailed security documentation
+- Reads the full text of the security advisory
 - Identifies specific vulnerability types (XSS, injection, etc.)
 
 **Step 5: Refinement 🤔**
