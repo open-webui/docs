@@ -44,6 +44,8 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **"Using Entire Document" (Full Context)** | Injects a whole file into every message | Very high: but a **File Context sub-mode**; only fires while File Context is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low: constant while voice mode is on |
 | **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low: stable as long as the attachments don't change |
+| **Open Terminal `AGENTS.md`** | Reads the terminal's `AGENTS.md` on every turn and places it before the first message | Changes the whole prefix whenever the file changes, for example when the model edits it mid-chat |
+| **Open Terminal skills** | Lists the skills saved in the terminal on every turn and adds the skill tool and skill list once one exists | Changes the tool list and system message the turn a skill is added or removed |
 
 :::info
 The attachment metadata block is intentionally **metadata only** (no file content), so it stays stable across turns and does not meaningfully hurt caching. The content-injecting rows above are the ones to watch.
