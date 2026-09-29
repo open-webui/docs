@@ -77,7 +77,7 @@ Sub-agents are deliberately narrower than the chat that starts them:
 - **No memory writes.** It can read memories but cannot add, change or delete them, keeping delegated work from quietly rewriting your personalization.
 - **No direct connections.** Models served through a direct connection cannot delegate.
 - **No code interpreter in the background**, unless the engine is Jupyter, since the browser-based Pyodide engine needs a live session.
-- **No external tool servers in the background.** A foreground sub-agent inherits the chat's OpenAPI and MCP tool servers; a background one does not. If a delegated task depends on an external tool server, keep it in the foreground.
+- **No user tool servers in the background.** A foreground sub-agent inherits the tool servers the user added in their own Settings, which run from the browser; a background one does not. Tool servers an admin added (OpenAPI and MCP) stay available to both. If a delegated task depends on a [user tool server](/features/extensibility/plugin/tools/openapi-servers/open-webui), keep it in the foreground.
 
 ## Cost
 
