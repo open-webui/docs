@@ -519,7 +519,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the admin-panel **export** action is available (data, chats, and database export). When disabled, the export endpoints reject requests. Database exports only work for SQLite databases for now. Note that admin retains the underlying ability to dump the database directly via deployment access; this toggle controls the in-product export surface, see the admin-posture-toggles note above. Requires a restart to take effect.
+- Description: Controls whether the admin-panel **export** action is available (data, chats, and database export). When disabled, the export endpoints reject requests. Database exports only work for SQLite databases for now. The database download copies the live `webui.db` file without its `-wal` file, so it is not the recommended way to back up the database; see the [backups guide](/tutorials/maintenance/backups) instead. Note that admin retains the underlying ability to dump the database directly via deployment access; this toggle controls the in-product export surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
 #### `ENABLE_ADMIN_CHAT_ACCESS`
 
