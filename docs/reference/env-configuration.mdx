@@ -1064,6 +1064,8 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 c-ares reads `/etc/resolv.conf` and the hosts file but not other name sources, so `.local` names via avahi/mDNS, NIS or LDAP directories and Windows NBNS names may stop resolving, and on some Windows hosts it finds no usable nameserver at all. Exercise your models, web search and any internal services after turning it on, and turn it back off if lookups start failing.
 
+Known issue with Tailscale: on a host that uses Tailscale's DNS (MagicDNS, nameserver `100.100.100.100`), c-ares rejects the cached answers that server sends back, so lookups hang for 10 to 20 seconds and then fail. A connection that verifies fine with this setting off shows "Server Connection Error" with it on. Keep this setting off on such hosts.
+
 The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your own image, do not upgrade it past that pin while this setting is on.
 
 :::
