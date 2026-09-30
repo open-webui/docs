@@ -317,7 +317,7 @@ WebSocket frames are compressed by the WebSocket server rather than that middlew
 ENABLE_ORJSON=True
 ```
 
-Every Socket.IO event in a multi-replica deployment is published through Redis, and each one is encoded on the way out and decoded on the way in. In clustered deployments that encoding was the single largest cost measured on the workers handling live updates, which is why this setting exists. It switches the whole application from Python's standard-library `json` to [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster. orjson already ships as a pinned dependency, so there is nothing to install. Available from v0.11.0.
+Every Socket.IO event in a multi-replica deployment is published through Redis, and each one is encoded on the way out and decoded on the way in. In clustered deployments that encoding was the single largest cost measured on the workers handling live updates, which is why this setting exists. It switches the whole application from Python's standard-library `json` to [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster. orjson already ships as a pinned dependency, so there is nothing to install. Available from v0.11.0 and on by default from v0.11.5, so the line above is only needed on v0.11.0 to v0.11.4.
 
 **What it covers:**
 
@@ -332,7 +332,7 @@ Every Socket.IO event in a multi-replica deployment is published through Redis, 
 | Results returned by built-in tools, and working out a user's permissions when they sign in, sign up or reload the page | Small payloads, but on paths every user hits over and over |
 | The output a Jupyter server returns for code run in chat | Only when the code execution or code interpreter engine is set to Jupyter. The cost follows how much a run prints and how many images it produces, so the difference shows on chart-heavy or output-heavy runs |
 
-**Why it is opt-in.** orjson is stricter than the standard library, so the default keeps behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
+**Why it was opt-in before v0.11.5.** orjson is stricter than the standard library, so the old default kept behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
 
 Two differences do survive the fallback, neither of which affects a normal deployment:
 
