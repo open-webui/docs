@@ -157,6 +157,12 @@ Extra workers cost you everything replicas cost, PostgreSQL, Redis and a client-
 
 :::
 
+:::caution Every worker runs the migrations
+
+Each worker is a full Open WebUI process, so each one runs the startup migrations, all at the same time. `ENABLE_DB_MIGRATIONS` cannot pick one of them: every worker in a container reads the same value. Start a new version with `UVICORN_WORKERS=1`, wait until the migrations have finished, then raise it again.
+
+:::
+
 ### Offload HTTP Compression to the Load Balancer
 
 Once a load balancer, ingress, or CDN sits in front of Open WebUI, let **it** handle HTTP response compression and disable the application-level compression middleware:
