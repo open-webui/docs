@@ -7897,6 +7897,12 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 - Default: `True`
 - Description: Controls whether database migrations are automatically run on startup. In multi-pod or multi-worker deployments, set this to `False` on all pods except one to designate a "master" pod responsible for migrations, preventing race conditions or schema corruption. It decides **which** instance migrates and nothing else: it does not make a mixed-version fleet safe, so a release that changes the schema still has to reach every pod at once rather than one at a time. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations).
 
+:::caution One migrating process, nothing else running
+
+Exactly one Open WebUI process may run the migrations, and no other instance may serve traffic until they have finished. The setting applies per container, so a container with `UVICORN_WORKERS` above `1` migrates from every worker at once: upgrade with `UVICORN_WORKERS=1`. Stop every other replica for the duration of the upgrade, since an instance that keeps serving writes into data the migration is still moving, and those writes can be lost.
+
+:::
+
 :::warning
 
 **Required for Multi-Replica Setups**
@@ -8573,6 +8579,12 @@ Leave it at `1` and add containers instead: more replicas in Docker Compose, or 
 Extra workers demand everything extra replicas demand, a client-server vector database, Redis, PostgreSQL and a single instance running migrations, and give you none of what replicas give you in return. They all sit in one container, so they share its memory limit and its fate: the container is a single point of failure, cannot be restarted one worker at a time, and cannot be spread across machines.
 
 If you do raise it, set the related variables for multi-worker deployments as well; the rest of this entry covers what breaks without them.
+
+:::
+
+:::caution Every worker runs the migrations
+
+Each worker is a full Open WebUI process, so each one runs the startup migrations, all at the same time. `ENABLE_DB_MIGRATIONS` cannot pick one of them: every worker in a container reads the same value. Start a new version with `UVICORN_WORKERS=1`, wait until the migrations have finished, then raise it again.
 
 :::
 
