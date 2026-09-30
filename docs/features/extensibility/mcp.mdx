@@ -78,11 +78,13 @@ Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-
 *   **None**: Use this for **local MCP servers** or internal networks where no token is required.
     *   **⚠️ Important**: Default to "None" unless your server strictly requires a token. Selecting "Bearer" without providing a key sends an empty Authorization header (`Authorization: Bearer`), which causes many servers to reject the connection immediately.
 *   **Bearer**: Use this **only** if your MCP server requires a specific API token. You **must** populate the "Key" field.
+*   **Session**: Sends the user's own Open WebUI session token as a bearer token. For servers that authenticate against Open WebUI itself.
+*   **OAuth**: Sends the access token from the user's Open WebUI SSO sign-in as a bearer token. Works only when users sign in to Open WebUI through that same OAuth provider and their token carries the scopes the MCP server needs.
 *   **OAuth 2.1**: Uses Dynamic Client Registration (DCR). Best when your MCP server supports registering OAuth clients automatically.
 *   **OAuth 2.1 (Static)**: Uses a pre-created client ID/client secret. Best when your provider does not support DCR, or when your security team requires manually managed credentials.
 
 :::info OAuth Resource Parameter
-With either OAuth mode, an **OAuth Resource Parameter** setting appears. It controls whether Open WebUI sends the OAuth `resource` parameter ([RFC 8707 resource indicators](https://datatracker.ietf.org/doc/html/rfc8707)) on the authorization and token requests:
+With **OAuth 2.1** or **OAuth 2.1 (Static)**, an **OAuth Resource Parameter** setting appears. It controls whether Open WebUI sends the OAuth `resource` parameter ([RFC 8707 resource indicators](https://datatracker.ietf.org/doc/html/rfc8707)) on the authorization and token requests:
 
 - **Automatic** (default): Open WebUI decides based on what the server advertises.
 - **Include**: always send the `resource` parameter. Use this if your provider requires it.
@@ -92,14 +94,14 @@ Leave it on **Automatic** unless OAuth fails and the provider's error or documen
 :::
 
 :::info OAuth Scopes
-With either OAuth mode, an **OAuth Scopes** setting controls which scopes Open WebUI requests from the server's authorization server:
+With **OAuth 2.1** or **OAuth 2.1 (Static)**, an **OAuth Scopes** setting controls which scopes Open WebUI requests from the server's authorization server:
 
 - **Use discovered scopes** (default): request the scopes advertised in the server's OAuth metadata.
 - **Custom scopes**: provide an explicit, space- or comma-separated list to override the discovered scopes, for example to request a narrower set than the server advertises, or when the server's metadata does not list usable scopes.
 :::
 
 :::info Check OAuth Discovery
-On an MCP connection using either OAuth mode, the verify button beside the URL reads **Check OAuth Discovery**, and a green result reports "OAuth discovery successful". It fetches the OAuth discovery document and parses it, and that is the whole of what it does. The MCP server itself is never contacted and no tools are listed, so a passing check tells you the authorization server was found and tells you nothing about whether tool calls will work.
+On an MCP connection using **OAuth 2.1** or **OAuth 2.1 (Static)**, the verify button beside the URL reads **Check OAuth Discovery**, and a green result reports "OAuth discovery successful". It fetches the OAuth discovery document and parses it, and that is the whole of what it does. The MCP server itself is never contacted and no tools are listed, so a passing check tells you the authorization server was found and tells you nothing about whether tool calls will work.
 
 With **OAuth 2.1 (Static)**, the check runs against the **OAuth Server URL** when one is set, and against the MCP **URL** when it is left empty.
 :::
