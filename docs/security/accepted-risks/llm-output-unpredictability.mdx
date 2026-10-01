@@ -23,8 +23,8 @@ This unpredictability is a property of how language models work. It is **not a d
 
 Open WebUI controls the system *around* the model, and we harden that surface:
 
-- **Access control and isolation** scope what a model and its tools can reach: per-user data scoping, the [tool and function permission model](/features/extensibility/plugin/), and container-isolated code execution.
-- **A model cannot exceed the calling user's own privileges.** Acting on a user's behalf, it is bound by that user's permissions; it cannot read or do what the user could not.
+- **Access control and isolation** scope what a model and its tools can reach: per-user data scoping, the [tool and function permission model](/features/extensibility/plugin/), and code execution that runs in the browser (Pyodide) by default, with any server-side engine opt-in and isolated by the operator.
+- **A model cannot exceed the calling user's own privileges.** Acting on a user's behalf, it is bound by that user's permissions; it cannot read or do what the user could not through Open WebUI's own APIs.
 - **Operator guardrails** ([filters](/features/extensibility/plugin/functions/filter), content checks, confirmation prompts) let deployments add their own policy layer.
 
 These reduce the *consequences* of bad model output. They do not, and cannot, make the model's output itself predictable or safe in every case.

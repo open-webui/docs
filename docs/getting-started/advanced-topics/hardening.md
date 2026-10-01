@@ -145,7 +145,7 @@ Without Redis, **signing out does not invalidate a user's token**. The token rem
 - Deactivating an account does not revoke the token already issued to it, although the account's role is rechecked on every request
 - OIDC back-channel logout cannot revoke tokens
 
-With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.
+With Redis configured, Open WebUI supports per-token revocation. Signing out revokes that session's token, and a password change (including one set by an admin) or an OIDC back-channel logout rejects every token issued to the user before that moment; with the default `JWT_EXPIRES_IN`, these revocation records auto-expire. Deactivating an account or changing its role does not revoke tokens, although the role is rechecked on every request. This is the intended production behavior.
 
 **Revocation checks fail open.** A revocation check that cannot reach Redis accepts the token and logs `Revocation check failed; accepting token` at most once a minute per worker process. A Redis outage therefore puts the instance back into the no-Redis behavior listed above for as long as it lasts, with sign-outs and password changes taking no effect, so treat Redis availability as part of your auth surface and alert on that log line.
 
