@@ -77,6 +77,27 @@ This method is perfect if you want to skip navigating through the Admin Settings
 
 ---
 
+## Updating and Deleting Models
+
+Both live in the same **Manage** dialog as downloading (see [Step 2](#step-2-managing-your-ollama-instance)). They act only on the Ollama server behind the connection whose **Manage** you opened, so with several Ollama connections, open **Manage** on each one you want to change.
+
+### Updating All Models
+
+Next to **Pull a model from Ollama.com**, the **Update All Models** button pulls every model on that server again, one at a time, which brings each one up to the latest version of its tag. Ollama only downloads what changed, so a model that is already current finishes quickly.
+
+While it runs, the dialog shows **Updating "model-name"** with a progress bar. **Cancel** stops the model that is downloading and skips the rest. If a model cannot be pulled, for example one you created yourself rather than downloaded from Ollama.com, the update skips it and moves on to the next one. When the run ends, Open WebUI shows **All models are up to date**.
+
+After an update, a model that was already loaded keeps running the old version until it is unloaded. See [Unloading Loaded Models](#unloading-loaded-models).
+
+### Deleting a Model
+
+1. Under **Delete a model**, pick the model from **Select a model**. Each entry shows its size on disk.
+2. Click **Delete Model** and confirm.
+
+Deleting removes the model from the Ollama server itself and frees its disk space, so it disappears for every user of that connection. To stop offering a model without deleting it, list only the models you want to offer in the connection's **Model IDs (Filter)** instead (see [Advanced Configuration](#advanced-configuration)).
+
+---
+
 ## Unloading Loaded Models
 
 Open WebUI shows a green "Loaded" indicator next to any Ollama model that is currently kept warm by the runtime, and admins see an **Eject** button on the model row to unload it without restarting the server. Behind the scenes, Open WebUI calls `POST /api/models/unload` (admin-only), which forwards a `keep_alive=0` generate call to every Ollama node serving that model.
