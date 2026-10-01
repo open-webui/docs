@@ -1028,7 +1028,7 @@ See the [Model List Loading Issues](/troubleshooting/connection-error#️-model-
 
 - Type: `int`
 - Default: Inherits `AIOHTTP_CLIENT_TIMEOUT` when unset
-- Description: Sets the timeout in seconds for executing tool server API calls (OpenAPI/MCP proxy calls made by Open WebUI). Use this to control how long Open WebUI waits for actual tool execution responses.
+- Description: Sets the timeout in seconds for executing tool server API calls (OpenAPI/MCP proxy calls made by Open WebUI). Use this to control how long Open WebUI waits for actual tool execution responses. A call that runs past it fails, and the model receives the timeout as a tool error. For MCP tool calls, a value of `0` or below means no limit.
 
 :::info
 
@@ -2819,6 +2819,19 @@ For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HO
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ### Milvus
+
+:::danger Milvus: back up before upgrading to v0.11.5
+
+v0.11.5 moves Milvus, in both regular and multitenancy mode, to native hybrid search, and **existing data is migrated the first time the new version starts**.
+
+- **Back up your Milvus data first.** Do not upgrade Milvus and Open WebUI on the same day: upgrade one, confirm it works, then the other.
+- On the first start with `ENABLE_DB_MIGRATIONS` on (the default), every Open WebUI collection in Milvus is **copied in full** into a new collection that holds the vectors, the text and a BM25 keyword index together. Nothing is re-embedded. This runs whether or not hybrid search is turned on.
+- **Open WebUI only finishes starting once the copy is done.** Measured at 11 to 22 MB/s on a 16-thread machine with Milvus's own Docker Compose setup, so 200 GB takes about 2.5 to 5 hours. Plan the downtime, and give health checks and orchestrator start-up probes enough time so the container is not restarted mid-copy.
+- **The copy needs free disk space for a full second copy of your Milvus data.** The original collections are dropped only after every copy has succeeded. A failed run leaves all collections unchanged and is retried on the next start.
+- Run that first start on a single instance with one worker, as with any migration, so only one process performs the copy.
+- **Requires Milvus 2.5 or newer.** On older Milvus servers the migration is skipped and hybrid search keeps working the way it did before.
+
+:::
 
 :::warning
 

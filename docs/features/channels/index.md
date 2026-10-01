@@ -53,6 +53,7 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 | 👥 **Shared context** | Every message, human or AI, builds the collective knowledge |
 | 🧵 **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
 | 📎 **File sharing** | Drop images, documents, and code. AI can see and process them |
+| 📝 **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed, and go out in order |
 | 🔒 **Access control** | Public, private, group-based, and direct message channels |
 | 🧠 **AI channel awareness** | Models can search and synthesize across channels autonomously |
 

@@ -53,6 +53,19 @@ Browse all available tags on the [GitHub releases page](https://github.com/open-
 Personal tool servers now sit behind their own switch, **Settings > Admin > Integrations > User Connections** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which starts off. Users who had the `direct_tool_servers` permission lose sight of the **Integrations** tab in their settings until you turn it on, admins included. Servers they already added keep working the whole time, so nothing breaks; they just cannot add or edit one until the switch is on.
 :::
 
+:::danger Milvus: back up before upgrading to v0.11.5
+
+v0.11.5 moves Milvus, in both regular and multitenancy mode, to native hybrid search, and **existing data is migrated the first time the new version starts**.
+
+- **Back up your Milvus data first.** Do not upgrade Milvus and Open WebUI on the same day: upgrade one, confirm it works, then the other.
+- On the first start with `ENABLE_DB_MIGRATIONS` on (the default), every Open WebUI collection in Milvus is **copied in full** into a new collection that holds the vectors, the text and a BM25 keyword index together. Nothing is re-embedded. This runs whether or not hybrid search is turned on.
+- **Open WebUI only finishes starting once the copy is done.** Measured at 11 to 22 MB/s on a 16-thread machine with Milvus's own Docker Compose setup, so 200 GB takes about 2.5 to 5 hours. Plan the downtime, and give health checks and orchestrator start-up probes enough time so the container is not restarted mid-copy.
+- **The copy needs free disk space for a full second copy of your Milvus data.** The original collections are dropped only after every copy has succeeded. A failed run leaves all collections unchanged and is retried on the next start.
+- Run that first start on a single instance with one worker, as with any migration, so only one process performs the copy.
+- **Requires Milvus 2.5 or newer.** On older Milvus servers the migration is skipped and hybrid search keeps working the way it did before.
+
+:::
+
 :::warning Running multiple workers or replicas?
 Update every instance at the same time. Rolling updates are not supported across a release that changes the database schema: the migration moves the whole database forward at once, while the instances still on the old version keep querying the old shape. Stop all replicas and workers, let one instance migrate, then bring the rest back up on the new version.
 
