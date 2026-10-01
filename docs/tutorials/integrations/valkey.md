@@ -39,7 +39,7 @@ services:
     container_name: valkey
     volumes:
       - valkey-data:/data
-    command: "valkey-server --save 30 1 --maxclients 10000 --timeout 1800"
+    command: "valkey-server --save 30 1 --appendonly yes --maxmemory-policy noeviction --maxclients 10000 --timeout 1800"
     healthcheck:
       test: "[ $$(valkey-cli ping) = 'PONG' ]"
       start_period: 5s
