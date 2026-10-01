@@ -174,7 +174,7 @@ LDAP_SERVER_HOST="1.222.222.222"
 LDAP_SERVER_PORT="636"
 
 # TLS Options
-LDAP_USE_TLS="true"
+LDAP_USE_TLS="true" # LDAPS from connect; there is no STARTTLS mode, so pair it with port 636
 LDAP_VALIDATE_CERT="false"          # Set to true for a public CA
 
 #LDAP_CA_CERT_FILE="/etc/ssl/certs/openwebui_ca.crt"
@@ -217,7 +217,7 @@ To enable full TLS validation (`LDAP_VALIDATE_CERT="true"`):
 sudo cp certificate_wildcard.crt /usr/local/share/ca-certificates/openwebui.crt
 sudo update-ca-certificates
 ```
-Restart Open WebUI after making this change.
+Restart Open WebUI after making this change. This only helps when Open WebUI runs directly on the host: with `LDAP_CA_CERT_FILE` empty, the LDAP client uses the system CA store of the machine or container it runs in, and a Docker container does not see the host's store. In Docker, mount the certificate into the container and point `LDAP_CA_CERT_FILE` at that path (it is shown commented out in section 7); on an instance that has already started once, set the same path in **Admin Panel > Settings > Authentication > LDAP > Certificate Path** instead, because the stored value takes precedence over the environment variable.
 
 ## 10. Test LDAPS Connection
 

@@ -152,14 +152,11 @@ MICROSOFT_CLIENT_SECRET=your_client_secret
 MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
 MICROSOFT_REDIRECT_URI=https://your-open-webui-domain/oauth/microsoft/callback
 
-# Required for logout to work properly
-OPENID_PROVIDER_URL=https://login.microsoftonline.com/your_tenant_id/v2.0/.well-known/openid-configuration
-
 # Enable OAuth signup
 ENABLE_OAUTH_SIGNUP=true
 
 # OAuth Group Management
-OAUTH_GROUP_CLAIM=groups
+OAUTH_GROUPS_CLAIM=groups
 ENABLE_OAUTH_GROUP_MANAGEMENT=true
 ENABLE_OAUTH_GROUP_CREATION=true
 
@@ -171,7 +168,7 @@ WEBUI_SECRET_KEY=your_secure_secret_key
 
 | Variable                        | Default  | Description                                                                                                                                      |
 | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `OAUTH_GROUP_CLAIM`             | `groups` | The claim in the ID/access token containing the user's group memberships.                                                                        |
+| `OAUTH_GROUPS_CLAIM`            | `groups` | The claim in the ID/access token containing the user's group memberships (`OAUTH_GROUP_CLAIM` is still read as a fallback).                                                                        |
 | `ENABLE_OAUTH_GROUP_MANAGEMENT` | `false`  | When `true`, user group memberships are synchronized with OAuth claims upon each login.                                                          |
 | `ENABLE_OAUTH_GROUP_CREATION`   | `false`  | When `true`, enables **Just-in-Time (JIT) group creation** - groups present in OAuth claims but not in Open WebUI will be created automatically. |
 
@@ -180,7 +177,7 @@ WEBUI_SECRET_KEY=your_secure_secret_key
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
 
 - Users will be **added** to Open WebUI groups that match their OAuth claims.
-- Users will be **removed** from any Open WebUI groups (including those manually assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session.
+- Users will be **removed** from any Open WebUI groups (including those manually assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session. If the claim is missing or empty, no memberships are touched, and groups matching `OAUTH_BLOCKED_GROUPS` are never added or removed.
 
 :::
 
@@ -189,12 +186,12 @@ When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group membership
 After completing the configuration:
 
 1. **Test the token**: Use [https://jwt.ms](https://jwt.ms) to decode your ID token and verify that the `groups` claim contains display names instead of GUIDs.
-2. **Log in as a non-admin user**: Admin users' group memberships are not automatically updated via OAuth group management. Use a standard user account for testing.
+2. **Log in as a test user**: admin and non-admin accounts are synced the same way since v0.8.11.
 3. **Check Open WebUI**: Navigate to the Admin Panel and verify that groups appear with readable names.
 
 :::info Admin Users
 
-Admin users' group memberships are **not** automatically updated via OAuth group management. If you need to test the configuration, use a non-admin user account.
+Admin users' group memberships are synced exactly like other users' since v0.8.11, so an admin account works for testing.
 
 :::
 
