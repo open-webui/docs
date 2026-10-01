@@ -22,7 +22,7 @@ The following speech-to-text providers are supported:
 | Self-hosted (OpenAI-compatible) | ✅ | [Self-Hosted STT Guide](/features/chat-conversations/audio/speech-to-text/self-hosted-stt) (uses an authenticated server) |
 | Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
 | Deepgram | ✅ | N/A |
-| Azure | ✅ | N/A |
+| Azure | ✅ | [Azure AI Speech STT Guide](/features/chat-conversations/audio/speech-to-text/azure-stt-integration) |
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 
