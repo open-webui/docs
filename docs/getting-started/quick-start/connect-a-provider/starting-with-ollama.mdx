@@ -144,6 +144,23 @@ A context that is too small silently truncates the prompt. This is most visible 
 - To set it per model or per chat, set `num_ctx` to a realistic value for the model (for example `8192`, `16384` or the model's maximum), not the `2048` pre-fill. Remember it overrides `OLLAMA_CONTEXT_LENGTH`.
 - A larger context uses more VRAM and RAM, so size it to what your hardware can hold.
 
+### How much memory a larger context needs
+
+Ollama reserves the KV cache for the whole context when it loads the model, so a higher `num_ctx` or `OLLAMA_CONTEXT_LENGTH` costs memory even if your chats stay short. For a standard transformer, the `f16` KV cache takes `2 × layers × KV heads × head dim × 2 bytes` per token:
+
+| Model | Per token | 8192 tokens | 32768 tokens | 131072 tokens |
+| --- | --- | --- | --- | --- |
+| Llama 3.1 8B (32 layers, 8 KV heads, head dim 128) | 128 KiB | 1 GiB | 4 GiB | 16 GiB |
+
+That is on top of the weights (about 4.9 GB for `llama3.1:8b` at Q4_K_M), so at its full 131072-token context this model needs more memory for the KV cache than for the weights.
+
+- `OLLAMA_NUM_PARALLEL` multiplies it: 4 parallel requests at 32768 tokens reserve the KV cache for 131072 tokens.
+- `OLLAMA_KV_CACHE_TYPE=q8_0` roughly halves it and `q4_0` roughly quarters it (see [Ollama's FAQ](https://docs.ollama.com/faq)).
+- Models with sliding-window layers (such as Gemma) or compressed KV attention (such as DeepSeek's MLA) need much less per token than this formula gives.
+- After loading, `ollama ps` shows the context Ollama actually allocated in `CONTEXT` and whether the model still fits in `PROCESSOR`. Anything other than `100% GPU` means part of it was offloaded to the CPU, which is much slower.
+
+To estimate this for a specific model before downloading it, [ModelVRAM](https://modelvram.com/) reads the model's config from Hugging Face and splits the total into weights and KV cache for a given context length and KV cache type.
+
 ---
 
 ## All Set!
