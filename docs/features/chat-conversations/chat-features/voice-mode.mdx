@@ -1,0 +1,99 @@
+---
+sidebar_position: 17
+title: "Voice Mode"
+---
+
+# Voice Mode
+
+Voice Mode turns a chat into a spoken conversation. You talk, Open WebUI transcribes what you said and sends it as your message, and the model's reply is read back to you a sentence at a time as it is written. The conversation stays an ordinary chat, so every turn is saved as text you can read and continue later.
+
+Voice Mode uses the instance's [speech-to-text](/features/chat-conversations/audio/speech-to-text/stt-config) and [text-to-speech](/features/chat-conversations/audio) settings, so it works with whichever engines your admin has set up.
+
+## Starting Voice Mode
+
+1. Open a chat with **one** model selected. Voice Mode talks to a single model at a time.
+2. Leave the message box empty. While it is empty and nothing is attached, the **Voice mode** button takes the place of the send button.
+3. Click **Voice mode** and allow microphone access when the browser asks.
+
+On a wide screen, Voice Mode opens in the side panel next to the chat, so the transcript stays in view. On a phone or a narrow window, it fills the screen. Your screen is kept awake for as long as Voice Mode is open, where the browser supports it.
+
+To end it, click **End call**. That also turns off the microphone and any camera or screen share.
+
+You can also open a chat with Voice Mode already running by adding `?call=true` to its URL. See [URL Parameters](/features/chat-conversations/chat-features/url-params).
+
+## Talking With the Model
+
+- **Speak, then pause.** Voice Mode starts recording when it hears you and sends what you said after about two seconds of silence.
+- **The reply is spoken as it streams.** Each sentence is read aloud as soon as it is complete, so a long answer starts playing before the model has finished writing it. Reasoning and tool-call details are not read aloud.
+- **Tap to interrupt.** While the model is speaking, tap its picture or the status line to stop it. If the reply is still being written, that stops the reply as well.
+- **Or talk over it.** With **Allow Voice Interruption in Call** turned on (see [Your Voice Mode Settings](#your-voice-mode-settings)), starting to speak cuts the model off the same way. With it off, the microphone ignores everything while the model is speaking.
+- **Mute.** Click the microphone button, or press **M** on a keyboard. Muting in the middle of a sentence discards that sentence instead of sending part of it. If you mute while the model is speaking, the microphone turns back on when it finishes.
+
+The status line under the model's picture shows what Voice Mode is doing:
+
+| Status | What it means |
+| :--- | :--- |
+| **Listening...** | Waiting for you to speak, or recording you |
+| **Thinking...** | Transcribing what you said and sending it |
+| **Tap to interrupt** | The model is speaking |
+| **Muted** | Your microphone is muted |
+
+## Show the Model What You See
+
+Click **Camera** to add video to the conversation. While video is on, each time you finish speaking, a still frame from the camera is attached to your message, so a model that can read images can answer questions about what it sees. The frames are saved with the chat like any other attached image.
+
+**Switch camera** lists your cameras and, where the browser supports it, **Screen Share**, which sends frames of a screen or window instead. Click **Stop camera** in the corner of the video to turn it off.
+
+## Voices and Playback
+
+The reply is spoken in:
+
+1. the model's own **TTS Voice**, if one is set when editing the model in **Workspace > Models**
+2. otherwise, the voice you picked under **Settings > Audio > Set Voice**
+3. otherwise, the default voice your admin set
+
+**Speech Playback Speed** in **Settings > Audio** sets how fast replies are read.
+
+The speech itself comes from the text-to-speech engine your admin chose in **Admin Panel > Settings > Audio**. If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser.
+
+The admin's **Response Splitting** setting decides how much of the reply is spoken at once:
+
+| Response Splitting | What Voice Mode does |
+| :--- | :--- |
+| **Punctuation** (default) | Speaks one sentence at a time as the reply streams |
+| **Paragraphs** | Speaks one paragraph at a time |
+| **None** | Waits for the whole reply, then speaks it |
+
+What you say is always transcribed on the server with the admin's speech-to-text engine, even if you chose **Web API** for dictation in your own settings. The **Language** under **Settings > Audio > STT Settings** is passed along with it. If the admin's speech-to-text engine is set to **Web API**, Voice Mode is not available.
+
+## Your Voice Mode Settings
+
+Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mode. Both are off by default.
+
+| Setting | What it does |
+| :--- | :--- |
+| **Allow Voice Interruption in Call** | Lets you interrupt the model by speaking while it talks |
+| **Display Emoji in Call** | Shows an emoji matching each spoken sentence in place of the model's picture. Each emoji is picked by the [task model](/features/administration/task-models), one request per sentence |
+
+## The Voice Mode Prompt
+
+While Voice Mode is on, Open WebUI adds voice instructions to the start of the system prompt. The built-in instructions ask the model for short, warm, conversational answers that are easy to follow when heard rather than read.
+
+Admins can turn this off, or replace the instructions with their own, under **Admin Panel > Settings > Interface > Voice Mode Prompt**. The same settings are available as [`ENABLE_VOICE_MODE_PROMPT`](/reference/env-configuration#enable_voice_mode_prompt) and [`VOICE_MODE_PROMPT_TEMPLATE`](/reference/env-configuration#voice_mode_prompt_template). An empty template uses the built-in instructions.
+
+## Permissions
+
+Admins can control access to Voice Mode on a per-role or per-group basis.
+
+- **Location**: Admin Panel > Users > Groups > **Default permissions** > **Permissions** > **Allow Call**. To set a group-specific value, edit the group and open its **Permissions** tab.
+- **Environment Variable**: [`USER_PERMISSIONS_CHAT_CALL`](/reference/env-configuration#user_permissions_chat_call) (Default: `True`)
+
+If disabled, users do not see the **Voice mode** button. Admins always do.
+
+## Troubleshooting
+
+- **"Permission denied when accessing media devices"**: the browser blocked the microphone. Browsers only allow microphone access on HTTPS or `localhost`, so opening Open WebUI by its IP address from another device usually causes this. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues).
+- **"Select only one model to call"**: more than one model is selected. Remove the others and try again.
+- **"Call feature is not supported when using Web STT engine"**: the admin's speech-to-text engine is set to **Web API**. An admin needs to choose a server-side engine in **Admin Panel > Settings > Audio**.
+- **It keeps listening and never sends**: Voice Mode sends after about two seconds of silence, so steady background noise can keep it recording. Mute while it is noisy, or move somewhere quieter.
+- **No sound from the model**: see [Text-to-Speech (TTS) Issues](/troubleshooting/audio#text-to-speech-tts-issues).
