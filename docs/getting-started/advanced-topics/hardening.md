@@ -508,7 +508,7 @@ AUDIT_INCLUDED_PATHS=auths,users,configs
 AUDIT_EXCLUDED_PATHS=/chats,/chat,/folders
 ```
 
-Authentication endpoints (signin, signout, signup) are always audited regardless of path exclusions. Passwords in request bodies are automatically redacted.
+Authentication endpoints (signin, signout, signup) are always audited regardless of path exclusions. Every field whose name ends in `password`, in any letter case, is masked in both request and response bodies.
 
 ---
 
@@ -625,11 +625,16 @@ Because Tools and Functions execute server-side code, any user with permission t
 If your deployment does not use Tools or Functions at all, remove the surface completely:
 
 ```bash
-# Set to false to disable the built-in Tools and Functions execution surface
+# Master switch: Tools, Functions, tool servers and Open Terminal
 ENABLE_PLUGINS=false
+
+# Or switch off one part only
+ENABLE_TOOLS=false
+ENABLE_FUNCTIONS=false
+ENABLE_TOOL_SERVERS=false
 ```
 
-This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages, makes their listing endpoints return empty, and stops those plugins loading and running, so filters, actions and pipe functions are skipped and user-authored tools are never offered to a model.
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers, Open Terminal connections and users' direct tool servers from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
 
 ### Code execution
 

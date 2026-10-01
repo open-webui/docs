@@ -131,7 +131,7 @@ Controls access to broad platform capabilities.
 | :--- | :--- |
 | **API Keys** | Ability for non-admin users to generate Personal Access Tokens (API Keys) in User Settings. |
 | **Notes** | Access to the "Notes" feature. |
-| **Channels** | Access to the "Channels" feature. |
+| **Channels** | Access to the "Channels" feature. Without it, a user also stops receiving live channel messages, and channel automations they created do not run. |
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |

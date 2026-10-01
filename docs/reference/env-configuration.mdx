@@ -8697,11 +8697,27 @@ Open WebUI provides environment variables to customize the pip installation proc
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns **plugins** off entirely: the [Tools and Functions](/features/extensibility/plugin/) users write and upload, which run Python on the server. When set to `False`, the workspace **Tools** page and admin **Functions** page are hidden and plugins stop loading and running, so user tools are not offered to models and filters, actions and pipe functions are skipped. This is stronger than [`SAFE_MODE`](#safe_mode): `SAFE_MODE` deactivates all Functions while the feature stays in place, whereas `ENABLE_PLUGINS=False` removes the surface. Surfaced to clients as the `enable_plugins` config flag.
-- Not affected: things that are not plugins. The [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) are part of Open WebUI rather than uploaded code, and keep working, as do the code interpreter and any OpenAPI or MCP tool servers configured through connections; `GET /api/v1/tools/` still returns those servers. So this is not a way to stop a model using tools in general, and not an "execute no code" switch. For those, use the per-model **Builtin Tools** categories and the code-execution settings.
-- Note: the flag gates the **listing** endpoints, which return empty (`GET /api/v1/functions/`, `/functions/list`, `/functions/export`, `/tools/list`, and the local-tool half of `/tools/`). The create, update, delete and valves endpoints are **not** gated, so a plugin can still be written through the API while the execution surface is off. Treat this as a switch for whether plugins *run*, not as an authorization boundary over the plugin endpoints.
-- Also hidden while disabled: the **Functions** entry in the Admin Panel (navigating to it redirects back), the **Tools** workspace page (same), and the **Tools Access** permission and its Import/Export sub-toggles under **Users > Groups > Permissions**, since there is nothing left for them to govern.
-- Failure modes differ by surface, which is worth knowing when debugging: tools and filters simply come back empty, while installing a plugin or running an action raises an error naming `ENABLE_PLUGINS`.
+- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections and users' own direct tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
+- Keeps working: the [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest), the code interpreter and direct model connections, since those are part of Open WebUI itself.
+- Note: this decides whether plugins and tool servers *run*. Some management endpoints stay reachable while it is off, for example deleting a tool or function and saving the tool server list, so treat it as an execution switch, and keep the permission to create Tools and Functions limited to people you trust.
+
+#### `ENABLE_TOOLS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Turns workspace **Tools** (the Python tools users write or import) on or off. Set to `False`, tools stop loading, tools attached to a model or chosen in a chat are dropped from the request, the **Tools** workspace page and the **Tools Access** permissions are hidden, and creating or updating a tool returns an error. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+
+#### `ENABLE_FUNCTIONS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Turns **Functions** on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions disappear from messages, pipe models leave the model list, the admin **Functions** page is hidden, and creating or updating a function returns an error. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+
+#### `ENABLE_TOOL_SERVERS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Turns every external tool connection on or off: OpenAPI and MCP tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections (admin and personal) and the direct tool servers users add themselves. Set to `False`, none of them is loaded or called, the **Tools** and **Open Terminal** sections of **Settings > Admin > Integrations** are greyed out, the terminal picker leaves the chat, and [`ENABLE_DIRECT_INTEGRATIONS`](#enable_direct_integrations) counts as off. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`
 
