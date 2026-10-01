@@ -1479,7 +1479,7 @@ JSON format: { "title": "your concise title here" }
 
 - Type: `str`
 - Description: Prompt to use for generating several relevant follow-up questions.
-- Default: The value of `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`:
@@ -1512,7 +1512,7 @@ JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
 
 - Type: `str`
 - Description: Prompt to use when calling tools.
-- Default: The value of `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 
 `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`:
 
@@ -1949,7 +1949,7 @@ When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons
 #### `TAGS_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE`:
@@ -4157,7 +4157,7 @@ Enabling this feature increases the text volume indexed by BM25, which may impac
 #### `RAG_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_RAG_TEMPLATE` environment variable.
+- Default: The built-in template shown below. (`DEFAULT_RAG_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_RAG_TEMPLATE`:
@@ -4576,7 +4576,7 @@ You **MUST** provide the full URL, including the endpoint path (e.g., `https://a
 #### `QUERY_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE`:
