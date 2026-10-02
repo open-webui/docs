@@ -68,7 +68,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Description**: The `call` parameter enables a video or call overlay in the chat interface.
 - **How to Set**: Set the parameter to `true` to enable the call overlay.
 - **Example**: `/?call=true`
-- **Behavior**: Activates a call interface overlay, allowing features such as live transcription and video input.
+- **Behavior**: Activates a call interface overlay, allowing features such as live transcription and video input. It applies the same checks as the Voice mode button: the user needs the **Allow Call** permission, only one model may be selected, and the speech-to-text engine must be something other than **Web API**.
 
 ### 7. **Initial Query Prompt**
 
@@ -140,12 +140,12 @@ Suppose a user wants to initiate a quick chat session without saving the history
 These URL parameters can be combined to create highly customized chat sessions. For example:
 
 ```bash
-/?models=model1,model2&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
+/?models=model1&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
 ```
 
 This URL will:
 
-- Initialize the chat with `model1` and `model2`.
+- Initialize the chat with `model1`.
 - Enable YouTube transcription, web search, and specified tools.
 - Display a call overlay.
 - Set an initial prompt of "Hello there."
