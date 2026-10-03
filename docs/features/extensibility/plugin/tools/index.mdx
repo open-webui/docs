@@ -500,14 +500,14 @@ Knowledge tool availability changes based on whether the model has attached know
 :::
 
 :::caution Attached Knowledge Still Requires User Access
-Attaching a knowledge base to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge item. Items the user cannot access are silently excluded from search results.
+Attaching a knowledge base or note to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge base and note. Items the user cannot access are silently excluded from search results. Individual files are different: a file attached directly to the model is shared with everyone who can use the model, and the model's author must be able to read it when attaching it.
 
 **Access requirements by knowledge type:**
 
 | Attached Type | User Needs |
 |---------------|-----------|
 | **Knowledge Base** (collection) | Owner, admin, or explicit read access grant |
-| **Individual File** | Owner or admin only (no access grants) |
+| **Individual File** | Anyone who can use the model (checked against the model's author when attached) |
 | **Note** | Owner, admin, or explicit read access grant |
 
 **Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself, even though they can use the model.
