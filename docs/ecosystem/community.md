@@ -192,6 +192,8 @@ The same menu has a language picker and switches the site between the **Auto**, 
 
 ## Report a problem with the site
 
+If openwebui.com shows **System Upgrade in Progress**, the site is being updated, not broken. Wait a while, then click **Refresh Page**. Your own Open WebUI instance keeps working, and only what goes through the site, such as importing a post or syncing stats, waits until it is back.
+
 **Report Issue** in the menu that opens from your picture leads to the [community platform's issue tracker](https://github.com/open-webui/community-platform/issues) on GitHub. Open an issue there for a bug on openwebui.com or an idea for the site, after searching for an existing one. Problems with Open WebUI itself belong in the [Open WebUI issue tracker](https://github.com/open-webui/open-webui/issues), and a post or comment that breaks the rules gets the **Report** button under it.
 
 ## Turn it off
