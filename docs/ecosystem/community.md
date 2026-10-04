@@ -149,7 +149,7 @@ Both are plain links. Nothing is sent until you write a review on the site and p
 The [Leaderboard](https://openwebui.com/leaderboard) ranks models by the messages people have synced from their own instances. Syncing is opt-in and per user: it sends stats about your own chats only, never their text.
 
 1. Sign in on openwebui.com, open **Leaderboard** and click **Sync Stats**. **Sync Open WebUI usage** on your profile opens the same dialog.
-2. Enter your Open WebUI URL and click **Sync**. Syncing needs Open WebUI v0.7.0 or later.
+2. Enter your Open WebUI URL and click **Sync**. Syncing needs Open WebUI v0.7.0 or later. Clicking **Sync** accepts the openwebui.com [Terms of Service](https://openwebui.com/terms).
 3. Your instance opens in a new tab with a **Sync Usage Stats** dialog that lists what is and is not shared.
 4. Click **Sync** to send the stats, or **Download as JSON** to save them to a file and read them first. The site's Sync dialog also accepts that file through **Click here to upload JSON file directly**.
 
