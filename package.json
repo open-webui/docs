@@ -5,6 +5,7 @@
 	"scripts": {
 		"docusaurus": "docusaurus",
 		"start": "docusaurus start",
+		"prebuild": "node scripts/check-index-links.mjs",
 		"build": "docusaurus build",
 		"postbuild": "node scripts/generate-raw-docs.mjs && node scripts/generate-search-corpus.mjs && node scripts/generate-llms-files.mjs",
 		"raw-docs": "node scripts/generate-raw-docs.mjs",
