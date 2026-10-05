@@ -37,16 +37,16 @@ If you would like to reach the Ollama service from another machine, make sure yo
 
 ## Configure Open WebUI
 
-Access the Ollama settings through **Settings -> Connections** in the menu. By default, the **Ollama Base URL** is preset to http://localhost:11434, as illustrated in the snapshot below. To verify the status of the Ollama service connection, click the **Refresh button** located next to the textbox. If the WebUI is unable to establish a connection with the Ollama server, you will see an error message stating, `WebUI could not connect to Ollama`.
+Access the Ollama settings through **Admin Panel > Settings > Connections**. The **Ollama API** connection defaults to `http://localhost:11434` (`http://host.docker.internal:11434` in the standard Docker image; `http://localhost:11434` in the bundled `:ollama` image), as illustrated in the snapshot below. To verify the status of the Ollama service connection, click **Configure** (the gear) on the Ollama connection, then **Verify Connection** (the circular-arrows button next to the URL). If the WebUI is unable to establish a connection with the Ollama server, you will see a connection error toast.
 
 ![Open WebUI Ollama Setting Failure](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings_0.png)
 
-If the connection is successful, you will see a message stating `Service Connection Verified`, as illustrated below.
+If the connection is successful, you will see a message stating `Server connection verified`, as illustrated below.
 
 ![Open WebUI Ollama Setting Success](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings.png)
 
 :::tip
 
-If you want to use an Ollama server hosted at a different URL, simply update the **Ollama Base URL** to the new URL and press the **Refresh** button to re-confirm the connection to Ollama.
+If you want to use an Ollama server hosted at a different URL, click **Configure** (the gear) on the Ollama connection, change the **URL**, click **Verify Connection**, then save.
 
 :::

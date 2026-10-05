@@ -163,7 +163,7 @@ apiBase: http://localhost:3000/api
 
 ### API Key
 
-To authenticate with your Open WebUI instance, you'll need to generate an API key.
+To authenticate with your Open WebUI instance, you'll need to generate an API key. API keys are off by default: an admin must enable them (`ENABLE_API_KEYS`), and non-admin users also need the API Keys permission (`USER_PERMISSIONS_FEATURES_API_KEYS`, off by default). If endpoint restrictions are on, `/api/chat/completions` and `/api/models` must be listed in `API_KEYS_ALLOWED_ENDPOINTS`.
 Follow the instructions in the [API Endpoints guide](/reference/api-endpoints) to create it.
 
 ```yaml

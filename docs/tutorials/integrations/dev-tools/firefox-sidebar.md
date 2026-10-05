@@ -79,6 +79,12 @@ The following URL parameters can be used to customize your Open WebUI instance:
 
 - `q`: Set an initial query or prompt for the chat (e.g., `/?q=Hello%20there`)
 
+### Other Parameters
+
+- `submit=false`: Prefill the `q` prompt without sending it (by default `q` is submitted immediately)
+- `load-url`: Fetch a web page into the chat (e.g., `/?load-url=https://example.com`)
+- `image-generation=true` and `code-interpreter=true`: Turn those features on for the chat
+
 ### Temporary Chat Sessions
 
 - `temporary-chat`: Mark the chat as a temporary session by setting this parameter to `true` (e.g., `/?temporary-chat=true`)
