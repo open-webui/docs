@@ -69,7 +69,7 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 1. Click on any folder in the sidebar to select it.
 2. The chat interface will show that folder is active.
 3. Any new chat you start will automatically be created inside this folder.
-4. New chats will **inherit the folder's settings** (system prompt and knowledge).
+4. New chats will **inherit the folder's settings** (default model, system prompt and knowledge).
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
 
@@ -90,6 +90,10 @@ Change the name of your folder to better reflect its purpose or project.
 ### Folder Background Image
 
 Customize the visual appearance of your folder by uploading a background image. This helps visually distinguish different projects in your workspace.
+
+### Default Model
+
+Pick the model new chats in this folder start with, or leave it on **Use default** to fall back to your usual default. Switching models inside one of the folder's chats leaves the folder's default as it is; change it here.
 
 ### System Prompt
 

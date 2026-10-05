@@ -64,7 +64,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 
 ## Creating a Model
 
-Click **Create** in the **Workspace** header while the **Models** tab is selected, or click the ellipsis (**...**) on an existing model and select **Edit**.
+Click **Create** in the **Workspace** header while the **Models** tab is selected, or click an existing model's name to open it in the editor. The arrow next to the name opens the model in a new chat.
 
 ### Core configuration
 
