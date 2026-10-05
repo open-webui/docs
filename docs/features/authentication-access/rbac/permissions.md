@@ -20,9 +20,9 @@ RBAC does not replace provider-side least-privilege design. For OpenAI-compatibl
 
 :::info Permission Logic
 Permissions in Open WebUI are **additive**.
-*   A user's effective permissions are the combination of **Global Defaults** and all their **Group Memberships**.
+*   A user's effective permissions are the combination of **Global Defaults** and all their **Group Memberships**, including every parent group of the groups they are in (see [Nested Groups](/features/authentication-access/rbac/groups#nested-groups)).
 *   **True takes precedence over False**: If *any* source (Global Default or *any* single Group) grants a permission, the user **will** have that permission.
-*   **No "Deny" ability**: You cannot use a specific group to "take away" a permission that is granted by another group or by the global defaults. To restrict a feature, it must be disabled in the Global Defaults *and* disabled in **all** groups the user belongs to.
+*   **No "Deny" ability**: You cannot use a specific group to "take away" a permission that is granted by another group or by the global defaults. To restrict a feature, it must be disabled in the Global Defaults *and* disabled in **all** groups the user belongs to, parent groups included.
 :::
 
 :::tip Best Practice: Principle of Least Privilege

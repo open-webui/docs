@@ -55,7 +55,7 @@ Open WebUI integrates with the identity systems your organization already uses:
 
 * **LDAP & Active Directory** ,  Connect directly to your existing directory services for user authentication and management.
 * **Single Sign-On (SSO)** ,  Support for OIDC and OAuth 2.0 (Google, Microsoft Entra, GitHub, and any OIDC provider), enabling users to access Open WebUI with their existing corporate credentials.
-* **Multi-Factor Authentication (MFA)** ,  Enforced by your identity provider when sign-in is delegated to it through SSO; Open WebUI has no MFA of its own for password logins.
+* **Multi-Factor Authentication (MFA)** ,  Enforced by your identity provider when sign-in is delegated to it through SSO, or by Open WebUI's own [two-factor sign-in](/features/authentication-access/mfa) with an authenticator app for password, LDAP, SSO and trusted-header logins.
 
 #### Access Control & Permissions
 

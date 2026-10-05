@@ -41,7 +41,7 @@ The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption
 
 If you run multiple Open WebUI instances behind a load balancer, every instance must share the same key. Otherwise, a token signed by one instance will be rejected by another, causing login failures. Generate a key with `openssl rand -base64 32` and pass it as an environment variable to all replicas.
 
-**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again.
+**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again. If [two-factor sign-in](#two-factor-sign-in) is on, users' authenticator secrets are encrypted with a key derived from `WEBUI_SECRET_KEY`, and Open WebUI refuses to start after a rotation. Set [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) before users enroll to rotate `WEBUI_SECRET_KEY` freely.
 
 ---
 
@@ -104,6 +104,16 @@ ENABLE_PASSWORD_CHANGE_FORM=false
 
 This is useful for SSO-focused deployments where local password changes should not be presented to users.
 
+### Two-factor sign-in
+
+Open WebUI can require a code from an authenticator app after every sign-in, for all users:
+
+```bash
+ENABLE_MFA=true
+```
+
+The same switch is **Require an authenticator for all users** in **Settings > Admin > Authentication**. OAuth and trusted-header sign-ins can be exempted when your identity provider or proxy already enforces a second factor (`MFA_ALLOW_OAUTH_BYPASS`, `MFA_ALLOW_TRUSTED_HEADER_BYPASS`). Changing any of these settings signs every user out. While MFA is on, sign-in attempts are also limited per account and per client address. See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa) for enrollment, recovery and the limits.
+
 ---
 
 ## Session and Cookie Security
@@ -136,18 +146,27 @@ Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will 
 
 ### Token revocation
 
-:::warning Token Revocation Requires Redis
+Signing an account out of every device is stored in the database and works with or without Redis. It happens when:
 
-Without Redis, **signing out does not invalidate a user's token**. The token remains valid and usable until it expires naturally (default: 4 weeks). This means:
+- The user changes their password, or an administrator sets a new one for them.
+- An administrator clicks **Sign out all devices** in the user's edit dialog (see [Signing a User Out of Every Device](/features/authentication-access/rbac/roles#signing-a-user-out-of-every-device)).
+- The user sets up or replaces their authenticator or generates new recovery codes, or an operator resets their MFA.
+- An administrator changes the [two-factor sign-in](#two-factor-sign-in) settings, which signs out every account.
 
-- A stolen or leaked token cannot be revoked by signing out
-- Changing a user's password does not invalidate their existing sessions
-- Deactivating an account does not revoke the token already issued to it, although the account's role is rechecked on every request
+From then on, every token issued to the account before that moment is refused. The account's live connections are closed, and automation and sub-agent runs in progress for that user lose access. Every open live connection is also rechecked every 30 seconds and closed once its session has been revoked or has expired. API keys stay valid; delete or regenerate the key to cut it off. The check reads the database on every request, and requests are refused while the database cannot be reached.
+
+Deactivating an account keeps the tokens already issued to it, with the account's role rechecked on every request. Use **Sign out all devices** as well to end its sessions.
+
+:::warning Signing Out of a Single Session Requires Redis
+
+Without Redis, **signing out does not invalidate that session's token**. The token remains valid and usable until it expires naturally (default: 4 weeks). This means:
+
+- A stolen or leaked token cannot be revoked by signing out; **Sign out all devices** or a password change ends it
 - OIDC back-channel logout cannot revoke tokens
 
-With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.
+With Redis configured, signing out adds the token to a revocation list that auto-expires, and OIDC back-channel logout signs the affected users out of every device. This is the intended production behavior.
 
-**Revocation checks fail open.** A revocation check that cannot reach Redis accepts the token and logs `Revocation check failed; accepting token` at most once a minute per worker process. A Redis outage therefore puts the instance back into the no-Redis behavior listed above for as long as it lasts, with sign-outs and password changes taking no effect, so treat Redis availability as part of your auth surface and alert on that log line.
+**Revocation checks fail open.** A revocation check that cannot reach Redis accepts the token and logs `Revocation check failed; accepting token` at most once a minute per worker process. A Redis outage therefore puts the instance back into the no-Redis behavior listed above for as long as it lasts, with sign-outs taking no effect, so treat Redis availability as part of your auth surface and alert on that log line.
 
 **If you cannot deploy Redis**, shorten `JWT_EXPIRES_IN` (e.g., `1h` or `4h`) to limit the window of exposure. See the [Redis tutorial](/tutorials/integrations/redis) for setup instructions.
 
@@ -251,7 +270,7 @@ HSTS=max-age=31536000;includeSubDomains
 
 ### Trusted proxy IPs
 
-Open WebUI uses `--forwarded-allow-ips` to determine which proxies are trusted to send `X-Forwarded-For` headers. By default, this is set to `*` (trust all), which is appropriate when Open WebUI is on an isolated network behind a single reverse proxy. If your network topology is more complex, restrict it to your proxy's IP:
+[`FORWARDED_ALLOW_IPS`](/reference/env-configuration#forwarded_allow_ips) determines which proxies are trusted to send `X-Forwarded-For` headers. The Docker image, `open-webui serve` and `open-webui dev` all read it. By default, this is set to `*` (trust all), which is appropriate only when a reverse proxy that overwrites these headers sits in front and nothing else can reach the backend. Otherwise any client can claim any address, which defeats the per-address sign-in limit and falsifies the address in audit logs. Restrict it to your proxy's IP:
 
 ```bash
 FORWARDED_ALLOW_IPS=192.168.1.100
@@ -508,7 +527,7 @@ AUDIT_INCLUDED_PATHS=auths,users,configs
 AUDIT_EXCLUDED_PATHS=/chats,/chat,/folders
 ```
 
-Authentication endpoints (signin, signout, signup) are always audited regardless of path exclusions. Every field whose name ends in `password`, in any letter case, is masked in both request and response bodies.
+Authentication endpoints (signin, signout, signup and the MFA endpoints) are always audited regardless of path exclusions. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, in any letter case, is masked in both request and response bodies.
 
 ---
 
@@ -782,7 +801,8 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Review signup policy](#registration) | Disabled after first user | Keep disabled or use `pending` role |
 | [Enable password validation](#password-validation) | Disabled | `ENABLE_PASSWORD_VALIDATION=true` |
 | [Secure cookies](#cookie-settings) | `Secure=false`, `SameSite=lax` | `Secure=true`, `SameSite=strict` |
-| [Enable token revocation](#token-revocation) | No revocation (no Redis) | Configure Redis or shorten `JWT_EXPIRES_IN` |
+| [Require two-factor sign-in](#two-factor-sign-in) | Disabled | `ENABLE_MFA=true` |
+| [Enable token revocation](#token-revocation) | Sign-out of a single session needs Redis | Configure Redis or shorten `JWT_EXPIRES_IN` |
 | [Restrict CORS](#cors) | `*` | Your specific domain(s) |
 | [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP, Cross-Origin policies |
 | [Restrict OAuth domains](#domain-and-group-restrictions) | All allowed | `OAUTH_ALLOWED_DOMAINS=yourdomain.com` |
@@ -807,7 +827,7 @@ For organizations where security is a priority, the following practices define t
 
 ### Network and Transport
 
-1. **Place Open WebUI behind a VPN, reverse proxy, or zero-trust access layer with rate limiting and IP allowlisting.** Open WebUI is built for private, trusted networks. Do not expose it directly to the public internet without an additional access control layer in front of it. Configure your proxy to throttle connection rates, limit repeated authentication attempts, restrict access to known IP ranges, and use tools like fail2ban to block abusive sources. Restrict `--forwarded-allow-ips` to your proxy's IP to prevent header spoofing. [Details](#network-placement)
+1. **Place Open WebUI behind a VPN, reverse proxy, or zero-trust access layer with rate limiting and IP allowlisting.** Open WebUI is built for private, trusted networks. Do not expose it directly to the public internet without an additional access control layer in front of it. Configure your proxy to throttle connection rates, limit repeated authentication attempts, restrict access to known IP ranges, and use tools like fail2ban to block abusive sources. Restrict `FORWARDED_ALLOW_IPS` to your proxy's IP to prevent header spoofing. [Details](#network-placement)
 
 2. **Serve all traffic over HTTPS and enable all security headers.** Use a reverse proxy that terminates TLS. Configure session cookies with `Secure=true` and `SameSite=strict`. Never serve Open WebUI over plain HTTP in production. Enable HSTS, Content Security Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy. Do not leave CORS set to `*`; restrict it to only the exact domains that need access. [Details](#https-and-tls)
 
@@ -817,7 +837,7 @@ For organizations where security is a priority, the following practices define t
 
 4. **Use SSO with your identity provider and disable local authentication.** Integrate with your organization's OAuth/OIDC or LDAP provider. Restrict access to specific email domains and IdP groups, map IdP roles to Open WebUI roles, and disable the local login form and password authentication entirely. Limit concurrent sessions per user, enable backchannel logout with Redis so sessions are revoked immediately when users are deprovisioned, and do not enable OAuth account merging unless your provider guarantees email verification. [Details](#oauth-and-sso)
 
-5. **Enforce password complexity and shorten session lifetime.** If local accounts are used, enable password validation. Reduce the default JWT expiration from 4 weeks to a shorter duration appropriate for your environment (e.g., 8 to 24 hours). Do not disable token expiration in production. [Details](#password-validation)
+5. **Enforce password complexity and shorten session lifetime.** If local accounts are used, enable password validation and two-factor sign-in. Reduce the default JWT expiration from 4 weeks to a shorter duration appropriate for your environment (e.g., 8 to 24 hours). Do not disable token expiration in production. [Details](#password-validation)
 
 6. **Review user accounts and permissions periodically.** Remove inactive accounts, audit group memberships, and verify that workspace permissions remain appropriate. Use SCIM provisioning to automate account lifecycle management through your identity provider. [Details](#access-control)
 
@@ -853,4 +873,4 @@ For organizations where security is a priority, the following practices define t
 
 16. **Monitor for anomalies.** Track CPU, memory, network, and disk usage. Integrate with your alerting infrastructure to detect unexpected compute usage, outbound network activity, or storage consumption early. [Details](#observability)
 
-17. **Maintain an incident response plan.** Define procedures for compromised accounts, unauthorized access, and unexpected resource consumption. Know how to disable user accounts, revoke sessions (requires Redis), rotate the secret key, and review audit logs.
+17. **Maintain an incident response plan.** Define procedures for compromised accounts, unauthorized access, and unexpected resource consumption. Know how to disable user accounts, sign users out of all devices, reset a user's two-factor sign-in, rotate the secret key and review audit logs.

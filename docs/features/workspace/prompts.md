@@ -100,7 +100,7 @@ Automatically replaced with their value at runtime:
 | `{{USER_AGE}}` | Age calculated from birth date (unreplaced if not set) |
 | `{{USER_LANGUAGE}}` | Your selected language |
 | `{{USER_LOCATION}}` | Your location. The browser asks for geolocation permission directly, which needs HTTPS. The Interface toggle only controls the location sent with chat requests |
-| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
+| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to, including groups inherited through parent groups (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
 
 ### Custom input variables
 

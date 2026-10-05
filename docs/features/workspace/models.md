@@ -98,7 +98,7 @@ The system prompt defines the behavior and persona. Use dynamic variables for co
 | `{{CURRENT_DATE}}` | `2024-10-27` |
 | `{{CURRENT_TIME}}` | `14:30:05` |
 | `{{USER_NAME}}` | `Admin` |
-| `{{ USER_GROUPS }}` | `Engineering, Beta Testers` (comma-separated; empty if the user is in no groups) |
+| `{{ USER_GROUPS }}` | `Engineering, Beta Testers` (comma-separated, including groups inherited through parent groups; empty if the user is in no groups) |
 
 ```
 You are a helpful assistant for {{USER_NAME}}.
@@ -249,7 +249,7 @@ These are the two instance-wide settings that decide which model or models a use
 
 | Setting | Menu action | What it does | Config key |
 | :--- | :--- | :--- | :--- |
-| **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
+| **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own and no [group default models](/features/authentication-access/rbac/groups#default-models-per-group) | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
 | **Pinned Model** | **Set as Pinned Model** | Pre-fills the model shortcuts in the sidebar for users who have not pinned any models themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
 
 Both accept more than one model, so you can hand users a small starting set rather than a single model.
@@ -288,8 +288,11 @@ For a new chat, Open WebUI takes the first of these that yields a model the user
 1. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params).
 2. The models bound to the folder the chat is started in, if any.
 3. The user's own default model, saved from the model selector in a chat with **Set as default**.
-4. The instance's **Selected Models**.
-5. The first available model in the list.
+4. The [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), taken from the group deepest in the group hierarchy that sets some (the earliest created group wins a tie). Groups the user inherits through a parent group count too.
+5. The instance's **Selected Models**.
+6. The first available model in the list.
+
+Steps 3 to 5 also pick the starting model in Notes and the Playground.
 
 Models that have been hidden or removed are dropped at every step, so a user whose last-used model disappeared lands on a working one instead of an empty selector.
 

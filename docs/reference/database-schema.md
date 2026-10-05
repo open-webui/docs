@@ -126,6 +126,7 @@ Things to know about the access_grant table:
 - `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
 - `principal_type` of `anyone` (added in v0.11.0) is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
+- A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants
 
 ## API Key Table
 
@@ -157,11 +158,14 @@ Things to know about the api_key table:
 | email           | String        | -               | User's email      |
 | password        | Text          | -               | Hashed password   |
 | active          | Boolean       | -               | Account status    |
+| mfa             | JSON          | nullable        | Two-factor sign-in state: encrypted authenticator secret, hashed recovery codes, pending sign-in steps and attempt counters |
+| session_stamp   | Text          | nullable        | Marker carried by every session token; replacing it signs the account out of every device |
 
 Things to know about the auth table:
 
 - Uses UUID for primary key
 - One-to-One relationship with the `user` table (shared id)
+- `mfa` and `session_stamp` were added by migration `a7d3e9f2b641`. Rows that existed before it start with both empty, and sessions issued before the upgrade stay valid until the account is first signed out everywhere.
 
 ## Channel Table
 
@@ -595,6 +599,7 @@ Things to know about the function table:
 | **Column Name** | **Data Type** | **Constraints**     | **Description**          |
 | --------------- | ------------- | ------------------- | ------------------------ |
 | id              | Text          | PRIMARY KEY, UNIQUE | Unique identifier (UUID) |
+| parent_group_id | Text          | FOREIGN KEY(group.id), nullable, indexed | Parent group for [nested groups](/features/authentication-access/rbac/groups#nested-groups), `NULL` for a top-level group |
 | user_id         | Text          | -                   | Group owner/creator      |
 | name            | Text          | -                   | Group name               |
 | description     | Text          | -                   | Group description        |
@@ -605,6 +610,12 @@ Things to know about the function table:
 | updated_at      | BigInteger    | -                   | Last update timestamp    |
 
 Note: The `user_ids` column has been migrated to the `group_member` table.
+
+Things to know about the group table:
+
+- `parent_group_id` was added in migration `b8e4f0a3c752`. Members of a group inherit the permissions and access grants of every group above it
+- Deleting a group moves its subgroups up to its own parent and deletes its memberships and its access grants
+- `data.config.default_models` holds the group's [default models](/features/authentication-access/rbac/groups#default-models-per-group) as a list of model IDs, and `data.config.share` holds the **Who can share to this group** setting
 
 ## Group Member Table
 

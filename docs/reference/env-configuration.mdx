@@ -211,7 +211,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working one rather than an empty selector. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. [Default models set on a group](/features/authentication-access/rbac/groups#default-models-per-group) replace this list for the group's members. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
@@ -706,6 +706,17 @@ open-webui serve --port 9999
 
 This will run the Open WebUI on port `9999`. The `PORT` environment variable is disregarded in this mode.
 
+:::
+
+#### `FORWARDED_ALLOW_IPS`
+
+- Type: `str`
+- Default: `*`
+- Description: Addresses of the reverse proxies trusted to report the real client address and protocol through `X-Forwarded-For` and `X-Forwarded-Proto` headers. Takes a comma-separated list of IP addresses or networks, or `*` to trust every connection. Read by the Docker image, `backend\start_windows.bat`, `open-webui serve` and `open-webui dev`. The resulting client address is what Open WebUI records in audit log entries and counts against per-address limits, such as the sign-in limit while [MFA](/features/authentication-access/mfa#attempt-limits) is on.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::warning
+With `*`, any client that reaches the backend directly can set its own address in these headers. Keep `*` only when a proxy that overwrites the headers sits in front and the backend port is unreachable from anywhere else; otherwise set it to your proxy's address, for example `FORWARDED_ALLOW_IPS=192.168.1.100`.
 :::
 
 #### `ENABLE_REALTIME_CHAT_SAVE`
@@ -1209,7 +1220,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1233,7 +1244,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: Empty string (disabled)
-- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Auth endpoints (signin, signout, signup) are always logged regardless of filtering mode.
+- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Auth endpoints (signin, signout, signup and the MFA endpoints) are always logged regardless of filtering mode.
 
 :::tip Whitelist vs Blacklist
 By default, audit logging uses **blacklist mode**: all paths are logged except those in `AUDIT_EXCLUDED_PATHS`. If you set `AUDIT_INCLUDED_PATHS`, it switches to **whitelist mode**: only the specified paths are logged. If both are set, whitelist mode takes precedence and a warning is logged at startup.
@@ -2303,7 +2314,7 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{USER_EMAIL}}` | Signed-in user's email |
 | `{{USER_ROLE}}` | Signed-in user's role |
 | `{{AUTH_TYPE}}` | How the caller authenticated: `jwt` for a browser session, `api_key` for an API key |
-| `{{USER_GROUPS}}` | Comma-separated names of the groups the user belongs to |
+| `{{USER_GROUPS}}` | Comma-separated names of the groups the user belongs to, including groups inherited through parent groups |
 | `{{USER_GROUP_IDS}}` | Comma-separated IDs of the same groups |
 | `{{USER_AGENT}}` | User-Agent of the originating browser request |
 
@@ -2399,6 +2410,45 @@ directly. Ensure that no users are present in the database if you intend to turn
 - Default: `None`
 - Description: URL the browser is sent to after signing out. The sign-out endpoint returns it as `redirect_url`, and for OpenID providers with an end-session endpoint it is passed along as `post_logout_redirect_uri`.
 
+#### `ENABLE_MFA`
+
+- Type: `bool`
+- Default: `False`
+- Description: Requires every user to enter a code from an authenticator app after their password, LDAP, OAuth or trusted-header sign-in. Users without an authenticator set one up at their next sign-in. Needs [`WEBUI_AUTH`](#webui_auth) and [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) on; while it is on, Open WebUI refuses to start if either is off or if a stored authenticator secret cannot be decrypted with the current key (see [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key)). See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa).
+- Also a toggle: **Require an authenticator for all users** in **Settings > Admin > Authentication**, which applies immediately and needs no restart.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+:::warning
+Changing this setting, or either of the two exemptions below, signs every user out of every device.
+:::
+
+#### `MFA_ALLOW_OAUTH_BYPASS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets users who sign in through OAuth or OIDC skip the authenticator code while [`ENABLE_MFA`](#enable_mfa) is on. Use it when your identity provider already enforces its own second factor. It also lets the [OAuth token exchange](#enable_oauth_token_exchange) endpoint return a session token directly.
+- Also a toggle: **Allow OAuth sign-in without an authenticator** in **Settings > Admin > Authentication**, shown while MFA is on.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MFA_ALLOW_TRUSTED_HEADER_BYPASS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets users who sign in through [trusted-header authentication](/features/authentication-access/auth/sso#trusted-header) skip the authenticator code while [`ENABLE_MFA`](#enable_mfa) is on. Use it when your authenticating proxy already enforces a second factor.
+- Also a toggle: **Allow trusted-header sign-in without an authenticator** in **Settings > Admin > Authentication**, shown while MFA is on.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `MFA_ENCRYPTION_KEY`
+
+- Type: `str`
+- Default: Empty (a key derived from [`WEBUI_SECRET_KEY`](#webui_secret_key) is used)
+- Description: Fernet key that encrypts each user's authenticator secret in the database. When set, it replaces the key derived from `WEBUI_SECRET_KEY`, so `WEBUI_SECRET_KEY` can then be rotated without affecting authenticators. Generate one with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::warning Set it before users enroll
+Secrets are decrypted with whichever key is active. Setting, changing or removing this key after users have set up an authenticator, or rotating `WEBUI_SECRET_KEY` while this key is unset, leaves the stored secrets unreadable, and Open WebUI refuses to start while MFA is on. Keep the key with your other secrets and back it up.
+:::
+
 #### `ENABLE_PASSWORD_VALIDATION`
 
 - Type: `bool`
@@ -2479,6 +2529,7 @@ While the auto-generated key is secure, it is tied to a file inside the containe
 1. **All existing user sessions become invalid** (users are logged out).
 2. **All OAuth sessions become invalid.**
 3. **MCP Tools break** (Error: `Error decrypting tokens`) because tokens encrypted with the previous key cannot be decrypted.
+4. **Open WebUI refuses to start while [MFA](/features/authentication-access/mfa) is on**, because users' authenticator secrets were encrypted with the previous key, unless [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key) is set.
 
 To avoid this, explicitly set `WEBUI_SECRET_KEY` to a secure, persistent value that survives container recreates:
 
@@ -6422,6 +6473,8 @@ curl -X POST "http://localhost:8080/api/v1/oauth/oidc/token/exchange" \
 }
 ```
 
+While [MFA](/features/authentication-access/mfa) is on and [`MFA_ALLOW_OAUTH_BYPASS`](#mfa_allow_oauth_bypass) is off, the endpoint answers with an MFA step (`next_step`, `challenge_token`, `expires_in`) in place of the session token.
+
 #### `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT`
 
 - Type: `int`
@@ -6474,7 +6527,7 @@ This is a deploy-time environment variable and cannot be changed from the admin 
 
 **Redis Requirement for JWT Revocation**
 
-Back-channel logout revokes existing Open WebUI JWT sessions through Redis-based revocation keys. Without Redis, Open WebUI can still remove stored OAuth sessions, but already-issued JWTs remain valid until they naturally expire.
+Back-channel logout signs the affected users out of every Open WebUI session only when Redis is configured. Without Redis, Open WebUI can still remove stored OAuth sessions, but already-issued JWTs remain valid until they naturally expire.
 
 For production SSO deployments, especially with multiple workers or replicas, configure `REDIS_URL` when enabling this feature.
 
@@ -8201,7 +8254,7 @@ Redis serves as the central state store that allows multiple Open WebUI instance
 
 **Single Instance Deployments**
 
-If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required** for basic functionality. However, without Redis, signing out and password changes do **not** invalidate existing JWT tokens; they remain valid until they expire (default: 4 weeks). For production deployments, either configure Redis or shorten [`JWT_EXPIRES_IN`](#jwt_expires_in). See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) for details.
+If you're running Open WebUI as a single instance with `UVICORN_WORKERS=1` (the default), Redis is **not required** for basic functionality. However, without Redis, signing out does **not** invalidate the token of that session; it remains valid until it expires (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. For production deployments, either configure Redis or shorten [`JWT_EXPIRES_IN`](#jwt_expires_in). See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) for details.
 
 :::
 
