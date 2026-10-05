@@ -825,7 +825,7 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 
 - Type: `str`
 - Default: `dev-build`
-- Description: Used for identifying the Git SHA of the build for releases.
+- Description: Used for identifying the Git SHA of the build for releases. The Docker image sets it to the commit it was built from (the `BUILD_HASH` build argument). Up to v0.11.4 the image set this value under the name `WEBUI_BUILD_VERSION` instead.
 
 #### `WEBUI_BANNERS`
 
@@ -1896,8 +1896,8 @@ Output:
 #### `ENABLE_EVALUATION_ARENA_MODELS`
 
 - Type: `bool`
-- Default: `True`
-- Description: Enables or disables evaluation arena models.
+- Default: `False` from v0.11.5 (`True` before)
+- Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Admin > Evaluations**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EVALUATION_ARENA_MODELS`
@@ -2539,7 +2539,7 @@ Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key). A key o
 
 - Type: `bool`
 - Default: `True`
-- Description: When enabled, the application makes automatic update checks and notifies you about version updates.
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates. From v0.11.5 only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. The Docker image takes this from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so set `--build-arg BUILD_CHANNEL=main` on your own release builds to keep update checks.
 
 :::info
 
