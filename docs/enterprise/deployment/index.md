@@ -83,15 +83,15 @@ For the complete step-by-step scaling walkthrough, see [Scaling Open WebUI](/get
 
 Open WebUI supports three production deployment patterns. Each guide covers architecture, scaling strategy, and key considerations specific to that approach.
 
-### [Python / Pip on Auto-Scaling VMs](./python-pip)
+### [Python / Pip on Auto-Scaling VMs](/enterprise/deployment/python-pip)
 
 Deploy `open-webui serve` as a systemd-managed process on virtual machines in a cloud auto-scaling group (AWS ASG, Azure VMSS, GCP MIG). Best for teams with established VM-based infrastructure and strong Linux administration skills, or when regulatory requirements mandate direct OS-level control.
 
-### [Container Service](./container-service)
+### [Container Service](/enterprise/deployment/container-service)
 
 Run the official Open WebUI container image on a managed platform such as AWS ECS/Fargate, Azure Container Apps, or Google Cloud Run. Best for teams wanting container benefits (immutable images, versioned deployments, no OS management) without Kubernetes complexity.
 
-### [Kubernetes with Helm](./kubernetes-helm)
+### [Kubernetes with Helm](/enterprise/deployment/kubernetes-helm)
 
 Deploy using the official Open WebUI Helm chart on any Kubernetes distribution (EKS, AKS, GKE, OpenShift, Rancher, self-managed). Best for large-scale, mission-critical deployments requiring declarative infrastructure-as-code, advanced auto-scaling, and GitOps workflows.
 

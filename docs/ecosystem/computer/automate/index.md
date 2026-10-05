@@ -13,11 +13,11 @@ Everything in this section runs without you watching: nobody is there to click *
 
 | I want to... | Go to |
 | --- | --- |
-| Chat with my computer from Telegram, Discord, Slack, WhatsApp, or Signal | [Message your computer](./messaging-bots) |
-| Run a prompt every morning, hour, or Monday | [Scheduled tasks](./scheduled-tasks) |
-| Trigger a task from CI, a cron job, or another service | [Scheduled tasks → webhook trigger](./scheduled-tasks#trigger-a-task-with-a-webhook) |
-| Get pinged when a chat or scheduled run finishes or fails | [Notifications and webhooks](./notifications) |
-| Use a Computer workspace as a model in Open WebUI | [Use a workspace from Open WebUI](./open-webui) |
-| Give the agent tools from MCP or OpenAPI servers | [MCP and OpenAPI tool servers](./tool-servers) |
+| Chat with my computer from Telegram, Discord, Slack, WhatsApp, or Signal | [Message your computer](/ecosystem/computer/automate/messaging-bots) |
+| Run a prompt every morning, hour, or Monday | [Scheduled tasks](/ecosystem/computer/automate/scheduled-tasks) |
+| Trigger a task from CI, a cron job, or another service | [Scheduled tasks → webhook trigger](/ecosystem/computer/automate/scheduled-tasks#trigger-a-task-with-a-webhook) |
+| Get pinged when a chat or scheduled run finishes or fails | [Notifications and webhooks](/ecosystem/computer/automate/notifications) |
+| Use a Computer workspace as a model in Open WebUI | [Use a workspace from Open WebUI](/ecosystem/computer/automate/open-webui) |
+| Give the agent tools from MCP or OpenAPI servers | [MCP and OpenAPI tool servers](/ecosystem/computer/automate/tool-servers) |
 
 All of these produce real chats in the workspace sidebar, so whatever runs while you're away is there to review when you get back.

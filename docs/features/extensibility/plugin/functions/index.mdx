@@ -39,7 +39,7 @@ A Pipe registers itself as a new "model" in Open WebUI. When a user selects it a
 
 A single Pipe can also expose **multiple models** (called a "manifold") by defining a `pipes()` method that returns a list of `{"id": ..., "name": ...}` dictionaries, one per model.
 
-→ **[Pipe Function Guide](./pipe)**
+→ **[Pipe Function Guide](/features/extensibility/plugin/functions/pipe)**
 
 ### Filter Functions
 
@@ -53,7 +53,7 @@ Filters enable powerful cross-cutting concerns like real-time translation, conte
 
 Filters can be applied globally (to all models) or attached to specific models. Toggleable filters let users enable/disable them per-chat.
 
-→ **[Filter Function Guide](./filter)**
+→ **[Filter Function Guide](/features/extensibility/plugin/functions/filter)**
 
 ### Action Functions
 
@@ -61,7 +61,7 @@ An Action adds a custom button to the chat message toolbar. When a user clicks i
 
 Actions can do anything Python can do: summarize or translate a message, copy formatted output, pin important messages, export conversations to external systems, trigger a CI/CD pipeline, send a Slack notification, generate a PDF report, run a code snippet, or kick off an external workflow.
 
-→ **[Action Function Guide](./action)**
+→ **[Action Function Guide](/features/extensibility/plugin/functions/action)**
 
 ### Event Functions
 
@@ -69,7 +69,7 @@ Actions can do anything Python can do: summarize or translate a message, copy fo
 
 An Event function runs custom Python in response to **system events** (a user signs up, a chat is deleted, the server starts, configuration changes). Its `event()` method is called for every event and filters on the event name. Event functions can register their own API endpoints and call internal services, which suits them to lifecycle automation, audit logging, signup gating, provisioning, and self-installing plugins.
 
-→ **[Event Function Guide](./event)**
+→ **[Event Function Guide](/features/extensibility/plugin/functions/event)**
 
 ---
 
@@ -236,10 +236,10 @@ Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Fil
 
 | Guide | Description |
 |:------|:-----------|
-| [Pipe Function Guide](./pipe) | Build custom models, agents, and non-LLM interfaces |
-| [Filter Function Guide](./filter) | Intercept, translate, moderate, and log messages |
-| [Action Function Guide](./action) | Add buttons for export, workflows, and interactive tasks |
-| [Event Function Guide](./event) | Run custom logic in response to system events |
+| [Pipe Function Guide](/features/extensibility/plugin/functions/pipe) | Build custom models, agents, and non-LLM interfaces |
+| [Filter Function Guide](/features/extensibility/plugin/functions/filter) | Intercept, translate, moderate, and log messages |
+| [Action Function Guide](/features/extensibility/plugin/functions/action) | Add buttons for export, workflows, and interactive tasks |
+| [Event Function Guide](/features/extensibility/plugin/functions/event) | Run custom logic in response to system events |
 | [Valves](/features/extensibility/plugin/development/valves) | Configure functions with admin and user settings |
 | [Events](/features/extensibility/plugin/development/events) | Send real-time updates to the UI |
 | [Reserved Arguments](/features/extensibility/plugin/development/reserved-args) | `__user__`, `__event_emitter__`, `__metadata__`, and more |

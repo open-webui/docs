@@ -88,16 +88,16 @@ Each page below is a complete workflow with a copy-pasteable skill:
 
 | Workflow | What it does |
 | :--- | :--- |
-| **[Data Reports](./data-reports)** | Turn messy CSVs into polished PDF reports with charts |
-| **[Database Analysis](./database-analysis)** | Connect to PostgreSQL/MySQL/SQLite, run queries, produce insights |
-| **[Research Assistant](./research-assistant)** | Gather web sources and write structured briefings |
-| **[Email Processing](./email-processing)** | Extract action items and deadlines from .eml files |
-| **[Document Comparison](./document-comparison)** | Diff two versions of a contract or proposal |
-| **[Finance Dashboard](./finance-dashboard)** | Analyze bank statements and chart spending |
-| **[Image Processing](./image-processing)** | Batch resize, watermark, and convert images |
-| **[Competitive Analysis](./competitive-analysis)** | Scrape competitor pricing and build comparisons |
-| **[App Builder](./app-builder)** | Build a complete web app from a description |
-| **[Code Review](./code-review)** | Review code changes for security, performance, and style issues |
+| **[Data Reports](/features/open-terminal/use-cases/advanced-workflows/data-reports)** | Turn messy CSVs into polished PDF reports with charts |
+| **[Database Analysis](/features/open-terminal/use-cases/advanced-workflows/database-analysis)** | Connect to PostgreSQL/MySQL/SQLite, run queries, produce insights |
+| **[Research Assistant](/features/open-terminal/use-cases/advanced-workflows/research-assistant)** | Gather web sources and write structured briefings |
+| **[Email Processing](/features/open-terminal/use-cases/advanced-workflows/email-processing)** | Extract action items and deadlines from .eml files |
+| **[Document Comparison](/features/open-terminal/use-cases/advanced-workflows/document-comparison)** | Diff two versions of a contract or proposal |
+| **[Finance Dashboard](/features/open-terminal/use-cases/advanced-workflows/finance-dashboard)** | Analyze bank statements and chart spending |
+| **[Image Processing](/features/open-terminal/use-cases/advanced-workflows/image-processing)** | Batch resize, watermark, and convert images |
+| **[Competitive Analysis](/features/open-terminal/use-cases/advanced-workflows/competitive-analysis)** | Scrape competitor pricing and build comparisons |
+| **[App Builder](/features/open-terminal/use-cases/advanced-workflows/app-builder)** | Build a complete web app from a description |
+| **[Code Review](/features/open-terminal/use-cases/advanced-workflows/code-review)** | Review code changes for security, performance, and style issues |
 
 ---
 

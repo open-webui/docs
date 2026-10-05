@@ -13,8 +13,8 @@ These community-contributed guides walk through real-world authentication setups
 
 | Tutorial | What you'll achieve | Audience |
 |----------|-------------------|----------|
-| [Okta SSO (OIDC)](./okta-oidc-sso) | Single sign-on with Okta, optional group sync and MFA | 👤 Admin · ⏱️ 30 min |
-| [Azure AD LDAP](./azure-ad-ds-ldap) | Secure LDAP authentication against Azure AD Domain Services | 👤 Admin · ⏱️ 45 min |
-| [Dual OAuth Setup](./dual-oauth-configuration) | Microsoft and Google OAuth running simultaneously | 👤 Admin · ⏱️ 15 min |
-| [Entra ID Group Name Sync](./entra-group-name-sync) | Human-readable group names instead of GUIDs from Microsoft Entra | 👤 Admin · ⏱️ 30 min |
-| [Tailscale](./tailscale) | HTTPS and SSO via Tailscale Serve, plus secure tunnels with Funnel | 👤 Admin · ⏱️ 20 min |
+| [Okta SSO (OIDC)](/tutorials/auth-sso/okta-oidc-sso) | Single sign-on with Okta, optional group sync and MFA | 👤 Admin · ⏱️ 30 min |
+| [Azure AD LDAP](/tutorials/auth-sso/azure-ad-ds-ldap) | Secure LDAP authentication against Azure AD Domain Services | 👤 Admin · ⏱️ 45 min |
+| [Dual OAuth Setup](/tutorials/auth-sso/dual-oauth-configuration) | Microsoft and Google OAuth running simultaneously | 👤 Admin · ⏱️ 15 min |
+| [Entra ID Group Name Sync](/tutorials/auth-sso/entra-group-name-sync) | Human-readable group names instead of GUIDs from Microsoft Entra | 👤 Admin · ⏱️ 30 min |
+| [Tailscale](/tutorials/auth-sso/tailscale) | HTTPS and SSO via Tailscale Serve, plus secure tunnels with Funnel | 👤 Admin · ⏱️ 20 min |
