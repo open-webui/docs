@@ -77,7 +77,7 @@ Ensure you have:
   -e TAVILY_API_KEY="your_tavily_api_key"
   ```
 
-  See [Environment Variable Configuration](https://docs.openwebui.com/environment).
+  See [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration).
 - **RAG Integration**: Combine Tavily results with local data using Retrieval Augmented Generation. Refer to [RAG Documentation](https://docs.openwebui.com/features/chat-conversations/rag).
 
 ## Troubleshooting
@@ -91,7 +91,7 @@ For further help, visit the [Open WebUI Community](https://openwebui.com/search)
 
 ## Additional Resources
 
-- [Tavily API Documentation](https://docs.tavily.com/docs/introduction): API reference and advanced options.
+- [Tavily API Documentation](https://docs.tavily.com/welcome): API reference and advanced options.
 - [Open WebUI Features](https://docs.openwebui.com/features): Details on RAG and web search.
 - [Contributing to Open WebUI](https://docs.openwebui.com/contributing): Share improvements or report issues.
 

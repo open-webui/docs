@@ -45,8 +45,8 @@ Adding a provider is as simple as entering a URL and API key in **Settings → A
 
 You need a running Open WebUI instance, administrator access, a reachable local model server, and an API key for the hosted provider you choose.
 
-1. [Connect Ollama](./starting-with-ollama) and make sure a downloaded local model appears in the model selector.
-2. Add a hosted connection using the [OpenAI](./starting-with-openai), [Anthropic](./starting-with-anthropic), or [OpenAI-compatible provider](./starting-with-openai-compatible) guide.
+1. [Connect Ollama](/getting-started/quick-start/connect-a-provider/starting-with-ollama) and make sure a downloaded local model appears in the model selector.
+2. Add a hosted connection using the [OpenAI](/getting-started/quick-start/connect-a-provider/starting-with-openai), [Anthropic](/getting-started/quick-start/connect-a-provider/starting-with-anthropic), or [OpenAI-compatible provider](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) guide.
 3. Start a conversation, select the local model, and send a short test message. Start another conversation with the hosted model and confirm that it also responds.
 4. To send the same prompt to both models, use [Multi-Model Chats](/features/chat-conversations/chat-features/multi-model-chats).
 
@@ -58,9 +58,9 @@ Hosted APIs that require an account and API key. No hardware needed.
 
 | Provider | Models | Guide |
 |----------|--------|-------|
-| **OpenAI** | GPT-5.6 Sol, GPT-5.6 Terra, GPT-5.6 Luna | [Starting with OpenAI →](./starting-with-openai) |
-| **Anthropic** | Claude Opus 5, Sonnet 5, Haiku 4.5 | [Starting with Anthropic →](./starting-with-anthropic) |
-| **OpenAI-Compatible** | DeepSeek, Mistral, Groq, OpenRouter, Vercel AI Gateway, Amazon Bedrock, Azure, and more | [OpenAI-Compatible Providers →](./starting-with-openai-compatible) |
+| **OpenAI** | GPT-5.6 Sol, GPT-5.6 Terra, GPT-5.6 Luna | [Starting with OpenAI →](/getting-started/quick-start/connect-a-provider/starting-with-openai) |
+| **Anthropic** | Claude Opus 5, Sonnet 5, Haiku 4.5 | [Starting with Anthropic →](/getting-started/quick-start/connect-a-provider/starting-with-anthropic) |
+| **OpenAI-Compatible** | DeepSeek, Mistral, Groq, OpenRouter, Vercel AI Gateway, Amazon Bedrock, Azure, and more | [OpenAI-Compatible Providers →](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) |
 
 ---
 
@@ -70,11 +70,11 @@ Run downloaded models on your own hardware. Authentication depends on how you co
 
 | Server | Description | Guide |
 |--------|-------------|-------|
-| **Ollama** | Run and manage downloaded models locally | [Starting with Ollama →](./starting-with-ollama) |
-| **llama.cpp** | Efficient GGUF model inference with OpenAI-compatible API | [Starting with llama.cpp →](./starting-with-llama-cpp) |
-| **vLLM** | High-throughput inference engine for production workloads | [Starting with vLLM →](./starting-with-vllm) |
+| **Ollama** | Run and manage downloaded models locally | [Starting with Ollama →](/getting-started/quick-start/connect-a-provider/starting-with-ollama) |
+| **llama.cpp** | Efficient GGUF model inference with OpenAI-compatible API | [Starting with llama.cpp →](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) |
+| **vLLM** | High-throughput inference engine for production workloads | [Starting with vLLM →](/getting-started/quick-start/connect-a-provider/starting-with-vllm) |
 
-More local servers (LM Studio, LocalAI, Docker Model Runner, Lemonade) are covered in the [OpenAI-Compatible Providers](./starting-with-openai-compatible#local-servers) guide.
+More local servers (LM Studio, LocalAI, Docker Model Runner, Lemonade) are covered in the [OpenAI-Compatible Providers](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#local-servers) guide.
 
 ---
 
@@ -82,8 +82,8 @@ More local servers (LM Studio, LocalAI, Docker Model Runner, Lemonade) are cover
 
 | Feature | Description | Guide |
 |---------|-------------|-------|
-| **Open Responses** | Connect providers using the Open Responses specification | [Starting with Open Responses →](./starting-with-open-responses) |
-| **Functions** | Extend Open WebUI with custom pipe functions for any backend | [Starting with Functions →](./starting-with-functions) |
+| **Open Responses** | Connect providers using the Open Responses specification | [Starting with Open Responses →](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) |
+| **Functions** | Extend Open WebUI with custom pipe functions for any backend | [Starting with Functions →](/getting-started/quick-start/connect-a-provider/starting-with-functions) |
 
 ---
 

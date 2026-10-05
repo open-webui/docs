@@ -58,13 +58,15 @@ If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=f
 
 ### Azure STT
 
+See the [Azure AI Speech STT guide](/features/chat-conversations/audio/speech-to-text/azure-stt-integration) for setup.
+
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `AUDIO_STT_AZURE_API_KEY` | Azure Cognitive Services API key | empty |
-| `AUDIO_STT_AZURE_REGION` | Azure region | `eastus` |
-| `AUDIO_STT_AZURE_LOCALES` | Comma-separated locales (e.g., `en-US,de-DE`) | auto |
+| `AUDIO_STT_AZURE_REGION` | Azure region | empty, which uses `eastus` |
+| `AUDIO_STT_AZURE_LOCALES` | Comma-separated locales, no spaces (e.g., `en-US,de-DE`) | empty, which sends a built-in list of 13 locales |
 | `AUDIO_STT_AZURE_BASE_URL` | Custom Azure base URL (optional) | empty |
-| `AUDIO_STT_AZURE_MAX_SPEAKERS` | Max speakers for diarization | `3` |
+| `AUDIO_STT_AZURE_MAX_SPEAKERS` | Max speakers for diarization | empty, which uses `3` |
 
 ### Deepgram STT
 
@@ -113,9 +115,11 @@ When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `mistral-tts-latest` when `AUDI
 
 ### Azure TTS
 
+See the [Azure AI Speech TTS guide](/features/chat-conversations/audio/text-to-speech/azure-tts-integration) for setup.
+
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_TTS_AZURE_SPEECH_REGION` | Azure Speech region | `eastus` |
+| `AUDIO_TTS_AZURE_SPEECH_REGION` | Azure Speech region | empty (speech uses `eastus`; without a base URL, the voice list does not load) |
 | `AUDIO_TTS_AZURE_SPEECH_BASE_URL` | Custom Azure Speech base URL (optional) | empty |
 | `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT` | Audio output format | `audio-24khz-160kbitrate-mono-mp3` |
 

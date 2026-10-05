@@ -77,7 +77,7 @@ These map to the [`LINKUP_SEARCH_PARAMS`](/reference/env-configuration#linkup_se
 -e LINKUP_SEARCH_PARAMS='{"depth": "deep", "outputType": "searchResults"}'
 ```
 
-The same JSON object is exposed as the single **Parameters** field in the Admin UI when the `linkup` engine is selected, so you do not need environment variables unless you prefer to manage configuration that way. See [Environment Variable Configuration](https://docs.openwebui.com/environment) for details and the [`ENABLE_PERSISTENT_CONFIG`](/reference/env-configuration#enable_persistent_config) behavior.
+The same JSON object is exposed as the single **Parameters** field in the Admin UI when the `linkup` engine is selected, so you do not need environment variables unless you prefer to manage configuration that way. See [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration) for details and the [`ENABLE_PERSISTENT_CONFIG`](/reference/env-configuration#enable_persistent_config) behavior.
 
 ## Troubleshooting
 

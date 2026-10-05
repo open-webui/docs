@@ -75,6 +75,52 @@ Here’s an example of how it works:
 
 This method is perfect if you want to skip navigating through the Admin Settings menu and get right to using your models.
 
+### Downloading GGUF Models from Hugging Face
+
+Ollama can also download GGUF models straight from Hugging Face. In **Pull a model from Ollama.com** or the model selector, enter the model as `hf.co/{username}/{repository}:{quantization}`, for example `hf.co/ggml-org/gemma-3-270m-it-GGUF:Q8_0`. The quantization matches the one in the GGUF file's name, such as `Q4_K_M` or `Q8_0`. The model is then listed under that full name. See Hugging Face's [Ollama guide](https://huggingface.co/docs/hub/en/ollama) for which repositories work.
+
+---
+
+## Updating and Deleting Models
+
+Both live in the same **Manage** dialog as downloading (see [Step 2](#step-2-managing-your-ollama-instance)). They act only on the Ollama server behind the connection whose **Manage** you opened, so with several Ollama connections, open **Manage** on each one you want to change.
+
+### Updating All Models
+
+Next to **Pull a model from Ollama.com**, the **Update All Models** button pulls every model on that server again, one at a time, which brings each one up to the latest version of its tag. Ollama only downloads what changed, so a model that is already current finishes quickly.
+
+While it runs, the dialog shows **Updating "model-name"** with a progress bar. **Cancel** stops the model that is downloading and skips the rest. If a model cannot be pulled, for example one you created yourself rather than downloaded from Ollama.com, the update skips it and moves on to the next one. When the run ends, Open WebUI shows **All models are up to date**.
+
+After an update, a model that was already loaded keeps running the old version until it is unloaded. See [Unloading Loaded Models](#unloading-loaded-models).
+
+### Deleting a Model
+
+1. Under **Delete a model**, pick the model from **Select a model**. Each entry shows its size on disk.
+2. Click **Delete Model** and confirm.
+
+Deleting removes the model from the Ollama server itself and frees its disk space, so it disappears for every user of that connection. To stop offering a model without deleting it, list only the models you want to offer in the connection's **Model IDs (Filter)** instead (see [Advanced Configuration](#advanced-configuration)).
+
+---
+
+## Creating a Model
+
+**Create a model**, also in the **Manage** dialog, makes a new model on that Ollama server from one it already has, with its own system prompt or parameters. Nothing new is downloaded, so it takes a few seconds.
+
+1. Enter a name for the new model, for example `pirate-gemma`.
+2. In the box below it, describe the model as JSON, using the fields of Ollama's [create API](https://docs.ollama.com/api/create). `from` is the model to build on, and must already be on that server. For example:
+
+   ```json
+   {"from": "gemma3:270m", "system": "You answer in one short sentence.", "parameters": {"temperature": 0.3, "num_ctx": 8192}}
+   ```
+
+3. Click **Create Model**, the button next to the name. It stays disabled until both the name and the JSON are filled in.
+
+When Ollama finishes, Open WebUI shows **success**, and the new model appears in the model selector as `pirate-gemma:latest`. If the JSON can't be read, the error is shown and nothing is sent. If the `from` model isn't on that server, Ollama tries to download it from Ollama.com instead and fails with **pull model manifest: file does not exist** when no such model exists there.
+
+:::note A system prompt set here is a fallback
+Ollama uses the model's own system prompt only when a chat sends none. A system prompt from the model's settings in **Workspace** > **Models**, from a user's settings, or added by a filter replaces it. To give a model a system prompt that always applies in Open WebUI, set it in **Workspace** > **Models** instead.
+:::
+
 ---
 
 ## Unloading Loaded Models

@@ -140,29 +140,29 @@ Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage di
 
 ## Get Started
 
-**[Installation →](./setup/installation)** · **[Connect to Open WebUI →](./setup/connecting)**
+**[Installation →](/features/open-terminal/setup/installation)** · **[Connect to Open WebUI →](/features/open-terminal/setup/connecting)**
 
 :::info Model requirements
-Open Terminal needs a model that performs tool calling at agentic quality, not just one that technically supports tools. Working inside a computer substrate is a multi-step loop: choose an action, observe files or output, decide what changed, recover from errors, and repeat across many turns. Small models often fail at that loop even when they can emit a valid tool call. Use a capable frontier model for complex software, data, and automation work. Native tool calling is the default as of v0.10.0; [check the model's tool-calling mode](./setup/connecting#8-enable-native-function-calling) if tools are not firing.
+Open Terminal needs a model that performs tool calling at agentic quality, not just one that technically supports tools. Working inside a computer substrate is a multi-step loop: choose an action, observe files or output, decide what changed, recover from errors, and repeat across many turns. Small models often fail at that loop even when they can emit a valid tool call. Use a capable frontier model for complex software, data, and automation work. Native tool calling is the default as of v0.10.0; [check the model's tool-calling mode](/features/open-terminal/setup/connecting#8-enable-native-function-calling) if tools are not firing.
 :::
 
 ---
 
 ## Use Cases
 
-- **[Code execution](./use-cases/code-execution)**: write, run, and debug scripts
-- **[Software development](./use-cases/software-development)**: repos, tests, debugging, refactoring, Git
-- **[Document & data analysis](./use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
-- **[Web development](./use-cases/web-development)**: build and preview websites
-- **[System automation](./use-cases/system-automation)**: file management, backups, batch operations
-- **[Advanced workflows](./use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
-- **[File browser](./file-browser)**: uploading, previewing, editing files
+- **[Code execution](/features/open-terminal/use-cases/code-execution)**: write, run, and debug scripts
+- **[Software development](/features/open-terminal/use-cases/software-development)**: repos, tests, debugging, refactoring, Git
+- **[Document & data analysis](/features/open-terminal/use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
+- **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites
+- **[System automation](/features/open-terminal/use-cases/system-automation)**: file management, backups, batch operations
+- **[Advanced workflows](/features/open-terminal/use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
+- **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files
 
 ---
 
 ## Enterprise Multi-User
 
-Need isolated, per-user agent workspaces for your team? **[Terminals](./terminals/)** is the orchestrator for Open Terminal. It provisions a dedicated computer substrate for every user and policy, with automatic lifecycle management, resource limits, custom images, persistent storage, scheduled resets, and policy-controlled environments.
+Need isolated, per-user agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It provisions a dedicated computer substrate for every user and policy, with automatic lifecycle management, resource limits, custom images, persistent storage, scheduled resets, and policy-controlled environments.
 
 ---
 

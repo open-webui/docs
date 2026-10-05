@@ -42,7 +42,7 @@ These are deeply integrated into Open WebUI and generally don't require external
 In [**Native Mode**](#built-in-system-tools-nativeagentic-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
-These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations**: they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](../development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
+These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations**: they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](/features/extensibility/plugin/development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
 - **Capability**: Can do anything Python can do (web scraping, complex math, API calls), and hold secrets (API keys) entirely server-side so neither the user nor the model can read them.
 - **Access**: Managed via the `Workspace` menu. 
 - **Safety**: Always review code before importing, as these run on your server.

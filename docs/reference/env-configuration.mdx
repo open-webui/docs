@@ -1492,7 +1492,7 @@ JSON format: { "title": "your concise title here" }
 
 - Type: `str`
 - Description: Prompt to use for generating several relevant follow-up questions.
-- Default: The value of `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`:
@@ -1525,7 +1525,7 @@ JSON format: { "follow_ups": ["Question 1?", "Question 2?", "Question 3?"] }
 
 - Type: `str`
 - Description: Prompt to use when calling tools.
-- Default: The value of `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 
 `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`:
 
@@ -1941,7 +1941,6 @@ Output:
   - **Models Workspace**: "Made by Open WebUI Community" section with a link to discover community model presets, and a "Share" button in the model menu dropdown
   - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions
   - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
-  - **Evaluation Feedbacks**: "Share to Open WebUI Community" button for contributing feedback history to the community leaderboard
   - **Stats Sync Modal**: Enables syncing usage statistics with the community
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1963,7 +1962,7 @@ When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons
 #### `TAGS_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_TAGS_GENERATION_PROMPT_TEMPLATE`:
@@ -4224,7 +4223,7 @@ Enabling this feature increases the text volume indexed by BM25, which may impac
 #### `RAG_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_RAG_TEMPLATE` environment variable.
+- Default: The built-in template shown below. (`DEFAULT_RAG_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_RAG_TEMPLATE`:
@@ -4643,7 +4642,7 @@ You **MUST** provide the full URL, including the endpoint path (e.g., `https://a
 #### `QUERY_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: The value of `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 `DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE`:
@@ -5819,12 +5818,12 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Settings → Admin → Interface → Voice Mode Custom Prompt** (toggle).
+- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Settings → Admin → Interface → Voice Mode Prompt** (toggle).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.voice.prompt.enable`.
 
 #### `VOICE_MODE_PROMPT_TEMPLATE`
 - Type: `str`
-- Default: The value of `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE` environment variable.
+- Default: Empty string, which falls back to the built-in voice prompt. (`DEFAULT_VOICE_MODE_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Description: Configures a custom system prompt for voice mode interactions. Allows administrators to control how the AI responds in voice conversations (style, length, tone). Leave empty to use the default prompt optimized for voice conversations, or provide custom instructions to tailor the voice assistant's behavior. Only applied when `ENABLE_VOICE_MODE_PROMPT` is `True`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 

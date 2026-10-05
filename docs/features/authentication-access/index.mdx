@@ -27,12 +27,12 @@ Open WebUI is multi-user from day one. Whether you're running a personal instanc
 
 | | |
 | :--- | :--- |
-| 👥 **[RBAC](./rbac)** | Roles, groups, and per-resource permissions. Define who can access what |
-| 🔑 **[SSO / OIDC](./auth/sso)** | Federated authentication with Google, Microsoft, Okta, Keycloak, or any OIDC provider |
-| 📂 **[LDAP](./auth/ldap)** | Authenticate against your existing directory service |
-| 📋 **[SCIM 2.0](./auth/scim)** | Automated user and group provisioning and deprovisioning from your IdP |
-| 📱 **[Two-Factor Sign-In (MFA)](./mfa)** | Require a code from an authenticator app at every sign-in |
-| 🔐 **[API Keys](./api-keys)** | Programmatic access for scripts, bots, pipelines, and integrations |
+| 👥 **[RBAC](/features/authentication-access/rbac)** | Roles, groups, and per-resource permissions. Define who can access what |
+| 🔑 **[SSO / OIDC](/features/authentication-access/auth/sso)** | Federated authentication with Google, Microsoft, Okta, Keycloak, or any OIDC provider |
+| 📂 **[LDAP](/features/authentication-access/auth/ldap)** | Authenticate against your existing directory service |
+| 📋 **[SCIM 2.0](/features/authentication-access/auth/scim)** | Automated user and group provisioning and deprovisioning from your IdP |
+| 📱 **[Two-Factor Sign-In (MFA)](/features/authentication-access/mfa)** | Require a code from an authenticator app at every sign-in |
+| 🔐 **[API Keys](/features/authentication-access/api-keys)** | Programmatic access for scripts, bots, pipelines, and integrations |
 
 ---
 
@@ -71,10 +71,10 @@ Open WebUI works out of the box with local email/password authentication. No ext
 
 ### Organization? Layer in SSO and SCIM
 
-1. **[Set up SSO](./auth/sso)**: Configure your identity provider for single sign-on
-2. **[Configure RBAC](./rbac)**: Create groups, assign permissions, and set up access control lists
-3. **[Enable SCIM](./auth/scim)** *(optional)*: Automate user lifecycle from your IdP
-4. **[Generate API keys](./api-keys)** *(optional)*: Enable programmatic access for automation
+1. **[Set up SSO](/features/authentication-access/auth/sso)**: Configure your identity provider for single sign-on
+2. **[Configure RBAC](/features/authentication-access/rbac)**: Create groups, assign permissions, and set up access control lists
+3. **[Enable SCIM](/features/authentication-access/auth/scim)** *(optional)*: Automate user lifecycle from your IdP
+4. **[Generate API keys](/features/authentication-access/api-keys)** *(optional)*: Enable programmatic access for automation
 
 ---
 
@@ -92,4 +92,4 @@ Models, Knowledge bases, Tools, and Skills all support fine-grained access contr
 
 There are two primary roles. **Admins** have full system access. **Users** have capabilities defined by default permissions plus group memberships. A third role, **Pending**, holds new sign-ups in a queue for admin approval.
 
-[**Roles →**](./rbac/roles) · [**Permissions →**](./rbac/permissions) · [**Groups →**](./rbac/groups)
+[**Roles →**](/features/authentication-access/rbac/roles) · [**Permissions →**](/features/authentication-access/rbac/permissions) · [**Groups →**](/features/authentication-access/rbac/groups)
