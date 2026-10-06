@@ -112,6 +112,41 @@ services:
 | `AUDIO_TTS_MODEL` | TTS model (`tts-1` or `tts-1-hd`) | `tts-1` |
 | `AUDIO_TTS_VOICE` | Voice to use | `alloy` |
 
+## Using the OpenAI Realtime Engine
+
+The **OpenAI Realtime** Text-to-Speech engine produces speech with OpenAI's realtime voice models, the same models used for [Realtime calls](/features/chat-conversations/chat-features/voice-mode#realtime-calls). For each piece of text, Open WebUI opens a short WebSocket session to `<API Base URL>/realtime`, asks the model to read the text aloud and saves the result as a finished WAV clip. It serves Read Aloud and Standard voice calls like any other Text-to-Speech engine.
+
+1. Go to **Admin Panel > Settings > Audio**.
+2. Set **Text-to-Speech Engine** to **OpenAI Realtime**. The model and voice switch to `gpt-realtime-2.1-mini` and `marin`.
+3. Fill in the **API Base URL** and **API Key**. These are the same fields the `OpenAI` engine uses.
+4. Optionally change the **TTS Model**, **TTS Voice** or **Prompt Template**, then click **Save**.
+
+| Setting | Options |
+|---------|---------|
+| **TTS Model** | `gpt-realtime-2.1-mini` (default) or `gpt-realtime-2.1` |
+| **TTS Voice** | `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`, `shimmer`, `verse`, `marin` (default) or `cedar` |
+| **Prompt Template** | Instructions for the model. Leave it empty to use the built-in prompt, which tells the model to read the text aloud word for word, in its original language, without answering, summarizing or adding commentary |
+
+The **Prompt Template** field takes the place of **Additional Parameters** for this engine. The same voice priority applies as above: a model's **TTS Voice**, then the user's own voice, then the admin default. Each finished clip is cached, so the same text with the same model, voice and prompt plays from the cache the next time.
+
+The API Base URL must start with `http://` or `https://` and contain no query string, user name or password. With environment variables:
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - AUDIO_TTS_ENGINE=openai-realtime
+      - AUDIO_TTS_OPENAI_API_BASE_URL=https://api.openai.com/v1
+      - AUDIO_TTS_OPENAI_API_KEY=sk-...
+      - AUDIO_TTS_MODEL=gpt-realtime-2.1-mini
+      - AUDIO_TTS_VOICE=marin
+      # Optional: replaces the built-in read-aloud instructions
+      # - REALTIME_TTS_PROMPT_TEMPLATE=...
+```
+
+See [`REALTIME_TTS_PROMPT_TEMPLATE`](/reference/env-configuration#realtime_tts_prompt_template) in the environment variable reference.
+
 ## Using OpenRouter as a Text-to-Speech Provider
 
 Open WebUI's `OpenAI` TTS engine is compatible with any service that implements the OpenAI Audio API, including [OpenRouter](https://openrouter.ai). This section explains how to configure OpenRouter as your TTS provider and how to avoid a common `400 Bad Request` error.
