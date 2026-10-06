@@ -257,10 +257,10 @@ Open WebUI encodes and decodes JSON constantly: every request body, every API re
 *   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
 *   **Where else it shows up**: saving and opening chats, so the cost follows the length of the chat.
 *   **Where it is not**: a single-user instance with ordinary-sized chats.
-*   **Why it was opt-in before v0.11.5**: anything orjson cannot encode falls back to the standard library automatically, so nothing breaks, but the old default kept behaviour identical to earlier releases. From v0.11.5 it is on by default. One change to know about: `NaN` and `Infinity` floats serialize as `null` instead of raising.
+*   **Why it was opt-in before v0.12.0**: anything orjson cannot encode falls back to the standard library automatically, so nothing breaks, but the old default kept behaviour identical to earlier releases. From v0.12.0 it is on by default. One change to know about: `NaN` and `Infinity` floats serialize as `null` instead of raising.
 
 - **Env Var**: `ENABLE_ORJSON=True`
-  *   *Recommendation*: enable on any Redis-backed multi-worker or multi-replica deployment. Requires a restart. Available from v0.11.0 and the default from v0.11.5.
+  *   *Recommendation*: enable on any Redis-backed multi-worker or multi-replica deployment. Requires a restart. Available from v0.11.0 and the default from v0.12.0.
 
 See [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full breakdown, and [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself.
 
@@ -619,7 +619,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
 13. **WebSocket Heartbeats**: `WEBSOCKET_HEARTBEAT_INTERVAL=60`. Halves the idle heartbeat traffic from every open tab, at the cost of a disconnected user lingering in the active count. See [WebSocket Heartbeats](#websocket-heartbeats).
 14. **WebSocket Compression**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Streaming sends one tiny frame per token, and compressing each of them costs CPU per subscriber for almost no saving. See [WebSocket Frame Compression](#websocket-frame-compression).
-15. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+, the default from v0.11.5). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
+15. **JSON Encoder**: `ENABLE_ORJSON=True` (v0.11.0+, the default from v0.12.0). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 

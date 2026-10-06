@@ -224,7 +224,7 @@ Multiple instances mean Socket.IO events travel through Redis, and every one of 
 ENABLE_ORJSON=True
 ```
 
-It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0 and on by default from v0.11.5.
+It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0 and on by default from v0.12.0.
 
 For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
 
@@ -232,7 +232,7 @@ For the full breakdown of what it covers, the two behaviour differences worth kn
 
 With `WEBSOCKET_MANAGER=redis`, every live update (each streamed token, each channel message, each note edit) used to go out on one shared Redis channel, and every instance decoded every update to find out whether any of its users needed it. With 16 instances, each token was decoded 16 times and thrown away 15 times. Profiling a loaded fleet of 16 instances and about 4,000 users put roughly 31% of all active CPU in that decoding, the largest single cost.
 
-From v0.11.5, updates addressed to a specific user, channel or note are published on a Redis channel of their own. Each instance checks the channel name and skips updates for rooms none of its users have joined, without decoding them. Acknowledgements and control messages stay on the shared channel. This is on by default, and the saving grows with the number of instances:
+From v0.12.0, updates addressed to a specific user, channel or note are published on a Redis channel of their own. Each instance checks the channel name and skips updates for rooms none of its users have joined, without decoding them. Acknowledgements and control messages stay on the shared channel. This is on by default, and the saving grows with the number of instances:
 
 ```
 WEBSOCKET_REDIS_ROOM_CHANNELS=True
@@ -527,7 +527,7 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 # Finished responses are deleted immediately; 0 keeps orphans forever
 # REDIS_RESPONSE_STREAM_TTL=3600
 
-# Faster JSON encoder (v0.11.0+, default from v0.11.5): biggest win is Socket.IO/Redis event
+# Faster JSON encoder (v0.11.0+, default from v0.12.0): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
 

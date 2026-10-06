@@ -953,8 +953,8 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 #### `ENABLE_ORJSON`
 
 - Type: `bool`
-- Default: `True` from v0.11.5 (`False` before)
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. orjson is stricter about what it accepts, but rejected payloads fall back to the standard library automatically, as does anything encoded with a request orjson has no equivalent for, such as indented output or a custom rule for converting values before they are written. On by default from v0.11.5; set it to `False` to go back to the standard library. On v0.11.0 to v0.11.4 it is off by default and worth enabling on clustered, Redis-backed deployments. Read once at startup, so a restart is required. Added in v0.11.0.
+- Default: `True` from v0.12.0 (`False` before)
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. orjson is stricter about what it accepts, but rejected payloads fall back to the standard library automatically, as does anything encoded with a request orjson has no equivalent for, such as indented output or a custom rule for converting values before they are written. On by default from v0.12.0; set it to `False` to go back to the standard library. On v0.11.0 to v0.11.4 it is off by default and worth enabling on clustered, Redis-backed deployments. Read once at startup, so a restart is required. Added in v0.11.0.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -1907,7 +1907,7 @@ Output:
 #### `ENABLE_EVALUATION_ARENA_MODELS`
 
 - Type: `bool`
-- Default: `False` from v0.11.5 (`True` before)
+- Default: `False` from v0.12.0 (`True` before)
 - Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Admin > Evaluations**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -2589,7 +2589,7 @@ Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key). A key o
 
 - Type: `bool`
 - Default: `True`
-- Description: When enabled, the application makes automatic update checks and notifies you about version updates. From v0.11.5 only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. The Docker image takes this from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so set `--build-arg BUILD_CHANNEL=main` on your own release builds to keep update checks.
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates. From v0.12.0 only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. The Docker image takes this from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so set `--build-arg BUILD_CHANNEL=main` on your own release builds to keep update checks.
 
 :::info
 
@@ -2870,9 +2870,9 @@ For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HO
 
 ### Milvus
 
-:::danger Milvus: back up before upgrading to v0.11.5
+:::danger Milvus: back up before upgrading to v0.12.0
 
-v0.11.5 moves Milvus, in both regular and multitenancy mode, to native hybrid search, and **existing data is migrated the first time the new version starts**.
+v0.12.0 moves Milvus, in both regular and multitenancy mode, to native hybrid search, and **existing data is migrated the first time the new version starts**.
 
 - **Back up your Milvus data first.** Do not upgrade Milvus and Open WebUI on the same day: upgrade one, confirm it works, then the other.
 - On the first start with `ENABLE_DB_MIGRATIONS` on (the default), every Open WebUI collection in Milvus is **copied in full** into a new collection that holds the vectors, the text and a BM25 keyword index together. Nothing is re-embedded. This runs whether or not hybrid search is turned on.
