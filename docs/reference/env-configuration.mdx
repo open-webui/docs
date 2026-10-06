@@ -5525,9 +5525,9 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 #### `WEB_LOADER_TIMEOUT`
 
-- Type: `float`
-- Default: Empty string (' '), since `None` is set as default.
-- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10 to 30 seconds depending on your network conditions.
+- Type: `str`
+- Default: Empty string (`''`)
+- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. The value is stored as a string, so a config import sets it as `"30"`. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10 to 30 seconds depending on your network conditions.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEB_FETCH_MAX_CONTENT_LENGTH`
