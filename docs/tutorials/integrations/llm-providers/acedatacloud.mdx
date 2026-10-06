@@ -1,0 +1,39 @@
+---
+sidebar_position: 2
+title: "AceDataCloud"
+---
+
+# Connect AceDataCloud to Open WebUI
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+AceDataCloud provides an OpenAI-compatible Chat Completions endpoint. Open WebUI can use it through the built-in **OpenAI API** connection; no Pipe or proxy is required. The steps below were checked with Open WebUI v0.11.4.
+
+## Prerequisites
+
+- An [AceDataCloud application API token](https://platform.acedata.cloud/console/applications) with access to a chat model. Check the model's current price and available credits.
+- An Open WebUI administrator account. The connection is configured on the Open WebUI server, so users allowed to use its models may consume the token's credits.
+
+## Configure the connection
+
+1. In Open WebUI, open the user menu and go to **Admin Panel → Settings → Connections**.
+2. Under **OpenAI API → Manage OpenAI API Connections**, click **Add Connection** (`+`).
+3. Set **Connection Type** to **External**, **URL** to `https://api.acedata.cloud/v1`, **Auth** to **Bearer**, and **API Key** to your AceDataCloud API token. Leave **API Type** at **Chat Completions**.
+4. Click **Verify Connection** to check model discovery, then **Save**. If the main Connections page prompts you to save its settings, save there too.
+5. Start a new chat, choose a model such as `gpt-4o-mini`, and send a short prompt. Confirm the completed response and the corresponding call in [AceDataCloud usage history](https://platform.acedata.cloud/console/usages).
+
+Use the base URL exactly as shown, without a trailing slash. Open WebUI appends `/models` for discovery and `/chat/completions` for chat. A successful verification checks model discovery only; send a chat message to verify generation.
+
+With a valid token, AceDataCloud currently returns models from `/v1/models`. If you want a smaller model selector, open **Advanced → Model IDs**, enter each exact model ID, and click **Add** (`+`) before saving. That list is an allowlist, replacing the full discovered list. If model discovery fails, you can add an ID manually and try a chat. Check the [current AceDataCloud model catalog](https://platform.acedata.cloud/documents/openai-chat-completions) for valid IDs.
+
+## Troubleshooting and billing
+
+An invalid token returns `401 invalid_token` from both model discovery and chat. If models appear but chat fails, check the selected ID, application access, and remaining credits. Open WebUI includes a default OpenAI connection; disable it in **Connections** if you do not use it, so it is not selected by mistake.
+
+Open WebUI may send extra model requests to generate chat titles, tags, and follow-up suggestions. These appear as separate charges in AceDataCloud usage history. Protect access to the Open WebUI server and rotate the token if it is exposed. This tutorial covers text chat; validate tools, files, images, and other capabilities separately for the selected model.
+
+For the generic connection UI, see [Starting with an OpenAI-compatible provider](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible).
