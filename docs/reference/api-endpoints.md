@@ -92,6 +92,18 @@ Earlier releases put the running total in `prompt_tokens` / `completion_tokens` 
 
 **The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#-anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
 
+**Model controls.** A model with [Model controls](/features/workspace/models#model-controls) applies each control's default option to API requests as well, and those parameters also only fill in what your request left out. To pick another option, send the control and option IDs under `params.model_controls`, keyed by model ID. `GET /api/models` lists a model's controls under `info.params.model_controls`, with each control's ID, label, default and the IDs and labels of its options:
+
+```json
+{
+  "model": "gpt-5",
+  "messages": [{ "role": "user", "content": "Plan a three-day trip to Lisbon." }],
+  "params": { "model_controls": { "gpt-5": { "thinking": "high" } } }
+}
+```
+
+A non-admin caller needs the **Allow Chat Controls** and **Allow Chat Params** permissions to pick an option and gets a `403` without them. A control or option the model no longer has returns a `400`.
+
 **Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless asked. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled, so you do not have to send it. A non-streaming request is left untouched, and a `stream_options` you send keeps its other keys but has `include_usage` forced to `true`, so usage cannot be switched off per request while the capability is on.
 
 #### Using Open WebUI tools, including MCP, from the API

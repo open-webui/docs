@@ -57,6 +57,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | 🎭 **Skills** | Bind markdown instruction sets loaded on-demand via `view_skill` |
 | 👥 **Access control** | Restrict to specific users or groups |
 | 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
+| 🎚️ **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
 | 🔊 **Per-model TTS voice** | Give each persona its own voice |
 | 🌐 **Translations** | Per-language name, description and prompt suggestions |
 
@@ -154,6 +155,43 @@ The request for token counts is added server-side, so it applies wherever the mo
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
 
 What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
+
+### Model controls
+
+Model controls give people a few simple choices in the chat, such as how hard the model thinks or how long it answers, while you decide exactly which parameters each choice sends. A control called **Thinking** with the options Minimal, Low, Medium and High, each setting `reasoning_effort` to the matching value, lets anyone change the reasoning effort without knowing the parameter exists.
+
+Only administrators define controls. Open the model from **Settings > Admin > Models** and use the **Model controls** section below **Advanced Params**: **+** adds a control, **Edit** changes one, **×** removes it and the handle on the left changes the order. Each row shows the control's default option. The controls are saved with the model, so they apply to everyone who can use it, and they stay in place when the model's owner edits it from **Workspace > Models**. The section itself appears only in the admin editor. People using the model see the control names, descriptions and option names, shown as typed in every interface language; the parameters behind each option stay visible to administrators only.
+
+![The Edit control dialog for a Thinking control shown as a slider, with Minimal, Low, Medium and High options that each set reasoning_effort](/images/features/models/model-controls-edit.webp)
+
+| Field | What it does |
+| :--- | :--- |
+| **Name** | The label people see in the chat, for example **Thinking** |
+| **Default option** | The option that applies while a person has picked nothing. With **None**, the control sends nothing until someone picks an option |
+| **Description** | Optional help text shown in the chat |
+| **Display** | **Menu** shows the options as a list. **Slider** shows them as steps on a slider, in the order listed here, and needs at least two options |
+| **Options** | Each option has a name and one or more **Parameter** and **Value** pairs, added with **Add parameter**. Drag the handle to reorder options |
+
+An option's parameters work like the ones added with **Add Custom Parameter** in **Advanced Params**: the parameter name goes to the provider exactly as written, and a value that reads as JSON (a number, `true`, an object) is sent as that type, anything else as text. When an option has several parameters, all of them are sent together. For an Ollama model they end up in Ollama's `options`, except `think`, `format` and `keep_alive`, which go at the top level of the request.
+
+Controls need a model served through one of the instance's connections, such as an OpenAI-compatible or Ollama connection. Saving controls on a model backed by a pipe function, on an arena model or on a model from a direct connection fails with **Model controls require a server-managed provider model.**
+
+#### Using model controls in chat
+
+When a selected model has controls, a sliders icon (**Model controls**) appears next to the model selector in the message input. It opens a panel listing each control with its current choice. A **Slider** control is changed by moving the slider, with **Default · Medium** (the default option's name) underneath to go back to the default, and its description behind the **?** icon. A **Menu** control opens a list with the description, **Default · Medium** and every option.
+
+![Model controls in the chat, with the Thinking slider set to High and a Verbosity slider on its default, Balanced](/images/features/models/model-controls-slider.webp)
+
+![Model controls in the chat shown as menus, with the Thinking submenu open on Default · Medium above Low, Medium and High](/images/features/models/model-controls-menu.webp)
+
+The icon is there only when a selected model has controls and the person has both the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions) (administrators always have them). With two models selected, each model's controls appear under its name, and each model gets its own choices.
+
+- **Choices are saved to the account, per model.** Picking an option saves it right away and it applies to every chat with that model, new and existing, on every device, until the person picks something else.
+- **Default follows the administrator.** While **Default** is ticked, every message sends the default option's parameters, or nothing from that control when the default option is **None**. If you later change the default option, everyone on **Default** moves with it.
+- **A picked option replaces the same parameter everywhere else.** Its values win over the model's **Advanced Params**, the [Global Model Defaults](#global-model-defaults-admin), the person's **Settings > General** and **Chat Controls**. If two controls set the same parameter, the one lower in the list wins.
+- **Automations use the defaults.** A chat started by an [automation](/features/chat-conversations/chat-features/automations) always sends each control's default option.
+
+API callers get the same controls. See [Chat Completions](/reference/api-endpoints#-chat-completions) for how a request picks an option.
 
 ### Prompt suggestions
 
