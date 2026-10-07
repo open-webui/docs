@@ -75,10 +75,10 @@ Inheritance applies everywhere Open WebUI checks group membership: resource acce
 
 ### Direct and Inherited Members
 
-The member count in the group list counts **direct members**, the people added to that group itself. The group editor's **Users** tab has two views:
+The member count in the group list counts **direct members**, the people added to that group itself. A **Direct** / **Inherited** dropdown in the group editor's **Users** tab switches between two member tables:
 
-*   **Direct members**: the people added to this group. Add and remove them here.
-*   **Inherited members**: the people in its subgroups, who share this group's access. Each entry names the subgroup they come through, with a link to it, and the view shows the direct, inherited and total counts. Manage these people in the subgroup they were added to.
+*   **Direct**: the people added to this group. Add and remove them here.
+*   **Inherited**: the people in its subgroups, who share this group's access. The **Inherited via** column names the subgroup each person comes through, with a link to it, and the table is searchable and paged at 30 people. Manage these people in the subgroup they were added to.
 
 ### Inherited Permissions
 
