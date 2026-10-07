@@ -17,126 +17,105 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Find what other people have built for Open WebUI, bring it into your instance, and share your own.**
+**Use models, prompts and plugins that other people have already built, and share your own.**
 
-[Open WebUI Community](https://openwebui.com/) is the community platform at openwebui.com. People publish model presets, prompts, Tools, Functions and chats there, review models, and compare which models get used on a public leaderboard. Any model, prompt, Tool or Function posted there can be imported into your own instance from its post.
+You don't have to write every system prompt, Tool or Function yourself. [Open WebUI Community](https://openwebui.com/) is a separate website where people publish what they've built for Open WebUI, and anything posted there can be imported into your instance in a few clicks.
 
-It is a separate website, not part of the Open WebUI server. Imports, shares and stats syncs are handed between two tabs in your browser, so openwebui.com never connects to your server, and an instance on `localhost` or a private network works the same as a public one. Nothing moves between the two until someone clicks a button for it.
+Run the server? [For admins](#for-admins) covers who can bring code onto it through the site, what reaches openwebui.com, and how to turn it off.
 
-:::danger Listed does not mean vetted
+## Import a post
 
-Posts are submitted by users and are **not reviewed** for security or quality. Being featured, popular or highly rated is not an endorsement.
+You need an account on openwebui.com, which is separate from your account on your instance.
 
-Tools and Functions execute **arbitrary Python on your server**. Read the code before you import, every time. See the full [Plugin Security Warning](/features/extensibility/plugin/).
+1. Open the post on openwebui.com and click **Get**.
+2. Enter your Open WebUI URL, for example `http://localhost:3000`, and click **Import**.
+3. Your instance opens in a new tab with the editor filled in, after you sign in if you aren't already. Read the item, including all the code of a Tool or Function, and save it.
 
-:::
-
-## What's on the site
-
-| Page | What you'll find |
-| :--- | :--- |
-| **Home** | The feed of posts. Filter by Models, Prompts, Tools, Functions, Chats or Reviews, and sort by Hot, New or Top |
-| **Search** | Posts, users and communities by keyword |
-| **Explore** | Trending posts and a directory of communities by topic |
-| **Communities** | Topic groups, named `o/<name>`, that you can join and post into |
-| **Models** | A catalog of AI models with star ratings and community reviews |
-| **Leaderboard** | Models ranked by the messages opted-in users have synced from their instances |
-| **Profile** | Your posts, comments and saved posts |
-
-Browsing needs no account. Getting a post, publishing one and syncing stats need you to sign in on openwebui.com. That account is separate from your account on your own instance.
-
-### Post types
-
-| Type | What it holds | Where it lands when imported |
+| Post | Lands in | Who can import it |
 | :--- | :--- | :--- |
-| **Model** | A [model preset](/features/workspace/models): base model, system prompt, parameters, tags and prompt suggestions | **Workspace > Models** |
-| **Prompt** | A [prompt](/features/workspace/prompts) and its slash command, with optional `{{variable}}` placeholders | **Workspace > Prompts** |
-| **Tool** | A [Tool](/features/extensibility/plugin/tools): Python code the model can call | **Workspace > Tools** |
-| **Function** | A [Function](/features/extensibility/plugin/functions): a Pipe, Filter, Action or Event written in Python | **Admin Panel > Functions** |
-| **Chat** | A snapshot of a conversation, shared from an instance | Read on the site |
-| **Review** | A star rating and written review of a model in the Models catalog | Read on the site |
-| **Text** | A discussion post | Read on the site |
+| Model preset | **Workspace > Models** | Users allowed to create models |
+| Prompt | **Workspace > Prompts** | Users allowed to create prompts |
+| Tool | **Workspace > Tools** | Users allowed to create tools |
+| Function | **Admin Panel > Functions** | Admins only |
 
-## Import a post into your instance
+## Share what you built
 
-1. Sign in on openwebui.com and open the post.
-2. Click **Get**.
-3. Enter your Open WebUI URL, for example `http://localhost:3000`, and click **Import**.
-4. Your instance opens in a new tab with the matching editor already filled in. Use a browser where you are signed in to your instance.
-5. Review the item, read the code if it is a Tool or Function, and save it.
+**Share** opens openwebui.com in a new tab with a new post already filled in. Nothing is published until you finish the post there.
 
-The import creates the item the same way you would by hand, so your account on the instance needs the right to create it: Functions are admin-only, and Models, Prompts and Tools follow your [workspace permissions](/features/authentication-access/rbac/permissions#1-workspace-permissions).
+- **A model preset, prompt or Tool:** in **Workspace**, open the item's menu and click **Share**.
+- **A Function (admins only):** in **Admin Panel > Functions**, open the function's menu and click **Share**.
+- **A chat:** in the chat's **Share** dialog, click **Share to Open WebUI Community**.
 
-**Download as JSON export**, under the **Import** button, saves the post as a JSON file instead.
+Sharing a Tool or Function publishes its full source code. Check it for API keys, internal addresses or anything else you wouldn't post publicly. Values you entered in its Valves aren't included.
 
-:::tip Your instance does not need to be public
+## Review a model
 
-The Open WebUI URL only has to open in your browser. The post is passed from the openwebui.com tab to your instance's tab inside the browser, so `http://localhost:3000` or an address on your private network works.
+Reviews on openwebui.com tell you how a model holds up for other people before you spend time setting it up, and yours does the same for them. Two links in Open WebUI lead to a model's reviews:
 
-:::
+- **To read them:** in the model selector, open a model's menu and click **Community Reviews**.
+- **To write one:** rate a reply with thumbs up or down, then click **Leave a public review for** the model in the panel that opens. On openwebui.com, open the model from the results. Under **Write a review**, give it a star rating, a title and what worked for you and what didn't, and click **Post**.
 
-For plugins, the [Community Plugins](/features/extensibility/community) guide matches goals to plugin types and lists highlighted plugins, and [Starting with Functions](/getting-started/quick-start/connect-a-provider/starting-with-functions) walks through a first import screen by screen.
+Both links search the site's [Models](https://openwebui.com/models) catalog for the model's ID on your instance, so a custom model or preset may not match an entry there. Nothing about your chats is sent, and your review is posted publicly under your openwebui.com account.
 
-## Share from your instance
+## Add your usage to the Leaderboard
 
-Each Share button opens the matching form on openwebui.com in a new tab, with your item filled in. Nothing is published until you finish the form there and post it.
+The [Leaderboard](https://openwebui.com/leaderboard) ranks models by how many messages people actually send them. Syncing your usage adds the models you rely on to that count, and your openwebui.com profile then shows your top models and a heatmap of your messages through the year.
 
-| To share | In Open WebUI | Opens on openwebui.com |
+1. Sign in on openwebui.com, open **Leaderboard** and click **Sync Stats**. The sync buttons on your profile and above your name at the bottom of the sidebar do the same.
+2. In **Sync Open WebUI Stats**, enter your Open WebUI URL and click **Sync**. Your instance needs Open WebUI v0.7.0 or later.
+3. Your instance opens in a new tab with a **Sync Usage Stats** dialog that lists what is and isn't shared. **Download as JSON** saves the data so you can read it first.
+4. Click **Sync**.
+
+Only stats about your own chats are sent, never their text. [What reaches openwebui.com](#what-reaches-openwebuicom) lists every field. After the first sync, later ones send stats only for chats that changed since the last one.
+
+## For admins
+
+### Who can bring code onto your server
+
+A Tool or Function imported from the site is Python that runs on your server from the moment it's saved.
+
+- **Functions** can only be imported by admins.
+- **Tools**, model presets and prompts can be imported by any user whose [workspace permissions](/features/authentication-access/rbac/permissions#1-workspace-permissions) let them create that kind of item.
+- A Tool or Function can list Python packages in a `requirements` line at its top, and Open WebUI installs them with pip when it loads the plugin. To stop that, set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) to `False`.
+
+### What reaches openwebui.com
+
+openwebui.com never connects to your server. Everything passes between two tabs in a user's browser, so an instance on `localhost` or a private network works the same as a public one, and nothing is sent until a user clicks for it. A user can send two things:
+
+- **A share.** Whatever they share is published as a post: a model preset or prompt as it's set up, a Tool's full source code, or a snapshot of a chat, messages included. Admins can also share a Function's full source code.
+- **A stats sync** for the [Leaderboard](#add-your-usage-to-the-leaderboard). Each user decides whether to sync, and it covers only their own chats. They confirm it in a **Sync Usage Stats** dialog on your instance.
+
+A stats sync sends:
+
+- the Open WebUI version
+- for each chat: its ID, the user's ID on your instance, its created and updated times, and its tags
+- for each message: its ID, role, model, length in characters, token count, timestamp, and the rating and tags it was given
+- per-chat totals: message counts, models used, average message lengths and average response time
+
+It doesn't send message text, prompts, model responses, chat titles, or uploaded files and images.
+
+Your instance's own [Evaluation](/features/administration/evaluation) leaderboard, built from your users' ratings, never leaves your instance.
+
+### Turn it off
+
+| Setting | Where | Default |
 | :--- | :--- | :--- |
-| A model preset | **Workspace > Models**, the model's menu > **Share** | A new Model post |
-| A prompt | **Workspace > Prompts**, the prompt's menu > **Share** | A new Prompt post |
-| A Tool | **Workspace > Tools**, the tool's menu > **Share** | A new Tool post |
-| A Function | **Admin Panel > Functions**, the function's menu > **Share** | A new Function post |
-| A chat | The chat's **Share** dialog > **Share to Open WebUI Community** | The chat upload page |
+| **Community Sharing** | **Admin Panel > Settings > General** | On |
 
-Sharing a Tool or Function publishes its full source code. Check it for API keys, internal addresses or anything else you would not post publicly. Valve values you entered in Open WebUI are stored separately and are not included.
+[`ENABLE_COMMUNITY_SHARING`](/reference/env-configuration#enable_community_sharing) sets it on an instance's first start. After that, the value saved in the Admin Panel wins.
 
-Shared chats are snapshots with their own visibility settings. See [Sharing to Open WebUI Community](/features/chat-conversations/chat-features/chatshare#sharing-to-open-webui-community).
-
-## Model reviews
-
-The **Models** catalog collects star ratings and written reviews, and two links in Open WebUI lead to it:
-
-- In the model selector, a model's menu has **Community Reviews**, which searches the catalog for that model.
-- After you rate a response, the rating panel offers **Leave a public review for** that model.
-
-Both are plain links. Nothing is sent until you write a review on the site and post it.
-
-## Sync usage stats to the leaderboard
-
-The [Leaderboard](https://openwebui.com/leaderboard) ranks models by the messages people have synced from their own instances. Syncing is opt-in and per user: it sends stats about your own chats only, never their text.
-
-1. Sign in on openwebui.com, open **Leaderboard** and click **Sync Stats**.
-2. Enter your Open WebUI URL and click **Sync**. Syncing needs Open WebUI v0.7.0 or later.
-3. Your instance opens in a new tab with a **Sync Usage Stats** dialog that lists what is and is not shared.
-4. Click **Sync** to send the stats, or **Download as JSON** to save them to a file and read them first. The site's Sync dialog also accepts that file through **Click here to upload JSON file directly**.
-
-After the first sync, **Only sync new/updated chats** is checked, so later syncs send only chats that changed since the last one. Clear it to send every chat again.
-
-The dialog lists the main items. The full contents of a sync are:
-
-| Sent | Not sent |
-| :--- | :--- |
-| Your Open WebUI version | Message text, prompts and model responses |
-| For each chat: its ID, your user ID on the instance, its created and updated times, and its tags | Chat titles |
-| For each message: its ID, role, model, length in characters, token count, timestamp, and the rating and tags it was given | Uploaded files and images |
-| Per-chat totals: message counts, models used, average message lengths and average response time | |
-
-## Turn it off
-
-Admins control the instance side with **Community Sharing** in **Admin Panel > Settings > General**, or with [`ENABLE_COMMUNITY_SHARING`](/reference/env-configuration#enable_community_sharing). It is on by default. Turning it off hides, for every user including admins:
+Turning it off hides these for every user, admins included:
 
 - the **Made by Open WebUI Community** links on the Models, Prompts, Tools and Functions pages
-- **Share** in the model, prompt, tool, and function menus
+- **Share** in the model, prompt, tool and function menus
 - **Share to Open WebUI Community** in the chat share dialog
-- **Community Reviews** in the model selector and the review link after rating
+- **Community Reviews** in the model selector, and the review link after rating a reply
 - the **Sync Usage Stats** dialog
 
-The stats export behind that dialog also refuses non-admin users while the setting is off.
+The stats export behind that dialog still answers admins through the API, and refuses everyone else.
 
-## See also
+## Where to go next
 
-- **[Community Plugins →](/features/extensibility/community)**: find a plugin by what you want to do, and import it safely.
-- **[Plugin Security Warning →](/features/extensibility/plugin/)**: why every Tool and Function needs a read before you import it.
-- **[Sharing chats →](/features/chat-conversations/chat-features/chatshare)**: share links, visibility settings, and sharing to the community.
-- **[Evaluation →](/features/administration/evaluation)**: your instance's own model leaderboard, built from your users' ratings and kept on your instance.
+- **[Community Plugins](/features/extensibility/community)**: find a plugin by what you want it to do.
+- **[Starting with Functions](/getting-started/quick-start/connect-a-provider/starting-with-functions)**: a first Function import, from finding it to setting its Valves.
+- **[Sharing chats](/features/chat-conversations/chat-features/chatshare#sharing-to-open-webui-community)**: share links, and who can see a chat you share to the site.
