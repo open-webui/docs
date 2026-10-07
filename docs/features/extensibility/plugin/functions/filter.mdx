@@ -128,10 +128,15 @@ async def request(self, body: dict) -> dict:
 # RIGHT: converges to the same body no matter how many times it runs.
 async def request(self, body: dict) -> dict:
     marker = "Be concise."
-    if not any(m.get("content") == marker for m in body["messages"]):
+    if not any(
+        m.get("role") == "system" and marker in str(m.get("content", ""))
+        for m in body["messages"]
+    ):
         body["messages"].insert(0, {"role": "system", "content": marker})
     return body
 ```
+
+Check whether a system message **contains** your text, not whether one equals it. Before each call to the model, Open WebUI merges all system messages into one, so on the next hop your line is part of a longer message whenever the chat has another system message, such as a system prompt from the chat controls or a folder, or one added by another filter. An equality check misses it there and adds the line again on every hop.
 
 Transformations that are naturally idempotent (clamping a value, downscaling an image that is already under the limit, redacting a pattern that no longer matches) need no guard. Anything that appends, prepends, increments or accumulates does. If a once-per-turn guarantee is what you actually want, that is what `inlet` is for.
 
