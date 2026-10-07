@@ -110,8 +110,9 @@ The System Prompt field is only visible if you have permission to set system pro
 Link **knowledge bases and files** to your folder:
 
 - All attached files and knowledge bases are automatically included as **context** for every chat in the folder.
-- This enables RAG (Retrieval Augmented Generation) for all folder conversations.
+- With **Native** function calling, the model gets a list of the folder's knowledge and reads it with the **Knowledge Base** [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), whether **File Context** is on or off. With **Legacy** function calling, it is retrieved and injected through RAG (Retrieval Augmented Generation) while **File Context** is on.
 - Knowledge is optional. Folders work for organization without any attached files.
+- **Attaching a folder to another chat.** Folders are listed in the `#` menu, and you can also drag one from the sidebar into the message input. This attaches the files and knowledge bases linked to the folder, and only while **File Context** is on. With File Context off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder.
 
 **Whose access decides what is attached.** A folder's knowledge is measured against the **folder owner**, not against whoever is editing or reading it:
 
