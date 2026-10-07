@@ -21,14 +21,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 You don't have to write every system prompt, Tool or Function yourself. [Open WebUI Community](https://openwebui.com/) is a separate website where people publish what they've built for Open WebUI, and anything posted there can be imported into your instance in a few clicks.
 
-:::danger Posts are not reviewed
-
-Anyone can publish a post, and nobody checks it for security or quality. Being featured, popular or highly rated is not an endorsement.
-
-Tools and Functions run **arbitrary Python on your server**. Read the code before you import, every time. The [Plugin Security Warning](/features/extensibility/plugin/) explains what a malicious plugin can do.
-
-:::
-
 Run the server? [For admins](#for-admins) covers who can bring code onto it through the site, what reaches openwebui.com, and how to turn it off.
 
 ## Import a post
