@@ -36,7 +36,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
     - `https://yacy.example.com` (using a custom domain name for a self-hosted Yacy instance, suitable for public or private access)
     - `https://yacy.example.com:8443` (using https over the default Yacy https port)
 
-5. Optionally, enter your Yacy username and password if authentication is required for your Yacy instance. If both are left blank, digest authentication will be skipped
+5. Enter a Yacy username, which the form requires before it saves. Add the password if your Yacy instance requires authentication. Open WebUI only sends the credentials when Yacy asks for them, so an instance without authentication works with any username and an empty password
 6. Press save
 
 ![Open WebUI Admin panel showing Yacy config](/images/tutorial_yacy.png)
