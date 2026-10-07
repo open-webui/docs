@@ -102,7 +102,9 @@ Turning File Context back on removes these tools again, on the grounds that the 
 Retrieval then becomes **on-demand**: the model decides what to fetch and calls a tool. Tool results are appended at the **end** of the conversation, so they never rewrite the cached prefix.
 
 :::info Chat-attached collections and notes are not orphaned
-Turning File Context off also re-routes any knowledge collections or notes attached to the chat into the knowledge tool path, so they stay searchable through `query_knowledge_files` and friends rather than becoming invisible. Nothing you attach loses its route to the model, only the automatic injection goes away.
+Turning File Context off also re-routes any knowledge collections or notes attached to the chat into the knowledge tool path, so they stay searchable through `query_knowledge_files` and friends rather than becoming invisible.
+
+A **chat folder** attached with `#` or dragged into the input only reaches the model through File Context, which retrieves from the folder's attached knowledge. With File Context off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder, where its knowledge goes through the knowledge tools.
 :::
 
 :::info "Using Entire Document" is a File Context sub-mode
@@ -135,7 +137,7 @@ Enable **Builtin Tools** on the model and leave the categories you need switched
 | Resource | Tools | Category |
 |---|---|---|
 | Files attached to the chat | `list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file` | **Files** |
-| Knowledge bases and collections | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
+| Knowledge bases and collections, including the knowledge of the folder the chat is in | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
 | Notes | `search_notes`, `view_note` | **Notes** |
 | Referenced chats | `search_chats`, `view_chat` | **Chat History** |
 
