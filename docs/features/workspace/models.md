@@ -149,6 +149,10 @@ Toggle what the model can do and bind resources:
 The request for token counts is added server-side, so it applies wherever the model is used: the chat interface, the API and the chats Open WebUI starts on your behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Nothing needs to be set per request. Only streaming requests are touched, so a model with **Stream Chat Response** turned off is left alone.
 :::
 
+### Voice avatar
+
+When an admin sets **Call mode** to **Realtime**, the editor also shows **Realtime Voice** and **Voice avatar**. **Voice avatar** gives the model an animated 3D character that takes the place of the orb in Realtime calls, with optional animations and gestures. See [Voice Avatars](/features/chat-conversations/chat-features/voice-mode#voice-avatars) for setup and file requirements.
+
 ### Advanced parameters
 
 - **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). One text field, comma-separated.

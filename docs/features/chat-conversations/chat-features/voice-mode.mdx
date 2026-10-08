@@ -155,7 +155,7 @@ Open WebUI keeps text transcripts of the call. The audio itself is streamed and 
 
 ### During a Realtime Call
 
-The call screen centres on an animated voice orb. The status under it reads **Connecting...**, **Listening**, **Speaking** or **Microphone off**, and **Call disconnected** with a **Retry** button when the connection drops. **Mute** and **End call** sit below the orb.
+The call screen centres on an animated voice orb, or on the model's character when it has a [voice avatar](#voice-avatars). The status under it reads **Connecting...**, **Listening**, **Speaking** or **Microphone off**, and **Call disconnected** with a **Retry** button when the connection drops. **Mute** and **End call** sit below the orb.
 
 - **Talk over it.** Starting to speak stops the assistant straight away. Tapping the orb while it speaks does the same.
 - **Mute.** Click the microphone button, or press **M** on a keyboard.
@@ -168,6 +168,52 @@ The call screen centres on an animated voice orb. The status under it reads **Co
 - **Time limit.** A call lasts at most one hour, the provider's session limit. Open WebUI also checks every minute that your session is still valid, that Realtime mode is still on and that you still have the **Allow Call** permission, and ends the call when one of them changes.
 
 Camera and screen share, **Display Emoji in Call**, **Allow Voice Interruption in Call**, Response Splitting and the speech engines further down the audio settings all belong to Standard mode.
+
+### Voice Avatars
+
+A model can show up in Realtime calls as an animated 3D character in place of the orb. The character moves its mouth with the assistant's voice, blinks, shifts its pose as it listens and speaks and can perform short gestures that the voice model picks during the conversation. Avatars appear in Realtime calls only.
+
+#### Setting Up an Avatar
+
+Open the model in **Workspace > Models**. While **Call mode** is **Realtime**, the editor shows a **Voice avatar** row below **Realtime Voice**, reading **Default orb** or **Custom avatar**. A model that already has an avatar keeps the row after Realtime mode is turned off, so the avatar can still be removed. Click **Configure** to open **Avatar setup**:
+
+1. Click **Upload VRM** and choose the character file. A live preview of the character appears in the dialog. **Replace avatar** swaps in a different file, and **Use orb** removes the avatar together with all its animations.
+2. Click **Idle**, **Listening** or **Speaking** under the preview to watch how the character moves in each state. The preview is silent; during a call the mouth follows the assistant's audio.
+3. Optionally add state animations and named gestures, described below.
+4. Click **Apply**, then **Save & Update**. The files are uploaded when the model is saved, and Open WebUI checks each of them again on the server.
+
+Anyone who can edit the model can give it an avatar. The avatar and its animations are stored like other uploaded files, in the configured file storage, and the model keeps a reference to each of them. Everyone the model is shared with can load these files, so every user who calls the model sees the same character.
+
+#### File Requirements
+
+The avatar is a rigged humanoid character in the VRM format, version 0.x or 1.0, saved as a single `.vrm` file. Only upload a character you have permission to use.
+
+| Requirement | Limit |
+| :--- | :--- |
+| **File size** | 25 MiB. The admin's [maximum upload size](/reference/env-configuration#rag_file_max_size) applies as well when it is lower |
+| **Skeleton** | A VRM humanoid rig with hips, spine, head and both upper and lower arms. A plain GLB model without a VRM rig is refused |
+| **Textures** | Embedded in the file as PNG, JPEG or WebP, up to 32 textures of at most 4096 px per side and about 33 million pixels in total, for example eight 2048 × 2048 textures |
+| **Complexity** | At most 512 nodes. Very dense meshes are refused as too complex for a voice call |
+| **Self-contained** | All buffers and textures inside the file. Links to external resources are refused |
+
+The mouth moves through the character's built-in "aa" mouth expression and blinking through its blink expressions. **Avatar setup** warns when a character has no mouth or no blink expressions. A character without a mouth expression speaks through body movement alone.
+
+#### Animations and Gestures
+
+Out of the box the character uses built-in movement: gentle breathing, a slight sway and small head movements that change as it listens and speaks. Two kinds of optional clips add authored motion. Both use the VRM animation format (`.vrma`, VRMA 1.0) and share these limits: at most 10 MiB and 60 seconds, one animation per file and baked keyframes of body motion only, without meshes or textures. Clips play in place, and the mouth, blinking and gaze stay automatic while they run.
+
+- **State animations.** One clip each for **Idle**, **Listening** and **Speaking**, set with **Upload**, **Replace** and **Remove**. A clip loops while the character is in its state; a state without a clip keeps the built-in movement.
+- **Named gestures.** Up to 16, added with **Add gesture**. Each gesture needs a clip, a name and a description. The name uses lowercase letters, numbers and underscores, starts with a letter, is at most 48 characters long and is unique within the model, for example `wave`. The description, up to 500 characters, tells the voice model when to use the gesture.
+
+**Preview** plays a state or gesture on the character in the dialog. During a call, a model with gestures gives the voice model a `play_animation` function listing each gesture's name and description. The voice model plays a gesture when you ask for one or when it suits the moment. A new gesture replaces the one that is running, and interrupting the assistant stops it.
+
+#### What Users See
+
+On the call screen the character takes the place of the orb, with the same status line and controls. A spinner shows while the character loads. Its mouth follows the assistant's audio, it moves between idle, listening and speaking poses as the call goes on and tapping it while the assistant speaks interrupts the reply. Switching to another model in the chat switches to that model's avatar.
+
+The character is drawn with WebGL, so the browser needs WebGL turned on. When the avatar file cannot be loaded or the browser's graphics stop working, the call carries on with the orb.
+
+With the reduce motion accessibility setting of the operating system or browser turned on, the character holds a still pose: built-in movement, state animations and gestures stop, while the mouth and blinking keep following the call.
 
 ### Requirements and Providers
 
