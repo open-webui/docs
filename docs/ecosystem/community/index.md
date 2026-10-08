@@ -1,6 +1,6 @@
 ---
 title: "Open WebUI Community"
-sidebar_position: 37
+sidebar_position: 0
 ---
 
 import ThemedImage from '@theme/ThemedImage';
