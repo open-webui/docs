@@ -198,7 +198,7 @@ These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sha
 
 ### Attachments
 
-Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either.
+Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This covers files uploaded by the note's owner and gives read access only.
 
 Two things to know:
 
