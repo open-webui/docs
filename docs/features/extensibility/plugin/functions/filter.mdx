@@ -93,7 +93,7 @@ class Filter:
 
 `inlet` runs **once per user turn**. `request` runs **once per call to the model**, and those are not the same number.
 
-A turn that uses tools makes several calls: one to decide which tool to use, then another after each set of tool results comes back, until the model produces a final answer. `inlet` saw only the first of those. `request` runs before every one of them, including the call made after a tool run the user had to approve.
+A turn that uses tools makes several calls: one to decide which tool to use, then another after each set of tool results comes back, until the model produces a final answer. `inlet` saw only the first of those. `request` runs before every one of them, including the call made after a tool run the user had to approve. After an approval, `request` filters run before the approved tool executes, so a filter can still reject the request before the tool has any effect.
 
 That difference decides which one you want:
 

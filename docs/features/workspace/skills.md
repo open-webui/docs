@@ -82,7 +82,7 @@ Skills bound to a model use lazy loading:
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
-The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, in full.
+The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, in full. The same happens when a model's **Skills** category is switched off under **Builtin Tools** in the model editor: the model can no longer find and load skills by itself, and skills you select or attach still apply in full.
 
 ### Skills from a terminal server
 

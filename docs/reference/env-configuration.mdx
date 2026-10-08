@@ -8151,7 +8151,7 @@ SQLCipher is not supported since v0.9.0. The async database layer introduced in 
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the database schema to connect to.
+- Description: Specifies the database schema to connect to. On PostgreSQL, migrations run inside this schema, so a fresh install can start in it. The schema must already exist, otherwise startup stops with an error naming it. Startup also stops when the schema holds tables but no `alembic_version` table, since Open WebUI cannot tell which migrations have run; keep the application tables and `alembic_version` in the same schema.
 
 #### `DATABASE_POOL_SIZE`
 
