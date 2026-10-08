@@ -1,0 +1,60 @@
+---
+sidebar_position: 1650
+title: "Translating Open WebUI"
+---
+
+# Translating Open WebUI
+
+If you use Open WebUI in a language other than English, you have probably seen English labels mixed in with your own language. Each one is a string nobody has translated yet, and anyone fluent in the language can fill it in. Translation pull requests are the one kind of code contribution that doesn't need a maintainer to ask for it first.
+
+Every release adds new strings, and they arrive untranslated in every language, so even a language that is complete today has gaps again after the next release.
+
+## Find what's missing in your language
+
+Each language is one file in the [Open WebUI repository](https://github.com/open-webui/open-webui), `src/lib/i18n/locales/<code>/translation.json`, where `<code>` is the language's code as listed in `src/lib/i18n/locales/languages.json`, such as `de-DE` or `pt-BR`. Each line pairs a key with its translation, and an empty value is a string nobody has translated:
+
+```json
+"Load content from these URLs?": "",
+"Load Model": "Modell laden",
+```
+
+Open WebUI shows the English text wherever the value is empty. To count the empty values in your language, run this from a checkout of the `dev` branch, with your language's code in place of `de-DE`:
+
+```bash
+grep -c '": ""' src/lib/i18n/locales/de-DE/translation.json
+```
+
+## Translate the strings
+
+For most keys, the key is the English text. Keys written as dotted names, such as `settings.personal.general.language.label`, are different. Their English text is the value of the same key in `src/lib/i18n/locales/en-US/translation.json`. Translate that English text, never the name.
+
+These rules keep a translation working in the interface:
+
+- **Keep every `{{placeholder}}` exactly as written**, capitalization included, and keep any `\n` line breaks. Open WebUI fills them in when it shows the string.
+- **Fill every plural form in your file.** A key such as `{{count}} files_one` comes with `{{count}} files_other`, and languages with more plural forms have more keys: Ukrainian also has `_few` and `_many`. Open WebUI picks the form that matches the number.
+- **Leave names untranslated:** Open WebUI, product and provider names, and parameter names such as `top_k`.
+- **Use the words your file already uses.** If the file already translates "prompt" one way, a new string that uses a different word reads as a mistake.
+- **Change only the values in your language's file.** Don't edit `en-US`, don't rename or reorder keys, and don't run `npm run i18n:parse`, which rewrites the file of every language.
+
+Before you submit, have a fluent speaker read the whole translation, whether that's you or someone you ask. Machine translation can give you a first draft, but it often gets short labels wrong because it can't see where they appear. "Open" can be a command or a description, and many languages use a different word for each.
+
+To see the translation in place, run Open WebUI from your checkout as described in [Developing Open WebUI](/getting-started/advanced-topics/development), then choose your language under **Settings > General > Language**.
+
+## Open the pull request
+
+- **One language per pull request**, opened against the `dev` branch.
+- **Start the title with `i18n:`**, for example `i18n: fill missing German (de-DE) translations`.
+- **Follow the [pull request template](https://github.com/open-webui/open-webui/blob/main/.github/pull_request_template.md).** Under **Maintainer Request**, write that the pull request only updates i18n/localization, and tick the checkbox that says so. A pull request without it is closed automatically.
+- **Say how the translation was made and who checked it**, for example "machine translated, then reviewed by a native speaker".
+- **Complete the Contributor License Agreement** at the end of the template.
+
+## Add a new language
+
+1. Create a directory under `src/lib/i18n/locales` named with the language's [ISO 639 code](http://www.lingoes.net/en/translator/langcode.htm), such as `fr-FR`.
+2. Copy `src/lib/i18n/locales/en-US/translation.json` into the new directory.
+3. Write a translation as the value of every key, following the rules above.
+4. Register the language in `src/lib/i18n/locales/languages.json` with its code and title, such as `{ "code": "fr-FR", "title": "French (France)" }`.
+
+## Where to go next
+
+Ask translation questions on [Discord](https://discord.gg/5rJgQTnV4s) or in [GitHub Discussions](https://github.com/open-webui/open-webui/discussions). For other ways to help, such as testing the `dev` branch or improving the documentation, see [Contributing](/contributing).
