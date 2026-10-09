@@ -204,7 +204,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string, which lets the browser's language pick the locale, with `en-US` as the fallback when no translation matches
-- Description: Sets the language a browser starts in on its first visit, overriding the browser's own language. A `?lang=` URL parameter and a language picked under **Settings > General > Language** take precedence over it. The first visit saves the language in that browser, so changing this value later only affects browsers that have not opened Open WebUI yet.
+- Description: Sets the language a browser starts in on its first visit, overriding the browser's own language. A `?lang=` URL parameter and a language picked under **Settings > General > Language** take precedence over it. The first visit saves the language in that browser, so changing this value later only affects browsers that have not opened Open WebUI yet. Dates and times are written in the format of the interface language.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DEFAULT_MODELS`
@@ -471,7 +471,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the notes feature, allowing users to create and manage personal notes within Open WebUI.
+- Description: Enables or disables the notes feature, allowing users to create and manage personal notes within Open WebUI. Set to `False`, it hides Notes in the interface and the notes API (`/api/v1/notes`) answers every request with a `403` error, for administrators too, so existing notes are also out of reach for scripts and integrations.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MEMORIES`
@@ -525,7 +525,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admins can open other users' chats inside Open WebUI. When disabled, the admin panel no longer offers other users' chats, and every chat endpoint refuses an admin acting on another user's chat: reading, editing or deleting it or its messages, sharing or cloning it, sending messages into it, attaching it as context, approving its tool calls and listing or stopping its running replies. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats and would re-open the same data on a different surface. This is not a security toggle. It only hides other users' chats from admins in the product: an admin always has access to every chat through other means, such as the database, a Function or Tool (which runs code on the server) or the server itself. See the admin-posture-toggles note above.
+- Description: Controls whether admins can open other users' chats inside Open WebUI. When enabled, an admin can read any user's chat, and it opens read-only in the app. Through the API the admin can also edit or delete its messages, delete the chat, change who its share link is shared with and clone it. Sending messages into the chat, regenerating, listing or stopping its replies and approving its tool calls stay with the chat's owner and the people it is shared with using [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies), which can include the admin. When disabled, the admin panel no longer offers other users' chats, and every chat endpoint refuses an admin acting on another user's chat beyond what a share gives them: reading, editing or deleting it or its messages, sharing or cloning it, sending messages into it, attaching it as context, approving its tool calls and listing or stopping its running replies. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats and would re-open the same data on a different surface. This is not a security toggle. It only hides other users' chats from admins in the product: an admin always has access to every chat through other means, such as the database, a Function or Tool (which runs code on the server) or the server itself. See the admin-posture-toggles note above.
 
   **Exception for internal chats:** admins can still retrieve a chat marked internal even when this is `False`. Internal chats are the ones Open WebUI creates on a user's behalf rather than the user opening them: [sub-agent](/features/chat-conversations/chat-features/subagents) chats, [timer](/features/chat-conversations/chat-features/timers) chats and note-attached chats. This carve-out is what lets an admin retrieve one at all, because internal chats are **excluded from every listing surface**: they do not appear in chat lists, search, counts, exports, or the admin chat list. They are reachable only by id.
 

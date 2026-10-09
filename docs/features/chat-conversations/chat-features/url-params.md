@@ -100,14 +100,14 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?image-generation=true`
 - **Behavior**: Activates the image generation button to generate an image.
 
-### 12. **Settings Deep Link**
+### 11. **Settings Deep Link**
 
 - **Description**: The `settings` parameter opens the settings dialog on a given tab and then removes itself from the URL.
 - **How to Set**: Use a user tab id (`general`, `interface`, `notifications`, `shortcuts`, `connections`, `tools`, `personalization`, `audio`, `data_controls`, `usage`, `archived_chats`, `account`, `about`) or an admin tab as `admin:<tab>` (`general`, `authentication`, `connections`, `models`, `subagents`, `evaluations`, `analytics`, `integrations`, `documents`, `web`, `code-execution`, `interface`, `audio`, `images`, `db`, `pipelines`).
 - **Example**: `/?settings=admin:documents`
 - **Behavior**: The dialog opens on that tab. A non-admin who follows an `admin:` link gets the General tab instead.
 
-### 13. **New Note**
+### 12. **New Note**
 
 - **Description**: On the Notes pages, `title` and `content` prefill a new note.
 - **How to Set**: Open `/notes/new` (or `/notes`) with either parameter.

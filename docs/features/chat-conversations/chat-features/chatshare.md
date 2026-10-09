@@ -30,7 +30,7 @@ To share a chat:
 
 :::info Sharing scope is controlled by RBAC
 
-After generating a share link, the modal shows an **Access Control** selector for who can open it, offering **Private**, **Public** and **Open**.
+The modal shows an **Access Control** selector for who can open the link, offering **Private**, **Public** and **Open**, plus specific users and groups. A new link starts private; giving someone access creates the link if the chat does not have one yet.
 
 **Public** makes the link reachable by any signed-in user of this instance, so a visitor who is not logged in is still sent to the login page. It is gated by the **Chats Public Sharing** permission. When disabled, non-admin users only see options to grant access to specific users or groups. Admins always retain access to all options. See [RBAC Permissions](/features/authentication-access/rbac/permissions) and [`USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_chat_allow_public_sharing) for configuration.
 
@@ -57,6 +57,23 @@ Treat the URL itself as the only protection. It cannot be revoked selectively, s
 
 :::
 
+### Allowing Replies
+
+Once at least one person or group has access, the modal also shows a **Sharing mode**:
+
+- **Clone only** (default): people open the link and see the conversation as it was when the link was created or last updated. To continue it, they clone it into their own chats.
+- **Allow replies**: people you shared the chat with by name, through a group or with **Public** write into the same chat. Opening the link takes them straight to the live conversation, and everyone in it sees new messages and replies as they arrive.
+
+In a chat with replies allowed:
+
+- Each message shows the name and profile picture of the person who sent it. In the bubble layout, other people's messages sit on the left.
+- A line above the message input shows who is typing.
+- Each person regenerates, continues and stops only the replies to their own messages. Editing messages and rating replies is left to the owner, on their own messages and the replies to them.
+- Messages from other people never generate a new title or tags, and never change the owner's selected models, attached files or chat variables. Their turns run without the chat's variables.
+- Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
+
+Switching back to **Clone only** refreshes the snapshot behind the link, so it then shows the conversation as it stands at that moment, replies included. The **Allow Chat Share** permission controls who can share a chat, and the access options follow the same permissions as for any share link. [Shared folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) have the same **Sharing mode**, applied to every chat in the folder.
+
 #### Sharing to Open WebUI Community
 
 When you select `Share to Open WebUI Community`:
@@ -82,7 +99,7 @@ When you select `Copy Link`, a unique share link is generated that can be shared
 **Important Considerations:**
 
 - The shared chat will only include messages that existed at the time the link was created. Any new messages sent within the chat after the link is generated will not be included, unless the link is deleted and updated with a new link.
-- The generated share link acts as a static snapshot of the chat at the time the link was generated.
+- The generated share link acts as a static snapshot of the chat at the time the link was generated. With [Allow replies](#allowing-replies), people you shared with see the live chat.
 - Unless the chat is set to **Open**, viewing it requires an account on the Open WebUI instance where the link was generated, and being signed in to that account. A visitor who is not signed in is redirected to the login page first.
 - A chat set to **Open** skips both requirements and is readable by anyone with the link. See [Open links](#open-links-no-sign-in).
 
@@ -92,10 +109,12 @@ To view a shared chat:
 
 1. Ensure you are signed in to an account on the Open WebUI instance where the chat was shared. This step does not apply to a chat shared as **Open**, which anyone can read without an account.
 2. Click on the shared link provided to you.
-3. The chat will be displayed in a read-only format.
+3. The chat will be displayed in a read-only format. With [Allow replies](#allowing-replies), you are taken to the chat itself and can write into it.
 4. If the Admin of the Open WebUI instance from which the shared link was shared has Text-to-Speech set up, there may be an audio button for messages to be read aloud to you (situational).
 
-A chat that belongs to someone else is shown under its author: their name and profile picture sit on the messages they wrote. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app rather than through a share link, the chat's **Overview** panel labels its message nodes the same way.
+A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** panel labels its message nodes the same way.
+
+Anyone other than the owner gets the conversation without the owner's chat settings: advanced parameters, selected tools, tool servers and filters, chat variables and the per-message settings are left out. A copy cloned from a share link starts with no chat variables and outside any folder.
 
 #### Using a Shared Chat as Context
 

@@ -28,7 +28,7 @@ The **Shared Chats** modal provides a unified interface for your public content:
 - **Copy Link**: Use the **Clipboard icon** next to any entry to instantly copy the share URL back to your clipboard.
 - **Revoke Access (Unshare)**: Use the **Unshare icon** (represented by a slashed link) to deactivate a share link.
     - :::warning
-      Revoking access immediately invalidates the link. Anyone attempting to visit the URL will receive a "Not Found" error. This action is permanent, though you can generate a *new* unique link by sharing the chat again from the main interface.
+      Revoking access immediately invalidates the link. Anyone attempting to visit the URL will receive a "Not Found" error. For a chat shared with [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies), the people you shared with also lose access to the chat itself. This action is permanent, though you can generate a *new* unique link by sharing the chat again from the main interface.
       :::
 - **Pagination**: Efficiently browse through your history using the "Load More" functionality at the bottom of the list.
 
