@@ -46,6 +46,8 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low: stable as long as the attachments don't change |
 | **Open Terminal `AGENTS.md`** | Reads the terminal's `AGENTS.md` on every turn and places it before the first message | Changes the whole prefix whenever the file changes, for example when the model edits it mid-chat |
 | **Open Terminal skills** | Lists the skills saved in the terminal on every turn and adds the skill tool and skill list once one exists | Changes the tool list and system message the turn a skill is added or removed |
+| **Open Terminal working directory** | Writes the terminal's current working directory into the command tool's instructions on every turn | Changes the tool list whenever the working directory changes. Turn off the connection's [Working Directory Context](/features/open-terminal/setup/connecting#working-directory-context) to keep it stable |
+| **Open Terminal user shell tools** | By default, adds the two tools for your own shell only while that shell is open | Changes the tool list when you open or close the shell. Set the connection's [User Shell Tools](/features/open-terminal/setup/connecting#user-shell-tools) to `Always Include` to keep it stable |
 
 :::info
 The attachment metadata block is intentionally **metadata only** (no file content), so it stays stable across turns and does not meaningfully hurt caching. The content-injecting rows above are the ones to watch.

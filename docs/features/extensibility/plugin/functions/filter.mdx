@@ -1284,6 +1284,10 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 📤 **Input**:
 - **`body`**: This contains **all current messages** in the chat (user history + LLM replies).
 
+Each message carries its `id`, `role`, `content`, `info` and `timestamp`, plus `output`, `usage` and `sources` when it has them. Only the reply that just finished carries **`finish_reason`**: the reason the provider gave for ending the reply, such as `stop`, `length` (the reply hit the token limit) or `tool_calls`. When the reply involved tool calls, it is the value from the last model call of the turn.
+
+`finish_reason` is set for OpenAI-compatible and Ollama models, streamed or not. Ollama reports `length` when a reply is cut off by the token limit. Connections that use the OpenAI Responses API set it on non-streamed replies only, as `stop` or `tool_calls`.
+
 🚀 **Your Task**: Modify this `body`. You can clean, append, or log changes, but be mindful of how each adjustment impacts the user experience.
 
 💡 **Best Practices**:
@@ -1370,7 +1374,7 @@ This section describes **behavior and caveats**, not a full drop-in program. Fil
 
 #### What such a Filter would observe
 
-Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`**, **`usage`** (often on the terminal chunk only), or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values). Exact shapes vary by connector and protocol.
+Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`** (also handed to `outlet` on the finished reply, see [`outlet`](#outlet-function-output-post-processing)), **`usage`** (often on the terminal chunk only), or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values). Exact shapes vary by connector and protocol.
 
 Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python): record when you first see a stream fragment for an assistant reply, bump counters when deltas contain printable model text (including reasoning / audio transcript fields some APIs expose), and compare timestamps when you decide the stream **ended**.
 
