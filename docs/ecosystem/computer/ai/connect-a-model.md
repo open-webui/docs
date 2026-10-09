@@ -35,6 +35,14 @@ Your pulled models are auto-discovered and appear in the model selector.
 
 OpenRouter exposes many models; set a **Prefix ID** like `openrouter` so its models are namespaced (`openrouter/gpt-5.6-sol`) and don't collide with models from other connections.
 
+## FreeAIapikey
+
+- **Provider:** OpenAI
+- **Base URL:** `https://api.freeaiapikey.com/v1`
+- **API Key:** your FreeAIapikey key (from the [dashboard](https://freeaiapikey.com/dashboard))
+
+[FreeAIapikey](https://freeaiapikey.com) is an OpenAI-compatible API gateway for GPT-5.5, GPT-5.6 Sol, GPT-6 Sol, GPT-6 Astra, Claude Opus 4.7/4.8/5/5.5 and Claude Sonnet 5. Since its model IDs carry a `openai/` or `anthropic/` prefix already, no Prefix ID is needed. The catalog can be queried at `GET https://api.freeaiapikey.com/v1/models` and auto-discovery picks it up.
+
 ## Anthropic
 
 - **Provider:** Anthropic
