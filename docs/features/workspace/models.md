@@ -281,6 +281,13 @@ See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-atta
 
 ### Bulk management
 
+The admin model list opens on the **Available** view: every base model a connection currently offers, plus every workspace model. **Unavailable** lists the base models that no connection offers anymore but that still have saved settings, for example after a provider retired a model or a connection was removed. **All** shows both.
+
+Each model's ellipsis (**...**) menu starts with one of two actions, and both ask for confirmation first:
+
+- **Reset**, on base models a connection still offers, puts the settings saved for that model back to their defaults. The model stays in the list.
+- **Delete**, on workspace models and unavailable base models, removes the model and its saved settings from the list.
+
 Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Drag-to-reorder works in a filtered view too: the model you move lands next to the visible model you dropped it by, and every model the filter hides keeps its place.
 
 ---
@@ -319,7 +326,7 @@ Hold **Shift** while the model list is open and every row exposes inline icon bu
 
 ### Reviewing what is configured
 
-Open the view filter (the **All** dropdown next to **Actions**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here.
+Open the view filter (the dropdown next to **Actions**, which starts on **Available**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by All, Available, Unavailable, Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here.
 
 ![The view filter with the Selected and Pinned options](/images/features/models/model-view-filter.png)
 
