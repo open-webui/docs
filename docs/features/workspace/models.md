@@ -57,14 +57,16 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | 🎭 **Skills** | Bind markdown instruction sets loaded on-demand via `view_skill` |
 | 👥 **Access control** | Restrict to specific users or groups |
 | 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
+| 🎚️ **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
 | 🔊 **Per-model TTS voice** | Give each persona its own voice |
 | 🌐 **Translations** | Per-language name, description and prompt suggestions |
+| 🕑 **Version history** | Every saved configuration is kept, and any of them can be set live again |
 
 ---
 
 ## Creating a Model
 
-Click **Create** in the **Workspace** header while the **Models** tab is selected, or click the ellipsis (**...**) on an existing model and select **Edit**.
+Click **Create** in the **Workspace** header while the **Models** tab is selected, or click an existing model's name to open it in the editor. The arrow next to the name opens the model in a new chat.
 
 ### Core configuration
 
@@ -98,7 +100,7 @@ The system prompt defines the behavior and persona. Use dynamic variables for co
 | `{{CURRENT_DATE}}` | `2024-10-27` |
 | `{{CURRENT_TIME}}` | `14:30:05` |
 | `{{USER_NAME}}` | `Admin` |
-| `{{USER_GROUPS}}` | `Engineering, Beta Testers` (comma-separated; empty if the user is in no groups) |
+| `{{USER_GROUPS}}` | `Engineering, Beta Testers` (comma-separated, including groups inherited through parent groups; empty if the user is in no groups) |
 
 ```
 You are a helpful assistant for {{USER_NAME}}.
@@ -139,7 +141,7 @@ Toggle what the model can do and bind resources:
 | **Citations** | Show the sources behind a reply, from knowledge, file retrieval and the builtin tools that return them. On by default; with it off no sources are shown. Web search hits are not sources in Native mode, see [Agentic Search](/features/chat-conversations/web-search/agentic-search) |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
-| **Builtin Tools** | Control which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents |
+| **Builtin Tools** | Control which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills |
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **File Context** disappears from this editor since there is nothing to extract |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **TTS Voice** | Set a specific voice for this model's responses |
@@ -148,12 +150,53 @@ Toggle what the model can do and bind resources:
 The request for token counts is added server-side, so it applies wherever the model is used: the chat interface, the API and the chats Open WebUI starts on your behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Nothing needs to be set per request. Only streaming requests are touched, so a model with **Stream Chat Response** turned off is left alone.
 :::
 
+### Voice avatar
+
+When an admin sets **Call mode** to **Realtime**, the editor also shows **Realtime Voice** and **Voice avatar**. **Voice avatar** gives the model an animated 3D character that takes the place of the orb in Realtime calls, with optional animations and gestures. See [Voice Avatars](/features/chat-conversations/chat-features/voice-mode#voice-avatars) for setup and file requirements.
+
 ### Advanced parameters
 
 - **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). One text field, comma-separated.
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
 
 What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
+
+### Model controls
+
+Model controls give people a few simple choices in the chat, such as how hard the model thinks or how long it answers, while you decide exactly which parameters each choice sends. A control called **Thinking** with the options Minimal, Low, Medium and High, each setting `reasoning_effort` to the matching value, lets anyone change the reasoning effort without knowing the parameter exists.
+
+Only administrators define controls. Open the model from **Settings > Admin > Models** and use the **Model controls** section below **Advanced Params**: **+** adds a control, **Edit** changes one, **×** removes it and the handle on the left changes the order. Each row shows the control's default option. The controls are saved with the model, so they apply to everyone who can use it, and they stay in place when the model's owner edits it from **Workspace > Models**. The section itself appears only in the admin editor. People using the model see the control names, descriptions and option names, shown as typed in every interface language; the parameters behind each option stay visible to administrators only.
+
+![The Edit control dialog for a Thinking control shown as a slider, with Minimal, Low, Medium and High options that each set reasoning_effort](/images/features/models/model-controls-edit.webp)
+
+| Field | What it does |
+| :--- | :--- |
+| **Name** | The label people see in the chat, for example **Thinking** |
+| **Default option** | The option that applies while a person has picked nothing. With **None**, the control sends nothing until someone picks an option |
+| **Description** | Optional help text shown in the chat |
+| **Display** | **Menu** shows the options as a list. **Slider** shows them as steps on a slider, in the order listed here, and needs at least two options |
+| **Options** | Each option has a name and one or more **Parameter** and **Value** pairs, added with **Add parameter**. Drag the handle to reorder options |
+
+An option's parameters work like the ones added with **Add Custom Parameter** in **Advanced Params**: the parameter name goes to the provider exactly as written, and a value that reads as JSON (a number, `true`, an object) is sent as that type, anything else as text. When an option has several parameters, all of them are sent together. For an Ollama model they end up in Ollama's `options`, except `think`, `format` and `keep_alive`, which go at the top level of the request.
+
+Controls need a model served through one of the instance's connections, such as an OpenAI-compatible or Ollama connection. Saving controls on a model backed by a pipe function, on an arena model or on a model from a direct connection fails with **Model controls require a server-managed provider model.**
+
+#### Using model controls in chat
+
+When a selected model has controls, a sliders icon (**Model controls**) appears next to the model selector in the message input. It opens a panel listing each control with its current choice. A **Slider** control is changed by moving the slider, with **Default · Medium** (the default option's name) underneath to go back to the default, and its description behind the **?** icon. A **Menu** control opens a list with the description, **Default · Medium** and every option.
+
+![Model controls in the chat, with the Thinking slider set to High and a Verbosity slider on its default, Balanced](/images/features/models/model-controls-slider.webp)
+
+![Model controls in the chat shown as menus, with the Thinking submenu open on Default · Medium above Low, Medium and High](/images/features/models/model-controls-menu.webp)
+
+The icon is there only when a selected model has controls and the person has both the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions) (administrators always have them). With two models selected, each model's controls appear under its name, and each model gets its own choices.
+
+- **Choices are saved to the account, per model.** Picking an option saves it right away and it applies to every chat with that model, new and existing, on every device, until the person picks something else.
+- **Default follows the administrator.** While **Default** is ticked, every message sends the default option's parameters, or nothing from that control when the default option is **None**. If you later change the default option, everyone on **Default** moves with it.
+- **A picked option replaces the same parameter everywhere else.** Its values win over the model's **Advanced Params**, the [Global Model Defaults](#global-model-defaults-admin), the person's **Settings > General** and **Chat Controls**. If two controls set the same parameter, the one lower in the list wins.
+- **Automations use the defaults.** A chat started by an [automation](/features/chat-conversations/chat-features/automations) always sends each control's default option.
+
+API callers get the same controls. See [Chat Completions](/reference/api-endpoints#-chat-completions) for how a request picks an option.
 
 ### Prompt suggestions
 
@@ -178,6 +221,7 @@ From the model list, click the ellipsis (**...**) on any model:
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Open the configuration panel |
+| **Access** | Open the model's access settings directly, without opening the editor |
 | **Hide Model** / **Show Model** | Remove from the model selector without deleting, or bring it back |
 | **Hide from Sidebar** / **Keep in Sidebar** | Toggle the model's pin in the sidebar |
 | **Clone** | Create an editable copy you can rename and reconfigure |
@@ -185,6 +229,30 @@ From the model list, click the ellipsis (**...**) on any model:
 | **Export** | Download the configuration as `.json` |
 | **Share** | Share to the Open WebUI community |
 | **Delete** | Permanently remove the preset |
+
+**Access** appears on models you can edit. It opens the same access settings as the **Access** button in the editor, and changes there are saved as soon as you make them.
+
+### Version history
+
+Every **Save & Update** that changes a model's configuration is kept as a version, together with the text typed into **Describe this change** beside the button. The version picker next to **Back** at the top of the model editor starts on **Production**, the configuration chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). It is there for anyone who can edit the model, in **Workspace > Models** and in **Settings > Admin > Models** for models with saved settings.
+
+- **Open a version** by picking it. The editor shows that version read-only.
+- **Set as Production** makes the opened version the live configuration. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
+- **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
+
+A version holds the name, the base model, the system prompt and parameters and the rest of the editor's settings, such as the description, tags, capabilities, prompt suggestions and the bound knowledge, tools, skills, filters, actions and terminal. The access settings, **Hide Model** and the **Enabled** switch belong to the live model and keep their current values when you change versions. Every existing model starts with one version, created by the upgrade.
+
+Setting a version as Production checks everything it points to, because an older version can reference things that have since been deleted or that you cannot reach. It is refused, and the live configuration stays as it was, when:
+
+- its base model is no longer available.
+- a knowledge base, knowledge file, skill, tool or terminal it binds is missing or not accessible to you.
+- a filter or action function it binds is missing or switched off.
+- its background image or voice avatar files are no longer accessible to you.
+- its [model controls](#model-controls) differ from the live ones and you are not an administrator.
+
+To go ahead, bring the missing item back or get access to it, or pick another version.
+
+The same actions are available over the API, each taking the model ID as `?id=`: `GET /api/v1/models/model/history` (paged with `&page=`), `GET /api/v1/models/model/history/{history_id}`, `POST /api/v1/models/model/update/version` with `{"version_id": "..."}` and `DELETE /api/v1/models/model/history/{history_id}`. A save through `POST /api/v1/models/model/update` accepts an optional `commit_message`.
 
 ### Enabled and disabled
 
@@ -239,7 +307,14 @@ See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-atta
 
 ### Bulk management
 
-Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Manual drag-to-reorder is only available with no search text and no filter applied.
+The admin model list opens on the **Available** view: every base model a connection currently offers, plus every workspace model. **Unavailable** lists the base models that no connection offers anymore but that still have saved settings, for example after a provider retired a model or a connection was removed. **All** shows both.
+
+Each model's ellipsis (**...**) menu starts with one of two actions, and both ask for confirmation first:
+
+- **Reset**, on base models a connection still offers, puts the settings saved for that model back to their defaults. The model stays in the list.
+- **Delete**, on workspace models and unavailable base models, removes the model and its saved settings from the list.
+
+Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Drag-to-reorder works in a filtered view too: the model you move lands next to the visible model you dropped it by, and every model the filter hides keeps its place.
 
 ---
 
@@ -249,7 +324,7 @@ These are the two instance-wide settings that decide which model or models a use
 
 | Setting | Menu action | What it does | Config key |
 | :--- | :--- | :--- | :--- |
-| **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
+| **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own and no [group default models](/features/authentication-access/rbac/groups#default-models-per-group) | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
 | **Pinned Model** | **Set as Pinned Model** | Pre-fills the model shortcuts in the sidebar for users who have not pinned any models themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
 
 Both accept more than one model, so you can hand users a small starting set rather than a single model.
@@ -277,7 +352,7 @@ Hold **Shift** while the model list is open and every row exposes inline icon bu
 
 ### Reviewing what is configured
 
-Open the view filter (the **All** dropdown next to **Actions**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here.
+Open the view filter (the dropdown next to **Actions**, which starts on **Available**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by All, Available, Unavailable, Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here.
 
 ![The view filter with the Selected and Pinned options](/images/features/models/model-view-filter.png)
 
@@ -288,8 +363,11 @@ For a new chat, Open WebUI takes the first of these that yields a model the user
 1. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params).
 2. The models bound to the folder the chat is started in, if any.
 3. The user's own default model, saved from the model selector in a chat with **Set as default**.
-4. The instance's **Selected Models**.
-5. The first available model in the list.
+4. The [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), taken from the group deepest in the group hierarchy that sets some (the earliest created group wins a tie). Groups the user inherits through a parent group count too.
+5. The instance's **Selected Models**.
+6. The first available model in the list.
+
+Steps 3 to 5 also pick the starting model in Notes and the Playground.
 
 Models that have been hidden or removed are dropped at every step, so a user whose last-used model disappeared lands on a working one instead of an empty selector.
 

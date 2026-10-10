@@ -13,16 +13,15 @@ The following table lists the available URL parameters, their function, and exam
 |-----------------------|-----------------------------------------------------------------------------------|----------------------------------|
 | `models`              | Specifies the models to be used, as a comma-separated list. | `/?models=model1,model2`         |
 | `model`               | Specifies a single model to be used for the chat session. | `/?model=model1`                 |
-| `youtube`             | Specifies a YouTube video ID to be transcribed within the chat. | `/?youtube=VIDEO_ID`             |
-| `load-url`            | Specifies a Website URL to be fetched and uploaded as a document within the chat. | `/?load-url=https://google.com`  |
+| `youtube`             | Specifies a YouTube video ID to be transcribed within the chat, after the user confirms. | `/?youtube=VIDEO_ID`             |
+| `load-url`            | Specifies a Website URL to be fetched and uploaded as a document within the chat, after the user confirms. | `/?load-url=https://google.com`  |
 | `web-search`          | Enables web search functionality if set to `true`. | `/?web-search=true`              |
 | `tools` or `tool-ids` | Specifies a comma-separated list of tool IDs to activate in the chat. Tool server connections use a prefixed ID. | `/?tools=tool1,tool2`            |
-| `call`                | Enables a call overlay if set to `true`. | `/?call=true`                    |
-| `q`                   | Sets an initial query or prompt for the chat. | `/?q=Hello%20there`              |
+| `call` or `voice`     | Starts Voice Mode if set to `true`, after the user confirms. | `/?call=true`                    |
+| `q`                   | Places a prompt in the message input for the user to review and send. | `/?q=Hello%20there`              |
 | `temporary-chat`      | Marks the chat as temporary if set to `true`, for one-time sessions. | `/?temporary-chat=true`          |
 | `code-interpreter`    | Enables the code interpreter feature if set to `true`. | `/?code-interpreter=true`        |
 | `image-generation`    | Enables the image generation feature if set to `true`. | `/?image-generation=true`        |
-| `submit`              | With `q`, set to `false` to place the text in the input without sending it. | `/?q=Hello&submit=false`         |
 | `settings`            | Opens the settings dialog on a tab, `admin:` tabs for admins only. | `/?settings=admin:documents`     |
 
 ### 1. **Models and Model Selection**
@@ -32,21 +31,21 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**:
   - `/?models=model1,model2`: This initializes the chat with `model1` and `model2`.
   - `/?model=model1`: This sets `model1` as the sole model for the chat.
-- **Note**: Without either parameter, a new chat falls back to the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin) ([`DEFAULT_MODELS`](/reference/env-configuration#default_models)) when nothing valid is selected, for instance when the model used last has since been removed or hidden. Passing one of these parameters suppresses that fallback, so the chat waits for the model you named rather than being switched to a default.
+- **Note**: Without either parameter, a new chat falls back to the [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group) or, when none apply, the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin) ([`DEFAULT_MODELS`](/reference/env-configuration#default_models)) when nothing valid is selected, for instance when the model used last has since been removed or hidden. Passing one of these parameters suppresses that fallback, so the chat waits for the model you named rather than being switched to a default.
 
 ### 2. **YouTube Transcription**
 
 - **Description**: The `youtube` parameter takes a YouTube video ID, enabling the chat to transcribe the specified video.
 - **How to Set**: Use the YouTube video ID as the value for this parameter.
 - **Example**: `/?youtube=VIDEO_ID`
-- **Behavior**: This triggers transcription functionality within the chat for the provided YouTube video.
+- **Behavior**: An **Open link** dialog lists the video URL and asks whether to load it. Once the user confirms, the video's transcript is added to the chat. Canceling loads nothing.
 
 ### 3. **Website Insertion**
 
 - **Description**: The `load-url` parameter downloads the specified website and extracts the content to upload it as a document into the chat.
 - **How to Set**: Use the full website URL as the value for this parameter.
 - **Example**: `/?load-url=https://google.com`
-- **Behavior**: This triggers insertion of the specified website url.
+- **Behavior**: An **Open link** dialog lists the URL and asks whether to load it. Once the user confirms, the page's content is added to the chat as a document. Canceling loads nothing. With both `youtube` and `load-url`, one dialog lists both URLs.
 
 ### 4. **Web Search**
 
@@ -65,17 +64,17 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 6. **Call Overlay**
 
-- **Description**: The `call` parameter enables a video or call overlay in the chat interface.
-- **How to Set**: Set the parameter to `true` to enable the call overlay.
-- **Example**: `/?call=true`
-- **Behavior**: Activates a call interface overlay, allowing features such as live transcription and video input.
+- **Description**: The `call` parameter starts [Voice Mode](/features/chat-conversations/chat-features/voice-mode), the call overlay in the chat interface. `voice` is an alias and works the same way.
+- **How to Set**: Set the parameter to `true` to start the call overlay.
+- **Example**: `/?call=true` or `/?voice=true`
+- **Behavior**: An **Open link** dialog asks whether to start a voice call using the microphone. Once the user confirms, the call overlay opens, allowing features such as live transcription and video input. Canceling leaves the microphone off. When the link also carries `youtube` or `load-url`, the same dialog lists those URLs, and confirming does both. The call applies the same checks as the Voice mode button: the user needs the **Allow Call** permission, only one model may be selected, and the speech-to-text engine must be something other than **Web API**.
 
 ### 7. **Initial Query Prompt**
 
 - **Description**: The `q` parameter allows setting an initial query or prompt for the chat.
 - **How to Set**: Specify the query or prompt text as the parameter value.
 - **Example**: `/?q=Hello%20there`
-- **Behavior**: The chat starts with the specified prompt, automatically submitting it as the first message. Add `submit=false` to leave the text in the input for the user to edit and send.
+- **Behavior**: The text lands in the message input, and the user decides when to send it.
 
 ### 8. **Temporary Chat Sessions**
 
@@ -84,7 +83,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?temporary-chat=true`
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
   - **Note**: Document processing in temporary chats is frontend-only for privacy. Complex files requiring backend parsing (e.g., DOCX) may not be fully supported.
-  - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so no chat record is created and nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts) and the [ask user tool](/features/extensibility/plugin/tools), are unavailable there. Chats in [channels](/features/channels) are treated the same way.
+  - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so no chat record is created and nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts), the [ask user tool](/features/extensibility/plugin/tools), [sub-agents](/features/chat-conversations/chat-features/subagents) and [timers](/features/chat-conversations/chat-features/timers), are unavailable there. Chats in [channels](/features/channels) are treated the same way.
   - **Note**: The list of unavailable features above is complete. Any feature or tool not listed there works in a temporary chat exactly as it does in a normal one. That includes tools that store or send data of their own, memory, notes and web search for example. Disable a tool on the model if you do not want a temporary chat to use it.
 
 ### 9. **Code Interpreter**
@@ -101,26 +100,19 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?image-generation=true`
 - **Behavior**: Activates the image generation button to generate an image.
 
-### 11. **Prefilled, Unsent Prompt**
-
-- **Description**: The `submit` parameter controls whether `q` is sent right away.
-- **How to Set**: Set it to `false` together with `q`. Any other value, or leaving it out, sends the prompt.
-- **Example**: `/?q=Summarize%20this&submit=false`
-- **Behavior**: The text lands in the message input, and the user decides when to send it.
-
-### 12. **Settings Deep Link**
+### 11. **Settings Deep Link**
 
 - **Description**: The `settings` parameter opens the settings dialog on a given tab and then removes itself from the URL.
 - **How to Set**: Use a user tab id (`general`, `interface`, `notifications`, `shortcuts`, `connections`, `tools`, `personalization`, `audio`, `data_controls`, `usage`, `archived_chats`, `account`, `about`) or an admin tab as `admin:<tab>` (`general`, `authentication`, `connections`, `models`, `subagents`, `evaluations`, `analytics`, `integrations`, `documents`, `web`, `code-execution`, `interface`, `audio`, `images`, `db`, `pipelines`).
 - **Example**: `/?settings=admin:documents`
 - **Behavior**: The dialog opens on that tab. A non-admin who follows an `admin:` link gets the General tab instead.
 
-### 13. **New Note**
+### 12. **New Note**
 
 - **Description**: On the Notes pages, `title` and `content` prefill a new note.
 - **How to Set**: Open `/notes/new` (or `/notes`) with either parameter.
 - **Example**: `/notes/new?title=Meeting&content=Agenda%3A`
-- **Behavior**: A note editor opens with the given title and body. The title defaults to today's date when only `content` is given.
+- **Behavior**: A **Create a new note** dialog shows the title and body and asks before creating anything. Once the user confirms, the note is created and opens in the editor. The title defaults to today's date when only `content` is given. Canceling on `/notes/new` returns to the notes list.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -140,13 +132,13 @@ Suppose a user wants to initiate a quick chat session without saving the history
 These URL parameters can be combined to create highly customized chat sessions. For example:
 
 ```bash
-/?models=model1,model2&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
+/?models=model1&youtube=VIDEO_ID&web-search=true&tools=tool1,tool2&call=true&q=Hello%20there&temporary-chat=true
 ```
 
 This URL will:
 
-- Initialize the chat with `model1` and `model2`.
-- Enable YouTube transcription, web search, and specified tools.
-- Display a call overlay.
-- Set an initial prompt of "Hello there."
+- Initialize the chat with `model1`.
+- Enable web search and the specified tools.
+- Show one **Open link** dialog that lists the YouTube video and asks to start a voice call. Confirming loads the transcript and opens the call overlay.
+- Place "Hello there" in the message input, ready to send.
 - Mark the chat as temporary, avoiding any history saving.

@@ -57,8 +57,8 @@ This is the more powerful option. Go to **Workspace → Models → Edit** and ch
 
 Here's how it works behind the scenes:
 
-1. The AI receives a manifest listing each attached skill's **name and description** (not the full instructions, that would waste context)
-2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the full instructions
+1. The AI receives a manifest listing the **name and description** of every active skill you can read, attached ones included, which keeps the full instructions out of the context until needed
+2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the full instructions and the list of the skill's supporting files
 3. The AI then follows those instructions to handle your request
 
 This means you can attach a "Data Report Generator" skill to your model, and any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.

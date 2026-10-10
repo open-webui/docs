@@ -33,6 +33,8 @@ Timers fire close to their stated time: the scheduler checks every second. [`TIM
 
 The prompt is appended to the original chat as a message, the chat reloads on its own, and the model answers using the model, workspace tools, skills, filters and settings the chat had when the timer was set. That configuration is captured up front, so later changes to the chat do not alter what a pending timer does.
 
+The system prompt is built again when the timer fires, from the same pieces the original message used: the chat's own system prompt (from **Chat Controls** or your **Settings**), the model's system prompt, the chat's variables and the full text of any skills mentioned in the message. The folder's system prompt, tool server and terminal instructions are applied as for any message in the chat.
+
 One gap to know about: **your own direct tool-server connections (Settings > Tools) are not carried across**. They are not part of what a timer captures, so a fired timer runs without them even if the chat had them attached. Admin-configured tool servers travel with the chat's tool ids and do run. The captured set also includes the attached files, the terminal connection and the prompt variables. Keep that in mind for a prompt whose whole job depends on an external tool server.
 
 A timer never interrupts you: if the chat is busy generating when the timer comes due, it waits and fires once the chat is free.

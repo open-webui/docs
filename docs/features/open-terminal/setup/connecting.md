@@ -47,6 +47,8 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | **API Key** | The password you chose during installation |
 | **Auth Type** | Leave as `Bearer` (the default) |
 | **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
+| **Working Directory Context** | Under **Advanced**, on by default. [Working Directory Context](#working-directory-context) covers when to turn it off |
+| **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
 | **Forward cookies** | Under **Advanced**, off by default. Only turn it on for a terminal server that authenticates by cookie, since every cookie the browser holds for your Open WebUI domain travels with the request |
 
 ![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
@@ -143,6 +145,23 @@ Four things change with it:
 The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
 ![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)
+
+---
+
+## Working Directory Context
+
+**Working Directory Context** is under **Advanced** on connections an administrator adds. While it is on, the default, Open WebUI asks the terminal for its current working directory on every message and writes it into the instructions of the command tool, so the model knows where its commands run.
+
+Tool instructions are part of the cached prefix of every request, so each change of directory starts the provider's [prompt cache](/features/chat-conversations/prompt-caching) over. Turn the switch off to keep the instructions identical from message to message.
+
+## User Shell Tools
+
+The **Shell** tab of the [terminal pane](../terminal-pane.md) is your own shell. Two tools let the model read that shell's recent output and send input to it. **User Shell Tools**, under **Advanced**, decides when the model gets them:
+
+- `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks your browser whether it is.
+- `Always Include`: on every message, open shell or not. The tool list stays the same from message to message, which keeps the [prompt cache](/features/chat-conversations/prompt-caching) intact when you open and close the shell.
+
+Automations and sub-agents never get the two tools. The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
 ---
 

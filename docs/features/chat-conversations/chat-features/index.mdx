@@ -56,7 +56,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 - **📱 Swipe the Sidebar**: On a phone or tablet, drag right with one finger to pull the sidebar in and left to push it away. It tracks your finger and dims the conversation behind it as it moves, a quick flick settles it either way, and every chat row carries an always-visible three-dot menu (⋯) so its actions are reachable without a hover.
 - **[🕒 Temporal Awareness](./temporal-awareness.mdx)**: How models understand time and date, including native tools for precise time calculations.
 
-- **[🎙️ Voice Mode](./voice-mode.mdx)**: Start a hands-free voice conversation with your model using the Voice Mode button. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session, useful in noisy or public environments.
+- **[🎙️ Voice Mode](./voice-mode.mdx)**: Start a hands-free voice conversation with your model using the Voice Mode button, either through the configured speech engines or as a Realtime call with an OpenAI-compatible realtime voice model. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session, useful in noisy or public environments.
 
 - **[🧠 Reasoning & Thinking Models](./reasoning-models.mdx)**: Specialized support for models that generate internal chains of thought using thinking tags.
 
@@ -98,7 +98,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
-  | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved on the selected terminal. Offered only when an Open Terminal is selected and the chat already has content, and anything you type after it steers what the skill covers. |
+  | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved privately to your Skills workspace. Offered once the chat has content and you hold the Skills Access permission; the model needs built-in tools with the **Skills** category switched on. Anything you type after it steers what the skill covers. |
   | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
   `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` and `/settings` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.

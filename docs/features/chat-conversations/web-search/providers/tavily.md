@@ -69,7 +69,7 @@ Ensure you have:
 
 ## Optional Configurations
 
-- **Search Parameters**: Open WebUI sends only `query` and `max_results` to Tavily, so no other Tavily search option can be set from Open WebUI. Domain filtering is applied by Open WebUI's own **Domain Filter List** after the results return.
+- **Search Parameters**: Open WebUI sends `query`, `max_results` and `search_depth` to Tavily. Set the depth under **Tavily Search Depth** (`ultra-fast`, `fast`, `basic` or `advanced`, default `basic`) or with [`TAVILY_SEARCH_DEPTH`](/reference/env-configuration#tavily_search_depth). Domain filtering is applied by Open WebUI's own **Domain Filter List** after the results return.
 - **Endpoint**: Requests go to `TAVILY_API_BASE_URL` plus `/search`, default `https://api.tavily.com`. The variable is read from the environment only and has no admin field.
 - **Environment Variables**: Set the `TAVILY_API_KEY` in your `.env` file or Docker command:
 

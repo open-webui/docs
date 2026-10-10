@@ -53,6 +53,7 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 | 👥 **Shared context** | Every message, human or AI, builds the collective knowledge |
 | 🧵 **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
 | 📎 **File sharing** | Drop images, documents, and code. AI can see and process them |
+| 📝 **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed, and go out in order |
 | 🔒 **Access control** | Public, private, group-based, and direct message channels |
 | 🧠 **AI channel awareness** | Models can search and synthesize across channels autonomously |
 
@@ -109,6 +110,8 @@ Before v0.9.6, tagging a model in a channel only forwarded **images** from the t
 ### Tagging people and linking channels
 
 Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. Use `#channel-name` to create clickable cross-references between conversations.
+
+Point at someone's profile picture next to their messages or in the channel's member list, or at an `@mention` of them, to open their profile card. It shows their name, whether they are online, their status, bio and groups, their local time and when they were last active. Local time follows the time zone of the browser they last used Open WebUI in. Every signed-in user can open any other user's card, and the same details, plus email address and role, are available to them through the API.
 
 ### Message interactions
 

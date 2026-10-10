@@ -20,9 +20,9 @@ RBAC does not replace provider-side least-privilege design. For OpenAI-compatibl
 
 :::info Permission Logic
 Permissions in Open WebUI are **additive**.
-*   A user's effective permissions are the combination of **Global Defaults** and all their **Group Memberships**.
+*   A user's effective permissions are the combination of **Global Defaults** and all their **Group Memberships**, including every parent group of the groups they are in (see [Nested Groups](/features/authentication-access/rbac/groups#nested-groups)).
 *   **True takes precedence over False**: If *any* source (Global Default or *any* single Group) grants a permission, the user **will** have that permission.
-*   **No "Deny" ability**: You cannot use a specific group to "take away" a permission that is granted by another group or by the global defaults. To restrict a feature, it must be disabled in the Global Defaults *and* disabled in **all** groups the user belongs to.
+*   **No "Deny" ability**: You cannot use a specific group to "take away" a permission that is granted by another group or by the global defaults. To restrict a feature, it must be disabled in the Global Defaults *and* disabled in **all** groups the user belongs to, parent groups included.
 :::
 
 :::tip Best Practice: Principle of Least Privilege
@@ -64,21 +64,23 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 ### 2. Sharing Permissions
 Controls what users can share with the community or make public.
 
+Each **(Parent)** permission sets what the **Access Control** panel offers for that item type: with it on, the panel shows the access list for adding users and groups and, together with the matching public permission, the **Public** option. The server decides which grants to accept through the **Public Sharing** permissions and the two **Allow Sharing With ...** permissions below.
+
 | Permission | Description |
 | :--- | :--- |
-| **Models Sharing** | **(Parent)** Ability to share models (make them accessible to others). |
+| **Models Sharing** | **(Parent)** Shows the access list in the Access Control panel of models. |
 | **Models Public Sharing** | *(Requires Models Sharing)* Ability to make models publicly discoverable. |
-| **Knowledge Sharing** | **(Parent)** Ability to share knowledge bases. |
+| **Knowledge Sharing** | **(Parent)** Shows the access list in the Access Control panel of knowledge bases. |
 | **Knowledge Public Sharing** | *(Requires Knowledge Sharing)* Ability to make knowledge bases public. |
-| **Prompts Sharing** | **(Parent)** Ability to share prompts. |
+| **Prompts Sharing** | **(Parent)** Shows the access list in the Access Control panel of prompts. |
 | **Prompts Public Sharing** | *(Requires Prompts Sharing)* Ability to make prompts public. |
-| **Tools Sharing** | **(Parent)** Ability to share tools. |
+| **Tools Sharing** | **(Parent)** Shows the access list in the Access Control panel of tools. |
 | **Tools Public Sharing** | *(Requires Tools Sharing)* Ability to make tools public. |
-| **Skills Sharing** | **(Parent)** Ability to share skills. |
+| **Skills Sharing** | **(Parent)** Shows the access list in the Access Control panel of skills. |
 | **Skills Public Sharing** | *(Requires Skills Sharing)* Ability to make skills public. |
-| **Notes Sharing** | **(Parent)** Ability to share Notes. |
+| **Notes Sharing** | **(Parent)** Shows the access list in the Access Control panel of Notes. |
 | **Notes Public Sharing** | *(Requires Notes Sharing)* Ability to make Notes public. |
-| **Folders Sharing** | Ability to share a chat folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
+| **Folders Sharing** | Shows the access list in a chat folder's **Share** dialog, for sharing the folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
 | **Chats Public Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
 | **Chats Open Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
@@ -117,7 +119,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI) and to [fork a chat](/features/chat-conversations/chat-features/), which copies an existing conversation into a new one ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. When disabled, **Import Chats** in **Settings > Data Controls**, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all hidden from non-admins. Admins are always exempt. |
 | **Allow Speech to Text** | Ability to use voice input. |
 | **Allow Text to Speech** | Ability to use voice output. |
-| **Allow Call** | Ability to use the real-time audio call feature. |
+| **Allow Call** | Ability to start a [Voice Mode](/features/chat-conversations/chat-features/voice-mode) call, in both Standard and Realtime call mode. |
 | **Allow Multiple Models in Chat** | Ability to select multiple models for a simultaneous response. |
 | **Allow Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
 | **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
@@ -129,7 +131,7 @@ Controls access to broad platform capabilities.
 | :--- | :--- |
 | **API Keys** | Ability for non-admin users to generate Personal Access Tokens (API Keys) in User Settings. |
 | **Notes** | Access to the "Notes" feature. |
-| **Channels** | Access to the "Channels" feature. |
+| **Channels** | Access to the "Channels" feature. Without it, a user also stops receiving live channel messages, and channel automations they created do not run. |
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
@@ -185,7 +187,7 @@ Taking this permission away hides the **Interface** page, so the people affected
 
 It reaches no further than that. A save that carries Interface fields anyway, from an older client or a script, is not rejected: those fields are dropped and the rest of the request is saved. Everything outside the Interface page keeps working, so a person without this permission still saves a system prompt (with **Allow Chat Controls** and **Allow Chat System Prompt**), pinned models, audio, notifications and keyboard shortcuts. **Allow Chat System Prompt** and **Allow Chat Params** behave the same way, dropping their own part of a save rather than failing the whole of it.
 
-The one thing that travels with the Interface page is the **default model** selection, which is an Interface field, so it stops being saved when this permission is off.
+The one exception is the **default model** a person saves with **Set as default** in the model selector. It is stored as an Interface field, so it stops being saved when this permission is off.
 
 There is no permission that locks personal settings as a whole. This one hides a page and filters that page's fields, nothing more.
 

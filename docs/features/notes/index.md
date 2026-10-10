@@ -181,7 +181,7 @@ Access management options via the **More (...)** menu in the top right corner.
 ### Export
 
 * **Plain text (.txt)** or **Markdown (.md)** for raw content
-* **PDF (.pdf)** with visual formatting (dark mode detected automatically)
+* **PDF (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
 
 ### Sharing
 
@@ -189,16 +189,18 @@ Access management options via the **More (...)** menu in the top right corner.
 
 Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access and is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
 
+The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry, and administrators see it on every note. Each change there is saved right away.
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
-* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) for internal sharing (default `False`)
+* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the access list in the **Access Control** panel (default `False`)
 * [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_notes_allow_public_sharing) for public links (default `False`)
 
 These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 ### Attachments
 
-Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either.
+Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This covers files uploaded by the note's owner and gives read access only.
 
 Two things to know:
 
@@ -213,10 +215,12 @@ Turn it off and Markdown characters stay as characters, a pasted URL stays text 
 
 ### Quick creation
 
-* Navigate to `/notes/new` to open a blank note
+* Navigate to `/notes/new` to create a note titled with today's date
 * Add query parameters: `/notes/new?title=My%20Title&content=Initial%20text`
-* Create from global search (`Cmd+K` / `Ctrl+K`) by selecting "Create a new note"
+* Create from global search (`Cmd+K` / `Ctrl+K`) by selecting "Create a new note", which uses the search text as the note's content
 * Import `.md` files by dragging them onto the Notes list
+
+The first three open a **Create a new note** dialog showing the title and content, and the note is created once you confirm.
 
 ### View options
 

@@ -96,6 +96,10 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 40      | api_key          | Stores per-user API keys, replacing the former `user.api_key` column |
 | 41      | knowledge_directory | Nestable folders that organize files within a knowledge base |
 | 42      | channel_webhook  | Stores per-channel incoming webhooks for unauthenticated posting |
+| 43      | model_history    | Saved versions of workspace model configurations             |
+| 44      | tool_history     | Saved versions of tool source code and metadata              |
+| 45      | function_history | Saved versions of function source code and metadata          |
+| 46      | skill_history    | Saved versions of skills, including their supporting files   |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -126,6 +130,7 @@ Things to know about the access_grant table:
 - `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
 - `principal_type` of `anyone` (added in v0.11.0) is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
+- A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants
 
 ## API Key Table
 
@@ -157,11 +162,14 @@ Things to know about the api_key table:
 | email           | String        | -               | User's email      |
 | password        | Text          | -               | Hashed password   |
 | active          | Boolean       | -               | Account status    |
+| mfa             | JSON          | nullable        | Two-factor sign-in state: encrypted authenticator secret, hashed recovery codes, pending sign-in steps and attempt counters |
+| session_stamp   | Text          | nullable        | Marker carried by every session token; replacing it signs the account out of every device |
 
 Things to know about the auth table:
 
 - Uses UUID for primary key
 - One-to-One relationship with the `user` table (shared id)
+- `mfa` and `session_stamp` were added by migration `a7d3e9f2b641`. Rows that existed before it start with both empty, and sessions issued before the upgrade stay valid until the account is first signed out everywhere.
 
 ## Channel Table
 
@@ -583,6 +591,7 @@ Things to know about the folder table:
 | valves          | JSON          | -               | Function control settings |
 | is_active       | Boolean       | -               | Function active status    |
 | is_global       | Boolean       | -               | Global availability flag  |
+| version_id      | Text          | nullable        | Production version (`function_history.id`) |
 | created_at      | BigInteger    | -               | Creation timestamp        |
 | updated_at      | BigInteger    | -               | Last update timestamp     |
 
@@ -590,11 +599,29 @@ Things to know about the function table:
 
 - `type` is one of: `pipe`, `filter`, `action`, `event` (the `event` type was added in v0.10.0). The type is auto-detected from the top-level class name in the function's source code.
 
+## Function History Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                        |
+| --------------- | ------------- | --------------- | -------------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)               |
+| function_id     | Text          | NOT NULL, INDEX | Function the version belongs to        |
+| parent_id       | Text          | nullable        | Version this one was saved on top of   |
+| snapshot        | JSON          | NOT NULL        | Saved name, source code and metadata   |
+| user_id         | Text          | NOT NULL        | User who saved the version             |
+| commit_message  | Text          | nullable        | Description entered when saving        |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                     |
+
+Things to know about the function history table:
+
+- The snapshot holds the name, the source code and the description and translations from `meta`. Valves, the active and global switches and the detected type stay on the `function` row.
+- Migration `f8c0e5b134cd` created this table together with `tool_history` and gave every existing function one starting version.
+
 ## Group Table
 
 | **Column Name** | **Data Type** | **Constraints**     | **Description**          |
 | --------------- | ------------- | ------------------- | ------------------------ |
 | id              | Text          | PRIMARY KEY, UNIQUE | Unique identifier (UUID) |
+| parent_group_id | Text          | FOREIGN KEY(group.id), nullable, indexed | Parent group for [nested groups](/features/authentication-access/rbac/groups#nested-groups), `NULL` for a top-level group |
 | user_id         | Text          | -                   | Group owner/creator      |
 | name            | Text          | -                   | Group name               |
 | description     | Text          | -                   | Group description        |
@@ -605,6 +632,12 @@ Things to know about the function table:
 | updated_at      | BigInteger    | -                   | Last update timestamp    |
 
 Note: The `user_ids` column has been migrated to the `group_member` table.
+
+Things to know about the group table:
+
+- `parent_group_id` was added in migration `b8e4f0a3c752`. Members of a group inherit the permissions and access grants of every group above it
+- Deleting a group moves its subgroups up to its own parent and deletes its memberships and its access grants
+- `data.config.default_models` holds the group's [default models](/features/authentication-access/rbac/groups#default-models-per-group) as a list of model IDs, and `data.config.share` holds the **Who can share to this group** setting
 
 ## Group Member Table
 
@@ -745,9 +778,27 @@ Things to know about the message_reaction table:
 | name            | Text          | -               | Display name           |
 | params          | JSON          | -               | Model parameters       |
 | meta            | JSON          | -               | Model metadata         |
+| version_id      | Text          | nullable        | Production version (`model_history.id`) |
 | is_active       | Boolean       | default=True    | Active status          |
 | created_at      | BigInteger    | -               | Creation timestamp     |
 | updated_at      | BigInteger    | -               | Last update timestamp  |
+
+## Model History Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                        |
+| --------------- | ------------- | --------------- | -------------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)               |
+| model_id        | Text          | NOT NULL, INDEX | Model the version belongs to           |
+| parent_id       | Text          | nullable        | Version this one was saved on top of   |
+| snapshot        | JSON          | NOT NULL        | Saved name, base model, params and meta |
+| user_id         | Text          | NOT NULL        | User who saved the version             |
+| commit_message  | Text          | nullable        | Description entered when saving        |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                     |
+
+Things to know about the model history table:
+
+- The snapshot holds `name`, `base_model_id`, `params` and `meta`. The hidden flag, the enabled switch and the access grants stay on the live model.
+- Migration `e7b9d4a023bc` created this table and gave every existing model one starting version.
 
 ## Note Table
 
@@ -835,7 +886,8 @@ Things to know about the oauth_session table:
 | name            | Text          | NOT NULL        | Display name of the skill          |
 | description     | Text          | nullable        | Short description (used in manifest) |
 | content         | Text          | NOT NULL        | Full skill instructions (Markdown) |
-| data            | JSON          | nullable        | Additional skill data              |
+| data            | JSON          | nullable        | Skill files: `SKILL.md` and its supporting files |
+| version_id      | Text          | nullable        | Production version (`skill_history.id`) |
 | meta            | JSON          | nullable        | Skill metadata                     |
 | is_active       | Boolean       | default=True    | Active status                      |
 | created_at      | BigInteger    | NOT NULL        | Creation timestamp                 |
@@ -846,6 +898,19 @@ Things to know about the skill table:
 - Uses UUID for primary key
 - Access control is managed through the `access_grant` table (resource_type `skill`)
 - `description` is injected into the system prompt as part of the manifest; `content` is loaded on-demand via the `view_skill` builtin tool
+- `data` and `version_id` were added in migration `d6a8c3f912ab`, which also seeds one `skill_history` version per existing skill
+
+## Skill History Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                   |
+| --------------- | ------------- | --------------- | --------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)          |
+| skill_id        | Text          | NOT NULL, INDEX | Reference to the skill            |
+| parent_id       | Text          | nullable        | Reference to the parent version   |
+| snapshot        | JSON          | NOT NULL        | Snapshot of the skill and its files at that version |
+| user_id         | Text          | NOT NULL        | User who created the version      |
+| commit_message  | Text          | nullable        | Version commit message            |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                |
 
 ## Tag Table
 
@@ -871,8 +936,26 @@ Things to know about the tag table:
 | specs           | JSON          | -               | Tool specifications   |
 | meta            | JSON          | -               | Tool metadata         |
 | valves          | JSON          | -               | Tool control settings |
+| version_id      | Text          | nullable        | Production version (`tool_history.id`) |
 | created_at      | BigInteger    | -               | Creation timestamp    |
 | updated_at      | BigInteger    | -               | Last update timestamp |
+
+## Tool History Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                        |
+| --------------- | ------------- | --------------- | -------------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)               |
+| tool_id         | Text          | NOT NULL, INDEX | Tool the version belongs to            |
+| parent_id       | Text          | nullable        | Version this one was saved on top of   |
+| snapshot        | JSON          | NOT NULL        | Saved name, source code and metadata   |
+| user_id         | Text          | NOT NULL        | User who saved the version             |
+| commit_message  | Text          | nullable        | Description entered when saving        |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                     |
+
+Things to know about the tool history table:
+
+- The snapshot holds the name, the source code and the description and translations from `meta`. Valves and access grants stay on the `tool` row.
+- Migration `f8c0e5b134cd` created this table and gave every existing tool one starting version.
 
 ## User Table
 
@@ -965,6 +1048,9 @@ erDiagram
     user ||--o{ tag : "creates"
     user ||--o{ skill : "manages"
     user ||--o{ tool : "manages"
+    model ||--o{ model_history : "has"
+    tool ||--o{ tool_history : "has"
+    function ||--o{ function_history : "has"
     user ||--o{ note : "owns"
     user ||--o{ pinned_note : "pins"
     note ||--o{ pinned_note : "pinned_by"
@@ -1197,6 +1283,16 @@ erDiagram
         json valves
         boolean is_active
         boolean is_global
+        text version_id
+    }
+
+    function_history {
+        text id PK
+        text function_id FK
+        text parent_id FK
+        json snapshot
+        text user_id FK
+        text commit_message
     }
 
     group {
@@ -1254,7 +1350,17 @@ erDiagram
         text name
         json params
         json meta
+        text version_id
         boolean is_active
+    }
+
+    model_history {
+        text id PK
+        text model_id FK
+        text parent_id FK
+        json snapshot
+        text user_id FK
+        text commit_message
     }
 
     note {
@@ -1337,6 +1443,16 @@ erDiagram
         json specs
         json meta
         json valves
+        text version_id
+    }
+
+    tool_history {
+        text id PK
+        text tool_id FK
+        text parent_id FK
+        json snapshot
+        text user_id FK
+        text commit_message
     }
 ```
 

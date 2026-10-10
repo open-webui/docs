@@ -25,7 +25,7 @@ If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (
 
 :::warning Security: Token Revocation Requires Redis
 
-Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Signing a user out everywhere works without Redis: a password change or an administrator's **Sign out all devices** ends every session of that account.
 
 For production-facing deployments, either configure Redis or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See the [Hardening guide](/getting-started/advanced-topics/hardening#token-revocation) for details.
 
@@ -148,7 +148,7 @@ Open WebUI uses Redis as a **stateful store, not a disposable cache**. Its keys 
 
 Under an `allkeys-lru`, `allkeys-lfu`, or `allkeys-random` policy, Redis evicts **any** key when memory fills, including the two groups above. That can:
 
-- **silently un-revoke a signed-out token**: if the revocation key is evicted before its TTL, a token that was invalidated by logout, password change, or admin deactivation starts working again (a security regression), and
+- **silently un-revoke a signed-out token**: if the revocation key is evicted before its TTL, a token that was invalidated by signing out starts working again (a security regression), and
 - **break websockets, session tracking, and configuration** by evicting the persistent pools.
 
 Use **`noeviction`** (the safe default). When memory is exhausted, Redis rejects new writes with an error, which is a loud, recoverable signal, instead of silently discarding auth and session state:

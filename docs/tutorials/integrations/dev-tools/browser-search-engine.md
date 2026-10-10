@@ -99,7 +99,7 @@ Once the search engine is set up, you can perform searches directly from the add
 webui your search query
 ```
 
-This command will redirect you to the Open WebUI interface with your search results.
+This opens Open WebUI with your query in the message input. Press Enter to send it.
 
 ## Troubleshooting
 

@@ -100,8 +100,16 @@ With **OAuth 2.1** or **OAuth 2.1 (Static)**, an **OAuth Scopes** setting contro
 - **Custom scopes**: provide an explicit, space- or comma-separated list to override the discovered scopes, for example to request a narrower set than the server advertises, or when the server's metadata does not list usable scopes.
 :::
 
+:::info Servers without OAuth discovery documents
+Open WebUI finds the authorization server through the OAuth discovery documents the server publishes. Some MCP servers publish none. When no discovery document is found and the server's protected resource metadata names no authorization server, Open WebUI uses the default endpoints the [MCP 2025-03-26 authorization spec](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization) defines for that case: `/authorize`, `/token` and `/register` at the origin of the MCP **URL**, or of the **OAuth Server URL** when one is set. For `https://mcp.example.com/v1/mcp` that means `https://mcp.example.com/authorize`, `https://mcp.example.com/token` and `https://mcp.example.com/register`. Sign-in and token refresh use `/authorize` and `/token`, and **OAuth 2.1** registers its client at `/register`.
+
+When the protected resource metadata names an authorization server and no discovery document can be fetched, **Register Client** fails with an error.
+:::
+
 :::info Check OAuth Discovery
-On an MCP connection using **OAuth 2.1** or **OAuth 2.1 (Static)**, the verify button beside the URL reads **Check OAuth Discovery**, and a green result reports "OAuth discovery successful". It fetches the OAuth discovery document and parses it, and that is the whole of what it does. The MCP server itself is never contacted and no tools are listed, so a passing check tells you the authorization server was found and tells you nothing about whether tool calls will work.
+On an MCP connection using **OAuth 2.1** or **OAuth 2.1 (Static)**, the verify button beside the URL reads **Check OAuth Discovery**, and a green result reports "OAuth discovery successful". It reads the server's protected resource metadata, then fetches the OAuth discovery document and parses it, and that is the whole of what it does. It lists no tools and calls none, so a passing check tells you the authorization server was found and tells you nothing about whether tool calls will work.
+
+The check succeeds only when a discovery document is found. A server that publishes none fails it, and **Register Client** still works for that server through the default endpoints described above.
 
 With **OAuth 2.1 (Static)**, the check runs against the **OAuth Server URL** when one is set, and against the MCP **URL** when it is left empty.
 :::
@@ -184,7 +192,7 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 | `{{USER_EMAIL}}` | The calling user's email address. |
 | `{{USER_ROLE}}` | The calling user's role (e.g. `admin`, `user`). |
 | `{{AUTH_TYPE}}` | How the caller authenticated: `jwt` for a browser session, `api_key` for an API key. |
-| `{{USER_GROUPS}}` | Comma-separated names of the groups the caller belongs to (empty if none). |
+| `{{USER_GROUPS}}` | Comma-separated names of the groups the caller belongs to, including groups inherited through parent groups (empty if none). |
 | `{{USER_GROUP_IDS}}` | Comma-separated IDs of those same groups. |
 | `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |
 | `{{MESSAGE_ID}}` | The current message ID (empty in non-chat contexts). |
@@ -202,6 +210,14 @@ Unknown tokens are passed through as literal text. Non-string header values are 
 This field restricts which tools are exposed to the LLM.
 *   **Default**: Leave empty to expose all tools (in most cases).
 *   **Workaround**: If you encounter connection errors with an empty list, try adding a single comma (`,`) to this field. This forces the system to treat it as a valid (but empty) filter, potentially bypassing some parsing issues.
+
+### Tool Names the Model Sees
+
+Open WebUI offers each MCP tool to the model as `<server ID>_<tool name>`. Some providers, such as the OpenAI API and AWS Bedrock, reject a request whose tool names run past 64 characters, so a longer name is shortened to its first 55 characters, an underscore and an 8-character hash. The same tool always gets the same shortened name, and the MCP server is still called with the original tool name.
+
+### Structured Tool Results
+
+An MCP tool can return structured data (`structuredContent`) alongside its regular content. Open WebUI adds that data as JSON text to the tool result the model sees. When one of the tool's text results already holds the same JSON, the result goes to the model unchanged, so the data appears once.
 
 ## Troubleshooting
 

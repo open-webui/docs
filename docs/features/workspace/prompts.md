@@ -39,11 +39,11 @@ Add typed input variables (dropdowns, date pickers, number fields, checkboxes) a
 
 ### Version history with rollback
 
-Every content change creates a new version. Browse the history, preview a version, set it live or delete it, and track who changed what. Untick **Set as Production** to save a version without making it live. Renaming, re-tagging or changing the command creates no version, and there is no side-by-side compare view in the editor (the diff endpoint is API-only).
+Every content change creates a new version. Browse the history, preview a version, compare it with the live one, edit it into a new version, set it live or delete it, and track who changed what. Untick **Set as Production** to save a version without making it live. Renaming, re-tagging or changing the command creates no version.
 
 ### Controlled sharing
 
-Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace.
+Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the sharing settings without opening the editor, and each change there is saved right away.
 
 ---
 
@@ -100,7 +100,7 @@ Automatically replaced with their value at runtime:
 | `{{USER_AGE}}` | Age calculated from birth date (unreplaced if not set) |
 | `{{USER_LANGUAGE}}` | Your selected language |
 | `{{USER_LOCATION}}` | Your location. The browser asks for geolocation permission directly, which needs HTTPS. The Interface toggle only controls the location sent with chat requests |
-| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
+| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to, including groups inherited through parent groups (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
 
 ### Custom input variables
 
@@ -204,9 +204,17 @@ With 20 messages, `{{MESSAGES:MIDDLETRUNCATE:6}}` keeps messages 1-3 and 18-20, 
 
 ## Version History
 
-Every save creates a new version. When editing a prompt, the **History sidebar** shows all versions with the commit message, author, timestamp, and a "Live" badge on the active production version.
+Every save creates a new version. When editing a prompt, the history menu above the prompt content starts on **Live**, the active production version. Open it to list the versions newest first, each with its commit message and author (hover for the date), and **Load more** for older ones.
 
-**Preview** any version by clicking it. **Set as Production** to restore it as the active version. **Delete** old versions from the menu (the current production version cannot be deleted).
+- **Preview** any version by clicking it. Its content opens read-only, with the version ID and date underneath.
+- **Compare to current** shows what differs between that version and the live one: the name and tags side by side, then the prompt content as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.
+- **Edit as new version** makes the previewed content editable. Saving creates a new version from it. The **Set as Production** checkbox beside **Save** starts unticked here, so the live prompt stays as it is until you tick it.
+- **Set as Production** restores that version as the active one.
+- **Delete Version** in a version's **⋯** menu removes it. The live version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the history stays connected.
+
+Switching to another version or leaving the editor while you have unsaved changes asks whether to discard them first. Anyone who can view a prompt can open and compare its versions; editing, setting a version live and deleting need write access.
+
+Over the API, `GET /api/v1/prompts/id/{prompt_id}/history/diff?from_id=...&to_id=...` returns both snapshots, the content diff as a list of lines, `name_changed` and `line_endings_only`, which is `true` when the contents differ only in their line endings.
 
 :::note Migration
 Prompts created before the versioning update were automatically migrated with their content preserved as the initial "Live" version. The URL structure changed from command-based to ID-based, so existing bookmarks may need updating. As of v0.5.0, all variables are optional by default.
