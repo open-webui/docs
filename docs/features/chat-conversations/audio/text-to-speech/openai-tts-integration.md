@@ -116,7 +116,7 @@ services:
 
 The **OpenAI Realtime** Text-to-Speech engine produces speech with OpenAI's realtime voice models, the same models used for [Realtime calls](/features/chat-conversations/chat-features/voice-mode#realtime-calls). For each piece of text, Open WebUI opens a short WebSocket session to `<API Base URL>/realtime`, asks the model to read the text aloud and saves the result as a finished WAV clip. It serves Read Aloud and Standard voice calls like any other Text-to-Speech engine.
 
-1. Go to **Admin Panel > Settings > Audio**.
+1. Go to **Settings > Admin > Audio**.
 2. Set **Text-to-Speech Engine** to **OpenAI Realtime**. The model and voice switch to `gpt-realtime-2.1-mini` and `marin`.
 3. Fill in the **API Base URL** and **API Key**. These are the same fields the `OpenAI` engine uses.
 4. Optionally change the **TTS Model**, **TTS Voice** or **Prompt Template**, then click **Save**.

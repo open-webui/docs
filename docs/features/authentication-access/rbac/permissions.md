@@ -80,7 +80,7 @@ Each **(Parent)** permission sets what the **Access Control** panel offers for t
 | **Skills Public Sharing** | *(Requires Skills Sharing)* Ability to make skills public. |
 | **Notes Sharing** | **(Parent)** Shows the access list in the Access Control panel of Notes. |
 | **Notes Public Sharing** | *(Requires Notes Sharing)* Ability to make Notes public. |
-| **Folders Sharing** | Shows the access list in a chat folder's **Share** dialog, for sharing the folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
+| **Folders Sharing** | Shows the access list in a chat folder's [**Share**](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) dialog, for sharing the folder (and the chats inside it) with specific users or groups, with read or write access. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
 | **Chats Public Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
 | **Chats Open Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
 | **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
@@ -114,15 +114,15 @@ Controls the features available to the user inside the chat interface.
 | **Allow Continue Response** | Ability to use the "Continue" feature for truncated responses. |
 | **Allow Regenerate Response**| Ability to regenerate an AI response. |
 | **Allow Rate Response** | Ability to thumbs up/down responses. |
-| **Allow Chat Share** | Ability to generate a share link for a chat. |
+| **Allow Chat Share** | Ability to generate a share link for a chat ([`USER_PERMISSIONS_CHAT_SHARE`](/reference/env-configuration#user_permissions_chat_share)). See [Allowing Replies](/features/chat-conversations/chat-features/chatshare#allowing-replies) for letting the people you share with reply. |
 | **Allow Chat Export** | Ability to export chat history. |
-| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI) and to [fork a chat](/features/chat-conversations/chat-features/), which copies an existing conversation into a new one ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. When disabled, **Import Chats** in **Settings > Data Controls**, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all hidden from non-admins. Admins are always exempt. |
+| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI) and to [fork a chat](/features/chat-conversations/chat-features/) or [clone one shared with you](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat), which copies an existing conversation into a new one ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. When disabled, **Import Chats** in **Settings > Data Controls**, the **Clone Chat** button on a shared chat, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all hidden from non-admins. Admins are always exempt. |
 | **Allow Speech to Text** | Ability to use voice input. |
 | **Allow Text to Speech** | Ability to use voice output. |
 | **Allow Call** | Ability to start a [Voice Mode](/features/chat-conversations/chat-features/voice-mode) call, in both Standard and Realtime call mode. |
 | **Allow Multiple Models in Chat** | Ability to select multiple models for a simultaneous response. |
 | **Allow Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
-| **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled). |
+| **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled) ([`USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`](/reference/env-configuration#user_permissions_chat_temporary_enforced)). |
 
 ### 4. Features Permissions
 Controls access to broad platform capabilities.
@@ -131,7 +131,7 @@ Controls access to broad platform capabilities.
 | :--- | :--- |
 | **API Keys** | Ability for non-admin users to generate Personal Access Tokens (API Keys) in User Settings. |
 | **Notes** | Access to the "Notes" feature. |
-| **Channels** | Access to the "Channels" feature. Without it, a user also stops receiving live channel messages, and channel automations they created do not run. |
+| **Channels** | Access to the "Channels" feature ([`USER_PERMISSIONS_FEATURES_CHANNELS`](/reference/env-configuration#user_permissions_features_channels)). Without it, a user also stops receiving live channel messages, and channel automations they created do not run. |
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
@@ -197,7 +197,7 @@ There is no permission that locks personal settings as a whole. This one hides a
 
 For API key creation:
 
-1.  **Global Toggle Required**: The feature must be enabled globally in **Settings > Admin > General > API Keys**. If this is off, *no one* can generate keys.
+1.  **Global Toggle Required**: The feature must be enabled globally in **Settings > Admin > Authentication > API Keys**. If this is off, *no one* can generate keys.
 2.  **Permission Check for Non-Admins**: Users with the `user` role must have the `features.api_keys` permission.
 3.  **Admins Are Exempt from `features.api_keys`**: Users with the `admin` role can generate API keys when API keys are globally enabled, even without that specific permission.
 

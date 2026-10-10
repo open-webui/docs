@@ -23,9 +23,9 @@ Groups can be managed in the **Admin Panel > Users > Groups** section.
 ### Group Configuration
 When creating or editing a group, you can configure its visibility in the system:
 
-*   **Who can share to this group**: (Access Control setting)
-    *   **Anyone**: (Default) Any user on the platform can see this group in the "Access Control" menus for Sharing and share Chat items, Models, Prompts, or Knowledge Bases to it.
-    *   **Members**: Only users who are **already members** of this group, directly or through one of its subgroups, will see it as an option in the "Access Control" menus for Sharing. This is the ideal setting for private team collaboration (e.g., a "Marketing" team), ensuring only teammates can share resources (Models, Prompts, Knowledge) with each other.
+*   **Who can share to this group**: (Access Control setting) New groups start with the value of [`DEFAULT_GROUP_SHARE_PERMISSION`](/reference/env-configuration#default_group_share_permission), which defaults to **Members**.
+    *   **Anyone**: Any user on the platform can see this group in the "Access Control" menus for Sharing and share Chat items, Models, Prompts or Knowledge Bases to it.
+    *   **Members**: (Default) Only users who are **already members** of this group, directly or through one of its subgroups, will see it as an option in the "Access Control" menus for Sharing. This is the ideal setting for private team collaboration (e.g., a "Marketing" team), ensuring only teammates can share resources (Models, Prompts, Knowledge) with each other.
     *   **No one**: The group is completely **hidden** from sharing menus for non-administrators. This is perfect for technical groups used exclusively for **RBAC Permission assignment** (e.g., a "High-Tier Users" group) where content sharing is not required.
 
 :::tip Strategy: Permission Groups vs. Sharing Groups

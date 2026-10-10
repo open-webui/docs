@@ -130,13 +130,13 @@ These configure **Realtime** call mode for [Voice Mode](/features/chat-conversat
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_REALTIME_ENABLED` | Call mode: `true` for **Realtime**, `false` for **Standard** | `false` |
-| `AUDIO_REALTIME_OPENAI_API_BASE_URL` | OpenAI-compatible Realtime API base URL | `https://api.openai.com/v1` |
-| `AUDIO_REALTIME_OPENAI_API_KEY` | Realtime API key | empty |
-| `AUDIO_REALTIME_MODEL` | Realtime voice model | `gpt-realtime-2.1-mini` |
-| `AUDIO_REALTIME_VOICE` | Default voice of the voice model | `marin` |
-| `AUDIO_REALTIME_TRANSCRIPTION_MODEL` | Model that transcribes what the user says | `gpt-transcribe` |
-| `REALTIME_CALL_PROMPT_TEMPLATE` | Instructions for the voice model | empty (built-in prompt) |
+| [`AUDIO_REALTIME_ENABLED`](/reference/env-configuration#audio_realtime_enabled) | Call mode: `true` for **Realtime**, `false` for **Standard** | `false` |
+| [`AUDIO_REALTIME_OPENAI_API_BASE_URL`](/reference/env-configuration#audio_realtime_openai_api_base_url) | OpenAI-compatible Realtime API base URL | `https://api.openai.com/v1` |
+| [`AUDIO_REALTIME_OPENAI_API_KEY`](/reference/env-configuration#audio_realtime_openai_api_key) | Realtime API key | empty |
+| [`AUDIO_REALTIME_MODEL`](/reference/env-configuration#audio_realtime_model) | Realtime voice model | `gpt-realtime-2.1-mini` |
+| [`AUDIO_REALTIME_VOICE`](/reference/env-configuration#audio_realtime_voice) | Default voice of the voice model | `marin` |
+| [`AUDIO_REALTIME_TRANSCRIPTION_MODEL`](/reference/env-configuration#audio_realtime_transcription_model) | Model that transcribes what the user says | `gpt-transcribe` |
+| [`REALTIME_CALL_PROMPT_TEMPLATE`](/reference/env-configuration#realtime_call_prompt_template) | Instructions for the voice model | empty (built-in prompt) |
 
 ## Tips for Configuring Audio
 

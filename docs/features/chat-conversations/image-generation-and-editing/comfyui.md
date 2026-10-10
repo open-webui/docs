@@ -50,7 +50,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
 ## Create Image (Image Generation)
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Tools** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Images**.
 
 2. **Enable and Configure ComfyUI:**
     - Ensure the **Image Generation** toggle at the top of the page is enabled.
@@ -71,7 +71,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
     - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Export (API)"** button found in the **File** sub-menu after clicking on the ComfyUI logo. This will prompt you to name the file. Name it something memorable and download it.
 
-    ![Screenshot of the "Save (API Format)" button in the ComfyUI interface.](/images/image-generation-and-editing/comfyui-save-api-format.png)
+    ![Screenshot of the "Export (API)" entry in the ComfyUI File menu.](/images/image-generation-and-editing/comfyui-save-api-format.png)
     - Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
 
     ![Screenshot of the ComfyUI Workflow section in Open WebUI, showing the upload button.](/images/image-generation-and-editing/comfyui-workflow-upload.png)
@@ -122,7 +122,7 @@ There is no "Generate Image" button underneath messages any more. Generation hap
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Tools** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Images**.
 
 2. **Configure Image Editing:**
     - Under the **Edit Image** section, switch **Image Edit** on. It is off by default, and without it the edit engine is never used.
@@ -164,7 +164,7 @@ Open WebUI's **ComfyUI Workflow Nodes** section lets you map generic controls to
 
 Before configuring Open WebUI, you must examine your exported workflow JSON files directly in a text editor. The Node ID is the unique number ComfyUI uses to identify the node in the JSON structure. The top-level keys in the JSON object are the node IDs.
 
-![Screenshot of the ComfyUI interface with a node selected, highlighting the node ID in the properties panel.](/images/image-generation-and-editing/comfyui-node-mapping.png)
+![Screenshot of the ComfyUI Workflow Nodes list in Open WebUI, pairing each input key such as text, unet_name, width, height, steps and seed with its node ID.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
 **Identify the Input Key (The Parameter Name)**
 
@@ -207,7 +207,7 @@ The Key is the exact parameter name within that node's JSON structure that you n
 },
 ```
 
-![Screenshot of the ComfyUI interface with the KSampler node selected, highlighting the node ID and the 'seed' and 'steps' input fields.](/images/image-generation-and-editing/comfyui-unet-name-node.png)
+![Screenshot of the Images page in Open WebUI's admin settings with ComfyUI as the engine, showing the base URL, API key, workflow upload and the Workflow Nodes mapping.](/images/image-generation-and-editing/comfyui-unet-name-node.png)
 
 #### Default Key Values by Task Type
 

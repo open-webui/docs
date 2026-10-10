@@ -135,8 +135,9 @@ Share a folder, and the chats inside it, with specific users or groups so a team
    - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
 4. Pick the **Sharing mode**, shown once at least one person or group has access:
    - **Clone only** (default): people you shared with read the folder's chats and clone one to continue it on their own.
-   - **Allow replies**: everyone with access to the folder, read or write, can send messages into its chats, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies).
-5. Save.
+   - **Allow replies**: everyone with access to the folder, read or write, can send messages into the chats directly in it, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). Chats in a subfolder follow that subfolder's own sharing mode, which you set by sharing the subfolder itself; until then they open read-only.
+
+Each change applies as soon as you make it.
 
 Only the folder's owner or an admin can change who a folder is shared with and its sharing mode. People with write access do not get the **Share** entry in the folder menu.
 
@@ -144,12 +145,12 @@ The **Add Access** picker lists only the people and groups the folder is not alr
 
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
-- **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it.
-- **Someone else's chat opens read-only, under their name.** With **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** panel. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
+- **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
+- **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** panel. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
 - **Folder owners see who added each chat.** In a folder you share, every chat in the sidebar shows the profile picture of the person it belongs to, so chats your collaborators added stand out from your own.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
-- **Only the owner or an admin can delete a shared root folder or change its sharing.** People with write access can add and edit chats and subfolders, but the folder itself, who it is shared with and its sharing mode stay with the owner.
-- **Clone a chat to continue it yourself.** In a folder set to **Clone only**, a chat you can only read shows a **Clone Chat** button. The copy goes into your own chats, outside any folder, starting from the message you are viewing, and needs the **Allow Chat Import** permission (admins always have it). The copy leaves out the owner's chat settings: advanced parameters, selected tools, filters and chat variables. To copy only part of the conversation, use the **Fork chat** action under a finished reply, which copies the chat up to that reply into your own chats, outside any folder and without the owner's chat settings, tags or chat variables, and needs the same permission; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
+- **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
+- **Clone a chat to continue it yourself.** In a folder set to **Clone only**, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
 
 Folder sharing is gated by the **Folders Sharing** permission, which is off by default. An administrator enables it per group under **Admin Panel > Users > Groups > Permissions**, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).

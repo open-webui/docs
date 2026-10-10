@@ -31,9 +31,9 @@ Each variant also has a development build: `:dev-slim`, `:dev-cuda`, `:dev-cuda1
 
 **196 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
 
-These are compressed download sizes for Linux/amd64, checked on September 28, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
+These are compressed download sizes for Linux/amd64, checked on October 10, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
 
-<!-- Verified from GHCR manifest layer sizes. main linux/amd64: sha256:34d884bba14a22a9745b00303f343cbdcfcbc16c004b4fe78af07c275b99a236 = 1,656,050,501 bytes; slim linux/amd64: sha256:c40d017d15da9945326e9e779d5988e513abfa56e0a3e9f633ab9a0f76c57afc = 176,489,702 bytes. slim and main-slim index digest: sha256:e8adae70e1db7a838d5d6cdfe2a66a4c1d293a0361b304ccc20df179b17aeead. -->
+<!-- Verified from GHCR manifest layer sizes of the dev images for 0.12.0 on October 10, 2026. dev linux/amd64: sha256:712cd1bd52793dc05c8db263f00852762926c1e82b00fe1fefe664131daa2c24 = 1,618,082,089 bytes; dev-slim linux/amd64: sha256:ef83eab7be31de1e59c8080c66e02f47c4f6ab4b7890c908a5b55e4ece74b15c = 195,786,928 bytes. slim and main-slim are two tags for the same image. -->
 
 The saving comes from leaving out the bundled machine-learning stack, including PyTorch, local embedding and speech runtimes, plus document-processing tools and optional database and storage clients. If you use Open WebUI to chat with models through an API, those dependencies would otherwise sit unused in your container.
 

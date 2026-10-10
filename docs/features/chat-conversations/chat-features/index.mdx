@@ -29,15 +29,15 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 ![A response with a syntax-highlighted code block](/images/features/chat/chat-code-answer.png)
 
-- **[📁 Folders & Projects](./conversation-organization.md)**: Transform folders into powerful project workspaces with custom system prompts and attached knowledge bases.
+- **[📁 Folders & Projects](./conversation-organization.md)**: Transform folders into powerful project workspaces with [a default model](./conversation-organization.md#default-model), custom system prompts and attached knowledge bases.
 
 - **[🔗 URL Parameters](./url-params.md)**: Configure chat sessions through URL parameters, enabling quick setup of models, tools, and other features.
 
-- **[⚙️ Chat Parameters](./chat-params.md)**: Control system prompts and advanced parameters at different levels (per-chat, per-account, or per-model), and fill placeholders in a shared system prompt with chat or user variables.
+- **[⚙️ Chat Parameters](./chat-params.md)**: Control system prompts and advanced parameters at different levels (per-chat, per-account or per-model), fill placeholders in a shared system prompt with chat or user variables and pick [model controls](/features/workspace/models#using-model-controls-in-chat).
 
 - **[✨ Autocomplete](./autocomplete.md)**: AI-powered text prediction that helps you write prompts faster using a task model.
 
-- **[🗨️ Chat Sharing](./chatshare.md)**: Share conversations locally or via the Open WebUI Community platform with controllable privacy settings.
+- **[🗨️ Chat Sharing](./chatshare.md)**: Share conversations locally or via the Open WebUI Community platform with controllable privacy settings. With [Allow replies](./chatshare.md#allowing-replies), the people you share a chat with can write into the same chat.
 
 - **⬇️ Response Auto-Scroll**: The view follows a response down the page as it is generated. Turn it off with **Response Auto-Scroll** in **Settings > Interface** to keep the scroll position where you put it, which is useful when you want to read earlier parts of a long answer while the rest is still streaming.
 
@@ -45,7 +45,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **💬 Reference Chats**: Attach another conversation to the current one, so the model can work from what was said there. Pick it from **+ > Reference Chats**, which lists your own chats, or drag a chat out of the sidebar and drop it on the message input, which also works for a chat that is not yours. The conversation goes in whole, as plain text, with no chunking and no vector search. Any chat you are allowed to read can be attached, including one [shared with you](./chatshare.md#using-a-shared-chat-as-context) and one sitting in a [folder shared with you](./conversation-organization.md#sharing-folders).
 
-- **🍴 Fork a Chat**: Branch a conversation into an independent copy from any assistant response. The **Fork chat** action on a message copies the history from the start of the conversation up to that point into a new chat titled `<original title> (fork)`, so you can take a different direction without touching the original. A fork of your own chat keeps its folder (while you can still write to it), pinned state, tags and chat variables. Shared links and chats you can only read have the action too, and their forks start outside any folder without the owner's pin, tags, chat settings or chat variables; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat). Forking requires the [Chat Import](/features/authentication-access/rbac/permissions#3-chat-permissions) permission (`chat.import`, allowed by default; admins always pass). Without it the **Fork chat** action is not shown on a message at all. Forking is also unavailable while a response is still streaming.
+- **🍴 Fork a Chat**: Branch a conversation into an independent copy from any assistant response. The **Fork chat** action on a message copies the history from the start of the conversation up to that point into a new chat titled `<original title> (fork)`, so you can take a different direction without touching the original. A fork of your own chat keeps its folder, pin, tags and chat variables. Shared and read-only chats can be forked too; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat). Forking requires the [Chat Import](/features/authentication-access/rbac/permissions#3-chat-permissions) permission (`chat.import`, allowed by default; admins always pass). Without it the **Fork chat** action is not shown on a message at all. Forking is also unavailable while a response is still streaming.
 
 - **🗺️ Chat Overview**: A map of the whole conversation, on the **Overview** tab of the chat controls panel. Open the panel with the **Controls** button in the chat's top bar, or with the **Toggle Controls** [shortcut](./keyboard-shortcuts.mdx) once you have given it keys, and the tab is listed as soon as the chat has a message in it.
 
@@ -56,7 +56,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 - **📱 Swipe the Sidebar**: On a phone or tablet, drag right with one finger to pull the sidebar in and left to push it away. It tracks your finger and dims the conversation behind it as it moves, a quick flick settles it either way, and every chat row carries an always-visible three-dot menu (⋯) so its actions are reachable without a hover.
 - **[🕒 Temporal Awareness](./temporal-awareness.mdx)**: How models understand time and date, including native tools for precise time calculations.
 
-- **[🎙️ Voice Mode](./voice-mode.mdx)**: Start a hands-free voice conversation with your model using the Voice Mode button, either through the configured speech engines or as a Realtime call with an OpenAI-compatible realtime voice model. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session, useful in noisy or public environments.
+- **[🎙️ Voice Mode](./voice-mode.mdx)**: Start a hands-free voice conversation with your model using the **Voice mode** button, either through the configured speech engines or as a [Realtime call](/features/chat-conversations/chat-features/voice-mode#realtime-calls) with an OpenAI-compatible realtime voice model. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session, useful in noisy or public environments.
 
 - **[🧠 Reasoning & Thinking Models](./reasoning-models.mdx)**: Specialized support for models that generate internal chains of thought using thinking tags.
 
@@ -98,7 +98,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
-  | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved privately to your Skills workspace. Offered once the chat has content and you hold the Skills Access permission; the model needs built-in tools with the **Skills** category switched on. Anything you type after it steers what the skill covers. |
+  | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved privately to your Skills workspace. Offered once the chat has content and you hold the [Skills Access](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission; the model needs built-in tools with the **Skills** category switched on. Anything you type after it steers what the skill covers. |
   | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
   `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` and `/settings` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.

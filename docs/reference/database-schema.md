@@ -10,7 +10,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.11.1.
+> This documentation reflects schema changes up to Open WebUI v0.12.0.
 
 ## Open-WebUI Internal SQLite Database
 
@@ -302,7 +302,7 @@ Things to know about the chat table:
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
 - `current_message_id` was added in v0.11.0 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
-- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when the chat's owner forks or clones it. A copy made by anyone else starts with an empty map. Temporary chats keep their values in the request instead, so nothing is stored.
+- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when the chat's owner forks or clones it. A copy made by anyone else starts with an empty map. Temporary chats keep their values in the request only, so nothing is stored.
 - A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
@@ -904,15 +904,15 @@ Things to know about the skill table:
 
 ## Skill History Table
 
-| **Column Name** | **Data Type** | **Constraints** | **Description**                   |
-| --------------- | ------------- | --------------- | --------------------------------- |
-| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)          |
-| skill_id        | Text          | NOT NULL, INDEX | Reference to the skill            |
-| parent_id       | Text          | nullable        | Reference to the parent version   |
-| snapshot        | JSON          | NOT NULL        | Snapshot of the skill and its files at that version |
-| user_id         | Text          | NOT NULL        | User who created the version      |
-| commit_message  | Text          | nullable        | Version commit message            |
-| created_at      | BigInteger    | NOT NULL        | Creation timestamp                |
+| **Column Name** | **Data Type** | **Constraints** | **Description**                        |
+| --------------- | ------------- | --------------- | -------------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)               |
+| skill_id        | Text          | NOT NULL, INDEX | Skill the version belongs to           |
+| parent_id       | Text          | nullable        | Version this one was saved on top of   |
+| snapshot        | JSON          | NOT NULL        | Saved skill content and its files      |
+| user_id         | Text          | NOT NULL        | User who saved the version             |
+| commit_message  | Text          | nullable        | Description entered when saving        |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp                     |
 
 ## Tag Table
 
@@ -1049,6 +1049,7 @@ erDiagram
     prompt ||--o{ prompt_history : "has"
     user ||--o{ tag : "creates"
     user ||--o{ skill : "manages"
+    skill ||--o{ skill_history : "has"
     user ||--o{ tool : "manages"
     model ||--o{ model_history : "has"
     tool ||--o{ tool_history : "has"
@@ -1435,6 +1436,16 @@ erDiagram
         json data
         json meta
         boolean is_active
+        text version_id
+    }
+
+    skill_history {
+        text id PK
+        text skill_id FK
+        text parent_id FK
+        json snapshot
+        text user_id FK
+        text commit_message
     }
 
     tool {

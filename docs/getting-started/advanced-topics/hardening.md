@@ -41,7 +41,7 @@ The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption
 
 If you run multiple Open WebUI instances behind a load balancer, every instance must share the same key. Otherwise, a token signed by one instance will be rejected by another, causing login failures. Generate a key with `openssl rand -base64 32` and pass it as an environment variable to all replicas.
 
-**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again. If [two-factor sign-in](#two-factor-sign-in) is on, users' authenticator secrets are encrypted with a key derived from `WEBUI_SECRET_KEY`, and Open WebUI refuses to start after a rotation. Set [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) before users enroll to rotate `WEBUI_SECRET_KEY` freely.
+**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again. If [two-factor sign-in](#two-factor-sign-in) is on, users' authenticator secrets are encrypted with a key derived from `WEBUI_SECRET_KEY`, and once users have enrolled, Open WebUI refuses to start after a rotation. Set [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) before users enroll to rotate `WEBUI_SECRET_KEY` freely.
 
 ---
 
@@ -112,7 +112,7 @@ Open WebUI can require a code from an authenticator app after every sign-in, for
 ENABLE_MFA=true
 ```
 
-The same switch is **Require an authenticator for all users** in **Settings > Admin > Authentication**. OAuth and trusted-header sign-ins can be exempted when your identity provider or proxy already enforces a second factor (`MFA_ALLOW_OAUTH_BYPASS`, `MFA_ALLOW_TRUSTED_HEADER_BYPASS`). Changing any of these settings signs every user out. While MFA is on, sign-in attempts are also limited per account and per client address. See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa) for enrollment, recovery and the limits.
+The same switch is **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Admin > Authentication**. OAuth and trusted-header sign-ins can be exempted when your identity provider or proxy already enforces a second factor (`MFA_ALLOW_OAUTH_BYPASS`, `MFA_ALLOW_TRUSTED_HEADER_BYPASS`). Changing any of these settings signs every user out. While MFA is on, sign-in attempts are also limited per account and per client address. See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa) for enrollment, recovery and the limits.
 
 ---
 
@@ -208,7 +208,7 @@ CORS_ALLOW_CUSTOM_SCHEME=app
 
 ## Security Headers
 
-Open WebUI includes a `SecurityHeadersMiddleware` that injects HTTP security headers into responses. None are set by default, so you opt in to each one via environment variables.
+Open WebUI includes a `SecurityHeadersMiddleware` that injects HTTP security headers into responses. None are set by default, so you opt in to each one via environment variables. The accepted values and fallbacks for each are listed under [Security Headers](/reference/env-configuration#security-headers) in the environment variable reference.
 
 The following is a recommended starting configuration for production deployments:
 

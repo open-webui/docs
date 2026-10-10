@@ -279,7 +279,7 @@ WEBUI_AUTH_COOKIE_SECURE=true     # Set to false if using HTTP
 
 ### 8. Network Timeout Issues
 
-OAuth providers may be slow to respond, causing timeout errors during the authentication handshake.
+OAuth providers may be slow to respond, causing timeout errors during the authentication handshake. Raise [`OAUTH_TIMEOUT`](/reference/env-configuration#oauth_timeout) to give them longer.
 
 #### Symptoms:
 - `httpcore.ReadTimeout` errors in logs
@@ -500,7 +500,7 @@ By carefully configuring both your OAuth provider and your Open WebUI environmen
 
 ---
 
-:::warning Token Revocation Requires Redis
+:::warning Signing Out of a Single Session Requires Redis
 
 Without Redis, **signing out does not revoke JWT tokens**: they remain valid until they expire (default: 4 weeks). This is especially relevant for SSO/OAuth deployments where you may need to revoke access quickly (e.g., when an employee leaves the organization), because OIDC back-channel logout also needs Redis to revoke tokens. Without Redis, an administrator can still end every session of an account with **Sign out all devices** in the user's edit dialog.
 

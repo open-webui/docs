@@ -81,7 +81,7 @@ Open the **+** menu in the chat input and choose **Skills** to toggle individual
 Skills bound to a model use lazy loading:
 
 1. **Manifest injection** - Only the skill's name and description are added to the system prompt.
-2. **On-demand loading** - The model receives a `view_skill` builtin tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
+2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
@@ -369,4 +369,4 @@ When injected via `$` mention, the skill content goes into the system prompt, up
 
 ### Lazy loading requires function calling
 
-The manifest and the `view_skill` builtin tool need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with Builtin Tools enabled. Without them there is no lazy loading at all: every bound, toggled or mentioned skill is injected into the system prompt, up to the first 100,000 characters of its `SKILL.md`. Reading a skill's supporting files takes the skill tools, so it needs native function calling too.
+The manifest and the `view_skill` built-in tool need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with **Builtin Tools** enabled. Without them there is no lazy loading at all: every bound, toggled or mentioned skill is injected into the system prompt, up to the first 100,000 characters of its `SKILL.md`. Reading a skill's supporting files takes the skill tools, so it needs native function calling too.

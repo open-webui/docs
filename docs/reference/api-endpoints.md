@@ -57,7 +57,7 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 
 **Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
-**Voice avatars travel as references.** A [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) and its animations stay files on the source instance, and the export only carries their file IDs. Importing or syncing a model whose avatar or animation files are missing or not accessible on the target instance fails with `403` and `Avatar or animation file is not accessible. Upload it again.`, so upload the avatar again on the target instance.
+**Voice avatars travel as references.** A [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) and its animations stay files on the source instance, and the export only carries their file IDs. Importing or syncing a model whose avatar or animation files are missing or not accessible on the target instance fails with `403` (`Avatar or animation file is not accessible. Upload it again.`). Upload the avatar on the target instance first.
 
 **Version-controlled, code-driven workflow:**
 
@@ -104,7 +104,7 @@ Earlier releases put the running total in `prompt_tokens` / `completion_tokens` 
 }
 ```
 
-A non-admin caller needs the **Allow Chat Controls** and **Allow Chat Params** permissions to pick an option. Without them the picks are ignored and each control's default option applies. A pick for a control the model no longer has is ignored, and picking an option the control no longer has returns a `400`.
+A non-admin caller needs the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) to pick an option. Without them the picks are ignored and each control's default option applies. A pick for a control the model no longer has is ignored, and picking an option the control no longer has returns a `400`.
 
 **Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless asked. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled, so you do not have to send it. A non-streaming request is left untouched, and a `stream_options` you send keeps its other keys but has `include_usage` forced to `true`, so usage cannot be switched off per request while the capability is on.
 
@@ -668,7 +668,7 @@ After uploading, you can group files into a knowledge collection or reference th
       return response.json()
   ```
 
-A file whose extracted text is already in the knowledge base is rejected with `400` and `Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added. Content added through the batch endpoint before v0.12.0 carries no content hash, so it is not detected as a duplicate.
+A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added. Content added through the batch endpoint before v0.12.0 carries no content hash, so it is not detected as a duplicate.
 
 
 #### Processing Web URLs into Knowledge Collections
@@ -682,7 +682,7 @@ Use this endpoint to fetch a webpage, extract content, and store the resulting c
 - **Request Body**:
   - `url` (string, required): Web URL to fetch and parse
   - `collection_name` (string, optional): Target collection name. If omitted, Open WebUI generates one from the URL
-- **Errors**: A link that cannot be fetched or yields no content, such as a host refusing the connection, returns `400` with `Could not read content from <url>`, with `process=false` too.
+- **Errors**: A link that cannot be fetched or yields no content, such as a host refusing the connection, returns `400` with the detail `[ERROR: Could not read content from <url>]`, also when `process=false`.
 
 **`overwrite` behavior:**
 | Value | Result |

@@ -102,7 +102,7 @@ Your instance's own [Evaluation](/features/administration/evaluation) leaderboar
 
 | Setting | Where | Default |
 | :--- | :--- | :--- |
-| **Community Sharing** | **Admin Panel > Settings > General** | On |
+| **Community Sharing** | **Settings > Admin > General** | On |
 
 [`ENABLE_COMMUNITY_SHARING`](/reference/env-configuration#enable_community_sharing) sets it on an instance's first start. After that, the value saved in the Admin Panel wins.
 

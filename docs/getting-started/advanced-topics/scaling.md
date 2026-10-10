@@ -115,7 +115,7 @@ ENABLE_WEBSOCKET_SUPPORT=true
 - For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
 - Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
 - For high-concurrency websocket streaming, review Redis Pub/Sub output buffer limits. Large Socket.IO events can disconnect Pub/Sub clients if Redis uses small default buffers; see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
-- All instances must run the same websocket delivery mode, so changing it means stopping or updating every instance together. See [Per-Room Redis Channels](#per-room-redis-channels).
+- All instances must use the same [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) value, so change it on every instance at once. See [Per-Room Redis Channels](#per-room-redis-channels).
 - A **single Redis instance** is sufficient for the vast majority of deployments, even with thousands of users. You almost certainly do not need Redis Cluster unless you have specific HA/bandwidth requirements. If you think you need Redis Cluster, first check whether your connection count and memory usage are caused by fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
 - Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
 
@@ -218,7 +218,7 @@ location ^~ /_app/immutable/ {
 
 ### Switch the JSON Encoder to orjson
 
-Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Open WebUI uses [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, by default from v0.12.0. On earlier versions, turn it on with:
+Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Open WebUI uses [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, by default from v0.12.0. On earlier versions, turn it on with [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson):
 
 ```
 ENABLE_ORJSON=True

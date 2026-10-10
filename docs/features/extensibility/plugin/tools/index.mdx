@@ -98,11 +98,11 @@ Every existing tool starts with one version, created by the upgrade.
 
 The same actions are available over the API: `GET /api/v1/tools/id/{id}/history` (paged with `?page=`), `GET /api/v1/tools/id/{id}/history/{history_id}`, `GET /api/v1/tools/id/{id}/history/diff?from_id=...&to_id=...`, `DELETE /api/v1/tools/id/{id}/history/{history_id}` and `POST /api/v1/tools/id/{id}/update/version` with `{"version_id": "..."}`. A save through `POST /api/v1/tools/id/{id}/update` accepts an optional `commit_message`.
 
----
-
 ### Translating a tool
 
 The globe selector in the tool editor stores a name, a description and valve labels per language. User valve labels are the ones worth translating first, since those are what ordinary users see in Chat Controls. See [Translations](/features/administration/translations).
+
+---
 
 ## How to Use Tools in Chat
 
@@ -617,7 +617,7 @@ The **Builtin Tools** capability can be toggled on or off for each model in the 
 
 #### Granular Builtin Tool Categories (Per-Model)
 
-When the **Builtin Tools** capability is enabled, you can further control which **categories** of builtin tools are available to the model. This appears in the Model Editor as a **Builtin Tools** row with one switch per category.
+When the **Builtin Tools** capability is enabled, you can further control which **categories** of built-in tools are available to the model. This appears in the Model Editor as a **Builtin Tools** row with one switch per category.
 
 ![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
 

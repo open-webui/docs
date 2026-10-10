@@ -82,7 +82,7 @@ You should now be able to access both services at the following URLs:
 
 When accessing the Jupyter service, you will need the `JUPYTER_TOKEN` defined above. For this tutorial, I've picked a dummary token value of `123456`.
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-token.png)
+![Jupyter login page asking for a password or token](/images/tutorials/jupyter/jupyter-token.png)
 
 # Step 2: Configure Code Execution for Jupyter
 
@@ -110,7 +110,7 @@ Once Jupyter is the engine, [`ENABLE_ORJSON`](/reference/env-configuration#enabl
 
 To start, let's confirm what's in our Jupyter directory. As you can see from the image below, we only have an empty `work` folder.
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-empty.png)
+![Empty Jupyter workspace with the Launcher open](/images/tutorials/jupyter/jupyter-empty.png)
 
 ### Create a CSV
 
@@ -120,11 +120,11 @@ Let's run our first prompt. Make sure you've selected the `Code Execution` butto
 Prompt: Create two CSV files using fake data. The first CSV should be created using vanilla python and the second CSV should be created using the pandas library. Name the CSVs data1.csv and data2.csv
 ```
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-create-csv.png)
+![Open WebUI chat where the model writes two CSV files with the code interpreter](/images/tutorials/jupyter/jupyter-create-csv.png)
 
 We can see the CSVs were created and are now accessible within Jupyter.
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-view-csv.png)
+![data1.csv opened in Jupyter, next to data2.csv in the file browser](/images/tutorials/jupyter/jupyter-view-csv.png)
 
 ### Create a Visualization
 
@@ -134,11 +134,11 @@ Let's run our second prompt. Again, make sure you've selected the `Code Executio
 Prompt: Create several visualizations in python using matplotlib and seaborn and save them to jupyter
 ```
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-create-viz.png)
+![Open WebUI chat where the model creates matplotlib and seaborn charts](/images/tutorials/jupyter/jupyter-create-viz.png)
 
 We can see the visualizations were created and are now accessible within Jupyter.
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-view-viz.png)
+![Seaborn box plot saved by the model, opened in Jupyter](/images/tutorials/jupyter/jupyter-view-viz.png)
 
 ### Create a Notebook
 
@@ -148,17 +148,17 @@ Let's run our last prompt together. In this prompt, we'll create an entirely new
 Prompt: Write python code to read and write json files and save it to my notebook called notebook.ipynb
 ```
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-create-notebook.png)
+![Open WebUI chat where the model writes a notebook called notebook.ipynb](/images/tutorials/jupyter/jupyter-create-notebook.png)
 
 We can see the visualizations were created and are now accessible within Jupyter.
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-view-notebook.png)
+![notebook.ipynb opened in Jupyter with a markdown cell and two code cells](/images/tutorials/jupyter/jupyter-view-notebook.png)
 
 ## Note about workflow
 
 While testing this feature, I noticed several times that Open-WebUI would not automatically save the code or output generated within Open-WebUI to my instance of Jupyter. To force it to output the file/item I created, I often followed this two-step workflow, which first creates the code artifact I want and then asks it to save it to my instance of Jupyter. This is by design: every execution starts a fresh kernel and deletes it when done, so variables and in-memory objects never persist between runs, and only files written to disk survive.
 
-![Code Execution Configuration](/images/tutorials/jupyter/jupyter-workflow.png)
+![Chat overview showing the prompts and replies that created and saved the notebooks](/images/tutorials/jupyter/jupyter-workflow.png)
 
 ## How are you using this feature?
 

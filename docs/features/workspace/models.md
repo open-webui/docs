@@ -74,7 +74,7 @@ The editor opens on a banner header: the background image fills the banner, with
 
 Everything else sits in rows, one per setting. Each row shows a short summary of what is set, such as **Default**, **3 modified**, **Custom · 4** or **Vision, File Upload, Web Search +2**, and opens when you click it. Hover a setting's name to see what it does.
 
-- **Switches**: **Capabilities**, **Default Features** and **Builtin Tools** open into switches, each with a one-line description.
+- **Switches**: **Capabilities**, **Default Features** and **Builtin Tools** open into switches. Hover over a switch label to see what it does.
 - **Pickers**: **Knowledge**, **Tools**, **Skills**, **Filters** and **Actions** open a searchable picker. **Clear** removes every selected item and **Manage** opens the workspace page where those items are created. **Enable all** selects every item matching the search (Knowledge has **Upload Files** in its place). Items marked **Global** are always on. When the list is empty, the picker names the workspace page where items are added.
 - **Advanced Params** shows how many parameters you changed (**N modified**), or **Default** when none.
 - **Prompts** holds the model's prompt suggestions.
@@ -147,7 +147,7 @@ Bind resources in the picker rows:
 
 Toggle what the model can do in the **Capabilities** row and the two rows that follow it:
 
-![Capabilities and builtin tool categories in the model editor](/images/workspace/model-editor-capabilities.png)
+![Capabilities and built-in tool categories in the model editor](/images/workspace/model-editor-capabilities.png)
 
 | Setting | What it controls |
 | :--- | :--- |
@@ -160,7 +160,7 @@ Toggle what the model can do in the **Capabilities** row and the two rows that f
 | **Citations** | Show the sources behind a reply, from knowledge, file retrieval and the builtin tools that return them. On by default; with it off no sources are shown. Web search hits are not sources in Native mode, see [Agentic Search](/features/chat-conversations/web-search/agentic-search) |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
-| **Builtin Tools** | The capability switches the builtin tools on as a whole. While it is on, a **Builtin Tools** row below **Capabilities** controls which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills |
+| **Builtin Tools** | The capability switches the built-in tools on as a whole. While it is on, a **Builtin Tools** row below **Capabilities** controls which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills |
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **File Context** disappears from this editor since there is nothing to extract |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **Default Features** | The row right below **Capabilities** lists **Web Search**, **Image Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |

@@ -51,7 +51,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
 | **Forward cookies** | Under **Advanced**, off by default. Only turn it on for a terminal server that authenticates by cookie, since every cookie the browser holds for your Open WebUI domain travels with the request |
 
-![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
+![Add Terminal Connection form with the Name, URL, Chat Uploads and Auth fields still empty](/images/open-terminal-connection-form.png)
 
 ### 5. Save
 
@@ -75,7 +75,7 @@ The same section carries a **Policy** block that takes environment variables for
 
 In the chat input area, click the **terminal button** (cloud icon ☁). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
 
-![Terminal dropdown showing Docs Terminal under System](/images/open-terminal-chat-dropdown.png)
+![Terminal dropdown showing Open Terminal under System](/images/open-terminal-chat-dropdown.png)
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it.
 

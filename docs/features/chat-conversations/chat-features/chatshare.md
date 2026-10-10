@@ -57,23 +57,6 @@ Treat the URL itself as the only protection. It cannot be revoked selectively, s
 
 :::
 
-### Allowing Replies
-
-Once at least one person or group has access, the modal also shows a **Sharing mode**:
-
-- **Clone only** (default): people open the link and see the conversation as it was when the link was created or last updated. To continue it, they clone or fork it into their own chats (see [Cloning or Forking a Shared Chat](#cloning-or-forking-a-shared-chat)).
-- **Allow replies**: people you shared the chat with by name, through a group or with **Public** write into the same chat. Opening the link takes them straight to the live conversation, and everyone in it sees new messages and replies as they arrive.
-
-In a chat with replies allowed:
-
-- Each message shows the name and profile picture of the person who sent it. In the bubble layout, other people's messages sit on the left.
-- A line above the message input shows who is typing.
-- Each person regenerates, continues and stops only the replies to their own messages. Editing messages and rating replies is left to the owner, on their own messages and the replies to them.
-- Messages from other people never generate a new title or tags, and never change the owner's selected models, attached files or chat variables. Their turns run without the chat's variables.
-- Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
-
-Switching back to **Clone only** refreshes the snapshot behind the link, so it then shows the conversation as it stands at that moment, replies included. The **Allow Chat Share** permission controls who can share a chat, and the access options follow the same permissions as for any share link. [Shared folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) have the same **Sharing mode**, applied to every chat in the folder.
-
 #### Sharing to Open WebUI Community
 
 When you select `Share to Open WebUI Community`:
@@ -103,6 +86,23 @@ When you select `Copy Link`, a unique share link is generated that can be shared
 - Unless the chat is set to **Open**, viewing it requires an account on the Open WebUI instance where the link was generated, and being signed in to that account. A visitor who is not signed in is redirected to the login page first.
 - A chat set to **Open** skips both requirements and is readable by anyone with the link. See [Open links](#open-links-no-sign-in).
 
+### Allowing Replies
+
+Once at least one person or group has access, the modal also shows a **Sharing mode**:
+
+- **Clone only** (default): people open the link and see the conversation as it was when the link was created or last updated. To continue it, they clone or fork it into their own chats (see [Cloning or Forking a Shared Chat](#cloning-or-forking-a-shared-chat)).
+- **Allow replies**: everyone with access by name, through a group or through **Public** can write into the same chat. Opening the link takes them straight to the live conversation, and everyone in it sees new messages and replies as they arrive.
+
+In a chat with replies allowed:
+
+- In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
+- A line above the message input shows who is typing.
+- Each person regenerates, continues and stops only the replies to their own messages. Only the owner can edit messages and rate replies, and only on their own messages and the replies to them.
+- Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
+- Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
+
+Switching back to **Clone only** refreshes the snapshot behind the link, so it then shows the conversation as it stands at that moment, replies included. The [**Allow Chat Share**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission controls who can share a chat, and the access options follow the same permissions as for any share link. [Shared folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) have the same **Sharing mode**, applied to the chats directly in the folder. Each subfolder has its own.
+
 ### Viewing Shared Chats
 
 To view a shared chat:
@@ -114,16 +114,16 @@ To view a shared chat:
 
 A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** panel labels its message nodes the same way.
 
-Anyone other than the owner gets the conversation without the owner's chat settings: advanced parameters, selected tools, tool servers and filters, chat variables and the per-message settings are left out. A copy cloned from a share link starts with no chat variables and outside any folder.
+Anyone other than the owner gets the conversation only: the owner's advanced parameters, selected tools, tool servers and filters, chat variables and per-message settings stay with the owner.
 
 #### Cloning or Forking a Shared Chat
 
-A chat that belongs to someone else and that you can read, through a share link, a share granted to you, a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or, for admins, **Admin Panel > Users**, can be copied into your own chats in two ways:
+You can copy a chat that belongs to someone else into your own chats whenever you can read it: through a share link, a share granted to you, a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or, for admins, **Admin Panel > Users**. There are two ways:
 
-- **Clone Chat**, the button at the bottom of the chat, copies the conversation.
+- **Clone Chat**, the button at the bottom of the chat, copies the conversation into your own chats, outside any folder. It shows when the chat is read-only for you; in a chat with replies allowed, use **Fork chat**.
 - **Fork chat**, the action under each finished reply, copies the conversation from the start up to that reply into a new chat titled `<original title> (fork)`.
 
-Both need you to be signed in and to have the **Allow Chat Import** permission (admins always have it). A fork made from a share link holds only what the link shows, so messages added to the original after the link was last updated stay out of it. A fork of someone else's chat goes into your own chats outside any folder and leaves out the owner's pin, tags, chat settings and chat variables.
+Both need you to be signed in and to have the [**Allow Chat Import**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission (admins always have it). A fork made from a share link holds only what the link shows, so messages added to the original after the link was last updated stay out of it. A fork of someone else's chat goes into your own chats outside any folder and leaves out the owner's pin, tags, chat settings and chat variables.
 
 #### Using a Shared Chat as Context
 

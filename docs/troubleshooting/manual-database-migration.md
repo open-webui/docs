@@ -252,7 +252,7 @@ alembic branches
 
 ```
 # alembic current should show something like:
-ae1027a6acf (head)
+b8f2c6d91a04 (head)
 
 # If you see multiple heads or branching, your migration history has issues
 ```
@@ -331,7 +331,7 @@ If you need to apply migrations up to a specific point:
 alembic history
 
 # Upgrade to specific revision
-alembic upgrade ae1027a6acf
+alembic upgrade <revision>
 ```
 
 ### Downgrade (Rollback)
@@ -359,7 +359,7 @@ After running migrations, confirm everything is correct:
 # Verify current version matches expected
 alembic current
 # Should show (head) indicating you're at latest
-# Example: ae1027a6acf (head)
+# Example: b8f2c6d91a04 (head)
 
 # Confirm no pending migrations
 alembic history -r current:head
@@ -1109,7 +1109,7 @@ Zero downtime but requires double infrastructure.
 
 ### Generate SQL Without Applying
 
-For review or audit purposes, run the upgrade on a copy of the database and compare its schema before and after. The upgrade output lists each migration it runs, and the diff shows the resulting schema changes as SQL. Your real database stays untouched.
+To see the SQL changes without touching your real database, run the upgrade on a copy and diff its schema before and after. The upgrade output lists each migration it runs, and the diff shows the resulting schema changes as SQL.
 
 <Tabs groupId="database-type">
   <TabItem value="sqlite" label="SQLite" default>

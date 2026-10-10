@@ -179,14 +179,11 @@ Functions are managed from **Admin Panel > Functions**. The page is hidden when 
 
 ### Version history
 
-Every save that changes a function's name, description, translations or code is kept as a version, together with the text typed into **Describe this change** beside **Save**. The version picker next to **Back** at the top of the function editor starts on **Production**, the version that is running. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty).
+Functions keep a version history that works like the one for tools: the version picker next to **Back**, **Compare to current**, **Set as Production** and **Delete**. See [Version history](/features/extensibility/plugin/tools#version-history) for the details. For functions:
 
-- **Open a version** by picking it. The editor shows its name, description, translations and code read-only.
-- **Compare to current** shows what differs between that version and Production: changed fields side by side, then the code as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.
-- **Set as Production** makes the opened version the running one. Its code is loaded and checked the same way as a save. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
-- **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
-
-A version holds the name, description, translations and code. Valves and the **Active** and **Global** switches belong to the function itself and keep their current values when you change versions. When the current Valves do not fit an older version's code, setting it as Production is refused with **Current Valves are incompatible with this code** and the running version stays in place. Saves run the same check (see [Changing Valves in Existing Code](/features/extensibility/plugin/development/valves#changing-valves-in-existing-code)). Every existing function starts with one version, created by the upgrade.
+- Only admins can open and change versions.
+- **Production** is the version that is running.
+- Valves and the **Active** and **Global** switches belong to the function itself and keep their current values when you change versions. When the current Valves do not fit an older version's code, setting it as Production is refused with **Current Valves are incompatible with this code** and the running version stays in place.
 
 The same actions are available over the API, admin only: `GET /api/v1/functions/id/{id}/history` (paged with `?page=`), `GET /api/v1/functions/id/{id}/history/{history_id}`, `GET /api/v1/functions/id/{id}/history/diff?from_id=...&to_id=...`, `DELETE /api/v1/functions/id/{id}/history/{history_id}` and `POST /api/v1/functions/id/{id}/update/version` with `{"version_id": "..."}`. A save through `POST /api/v1/functions/id/{id}/update` accepts an optional `commit_message`.
 

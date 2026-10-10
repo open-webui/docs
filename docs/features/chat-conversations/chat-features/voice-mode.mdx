@@ -7,10 +7,10 @@ title: "Voice Mode"
 
 Voice Mode turns a chat into a spoken conversation. You talk, Open WebUI transcribes what you said and sends it as your message, and the model's reply is read back to you a sentence at a time as it is written. The conversation stays an ordinary chat, so every turn is saved as text you can read and continue later.
 
-Admins pick one of two call modes under **Admin Panel > Settings > Audio > Voice calls**:
+Admins pick one of two call modes under **Settings > Admin > Audio > Voice calls**:
 
-- **Standard** (the default) uses the instance's [speech-to-text](/features/chat-conversations/audio/speech-to-text/stt-config) and [text-to-speech](/features/chat-conversations/audio) settings, so it works with whichever engines your admin has set up. Most of this page describes Standard mode.
-- **Realtime** connects the call to a speech-to-speech model from an OpenAI-compatible Realtime API, which hears you directly and hands real questions to the chat's model. See [Realtime Calls](#realtime-calls).
+- **Standard** (the default) uses the instance's [speech-to-text](/features/chat-conversations/audio/speech-to-text/stt-config) and [text-to-speech](/features/chat-conversations/audio) settings, so it works with whichever engines your admin has set up. The page covers Standard mode first.
+- **Realtime** connects the call to a speech-to-speech model from an OpenAI-compatible Realtime API, which hears you directly and hands real questions to the chat's model. Its own section, [Realtime Calls](#realtime-calls), follows further down.
 
 ## Starting Voice Mode
 
@@ -57,7 +57,7 @@ The reply is spoken in:
 
 **Speech Playback Speed** in **Settings > Audio** sets how fast replies are read.
 
-The speech itself comes from the text-to-speech engine your admin chose in **Admin Panel > Settings > Audio**. If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser.
+The speech itself comes from the text-to-speech engine your admin chose in **Settings > Admin > Audio**. If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser.
 
 The admin's **Response Splitting** setting decides how much of the reply is spoken at once:
 
@@ -82,9 +82,40 @@ Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mo
 
 While Voice Mode is on, Open WebUI adds voice instructions to the start of the system prompt. The built-in instructions ask the model for short, warm, conversational answers that are easy to follow when heard rather than read.
 
-Admins can turn this off, or replace the instructions with their own, under **Admin Panel > Settings > Interface > Voice Mode Prompt**. The same settings are available as [`ENABLE_VOICE_MODE_PROMPT`](/reference/env-configuration#enable_voice_mode_prompt) and [`VOICE_MODE_PROMPT_TEMPLATE`](/reference/env-configuration#voice_mode_prompt_template). An empty template uses the built-in instructions.
+Admins can turn this off, or replace the instructions with their own, under **Settings > Admin > Interface > Voice Mode Prompt**. The same settings are available as [`ENABLE_VOICE_MODE_PROMPT`](/reference/env-configuration#enable_voice_mode_prompt) and [`VOICE_MODE_PROMPT_TEMPLATE`](/reference/env-configuration#voice_mode_prompt_template). An empty template uses the built-in instructions.
 
 The Voice Mode Prompt belongs to Standard mode. In a Realtime call, the chat model receives your message as an ordinary chat message and answers in its usual written style, and the voice model condenses that answer for speech.
+
+## Permissions
+
+Admins can control access to Voice Mode on a per-role or per-group basis.
+
+- **Location**: Admin Panel > Users > Groups > **Default permissions** > **Permissions** > [**Allow Call**](/features/authentication-access/rbac/permissions#3-chat-permissions). To set a group-specific value, edit the group and open its **Permissions** tab.
+- **Environment Variable**: [`USER_PERMISSIONS_CHAT_CALL`](/reference/env-configuration#user_permissions_chat_call) (Default: `True`)
+
+If disabled, users do not see the **Voice mode** button. Admins always do.
+
+The same permission covers both call modes. In Realtime mode, Open WebUI checks it again when the call connects and every minute during the call.
+
+## Troubleshooting
+
+- **"Permission denied when accessing media devices"**: the browser blocked the microphone. Browsers only allow microphone access on HTTPS or `localhost`, so opening Open WebUI by its IP address from another device usually causes this. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues).
+- **"Select only one model to call"**: more than one model is selected. Remove the others and try again.
+- **"Call feature is not supported when using Web STT engine"**: the admin's speech-to-text engine is set to **Web API**. An admin needs to choose a server-side engine in **Settings > Admin > Audio**.
+- **It keeps listening and never sends**: Voice Mode sends after about two seconds of silence, so steady background noise can keep it recording. Mute while it is noisy, or move somewhere quieter.
+- **No sound from the model**: see [Text-to-Speech (TTS) Issues](/troubleshooting/audio#text-to-speech-tts-issues).
+
+Realtime calls show their own messages:
+
+- **"Configure the Realtime API key, model, voice, and transcription model"**: one of the Realtime fields in **Settings > Admin > Audio > Voice calls** is empty.
+- **"Invalid Realtime provider URL"**: the **OpenAI API Base URL** needs to start with `http://` or `https://` and contain no query string, user name or password.
+- **"Voice connection failed"** right after starting: the provider refused the connection, most often because of a wrong API key or a base URL that has no `/realtime` endpoint.
+- **"Provider rejected voice configuration. Check model, voice, and transcription model."**: the provider accepted the key but rejected the **Voice Model**, **Voice** or **Input Transcription Model**.
+- **"Select one server-configured chat model."**: select a single model provided by the server. Models from a user's own Direct Connections need Standard mode.
+- **"Call permission denied"** or **"Chat model access denied"**: the user lacks **Allow Call** or access to the selected model.
+- **"Call session expired. Start a new call."**: the call reached the one-hour limit.
+- **"A voice segment could not be transcribed. Please try again."**: the provider could not transcribe part of what you said. The message shows as an error notification and the call continues, so say it again.
+- **"This browser cannot use 24 kHz AudioWorklet audio. Use Standard call mode."**: the browser lacks the 24 kHz audio processing Realtime calls need. Use a browser with AudioWorklet support, or have the admin switch to Standard mode.
 
 ## Realtime Calls
 
@@ -92,7 +123,7 @@ In **Realtime** call mode, a realtime voice model holds the spoken conversation.
 
 ### Setting Up Realtime Calls
 
-Admins set this up in **Admin Panel > Settings > Audio**, in the **Voice calls** section at the top of the page. Set **Call mode** to **Realtime** and the remaining fields appear:
+Admins set this up in **Settings > Admin > Audio**, in the **Voice calls** section at the top of the page. Set **Call mode** to **Realtime** and the remaining fields appear:
 
 ![Admin audio settings with Call mode set to Realtime, showing the OpenAI API Base URL, API Key, Voice Model, Voice, Input Transcription Model and Prompt Template fields above the Speech-to-Text and Text-to-Speech sections](/images/features/audio/audio-realtime-call-mode.webp)
 
@@ -230,34 +261,3 @@ With the reduce motion accessibility setting of the operating system or browser 
 - **Costs.** Each call uses the voice model and the transcription model on the realtime provider, plus the chat model for every question it answers.
 
 Realtime calls work with every speech-to-text engine setting, **Web API** included, because the provider transcribes your speech.
-
-## Permissions
-
-Admins can control access to Voice Mode on a per-role or per-group basis.
-
-- **Location**: Admin Panel > Users > Groups > **Default permissions** > **Permissions** > [**Allow Call**](/features/authentication-access/rbac/permissions#3-chat-permissions). To set a group-specific value, edit the group and open its **Permissions** tab.
-- **Environment Variable**: [`USER_PERMISSIONS_CHAT_CALL`](/reference/env-configuration#user_permissions_chat_call) (Default: `True`)
-
-If disabled, users do not see the **Voice mode** button. Admins always do.
-
-The same permission covers both call modes. In Realtime mode, Open WebUI checks it again when the call connects and every minute during the call.
-
-## Troubleshooting
-
-- **"Permission denied when accessing media devices"**: the browser blocked the microphone. Browsers only allow microphone access on HTTPS or `localhost`, so opening Open WebUI by its IP address from another device usually causes this. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues).
-- **"Select only one model to call"**: more than one model is selected. Remove the others and try again.
-- **"Call feature is not supported when using Web STT engine"**: the admin's speech-to-text engine is set to **Web API**. An admin needs to choose a server-side engine in **Admin Panel > Settings > Audio**.
-- **It keeps listening and never sends**: Voice Mode sends after about two seconds of silence, so steady background noise can keep it recording. Mute while it is noisy, or move somewhere quieter.
-- **No sound from the model**: see [Text-to-Speech (TTS) Issues](/troubleshooting/audio#text-to-speech-tts-issues).
-
-Realtime calls show their own messages:
-
-- **"Configure the Realtime API key, model, voice, and transcription model"**: one of the Realtime fields in **Admin Panel > Settings > Audio > Voice calls** is empty.
-- **"Invalid Realtime provider URL"**: the **OpenAI API Base URL** needs to start with `http://` or `https://` and contain no query string, user name or password.
-- **"Voice connection failed"** right after starting: the provider refused the connection, most often because of a wrong API key or a base URL that has no `/realtime` endpoint.
-- **"Provider rejected voice configuration. Check model, voice, and transcription model."**: the provider accepted the key but rejected the **Voice Model**, **Voice** or **Input Transcription Model**.
-- **"Select one server-configured chat model."**: select a single model provided by the server. Models from a user's own Direct Connections need Standard mode.
-- **"Call permission denied"** or **"Chat model access denied"**: the user lacks **Allow Call** or access to the selected model.
-- **"Call session expired. Start a new call."**: the call reached the one-hour limit.
-- **"A voice segment could not be transcribed. Please try again."**: the provider could not transcribe part of what you said. The message shows as an error notification and the call continues, so say it again.
-- **"This browser cannot use 24 kHz AudioWorklet audio. Use Standard call mode."**: the browser lacks the 24 kHz audio processing Realtime calls need. Use a browser with AudioWorklet support, or have the admin switch to Standard mode.
