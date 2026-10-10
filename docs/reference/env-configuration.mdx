@@ -5204,7 +5204,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the API key for Exa search API.
+- Description: Sets the API key for Exa. The same key is used by the Exa search engine (`WEB_SEARCH_ENGINE=exa`) and the Exa web loader ([`WEB_LOADER_ENGINE=exa`](#web_loader_engine)). When Exa is the web loader but another search engine is selected, the web loader settings in **Settings > Admin > Web Search** show their own **Exa API Key** field, which sets this same key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXA_MAX_CONTENT_LENGTH`
@@ -5465,6 +5465,7 @@ If you use `perplexity`, this variable is not relevant to you.
   - `playwright`: Uses Playwright for rendering pages with JavaScript support.
   - `firecrawl`: Uses Firecrawl service.
   - `tavily`: Uses Tavily service.
+  - `exa`: Uses the [Exa](/features/chat-conversations/web-search/providers/exa) Contents API with [`EXA_API_KEY`](#exa_api_key). Exa fetches the pages and returns their text and title. Requests time out after [`WEB_LOADER_TIMEOUT`](#web_loader_timeout) seconds, or 60 seconds when that is unset. A rejected key or a billing problem stops the load with an error; pages Exa cannot read are skipped. Exa returns the full page text, and the `fetch_url` tool still cuts it to [`WEB_FETCH_MAX_CONTENT_LENGTH`](#web_fetch_max_content_length). [`EXA_MAX_CONTENT_LENGTH`](#exa_max_content_length) applies to search results only.
   - `microsoft_web_iq`: Uses the Microsoft Web IQ fetch API, configured by [`MICROSOFT_WEB_IQ_API_BASE_URL`](#microsoft_web_iq_api_base_url), [`MICROSOFT_WEB_IQ_API_KEY`](#microsoft_web_iq_api_key) and [`MICROSOFT_WEB_IQ_LANGUAGE`](#microsoft_web_iq_language).
   - `external`: Uses an external web loader API.
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -5527,7 +5528,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `str`
 - Default: Empty string (`''`)
-- Description: Specifies the request timeout in seconds for the SafeWebBaseLoader when scraping web pages. The value is stored as a string, so a config import sets it as `"30"`. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10 to 30 seconds depending on your network conditions.
+- Description: Specifies the request timeout in seconds for the default web loader (`safe_web`) and the `exa` and `microsoft_web_iq` loaders. The value is stored as a string, so a config import sets it as `"30"`. Without this setting, web scraping operations can hang indefinitely on slow or unresponsive pages. Recommended values are 10 to 30 seconds depending on your network conditions.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEB_FETCH_MAX_CONTENT_LENGTH`
@@ -5539,7 +5540,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 :::warning
 
-This **timeout only applies when `WEB_LOADER_ENGINE` is set to `safe_web`** or left empty (the default). It has no effect on Playwright or Firecrawl loader engines, which have their own timeout configurations (`PLAYWRIGHT_TIMEOUT` and Firecrawl's internal settings respectively).
+This **timeout applies when `WEB_LOADER_ENGINE` is `safe_web`** or left empty (the default), **`exa`** (60 seconds when unset) or `microsoft_web_iq`. Playwright and Firecrawl use their own settings, `PLAYWRIGHT_TIMEOUT` and `FIRECRAWL_TIMEOUT`.
 
 :::
 

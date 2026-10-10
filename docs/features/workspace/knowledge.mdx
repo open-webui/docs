@@ -73,6 +73,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
+| 👁️ **File browser with preview** | Browse files in a tree, preview the original file next to the list, and read or edit the indexed text the AI searches |
 | 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
@@ -244,29 +245,60 @@ For the initial create, upload, and chat steps, see [Ask your first document que
 
 Once you have more than a handful, the list can be reordered by clicking the **Title** or **Updated at** column headers. Clicking the header you are already sorted by reverses the direction. The list starts on **Updated at**, newest first.
 
+To change who can see or edit a knowledge base, open the three-dot menu on its row and choose **Access**. This opens the access settings directly, without opening the knowledge base, and every change saves as soon as you make it. Admins see the menu on every knowledge base; other users see it on the ones they can edit. [Resource Access](/features/authentication-access/rbac/groups#resource-access-rbac) explains visibility and access grants.
+
+### Browsing and previewing files
+
+Opening a knowledge base shows its files as a tree on the left and a preview pane on the right. Click a file to open it in the preview; on small screens the preview slides in over the list. Drag the divider to make the file list wider or narrower.
+
+The preview has two views, switched with the buttons above it:
+
+- **Preview** shows the original file as it was uploaded: PDFs, images, audio, video, Word documents, Excel workbooks (with a sheet picker), PowerPoint slides and text-based files such as Markdown, code, CSV, JSON and HTML. For formats with a rendered view, such as Markdown, CSV, JSON, HTML and SVG, the **⋯** menu switches between **View source** and **Rendered preview**.
+- **Indexed text** shows the text Open WebUI extracted from the file. This is what retrieval and the knowledge tools search, so it is the place to check when an answer misses something that is in the document.
+
+If the original file is not available, for example because only its text was stored, the file opens on **Indexed text** and the **Preview** button is hidden.
+
+**Editing the indexed text**
+
+With write access, click **Edit** to change the indexed text, then **Save** (or **Cancel**). Saving processes the new text again and updates every knowledge base that contains the file, so retrieval uses your corrected text. The original file stays as it was. If processing the text fails, or the text is saved but some knowledge bases could not be updated, an error message says so; save again to retry.
+
+While you have unsaved edits, opening another file, closing the preview, deleting an item, syncing, resetting or leaving the page asks **Discard unsaved changes?** first.
+
+**Downloading**
+
+**Download** sits in the **⋯** menu of the preview and in the three-dot menu of each file row. It saves the original file. For a file that opens on **Indexed text** because its original is not available, Download saves the indexed text as a `.txt` file.
+
+**Search, filter and sort**
+
+The **Search Collection** box above the tree searches the whole knowledge base by file name, and results inside a folder show the folder path next to the name. The filter button next to it offers:
+
+- **Search file content**: also match the indexed text inside files. Very large files are searched up to a character limit ([`RAG_FILE_CONTENT_SEARCH_MAX_CHARS`](/reference/env-configuration#rag_file_content_search_max_chars)).
+- **All**, **Created by you** or **Shared with you**: limit the list by who added the file.
+- **Name**, **Created** or **Updated**, with **Ascending** or **Descending**: the sort order. The default is **Updated**, newest first.
+
 ### Organizing into directories
 
 Knowledge bases support nested **directories** so larger document sets stay navigable. Create them from the **Add Content** menu (**New directory**), then reorganize freely.
 
 **Creating and navigating**
 
-- **New directory** lives next to file upload in the **Add Content** menu, which also offers **Upload directory**, **Add webpage**, **Add text content** and **Reset** (which removes every file from the knowledge base). Name uniqueness is enforced per parent: two siblings can't share a name, but you can reuse names in different parents.
-- Click a directory to descend into it; the **breadcrumb trail** at the top of the view always reflects the current path and lets you jump back to any ancestor in one click.
+- **New directory** lives in the **Add Content** menu (the **+** button next to the search box), which also offers **Upload files**, **Upload directory**, **Sync directory**, **Add webpage**, **Add text content** and **Reset** (which removes every file from the knowledge base). Type the name in the new row and press Enter. Name uniqueness is enforced per parent: two siblings can't share a name, but you can reuse names in different parents.
+- Click a directory to expand or collapse it in the tree. The three-dot menu on a directory row adds content straight into that directory: **New folder**, **Upload files**, **Upload directory**, **Add text content** and **Add webpage**.
 - Directories can be **renamed** or **moved to a different parent** without affecting the files inside them.
 
 **Drag-and-drop**
 
 You can move items by dragging:
 
-- **Files** onto a directory row, into the empty area of an open directory, or onto any breadcrumb crumb (including the root crumb to send a file back to the top level).
-- **Directories** onto another directory to nest them, or onto a breadcrumb crumb to move them up the tree. Moving a directory into itself or one of its descendants is blocked server-side.
+- **Files** onto a directory row, or onto the **All files** label at the top of the tree to send them back to the top level.
+- **Directories** onto another directory to nest them, or onto **All files** to move them to the top level. Moving a directory into itself or one of its descendants is blocked server-side.
 
 **Deletion semantics**
 
-Deleting a non-empty directory prompts for the action to take with its contents:
+Deleting a directory opens a dialog titled **Delete directory?** with one checkbox, **Delete all contents inside this directory**:
 
-- Leave **Delete all contents inside this directory** unchecked (the default) and the directory is removed while its files and subdirectories are re-parented one level up. The dialog is titled **Delete directory?** and has that one checkbox.
-- **Delete everything**: the directory and all files/subdirectories underneath it are permanently removed.
+- Checked (the default): the directory, its subdirectories and every file inside them are removed from the knowledge base.
+- Unchecked: the directory and its subdirectories are removed, and every file inside them, at any depth, moves into the deleted directory's parent (or the top level).
 
 **Effect on retrieval and tools**
 
@@ -313,6 +345,10 @@ Knowledge bases can be managed programmatically:
 - `POST /api/v1/files/`: Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side**, equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing). The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
 - `GET /api/v1/files/{id}/process/status`: Check processing status
 - `POST /api/v1/files/{id}/rename`: Rename a file
+- `GET /api/v1/files/{id}/content`: Download the original file. Returns 404 with `Original file is unavailable.` for a file stored as text only.
+- `GET /api/v1/files/{id}/content/{file_name}`: Download the file as an attachment. When the original upload is missing, it returns the indexed text as plain text.
+- `GET /api/v1/files/{id}/data/content`: Read the indexed text
+- `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
 - `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)
 
