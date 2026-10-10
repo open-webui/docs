@@ -60,6 +60,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | 🎚️ **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
 | 🔊 **Per-model TTS voice** | Give each persona its own voice |
 | 🌐 **Translations** | Per-language name, description and prompt suggestions |
+| 🕑 **Version history** | Every saved configuration is kept, and any of them can be set live again |
 
 ---
 
@@ -220,6 +221,7 @@ From the model list, click the ellipsis (**...**) on any model:
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Open the configuration panel |
+| **Access** | Open the model's access settings directly, without opening the editor |
 | **Hide Model** / **Show Model** | Remove from the model selector without deleting, or bring it back |
 | **Hide from Sidebar** / **Keep in Sidebar** | Toggle the model's pin in the sidebar |
 | **Clone** | Create an editable copy you can rename and reconfigure |
@@ -227,6 +229,30 @@ From the model list, click the ellipsis (**...**) on any model:
 | **Export** | Download the configuration as `.json` |
 | **Share** | Share to the Open WebUI community |
 | **Delete** | Permanently remove the preset |
+
+**Access** appears on models you can edit. It opens the same access settings as the **Access** button in the editor, and changes there are saved as soon as you make them.
+
+### Version history
+
+Every **Save & Update** that changes a model's configuration is kept as a version, together with the text typed into **Describe this change** beside the button. The version picker next to **Back** at the top of the model editor starts on **Production**, the configuration chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). It is there for anyone who can edit the model, in **Workspace > Models** and in **Settings > Admin > Models** for models with saved settings.
+
+- **Open a version** by picking it. The editor shows that version read-only.
+- **Set as Production** makes the opened version the live configuration. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
+- **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
+
+A version holds the name, the base model, the system prompt and parameters and the rest of the editor's settings, such as the description, tags, capabilities, prompt suggestions and the bound knowledge, tools, skills, filters, actions and terminal. The access settings, **Hide Model** and the **Enabled** switch belong to the live model and keep their current values when you change versions. Every existing model starts with one version, created by the upgrade.
+
+Setting a version as Production checks everything it points to, because an older version can reference things that have since been deleted or that you cannot reach. It is refused, and the live configuration stays as it was, when:
+
+- its base model is no longer available.
+- a knowledge base, knowledge file, skill, tool or terminal it binds is missing or not accessible to you.
+- a filter or action function it binds is missing or switched off.
+- its background image or voice avatar files are no longer accessible to you.
+- its [model controls](#model-controls) differ from the live ones and you are not an administrator.
+
+To go ahead, bring the missing item back or get access to it, or pick another version.
+
+The same actions are available over the API, each taking the model ID as `?id=`: `GET /api/v1/models/model/history` (paged with `&page=`), `GET /api/v1/models/model/history/{history_id}`, `POST /api/v1/models/model/update/version` with `{"version_id": "..."}` and `DELETE /api/v1/models/model/history/{history_id}`. A save through `POST /api/v1/models/model/update` accepts an optional `commit_message`.
 
 ### Enabled and disabled
 

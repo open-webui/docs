@@ -189,6 +189,8 @@ Access management options via the **More (...)** menu in the top right corner.
 
 Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access and is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
 
+The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry, and administrators see it on every note. Each change there is saved right away.
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the access list in the **Access Control** panel (default `False`)

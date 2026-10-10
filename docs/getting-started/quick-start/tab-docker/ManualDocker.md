@@ -20,7 +20,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 |-----|----------|
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
-| `:slim`, `:main-slim` | About **176 MB instead of 1.66 GB** to download—**89% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
+| `:slim`, `:main-slim` | About **196 MB instead of 1.62 GB** to download, **88% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
 | `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
@@ -29,7 +29,7 @@ Each variant also has a development build: `:dev-slim`, `:dev-cuda`, `:dev-cuda1
 
 ### Why choose slim? {#what-slim-leaves-out}
 
-**176 MB instead of 1.66 GB. Same chat experience.** The `:slim` image is **89% smaller** than `:main`, saving about **1.48 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
+**196 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
 
 These are compressed download sizes for Linux/amd64, checked on September 28, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
 

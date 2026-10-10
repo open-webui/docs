@@ -93,7 +93,7 @@ class Filter:
 
 ### Module Loading & Caching
 
-The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Four legacy prefixes are rewritten on the way in, `from utils`, `from apps`, `from main` and `from config`, each gaining an `open_webui.` prefix. The rewrite is a plain text replacement over the whole file, so those strings are also changed inside docstrings and prompt text, and the rewritten source is saved back to the database.
+The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Four legacy prefixes are rewritten on the way in, `from utils`, `from apps`, `from main` and `from config`, each gaining an `open_webui.` prefix. The rewrite is a plain text replacement over the whole file, so those strings are also changed inside docstrings and prompt text. Creating or saving a function stores the rewritten source. Loading a function applies the rewrite to the code it runs and leaves the stored source as it is.
 
 ### When a Function Fails to Load
 
@@ -176,6 +176,19 @@ Functions are managed from **Admin Panel > Functions**. Each function has the fo
 | **Global toggle** | When enabled, the function applies to **all models** automatically. Available for Filters and Actions. |
 | **Valves** (⚙️ gear icon) | Opens the admin-configurable settings for this function. |
 | **Export / Delete** | Export the function as a file or remove it. |
+
+### Version history
+
+Every save that changes a function's name, description, translations or code is kept as a version, together with the text typed into **Describe this change** beside **Save**. The version picker next to **Back** at the top of the function editor starts on **Production**, the version that is running. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty).
+
+- **Open a version** by picking it. The editor shows its name, description, translations and code read-only.
+- **Compare to current** shows what differs between that version and Production: changed fields side by side, then the code as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.
+- **Set as Production** makes the opened version the running one. Its code is loaded and checked the same way as a save. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
+- **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
+
+A version holds the name, description, translations and code. Valves and the **Active** and **Global** switches belong to the function itself and keep their current values when you change versions. When the current Valves do not fit an older version's code, setting it as Production is refused with **Current Valves are incompatible with this code** and the running version stays in place. Every existing function starts with one version, created by the upgrade.
+
+The same actions are available over the API, admin only: `GET /api/v1/functions/id/{id}/history` (paged with `?page=`), `GET /api/v1/functions/id/{id}/history/{history_id}`, `GET /api/v1/functions/id/{id}/history/diff?from_id=...&to_id=...`, `DELETE /api/v1/functions/id/{id}/history/{history_id}` and `POST /api/v1/functions/id/{id}/update/version` with `{"version_id": "..."}`. A save through `POST /api/v1/functions/id/{id}/update` accepts an optional `commit_message`.
 
 ### Translating a function
 
