@@ -48,7 +48,7 @@ Pyodide works well for **text analysis, hash computation, chart generation, file
 :::warning Best for basic analysis only
 Pyodide runs Python via WebAssembly inside the browser. The AI **cannot install additional libraries** beyond the small fixed set listed below. Any code that imports an unsupported package will fail. Execution is also **significantly slower** than native Python, and large datasets or CPU-intensive tasks may hit browser memory limits. Pyodide is best suited for **basic file analysis, simple calculations, text processing, and chart generation**. For anything more demanding, use **Open Terminal** instead, which provides full native performance and unrestricted package access inside a Docker container.
 
-Available libraries: micropip, requests, beautifulsoup4, numpy, pandas, matplotlib, seaborn, scikit-learn, scipy, regex, sympy, tiktoken, pytz, and the Python standard library. **Nothing else can be installed at runtime.**
+Available libraries: micropip, requests, beautifulsoup4, numpy, pandas, matplotlib, seaborn, scikit-learn, scipy, regex, sympy, tiktoken, pytz, openpyxl, python-pptx, python-docx and the Python standard library. **Nothing else can be installed at runtime.**
 :::
 
 :::note Mutually exclusive with Open Terminal

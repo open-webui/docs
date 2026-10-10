@@ -104,7 +104,7 @@ Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI'
 
 These are persisted Admin settings: an environment variable only takes effect on the very first start against a fresh database; after that the value saved in the database wins (change it under Settings > Admin > Code Execution), unless `ENABLE_PERSISTENT_CONFIG=False`. `CODE_EXECUTION_JUPYTER_AUTH` accepts exactly `token` or `password`; any other value sends no credentials, and password mode logs in through Jupyter's `/login` form. The `CODE_INTERPRETER_JUPYTER_*` variables default to their `CODE_EXECUTION_JUPYTER_*` twins, but `CODE_INTERPRETER_ENGINE` does not (it defaults to `pyodide`), so set both engine variables.
 
-Once Jupyter is the engine, setting [`ENABLE_ORJSON=True`](/reference/env-configuration#enable_orjson) on Open WebUI gets the output of a run into the chat faster, which is most noticeable when the code prints a lot or generates images. It is read once at startup, so restart after setting it.
+Once Jupyter is the engine, [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson), on by default, gets the output of a run into the chat faster, which is most noticeable when the code prints a lot or generates images. Leave it at `True`; it is read once at startup, so restart after changing it.
 
 ## Step 3: Test the Connection
 

@@ -9,7 +9,7 @@ Generate images from a prompt, or upload images and describe the changes you wan
 
 Image generation is only available in a chat when all of the following are true:
 
-- **Image Generation** is enabled in **Settings** > **Admin** > **Experience** > **Images**.
+- **Image Generation** is enabled in **Settings** > **Admin** > **Tools** > **Images**.
 - Your role has the **Image Generation** feature permission. Admins always pass this check.
 - The model has the **Image Generation** capability checked in **Workspace** > **Models** > **Edit**. Outside Legacy mode its **Builtin Tools** capability and the **Image Generation** builtin tool category must stay enabled too. All of these are on by default.
 - The **Image** toggle is on for that chat, in the **Integrations** menu of the message input. Tick **Image Generation** under **Default Features** in the model editor to have it active in every new chat.
@@ -65,7 +65,7 @@ This action adds a "Generate Image" icon to the message action bar, allowing you
 
 
 :::info
-**Requirement:** Image editing runs through the same conditions listed at the top of this page. To use **Image Editing** or **Image+Image Generation**, also turn on **Image Edit** in the **Edit Image** section of **Settings** > **Admin** > **Experience** > **Images**, with an edit engine (`Default (Open AI)`, `ComfyUI` or `Gemini`) and a model that supports inpainting or img2img.
+**Requirement:** Image editing runs through the same conditions listed at the top of this page. To use **Image Editing** or **Image+Image Generation**, also turn on **Image Edit** in the **Edit Image** section of **Settings** > **Admin** > **Tools** > **Images**, with an edit engine (`Default (Open AI)`, `ComfyUI` or `Gemini`) and a model that supports inpainting or img2img.
 :::
 
 ## Image Editing (Inpainting)

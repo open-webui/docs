@@ -302,7 +302,7 @@ Things to know about the chat table:
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
 - `current_message_id` was added in v0.11.0 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
-- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when a chat is forked or cloned. Temporary chats keep their values in the request instead, so nothing is stored.
+- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when the chat's owner forks or clones it. A copy made by anyone else starts with an empty map. Temporary chats keep their values in the request instead, so nothing is stored.
 - A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
@@ -555,6 +555,8 @@ The `meta` field's expected structure:
     # Additional metadata supported via ConfigDict(extra="allow")
 }
 ```
+
+- On PostgreSQL, the partial index `file_pending_knowledge_idx` (migration `b8f2c6d91a04`) covers files whose `data.status` is `pending` or `processing`, keyed on the knowledge base id in `meta.data.knowledge_id`. Opening a knowledge base uses it to find files still being processed with a short index lookup. On SQLite the migration has no effect. If PostgreSQL cannot create the index, the migration logs a warning and is recorded as applied, so startup continues without the index.
 
 ## Folder Table
 

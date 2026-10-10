@@ -144,7 +144,7 @@ So: mark a field `required` when the answer has to come from the user, and give 
 
 :::
 
-Values are stored on the chat, so reopening it keeps them, and forking or cloning a chat carries them over. In temporary chats they are sent with the request instead of being stored, so they last only as long as the chat does.
+Values are stored on the chat, so reopening it keeps them, and forking or cloning your own chat carries them over. A copy of someone else's chat starts with empty chat variables. In temporary chats they are sent with the request instead of being stored, so they last only as long as the chat does.
 
 A single value can be up to 20,000 characters, and all of a chat's variables together up to 100,000 characters.
 

@@ -84,6 +84,8 @@ Relevant permissions:
 - **Chat > Temporary Chat**
 - **Chat > Enforced Temporary**
 
+For users with both permissions, the server refuses to save a chat on every route, including direct API calls, chat import, clone and fork. Chats they already have still open, and administrators are exempt.
+
 Temporary Chat is a data-minimization control for saved history. The active prompt is still processed by Open WebUI and the configured model endpoint. Tools you leave enabled still run in a temporary chat and can store data of their own, so disable them on the model where that matters.
 
 ### Keep Sensitive Prompts on Private Models

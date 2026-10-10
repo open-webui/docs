@@ -106,6 +106,8 @@ A non-admin caller needs the **Allow Chat Controls** and **Allow Chat Params** p
 
 **Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless asked. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled, so you do not have to send it. A non-streaming request is left untouched, and a `stream_options` you send keeps its other keys but has `include_usage` forced to `true`, so usage cannot be switched off per request while the capability is on.
 
+**Provider errors.** When the model provider rejects a request, the endpoint returns the provider's own status code and error, for example a `429` when you hit its rate limit, and passes its `Retry-After` and `retry-after-ms` headers through so your client can back off. The OpenAI, Ollama and Anthropic proxy routes forward those retry headers too.
+
 #### Using Open WebUI tools, including MCP, from the API
 
 The chat completions endpoint can run server-side tools when you pass Open WebUI tool IDs in the request body. This includes native Python tools, OpenAPI tool servers, and MCP tool servers that are already configured and enabled in Open WebUI.
@@ -130,6 +132,8 @@ curl -X POST http://localhost:3000/api/chat/completions \
 Open WebUI checks the caller's access to each selected tool server before resolving the tools. For OAuth-protected MCP servers, the user associated with the API key must have already completed the OAuth authorization flow in the web UI; otherwise the tool connection can fail during the API request.
 
 If your external client sends its own OpenAI-style `tools` array, Open WebUI forwards those caller-provided tool definitions to the model instead of resolving `tool_ids` server-side.
+
+To see which tools an MCP connection offers, call `GET /api/v1/tools/id/{id}/specs` with a `server:mcp:<server-id>` ID. It connects to the server and returns `{"specs": [{"name": ..., "description": ...}]}`. Any other ID, or a server you cannot access, returns `404`. An OAuth server you have not signed in to returns `401`, a server that does not answer within 15 seconds returns `504` and any other failure returns `502`.
 
 :::tip Want the model to actually run those tools, in a loop, with the built-in tools too?
 Which fields you send decides whether Open WebUI executes tool calls for you or hands them back for your client to run, and whether the answer arrives in the HTTP body or in the chat record. [Server-Side Tool Calling (API)](/reference/server-side-tool-calling) walks through every call for both approaches, streaming and non-streaming, with and without saving the chat, and ends in a reusable script.

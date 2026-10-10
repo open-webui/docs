@@ -50,7 +50,7 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
 | **Import Prompts** | *(Requires Prompts Access)* Ability to import prompts. |
 | **Export Prompts** | *(Requires Prompts Access)* Ability to export prompts. |
-| **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) is `false`, since the Tools workspace does not exist in that case. |
+| **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) or [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) is `false`, since the Tools workspace does not exist in that case. |
 | **Import Tools** | *(Requires Tools Access)* Ability to import tools. |
 | **Export Tools** | *(Requires Tools Access)* Ability to export tools. |
 | **Skills Access** | **(Parent)** Access the **Skills** workspace to create and manage reusable instruction sets. |

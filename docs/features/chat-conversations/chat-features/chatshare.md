@@ -61,7 +61,7 @@ Treat the URL itself as the only protection. It cannot be revoked selectively, s
 
 Once at least one person or group has access, the modal also shows a **Sharing mode**:
 
-- **Clone only** (default): people open the link and see the conversation as it was when the link was created or last updated. To continue it, they clone it into their own chats.
+- **Clone only** (default): people open the link and see the conversation as it was when the link was created or last updated. To continue it, they clone or fork it into their own chats (see [Cloning or Forking a Shared Chat](#cloning-or-forking-a-shared-chat)).
 - **Allow replies**: people you shared the chat with by name, through a group or with **Public** write into the same chat. Opening the link takes them straight to the live conversation, and everyone in it sees new messages and replies as they arrive.
 
 In a chat with replies allowed:
@@ -115,6 +115,15 @@ To view a shared chat:
 A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** panel labels its message nodes the same way.
 
 Anyone other than the owner gets the conversation without the owner's chat settings: advanced parameters, selected tools, tool servers and filters, chat variables and the per-message settings are left out. A copy cloned from a share link starts with no chat variables and outside any folder.
+
+#### Cloning or Forking a Shared Chat
+
+A chat that belongs to someone else and that you can read, through a share link, a share granted to you, a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or, for admins, **Admin Panel > Users**, can be copied into your own chats in two ways:
+
+- **Clone Chat**, the button at the bottom of the chat, copies the conversation.
+- **Fork chat**, the action under each finished reply, copies the conversation from the start up to that reply into a new chat titled `<original title> (fork)`.
+
+Both need you to be signed in and to have the **Allow Chat Import** permission (admins always have it). A fork made from a share link holds only what the link shows, so messages added to the original after the link was last updated stay out of it. A fork of someone else's chat goes into your own chats outside any folder and leaves out the owner's pin, tags, chat settings and chat variables.
 
 #### Using a Shared Chat as Context
 

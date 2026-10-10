@@ -6529,6 +6529,7 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 - Default: `False`
 - Description: Enables the OAuth token exchange endpoint, allowing external applications to exchange an OAuth provider's access token for an Open WebUI JWT session token. This enables programmatic authentication for external tools and services that already have OAuth tokens from your identity provider.
 - Usage: Set to `true` to enable the token exchange endpoint at `/api/v1/oauth/{provider}/token/exchange`. When enabled, external applications can POST to this endpoint with an OAuth access token to obtain an Open WebUI session token. Set [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](#oauth_token_exchange_trusted_client_ids) alongside it: **leaving it empty performs no client check at all**, so any token your provider recognises is accepted. Neither setting is per-provider: the same trusted client list applies whichever provider the request names, so a provider without introspection support is refused entirely once the list is set.
+- Roles and groups: once the provider's userinfo endpoint has accepted the token, Open WebUI decodes the token without verifying its signature and reads the roles and groups claims from it when userinfo lacks them. With [`ENABLE_OAUTH_ROLE_MANAGEMENT`](#enable_oauth_role_management) on and [`OAUTH_ALLOWED_ROLES`](#oauth_allowed_roles) restricting roles (no `*`), an exchange whose token and userinfo carry no readable roles claim is refused with `403`.
 
 :::danger
 
@@ -7382,7 +7383,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables enforced temporary chats for users.
+- Description: Enables or disables enforced temporary chats for users. Every chat such a user starts is a temporary chat. For users who also have [`USER_PERMISSIONS_CHAT_TEMPORARY`](#user_permissions_chat_temporary), the server refuses to save a chat on every route: creating a chat through the API (`POST /api/v1/chats/new`), importing, cloning and forking all return `403`. Chats they already have still open. Administrators are exempt.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Feature Permissions
@@ -8180,7 +8181,7 @@ SQLCipher is not supported since v0.9.0. The async database layer introduced in 
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the database schema to connect to. On PostgreSQL, migrations run inside this schema, so a fresh install can start in it. The schema must already exist, otherwise startup stops with an error naming it. Startup also stops when the schema holds tables but no `alembic_version` table, since Open WebUI cannot tell which migrations have run; keep the application tables and `alembic_version` in the same schema.
+- Description: Specifies the database schema to connect to. On PostgreSQL, migrations run inside this schema, so a fresh install can start in it. The schema must already exist, otherwise startup stops with an error naming it. Startup also stops when the schema holds tables but no `alembic_version` table, since Open WebUI cannot tell which migrations have run; keep the application tables and `alembic_version` in the same schema. It also stops when the schema has no migration record but the database's default schema (usually `public`) already holds `alembic_version`, `auth`, `chat` or `config`, so pointing an existing install at a new, empty schema is refused.
 
 #### `DATABASE_POOL_SIZE`
 
@@ -8617,6 +8618,7 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 - Type: `bool`
 - Default: `True`
 - Description: Takes effect when `WEBSOCKET_MANAGER=redis`. Live updates addressed to a specific user, channel or note are published on a Redis channel of their own, and each instance skips updates for rooms none of its connected clients have joined. This saves the CPU each instance would spend decoding every update, which adds up on multi-instance deployments. Acknowledgements and control messages stay on the shared channel. Set to `False` to send everything through the one shared channel.
+- Redis permissions: room channels use the shared channel `socketio` plus room channels named `socketio#<namespace>#<room>`, subscribed to with the pattern `socketio#*`. A Redis user restricted by ACLs needs the `PUBLISH`, `SUBSCRIBE` and `PSUBSCRIBE` commands and the channel patterns `&socketio` and `&socketio#*`. When one is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
 
 :::warning
 
@@ -8802,12 +8804,18 @@ It is recommended to use the `ENABLE_DB_MIGRATIONS` variable to designate a spec
 #### `CACHE_CONTROL`
 
 - Type: `str`
-- Default: Not set (no Cache-Control header added)
-- Description: Sets the Cache-Control header for all HTTP responses. Supports standard directives like `public`, `private`, `no-cache`, `no-store`, `must-revalidate`, `max-age=seconds`, etc. If an invalid value is provided, defaults to `"no-store, max-age=0"` (no caching).
+- Default: Not set. The app page (`index.html`) is then sent with `Cache-Control: no-cache`, so browsers check for a newer version on every visit and pick up an upgrade on their next load.
+- Description: Sets the Cache-Control header for all HTTP responses, the app page included. Supports standard directives like `public`, `private`, `no-cache`, `no-store`, `must-revalidate`, `max-age=seconds`, etc. If an invalid value is provided, defaults to `"no-store, max-age=0"` (no caching).
 - Examples:
   - `"private, max-age=86400"`: Cache privately for 24 hours
   - `"public, max-age=3600, must-revalidate"`: Cache publicly for 1 hour, then revalidate
   - `"no-cache, no-store, must-revalidate"`: Never cache
+
+:::warning
+
+A value that lets browsers keep the app page, such as `max-age=86400`, also applies to `index.html`. After an upgrade, browsers can then keep loading the old page, which points at files the new version no longer has, until the cached copy expires or the user does a hard refresh.
+
+:::
 
 ### Proxy Settings
 

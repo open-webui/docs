@@ -266,7 +266,7 @@ If you need to support both Microsoft and Google simultaneously, check out our *
 :::
 ### OAuth Role Management
 
-Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. The access token is never decoded.
+Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. On the [token exchange endpoint](/reference/env-configuration#enable_oauth_token_exchange), once the provider's userinfo endpoint has accepted the presented access token, Open WebUI decodes that token without verifying its signature and reads the roles claim from it when userinfo lacks one. If `OAUTH_ALLOWED_ROLES` restricts roles (no `*`) and neither source has a readable roles claim, the exchange is refused with `403`.
 To use this feature set `ENABLE_OAUTH_ROLE_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the roles returned by the OAuth provider:
 
@@ -285,7 +285,7 @@ When that login does change the role, Open WebUI ends the account's other live W
 
 ### OAuth Group Management
 
-Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI upon user login.
+Any OAuth provider that can be configured to return groups in the ID token or userinfo response can be used to manage user groups in Open WebUI upon user login. On the token exchange endpoint, Open WebUI also reads the groups claim from the presented access token when userinfo lacks one.
 To enable this synchronization, set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 
 You can configure the following environment variables:
