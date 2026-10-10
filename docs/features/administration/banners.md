@@ -7,7 +7,7 @@ title: "Customizable Banners"
 
 Open WebUI allows administrators to display custom banners on the new-chat screen. They are shown under the chat header only while no chat is open, and not on workspace, admin or other pages. Banners are useful for announcements, system-wide alerts, maintenance notices, and other important messages.
 
-Banners are persistent and can optionally be **dismissible** by users. You can configure banners in two ways:
+Users can close any banner for the current page load, and a banner can optionally remember that dismissal. You can configure banners in two ways:
 
 1. **Admin Panel** (recommended for quick edits and experimentation)
 2. **Environment variable (`WEBUI_BANNERS`)** (recommended for automated / GitOps-style deployments)
@@ -49,7 +49,7 @@ You can configure the following options for each banner:
   - `error` (Red)
 - **Title:** The main heading of the banner.
 - **Content:** The main message. Markdown is rendered and inline HTML is allowed, both passed through a sanitizer. Every newline becomes a line break before parsing, so multi-line Markdown blocks (lists, tables, blockquotes) do not form. Use their HTML forms for those.
-- **Dismissible:** If enabled, users can close the banner.
+- **Remember Dismissal:** If enabled, a banner the user closed stays closed. If disabled, it shows again on the next page load.
 
 The globe selector next to the **Banners** heading stores the content per language, so each user reads the banner in the language their interface is set to. See [Translations](/features/administration/translations#banners).
 
@@ -61,7 +61,7 @@ Dismissed banners are stored in the user’s browser (client-side). This means:
 - A dismissed banner may reappear on a different device or browser
 - Dismissal is per-banner `id` (if the `id` changes, the banner is treated as new)
 
-If you need the banner to remain visible for everyone, set `dismissible: false`.
+If you need the banner to come back on every page load, set `dismissible: false`.
 
 ---
 
@@ -98,7 +98,7 @@ Each banner object supports the following properties:
 - `type` (string, required): Banner style. Must be one of: `info`, `success`, `warning`, `error`.
 - `title` (string, optional): Title text.
 - `content` (string, required): Main banner message (Markdown, inline HTML allowed).
-- `dismissible` (boolean, required): Whether the user can dismiss the banner.
+- `dismissible` (boolean, required): Whether a closed banner stays closed for that user (the **Remember Dismissal** switch).
 - `timestamp` (integer, required): Present in configuration, but currently not used by the frontend to control display timing.
 - `i18n` (object, optional): Translated content, keyed by language, each entry holding a `content` string. A user is shown the entry matching their interface language, falling back to `content`. See [Translations](/features/administration/translations#banners).
 

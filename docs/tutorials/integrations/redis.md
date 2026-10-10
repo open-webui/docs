@@ -23,9 +23,9 @@ Redis serves two distinct purposes in Open WebUI, and understanding when it's re
 
 If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (the default), Redis is **not required for basic functionality**. The application will function normally without it for most operations.
 
-:::warning Security: Token Revocation Requires Redis
+:::warning Security: Signing Out of a Single Session Requires Redis
 
-Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Signing a user out everywhere works without Redis: a password change or an administrator's [**Sign out all devices**](/features/authentication-access/rbac/roles#signing-a-user-out-of-every-device) ends every session of that account.
 
 For production-facing deployments, either configure Redis or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See the [Hardening guide](/getting-started/advanced-topics/hardening#token-revocation) for details.
 
@@ -148,7 +148,7 @@ Open WebUI uses Redis as a **stateful store, not a disposable cache**. Its keys 
 
 Under an `allkeys-lru`, `allkeys-lfu`, or `allkeys-random` policy, Redis evicts **any** key when memory fills, including the two groups above. That can:
 
-- **silently un-revoke a signed-out token**: if the revocation key is evicted before its TTL, a token that was invalidated by logout, password change, or admin deactivation starts working again (a security regression), and
+- **silently un-revoke a signed-out token**: if the revocation key is evicted before its TTL, a token that was invalidated by signing out starts working again (a security regression), and
 - **break websockets, session tracking, and configuration** by evicting the persistent pools.
 
 Use **`noeviction`** (the safe default). When memory is exhausted, Redis rejects new writes with an error, which is a loud, recoverable signal, instead of silently discarding auth and session state:
@@ -661,6 +661,7 @@ REDIS_URL="redis://redis:6379/0"
    - `WEBSOCKET_REDIS_URL="redis://redis:6379/1"`
 2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.` (logged at DEBUG level, so it appears only with `GLOBAL_LOG_LEVEL=DEBUG`)
 3. Verify Redis is accessible from Open WebUI container
+4. If your Redis user is restricted by ACLs, check the log for `Redis denied publishing` or `Redis denied subscribing`. Either means the user is missing a command or channel permission; see [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) for the commands and channel patterns it needs.
 
 #### Issue: "Multiple Open WebUI instances interfering with each other"
 

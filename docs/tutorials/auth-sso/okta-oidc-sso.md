@@ -79,6 +79,8 @@ To enhance security, you can enforce Multi-Factor Authentication (MFA) for users
 
 Now, when users log in to Open WebUI, they will be required to provide their Okta password and an additional verification code from Google Authenticator.
 
+If Open WebUI's own [two-factor sign-in](/features/authentication-access/mfa) is also on, Okta users are asked for a second code by Open WebUI as well. Turn on **Allow OAuth sign-in without an authenticator** ([`MFA_ALLOW_OAUTH_BYPASS`](/reference/env-configuration#mfa_allow_oauth_bypass)) to rely on Okta's factor alone.
+
 :::note
 
 Re-authentication Frequency

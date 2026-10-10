@@ -26,7 +26,7 @@ The Workspace is where you turn a raw model into something tailored to your work
 | [**Models**](/features/workspace/models) | Wrap a base model with a system prompt, parameters, knowledge and tools, then save it as a reusable preset in the model picker. |
 | [**Knowledge**](/features/workspace/knowledge) | Upload documents and build collections the AI retrieves from (RAG), so it answers from your sources instead of guessing. |
 | [**Prompts**](/features/workspace/prompts) | Save reusable prompt templates with typed variables, callable in any chat with a `/` slash command. |
-| [**Skills**](/features/workspace/skills) | Markdown instruction sets that teach a model how to approach a task (methodology, steps, house rules), loaded on demand. |
+| [**Skills**](/features/workspace/skills) | Markdown instruction sets that teach a model how to approach a task (methodology, steps, house rules), with optional [supporting files](/features/workspace/skills#supporting-files), loaded on demand. |
 | [**Tools** ↗](/features/extensibility/plugin/tools) | Give models real abilities they can call: APIs, code, the web. Tools are documented under [**Plugins & Extensibility**](/features/extensibility/plugin/tools), not here. |
 
 Each has its own page, so start anywhere. Most people begin with a custom **Model** and add the other pieces as they need them.
@@ -46,9 +46,9 @@ Everything that adds or moves workspace items runs through one **Create** button
 | **Models** | Opens the model editor on its own page | Import JSON, Export JSON |
 | **Knowledge** | Opens a dialog on top of the list | none |
 | **Prompts** | Opens a dialog on top of the list | Import JSON, Export JSON |
-| **Skills** | Opens the skill editor on its own page | Import JSON, Export JSON |
-| **Tools** | Opens the tool editor on its own page | Import From Link (admins only), Import JSON, Export JSON |
+| **Skills** | Opens the skill editor on its own page | Import, Import from URL (admins only), Import folder, Export ZIP, Export JSON |
+| **Tools** | Opens the tool editor on its own page | Import from URL (admins only), Import JSON, Export JSON |
 
-When a section has only one action available, the chevron is dropped and **Create** is a plain button. That is always the case for Knowledge, and it happens elsewhere when the import and export permissions are withheld: each menu entry is gated by the matching `workspace` permission (`models_import`, `prompts_export` and so on), and admins always see all of them. Export writes the section's items to a JSON file, which the matching Import reads back.
+When a section has only one action available, the chevron is dropped and **Create** is a plain button. That is always the case for Knowledge, and it happens elsewhere when the import and export permissions are withheld: each menu entry is gated by the matching `workspace` permission (`models_import`, `prompts_export` and so on), and admins always see all of them. Export writes the section's items to a JSON file (Skills also to a ZIP), which the matching Import reads back.
 
 The old create URLs still resolve. `/workspace/prompts/create` and `/workspace/knowledge/create` open the list with the create dialog already open, and closing it returns you to the list.

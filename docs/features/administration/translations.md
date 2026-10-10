@@ -17,14 +17,14 @@ Separately from that, admins can override Open WebUI's own interface wording, th
 
 | Resource | Fields | Where |
 | :--- | :--- | :--- |
-| **Models** | Name, description, prompt suggestions | Workspace > Models, in the model editor. See [Models](/features/workspace/models#translations) |
+| **Models** | Name, description, prompt suggestions, model control and option names | Workspace > Models, in the model editor. See [Models](/features/workspace/models#translations) |
 | **Tools** | Name, description, valve labels | Workspace > Tools, in the tool editor |
 | **Skills** | Name, description | Workspace > Skills, in the skill editor |
-| **Functions** | Name, description, valve labels, per-action labels | Settings > Admin > Functions, in the function editor |
-| **Banners** | Content, not the title | Settings > Admin > System > General, next to the Banners heading |
+| **Functions** | Name, description, valve labels, per-action labels | Admin Panel > Functions, in the function editor |
+| **Banners** | Content, not the title | Settings > Admin > General, next to the Banners heading |
 | **Arena models** | Name, description | Settings > Admin > Evaluations, in the arena model dialog |
 | **Default prompt suggestions** | The suggestions themselves | Settings > Admin > Models > Model Defaults |
-| **Open WebUI's own interface** | Any string the application ships | Settings > Admin > System > General, under UI Translations. See [Interface text](#interface-text) |
+| **Open WebUI's own interface** | Any string the application ships | Settings > Admin > General, under UI Translations. See [Interface text](#interface-text) |
 
 ---
 
@@ -52,7 +52,7 @@ Open WebUI picks by the language the user has the interface set to, in this orde
 
 A field you leave blank is dropped when you save, so an empty translation is the same as no translation and the original shows through. Translate what matters and leave the rest.
 
-Translated text follows the resource everywhere it is named: model and tool pickers, the new chat screen, the `@`, `$` and `/` menus, the Integrations menu, the action buttons under a reply, the sidebar and the Workspace lists. Workspace search matches both the translated name and the original, so searching for either finds the thing.
+Translated text follows the resource everywhere it is named: model and tool pickers, the new chat screen, the `@`, `$` and `/` menus, the Integrations menu, the model controls panel, the action buttons under a reply, the sidebar and the Workspace lists. Workspace search matches both the translated name and the original, so searching for either finds the thing.
 
 ---
 
@@ -89,9 +89,25 @@ The table also has a search box and a **Modified** filter for showing only rows 
 
 ---
 
+## Translating model controls
+
+A model's [controls](/features/workspace/models#model-controls) carry names people read in the chat: the control's name, its description and the name of each option. Pick a language in the model editor and the **Model controls** row lists each of them with the original as placeholder text. **Use default** clears every control translation for that language at once.
+
+The translations are stored with the model's other translations in `meta.i18n`, one map per language, under these keys:
+
+| Key | What it labels |
+| :--- | :--- |
+| `model_controls.<key>.label` | The control's name |
+| `model_controls.<key>.description` | Its help text |
+| `model_controls.<key>.options.<value>.label` | The name of one option |
+
+`<key>` is the control's ID and `<value>` the option's ID, the same IDs the API uses under `params.model_controls`. Only the names change; the parameters each option sends stay the same in every language.
+
+---
+
 ## Banners
 
-Banner content is translated from **Settings > Admin > System > General**, with the same globe selector next to the **Banners** heading. Each banner keeps its original content and a version per language, and a user is shown the one matching their interface language.
+Banner content is translated from **Settings > Admin > General**, with the same globe selector next to the **Banners** heading. Each banner keeps its original content and a version per language, and a user is shown the one matching their interface language.
 
 ![A banner being edited in German, with the language selector next to the Banners heading](/images/features/translations/banner-translations.png)
 
@@ -103,7 +119,7 @@ This replaces the older habit of putting several languages into one banner. Writ
 
 Everything above is about the things you create. This one is about Open WebUI's own wording: the buttons, labels and messages the application ships with.
 
-Open **Settings > Admin > System > General** and find **UI Translations**. Each row is a pair: on the left the original English string exactly as the application uses it, on the right what you want shown instead. The selector picks which language the right-hand column belongs to, and it starts on the language you are currently reading the interface in.
+Open **Settings > Admin > General** and find **UI Translations**. Each row is a pair: on the left the original English string exactly as the application uses it, on the right what you want shown instead. The selector picks which language the right-hand column belongs to, and it starts on the language you are currently reading the interface in.
 
 The overrides are merged over the language files Open WebUI ships. Anything you override wins, everything you leave alone keeps the shipped wording, so you never have to supply a whole catalogue to change one word.
 

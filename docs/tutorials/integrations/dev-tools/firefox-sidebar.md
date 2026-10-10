@@ -61,7 +61,7 @@ The following URL parameters can be used to customize your Open WebUI instance:
 
 ### YouTube Transcription
 
-- `youtube`: Provide a YouTube video ID to transcribe the video in the chat (e.g., `/?youtube=VIDEO_ID`)
+- `youtube`: Provide a YouTube video ID to transcribe the video in the chat, after confirming the link (e.g., `/?youtube=VIDEO_ID`)
 
 ### Web Search
 
@@ -73,11 +73,11 @@ The following URL parameters can be used to customize your Open WebUI instance:
 
 ### Call Overlay
 
-- `call`: Enable a video or call overlay in the chat interface by setting this parameter to `true` (e.g., `/?call=true`)
+- `call` or `voice`: Start Voice Mode by setting this parameter to `true`, after confirming the microphone prompt (e.g., `/?call=true`)
 
 ### Initial Query Prompt
 
-- `q`: Set an initial query or prompt for the chat (e.g., `/?q=Hello%20there`)
+- `q`: Place a prompt in the message input, ready to send (e.g., `/?q=Hello%20there`)
 
 ### Temporary Chat Sessions
 

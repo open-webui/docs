@@ -110,11 +110,12 @@ ENABLE_WEBSOCKET_SUPPORT=true
 
 **Key things to know:**
 
-- Redis is **not needed** for single-instance deployments for basic functionality. However, **without Redis, signing out does not revoke tokens**: they remain valid until they expire (default: 4 weeks). If your deployment is production-facing or handles sensitive data, Redis is strongly recommended even for a single instance, or alternatively shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) in the Hardening guide for details.
+- Redis is **not needed** for single-instance deployments for basic functionality. However, **without Redis, signing out does not revoke tokens**: they remain valid until they expire (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. If your deployment is production-facing or handles sensitive data, Redis is strongly recommended even for a single instance, or alternatively shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) in the Hardening guide for details.
 - If you're using Redis Sentinel for high availability, also set `REDIS_SENTINEL_HOSTS` and consider setting `REDIS_SOCKET_CONNECT_TIMEOUT=5` to prevent hangs during failover.
 - For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
 - Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
 - For high-concurrency websocket streaming, review Redis Pub/Sub output buffer limits. Large Socket.IO events can disconnect Pub/Sub clients if Redis uses small default buffers; see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
+- All instances must use the same [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) value, so change it on every instance at once. See [Per-Room Redis Channels](#per-room-redis-channels).
 - A **single Redis instance** is sufficient for the vast majority of deployments, even with thousands of users. You almost certainly do not need Redis Cluster unless you have specific HA/bandwidth requirements. If you think you need Redis Cluster, first check whether your connection count and memory usage are caused by fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
 - Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
 
@@ -211,21 +212,41 @@ location ^~ /_app/immutable/ {
 ```
 
 - The `immutable` keyword stops browsers from revalidating on reload/F5, `max-age` alone doesn't. If a year feels uncomfortable, 30 days (`max-age=2592000, immutable`) gives nearly the same effect; the hashed filenames make staleness impossible either way.
-- **Do not** apply long caching to the HTML shell or `/_app/version.json`, leave those uncached or at a few minutes at most, or users won't pick up upgrades.
+- **Do not** apply long caching to the HTML shell or `/_app/version.json`, leave those uncached or at a few minutes at most, or users won't pick up upgrades. Open WebUI sends the HTML shell with `Cache-Control: no-cache` unless [`CACHE_CONTROL`](/reference/env-configuration#cache_control) is set, so browsers revalidate it on every visit; keep that header as it is at the proxy.
 - `proxy_cache` means each asset is fetched from a worker once per cache lifetime instead of once per user, removing the static file serving load from the Python workers entirely.
 - If Nginx compresses on the fly, note that it compresses on **every response** (its proxy cache stores the uncompressed body), so prefer moderate levels, `gzip_comp_level 4;` / brotli quality 4–5 gets ~95% of the ratio of level 6 at roughly half the CPU, and set `gzip_min_length 1000;` so tiny responses skip the compressor.
 
 ### Switch the JSON Encoder to orjson
 
-Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Switching the application to [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, is a one-line change:
+Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Open WebUI uses [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, by default from v0.12.0. On earlier versions, turn it on with [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson):
 
 ```
 ENABLE_ORJSON=True
 ```
 
-It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. It is opt-in only because orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so enabling it cannot turn a working payload into an error. Available from v0.11.0.
+It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so it cannot turn a working payload into an error. The setting exists from v0.11.0.
 
 For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
+
+### Per-Room Redis Channels
+
+With `WEBSOCKET_MANAGER=redis`, every live update (each streamed token, each channel message, each note edit) used to go out on one shared Redis channel, and every instance decoded every update to find out whether any of its users needed it. With 16 instances, each token was decoded 16 times and thrown away 15 times. Profiling a loaded fleet of 16 instances and about 4,000 users put roughly 31% of all active CPU in that decoding, the largest single cost.
+
+From v0.12.0, updates addressed to a specific user, channel or note are published on a Redis channel of their own. Each instance checks the channel name and skips updates for rooms none of its users have joined, without decoding them. Acknowledgements and control messages stay on the shared channel. This is on by default, and the saving grows with the number of instances:
+
+```
+WEBSOCKET_REDIS_ROOM_CHANNELS=True
+```
+
+:::warning Update all instances together
+
+Every instance must run the same mode. When changing this setting, stop or update all instances at once.
+
+:::
+
+If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE` and `PSUBSCRIBE` commands and access to the channels `&socketio` and `&socketio#*`. The room channels are named `socketio#<namespace>#<room>`, and each instance subscribes to them with the pattern `socketio#*`. When a permission is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
+
+`WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel again. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
 
 ### Speed Up Name Lookups
 
@@ -508,7 +529,7 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 # Finished responses are deleted immediately; 0 keeps orphans forever
 # REDIS_RESPONSE_STREAM_TTL=3600
 
-# Faster JSON encoder (v0.11.0+): biggest win is Socket.IO/Redis event
+# Faster JSON encoder (v0.11.0+, default from v0.12.0): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
 
@@ -557,7 +578,7 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 
 </div>
 
-†Without Redis, signing out and password changes do **not** revoke tokens: they remain valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). For production deployments handling sensitive data, Redis is recommended for proper token revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+†Without Redis, signing out does **not** revoke the token of that session: it remains valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. For production deployments handling sensitive data, Redis is recommended for proper token revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
 
 :::note About "External Vector DB"
 The default ChromaDB uses a local SQLite backend that crashes under multi-process access. "External Vector DB" means either a client-server database (PGVector, Milvus, Qdrant, Pinecone) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4-switch-to-an-external-vector-database) for details.

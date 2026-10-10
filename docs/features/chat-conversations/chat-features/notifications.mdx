@@ -44,7 +44,7 @@ Five events can be subscribed to:
 | Event | Fires when |
 |---|---|
 | `chat.finished` | A chat response finishes generating. |
-| `chat.failed` | A chat response fails. |
+| `chat.failed` | A chat response ends in an error, including when the model provider returns an error status or cannot be reached. The notification carries the error text and a link to the chat. |
 | `channel.message` | A message arrives in a channel you receive notifications for. |
 | `calendar.alert` | A calendar event alert triggers. |
 | `retrieval.content.process_failed` | A file fails content extraction. |

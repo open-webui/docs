@@ -279,7 +279,7 @@ WEBUI_AUTH_COOKIE_SECURE=true     # Set to false if using HTTP
 
 ### 8. Network Timeout Issues
 
-OAuth providers may be slow to respond, causing timeout errors during the authentication handshake.
+OAuth providers may be slow to respond, causing timeout errors during the authentication handshake. Raise [`OAUTH_TIMEOUT`](/reference/env-configuration#oauth_timeout) to give them longer.
 
 #### Symptoms:
 - `httpcore.ReadTimeout` errors in logs
@@ -470,7 +470,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 ### Key Log Messages to Watch For:
 - `OAuth callback error: mismatching_state` → Session/cookie issue
 - `httpcore.ReadTimeout` → Network timeout issue
-- `The email or password provided is incorrect` → Often means OAuth completed but session wasn't established. Token and claim failures are reported to the browser with this message, so read the backend log for the actual cause. A role mismatch or a signup-disabled case shows the access-prohibited text, a duplicate email shows the already-registered error, and other exceptions show `Error during OAuth process`
+- `Sign-in with your identity provider failed. Please contact your administrator for assistance.` → The sign-in failed at the callback, for example because the provider denied access, the account has no email or its email domain is not allowed. The text is the same for all of these, so read the backend log for the actual cause. A role mismatch or a signup-disabled case shows the access-prohibited text, a duplicate email shows the already-registered error, and other exceptions show `Error during OAuth process`
 - `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token and your version still rejects it. See [Providers that add their own parameters to the ID token](#providers-that-add-their-own-parameters-to-the-id-token)
 - `1 validation error for UserModel` on the `oauth` field → An old upgrade step stored the identity provider subject as text. See [Existing Accounts Cannot Sign In After a Long-Delayed Upgrade](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
 - `404` on callback URLs → Redirect URI misconfiguration
@@ -500,9 +500,9 @@ By carefully configuring both your OAuth provider and your Open WebUI environmen
 
 ---
 
-:::warning Token Revocation Requires Redis
+:::warning Signing Out of a Single Session Requires Redis
 
-Without Redis, **signing out does not revoke JWT tokens**: they remain valid until they expire (default: 4 weeks). This is especially relevant for SSO/OAuth deployments where you may need to revoke access quickly (e.g., when an employee leaves the organization). Password changes and admin-initiated account deactivation also cannot revoke existing tokens without Redis.
+Without Redis, **signing out does not revoke JWT tokens**: they remain valid until they expire (default: 4 weeks). This is especially relevant for SSO/OAuth deployments where you may need to revoke access quickly (e.g., when an employee leaves the organization), because OIDC back-channel logout also needs Redis to revoke tokens. Without Redis, an administrator can still end every session of an account with **Sign out all devices** in the user's edit dialog.
 
 For production SSO deployments, configure Redis or shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) and the [Redis tutorial](/tutorials/integrations/redis) for details.
 

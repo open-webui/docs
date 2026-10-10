@@ -165,7 +165,7 @@ A sub-action without a `name` is shown as `<function name> (<sub id>)`. Its icon
 - **Global Actions**: Turn on the toggle in the Action's settings, to globally enable it for all users and all models.
 - **Model-Specific Actions**: Configure enabled actions for specific models in the model settings.
 
-An action is offered only while it is enabled. A user who is not an admin can run it only on a model they have access to that surfaces the action, and only on a chat they own. Setting `ENABLE_PLUGINS=false` disables actions altogether.
+An action is offered only while it is enabled. A user who is not an admin can run it only on a model they have access to that surfaces the action, and only on a chat they own. Setting [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) or [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) to `false` disables actions altogether.
 
 ### Button Display Order (Priority)
 

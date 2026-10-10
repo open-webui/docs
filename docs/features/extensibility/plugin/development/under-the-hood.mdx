@@ -20,10 +20,10 @@ This page documents what the loader really does and what that opens up, so you c
 A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/plugin.py) handles every plugin type:
 
 1. The plugin's Python source is read from the database.
-2. A fresh `types.ModuleType` is created and registered in `sys.modules` as `function_{id}` (or `tool_{id}`).
+2. A fresh `types.ModuleType` is created and registered in `sys.modules` while it loads, under a unique name for this source version, `function_{id}_<32 hex characters>` (or `tool_{id}_<32 hex characters>`). That unique name is the plugin's `__name__`, so `logging.getLogger(__name__)` uses it too.
 3. The source is fed to `exec(content, module.__dict__)`. Anything at module top level runs at this point.
 4. The loader looks for **one** entry-point class: `Tools`, `Pipe`, `Filter`, `Action` or `Event`. That class becomes the handle Open WebUI calls into.
-5. The module stays in `sys.modules` for the life of the process. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
+5. After a successful load the module is published in `sys.modules` under its unique name plus the stable alias `function_{id}` (or `tool_{id}`), and the previous version's entries are removed. A load that fails publishes nothing. The published module stays until a newer version replaces it or the process restarts. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
 
 The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
 

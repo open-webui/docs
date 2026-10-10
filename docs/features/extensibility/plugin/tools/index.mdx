@@ -65,7 +65,7 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 
 ## How to Install & Manage Workspace Tools
 
-📦 Workspace Tools are the most common way to extend your instance with community features.
+📦 Workspace Tools are the most common way to extend your instance with community features. They need [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), which is on by default.
 
 1. Go to [Community Tool Library](https://openwebui.com/search)
 2. Choose a Tool, then click the **Get** button.
@@ -76,11 +76,33 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code on your host system. **Crucially, ensure you only grant "Tool" permissions to trusted users**, as the ability to create or import tools is equivalent to the ability to run arbitrary code on the server.
 :::
 
----
+### Sharing a tool
+
+The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list, without opening the editor. It appears on tools you can edit.
+
+### Version history
+
+Every save that changes a tool's name, description, translations or code is kept as a version, together with the text typed into **Describe this change** beside **Save**. The version picker next to **Back** at the top of the tool editor starts on **Production**, the version chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). Anyone who can edit the tool can use it.
+
+- **Open a version** by picking it. The editor shows its name, description, translations and code read-only.
+- **Compare to current** shows what differs between that version and Production: changed fields side by side, then the code as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.
+- **Set as Production** makes the opened version the one chats use. Its code is loaded and checked the same way as a save. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
+- **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
+
+A version holds the name, description, translations and code. Valves and access settings belong to the tool itself and keep their current values when you change versions. Setting a version as Production is refused when:
+
+- the current Valves do not fit that version's code (**Current Valves are incompatible with this code**). Adjust the Valves first (see [Changing Valves in Existing Code](/features/extensibility/plugin/development/valves#changing-valves-in-existing-code)).
+- the version's code differs from Production and you have neither the [**Tools Access** nor the **Import Tools** permission](/features/authentication-access/rbac/permissions#1-workspace-permissions). Without either permission, write access covers only a tool's name, description and translations, for saves and version changes alike.
+
+Every existing tool starts with one version, created by the upgrade.
+
+The same actions are available over the API: `GET /api/v1/tools/id/{id}/history` (paged with `?page=`), `GET /api/v1/tools/id/{id}/history/{history_id}`, `GET /api/v1/tools/id/{id}/history/diff?from_id=...&to_id=...`, `DELETE /api/v1/tools/id/{id}/history/{history_id}` and `POST /api/v1/tools/id/{id}/update/version` with `{"version_id": "..."}`. A save through `POST /api/v1/tools/id/{id}/update` accepts an optional `commit_message`.
 
 ### Translating a tool
 
 The globe selector in the tool editor stores a name, a description and valve labels per language. User valve labels are the ones worth translating first, since those are what ordinary users see in Chat Controls. See [Translations](/features/administration/translations).
+
+---
 
 ## How to Use Tools in Chat
 
@@ -92,9 +114,8 @@ While chatting, click the **Integrations** icon in the input area (the four-diam
 ### Option 2: Enable by Default (Global/Model Level)
 1. Go to **Workspace ➡️ Models**.
 2. Choose the model you’re using and click the ✏️ edit icon.
-3. Scroll to the **Tools** section.
-4. ✅ Check the Tools you want this model to always have access to by default.
-5. Click **Save**.
+3. Open the **Tools** row and pick the tools you want this model to always have access to by default.
+4. Click **Save**.
 
 For models that support it, **Native tool calling mode** (see [Tool Calling Modes](#tool-calling-modes-default-vs-native) below) lets the model itself decide which of the attached tools to call on each turn. This replaces the older prompt-injection "auto-tool" filter approach and is the recommended way to let the model auto-select tools.
 
@@ -141,7 +162,7 @@ Since v0.10.0 Native is the default, so you never need to "turn Native on". The 
     *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
+2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and open the **Advanced Params** row and set **Function Calling** to `Legacy`. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -179,7 +200,7 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
     *   In **Settings → Admin → Models**, pick a specific model and click its edit button.
-    *   Under **Model Params**, expand **Advanced Params** and set **Function Calling** to `Native`. This value overrides the global default for that model only.
+    *   Open the **Advanced Params** row and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
     *   Inside a chat, open **Chat Controls** (right sidebar).
@@ -268,13 +289,36 @@ Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with
 
 You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
 
-Your choice is saved to your user settings, so it carries over to new chats until you change it back. A denied call is reported back to the model as an error, so it can react rather than silently losing the result, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
+Your choice is saved to your user settings, so it carries over to new chats until you change it back. It is also stored on the chat, so reopening that chat keeps its mode. A denied call is reported back to the model as an error, so the model can react to it, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
 
 Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
 
-:::info Requires a saved chat
-Approval works by persisting the pending call on the assistant message, so a temporary chat has nowhere to store it. Approval prompts also survive a page reload, since the pending state lives in the message rather than in the browser.
+:::info Saved and temporary chats
+In a saved chat the pending call is stored on the assistant message, so approval prompts survive a page reload. In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) each call opens a live **Tool Permissions** dialog showing the tool name and its arguments, with **Allow** and **Deny**. The call is denied at once when that chat is not the one open in the tab. It is also denied when the browser tab is gone or nobody answers within 120 seconds, or within [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is set lower.
 :::
+
+### Tool Search
+
+With many tools enabled, their definitions alone can fill a large part of every request. **Tool Search** keeps large tool definitions out of the request until the model asks for them. The feature is **experimental**, off by default and applies to chats in Native Mode.
+
+An administrator turns it on in **Settings > Admin > Interface**, in the **Chat** section. The settings apply to every model and every user:
+
+| Setting | Default | What it does |
+| :--- | :--- | :--- |
+| **Tool Search** ([`ENABLE_TOOL_SEARCH`](/reference/env-configuration#enable_tool_search)) | Off | Turns the feature on. The three settings below appear once it is on. |
+| **Defer Built-in Tools** ([`TOOL_SEARCH_DEFER_BUILTIN_TOOLS`](/reference/env-configuration#tool_search_defer_builtin_tools)) | On | Treats built-in tools like any other tool. Turn it off to always send built-in tools in full. |
+| **Deferral Threshold (characters)** ([`TOOL_SEARCH_DEFER_THRESHOLD`](/reference/env-configuration#tool_search_defer_threshold)) | `400` | A tool whose definition (name, description and parameter schema, as JSON) is longer than this many characters is deferred. `0` defers every tool. |
+| **Always Loaded Tools** ([`TOOL_SEARCH_ALWAYS_LOADED`](/reference/env-configuration#tool_search_always_loaded)) | Empty | Comma-separated tool names or glob patterns, such as `jira_create_issue, github_*`, that are always sent in full. Matching is case-sensitive. |
+
+How it works:
+
+- **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.
+- **What the model sees.** Deferred tools are listed in an `<available_tools>` block at the end of the system prompt, each with its name and a description shortened to 100 characters. A built-in `search_tools` tool is added to the tool list.
+- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches and then calls the tool by name like any other. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by how well the query matches its name, description and parameter names.
+- **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
+- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself.
+
+Write Always Loaded patterns against the [tool names the model sees](/features/extensibility/mcp#tool-names-the-model-sees). MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
 
 ### Built-in System Tools (Native/Agentic Mode)
 
@@ -342,12 +386,15 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires built-in tools to be active for the chat and at least one active skill the user can read. The model receives a summary of every such skill in its system prompt, attached to the model or not, and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed.* |
-| `view_skill` | Load the full instructions of a skill by name. The tool is injected together with the skill summary; resolving a skill still follows normal ownership/access-grant checks. |
+| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). The model receives a summary of every active skill the user can read in its system prompt, attached to the model or not, and loads full instructions and files on demand. `create_skill` is injected for admins and users with the Skills Access permission.* |
+| `view_skill` | Load a skill's `SKILL.md` and the list of its supporting files by skill id. Resolving a skill follows normal ownership/access-grant checks. |
+| `read_skill_file` | Read one file of a skill by path, paging through long text. |
+| `update_skill_files` | Save file changes (write, move, delete) to a skill the user can edit, as a new version. Text writes only. |
+| `create_skill` | Create a private workspace skill from `SKILL.md` text and optional text files. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
-| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message. Not available in a [temporary chat](/features/chat-conversations/chat-features/url-params).* |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
@@ -420,8 +467,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable) | `{id, filename, content, knowledge_id, knowledge_name}`, includes pagination metadata when truncated |
 | `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
-| `generate_image` | `prompt` (required) | `{status, message, images}`, auto-displayed |
-| `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}`, auto-displayed |
+| `generate_image` | `prompt` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed |
+| `edit_image` | `prompt` (required), `image_urls` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed |
 | **Code Interpreter** | | |
 | `execute_code` | `code` (required) | `{status, stdout, stderr, result}` |
 | **Memory** | | |
@@ -461,7 +508,10 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `update_calendar_event` | `event_id` (required), `title`, `description`, `start`, `end`, `all_day`, `location`, `is_cancelled` (all optional; only provided fields are changed) | `{status, id, title, start, end, ...}` |
 | `delete_calendar_event` | `event_id` (required) | `{status, message}` |
 | **Skills** | | |
-| `view_skill` | `name` (required) | `{name, content}` |
+| `view_skill` | `id` (required) | `{id, version_id, name, content, next_offset, files: [{path, size, encoding}]}`, plus `notice` when the file list was shortened. `content` holds up to 100,000 characters; `next_offset` is set when more follows. A terminal skill returns `{name, description, content, next_offset, directory, resources}` |
+| `read_skill_file` | `id` (required), `path` (required), `offset` (default: 0), `max_chars` (default: 10000, at most 100000) | `{path, version_id, content, next_offset}`; for a binary file `{path, size, encoding, version_id, url}` with a link into the skill editor. A terminal skill supports `path: "SKILL.md"` only |
+| `update_skill_files` | `id` (required), `operations` (required; each `{op: "put", path, content}`, `{op: "move", path, destination}` or `{op: "delete", path}`), `commit_message` (optional) | `{id, version_id}` |
+| `create_skill` | `id` (required), `name` (required), `content` (required; the complete `SKILL.md` including `name` and `description` frontmatter), `files` (optional; text files as `{path, content}`), `commit_message` (optional) | `{id, version_id, url}` |
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
@@ -500,14 +550,14 @@ Knowledge tool availability changes based on whether the model has attached know
 :::
 
 :::caution Attached Knowledge Still Requires User Access
-Attaching a knowledge base to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge item. Items the user cannot access are silently excluded from search results.
+Attaching a knowledge base or note to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge base and note. Items the user cannot access are silently excluded from search results. Individual files are different: a file attached directly to the model is shared with everyone who can use the model, and the model's author must be able to read it when attaching it.
 
 **Access requirements by knowledge type:**
 
 | Attached Type | User Needs |
 |---------------|-----------|
 | **Knowledge Base** (collection) | Owner, admin, or explicit read access grant |
-| **Individual File** | Owner or admin only (no access grants) |
+| **Individual File** | Anyone who can use the model (checked against the model's author when attached) |
 | **Note** | Owner, admin, or explicit read access grant |
 
 **Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself, even though they can use the model.
@@ -567,7 +617,7 @@ The **Builtin Tools** capability can be toggled on or off for each model in the 
 
 #### Granular Builtin Tool Categories (Per-Model)
 
-When the **Builtin Tools** capability is enabled, you can further control which **categories** of builtin tools are available to the model. This appears in the Model Editor as a set of checkboxes under **Builtin Tools**.
+When the **Builtin Tools** capability is enabled, you can further control which **categories** of built-in tools are available to the model. This appears in the Model Editor as a **Builtin Tools** row with one switch per category.
 
 ![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
 
@@ -586,17 +636,18 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Task Management** | `create_tasks`, `update_task` | Create a structured task/todo list and update individual task statuses in the active chat |
 | **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
 | **Calendar** | `search_calendar_events`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event` | Search, create, update, and delete calendar events |
+| **Skills** | `view_skill`, `read_skill_file`, `update_skill_files`, `create_skill` | Find, read, edit and create skills |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
-:::info Skills / view_skill, Not a Category Toggle
-The `view_skill` tool does **not** appear in the Builtin Tools category checkboxes. It is injected whenever built-in tools are active for the chat and the user can read at least one active skill. In that case:
+:::info Skills
+While built-in tools are active for the chat and the model's **Skills** category is on:
 
 1. The model receives a summary (name + description) of **every active skill the user can read** in its system prompt via `<available_skills>` tags, including skills that are not attached to the model or selected for the chat
-2. The `view_skill` tool is injected so the model can load full instructions on demand
-3. If the user can read no active skill, `view_skill` and the `<available_skills>` block are both left out
+2. `view_skill`, `read_skill_file` and `update_skill_files` are injected so the model can load instructions and files on demand and edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
+3. When the user can read no active skill, the `<available_skills>` block is left out
 
-Skills mentioned with `$` in the chat input have their full content injected directly into the system prompt. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off), skills selected for the chat or attached to the model are injected in full as well.
+Skills mentioned with `$` in the chat input have their content injected directly into the system prompt, up to the first 100,000 characters of `SKILL.md`. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, skills selected for the chat or attached to the model are injected the same way.
 
 When the chat has no system prompt, the skill summary is sent as a new system message. A custom backend that only adds its own system prompt when the request carries none needs to merge its prompt into the incoming system message, or its prompt is lost for every user with skill access.
 :::

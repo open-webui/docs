@@ -104,8 +104,10 @@ The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `
 - **Create Group** (`POST /Groups`): Create a new group
 - **Get Group** (`GET /Groups/{id}`): Retrieve group information
 - **Update Group** (`PUT /Groups/{id}`, `PATCH /Groups/{id}`): Update group membership
-- **Delete Group** (`DELETE /Groups/{id}`): Remove a group
+- **Delete Group** (`DELETE /Groups/{id}`): Remove a group. Its subgroups move up to its parent group, and its access grants are deleted
 - **List Groups** (`GET /Groups`): List all groups with filtering support
+
+Groups created through SCIM start at the top level. A parent group set in the admin panel stays in place across SCIM updates, and members inherit access from it as described in [Nested Groups](/features/authentication-access/rbac/groups#nested-groups).
 
 ### Supported Attributes
 
@@ -119,7 +121,7 @@ The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `
 
 #### Group Attributes
 - `displayName`: Group name (required)
-- `members`: Array of user members
+- `members`: Array of user members. Every member must be an existing user. A member of type `Group`, or one that references a Group resource, or an unknown user ID makes Open WebUI reject the whole request with a `400` `invalidValue` error, and nothing is changed
 - `externalId`: External identifier from the identity provider
 
 ## Filtering Support

@@ -32,6 +32,7 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | `[SSL: CERTIFICATE_VERIFY_FAILED]` | [Connection Errors → SSL](/troubleshooting/connection-error#-ssl-certificate-issues-with-internal-tools) |
 | Login loops, 401 Unauthorized, token errors across replicas | [Scaling & HA → Login Loops](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors) |
 | `database is locked`, data disappearing across instances | [Scaling & HA → Database](/troubleshooting/multi-replica#4-database-corruption--locked-errors) |
+| Live updates stop with `Redis denied publishing` or `Redis denied subscribing` in the log | [Scaling → Per-Room Redis Channels](/getting-started/advanced-topics/scaling#per-room-redis-channels) |
 | Worker crash: `Child process [pid] died` during upload | [RAG → Worker Crashes](/troubleshooting/rag#12-worker-dies-during-document-upload) |
 | Model ignores attached knowledge base | [RAG → Knowledge Base Not Working](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) |
 | `Could not read content from <url>`, or a YouTube video that will not attach | [RAG → Link and YouTube attachments](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails) |
@@ -44,9 +45,12 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 | `CSRF Warning! State not equal in request and response` | [SSO → CSRF Errors](/troubleshooting/sso#9-session-state-mismatch-csrf-errors) |
 | SSO login ends with "The email or password provided is incorrect" and the log shows `Unsupported {'app_id'} in header` | [SSO → Provider adds its own ID token parameters](/troubleshooting/sso#providers-that-add-their-own-parameters-to-the-id-token) |
 | Nobody who ever used SSO can sign in after an upgrade, log shows `1 validation error for UserModel` on `oauth` | [SSO → Accounts locked out after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade) |
+| Open WebUI refuses to start after changing `WEBUI_SECRET_KEY` with two-factor sign-in on | [Two-Factor Sign-In → Requirements](/features/authentication-access/mfa#requirements) |
+| A user lost their authenticator and their recovery codes | [Two-Factor Sign-In → Recovering a Lost Authenticator](/features/authentication-access/mfa#recovering-a-lost-authenticator) |
 | TTS loading forever, `Dataset scripts are no longer supported` | [Audio → TTS Issues](/troubleshooting/audio#tts-loading-forever--not-working) |
 | Whisper `int8 compute type` error | [Audio → STT Issues](/troubleshooting/audio#whisper-stt-not-working--compute-type-error) |
 | Microphone not working (non-HTTPS) | [Audio → Microphone](/troubleshooting/audio#microphone-access-issues) |
+| Realtime voice call fails (`Voice connection failed`, `Provider rejected voice configuration`) | [Voice Mode → Troubleshooting](/features/chat-conversations/chat-features/voice-mode#troubleshooting) |
 | Image not generating, ComfyUI workflow errors | [Image Generation](/troubleshooting/image-generation) |
 | An image in a chat shows "Image unavailable" | [Image Generation → General Issues](/troubleshooting/image-generation#general-issues) |
 | Web search returns empty content or proxy errors | [Web Search](/troubleshooting/web-search) |

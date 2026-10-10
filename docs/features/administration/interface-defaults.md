@@ -146,7 +146,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
-| `ctrlEnterToSend` | Enter Key Behavior | `false` (**Enter to Send**); `true` is **Ctrl+Enter to Send** |
+| `ctrlEnterToSend` | Enter Key Behavior | `false` (**Enter to Send**); `true` is **Ctrl+Enter to Send**, in chats, channel messages and thread replies |
 | `richTextInput` | Rich Text Input for Chat | `true` |
 | `promptAutocomplete` | Prompt Autocompletion | `false` |
 | `showFormattingToolbar` | Show Formatting Toolbar | `false` |

@@ -22,7 +22,7 @@ The Admin role is designed for system maintainers.
 
 :::warning Admin Limitations & Best Practices
 While Administrators generally have unrestricted access, certain system configurations can limit their capabilities for security and privacy:
-*   **Privacy Controls**: Environment variables like `ENABLE_ADMIN_CHAT_ACCESS=False` can prevent Admins from viewing user chats.
+*   **Privacy Controls**: Environment variables like [`ENABLE_ADMIN_CHAT_ACCESS=False`](/reference/env-configuration#enable_admin_chat_access) can prevent Admins from viewing user chats.
 *   **Feature-Specific Exceptions May Apply**: Some features can enforce additional checks beyond the standard admin bypass behavior. For API keys specifically, admins can generate keys whenever `ENABLE_API_KEYS` is enabled.
 *   **Access Control Exceptions**: If `BYPASS_ADMIN_ACCESS_CONTROL` is disabled, Admins are checked against access grants like everyone else. A private workspace item (model, knowledge base, prompt, tool, skill, note) is visible only to its owner and to the people it is shared with. Admin-configured connections and arena models with no grants stay admin-only. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
 
@@ -82,8 +82,18 @@ In a multi-replica deployment with [`WEBSOCKET_MANAGER=redis`](/reference/env-co
 The browser reconnects on its own and re-authenticates, so the features that run over that connection (channels, collaborative note editing) act on the new role instead of the one cached when the connection opened. REST API calls read the account from the database on every request, so a demoted admin loses the admin-only endpoints on their very next call regardless.
 
 :::note A role change does not revoke the person's token
-They stay signed in and keep browsing under the new role. Demotion to `pending` does lock them out, because `pending` accounts are refused on every API request and on the WebSocket handshake. To revoke tokens outright, see [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+They stay signed in and keep browsing under the new role. Demotion to `pending` does lock them out, because `pending` accounts are refused on every API request and on the WebSocket handshake. To end their sessions as well, use [Sign out all devices](#signing-a-user-out-of-every-device).
 :::
+
+## Signing a User Out of Every Device
+
+Open the user in **Admin Panel > Users** and click **Sign out all devices** at the bottom of the edit dialog, then confirm. Every session of that user ends: browser tabs and apps signed in with the account are refused on their next request and have to sign in again, and their live connections are closed. Automation and sub-agent runs in progress for that user lose access too. Use it when a device is lost, an account may be compromised or someone leaves.
+
+- **API keys stay active.** Delete or regenerate the user's key to cut off scripts and integrations.
+- **Works without Redis.** The sign-out is stored in the database, so it applies on every worker and replica.
+- **The primary administrator** can only be signed out this way by themselves.
+
+Setting a new password for the user in the same dialog signs them out everywhere as well. The action is recorded as the `auth.sessions_revoked` [event](/features/extensibility/plugin/functions/event). Scripts can trigger it with `POST /api/v1/users/{user_id}/sessions/revoke` using an administrator's API key. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) for every action that signs an account out.
 
 ## The Primary Administrator
 

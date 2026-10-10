@@ -20,9 +20,10 @@ Admins can configure server-wide audio defaults:
 4. Select the **Audio** tab
 
 Here you can configure:
-- **Speech-to-Text Engine**: Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
+- **Voice calls**: **Call mode** (**Standard** or **Realtime**). See [Realtime Calls](/features/chat-conversations/chat-features/voice-mode#realtime-calls) and [Realtime call error messages](/features/chat-conversations/chat-features/voice-mode#troubleshooting)
+- **Speech-to-Text Engine**: Choose between local Whisper, OpenAI, Azure, Deepgram or Mistral
 - **Whisper Model**: Select model size for local STT (tiny, base, small, medium, large)
-- **Text-to-Speech Engine**: Choose between OpenAI-compatible, Mistral, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
+- **Text-to-Speech Engine**: Choose between OpenAI-compatible, OpenAI Realtime, Mistral, ElevenLabs, Azure or local Transformers, or disable backend TTS (browser-only)
 - **TTS Voice**: Select the default voice
 - **API Keys and Base URLs**: Configure external service connections
 
@@ -431,7 +432,7 @@ curl http://your-tts-service:port/health
 
 | Variable | Description |
 |----------|-------------|
-| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS, uses browser), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` |
+| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS, uses browser), `openai`, `openai-realtime`, `mistral`, `elevenlabs`, `azure`, `transformers`. For `openai-realtime` see [Realtime Voice Calls](/reference/env-configuration#realtime-voice-calls) |
 | `AUDIO_TTS_MODEL` | TTS model to use (default: `tts-1`) |
 | `AUDIO_TTS_VOICE` | Default voice for TTS (default: `alloy`) |
 | `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS |

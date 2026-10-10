@@ -7,7 +7,7 @@ Open WebUI implements a flexible and secure **Role-Based Access Control (RBAC)**
 
 1.  [**Roles**](./roles.md): The high-level user type (Admin, User, Pending). This defines the baseline trust level.
 2.  [**Permissions**](./permissions.md): Granular feature flags (e.g., "Can Delete Chats", "Can Use Web Search").
-3.  [**Groups**](./groups.md): The mechanism for organizing users, granting additional permissions, and managing shared access to resources (ACLs). Resources can also be shared directly to individual users.
+3.  [**Groups**](./groups.md): The mechanism for organizing users, granting additional permissions, and managing shared access to resources (ACLs). Resources can also be shared directly to individual users. A group can sit inside another group and inherit its rights ([nested groups](./groups.md#nested-groups)), and it can set the [default models](./groups.md#default-models-per-group) its members start a new chat with.
 
 :::info Key Concept: Additive Permissions
 The security model is **Additive**. Users start with their default rights, and Group memberships **add** capabilities. A user effectively has the *union* of all rights granted by their Roles and Groups.
@@ -26,6 +26,7 @@ Avoid configuring management/master keys for general user traffic unless your de
 *   [‍🔑 **Roles**](./roles.md)
     *   Understand the difference between Admins and Users.
     *   Learn about Admin limitations and security/privacy configurations.
+    *   End every session of a user with [**Sign out all devices**](./roles.md#signing-a-user-out-of-every-device).
 
 *   [🔒 **Permissions**](./permissions.md)
     *   Explore the full list of available permission toggles.
@@ -36,5 +37,6 @@ Avoid configuring management/master keys for general user traffic unless your de
     *   Learn how to structure teams and projects.
     *   **Strategy**: Distinguish between "Permission Groups" (for rights) and "Sharing Groups" (for access).
     *   Manage Access Control Lists (ACLs) for private Models and Knowledge: share with groups or individual users.
+    *   Put groups inside other groups ([nested groups](./groups.md#nested-groups)) and set [default models per group](./groups.md#default-models-per-group).
 
 ![The user list in the admin panel](/images/admin/users-list.png)

@@ -50,7 +50,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 | `WEBUI_SECRET_KEY`                    | *empty*            | MUST be set, especially in clustered environments. Otherwise session issues and weird OAuth issues will occur                 |
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
 | `OAUTH_CLIENT_INFO_ENCRYPTION_KEY`    | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth client information stored on the server, used for OAuth 2.1 authentication for MCP servers. |
-| `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. |
+| `ENABLE_OAUTH_ID_TOKEN_COOKIE`        | `true`             | For backward compatibility. Controls if the legacy `oauth_id_token` cookie is set. Recommended to set to `false`. The cookie is set on OAuth sign-ins that skip the MFA step; with MFA on, an integration that depends on it needs [`MFA_ALLOW_OAUTH_BYPASS=true`](/reference/env-configuration#mfa_allow_oauth_bypass). |
 | `ENABLE_OAUTH_TOKEN_EXCHANGE`         | `false`            | Enables the token exchange endpoint for external apps to exchange OAuth tokens for Open WebUI JWTs. Pair it with `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`. |
 | `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` | *empty*        | Comma-separated OAuth client IDs whose tokens the exchange endpoint accepts. Empty performs no client check, accepting any token the provider validates. |
 | `ENABLE_OAUTH_BACKCHANNEL_LOGOUT`     | `false`            | Enables OIDC Back-Channel Logout endpoint (`POST /oauth/backchannel-logout`) for IdP-initiated logout. Requires Redis for JWT revocation. |
@@ -95,7 +95,7 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 1. **Server-Side Storage:** Instead of storing large `access_token` and `id_token` values in browser cookies, the entire token payload is now encrypted and stored securely in the Open WebUI database in a new `oauth_session` table.
 2. **Secure Session Cookie:** The user's browser is sent a single, small, and secure `httponly` cookie named `oauth_session_id`. This cookie acts as an opaque identifier, containing no sensitive information itself.
 3. **Multi-Device Support:** Multiple concurrent sessions are supported per user per provider. Logging in from a second device (e.g., mobile) does **not** invalidate the first device's session. To prevent unbounded session growth, a configurable limit (`OAUTH_MAX_SESSIONS_PER_USER`, default: 10) prunes the oldest sessions when exceeded.
-4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures.
+4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures. When several requests hit an expiring token at once, it is refreshed only once: with Redis configured, a per-session lock covers every worker and replica, and without Redis the lock covers one process. This keeps sessions working with providers that rotate refresh tokens, which reject the second refresh.
 5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 
 **When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning is logged. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
@@ -110,7 +110,7 @@ Open WebUI also supports **OAuth Token Exchange**, allowing external application
 
 **Example use case:** A CLI tool that has obtained an OAuth access token from your identity provider can exchange it for an Open WebUI token to make API calls to Open WebUI.
 
-To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true` and list the OAuth clients you trust in `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations.
+To enable this feature, set `ENABLE_OAUTH_TOKEN_EXCHANGE=true` and list the OAuth clients you trust in `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`. See the [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) environment variable documentation for details on usage, request/response examples, and security considerations. With two-factor sign-in on, the endpoint returns an [MFA step](/features/authentication-access/mfa#api-access-and-automation) in place of a session token unless [`MFA_ALLOW_OAUTH_BYPASS`](/reference/env-configuration#mfa_allow_oauth_bypass) is `true`.
 
 :::danger
 
@@ -241,6 +241,7 @@ The following environment variables are used:
 1. `OPENID_PROVIDER_URL`: **Required.** OIDC well known URL, for example `https://accounts.google.com/.well-known/openid-configuration`
 1. `OAUTH_PROVIDER_NAME`: Name of the provider to show on the UI, defaults to SSO
 1. `OAUTH_SCOPES`: Scopes to request. Defaults to `openid email profile`
+1. [`OAUTH_TOKEN_ENDPOINT_AUTH_METHOD`](/reference/env-configuration#oauth_token_endpoint_auth_method): Optional. How Open WebUI authenticates to the provider's token endpoint (`client_secret_basic`, `client_secret_post` or `none`). Set it when the provider accepts only one method.
 1. `OPENID_REDIRECT_URI`: Optional override of the redirect URI. When empty, Open WebUI derives `<open-webui>/oauth/oidc/callback` from the incoming request, and that is the value to register with your provider.
 1. `OAUTH_AUDIENCE`: Optional `audience` value that will be passed to the oauth provider's authorization endpoint as an additional query parameter.
 
@@ -266,7 +267,7 @@ If you need to support both Microsoft and Google simultaneously, check out our *
 :::
 ### OAuth Role Management
 
-Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. The access token is never decoded.
+Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. On the [token exchange endpoint](/reference/env-configuration#enable_oauth_token_exchange), once the provider's userinfo endpoint has accepted the presented access token, Open WebUI decodes that token without verifying its signature and reads the roles claim from it when userinfo lacks one. If `OAUTH_ALLOWED_ROLES` restricts roles (no `*`) and neither source has a readable roles claim, the exchange is refused with `403`.
 To use this feature set `ENABLE_OAUTH_ROLE_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the roles returned by the OAuth provider:
 
@@ -285,7 +286,7 @@ When that login does change the role, Open WebUI ends the account's other live W
 
 ### OAuth Group Management
 
-Any OAuth provider that can be configured to return groups in the access token can be used to manage user groups in Open WebUI upon user login.
+Any OAuth provider that can be configured to return groups in the ID token or userinfo response can be used to manage user groups in Open WebUI upon user login. On the token exchange endpoint, Open WebUI also reads the groups claim from the presented access token when userinfo lacks one.
 To enable this synchronization, set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 
 You can configure the following environment variables:
@@ -300,7 +301,7 @@ Strict Group Synchronization
 When `ENABLE_OAUTH_GROUP_MANAGEMENT` is set to `true`, a user's group memberships in Open WebUI are **strictly synchronized** with the groups received in their OAuth claims upon each login.
 
 *   Users will be **added** to Open WebUI groups that match their OAuth claims.
-*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session. Removal and addition only happen when the claim is present and non-empty. An absent or empty groups claim leaves memberships untouched, and groups matching `OAUTH_BLOCKED_GROUPS` are never added or removed.
+*   Users will be **removed** from any Open WebUI groups (including those manually created or assigned within Open WebUI) if those groups are **not** present in their OAuth claims for that login session. Removal and addition only happen when the claim is present and non-empty. An absent or empty groups claim leaves memberships untouched, and groups matching [`OAUTH_BLOCKED_GROUPS`](/reference/env-configuration#oauth_blocked_groups) are never created, added or removed.
 
 Ensure all necessary groups are correctly configured in your OAuth provider and included in the group claim (`OAUTH_GROUP_CLAIM`).
 

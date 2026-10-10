@@ -17,7 +17,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-**Use models, prompts and plugins that other people have already built, and share your own.**
+**Use models, prompts, skills and plugins that other people have already built, and share your own.**
 
 You don't have to write every system prompt, Tool or Function yourself. [Open WebUI Community](https://openwebui.com/) is a separate website where people publish what they've built for Open WebUI, and anything posted there can be imported into your instance in a few clicks.
 
@@ -35,6 +35,7 @@ You need an account on openwebui.com, which is separate from your account on you
 | :--- | :--- | :--- |
 | Model preset | **Workspace > Models** | Users allowed to create models |
 | Prompt | **Workspace > Prompts** | Users allowed to create prompts |
+| Skill | **Workspace > Skills** | Users allowed to create and import skills |
 | Tool | **Workspace > Tools** | Users allowed to create tools |
 | Function | **Admin Panel > Functions** | Admins only |
 
@@ -43,6 +44,7 @@ You need an account on openwebui.com, which is separate from your account on you
 **Share** opens openwebui.com in a new tab with a new post already filled in. Nothing is published until you finish the post there.
 
 - **A model preset, prompt or Tool:** in **Workspace**, open the item's menu and click **Share**.
+- **A skill:** in **Workspace > Skills**, open the skill's menu and click **Share**. This needs the **Export Skills** permission. The post carries the skill with all its files, up to 15 MiB in total.
 - **A Function (admins only):** in **Admin Panel > Functions**, open the function's menu and click **Share**.
 - **A chat:** in the chat's **Share** dialog, click **Share to Open WebUI Community**.
 
@@ -82,7 +84,7 @@ A Tool or Function imported from the site is Python that runs on your server fro
 
 openwebui.com never connects to your server. Everything passes between two tabs in a user's browser, so an instance on `localhost` or a private network works the same as a public one, and nothing is sent until a user clicks for it. A user can send two things:
 
-- **A share.** Whatever they share is published as a post: a model preset or prompt as it's set up, a Tool's full source code, or a snapshot of a chat, messages included. Admins can also share a Function's full source code.
+- **A share.** Whatever they share is published as a post: a model preset or prompt as it's set up, a skill with all its files, a Tool's full source code or a snapshot of a chat, messages included. Admins can also share a Function's full source code.
 - **A stats sync** for the [Leaderboard](#add-your-usage-to-the-leaderboard). Each user decides whether to sync, and it covers only their own chats. They confirm it in a **Sync Usage Stats** dialog on your instance.
 
 A stats sync sends:
@@ -100,14 +102,14 @@ Your instance's own [Evaluation](/features/administration/evaluation) leaderboar
 
 | Setting | Where | Default |
 | :--- | :--- | :--- |
-| **Community Sharing** | **Admin Panel > Settings > General** | On |
+| **Community Sharing** | **Settings > Admin > General** | On |
 
 [`ENABLE_COMMUNITY_SHARING`](/reference/env-configuration#enable_community_sharing) sets it on an instance's first start. After that, the value saved in the Admin Panel wins.
 
 Turning it off hides these for every user, admins included:
 
-- the **Made by Open WebUI Community** links on the Models, Prompts, Tools and Functions pages
-- **Share** in the model, prompt, tool and function menus
+- the **Made by Open WebUI Community** links on the Models, Prompts, Skills, Tools and Functions pages
+- **Share** in the model, prompt, skill, tool and function menus
 - **Share to Open WebUI Community** in the chat share dialog
 - **Community Reviews** in the model selector, and the review link after rating a reply
 - the **Sync Usage Stats** dialog

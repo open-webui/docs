@@ -57,6 +57,8 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 
 **Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
+**Voice avatars travel as references.** A [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) and its animations stay files on the source instance, and the export only carries their file IDs. Importing or syncing a model whose avatar or animation files are missing or not accessible on the target instance fails with `403` (`Avatar or animation file is not accessible. Upload it again.`). Upload the avatar on the target instance first.
+
 **Version-controlled, code-driven workflow:**
 
 ```bash
@@ -90,9 +92,23 @@ Earlier releases put the running total in `prompt_tokens` / `completion_tokens` 
 
 :::
 
-**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#-anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
+**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#-anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
+
+**Model controls.** A model with [Model controls](/features/workspace/models#model-controls) applies each control's default option to API requests as well, and those parameters also only fill in what your request left out. To pick another option, send the control and option IDs under `params.model_controls`, keyed by model ID. `GET /api/models` lists a model's controls under `info.params.model_controls`, with each control's ID, label, default and the IDs and labels of its options:
+
+```json
+{
+  "model": "gpt-5",
+  "messages": [{ "role": "user", "content": "Plan a three-day trip to Lisbon." }],
+  "params": { "model_controls": { "gpt-5": { "thinking": "high" } } }
+}
+```
+
+A non-admin caller needs the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) to pick an option. Without them the picks are ignored and each control's default option applies. A pick for a control the model no longer has is ignored, and picking an option the control no longer has returns a `400`.
 
 **Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless asked. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled, so you do not have to send it. A non-streaming request is left untouched, and a `stream_options` you send keeps its other keys but has `include_usage` forced to `true`, so usage cannot be switched off per request while the capability is on.
+
+**Provider errors.** When the model provider rejects a request, the endpoint returns the provider's own status code and error, for example a `429` when you hit its rate limit, and passes its `Retry-After` and `retry-after-ms` headers through so your client can back off. The OpenAI, Ollama and Anthropic proxy routes forward those retry headers too.
 
 #### Using Open WebUI tools, including MCP, from the API
 
@@ -118,6 +134,8 @@ curl -X POST http://localhost:3000/api/chat/completions \
 Open WebUI checks the caller's access to each selected tool server before resolving the tools. For OAuth-protected MCP servers, the user associated with the API key must have already completed the OAuth authorization flow in the web UI; otherwise the tool connection can fail during the API request.
 
 If your external client sends its own OpenAI-style `tools` array, Open WebUI forwards those caller-provided tool definitions to the model instead of resolving `tool_ids` server-side.
+
+To see which tools an MCP connection offers, call `GET /api/v1/tools/id/{id}/specs` with a `server:mcp:<server-id>` ID. It connects to the server and returns `{"specs": [{"name": ..., "description": ...}]}`. Any other ID, or a server you cannot access, returns `404`. An OAuth server you have not signed in to returns `401`, a server that does not answer within 15 seconds returns `504` and any other failure returns `502`.
 
 :::tip Want the model to actually run those tools, in a loop, with the built-in tools too?
 Which fields you send decides whether Open WebUI executes tool calls for you or hands them back for your client to run, and whether the answer arrives in the HTTP body or in the chat record. [Server-Side Tool Calling (API)](/reference/server-side-tool-calling) walks through every call for both approaches, streaming and non-streaming, with and without saving the chat, and ends in a reusable script.
@@ -650,6 +668,8 @@ After uploading, you can group files into a knowledge collection or reference th
       return response.json()
   ```
 
+A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added. Content added through the batch endpoint before v0.12.0 carries no content hash, so it is not detected as a duplicate.
+
 
 #### Processing Web URLs into Knowledge Collections
 
@@ -662,6 +682,7 @@ Use this endpoint to fetch a webpage, extract content, and store the resulting c
 - **Request Body**:
   - `url` (string, required): Web URL to fetch and parse
   - `collection_name` (string, optional): Target collection name. If omitted, Open WebUI generates one from the URL
+- **Errors**: A link that cannot be fetched or yields no content, such as a host refusing the connection, returns `400` with the detail `[ERROR: Could not read content from <url>]`, also when `process=false`.
 
 **`overwrite` behavior:**
 | Value | Result |

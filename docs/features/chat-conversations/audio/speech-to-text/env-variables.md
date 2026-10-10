@@ -88,7 +88,7 @@ See the [Azure AI Speech STT guide](/features/chat-conversations/audio/speech-to
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` | empty |
+| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `openai-realtime`, `mistral`, `elevenlabs`, `azure`, `transformers` | empty |
 | `AUDIO_TTS_MODEL` | TTS model | `tts-1` |
 | `AUDIO_TTS_VOICE` | Default voice | `alloy` |
 | `AUDIO_TTS_SPLIT_ON` | Split text on: `punctuation`, `paragraphs`, or `none` | `punctuation` |
@@ -101,6 +101,7 @@ See the [Azure AI Speech STT guide](/features/chat-conversations/audio/speech-to
 | `AUDIO_TTS_OPENAI_API_BASE_URL` | OpenAI-compatible TTS API base URL | `https://api.openai.com/v1` |
 | `AUDIO_TTS_OPENAI_API_KEY` | OpenAI TTS API key | empty |
 | `AUDIO_TTS_OPENAI_PARAMS` | Additional JSON params for OpenAI TTS | empty |
+| `REALTIME_TTS_PROMPT_TEMPLATE` | Instructions for the model when `AUDIO_TTS_ENGINE` is `openai-realtime` | empty (built-in prompt) |
 
 ### Mistral TTS
 
@@ -122,6 +123,20 @@ See the [Azure AI Speech TTS guide](/features/chat-conversations/audio/text-to-s
 | `AUDIO_TTS_AZURE_SPEECH_REGION` | Azure Speech region | empty (speech uses `eastus`; without a base URL, the voice list does not load) |
 | `AUDIO_TTS_AZURE_SPEECH_BASE_URL` | Custom Azure Speech base URL (optional) | empty |
 | `AUDIO_TTS_AZURE_SPEECH_OUTPUT_FORMAT` | Audio output format | `audio-24khz-160kbitrate-mono-mp3` |
+
+## Realtime Voice Calls Environment Variables
+
+These configure **Realtime** call mode for [Voice Mode](/features/chat-conversations/chat-features/voice-mode#realtime-calls). See [Realtime Voice Calls](/reference/env-configuration#realtime-voice-calls) in the environment variable reference for details.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| [`AUDIO_REALTIME_ENABLED`](/reference/env-configuration#audio_realtime_enabled) | Call mode: `true` for **Realtime**, `false` for **Standard** | `false` |
+| [`AUDIO_REALTIME_OPENAI_API_BASE_URL`](/reference/env-configuration#audio_realtime_openai_api_base_url) | OpenAI-compatible Realtime API base URL | `https://api.openai.com/v1` |
+| [`AUDIO_REALTIME_OPENAI_API_KEY`](/reference/env-configuration#audio_realtime_openai_api_key) | Realtime API key | empty |
+| [`AUDIO_REALTIME_MODEL`](/reference/env-configuration#audio_realtime_model) | Realtime voice model | `gpt-realtime-2.1-mini` |
+| [`AUDIO_REALTIME_VOICE`](/reference/env-configuration#audio_realtime_voice) | Default voice of the voice model | `marin` |
+| [`AUDIO_REALTIME_TRANSCRIPTION_MODEL`](/reference/env-configuration#audio_realtime_transcription_model) | Model that transcribes what the user says | `gpt-transcribe` |
+| [`REALTIME_CALL_PROMPT_TEMPLATE`](/reference/env-configuration#realtime_call_prompt_template) | Instructions for the voice model | empty (built-in prompt) |
 
 ## Tips for Configuring Audio
 

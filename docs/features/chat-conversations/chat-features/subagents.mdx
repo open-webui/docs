@@ -11,6 +11,12 @@ A sub-agent is a full chat completion of its own. It runs with the same model, t
 
 Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Admin > Sub-agents** toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
 
+## What a Sub-agent Is Told
+
+A sub-agent builds its instructions the way a new chat message does, starting from the parent chat's original setup: the chat's own system prompt (from **Chat Controls** or your **Settings**), the model's system prompt, the chat's variables and the full text of any skills mentioned in the message. The folder's system prompt, tool server and terminal instructions are applied for the sub-agent's own run, along with the [sub-agent system prompt](#admin-limits).
+
+A background sub-agent's result continues the parent chat with instructions built the same way.
+
 ## Why Delegate
 
 Delegation buys focus and parallelism:
@@ -77,7 +83,7 @@ Sub-agents are deliberately narrower than the chat that starts them:
 - **No memory writes.** It can read memories but cannot add, change or delete them, keeping delegated work from quietly rewriting your personalization.
 - **No direct connections.** Models served through a direct connection cannot delegate.
 - **No code interpreter in the background**, unless the engine is Jupyter, since the browser-based Pyodide engine needs a live session.
-- **No external tool servers in the background.** A foreground sub-agent inherits the chat's OpenAPI and MCP tool servers; a background one does not. If a delegated task depends on an external tool server, keep it in the foreground.
+- **No user tool servers in the background.** A foreground sub-agent inherits the tool servers the user added in their own Settings, which run from the browser; a background one does not. Tool servers an admin added (OpenAPI and MCP) stay available to both. If a delegated task depends on a [user tool server](/features/extensibility/plugin/tools/openapi-servers/open-webui), keep it in the foreground.
 
 ## Cost
 

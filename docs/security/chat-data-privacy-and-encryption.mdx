@@ -61,7 +61,7 @@ ENABLE_PASSWORD_CHANGE_FORM=false
 DEFAULT_USER_ROLE=pending
 ```
 
-Use your identity provider for MFA, conditional access, device posture, group membership, and user lifecycle. Use SCIM where possible.
+Use your identity provider for MFA, conditional access, device posture, group membership and user lifecycle. Use SCIM where possible. Where accounts still sign in to Open WebUI directly, turn on the built-in [two-factor sign-in](/features/authentication-access/mfa).
 
 ### Use Temporary Chat Where History Is Not Needed
 
@@ -83,6 +83,8 @@ Relevant permissions:
 
 - **Chat > Temporary Chat**
 - **Chat > Enforced Temporary**
+
+For users with both permissions, the server refuses to save a chat on every route, including direct API calls, chat import, clone and fork. Chats they already have still open, and administrators are exempt.
 
 Temporary Chat is a data-minimization control for saved history. The active prompt is still processed by Open WebUI and the configured model endpoint. Tools you leave enabled still run in a temporary chat and can store data of their own, so disable them on the model where that matters.
 
