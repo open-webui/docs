@@ -21,7 +21,7 @@ See the companion guide: [Using Azure AI Speech for Speech-to-Text](/features/ch
 
 1. Click your **profile icon** (bottom-left corner)
 2. Select **Admin Panel**, then **Settings**. Settings opens in a window.
-3. In the sidebar, choose **Audio** under **Admin**, in the *Tools* group. The other **Audio** entry, in the *Preferences* group, holds your personal audio settings. On a narrow screen these labels are hidden, so open the admin one directly at `/?settings=admin:audio` instead.
+3. In the sidebar, choose **Audio** under **Admin**, in the *Tools* group. The other **Audio** entry, in the *Preferences* group, holds your personal audio settings. On a narrow screen these labels are hidden; open the admin one directly at `/?settings=admin:audio`.
 4. Configure the following:
 
 | Setting | Value |

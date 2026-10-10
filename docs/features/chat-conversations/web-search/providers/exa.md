@@ -64,7 +64,7 @@ Alternatively, you can configure the Exa AI integration using an environment var
 
 Set the following environment variable for your Open WebUI instance:
 
-- `EXA_API_KEY`: Your Exa AI API key.
+- [`EXA_API_KEY`](/reference/env-configuration#exa_api_key): Your Exa AI API key.
 
 When this environment variable is set, the "Exa API Key" field in the admin settings will be automatically populated.
 

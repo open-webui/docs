@@ -127,7 +127,7 @@ The **OpenAI Realtime** Text-to-Speech engine produces speech with OpenAI's real
 | **TTS Voice** | `alloy`, `ash`, `ballad`, `coral`, `echo`, `sage`, `shimmer`, `verse`, `marin` (default) or `cedar` |
 | **Prompt Template** | Instructions for the model. Leave it empty to use the built-in prompt, which tells the model to read the text aloud word for word, in its original language, without answering, summarizing or adding commentary |
 
-The **Prompt Template** field takes the place of **Additional Parameters** for this engine. The same voice priority applies as above: a model's **TTS Voice**, then the user's own voice, then the admin default. Each finished clip is cached, so the same text with the same model, voice and prompt plays from the cache the next time.
+The **Prompt Template** field takes the place of **Additional Parameters** for this engine. The same [voice priority](#voice-priority) applies as above: a model's **TTS Voice**, then the user's own voice, then the admin default. Each finished clip is cached, so the same text with the same model, voice and prompt plays from the cache the next time.
 
 The API Base URL must start with `http://` or `https://` and contain no query string, user name or password. With environment variables:
 

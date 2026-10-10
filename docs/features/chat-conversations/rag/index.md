@@ -255,7 +255,7 @@ If you change the embedding model, those standalone chat file embeddings will st
 
 ## Citations in RAG Feature
 
-The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats.
+The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
 
 ## File Context vs Builtin Tools
 

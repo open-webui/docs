@@ -31,7 +31,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**:
   - `/?models=model1,model2`: This initializes the chat with `model1` and `model2`.
   - `/?model=model1`: This sets `model1` as the sole model for the chat.
-- **Note**: Without either parameter, a new chat falls back to the [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group) or, when none apply, the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin) ([`DEFAULT_MODELS`](/reference/env-configuration#default_models)) when nothing valid is selected, for instance when the model used last has since been removed or hidden. Passing one of these parameters suppresses that fallback, so the chat waits for the model you named rather than being switched to a default.
+- **Note**: When nothing valid is selected, for instance because the model used last was removed or hidden, a new chat without either parameter falls back to the [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), or to the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin) ([`DEFAULT_MODELS`](/reference/env-configuration#default_models)) when no group sets any. Passing one of these parameters suppresses that fallback, so the chat waits for the model you named.
 
 ### 2. **YouTube Transcription**
 
@@ -67,7 +67,7 @@ The following table lists the available URL parameters, their function, and exam
 - **Description**: The `call` parameter starts [Voice Mode](/features/chat-conversations/chat-features/voice-mode), the call overlay in the chat interface. `voice` is an alias and works the same way.
 - **How to Set**: Set the parameter to `true` to start the call overlay.
 - **Example**: `/?call=true` or `/?voice=true`
-- **Behavior**: An **Open link** dialog asks whether to start a voice call using the microphone. Once the user confirms, the call overlay opens, allowing features such as live transcription and video input. Canceling leaves the microphone off. When the link also carries `youtube` or `load-url`, the same dialog lists those URLs, and confirming does both. The call applies the same checks as the Voice mode button: the user needs the **Allow Call** permission, only one model may be selected, and the speech-to-text engine must be something other than **Web API**.
+- **Behavior**: An **Open link** dialog asks whether to start a voice call using the microphone. Once the user confirms, the call overlay opens, allowing features such as live transcription and video input. Canceling leaves the microphone off. When the link also carries `youtube` or `load-url`, the same dialog lists those URLs, and confirming does both. The call applies the same checks as the **Voice mode** button: the user needs the [**Allow Call**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission and only one model may be selected. In Standard call mode the speech-to-text engine must also be something other than **Web API**.
 
 ### 7. **Initial Query Prompt**
 
@@ -83,8 +83,8 @@ The following table lists the available URL parameters, their function, and exam
 - **Example**: `/?temporary-chat=true`
 - **Behavior**: This initiates a disposable chat session without saving history or applying advanced configurations.
   - **Note**: Document processing in temporary chats is frontend-only for privacy. Complex files requiring backend parsing (e.g., DOCX) may not be fully supported.
-  - **Note**: A temporary chat is identified by a per-session ID rather than a stored chat record, so no chat record is created and nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts), [sub-agents](/features/chat-conversations/chat-features/subagents) and [timers](/features/chat-conversations/chat-features/timers), are unavailable there. Chats in [channels](/features/channels) are treated the same way, and the [ask user tool](/features/extensibility/plugin/tools) is unavailable in channels as well.
-  - **Note**: In a temporary chat, the [ask user tool](/features/extensibility/plugin/tools) and tool approval set to **Ask for approval** show their question or their **Allow** and **Deny** buttons as a dialog in the open browser tab. A tool call counts as denied when nobody answers within about two minutes, when you leave the chat or when the tab loses its connection.
+  - **Note**: A temporary chat lives under a per-session ID with no stored chat record, so nothing the run produces (messages, generated images, status updates, titles or tags) is written to the database. Features that need a saved chat, such as [task lists](/features/chat-conversations/chat-features/task-management), [terminals scoped per chat](/features/open-terminal/terminals/orchestration/contexts), [sub-agents](/features/chat-conversations/chat-features/subagents) and [timers](/features/chat-conversations/chat-features/timers), are unavailable there. Chats in [channels](/features/channels) are treated the same way, and the [ask user tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) is unavailable in channels as well.
+  - **Note**: In a temporary chat, a question from the [ask user tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), or a tool call waiting under [**Ask for approval**](/features/extensibility/plugin/tools#tool-approval), appears as a dialog in the open browser tab. Nobody answering within about two minutes, leaving the chat or the tab losing its connection counts as a denial. The temporary chat must be the one open in that tab; otherwise the request is cancelled at once.
   - **Note**: The list of unavailable features above is complete. Any feature or tool not listed there works in a temporary chat exactly as it does in a normal one. That includes tools that store or send data of their own, memory, notes and web search for example. Disable a tool on the model if you do not want a temporary chat to use it.
 
 ### 9. **Code Interpreter**
@@ -110,7 +110,7 @@ The following table lists the available URL parameters, their function, and exam
 
 ### 12. **New Note**
 
-- **Description**: On the Notes pages, `title` and `content` prefill a new note.
+- **Description**: On the [Notes pages](/features/notes#quick-creation), `title` and `content` prefill a new note.
 - **How to Set**: Open `/notes/new` (or `/notes`) with either parameter.
 - **Example**: `/notes/new?title=Meeting&content=Agenda%3A`
 - **Behavior**: A **Create a new note** dialog shows the title and body and asks before creating anything. Once the user confirms, the note is created and opens in the editor. The title defaults to today's date when only `content` is given. Canceling on `/notes/new` returns to the notes list.

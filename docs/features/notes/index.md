@@ -200,7 +200,7 @@ These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sha
 
 ### Attachments
 
-Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This covers files uploaded by the note's owner and gives read access only.
+Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This applies to files the note's owner uploaded, and those files stay read-only for them.
 
 Two things to know:
 
@@ -216,7 +216,7 @@ Turn it off and Markdown characters stay as characters, a pasted URL stays text 
 ### Quick creation
 
 * Navigate to `/notes/new` to create a note titled with today's date
-* Add query parameters: `/notes/new?title=My%20Title&content=Initial%20text`
+* Add [query parameters](/features/chat-conversations/chat-features/url-params#12-new-note): `/notes/new?title=My%20Title&content=Initial%20text`
 * Create from global search (`Cmd+K` / `Ctrl+K`) by selecting "Create a new note", which uses the search text as the note's content
 * Import `.md` files by dragging them onto the Notes list
 
@@ -231,7 +231,7 @@ Toggle between **Created by you** and **Shared with you** filters, and switch be
 Hold **Shift** while the Notes list is open and every note's **⋯** menu button turns into a delete button. Clicking it deletes that note straight away, with no menu and no confirmation prompt. It works in both **List** and **Grid** layouts, and holding Shift closes any note menu that is already open. Release Shift, or click away from the window, and the menu button comes back. Without Shift nothing changes: delete still goes through the menu and asks you to confirm.
 
 :::info Admin Visibility
-Notes are workspace items. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), administrators can see all users' notes. Set `BYPASS_ADMIN_ACCESS_CONTROL` to `False` to restrict this. See [Environment Configuration](/reference/env-configuration#bypass_admin_access_control) for details.
+Notes are workspace items. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), administrators can see all users' notes. Set `BYPASS_ADMIN_ACCESS_CONTROL` to `False` to restrict this. See [Environment Configuration](/reference/env-configuration#bypass_admin_access_control) for details. To turn Notes off for the whole instance, see [`ENABLE_NOTES`](/reference/env-configuration#enable_notes).
 :::
 
 ---
