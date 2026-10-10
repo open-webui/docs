@@ -888,7 +888,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `str`
 - Default: `cpu`
-- Description: Specifies the device type for model execution. Automatically set to `cuda` if CUDA is available and enabled, or `mps` for Apple Silicon.
+- Description: The device that local models run on (embedding and reranking, plus speech-to-text when it is `cuda`). Open WebUI sets it automatically at startup from the detected hardware, so it cannot be set as an environment variable: `cuda` when [`USE_CUDA`](#use_cuda) (`USE_CUDA_DOCKER=true`) is enabled and a CUDA GPU is available, `mps` on Apple Silicon Macs and `cpu` otherwise. The slim image always uses `cpu`.
 
 #### `EXTERNAL_PWA_MANIFEST_URL`
 
@@ -960,8 +960,8 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 #### `DEFAULT_PROMPT_SUGGESTIONS`
 
 - Type: `list` of `dict`
-- Default: `[]` (which means to use the built-in default prompt suggestions)
-- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
+- Default: `null` (unset, which shows the built-in prompt suggestions)
+- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Leave it unset (or set it to `null`) to show the built-in suggestions; set it to `[]` to turn suggestions off. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
 
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
@@ -969,6 +969,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
   Per-language versions of these suggestions are set in the admin panel rather than here, under **Settings > Admin > Models > Model Defaults**. See [Translations](/features/workspace/models#translations).
 
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 
 ### AIOHTTP Client
@@ -1146,11 +1147,6 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `./data`
 - Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc.
-
-#### `FONTS_DIR`
-
-- Type: `str`
-- Description: Specifies the directory for fonts.
 
 #### `FRONTEND_BUILD_DIR`
 
@@ -2719,6 +2715,28 @@ Provide a semicolon-separated list of scheme names without the `://`. For exampl
 When configured, these custom schemes will be validated alongside `http` and `https` for any origins specified in `CORS_ALLOW_ORIGIN`.
 
 :::
+
+#### Security Headers
+
+Each variable below adds one HTTP security header to every response Open WebUI sends. All are unset by default, and an unset variable means its header is not sent. Values are read once at startup. A value outside the accepted format is replaced with the fallback in the last column, so the header is still sent; matching ignores case. For a recommended production setup and the cross-origin isolation caveats, see [Hardening: Security Headers](/getting-started/advanced-topics/hardening#security-headers). [`CACHE_CONTROL`](#cache_control) has its own entry.
+
+| Variable | Header | Accepted values | Fallback |
+|----------|--------|-----------------|----------|
+| `HSTS` | `Strict-Transport-Security` | `max-age=<seconds>`, optionally followed by `;includeSubDomains` and `;preload` (no spaces) | `max-age=31536000;includeSubDomains` |
+| `PERMISSIONS_POLICY` | `Permissions-Policy` | Comma-separated `feature=()` or `feature=(self)` entries without spaces, for `accelerometer`, `autoplay`, `camera`, `clipboard-read`, `clipboard-write`, `fullscreen`, `geolocation`, `gyroscope`, `magnetometer`, `microphone`, `midi`, `payment`, `picture-in-picture`, `sync-xhr`, `usb` and `xr-spatial-tracking` | `none` |
+| `REFERRER_POLICY` | `Referrer-Policy` | `no-referrer`, `no-referrer-when-downgrade`, `origin`, `origin-when-cross-origin`, `same-origin`, `strict-origin`, `strict-origin-when-cross-origin`, `unsafe-url` | `no-referrer` |
+| `XCONTENT_TYPE` | `X-Content-Type-Options` | `nosniff` (any value sends `nosniff`) | `nosniff` |
+| `XDOWNLOAD_OPTIONS` | `X-Download-Options` | `noopen` (any value sends `noopen`) | `noopen` |
+| `XFRAME_OPTIONS` | `X-Frame-Options` | `DENY`, `SAMEORIGIN` | `DENY` |
+| `XPERMITTED_CROSS_DOMAIN_POLICIES` | `X-Permitted-Cross-Domain-Policies` | `none`, `master-only`, `by-content-type`, `by-ftp-filename` | `none` |
+| `CONTENT_SECURITY_POLICY` | `Content-Security-Policy` | Any policy string, sent as given | None (not validated) |
+| `CONTENT_SECURITY_POLICY_REPORT_ONLY` | `Content-Security-Policy-Report-Only` | Any policy string, sent as given | None (not validated) |
+| `CROSS_ORIGIN_EMBEDDER_POLICY` | `Cross-Origin-Embedder-Policy` | `unsafe-none`, `require-corp`, `credentialless` | `require-corp` |
+| `CROSS_ORIGIN_OPENER_POLICY` | `Cross-Origin-Opener-Policy` | `unsafe-none`, `same-origin-allow-popups`, `same-origin` | `same-origin` |
+| `CROSS_ORIGIN_RESOURCE_POLICY` | `Cross-Origin-Resource-Policy` | `same-site`, `same-origin`, `cross-origin` | `same-origin` |
+| `REPORTING_ENDPOINTS` | `Reporting-Endpoints` | Any endpoint list, sent as given, for example `default="https://reports.example.com/csp"` | None (not validated) |
+
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE`
 
@@ -4750,6 +4768,13 @@ Strictly return in JSON format:
 - Default: `False`
 - Description: When enabled, injects RAG context into the **system message** instead of the user message. For models that support **KV prefix caching** or **Prompt Caching** (local engines like Ollama, llama.cpp or vLLM, and cloud providers like OpenAI and Vertex AI), this keeps the context at a stable position at the start of the conversation, so the cache can persist across turns. When disabled (default), context is injected into the user message, which shifts position each turn and invalidates the cache.
 
+#### `RAG_SOURCE_METADATA_KEYS`
+
+- Type: `str` (comma-separated)
+- Default: Empty string (`""`)
+- Description: Chunk metadata keys the model gets to see next to the retrieved text. For each retrieved chunk, every listed key that has a value is added as an attribute on the chunk's `<source>` tag in the RAG context, and as a field in the results of the built-in `query_knowledge_files` and `query_chat_files` tools. When empty, the chunk text reaches the model with the fixed source details only, such as its name and ID. Chunk metadata also holds internal bookkeeping such as file hashes, collection names and scores, so list only the keys you want the model to read. Example: `page,page_label` lets the model cite page numbers from PDFs.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
 #### `ENABLE_LOCAL_WEB_FETCH`
 
 - Type: `bool`
@@ -6129,7 +6154,7 @@ Strictly return in JSON format:
 ##### `IMAGES_OPENAI_API_VERSION`
 
 - Type: `str`
-- Default: `${OPENAI_API_VERSION}`
+- Default: Empty string (`""`)
 - Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation endpoint. Required for Azure OpenAI deployments.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -6910,6 +6935,24 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 - Description: Sets the scope for OIDC authentication. `openid` and `email` are required.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `OAUTH_TOKEN_ENDPOINT_AUTH_METHOD`
+
+- Type: `str`
+- Options:
+  - `client_secret_basic`: Sends the client ID and secret in an HTTP Basic `Authorization` header.
+  - `client_secret_post`: Sends the client ID and secret in the request body.
+  - `none`: Sends the client ID only, for public clients that use PKCE (see [`OAUTH_CODE_CHALLENGE_METHOD`](#oauth_code_challenge_method)).
+- Default: Not set. The sign-in library then uses `client_secret_basic` when [`OAUTH_CLIENT_SECRET`](#oauth_client_secret) is set and `none` when it is not.
+- Description: Sets how Open WebUI authenticates to the OIDC provider's token endpoint when it exchanges the login code for tokens. Set it when the provider only accepts one method, for example `client_secret_post`. Applies to the generic OIDC provider only.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `OAUTH_TIMEOUT`
+
+- Type: `int`
+- Default: Empty string (the HTTP client's own default)
+- Description: Timeout in seconds for the requests the sign-in flow sends to the provider: loading the OpenID discovery document, exchanging the login code for tokens and fetching user info. Applies to Google, Microsoft, GitHub, Feishu and the generic OIDC provider.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `OAUTH_CODE_CHALLENGE_METHOD`
 
 - Type: `str`
@@ -6923,7 +6966,7 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 
 - Type: `int`
 - Default: Empty string (the HTTP client's own default)
-- Description: Timeout in seconds for the HTTP client the OAuth login flow uses to reach the provider's token and userinfo endpoints.
+- Description: Timeout in seconds for the OAuth clients of MCP tool server connections using OAuth 2.1. The sign-in flow uses [`OAUTH_TIMEOUT`](#oauth_timeout).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_PROVIDER_NAME`
@@ -7305,6 +7348,13 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to edit chats.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_CHAT_SHARE`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables user permission to share chats. When `False`, non-admins no longer see the **Share** option in the chat menu or the sidebar, and creating or updating a share link is refused. It is the parent of [`USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`](#user_permissions_chat_allow_public_sharing) and [`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](#user_permissions_chat_allow_open_sharing), whose toggles appear only while this one is on. Admins are exempt. Configurable per-group as **Allow Chat Share**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_EXPORT`
