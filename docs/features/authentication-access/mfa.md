@@ -44,6 +44,8 @@ The same switches exist as environment variables: [`ENABLE_MFA`](/reference/env-
 
 ## Signing In
 
+While MFA is on, an account that is still awaiting administrator approval gets no session: every sign-in to it ends on the sign-in page with the fixed message **Your account is awaiting administrator approval.** The custom pending overlay set with [`PENDING_USER_OVERLAY_TITLE`](/reference/env-configuration#pending_user_overlay_title) and [`PENDING_USER_OVERLAY_CONTENT`](/reference/env-configuration#pending_user_overlay_content) needs a session, so it shows only while MFA is off.
+
 ### Setting up an authenticator
 
 The first time a user signs in after MFA is turned on:

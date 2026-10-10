@@ -309,14 +309,14 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets a custom title for the pending user overlay.
+- Description: Sets a custom title for the pending user overlay. While [`ENABLE_MFA`](#enable_mfa) is on, a pending account gets no session and its sign-ins end on the sign-in page with the fixed message "Your account is awaiting administrator approval.", so the overlay shows only while MFA is off.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `PENDING_USER_OVERLAY_CONTENT`
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets a custom text content for the pending user overlay.
+- Description: Sets a custom text content for the pending user overlay. While [`ENABLE_MFA`](#enable_mfa) is on, a pending account gets no session and its sign-ins end on the sign-in page with the fixed message "Your account is awaiting administrator approval.", so the overlay shows only while MFA is off.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_CALENDAR`
@@ -6521,7 +6521,7 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.**
+- Description: Controls whether the **legacy** `oauth_id_token` cookie (unsafe, not recommended, token can go stale/orphaned) is set in the browser upon a successful OAuth login. This is provided for **backward compatibility** with custom tools or older versions that might rely on scraping this cookie. **The new, recommended approach is to use the server-side session management.** The cookie is set on OAuth sign-ins that skip the MFA step: always while [`ENABLE_MFA`](#enable_mfa) is off, and while it is on only with [`MFA_ALLOW_OAUTH_BYPASS`](#mfa_allow_oauth_bypass) set to `true`. An integration that depends on this cookie on an MFA-enabled instance needs `MFA_ALLOW_OAUTH_BYPASS=true`.
 - Usage: For new and secure deployments, **it is recommended to set this to `False`** to minimize the information exposed to the client-side. Keep it as `True` only if you have integrations that depend on the old cookie-based method.
 
 #### `ENABLE_OAUTH_TOKEN_EXCHANGE`
@@ -7478,7 +7478,7 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the ability for users to create their own group channels.
+- Description: Gives non-admin users access to the whole Channels feature: listing, opening, creating and managing channels, reading and posting messages, reactions and pins, managing channel webhooks and receiving live channel messages. Channel automations a user created run only while they hold this permission. Admins always have access. Messages sent to a channel's incoming webhook URL are accepted whenever [`ENABLE_CHANNELS`](#enable_channels) is on, since that URL carries its own token.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`
