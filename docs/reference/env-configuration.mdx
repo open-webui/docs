@@ -1407,7 +1407,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. Can also be toggled in **Settings > Admin > Interface**.
+- Description: Enables automatic context compaction. When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. The check runs at the start of each turn and again between tool rounds of a native tool loop. Can also be toggled in **Settings > Admin > Interface**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_MODEL`
@@ -1435,7 +1435,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `int`
 - Default: `40`
-- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Compaction always splits on a user message, so the retained portion begins at a turn boundary rather than mid-exchange. Can also be set in **Settings > Admin > Interface** (**Retained Messages**).
+- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. At the start of a turn compaction splits on a user message, so the retained portion begins at a turn boundary; between tool rounds of a long tool loop it splits at the start of a tool round, keeping each tool call with its results. Can also be set in **Settings > Admin > Interface** (**Retained Messages**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -1444,6 +1444,34 @@ Several parameters have no effect on background requests wherever you set them: 
 - Default: Empty string (falls back to the built-in default compaction prompt)
 - Description: The prompt used to summarize the messages being compacted. Leave empty to use the built-in default, or provide a custom prompt. Supports two variables: `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_TOOL_SEARCH`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request and listed by name in the system prompt, and the model loads the ones it needs with the built-in `search_tools` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.enable`.
+
+#### `TOOL_SEARCH_DEFER_THRESHOLD`
+
+- Type: `int`
+- Default: `400`
+- Description: The length, in characters, above which a tool's JSON definition (name, description and parameter schema) is deferred when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on. `0` defers every tool. Can also be set in **Settings > Admin > Interface** (**Deferral Threshold (characters)**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.defer_threshold`.
+
+#### `TOOL_SEARCH_ALWAYS_LOADED`
+
+- Type: `str` (comma-separated)
+- Default: Empty string
+- Description: Tool names or glob patterns that are always sent in full when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on, for example `jira_create_issue,github_*`. Patterns match the tool names the model sees and are case-sensitive; MCP tools carry their server's ID as a prefix. Can also be set in **Settings > Admin > Interface** (**Always Loaded Tools**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.always_loaded`.
+
+#### `TOOL_SEARCH_DEFER_BUILTIN_TOOLS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Lets [Tool Search](/features/extensibility/plugin/tools#tool-search) defer built-in tools like any other tool. Set it to `False` to always send built-in tools in full. Can also be toggled in **Settings > Admin > Interface** (**Defer Built-in Tools**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.defer_builtin_tools`.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
 

@@ -165,7 +165,7 @@ It is **off by default**. An administrator turns it on in **Settings > Admin > E
 
 Two things to know before you lean on it:
 
-- Crossing the threshold does not guarantee it ran. The cut has to land on a user message, so a chat that is one enormous exchange rather than many turns is sent uncompacted. That happens silently and is retried on the next turn, so compaction is a relief valve rather than a hard ceiling.
+- Crossing the threshold does not guarantee it ran. At the start of a turn the cut has to land on a user message, so a chat that is one enormous exchange with no earlier turns is sent uncompacted. That happens silently and is retried on the next turn, so compaction works as a relief valve with no hard ceiling. A long run of tool calls is the exception: compaction also runs between tool rounds and can cut there.
 - The token figure is an estimate wherever your provider did not report real usage, so read it as a gauge rather than an exact count.
 
 With it enabled, `/compact` in the chat input compacts the conversation right away instead of waiting for the threshold.

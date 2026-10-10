@@ -294,9 +294,32 @@ Your choice is saved to your user settings, so it carries over to new chats unti
 
 Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
 
-:::info Requires a saved chat
-Approval works by persisting the pending call on the assistant message, so a temporary chat has nowhere to store it. Approval prompts also survive a page reload, since the pending state lives in the message rather than in the browser.
+:::info Saved and temporary chats
+In a saved chat the pending call is stored on the assistant message, so approval prompts survive a page reload. In a [temporary chat](/features/chat-conversations/chat-features/url-params) each call opens a live **Tool Permissions** dialog showing the tool name and its arguments, with **Allow** and **Deny**. The call is denied when the browser tab is gone or nobody answers within 120 seconds, or within [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is set lower.
 :::
+
+### Tool Search
+
+With many tools enabled, their definitions alone can fill a large part of every request. **Tool Search** keeps large tool definitions out of the request until the model asks for them. The feature is **experimental**, off by default and applies to chats in Native Mode.
+
+An administrator turns it on in **Settings > Admin > Interface**, in the **Chat** section. The settings apply to every model and every user:
+
+| Setting | Default | What it does |
+| :--- | :--- | :--- |
+| **Tool Search** ([`ENABLE_TOOL_SEARCH`](/reference/env-configuration#enable_tool_search)) | Off | Turns the feature on. The three settings below appear once it is on. |
+| **Defer Built-in Tools** ([`TOOL_SEARCH_DEFER_BUILTIN_TOOLS`](/reference/env-configuration#tool_search_defer_builtin_tools)) | On | Treats built-in tools like any other tool. Turn it off to always send built-in tools in full. |
+| **Deferral Threshold (characters)** ([`TOOL_SEARCH_DEFER_THRESHOLD`](/reference/env-configuration#tool_search_defer_threshold)) | `400` | A tool whose definition (name, description and parameter schema, as JSON) is longer than this many characters is deferred. `0` defers every tool. |
+| **Always Loaded Tools** ([`TOOL_SEARCH_ALWAYS_LOADED`](/reference/env-configuration#tool_search_always_loaded)) | Empty | Comma-separated tool names or glob patterns, such as `jira_create_issue, github_*`, that are always sent in full. Matching is case-sensitive. |
+
+How it works:
+
+- **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.
+- **What the model sees.** Deferred tools are listed in an `<available_tools>` block at the end of the system prompt, each with its name and a description shortened to 100 characters. A built-in `search_tools` tool is added to the tool list.
+- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches and then calls the tool by name like any other. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by how well the query matches its name, description and parameter names.
+- **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
+- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself.
+
+Write Always Loaded patterns against the tool names the model sees. MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
 
 ### Built-in System Tools (Native/Agentic Mode)
 
