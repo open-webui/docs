@@ -99,7 +99,7 @@ The Python source code is loaded via `exec()` into a temporary module namespace.
 
 A function fails to load when its code raises while it is being executed: a syntax error, an `import` that fails, an exception raised while the class is constructed or a file with no `Pipe`, `Filter`, `Action` or `Event` class in it.
 
-- **Saving in the editor** executes the new code before storing it. Code that fails to load is refused: the Python error shows in the editor, the new source is not written, and the version already saved stays active and keeps running. Fix the code and save again. A failed `requirements` install is refused the same way.
+- **Saving in the editor** executes the new code before storing it. Code that fails to load is refused: the Python error shows in the editor, the new source is not written and the version already saved stays active and keeps running. Fix the code and save again. A failed `requirements` install is refused the same way.
 - **Outside the editor**, the code is executed again every time the module is loaded, for example after a restart. When that fails, Open WebUI switches the function to **inactive** to keep it from failing on every request, and logs `Error loading module: <function id>: <the error>`. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart. Fix the code, then switch the function back on in **Admin Panel > Functions**.
 
 ### Frontmatter
@@ -168,7 +168,7 @@ Always review the source code before importing. Community functions are user-con
 
 ### Admin Controls
 
-Functions are managed from **Admin Panel > Functions**. Each function has the following controls:
+Functions are managed from **Admin Panel > Functions**. The page is hidden when [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) is set to `False`. Each function has the following controls:
 
 | Control | Description |
 |:--------|:-----------|

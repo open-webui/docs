@@ -1306,7 +1306,7 @@ Each message carries its `id`, `role`, `content`, `info` and `timestamp`, plus `
 - **Quality scoring**: Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-On tagged releases `outlet()` is never invoked by `/api/chat/completions`, so a direct API integration has to follow it with `POST /api/chat/completed`. On `dev` it runs by default for direct callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
+Since v0.10.0, `outlet()` runs by default for direct `/api/chat/completions` callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). With it switched off, a direct API integration has to follow the request with `POST /api/chat/completed`. Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
 An outlet that changes the reply edits both its `content` and the text in its `output`, because the chat shows the reply from `output`.
@@ -1376,9 +1376,9 @@ This section describes **behavior and caveats**, not a full drop-in program. Fil
 
 #### What such a Filter would observe
 
-Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`** (also handed to `outlet` on the finished reply, see [`outlet`](#outlet-function-output-post-processing)), **`usage`** (often on the terminal chunk only), or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values). Exact shapes vary by connector and protocol.
+Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`** (also handed to `outlet` on the finished reply, see [`outlet`](#outlet-function-output-post-processing)), **`usage`** (often on the terminal chunk only) or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values). Exact shapes vary by connector and protocol.
 
-Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python): record when you first see a stream fragment for an assistant reply, bump counters when deltas contain printable model text (including reasoning / audio transcript fields some APIs expose), and compare timestamps when you decide the stream **ended**.
+Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python): record when you first see a stream fragment for an assistant reply, bump counters when deltas contain printable model text (including reasoning / audio transcript fields some APIs expose) and compare timestamps when you decide the stream **ended**.
 
 #### Correlating one stream (“which message is this?”)
 

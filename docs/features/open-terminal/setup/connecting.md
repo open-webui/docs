@@ -31,7 +31,7 @@ The settings sidebar lists **Integrations** twice, once under **Personal** in th
 
 ### 3. Find the "Open Terminal" section
 
-Scroll down until you see the **Open Terminal** section.
+Scroll down until you see the **Open Terminal** section. It is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
 
 ![The Open Terminal section under Integrations](/images/open-terminal-connected.png)
 
@@ -150,7 +150,7 @@ The field is on every terminal connection, the ones an administrator adds and th
 
 ## Working Directory Context
 
-**Working Directory Context** is under **Advanced** on connections an administrator adds. While it is on, the default, Open WebUI asks the terminal for its current working directory on every message and writes it into the instructions of the command tool, so the model knows where its commands run.
+**Working Directory Context** is under **Advanced** on connections an administrator adds. It is on by default. While it is on, Open WebUI asks the terminal for its current working directory on every message and writes it into the instructions of the command tool, so the model knows where its commands run.
 
 Tool instructions are part of the cached prefix of every request, so each change of directory starts the provider's [prompt cache](/features/chat-conversations/prompt-caching) over. Turn the switch off to keep the instructions identical from message to message.
 

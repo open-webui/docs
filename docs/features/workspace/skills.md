@@ -85,7 +85,7 @@ Skills bound to a model use lazy loading:
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
-The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, in full. The same happens when a model's **Skills** category is switched off under **Builtin Tools** in the model editor: the model can no longer find and load skills by itself, and skills you select or attach still apply in full. The switch also covers the tools that read, edit and create skills (`read_skill_file`, `update_skill_files` and `create_skill`), so `/skills:create` needs it switched on.
+The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, each with the first 100,000 characters of its `SKILL.md`. The model cannot read the rest of a longer `SKILL.md` or the supporting files. Switching off a model's **Skills** category under **Builtin Tools** has the same effect: the model can no longer find and load skills by itself, and skills you select or attach are injected the same way. The switch also covers `read_skill_file`, `update_skill_files` and `create_skill`, so `/skills:create` needs it switched on.
 
 ### Skill tools
 
@@ -136,7 +136,7 @@ Add a short note in **Describe this change** beside **Save** to label the versio
 
 ### Supporting files
 
-A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. Markdown files have a **Preview**, images and PDFs open in place, and other binary files are offered for download.
+A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
 
 | Limit | Value |
 | :--- | :--- |
@@ -144,19 +144,19 @@ A skill is a small folder: `SKILL.md` at its root, plus any files the instructio
 | Size of all files in one skill | 50 MiB |
 | Files per skill | 1,000 |
 
-Text files are stored as UTF-8 text; any other file is stored base64-encoded. `SKILL.md` stays at the root and must be UTF-8 text. All file changes land together when you click **Save**.
+Text files are stored as text and any other file as binary. `SKILL.md` stays at the root and must be UTF-8 text. All file changes land together when you click **Save**.
 
-When a chat injects a skill in full, the model gets the list of its supporting files and reads them with `read_skill_file`.
-
-### Importing from Markdown
+### Importing skills
 
 The chevron menu beside **Create** has three import entries:
 
-- **Import** takes one or more `.zip`, `.json` or `.md` files, up to 200 MiB per import. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. Needs the **Import Skills** permission.
+- **Import** takes one or more `.zip`, `.json` or `.md` files, up to 200 MiB per import. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. Needs the **Skills Access** and **Import Skills** permissions.
 - **Import from URL** (admins only) downloads skills from a link. See [Importing from a URL](#importing-from-a-url).
-- **Import folder** takes a skill folder from your computer, or a folder holding several skill folders, each with its own `SKILL.md`. Needs the **Import Skills** permission.
+- **Import folder** takes a skill folder from your computer, or a folder holding several skill folders, each with its own `SKILL.md`. Needs the **Skills Access** and **Import Skills** permissions.
 
 Every import opens a preview listing each skill with its name, ID and files. For each one, choose **Create**, **Create copy**, **Replace** or **Skip**. A skill whose ID or name already exists starts on **Skip**; give it a unique ID and name to create it as a copy. **Replace** appears for existing skills you can edit, and saves the import as a new version of that skill with its sharing unchanged. New skills and copies start private.
+
+### Importing from Markdown
 
 Skills imported from a ZIP, a folder or a `.md` file take their name and description from the `SKILL.md` frontmatter, and the ID from the name; a JSON export carries its own:
 
@@ -211,7 +211,7 @@ This is the standard Open WebUI itself follows when it writes a skill through `/
 | Key | Rule |
 | :--- | :--- |
 | `name` | Lowercase and hyphenated, no spaces, 64 characters at most. |
-| `description` | A clear description, **1024 characters at most**, ending in a period. Name the capability, skip the implementation, do not repeat the skill name, and leave out words like powerful, comprehensive, seamless, advanced or robust. Count the characters before saving. |
+| `description` | A clear description, **1024 characters at most**, ending in a period. Name the capability, skip the implementation, do not repeat the skill name and leave out words like powerful, comprehensive, seamless, advanced or robust. Count the characters before saving. |
 | `platforms` | `[macos]`, `[linux]` or `[windows]`, and only when the skill uses something OS-bound. Omit it for portable skills. |
 
 **Body sections, in this order**
@@ -251,20 +251,20 @@ From the Skills workspace list, use the ellipsis menu (**...**) on a skill you c
 | **Edit** | Open the skill in the editor |
 | **Access** | Open the skill's access settings straight from the list. Changes save as you make them |
 | **Clone** | Create a private copy of the current version, with all its files, and open it in the editor. The copy's name and ID get a short random suffix |
-| **Export JSON** / **Export ZIP** | Download the skill with all its files. Needs the **Export Skills** permission |
+| **Export JSON** / **Export ZIP** | Download the skill with all its files. Needs the **Skills Access** and **Export Skills** permissions |
 | **Share** | Publish the skill with all its files on openwebui.com. Needs **Community Sharing** on and the **Export Skills** permission. See [Community skills](#community-skills) |
 | **Delete** | Permanently remove the skill and its whole version history (Shift+Click for quick deletion) |
 
-**Bulk export**: Click **Export ZIP** or **Export JSON** in the chevron menu beside **Create** to export all accessible skills as one file. The ZIP holds one folder per skill. Both need the **Export Skills** permission.
+**Bulk export**: Click **Export ZIP** or **Export JSON** in the chevron menu beside **Create** to export all accessible skills as one file. The ZIP holds one folder per skill. Both need the **Skills Access** and **Export Skills** permissions.
 
-**Active/Inactive toggle**: Inactive skills are excluded from manifests and from `$` mentions, even if bound to a model. Only users with write access to an inactive skill can still have the model load it through `view_skill`.
+**Active/Inactive toggle**: Inactive skills are left out of manifests and `$` mentions, even when bound to a model. Users with write access can still have the model load them (see [Skill tools](#skill-tools)).
 
 ### Community skills
 
 With **Community Sharing** switched on (see [Open WebUI Community](/ecosystem/community#turn-it-off)), the Skills workspace connects to openwebui.com:
 
 - **Discover a skill**, at the bottom of the skill list, opens the skills published on openwebui.com.
-- A skill imported from its page on openwebui.com opens in a new skill editor on your instance, with its name, description and all its files filled in. Review it and click **Save** to add it. This needs the **Skills Access** and **Import Skills** permissions.
+- A skill imported from its page on openwebui.com opens in a new skill editor on your instance, with its name, description and all its files filled in. Review it and click **Save & Create** to add it. This needs the **Skills Access** and **Import Skills** permissions.
 - **Share** in a skill's **...** menu opens openwebui.com in a new tab with a new post holding the skill and all its files. Nothing is published until you finish the post there. This needs the **Export Skills** permission, and a skill can be shared up to 15 MiB in total.
 
 ---
@@ -331,7 +331,7 @@ The editor's file, version, import and export features are backed by these endpo
 | `GET /export` | Exports skills as `format=json` or `format=zip`. Repeat `ids` to pick skills; with exactly one id, `version_id` exports a historical version. |
 | `POST /load/url` | Admins only. Downloads the skills behind `{"url": "..."}` (see [Importing from a URL](#importing-from-a-url)) and returns them as skill packages, without saving anything. |
 | `POST /import/preview` | Reads uploaded ZIP, JSON or Markdown files (up to 200 MiB in total) and lists the skills found, flagging IDs and names that already exist. |
-| `POST /import` | Imports the same uploads with a `decisions` list, one entry per skill: `action` (`create`, `copy`, `replace` or `skip`), optional `id` and `name`, and `expected_version_id` for `replace`. |
+| `POST /import` | Imports the same uploads with a `decisions` list, one entry per skill: `action` (`create`, `copy`, `replace` or `skip`), an optional `id` and `name`, plus `expected_version_id` for `replace`. |
 
 `POST /create` and `POST /id/{id}/update` take the skill's files as `files`, and an optional `commit_message` that labels the new version. An update can send `operations` (`put`, `move`, `delete`) to change single files. An update that sends `files` or `operations` needs `expected_version_id` and returns `409` when someone saved the skill in the meantime.
 
@@ -361,7 +361,7 @@ Pair a skill with Open Terminal to teach the model *how* to use it well. "Always
 
 ### Plain text only
 
-A skill holds instructions and files. Open WebUI stores a skill's scripts and hands them to the model to read; running one takes a tool that executes code, such as [Open Terminal](/features/open-terminal) or the code interpreter. For actions that require computation, API calls or system access, use [Tools](/features/extensibility/plugin/tools).
+Open WebUI stores a skill's scripts for the model to read. Running one takes a tool that executes code, such as [Open Terminal](/features/open-terminal) or the code interpreter. For computation, API calls or system access, use [Tools](/features/extensibility/plugin/tools).
 
 ### Context window with $ mention
 
@@ -369,4 +369,4 @@ When injected via `$` mention, the skill content goes into the system prompt, up
 
 ### Lazy loading requires function calling
 
-The manifest and the `view_skill` builtin tool need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with Builtin Tools enabled. Without them there is no lazy loading at all: every bound, toggled or mentioned skill is injected in full into the system prompt, and its supporting files need a model with the skill tools to be read.
+The manifest and the `view_skill` builtin tool need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with Builtin Tools enabled. Without them there is no lazy loading at all: every bound, toggled or mentioned skill is injected into the system prompt, up to the first 100,000 characters of its `SKILL.md`. Reading a skill's supporting files takes the skill tools, so it needs native function calling too.

@@ -65,7 +65,7 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 
 ## How to Install & Manage Workspace Tools
 
-📦 Workspace Tools are the most common way to extend your instance with community features.
+📦 Workspace Tools are the most common way to extend your instance with community features. They need [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), which is on by default.
 
 1. Go to [Community Tool Library](https://openwebui.com/search)
 2. Choose a Tool, then click the **Get** button.
@@ -78,7 +78,7 @@ Never import a Tool you don’t recognize or trust. These are Python scripts and
 
 ### Sharing a tool
 
-The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's access settings straight from the list, without opening the editor. It appears on tools you can edit.
+The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list, without opening the editor. It appears on tools you can edit.
 
 ### Version history
 
@@ -92,7 +92,7 @@ Every save that changes a tool's name, description, translations or code is kept
 A version holds the name, description, translations and code. Valves and access settings belong to the tool itself and keep their current values when you change versions. Setting a version as Production is refused when:
 
 - the current Valves do not fit that version's code (**Current Valves are incompatible with this code**). Adjust the Valves first (see [Changing Valves in Existing Code](/features/extensibility/plugin/development/valves#changing-valves-in-existing-code)).
-- the version's code differs from Production and you have neither the [**Tools Access** nor the **Import Tools** permission](/features/authentication-access/rbac/permissions). Write access on a tool without one of those permissions covers its name, description and translations; the code stays as it is, for saves and version changes alike.
+- the version's code differs from Production and you have neither the [**Tools Access** nor the **Import Tools** permission](/features/authentication-access/rbac/permissions#1-workspace-permissions). Without either permission, write access covers only a tool's name, description and translations, for saves and version changes alike.
 
 Every existing tool starts with one version, created by the upgrade.
 
@@ -289,12 +289,12 @@ Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with
 
 You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
 
-Your choice is saved to your user settings, so it carries over to new chats until you change it back. It is also stored on the chat, so reopening that chat keeps its mode. A denied call is reported back to the model as an error, so it can react rather than silently losing the result, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
+Your choice is saved to your user settings, so it carries over to new chats until you change it back. It is also stored on the chat, so reopening that chat keeps its mode. A denied call is reported back to the model as an error, so the model can react to it, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
 
 Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
 
 :::info Saved and temporary chats
-In a saved chat the pending call is stored on the assistant message, so approval prompts survive a page reload. In a [temporary chat](/features/chat-conversations/chat-features/url-params) each call opens a live **Tool Permissions** dialog showing the tool name and its arguments, with **Allow** and **Deny**. The call is denied when the browser tab is gone or nobody answers within 120 seconds, or within [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is set lower.
+In a saved chat the pending call is stored on the assistant message, so approval prompts survive a page reload. In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) each call opens a live **Tool Permissions** dialog showing the tool name and its arguments, with **Allow** and **Deny**. The call is denied at once when that chat is not the one open in the tab. It is also denied when the browser tab is gone or nobody answers within 120 seconds, or within [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is set lower.
 :::
 
 ### Tool Search
@@ -318,7 +318,7 @@ How it works:
 - **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
 - **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself.
 
-Write Always Loaded patterns against the tool names the model sees. MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
+Write Always Loaded patterns against the [tool names the model sees](/features/extensibility/mcp#tool-names-the-model-sees). MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
 
 ### Built-in System Tools (Native/Agentic Mode)
 
@@ -394,7 +394,7 @@ Write Always Loaded patterns against the tool names the model sees. MCP tools ca
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
-| **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
@@ -647,7 +647,7 @@ While built-in tools are active for the chat and the model's **Skills** category
 2. `view_skill`, `read_skill_file` and `update_skill_files` are injected so the model can load instructions and files on demand and edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
 3. When the user can read no active skill, the `<available_skills>` block is left out
 
-Skills mentioned with `$` in the chat input have their content injected directly into the system prompt, up to the first 100,000 characters of `SKILL.md`. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, skills selected for the chat or attached to the model are injected in full as well.
+Skills mentioned with `$` in the chat input have their content injected directly into the system prompt, up to the first 100,000 characters of `SKILL.md`. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, skills selected for the chat or attached to the model are injected the same way.
 
 When the chat has no system prompt, the skill summary is sent as a new system message. A custom backend that only adds its own system prompt when the request carries none needs to merge its prompt into the incoming system message, or its prompt is lost for every user with skill access.
 :::

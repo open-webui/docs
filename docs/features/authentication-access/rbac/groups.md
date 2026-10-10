@@ -113,7 +113,7 @@ When editing a group, you can toggle specific permissions.
 
 You can restrict access to specific objects (like a proprietary Model or sensitive Knowledge Base) using Groups or individual user grants.
 
-1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**.
+1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**. On resources you can edit, **Access** in the **⋯** menu of the **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists opens the same settings.
 2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once. A grant to a group also reaches the members of its subgroups.
 
 The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.** instead of leaving a **Users** heading above an empty list.

@@ -72,7 +72,7 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 
 The editor opens on a banner header: the background image fills the banner, with the model's picture, name and ID set over its lower edge. Below it come the description, the base model, the tags and the system prompt. A saved system prompt opens folded to a short preview; click it or **Show more** to edit it.
 
-Everything else sits in rows, one per setting. Each row shows a short summary of what is set, such as **Default**, **3 modified**, **Custom · 4** or **Web Search, Image Generation +2**, and opens when you click it. Hover a setting's name to see what it does.
+Everything else sits in rows, one per setting. Each row shows a short summary of what is set, such as **Default**, **3 modified**, **Custom · 4** or **Vision, File Upload, Web Search +2**, and opens when you click it. Hover a setting's name to see what it does.
 
 - **Switches**: **Capabilities**, **Default Features** and **Builtin Tools** open into switches, each with a one-line description.
 - **Pickers**: **Knowledge**, **Tools**, **Skills**, **Filters** and **Actions** open a searchable picker. **Clear** removes every selected item and **Manage** opens the workspace page where those items are created. **Enable all** selects every item matching the search (Knowledge has **Upload Files** in its place). Items marked **Global** are always on. When the list is empty, the picker names the workspace page where items are added.
@@ -80,7 +80,7 @@ Everything else sits in rows, one per setting. Each row shows a short summary of
 - **Prompts** holds the model's prompt suggestions.
 - **Voice** holds the realtime voice, the voice avatar and the TTS voice.
 
-**Save & Update** (**Save & Create** for a new model) and the **Describe this change** field stay pinned at the bottom of the editor while you scroll. The button becomes active once something has changed.
+**Save & Update** (**Save & Create** for a new model) stays pinned at the bottom of the editor while you scroll. When you edit an existing model, the **Describe this change** field sits beside it. **Save & Create** is always active; **Save & Update** becomes active once something has changed.
 
 ### Core configuration
 
@@ -142,7 +142,7 @@ Bind resources in the picker rows:
 | **Knowledge** | Bind collections or files. **Upload Files** in the picker adds files straight from your computer. Click an attached item to choose between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
 | **Tools** | Force-enable specific tools (e.g., Calculator for a Math Bot) |
 | **Skills** | Bind [Skills](/features/workspace/skills) so their manifests are always injected |
-| **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
+| **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
 | **Actions** | Attach action scripts (e.g., "Add to Memories"). The row appears once the instance has at least one action function |
 
 Toggle what the model can do in the **Capabilities** row and the two rows that follow it:
@@ -188,7 +188,9 @@ What you set here applies to every chat that does not set the same parameter its
 
 Model controls give people a few simple choices in the chat, such as how hard the model thinks or how long it answers, while you decide exactly which parameters each choice sends. A control called **Thinking** with the options Minimal, Low, Medium and High, each setting `reasoning_effort` to the matching value, lets anyone change the reasoning effort without knowing the parameter exists.
 
-Anyone with write access to a model can define its controls, in **Workspace > Models** or in **Settings > Admin > Models**. Use the **Model controls** section below **Advanced Params**: **+** adds a control, **Edit** changes one, **×** removes it and the handle on the left changes the order. Each row shows the control's default option. The controls are saved with the model, so they apply to everyone who can use it. Everyone who can edit the model sees the parameters behind each option, in the editor, the JSON Preview and the export. People who can only use the model see the control names, descriptions and option names. Those names can be translated per language, see [Translations](#translations).
+Anyone with write access to a model can define its controls, in **Workspace > Models** or in **Settings > Admin > Models**. Use the **Model controls** row below **Advanced Params**: **+** adds a control, **Edit** changes one, **×** removes it and the handle on the left changes the order. Each row shows the control's default option.
+
+The controls are saved with the model and apply to everyone who can use it. People who can edit the model see the parameters behind each option in the editor, the JSON Preview and the export. People who can only use it see the names, descriptions and option names, which can be translated (see [Translations](#translations)).
 
 ![The Edit control dialog for a Thinking control shown as a slider, with Minimal, Low, Medium and High options that each set reasoning_effort](/images/features/models/model-controls-edit.webp)
 
@@ -200,7 +202,7 @@ Anyone with write access to a model can define its controls, in **Workspace > Mo
 | **Display** | **Menu** shows the options as a list. **Slider** shows them as steps on a slider, in the order listed here, and needs at least two options |
 | **Options** | Each option has a name and one or more **Parameter** and **Value** pairs, added with **Add parameter**. Drag the handle to reorder options |
 
-An option's parameters work like the ones added with **Add Custom Parameter** in **Advanced Params**: the parameter name goes to the provider exactly as written, and a value that reads as JSON (a number, `true`, an object) is sent as that type, anything else as text. When an option has several parameters, all of them are sent together. For an Ollama model they end up in Ollama's `options`, except `think`, `format` and `keep_alive`, which go at the top level of the request.
+An option's parameters work like the ones added with **Add Custom Parameter** in **Advanced Params**: the parameter name goes to the provider exactly as written, and a value that reads as JSON (a number, `true`, an object) is sent as that type, anything else as text. When an option has several parameters, all of them are sent together. For an Ollama model they end up in Ollama's `options`, except `think`, `format` and `keep_alive`, which go at the top level of the request. A `think`, `format` or `keep_alive` the model sets itself still wins over a control; leave those three unset on the model if a control should drive them.
 
 Controls need a model served through one of the instance's connections, such as an OpenAI-compatible or Ollama connection. Saving controls on a model backed by a pipe function, on an arena model or on a model from a direct connection fails with **Model controls require a server-managed provider model.**
 
@@ -212,11 +214,12 @@ When a selected model has controls, a knobs icon (**Model controls**) appears ne
 
 ![Model controls in the chat shown as menus, with the Thinking submenu open on Default · Medium above Low, Medium and High](/images/features/models/model-controls-menu.webp)
 
-The icon is there only when a selected model has controls and the person has both the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions) (administrators always have them). With two models selected, each model's controls appear under its name, and each model gets its own choices.
+The icon is there only when a selected model has controls and the person has both the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) (administrators always have them). With two models selected, each model's controls appear under its name, and each model gets its own choices.
 
 - **Choices are saved to the account, per model.** Picking an option saves it right away and it applies to every chat with that model, new and existing, on every device, until the person picks something else.
 - **Default follows the model.** While **Default** is ticked, every message sends the default option's parameters, or nothing from that control when the default option is **None**. If someone later changes the default option, everyone on **Default** moves with it.
 - **A picked option replaces the same parameter everywhere else.** Its values win over the model's **Advanced Params**, the [Global Model Defaults](#global-model-defaults-admin), the person's **Settings > General** and **Chat Controls**. If two controls set the same parameter, the one lower in the list wins.
+- **A removed option blocks the model until a new pick.** If an editor removes an option someone picked, that person's messages to the model fail with `Model control <key>: the selected option is no longer available.` until they pick another option or **Default**. A pick for a removed control is skipped.
 - **Automations use the defaults.** A chat started by an [automation](/features/chat-conversations/chat-features/automations) always sends each control's default option.
 
 API callers get the same controls. See [Chat Completions](/reference/api-endpoints#-chat-completions) for how a request picks an option.
@@ -246,7 +249,7 @@ From the model list, click the ellipsis (**...**) on any model:
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Open the configuration panel |
-| **Access** | Open the model's access settings directly, without opening the editor |
+| **Access** | On models you can edit: opens the editor's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list. Changes save as you make them |
 | **Hide Model** / **Show Model** | Remove from the model selector without deleting, or bring it back |
 | **Hide from Sidebar** / **Keep in Sidebar** | Toggle the model's pin in the sidebar |
 | **Clone** | Create an editable copy you can rename and reconfigure |
@@ -254,8 +257,6 @@ From the model list, click the ellipsis (**...**) on any model:
 | **Export** | Download the configuration as `.json` |
 | **Share** | Share to the Open WebUI community |
 | **Delete** | Permanently remove the preset |
-
-**Access** appears on models you can edit. It opens the same access settings as the **Access** button in the editor, and changes there are saved as soon as you make them.
 
 ### Version history
 
@@ -265,9 +266,9 @@ Every **Save & Update** that changes a model's configuration is kept as a versio
 - **Set as Production** makes the opened version the live configuration. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
 - **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
 
-A version holds the name, the base model, the system prompt and parameters and the rest of the editor's settings, such as the description, tags, capabilities, prompt suggestions and the bound knowledge, tools, skills, filters, actions and terminal. The access settings, **Hide Model** and the **Enabled** switch belong to the live model and keep their current values when you change versions. Every existing model starts with one version, created by the upgrade.
+A version holds the name, base model, system prompt, parameters and the rest of the editor's settings, such as the description, tags, capabilities, prompt suggestions and the bound knowledge, tools, skills, filters, actions and terminal. The access settings, **Hide Model** and the **Enabled** switch belong to the live model and keep their current values when you change versions. Every existing model starts with one version, created by the upgrade.
 
-Setting a version as Production checks everything it points to, because an older version can reference things that have since been deleted or that you cannot reach. It is refused, and the live configuration stays as it was, when:
+Setting a version as Production checks everything it points to, because an older version can reference things that have since been deleted or that you cannot reach. The live configuration stays as it was, and the switch is refused, when:
 
 - its base model is no longer available.
 - a knowledge base, knowledge file, skill, tool or terminal it binds is missing or not accessible to you.

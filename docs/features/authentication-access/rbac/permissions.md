@@ -51,11 +51,11 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Import Prompts** | *(Requires Prompts Access)* Ability to import prompts. |
 | **Export Prompts** | *(Requires Prompts Access)* Ability to export prompts. |
 | **Tools Access** | **(Parent)** Access the **Tools** workspace to manage functions/tools. Hidden, along with its Import and Export sub-toggles, when [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) or [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) is `false`, since the Tools workspace does not exist in that case. |
-| **Import Tools** | *(Requires Tools Access)* Ability to import tools. |
+| **Import Tools** | *(Requires Tools Access)* Ability to import tools. See [Version history](/features/extensibility/plugin/tools#version-history) for how it affects code changes. |
 | **Export Tools** | *(Requires Tools Access)* Ability to export tools. |
-| **Skills Access** | **(Parent)** Access the **Skills** workspace to create and manage reusable instruction sets. |
-| **Import Skills** | *(Requires Skills Access)* Import skills into the Skills workspace. |
-| **Export Skills** | *(Requires Skills Access)* Export skills from the Skills workspace. |
+| **Skills Access** | **(Parent)** Access the **Skills** workspace to create and manage reusable instruction sets. Also needed for [`/skills:create`](/features/workspace/skills#from-a-chat-with-skillscreate). |
+| **Import Skills** | *(Requires Skills Access)* Import skills into the Skills workspace (see [Importing skills](/features/workspace/skills#importing-skills) and [Community skills](/features/workspace/skills#community-skills)). |
+| **Export Skills** | *(Requires Skills Access)* Export skills from the Skills workspace (see [Skill Management](/features/workspace/skills#skill-management) and [Community skills](/features/workspace/skills#community-skills)). |
 
 :::danger ⚠️ Tools Access = Root-Equivalent Access
 **Treat the Tools Access permission as root-equivalent access.** Granting a user access to create or import Tools is equivalent to giving them shell access to your server, because Tools and Functions execute arbitrary Python code. Only grant this permission to users you would trust with direct access to your server. If you enable this permission for untrusted users, you are accepting the risk of arbitrary code execution on your host. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
@@ -102,10 +102,10 @@ Controls the features available to the user inside the chat interface.
 
 | Permission | Description |
 | :--- | :--- |
-| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. |
+| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. Also needed for [model controls](/features/workspace/models#using-model-controls-in-chat). |
 | **Allow Chat Valves** | *(Requires Allow Chat Controls)* Access to model-specific configuration "valves". |
 | **Allow Chat System Prompt** | *(Requires Allow Chat Controls)* Ability to edit the system prompt for a conversation. |
-| **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). |
+| **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). Also needed for [model controls](/features/workspace/models#using-model-controls-in-chat). |
 | **Allow File Upload** | Ability to upload files to the chat. |
 | **Allow Web Upload** | Ability to attach a web page to a chat by URL, using **Attach Webpage** in the message input's attach menu ([`USER_PERMISSIONS_CHAT_WEB_UPLOAD`](/reference/env-configuration#user_permissions_chat_web_upload)). On by default. When disabled, the option is greyed out and the attach is refused. Admins are always exempt. |
 | **Allow Chat Delete** | Ability to delete entire chat conversations ([`USER_PERMISSIONS_CHAT_DELETE`](/reference/env-configuration#user_permissions_chat_delete)). On by default. When disabled, the delete controls are hidden from non-admins rather than shown and refused: the sidebar chat menu, the `Shift`+hover delete icon on a sidebar row, the chat's own top-bar menu, the search results, the per-chat delete in **Settings > Archived Chats** and **Delete All Chats** in **Settings > Data Controls**. The **Delete chat** keyboard shortcut stops doing anything, and archiving is unaffected. Deleting a folder that still holds chats needs this permission too, and that menu entry is not hidden, so it is refused rather than absent. Admins are always exempt. |

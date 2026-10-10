@@ -361,9 +361,9 @@ Knowledge bases can be managed programmatically:
 
 **Incremental directory sync** (added in v0.9.6)
 
-- `POST /api/v1/knowledge/{id}/sync/diff`: Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete, and which directories to create/remove. Read-only, does not mutate the KB. A file uploaded to the KB less than an hour ago that is still pending or processing counts as unmodified when its path, name and checksum match, so a second sync does not upload it again. After an hour it is offered for upload again.
+- `POST /api/v1/knowledge/{id}/sync/diff`: Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete and which directories to create/remove. Read-only, does not mutate the KB. A file uploaded to the KB less than an hour ago that is still pending or processing counts as unmodified when its path, name and checksum match, so a second sync does not upload it again. After an hour it is offered for upload again.
 - After acting on the diff (create `mkdir` paths, upload `added` + `modified` files with their hashes via `POST /api/v1/files/`), call:
-- `POST /api/v1/knowledge/{id}/sync/cleanup`: Body: `{file_ids: [...], dir_ids: [...]}`. Removes the stale files (from the KB, vector store, and per-file collections) and the now-empty directories returned by `sync/diff`. Run this last so deletions don't outrun uploads.
+- `POST /api/v1/knowledge/{id}/sync/cleanup`: Body: `{file_ids: [...], dir_ids: [...]}`. Removes the stale files (from the KB, vector store and per-file collections) and the now-empty directories returned by `sync/diff`. Run this last so deletions don't outrun uploads.
 
 File processing happens asynchronously. You must poll the status endpoint until processing completes before adding files to a knowledge base, or you'll get an "empty content" error. See [API Endpoints](/reference/api-endpoints#-retrieval-augmented-generation-rag) for workflow examples.
 

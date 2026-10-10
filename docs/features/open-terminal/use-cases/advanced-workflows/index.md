@@ -51,9 +51,9 @@ Type `$` in the chat input, then search for your skill by name. Select it, and t
 
 ![AI interacting with data using skills and structured workflows](/images/open-terminal-ai-csv-analysis.png)
 
-**Option 2: Attach it to a Model (auto-discovery)**
+**Option 2: Let the AI find it (auto-discovery)**
 
-This is the more powerful option. Go to **Workspace → Models → Edit**, open the **Skills** row and pick the skill. Now the AI **automatically discovers and uses it when relevant**. You don't need to mention the skill at all.
+This is the more powerful option. With built-in tools active and the model's **Skills** category on, the AI **automatically discovers and uses every active skill you can read when relevant**. You don't need to mention the skill at all. Attaching a skill to a model (**Workspace → Models → Edit**, **Skills** row) pre-selects it in the chat. Without built-in tools, an attached skill is injected into every chat with that model.
 
 Here's how it works behind the scenes:
 
@@ -61,7 +61,7 @@ Here's how it works behind the scenes:
 2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the full instructions and the list of the skill's supporting files
 3. The AI then follows those instructions to handle your request
 
-This means you can attach a "Data Report Generator" skill to your model, and any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.
+This means that with a "Data Report Generator" skill in your workspace, any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.
 
 ![Model capabilities settings page](/images/open-terminal-model-capabilities.png)
 
