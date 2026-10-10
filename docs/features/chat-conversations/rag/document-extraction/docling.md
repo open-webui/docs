@@ -229,6 +229,12 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via e
 - Tesseract uses 3-letter codes: `["eng", "deu"]`
 - EasyOCR uses 2-letter codes: `["en", "de"]`
 
+### Citations point to the wrong page
+
+**Cause**: Docling marks only page changes in its Markdown output, so a blank page leaves no page break. Files extracted before v0.12.0 counted pages from those breaks, and every citation after a blank page shows an earlier page number. From v0.12.0, Open WebUI takes the page numbers from the JSON output Docling returns alongside the Markdown.
+
+**Solution**: Upload the affected files again, for example by removing a file from its knowledge base and adding it back. Page numbers are set when Docling extracts a file, and **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents** reuses the text already extracted, so it keeps the old page numbers.
+
 ### "Error calling Docling" with no specific details
 
 **Steps to diagnose:**

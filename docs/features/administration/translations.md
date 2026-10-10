@@ -17,7 +17,7 @@ Separately from that, admins can override Open WebUI's own interface wording, th
 
 | Resource | Fields | Where |
 | :--- | :--- | :--- |
-| **Models** | Name, description, prompt suggestions | Workspace > Models, in the model editor. See [Models](/features/workspace/models#translations) |
+| **Models** | Name, description, prompt suggestions, model control and option names | Workspace > Models, in the model editor. See [Models](/features/workspace/models#translations) |
 | **Tools** | Name, description, valve labels | Workspace > Tools, in the tool editor |
 | **Skills** | Name, description | Workspace > Skills, in the skill editor |
 | **Functions** | Name, description, valve labels, per-action labels | Settings > Admin > Functions, in the function editor |
@@ -52,7 +52,7 @@ Open WebUI picks by the language the user has the interface set to, in this orde
 
 A field you leave blank is dropped when you save, so an empty translation is the same as no translation and the original shows through. Translate what matters and leave the rest.
 
-Translated text follows the resource everywhere it is named: model and tool pickers, the new chat screen, the `@`, `$` and `/` menus, the Integrations menu, the action buttons under a reply, the sidebar and the Workspace lists. Workspace search matches both the translated name and the original, so searching for either finds the thing.
+Translated text follows the resource everywhere it is named: model and tool pickers, the new chat screen, the `@`, `$` and `/` menus, the Integrations menu, the model controls panel, the action buttons under a reply, the sidebar and the Workspace lists. Workspace search matches both the translated name and the original, so searching for either finds the thing.
 
 ---
 
@@ -86,6 +86,22 @@ Only the labels change. Valve names, stored values and defaults are untouched, s
 An import is checked before it is accepted. Every value has to be a string, and any `{{ placeholder }}` in the original has to appear in the translation as well, so a translation cannot quietly drop the value that gets substituted into it. A file that fails either check is rejected with the offending key named, and nothing is changed.
 
 The table also has a search box and a **Modified** filter for showing only rows you have actually translated, which is how you find what is left in a plugin with a lot of valves.
+
+---
+
+## Translating model controls
+
+A model's [controls](/features/workspace/models#model-controls) carry names people read in the chat: the control's name, its description and the name of each option. Pick a language in the model editor and the **Model controls** row lists each of them with the original as placeholder text. **Use default** clears every control translation for that language at once.
+
+The translations are stored with the model's other translations in `meta.i18n`, one map per language, under these keys:
+
+| Key | What it labels |
+| :--- | :--- |
+| `model_controls.<key>.label` | The control's name |
+| `model_controls.<key>.description` | Its help text |
+| `model_controls.<key>.options.<value>.label` | The name of one option |
+
+`<key>` is the control's ID and `<value>` the option's ID, the same IDs the API uses under `params.model_controls`. Only the names change; the parameters each option sends stay the same in every language.
 
 ---
 

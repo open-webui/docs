@@ -212,7 +212,7 @@ location ^~ /_app/immutable/ {
 ```
 
 - The `immutable` keyword stops browsers from revalidating on reload/F5, `max-age` alone doesn't. If a year feels uncomfortable, 30 days (`max-age=2592000, immutable`) gives nearly the same effect; the hashed filenames make staleness impossible either way.
-- **Do not** apply long caching to the HTML shell or `/_app/version.json`, leave those uncached or at a few minutes at most, or users won't pick up upgrades.
+- **Do not** apply long caching to the HTML shell or `/_app/version.json`, leave those uncached or at a few minutes at most, or users won't pick up upgrades. Open WebUI sends the HTML shell with `Cache-Control: no-cache` unless [`CACHE_CONTROL`](/reference/env-configuration#cache_control) is set, so browsers revalidate it on every visit; keep that header as it is at the proxy.
 - `proxy_cache` means each asset is fetched from a worker once per cache lifetime instead of once per user, removing the static file serving load from the Python workers entirely.
 - If Nginx compresses on the fly, note that it compresses on **every response** (its proxy cache stores the uncompressed body), so prefer moderate levels, `gzip_comp_level 4;` / brotli quality 4–5 gets ~95% of the ratio of level 6 at roughly half the CPU, and set `gzip_min_length 1000;` so tiny responses skip the compressor.
 
@@ -243,6 +243,8 @@ WEBSOCKET_REDIS_ROOM_CHANNELS=True
 Every instance must run the same mode. When changing this setting, stop or update all instances at once.
 
 :::
+
+If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE` and `PSUBSCRIBE` commands and access to the channels `&socketio` and `&socketio#*`. The room channels are named `socketio#<namespace>#<room>`, and each instance subscribes to them with the pattern `socketio#*`. When a permission is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
 
 `WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel again. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
 

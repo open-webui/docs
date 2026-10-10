@@ -46,8 +46,8 @@ Everything that adds or moves workspace items runs through one **Create** button
 | **Models** | Opens the model editor on its own page | Import JSON, Export JSON |
 | **Knowledge** | Opens a dialog on top of the list | none |
 | **Prompts** | Opens a dialog on top of the list | Import JSON, Export JSON |
-| **Skills** | Opens the skill editor on its own page | Import JSON, Export JSON |
-| **Tools** | Opens the tool editor on its own page | Import From Link (admins only), Import JSON, Export JSON |
+| **Skills** | Opens the skill editor on its own page | Import, Import from URL (admins only), Import folder, Export ZIP, Export JSON |
+| **Tools** | Opens the tool editor on its own page | Import from URL (admins only), Import JSON, Export JSON |
 
 When a section has only one action available, the chevron is dropped and **Create** is a plain button. That is always the case for Knowledge, and it happens elsewhere when the import and export permissions are withheld: each menu entry is gated by the matching `workspace` permission (`models_import`, `prompts_export` and so on), and admins always see all of them. Export writes the section's items to a JSON file, which the matching Import reads back.
 

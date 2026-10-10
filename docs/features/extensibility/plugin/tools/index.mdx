@@ -395,7 +395,7 @@ Write Always Loaded patterns against the tool names the model sees. MCP tools ca
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
-| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message. Not available in a [temporary chat](/features/chat-conversations/chat-features/url-params).* |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
