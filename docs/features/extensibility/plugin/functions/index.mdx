@@ -97,12 +97,10 @@ The Python source code is loaded via `exec()` into a temporary module namespace.
 
 ### When a Function Fails to Load
 
-If the code raises while it is being executed, Open WebUI switches the function to **inactive** rather than leaving it to fail on every request. That covers a syntax error, an `import` that fails, an exception raised while the class is constructed and a file with no `Pipe`, `Filter`, `Action` or `Event` class in it. A failed `requirements` install is separate: it rejects the save and leaves the function's state alone.
+A function fails to load when its code raises while it is being executed: a syntax error, an `import` that fails, an exception raised while the class is constructed or a file with no `Pipe`, `Filter`, `Action` or `Event` class in it.
 
-- **Saving over an existing function** executes the code before storing it. The save is rejected and your new source is never written, so what ends up deactivated is the version already in the database. The browser only shows a generic error, the Python error goes to the server log as `Error loading module: <function id>: <the error>`.
-- **Outside the editor**, the same execution happens every time the module is loaded again, so a function can turn itself off with nobody touching it in the admin panel. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart.
-
-Fix the code, then switch the function back on in **Admin Panel > Functions**.
+- **Saving in the editor** executes the new code before storing it. Code that fails to load is refused: the Python error shows in the editor, the new source is not written, and the version already saved stays active and keeps running. Fix the code and save again. A failed `requirements` install is refused the same way.
+- **Outside the editor**, the code is executed again every time the module is loaded, for example after a restart. When that fails, Open WebUI switches the function to **inactive** to keep it from failing on every request, and logs `Error loading module: <function id>: <the error>`. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart. Fix the code, then switch the function back on in **Admin Panel > Functions**.
 
 ### Frontmatter
 
