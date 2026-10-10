@@ -45,7 +45,7 @@ For knowledge search, document extraction or voice, slim connects to services th
 
 Check your database and file storage before switching:
 
-- **Database:** SQLite and PostgreSQL are supported. MySQL, MariaDB, Oracle and AWS RDS IAM authentication require the standard image.
+- **Database:** SQLite and PostgreSQL work on slim, the two databases Open WebUI supports. AWS RDS IAM authentication for PostgreSQL requires the standard image.
 - **File storage:** Local files and S3 (`STORAGE_PROVIDER=s3`) are supported. Azure Blob and Google Cloud Storage require the standard image.
 
 Slim checks these settings at startup and reports an error for unsupported configurations. Default installs already use SQLite and local files.
