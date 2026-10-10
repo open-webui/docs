@@ -164,7 +164,7 @@ When access grants span many groups and resources, it's easy to lose track of wh
 
 **For a user**: In **Admin Panel > Users**, hover over a non-admin user row and click the eye-style **Preview Access** button. The modal shows every model, knowledge base, and tool the user can read, aggregated across all of their group memberships (including groups inherited through parent groups) and any direct user grants, **plus the resources they own themselves**, which they can always read without a grant existing for them. Models that have been deactivated are left out, since nobody reaches them.
 
-**For a group**: In **Admin Panel > Users > Groups**, open the group editor and use the **Preview Group Access** panel. The output is the same shape (models, knowledge, tools), scoped to the grants given to that group and to its parent groups.
+**For a group**: In **Admin Panel > Users > Groups**, open the group editor and use its **Preview** tab. The output is the same shape (models, knowledge, tools), scoped to the grants given to that group and to its parent groups.
 
 Both views are admin-only and read-only: they reflect what the access-grant table currently says without modifying it. Use them after a permission change to confirm the result matches intent, or as part of a periodic RBAC audit.
 

@@ -214,7 +214,7 @@ The chip being present = the filter is enabled for the next request. The chip be
 
 - Stored in the browser as **sessionStorage draft state**, keyed per chat.
 - Survives page reloads in the same browser session but is **not persisted to the chat record on the server**.
-- Initial state comes from the model's `defaultFilterIds` (Settings > Admin > Models → Edit the model → Default Filters). Admins decide which toggleable filters start **on** vs **off** per model.
+- Initial state comes from the model's `defaultFilterIds` (Settings > Admin > Models → Edit the model → **Filters** → **Start enabled in new chats**). Admins decide which toggleable filters start **on** vs **off** per model.
 - Resets when the user switches to a different model.
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
@@ -358,14 +358,14 @@ Open WebUI uses a sophisticated two-tier system for managing filters on a per-mo
 
 #### Tier 1: FiltersSelector (Which filters are available?)
 
-**Location:** Model Settings → Filters → "Filters" Section
+**Location:** Model Settings → **Filters** row
 
 This controls which filters are **available** for a specific model.
 
 **Behavior:**
-- Shows **all** filters (both global and model-specific)
-- **Global filters** appear as checked and disabled (can't be unchecked)
-- **Regular filters** can be toggled on/off
+- Opens a searchable picker with **all** filters (both global and model-specific)
+- **Global filters** are marked **Global** and cannot be clicked
+- **Regular filters** are added or removed with a click
 - Saves to: `model.meta.filterIds` in the database
 
 **Example:**
@@ -379,9 +379,9 @@ This controls which filters are **available** for a specific model.
 
 #### Tier 2: DefaultFiltersSelector (Which toggleable filters start enabled?)
 
-**Location:** Model Settings → Filters → "Default Filters" Section
+**Location:** Model Settings → **Filters** row → **Start enabled in new chats** switch
 
-This section **only appears** when at least one toggleable filter is selected (or is global).
+The switch appears below each toggleable filter that is selected or global.
 
 **Purpose:** Controls which toggleable filters are **enabled by default** for new chats.
 
@@ -428,7 +428,7 @@ Understanding the difference between these two types is key to using the filter 
 **Characteristics:**
 - Run automatically whenever the filter is active for a model
 - **No user control** in the chat interface
-- Do **not** appear in the "Default Filters" section
+- Have no **Start enabled in new chats** switch in the model's **Filters** row
 - Do **not** show up in the chat integrations menu (⚙️ icon)
 
 **Use Cases:**
@@ -461,7 +461,7 @@ class ContentModerationFilter:
 **Characteristics:**
 - Appear in the **chat input bar as a clickable chip** and in the **Integrations menu (⚙️ icon) as a Switch**.
 - Users can add or remove them from the active selection on a per-chat, per-session basis. Selection is stored in browser sessionStorage, not persisted to the chat record on the server.
-- **Do** appear in the model's "Default Filters" configuration.
+- Get a **Start enabled in new chats** switch in the model's **Filters** row.
 - `defaultFilterIds` on the model controls the **initial selection** (which toggleable filters start on when a new chat begins with that model).
 - `self.toggle` itself is **never mutated at runtime**: it's a visibility/gating flag read once at request dispatch. `inlet()` only runs when the filter is currently selected; there is no "else" branch to write inside the filter. See [the detailed note above](#what-selftoggle--true-actually-does).
 
@@ -497,8 +497,8 @@ class WebSearchFilter:
 
 **Where Toggleable Filters Appear:**
 
-1.  **Model Settings → Default Filters**
-    - Admin picks which toggleable filters start in the selection on new chats with that model.
+1.  **Model Settings → Filters → Start enabled in new chats**
+    - Admin switches on the toggleable filters that start in the selection on new chats with that model.
 2.  **Chat input bar → Inline chip**
     - Shown for every toggleable filter currently in the user's selection for this chat.
     - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection** (it moves back to the Integrations menu where the user can re-enable it).
@@ -520,9 +520,9 @@ Here's the complete flow from admin configuration to filter execution:
 - Toggle is_global (apply to all models)
 
 **2. MODEL CONFIGURATION (Per-Model Filter Selection)**
-- Model Settings → Filters Section
-- FiltersSelector: Select which filters for this model
-- DefaultFiltersSelector: Set default enabled state (only for toggleable filters)
+- Model Settings → **Filters** row
+- Filters picker: Select which filters for this model
+- **Start enabled in new chats** switch: Set default enabled state (only for toggleable filters)
 
 **3. CHAT UI (User Interaction, Toggleable Filters Only)**
 - Chat input bar → Inline chip (add/remove via click; click opens UserValves modal if defined)
@@ -904,11 +904,13 @@ Only parameters you declare in your function signature are injected. Open WebUI 
 
 #### In Model Settings (FiltersSelector)
 
-| State | Checkbox | Description |
-|-------|----------|-------------|
-| Global Filter | ✅ Checked & Disabled (greyed) | "This filter is globally enabled" |
-| Selected Filter | ✅ Checked & Enabled | "This filter is selected for this model" |
-| Unselected Filter | ☐ Unchecked & Enabled | "Click to include this filter" |
+| State | Picker entry | Description |
+|-------|--------------|-------------|
+| Global Filter | ✓ Marked **Global**, not clickable | "This filter is globally enabled" |
+| Selected Filter | ✓ Checkmark, clickable | "This filter is selected for this model" |
+| Unselected Filter | No checkmark, clickable | "Click to include this filter" |
+
+Each selected or global toggleable filter shows a **Start enabled in new chats** switch below its entry.
 
 #### In Chat UI (Integrations Menu)
 

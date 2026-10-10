@@ -53,7 +53,7 @@ Type `$` in the chat input, then search for your skill by name. Select it, and t
 
 **Option 2: Attach it to a Model (auto-discovery)**
 
-This is the more powerful option. Go to **Workspace → Models → Edit** and check the skill under the **Skills** section. Now the AI **automatically discovers and uses it when relevant**. You don't need to mention the skill at all.
+This is the more powerful option. Go to **Workspace → Models → Edit**, open the **Skills** row and pick the skill. Now the AI **automatically discovers and uses it when relevant**. You don't need to mention the skill at all.
 
 Here's how it works behind the scenes:
 

@@ -494,7 +494,7 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 ✅ **Solutions (check in order):**
 
 1. **Check Global Model Settings first**:
-   - Go to **Settings > Admin > Models > Model Defaults > Configure**
+   - Go to **Settings > Admin > Models** and open **Model Defaults**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
    - Models without an explicit per-model value inherit this setting. Keep the effective value set to `native` and check that the selected model supports tool calling
    - Also check the **Model Capabilities** section: **File Context** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access

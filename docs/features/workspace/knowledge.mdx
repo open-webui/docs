@@ -349,7 +349,8 @@ Knowledge bases can be managed programmatically:
 - `GET /api/v1/files/{id}/content/{file_name}`: Download the file as an attachment. When the original upload is missing, it returns the indexed text as plain text.
 - `GET /api/v1/files/{id}/data/content`: Read the indexed text
 - `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
-- `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base
+- `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base. A file whose extracted text is already in the knowledge base is rejected with `Duplicate content detected. Please provide unique content to proceed.`
+- `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added. Content batch-added before v0.12.0 has no content hash and is not detected as a duplicate.
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)
 
 **Directories**
@@ -360,7 +361,7 @@ Knowledge bases can be managed programmatically:
 
 **Incremental directory sync** (added in v0.9.6)
 
-- `POST /api/v1/knowledge/{id}/sync/diff`: Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete, and which directories to create/remove. Read-only, does not mutate the KB.
+- `POST /api/v1/knowledge/{id}/sync/diff`: Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete, and which directories to create/remove. Read-only, does not mutate the KB. A file uploaded to the KB less than an hour ago that is still pending or processing counts as unmodified when its path, name and checksum match, so a second sync does not upload it again. After an hour it is offered for upload again.
 - After acting on the diff (create `mkdir` paths, upload `added` + `modified` files with their hashes via `POST /api/v1/files/`), call:
 - `POST /api/v1/knowledge/{id}/sync/cleanup`: Body: `{file_ids: [...], dir_ids: [...]}`. Removes the stale files (from the KB, vector store, and per-file collections) and the now-empty directories returned by `sync/diff`. Run this last so deletions don't outrun uploads.
 

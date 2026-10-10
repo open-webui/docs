@@ -210,7 +210,7 @@ Every save creates a new version. When editing a prompt, the history menu above 
 - **Compare to current** shows what differs between that version and the live one: the name and tags side by side, then the prompt content as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.
 - **Edit as new version** makes the previewed content editable. Saving creates a new version from it. The **Set as Production** checkbox beside **Save** starts unticked here, so the live prompt stays as it is until you tick it.
 - **Set as Production** restores that version as the active one.
-- **Delete Version** in a version's **⋯** menu removes it. The live version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the history stays connected.
+- **Delete** in a version's **⋯** menu removes it after you confirm in the **Delete Version** dialog. The live version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the history stays connected.
 
 Switching to another version or leaving the editor while you have unsaved changes asks whether to discard them first. Anyone who can view a prompt can open and compare its versions; editing, setting a version live and deleting need write access.
 

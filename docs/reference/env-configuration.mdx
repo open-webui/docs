@@ -250,7 +250,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings > Admin > Models** (**Model Defaults** > **Configure** > **Model Parameters**).
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings > Admin > Models** (**Model Defaults** > **Model Parameters**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_params`.
 
 :::info
@@ -2908,6 +2908,7 @@ v0.12.0 moves Milvus, in both regular and multitenancy mode, to native hybrid se
 - **The copy needs free disk space for a full second copy of your Milvus data.** The original collections are dropped only after every copy has succeeded. A failed run leaves all collections unchanged and is retried on the next start.
 - Run that first start on a single instance with one worker, as with any migration, so only one process performs the copy.
 - **Requires Milvus 2.5 or newer.** On older Milvus servers the migration is skipped and hybrid search keeps working the way it did before.
+- With [`ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`](#enable_rag_hybrid_search_enriched_texts) on, native hybrid search is skipped: every search fetches all chunks of the collection and Open WebUI scores BM25 itself.
 
 :::
 
@@ -4239,7 +4240,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `bool`
 - Default: `False`
-- Description: Enhances BM25 hybrid search by enriching indexed text with document metadata including filenames, titles, sections, and snippets. This improves keyword recall for metadata-based queries, allowing searches to match on document names and structural elements in addition to content.
+- Description: Enhances BM25 hybrid search by enriching indexed text with document metadata including filenames, titles, sections, and snippets. This improves keyword recall for metadata-based queries, allowing searches to match on document names and structural elements in addition to content. While it is on, the native hybrid search of Milvus 2.5 or newer and pgvector is skipped: every search fetches all chunks of the collection and Open WebUI scores BM25 itself.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -5907,7 +5908,7 @@ These variables configure **Realtime** call mode for [Voice Mode](/features/chat
 
 - Type: `str`
 - Default: Empty string, which falls back to the built-in realtime call prompt.
-- Description: Sets the instructions for the realtime voice model. A custom template replaces the built-in prompt completely and is used as written, so it should still tell the voice model to call `generate_chat_completion` for real questions and tasks. That function is how the voice model reaches the chat's selected model.
+- Description: Sets the instructions for the realtime voice model. A custom template replaces the built-in prompt completely and is used as written. For a model with [avatar gestures](/features/chat-conversations/chat-features/voice-mode#animations-and-gestures), Open WebUI appends short instructions for playing them. The template should still tell the voice model to call `generate_chat_completion` for real questions and tasks. That function is how the voice model reaches the chat's selected model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### OpenAI Text-to-Speech

@@ -163,6 +163,12 @@ The **Shell** tab of the [terminal pane](../terminal-pane.md) is your own shell.
 
 Automations and sub-agents never get the two tools. The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
+## AGENTS.md
+
+When a terminal is selected in the chat, Open WebUI reads `AGENTS.md` from the home folder of the terminal's user on every message. Its content is added to the conversation as a user message just before the first user message, so the model gets your standing instructions for that workspace. Edits to the file apply from the next message. Windows home folders work too.
+
+A file larger than 32 KiB is skipped, and so is a read that takes longer than 5 seconds. A terminal an admin configured is read by the Open WebUI server. A terminal a user added in their own settings is read through that user's browser, so the chat tab has to stay open.
+
 ---
 
 ## Troubleshooting

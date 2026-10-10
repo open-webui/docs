@@ -72,6 +72,10 @@ class Filter:
 
 </details>
 
+## Changing Valves in Existing Code
+
+Saving a tool or function checks the Valve values already stored for it against the new code. When a stored value does not validate, for example because the new code changed a field's type or limits, the save is refused with `Current Valves are incompatible with this code: <field>: <message>` and the saved code stays as it was. Keep changed fields compatible with the values already stored, or adjust the Valves first. A field that has no stored value yet does not block the save. Setting an older version as Production runs the same check.
+
 ## Translating valve labels
 
 Valve titles, help text and dropdown option labels can be stored per language, from the globe selector in the tool or function editor. Only the labels change, the field names and the values you receive in code stay exactly as written. See [Translations](/features/administration/translations#translating-valve-labels).
