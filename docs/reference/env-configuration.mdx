@@ -4178,14 +4178,14 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `int`
 - Default: `3`
-- Description: Sets the default number of results to consider for the embedding when using RAG.
+- Description: Sets the default number of chunks retrieved per search query from each attached knowledge base or file. With hybrid search off, these chunks go to the model. With [hybrid search](#enable_rag_hybrid_search) on, they are the candidates the reranker scores, and [`RAG_TOP_K_RERANKER`](#rag_top_k_reranker) sets how many of them reach the model. Either way, one knowledge base or file passes at most this many chunks to the model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_TOP_K_RERANKER`
 
 - Type: `int`
 - Default: `3`
-- Description: Sets the default number of results to consider for the reranker when using RAG.
+- Description: Sets the default number of chunks kept after reranking and given to the model, per search query from each attached knowledge base or file. Only used with [hybrid search](#enable_rag_hybrid_search). One knowledge base or file passes at most [`RAG_TOP_K`](#rag_top_k) chunks to the model, so keep this value lower. Example: `RAG_TOP_K=50` and `RAG_TOP_K_RERANKER=10` let the reranker choose the best 10 of 50 candidates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_RELEVANCE_THRESHOLD`
