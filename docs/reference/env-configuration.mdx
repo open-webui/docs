@@ -2921,6 +2921,8 @@ For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HO
 
 v0.12.0 moves Milvus, in both regular and multitenancy mode, to native hybrid search, and **existing data is migrated the first time the new version starts**.
 
+What to expect during the migration, reference speeds and a script to follow its progress: [Milvus Native Hybrid Search Migration](/tutorials/maintenance/milvus-hybrid-search-migration).
+
 - **Back up your Milvus data first.** Do not upgrade Milvus and Open WebUI on the same day: upgrade one, confirm it works, then the other.
 - On the first start with `ENABLE_DB_MIGRATIONS` on (the default), every Open WebUI collection in Milvus is **copied in full** into a new collection that holds the vectors, the text and a BM25 keyword index together. Nothing is re-embedded. This runs whether or not hybrid search is turned on.
 - **Open WebUI only finishes starting once the copy is done.** Measured at 11 to 22 MB/s on a 16-thread machine with Milvus's own Docker Compose setup, so 200 GB takes about 2.5 to 5 hours. Plan the downtime, and give health checks and orchestrator start-up probes enough time so the container is not restarted mid-copy.
