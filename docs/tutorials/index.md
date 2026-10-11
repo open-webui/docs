@@ -41,7 +41,7 @@ Connect Open WebUI to LLM providers, monitoring platforms, developer tools, and 
 | [DeepSeek R1 Dynamic](/tutorials/integrations/llm-providers/deepseekr1-dynamic) | Run the full 671B DeepSeek-R1 via llama.cpp | 👤 Developer · ⏱️ 45 min |
 | [Intel GPU (IPEX-LLM)](/tutorials/integrations/llm-providers/ipex_llm) | Accelerate Ollama on Intel GPUs | 👤 Developer · ⏱️ 20 min |
 | [Helicone](/tutorials/integrations/monitoring/helicone) | Monitor LLM API calls, costs, and latency | 👤 Admin · ⏱️ 15 min |
-| [Langfuse](/tutorials/integrations/monitoring/langfuse) | Trace LLM usage and evaluate prompt quality | 👤 Admin · ⏱️ 20 min · ⚠️ Outdated |
+| [Langfuse](/tutorials/integrations/monitoring/langfuse) | Trace LLM usage and evaluate prompt quality | 👤 Admin · ⏱️ 10 min |
 | [Continue.dev](/tutorials/integrations/dev-tools/continue-dev) | Use Open WebUI as a VS Code backend | 👤 Developer · ⏱️ 15 min |
 | [Jupyter Notebooks](/tutorials/integrations/dev-tools/jupyter) | Code interpreter with Jupyter integration | 👤 Developer · ⏱️ 20 min |
 | [iTerm2](/tutorials/integrations/dev-tools/iterm2) | Query models from your macOS terminal | 👤 Developer · ⏱️ 10 min |

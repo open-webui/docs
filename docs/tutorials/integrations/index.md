@@ -26,7 +26,7 @@ These community-contributed guides cover specific integration scenarios with ste
 | Tutorial | What you'll achieve | Details |
 |----------|-------------------|---------|
 | [Helicone](/tutorials/integrations/monitoring/helicone) | Log and monitor LLM API calls, costs, and latency | 👤 Admin · ⏱️ 15 min |
-| [Langfuse](/tutorials/integrations/monitoring/langfuse) | Trace LLM usage and evaluate prompt quality | 👤 Admin · ⏱️ 20 min · ⚠️ Outdated |
+| [Langfuse](/tutorials/integrations/monitoring/langfuse) | Trace LLM usage and evaluate prompt quality | 👤 Admin · ⏱️ 10 min |
 
 ---
 
