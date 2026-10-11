@@ -287,7 +287,22 @@ You can modify this proxy Pipe to support additional service providers like Anth
 :::caution Building a self-contained agent? Don't emit `delta.tool_calls`.
 If your Pipe wraps an agent (LangChain, LlamaIndex, a custom planner, …) that executes tools **internally** and then streams the final answer back to the chat, emitting `delta.tool_calls` in the stream will trigger Open WebUI's tool-execution retry loop. The middleware treats `delta.tool_calls` as "please execute this for me, client" and loops back through your pipe, duplicating the response up to [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) (default 256; `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES`, default 30, before v0.9.6) times.
 
-For self-contained agents, render tool executions as `<details type="tool_calls">` content blocks instead, the same shape Open WebUI itself emits after internal tool execution. See the [Pipes → Self-contained agents and `delta.tool_calls`](/features/extensibility/pipelines/pipes#self-contained-agents-and-deltatool_calls) section for the full pattern, a LangChain example, and the rule of thumb for which path to take.
+For self-contained agents, render tool executions as `<details type="tool_calls">` content blocks instead, the same shape Open WebUI itself emits after internal tool execution. Yield the block as plain content once the tool has run:
+
+```python
+import html
+import json
+
+details_block = (
+    f'<details type="tool_calls" done="true" '
+    f'id="{call_id}" name="{name}" '
+    f'arguments="{html.escape(json.dumps(arguments))}">\n'
+    f'<summary>Tool Executed</summary>\n'
+    f'{html.escape(json.dumps(result, ensure_ascii=False))}\n'
+    f'</details>\n'
+)
+yield details_block
+```
 :::
 
 ---
