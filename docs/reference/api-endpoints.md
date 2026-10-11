@@ -349,11 +349,11 @@ Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** fo
 
 #### Filter Execution
 
-| Filter Function | WebUI Request | Direct API, stable (`main`) | Direct API, pre-release (`dev`) |
-|----------------|--------------|------------------------------|-----------------------------------|
-| `inlet()` | ✅ Runs | ✅ Runs | ✅ Runs |
-| `stream()` | ✅ Runs | ✅ Runs | ✅ Runs |
-| `outlet()` | ✅ Runs | ❌ Not called by `/api/chat/completions`, use `/api/chat/completed` | ✅ Runs inline by default, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
+| Filter Function | WebUI Request | Direct API |
+|----------------|--------------|------------|
+| `inlet()` | ✅ Runs | ✅ Runs |
+| `stream()` | ✅ Runs | ✅ Runs |
+| `outlet()` | ✅ Runs | ✅ Runs inline by default, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
 
 The `inlet()` function always executes, making it ideal for:
 - **Rate limiting**: Track and limit requests per user
@@ -361,20 +361,18 @@ The `inlet()` function always executes, making it ideal for:
 - **Input validation**: Reject invalid requests before they reach the model
 
 :::danger Outlet Behavior for Direct API Calls, Read Carefully
-**On tagged releases / `main`:** `outlet()` is **not** invoked inline by `/api/chat/completions` at all. It only runs if the caller performs the second POST to `/api/chat/completed`. For now, if your integration needs `outlet()`, you must still do that second call.
-
-**On `dev` / pre-release builds:** `outlet()` runs inline after `/api/chat/completions` **by default**, on **both** the streaming and non-streaming paths, gated by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). A `chat_id` and a message `id` are **not** required: when neither is in the request body, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Set `ENABLE_API_OUTLET_FILTERS=False` to turn inline execution off for direct API traffic.
+Since v0.10.0, `outlet()` runs inline after `/api/chat/completions` **by default**, on **both** the streaming and non-streaming paths, gated by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). A `chat_id` and a message `id` are **not** required: when neither is in the request body, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Set `ENABLE_API_OUTLET_FILTERS=False` to turn inline execution off for direct API traffic. Before v0.10.0, `outlet()` only ran when the caller sent the second POST to `/api/chat/completed`.
 
 What `chat_id` and `id` decide is where the response goes. Send both and the request takes the path built for the WebUI: the server consumes the upstream stream itself and routes the content to the user's WebSocket, so the HTTP response to a streaming caller is effectively empty. Omit them and the upstream stream is relayed to you over HTTP as usual, with `outlet()` running once it has finished.
 
 In every case, **`outlet()` does not rewrite the HTTP response body**. It updates the persisted chat message and emits a `chat:outlet` WebSocket event, but the JSON your client receives is the pre-outlet content. If you need the outlet-filtered text, read it back from the chat record, subscribe to the WebSocket, or keep using `/api/chat/completed`.
 
-**Practical guidance:** if you are a pure API consumer (Continue.dev, Claude Code, custom scripts, Langfuse pipelines, etc.) and you need `outlet()`'s output back over HTTP, follow the completion with `/api/chat/completed`. Inline execution still runs your outlet filters and their side effects; it just does not hand you the filtered payload.
+**Practical guidance:** if you are a pure API consumer (Continue.dev, Claude Code, custom scripts, etc.) and you need `outlet()`'s output back over HTTP, follow the completion with `/api/chat/completed`. Inline execution still runs your outlet filters and their side effects; it just does not hand you the filtered payload.
 :::
 
 #### Legacy / Supported-for-API Endpoint: `/api/chat/completed`
 
-`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. On `dev` it is marked deprecated in favor of inline execution, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
+`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. It is marked deprecated since v0.10.0, when inline execution arrived, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
 
 - **Endpoint**: `POST /api/chat/completed`
 - **Description**: Runs `outlet()` filters (and pipeline outlet filters) unconditionally over a completed chat payload. Returns the filtered payload.
@@ -403,11 +401,10 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
 
   def complete_chat_with_outlet(token, model, messages, chat_id=None):
       """
-      Second-step call that actually runs outlet() for direct API callers.
-      On tagged releases /api/chat/completions does not run outlet inline at all.
-      On dev it runs inline by default but does not rewrite the HTTP response
-      body, so this endpoint is still the right call for most API integrations
-      that want outlet's output over HTTP.
+      Second-step call that returns outlet()'s output to direct API callers.
+      /api/chat/completions runs outlet inline by default but does not rewrite
+      the HTTP response body, so this endpoint is still the right call for API
+      integrations that want outlet's output over HTTP.
       """
       url = 'http://localhost:3000/api/chat/completed'
       headers = {
