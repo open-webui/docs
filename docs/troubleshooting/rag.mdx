@@ -33,7 +33,7 @@ Typical for Ollama models on consumer hardware (Qwen 3.5 4B, Gemma 4 12B, Muse G
 | **Full Context Mode** | Off | Cannot afford to send full documents |
 
 :::tip Context budget math
-With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. Add your system prompt and conversation history. If your model has an 8K context window, that leaves about 2 to 3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
+With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. With hybrid search on, **Top K Reranker** sets how many chunks reach the model, so use it for this math. Add your system prompt and conversation history. If your model has an 8K context window, that leaves about 2 to 3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
 :::
 
 ### Cloud models with large context (32K+ tokens)
