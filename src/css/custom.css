@@ -4,7 +4,7 @@
  * Brutal minimalism theme for Open WebUI docs.
  * Inspired by benji.app — typography-first, zero chrome.
  */
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 /* Tailwind base styles */
 @tailwind base;
@@ -31,6 +31,9 @@
 	--ifm-font-family-base:
 		"IBM Plex Sans", -apple-system, blinkmacsystemfont, "Segoe UI", roboto,
 		"Helvetica Neue", arial, sans-serif;
+	--ifm-font-family-monospace:
+		"IBM Plex Mono", ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas",
+		monospace;
 	--ifm-heading-font-family: var(--ifm-font-family-base);
 	--ifm-font-size-base: 15px;
 	--ifm-line-height-base: 1.65;
@@ -207,6 +210,22 @@ code {
 	margin-bottom: var(--ifm-leading);
 	border-radius: 16px;
 	overflow: hidden;
+}
+
+.shiki-code-block pre {
+	margin: 0;
+	padding: 14px 16px 10px;
+	line-height: 1.35;
+}
+
+.shiki-code-block code {
+	display: block;
+	vertical-align: baseline;
+}
+
+.shiki-code-block .line {
+	display: block;
+	line-height: 1.35;
 }
 
 /* stylelint-disable no-descending-specificity */
