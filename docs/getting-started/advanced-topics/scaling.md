@@ -19,11 +19,16 @@ Open WebUI defaults to a **self-contained, single-instance deployment**. The sta
 
 - **Embedded SQLite** for application data on a persistent volume
 - **Embedded ChromaDB** (also backed by SQLite) for RAG embeddings
+- **Local file storage** (`STORAGE_PROVIDER=local`) for uploads under `DATA_DIR/uploads`
 - **A single Uvicorn worker**, with no external database or Redis required
 
 This approach was chosen to **minimize time to deployment and operational overhead**: you can start using Open WebUI without first provisioning separate database or coordination services. Keeping these dependencies local also simplifies **air-gapped deployment** when models and required assets are provisioned within the isolated environment.
 
 **Horizontal scaling requires shared persistence and coordination**, so every replica operates on the same data. Before adding replicas or workers, replace the embedded database configuration with PostgreSQL and a client-server vector database, configure shared file storage, and add Redis for coordination. This separates state from individual instances, allowing the **stateless application tier** to scale independently behind a load balancer.
+
+:::warning External databases do not share uploaded files
+PostgreSQL stores file metadata and storage paths, while the vector database stores embeddings. Neither replaces file storage. Before adding replicas, configure **external object storage (S3, GCS, or Azure Blob)** or a **shared filesystem** accessible to every replica. Separate local volumes leave attachments unavailable when a request reaches another instance. See [Step 5](#step-5-share-file-storage-across-instances).
+:::
 
 ---
 
@@ -315,28 +320,28 @@ For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** b
 
 ## Step 5: Share File Storage Across Instances
 
-**When:** You're running multiple instances that need to share uploaded files, generated images, and other user data.
+**When:** You're running multiple instances. **Shared access to uploaded files is required** for attachments, knowledge documents, and generated images to work across replicas.
 
 By default, Open WebUI stores uploaded files on the local filesystem under `DATA_DIR` (typically `/app/backend/data`). In a multi-instance setup, each instance needs access to the same files. Without shared storage, you will see [uploaded files and RAG knowledge become inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible) when requests hit different replicas.
 
 ### Do I need cloud storage (S3)?
 
-**Not necessarily.** Open WebUI stores all uploaded files with **UUID-based unique filenames**. Multiple processes and replicas only ever **create new files** or **read existing ones**: they never write to the same file simultaneously. This means a simple **shared filesystem mount** works correctly without write conflicts under normal operation. Though you have to ensure, that all workers/replicas have access to the very same shared DATA_DIR directory in a shared storage.
+**External object storage is one option; shared file access is the requirement.** Use S3, GCS, or Azure Blob to keep uploaded files independent of individual containers, or keep `STORAGE_PROVIDER=local` and mount the same shared filesystem at the same path on every replica. UUID-based upload names avoid collisions between new uploads, but do not eliminate concurrent access to existing files or local working copies.
 
 **Your options:**
 
 | Approach | When to Use |
 |---|---|
-| **Shared filesystem** (NFS, AWS EFS, CephFS, GlusterFS, or a simple shared Docker volume) | The simplest option for most deployments. Mount the same directory to `/app/backend/data` on all instances. Works well for on-prem, Docker Swarm, and Kubernetes with ReadWriteMany (RWX) volumes. |
-| **Cloud object storage** (S3, GCS, Azure Blob) | Better for cloud-native deployments at very large scale, or when you want managed durability (11 nines) and don't want to manage shared filesystems. Requires setting `STORAGE_PROVIDER`. |
+| **Shared filesystem** (NFS, AWS EFS, CephFS, or a shared volume on one host) | Use when you already operate shared storage. Mount the same directory at the same path on all instances; multi-node Kubernetes deployments need storage supporting ReadWriteMany (RWX). |
+| **External object storage** (S3, GCS, Azure Blob) | Use when replicas run on separate hosts or need uploaded files to survive container replacement without a shared upload volume. Configure `STORAGE_PROVIDER` and the same bucket/container on every replica. |
 
 :::info What does STORAGE_PROVIDER actually control?
-`STORAGE_PROVIDER` only controls where **uploaded files** are stored (documents, images, etc.). It does **not** affect the main database (use `DATABASE_URL` for that) or the vector database (use `VECTOR_DB` for that). When left unset, files are stored on the local filesystem under `DATA_DIR`.
+`STORAGE_PROVIDER` controls files saved through Open WebUI's file upload API, including documents, attachments, and generated images. It does **not** move the main database (use `DATABASE_URL`), the vector database (use `VECTOR_DB`), or the entire `DATA_DIR` to object storage. Files served directly from `/cache/`, such as some tool outputs, still use the filesystem and need shared access if another replica must serve them.
 :::
 
 ### Option A: Shared Filesystem (Simplest)
 
-No configuration changes needed, just ensure all instances mount the same directory:
+Keep `STORAGE_PROVIDER=local` and ensure all instances mount the same directory at the same path:
 
 **Example Kubernetes:**
 ```yaml
@@ -352,6 +357,8 @@ volumes:
   - /opt/data/openwebui-data:/app/backend/data
 ```
 
+This bind mount shares files only between containers on the **same host**. On separate hosts, the source directory must itself be backed by shared storage. Giving Docker volumes the same name on different hosts does not share their contents.
+
 :::warning
 Do **not** store the SQLite database on a network filesystem. SQLite's file locking does not work reliably over NFS. This is another reason to switch to PostgreSQL (Step 1) before scaling to multiple instances.
 :::
@@ -360,7 +367,7 @@ Once your data directory is shared, lock down what can land in it: see [File upl
 
 ### Option B: Cloud Object Storage
 
-Set `STORAGE_PROVIDER` and the corresponding credentials:
+Set `STORAGE_PROVIDER` and the corresponding bucket/container and credentials on **every replica**. All replicas must use the same storage destination, including the same `S3_KEY_PREFIX` if configured, with permission to read, write, and delete files.
 
 **Supported providers:**
 
@@ -370,13 +377,31 @@ Set `STORAGE_PROVIDER` and the corresponding credentials:
 | Google Cloud Storage | `gcs` |
 | Microsoft Azure Blob Storage | `azure` |
 
-```
+```bash
 STORAGE_PROVIDER=s3
 S3_BUCKET_NAME=my-openwebui-bucket
 S3_REGION_NAME=us-east-1
+
+# For an S3-compatible service, also set its endpoint:
+# S3_ENDPOINT_URL=https://s3.example.com
+# S3_ADDRESSING_STYLE=path
 ```
 
-Each provider has its own set of environment variables for credentials and bucket configuration. See the [Environment Variable Reference](/reference/env-configuration#cloud-storage) for details.
+For S3, omit `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` to use the default AWS credential chain (for example, an IAM role), or supply both through your deployment's secret management. GCS uses `GCS_BUCKET_NAME` with application default credentials or `GOOGLE_APPLICATION_CREDENTIALS_JSON`. Azure uses `AZURE_STORAGE_ENDPOINT` and `AZURE_STORAGE_CONTAINER_NAME`, with `AZURE_STORAGE_KEY` or the default Azure credential. The slim image supports only `local` and `s3`; use the standard image for GCS or Azure.
+
+See the [Environment Variable Reference](/reference/env-configuration#cloud-storage) for all provider settings and the [S3 Storage tutorial](/tutorials/maintenance/s3-storage) for a worked example.
+
+:::warning Object storage still needs local disk
+Cloud providers first write uploads to `DATA_DIR/uploads`, then upload them to the bucket/container. Reads download files there before Open WebUI processes or serves them. Give every replica a writable data directory with enough disk space and I/O capacity for concurrent uploads and downloads.
+
+`STORAGE_LOCAL_CACHE=false` removes cloud-backed local copies after the file-processing handler finishes. It does **not** eliminate temporary disk use or clean up every download and unprocessed upload. Plan local disk capacity even with this setting enabled.
+:::
+
+### Switching an Existing Deployment
+
+Changing `STORAGE_PROVIDER` does **not** migrate existing files or rewrite their stored paths. Plan the transfer of existing objects and corresponding file records before switching providers; simply copying files into a bucket is insufficient. Back up both the application database and files before the move.
+
+Before sending production traffic to multiple replicas, upload a file through one replica and download it through another. Verify knowledge-document access and generated images too, then repeat after replacing the uploading replica. This catches configurations that appear to work only because the original local files are still present.
 
 ---
 
@@ -492,12 +517,15 @@ REDIS_URL=redis://redis-host:6379/0
 WEBSOCKET_MANAGER=redis
 ENABLE_WEBSOCKET_SUPPORT=true
 
-# Storage — pick ONE:
-# Option A: shared filesystem (no env vars needed, just mount the same volume)
-# Option B: cloud storage
+# File storage — REQUIRED across replicas; configure ONE option on all of them:
+# Option A: STORAGE_PROVIDER=local with the same shared filesystem and mount path
+#          Separate per-host Docker volumes do not share files.
+# Option B: external object storage (same bucket and any key prefix on all replicas)
 # STORAGE_PROVIDER=s3
 # S3_BUCKET_NAME=my-openwebui-bucket
 # S3_REGION_NAME=us-east-1
+# Supply credentials via an IAM role or your deployment's secret management.
+# Object storage still needs writable local disk; see Step 5.
 
 # Content Extraction (do NOT use default pypdf in production)
 CONTENT_EXTRACTION_ENGINE=tika
@@ -573,8 +601,8 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 | Single user / evaluation | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
 | Small team (< 50 users, single instance) | Recommended | Recommended† | ✗ | Recommended | ✗ | ✗ |
 | Multiple Uvicorn workers | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | ✗ (same filesystem) |
-| Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
-| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Optional** (NFS or S3) |
+| Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Required** (shared filesystem or object storage) |
+| Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Required across replicas** |
 
 </div>
 
@@ -585,5 +613,5 @@ The default ChromaDB uses a local SQLite backend that crashes under multi-proces
 :::
 
 :::note About "Shared Storage"
-For multiple instances, all replicas need access to the same uploaded files. A **shared filesystem mount** (local drive, NFS, EFS, CephFS) is sufficient. Cloud object storage (S3/GCS/Azure) is a scalable alternative, but not a requirement. Files use UUID-based unique names, so there are no write conflicts. See [Step 5](#step-5-share-file-storage-across-instances) for details.
+For multiple instances, all replicas must access the same uploaded files through **external object storage** (S3/GCS/Azure) or a **shared filesystem** (NFS, EFS, CephFS, or a volume shared on one host). External object storage is optional; shared file access is not. Object storage still needs local working space and does not cover files served directly from `/cache/`. See [Step 5](#step-5-share-file-storage-across-instances) for configuration and migration guidance.
 :::

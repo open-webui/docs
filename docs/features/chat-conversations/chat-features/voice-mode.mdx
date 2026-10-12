@@ -179,6 +179,8 @@ The built-in prompt will not suit every setup. When the voice model behaves stra
 5. **Real questions and tasks.** For everything else, the voice model calls `generate_chat_completion`, usually after a short "I'll check". Open WebUI then sends your transcribed message to the chat's selected model, the same way a typed message is sent: the model's system prompt, knowledge, tools, filters and the chat history all apply, and the answer appears in the chat as it is written. When that request fails, the voice model tells you once that it failed and that nothing is retrying. Ask it to retry when you want to try again.
 6. **The answer is spoken.** Once the chat model finishes, its visible answer goes back to the voice model, which speaks it in its own voice, shortened or rephrased for listening where that helps. The complete answer stays in the chat.
 
+![A Realtime call with a voice avatar beside the chat: the voice model answered the greeting itself, and the chat model's answer to the dinner question is still being written while the avatar speaks](/images/features/audio/realtime-call-answer-streaming.webp)
+
 ### What Is Saved in the Chat
 
 A Realtime call fills the chat like a typed conversation:
@@ -218,6 +220,8 @@ Open the model in [**Workspace > Models**](/features/workspace/models#voice-avat
 3. Optionally add state animations and named gestures, described below.
 4. Click **Apply**, then **Save & Update**. The files are uploaded when the model is saved, and Open WebUI checks each of them again on the server.
 
+![The Avatar setup dialog with a character loaded, the Idle, Listening and Speaking preview buttons, built-in state animations and three named gestures, wave, clap and think, each with a description](/images/features/audio/voice-avatar-setup.webp)
+
 Anyone who can edit the model can give it an avatar. The avatar and its animations are stored like other uploaded files, in the configured file storage, and the model keeps a reference to each of them. Everyone the model is shared with can load these files, so every user who calls the model sees the same character.
 
 #### File Requirements
@@ -246,6 +250,8 @@ Out of the box the character uses built-in movement: gentle breathing, a slight 
 #### What Users See
 
 On the call screen the character takes the place of the orb, with the same status line and controls. A spinner shows while the character loads. Its mouth follows the assistant's audio, it moves between idle, listening and speaking poses as the call goes on and tapping it while the assistant speaks interrupts the reply. Switching to another model in the chat switches to that model's avatar.
+
+![A Realtime call with a voice avatar on the right. The chat shows the spoken greeting, the small talk reply labelled with the voice model's name, the spoken question and the chat model's full answer under its own name](/images/features/audio/realtime-call-avatar.webp)
 
 The character is drawn with WebGL, so the browser needs WebGL turned on. When the avatar file cannot be loaded or the browser's graphics stop working, the call carries on with the orb.
 

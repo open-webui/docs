@@ -175,6 +175,8 @@ The request for token counts is added server-side, so it applies wherever the mo
 
 When an admin sets **Call mode** to **Realtime**, the **Voice** row also shows **Realtime Voice** and **Voice avatar**. **Voice avatar** gives the model an animated 3D character that takes the place of the orb in Realtime calls, with optional animations and gestures. See [Voice Avatars](/features/chat-conversations/chat-features/voice-mode#voice-avatars) for setup and file requirements.
 
+![The Avatar setup dialog with a character loaded, the Idle, Listening and Speaking preview buttons, built-in state animations and three named gestures, wave, clap and think, each with a description](/images/features/audio/voice-avatar-setup.webp)
+
 ### Advanced parameters
 
 The **Advanced Params** row shows how many parameters this model changes, for example **2 modified**, and opens the full list when clicked.
