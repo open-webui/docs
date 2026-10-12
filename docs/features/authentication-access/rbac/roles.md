@@ -89,6 +89,8 @@ They stay signed in and keep browsing under the new role. Demotion to `pending` 
 
 Open the user in **Admin Panel > Users** and click **Sign out all devices** at the bottom of the edit dialog, then confirm. Every session of that user ends: browser tabs and apps signed in with the account are refused on their next request and have to sign in again, and their live connections are closed. Automation and sub-agent runs in progress for that user lose access too. Use it when a device is lost, an account may be compromised or someone leaves.
 
+![The Sign out all devices? confirmation, which says the user will need to sign in again on every device and that API keys remain active](/images/features/auth/sign-out-all-devices.webp)
+
 - **API keys stay active.** Delete or regenerate the user's key to cut off scripts and integrations.
 - **Works without Redis.** The sign-out is stored in the database, so it applies on every worker and replica.
 - **The primary administrator** can only be signed out this way by themselves.

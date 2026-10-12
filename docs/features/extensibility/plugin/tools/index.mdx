@@ -310,6 +310,8 @@ An administrator turns it on in **Settings > Admin > Interface**, in the **Chat*
 | **Deferral Threshold (characters)** ([`TOOL_SEARCH_DEFER_THRESHOLD`](/reference/env-configuration#tool_search_defer_threshold)) | `400` | A tool whose definition (name, description and parameter schema, as JSON) is longer than this many characters is deferred. `0` defers every tool. |
 | **Always Loaded Tools** ([`TOOL_SEARCH_ALWAYS_LOADED`](/reference/env-configuration#tool_search_always_loaded)) | Empty | Comma-separated tool names or glob patterns, such as `jira_create_issue, github_*`, that are always sent in full. Matching is case-sensitive. |
 
+![The Chat section of Settings > Admin > Interface with Tool Search switched on, Defer Built-in Tools, Deferral Threshold (characters) set to 400 and an empty Always Loaded Tools field](/images/features/plugin/tools/tool-search-settings.webp)
+
 How it works:
 
 - **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.

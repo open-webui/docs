@@ -93,6 +93,8 @@ Once at least one person or group has access, the modal also shows a **Sharing m
 - **Clone only** (default): people open the link and see the conversation as it was when the link was created or last updated. To continue it, they clone or fork it into their own chats (see [Cloning or Forking a Shared Chat](#cloning-or-forking-a-shared-chat)).
 - **Allow replies**: everyone with access by name, through a group or through **Public** can write into the same chat. Opening the link takes them straight to the live conversation, and everyone in it sees new messages and replies as they arrive.
 
+![The Share Chat dialog with Sharing mode set to Allow replies and the Engineering group in the access list](/images/features/chat/share-allow-replies.webp)
+
 In a chat with replies allowed:
 
 - In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
@@ -100,6 +102,8 @@ In a chat with replies allowed:
 - Each person regenerates, continues and stops only the replies to their own messages. Only the owner can edit messages and rate replies, and only on their own messages and the replies to them.
 - Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
+
+![The chat owner's view of a chat with replies allowed: another member's message with their name and picture, the model's answer to it, and a line above the input saying that member is typing](/images/features/chat/shared-chat-replies-live.webp)
 
 Switching back to **Clone only** refreshes the snapshot behind the link, so it then shows the conversation as it stands at that moment, replies included. The [**Allow Chat Share**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission controls who can share a chat, and the access options follow the same permissions as for any share link. [Shared folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) have the same **Sharing mode**, applied to the chats directly in the folder. Each subfolder has its own.
 

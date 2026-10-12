@@ -262,6 +262,8 @@ From the model list, click the ellipsis (**...**) on any model:
 
 Every **Save & Update** that changes a model's configuration is kept as a version, together with the text typed into **Describe this change** beside the button. The version picker next to **Back** at the top of the model editor starts on **Production**, the configuration chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). It is there for anyone who can edit the model, in **Workspace > Models** and in **Settings > Admin > Models** for models with saved settings.
 
+![The model editor with the version picker open next to Back, listing the Production version and older versions by their descriptions](/images/features/models/model-version-history.webp)
+
 - **Open a version** by picking it. The editor shows that version read-only.
 - **Set as Production** makes the opened version the live configuration. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
 - **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
