@@ -55,9 +55,7 @@ Then open [http://localhost:3000](http://localhost:3000).
 For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
 
 :::tip Pick the right image
-`:main` above is the batteries-included one: it carries the embedding, speech and reranking models, document extraction and every database client, so retrieval, uploads and voice work the moment it starts.
-
-**`:slim` is 196 MB instead of 1.62 GB, 88% less to download, with the same chat experience.** Choose it when your models run through a hosted API, your own model server or a separate Ollama instance. Change the tag above to `:slim` (also called `:main-slim`) and connect your provider; the default database and file storage work as usual. Features such as knowledge search and voice need external services. These are compressed Linux/amd64 sizes, checked on October 10, 2026; see [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out) for details.
+Use `:main` for built-in embeddings, document extraction and speech recognition. For chat through an API or a separate Ollama instance, switch to `:slim`—**about 88% smaller**. Knowledge search and voice require external services. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
 :::
 
   </TabItem>
