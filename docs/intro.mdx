@@ -40,6 +40,12 @@ Open WebUI is **a home for AI**, a self-hosted AI platform that's **[extensible]
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
+For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
+
+:::tip Pick the right image
+Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a smaller download: **196 MB instead of 1.62 GB (88% smaller)**. It relies on external services for those features. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
+:::
+
 Then open [http://localhost:3000](http://localhost:3000).
 
 <img
@@ -51,12 +57,6 @@ Then open [http://localhost:3000](http://localhost:3000).
 <p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
   Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
 </p>
-
-For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
-
-:::tip Pick the right image
-Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a smaller download: **196 MB instead of 1.62 GB (88% smaller)**. It relies on external services for those features. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
-:::
 
   </TabItem>
   <TabItem value="pip" label="pip">
