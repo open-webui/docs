@@ -73,12 +73,16 @@ Inheritance applies everywhere Open WebUI checks group membership: resource acce
 *   **Search**: The search box matches the full path (for example `Engineering / Backend`) and keeps the parents of every match visible.
 *   **Loops are blocked**: The **Parent group** dropdown and the drag targets offer only groups outside the group's own branch, and the server rejects a move under the group itself or one of its subgroups.
 
+![The groups list showing the hierarchy as a tree: Staff with Engineering and Sales inside it, and Platform inside Engineering](/images/features/auth/nested-groups-tree.webp)
+
 ### Direct and Inherited Members
 
 The member count in the group list counts **direct members**, the people added to that group itself. A **Direct** / **Inherited** dropdown in the group editor's **Users** tab switches between two member tables:
 
 *   **Direct**: the people added to this group. Add and remove them here.
 *   **Inherited**: the people in its subgroups, who share this group's access. The **Inherited via** column names the subgroup each person comes through, with a link to it, and the table is searchable and paged at 30 people. Manage these people in the subgroup they were added to.
+
+![The Users tab of the Engineering group set to Inherited, listing a member with the Inherited via path Staff / Engineering / Platform](/images/features/auth/group-inherited-members.webp)
 
 ### Inherited Permissions
 
@@ -95,6 +99,8 @@ Changing a group's members, permissions, parent or default models, or deleting i
 ## Default Models per Group
 
 The **Default models** field in the group editor's **General** tab sets the models the group's members start a new chat with. For those members they replace the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin). Leave the field empty, or click **Inherit**, to keep what applies above: the editor then shows the default models of the nearest parent group that sets some, or the global defaults, and where they come from.
+
+![The General tab of the Platform group, with Engineering as its parent group and its own default model set next to Inherit](/images/features/auth/group-default-models.webp)
 
 When a user's groups set different default models, including groups they inherit from:
 

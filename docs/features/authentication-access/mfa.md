@@ -32,6 +32,8 @@ While MFA is on, Open WebUI checks all of this at startup and refuses to start w
    - **Allow trusted-header sign-in without an authenticator**: users who arrive through [trusted-header authentication](/features/authentication-access/auth/sso#trusted-header) skip the code. Use this when your authenticating proxy already enforces a second factor.
 4. Click **Save**.
 
+![The Multi-factor authentication section in Settings > Admin > Authentication, with Require an authenticator for all users switched on and the OAuth and trusted-header exemptions below it](/images/features/auth/mfa-admin-setting.webp)
+
 :::warning Saving a change signs everyone out
 Any change to these three switches signs every user out of every device, you included, and you land on the sign-in page. Users with an authenticator enter their code; users without one set it up on the spot.
 :::
@@ -54,6 +56,10 @@ The first time a user signs in after MFA is turned on:
 2. Open WebUI shows **Set up your authenticator** with a QR code. They scan it with their authenticator app, or open **Enter the key manually** and type the key into the app. The entry appears in the app as **Open WebUI** with their email address.
 3. They enter the six-digit code the app shows.
 4. Open WebUI shows ten **recovery codes**, once. They can download them, must confirm they have saved them, and are then signed in.
+
+![The Set up your authenticator screen with a QR code, Enter the key manually and the Authenticator code field](/images/features/auth/mfa-setup-qr.webp)
+
+![The Save your recovery codes screen listing ten recovery codes, with Download recovery codes and the confirmation checkbox](/images/features/auth/mfa-recovery-codes.webp)
 
 Each recovery code works once and stands in for an authenticator code. They are the way back in when the phone is lost, so users should store them somewhere safe and separate from the phone.
 

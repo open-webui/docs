@@ -212,6 +212,8 @@ Every save creates a new version. When editing a prompt, the history menu above 
 - **Set as Production** restores that version as the active one.
 - **Delete** in a version's **⋯** menu removes it after you confirm in the **Delete Version** dialog. The live version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the history stays connected.
 
+![Compare to current in the prompt editor, with an older version on the left and the production version on the right in the Split layout](/images/workspace/prompt-version-compare.webp)
+
 Switching to another version or leaving the editor while you have unsaved changes asks whether to discard them first. Anyone who can view a prompt can open and compare its versions; editing, setting a version live and deleting need write access.
 
 Over the API, `GET /api/v1/prompts/id/{prompt_id}/history/diff?from_id=...&to_id=...` returns both snapshots, the content diff as a list of lines, `name_changed` and `line_endings_only`, which is `true` when the contents differ only in their line endings.
