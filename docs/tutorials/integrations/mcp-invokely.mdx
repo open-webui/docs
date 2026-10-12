@@ -1,0 +1,51 @@
+---
+title: Invokely (MCP)
+sidebar_label: Invokely MCP Integration
+sidebar_position: 51
+description: Connect Open WebUI to Invokely's hosted MCP service for official statistics.
+keywords: [invokely, mcp, model context protocol, statistics, data, streamable http]
+---
+
+:::warning
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
+
+:::
+
+:::info
+
+Requires Open WebUI v0.6.31 or later, which includes native MCP support.
+
+:::
+
+Invokely provides official statistics through a hosted MCP service over **Streamable HTTP**. Its no-account trial endpoint is public and requires no API key or OAuth. It allows 25 calls per day per IP address.
+
+## Setup
+
+MCP servers can be added only by an Open WebUI administrator. In **Settings > Admin > Integrations**, find **External Tool Servers** and click **+ Add Connection**. Enter the following:
+
+| Field | Value |
+|-------|-------|
+| **Type** | MCP (Streamable HTTP) |
+| **Server URL** | `https://invokely.ai/mcp/trial` |
+| **Auth** | None |
+| **ID** | `invokely` |
+| **Name** | `Invokely` |
+
+Save the connection. If Open WebUI prompts you to restart, do so.
+
+The trial is public and has no user-specific credential. Requests from users behind the same public IP share its daily limit. To let non-admins use the connection, grant access to the intended users or groups in **Access Control**; without grants, it remains admin-only.
+
+## Use Invokely in a chat
+
+In a chat, open **+ > Integrations > Tools** and enable **Invokely**.
+
+Try a request such as:
+
+> Find an official population indicator for Spain and retrieve its latest available value. Include its unit, period, publisher, source URL, retrieval date, and citation.
+
+Coverage and available periods vary by indicator and place. For comparisons, ask whether the values are comparable and request an explanation when they are not.
+
+## References
+
+See [Invokely's MCP documentation](https://invokely.ai/docs) for endpoint and response details, and Open WebUI's [MCP guide](/features/extensibility/mcp) for server setup and access control.
