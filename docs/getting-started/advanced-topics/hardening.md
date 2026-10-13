@@ -41,7 +41,7 @@ The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption
 
 If you run multiple Open WebUI instances behind a load balancer, every instance must share the same key. Otherwise, a token signed by one instance will be rejected by another, causing login failures. Generate a key with `openssl rand -base64 32` and pass it as an environment variable to all replicas.
 
-**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again. If [two-factor sign-in](#two-factor-sign-in) is on, users' authenticator secrets are encrypted with a key derived from `WEBUI_SECRET_KEY`, and once users have enrolled, Open WebUI refuses to start after a rotation. Set [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) before users enroll to rotate `WEBUI_SECRET_KEY` freely.
+**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again. If [two-factor sign-in](#two-factor-sign-in) is on, users' authenticator secrets are encrypted with a key derived from `WEBUI_SECRET_KEY`, and once users have enrolled, Open WebUI refuses to start after a rotation. Set [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) before users enroll to rotate `WEBUI_SECRET_KEY` freely. Installed [apps](/features/channels/apps) stop connecting after a rotation; uninstall each app, connect it again with its API key and add it back to its channels (see [Apps stop connecting after WEBUI_SECRET_KEY changed](/features/channels/apps#apps-stop-connecting-after-webui_secret_key-changed)).
 
 ---
 
@@ -585,6 +585,8 @@ AIOHTTP_CLIENT_ALLOW_REDIRECTS=false
 :::note Playwright loader (v0.9.6+)
 Earlier versions applied URL validation and the redirect gate only to the default web loader; the Playwright-based loader (`WEB_LOADER_ENGINE=playwright` / the `playwright` Docker variant) could navigate and follow redirects to internal or blocklisted URLs unchecked. As of v0.9.6 the Playwright path enforces the same `validate_url()` and redirect rules as the default loader, so the SSRF controls above apply regardless of which web loader engine you run. If you use Playwright, ensure you are on v0.9.6 or later.
 :::
+
+[Apps](/features/channels/apps) have their own gate: an app URL must use HTTPS and resolve to public addresses, rejects redirects and always verifies TLS. [`APP_ALLOWED_PRIVATE_ORIGINS`](/reference/env-configuration#app_allowed_private_origins) lists the app origins allowed on private addresses or plain HTTP.
 
 ### Profile image URL forwarding
 

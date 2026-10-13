@@ -102,7 +102,7 @@ The single **Notification Webhook** field under **Settings > Account** has been 
 
 ## 3. Channel Webhooks: External Message Integration
 
-Channel Webhooks allow external services, automation tools, or scripts to post messages directly into Open WebUI channels. This enables seamless integration with monitoring systems, CI/CD pipelines, notification services, or any custom automation.
+Channel Webhooks allow external services, automation tools, or scripts to post messages directly into Open WebUI channels. This enables seamless integration with monitoring systems, CI/CD pipelines, notification services, or any custom automation. A webhook posts messages into one channel. A service that should also answer `@mentions` or post buttons is built as an [App](/features/channels/apps).
 
 ### Use Cases
 
@@ -123,7 +123,7 @@ Messages posted via webhooks appear in the channel with the webhook's identity, 
 
 ### Managing Channel Webhooks
 
-Only **channel managers** and **administrators** can create and manage webhooks for a channel.
+Only the channel's creator and **administrators** can create and manage webhooks for a channel.
 
 #### Creating a Webhook
 

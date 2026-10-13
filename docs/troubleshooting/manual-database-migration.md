@@ -340,6 +340,8 @@ alembic upgrade <revision>
 Downgrading can cause **permanent data loss** if the migration removed columns or tables. Only downgrade if you understand the consequences.
 :::
 
+Downgrading past the [Apps](/features/channels/apps) migration (`c92da83b017f`) stops with `Export/remove app messages before downgrading apps` while any message posted by an app exists. Once those messages are gone it removes the app table and every app channel membership.
+
 ```bash title="Terminal - Downgrade Migrations"
 # Downgrade one version
 alembic downgrade -1

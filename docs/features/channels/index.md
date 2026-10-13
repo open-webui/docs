@@ -56,6 +56,7 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 | 📝 **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed and go out in order |
 | 🔒 **Access control** | Public, private, group-based, and direct message channels |
 | 🧠 **AI channel awareness** | Models can search and synthesize across channels autonomously |
+| 🧩 **[Apps](/features/channels/apps)** | External services join channels, answer `@mentions` and post messages with buttons |
 
 ---
 
@@ -119,11 +120,15 @@ Hover any message to react with emoji, pin it for reference, reply inline, or st
 
 ### Bots posting as a model
 
-Any account can post into a channel over the API, which is how bot integrations work: the bot runs under its own account and posts like any other member. [open-webui/bot](https://github.com/open-webui/bot) is an experimental starting point for building one.
+Any account can post into a channel over the API: a script or bot runs under its own account and posts like any other member. A bot that answers `@mentions` under its own name is an [App](#apps).
 
 A posted message can carry an optional model identity, and the interface then renders that message under the model's name and avatar in place of the posting account's. A bot that answers on behalf of a model sets this so its replies are presented as that model's replies.
 
 That identity is a label chosen by whoever posts the message, and it is not evidence that the server ran the model. The account that posted stays the recorded author and is what the API returns for the message, so the real sender can always be recovered. Anyone who can post in a channel can set the label, so treat the model name next to a message as presentation only.
+
+### Apps
+
+External services can also join a channel as [Apps](/features/channels/apps). An admin installs them in **Settings > Admin > Apps**; the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.
 
 ### Direct messages
 

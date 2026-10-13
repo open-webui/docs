@@ -100,6 +100,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 44      | tool_history     | Saved versions of tool source code and metadata              |
 | 45      | function_history | Saved versions of function source code and metadata          |
 | 46      | skill_history    | Saved versions of skills, including their supporting files   |
+| 47      | app              | Installed [Apps](/features/channels/apps) and their encrypted credentials |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -154,6 +155,29 @@ Things to know about the api_key table:
 - Key generation, retrieval and deletion all go through `/api/v1/auths/api_key`. All three are refused unless the `auth.enable_api_keys` config key is on, and non-admins additionally need the `features.api_keys` permission.
 - `data`, `expires_at` and `last_used_at` are present in the schema and no code path writes them. Key lookup joins on `key` alone and does not consult `expires_at`.
 
+## App Table
+
+Added in v0.12.1 (migration `c92da83b017f`) for [Apps](/features/channels/apps).
+
+| **Column Name** | **Data Type** | **Constraints**              | **Description**                                    |
+| --------------- | ------------- | ---------------------------- | -------------------------------------------------- |
+| id              | Text          | PRIMARY KEY                  | Unique identifier (UUID), the `app_id` sent to the app |
+| slug            | Text          | UNIQUE, NOT NULL             | The app handle chosen at install                   |
+| name            | Text          | NOT NULL                     | Display name                                       |
+| user_id         | Text          | nullable                     | Admin who installed the app                        |
+| is_active       | Boolean       | NOT NULL, server_default=false | Whether the app is enabled                       |
+| data            | JSON          | NOT NULL                     | App URL, manifest, granted scopes, settings, installation ID and the encrypted connection credential |
+| api_key         | Text          | nullable                     | The app's API key, encrypted                       |
+| created_at      | BigInteger    | NOT NULL                     | Creation timestamp (nanoseconds)                   |
+| updated_at      | BigInteger    | NOT NULL                     | Last update timestamp (nanoseconds)                |
+
+Things to know about the app table:
+
+- `api_key` and the connection credential in `data` are encrypted with a key derived from `WEBUI_SECRET_KEY`.
+- Uninstalling an app keeps the row and its `slug`: it clears `api_key`, the connection credential and the installation ID, sets `is_active` to false and deactivates the app's channel memberships.
+- Who can use an app is stored in the `access_grant` table with `resource_type = 'app'`.
+- Downgrading past `c92da83b017f` is refused while any row in `message` has an `app_id`.
+
 ## Auth Table
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**   |
@@ -206,7 +230,8 @@ Things to know about the channel table:
 | ----------------- | ------------- | ------------------------------- | -------------------------------------------- |
 | id                | Text          | PRIMARY KEY, UNIQUE             | Unique identifier for the channel membership |
 | channel_id        | Text          | NOT NULL                        | Reference to the channel                     |
-| user_id           | Text          | NOT NULL                        | Reference to the user                        |
+| user_id           | Text          | nullable                        | Reference to the user                        |
+| app_id            | Text          | nullable                        | Reference to the app, for app memberships    |
 | role              | Text          | nullable                        | Member's role within the channel             |
 | status            | Text          | nullable                        | Membership status: `joined` or `left`        |
 | is_active         | Boolean       | NOT NULL, server_default=true   | Whether the membership is live               |
@@ -228,9 +253,11 @@ Things to know about the channel_member table:
 - `status` is written as `joined` when the membership is created. Leaving a channel writes `left`, sets `is_active` to false and stamps `left_at`. The row survives.
 - `is_active` is the flag that channel listings and member listings filter on, so a membership someone has left drops out of those results while remaining in the table. It is also written by `POST /api/v1/channels/{id}/members/active`.
 - `last_read_at` is stamped when the membership is created and updated over the socket connection when the user reads the channel.
-- `role` is read in one place, to test whether a member is a `manager`. No code path writes it, so it is null on every row and that test never matches. Manager-only actions such as viewing and creating channel webhooks fall through to the other two branches of the check: the channel's own `user_id`, or an instance admin.
+- `role` is read in one place, to test whether a member is a `manager`. Nothing writes `manager`: user memberships leave `role` null and app memberships are written as `member`, so that test never matches. Manager-only actions such as viewing and creating channel webhooks fall through to the other two branches of the check: the channel's own `user_id`, or an instance admin.
 - `is_channel_muted` has no write path and stays false. `is_channel_pinned` has a setter on the model, `Channels.pin_channel`, that nothing calls.
 - `joined_at` is NOT NULL in the database (migration `2f1211949ecc`) while the SQLAlchemy model omits the flag. The database constraint is the one that applies.
+- Removing an app from a channel, or uninstalling the app, sets `is_active` to false and stamps `left_at`; `status` stays `joined`. Adding the app again reactivates the same row.
+- Migration `c92da83b017f` made `user_id` nullable and added `app_id`. A check constraint requires exactly one of the two on every row, and (`channel_id`, `app_id`) is unique.
 - Deleting a user account leaves their `channel_member` rows in place. Member listings, the member count on a channel and the lookup that finds the existing direct message for a set of people all skip rows whose `user_id` no longer matches an account, so a leftover row is not counted as a member and does not push a direct message into a second conversation.
 
 ## Channel Webhook Table
@@ -737,6 +764,7 @@ Things to know about the memory table:
 | --------------- | ------------- | --------------- | ----------------------------------- |
 | id              | Text          | PRIMARY KEY     | Unique identifier (UUID)            |
 | user_id         | Text          | -               | Message author                      |
+| app_id          | Text          | nullable        | App that posted the message         |
 | channel_id      | Text          | nullable        | Associated channel                  |
 | reply_to_id     | Text          | nullable        | Message this one quotes in its reply |
 | parent_id       | Text          | nullable        | Thread root for threaded replies    |
@@ -754,6 +782,7 @@ Things to know about the message table:
 - `parent_id` was added in migration `3781e22d8b01` and `reply_to_id` in migration `a5c220713937`. `is_pinned`, `pinned_at` and `pinned_by` were added in migration `2f1211949ecc`.
 - `parent_id` and `reply_to_id` do different jobs. `parent_id` is the thread root: a channel's message list selects rows with a null `parent_id`, and a thread is read by selecting rows whose `parent_id` is the root message. `reply_to_id` points at a single message that the reply quotes, and the quoted message is fetched and attached when a message is served. It has no effect on which list a message appears in.
 - `is_pinned`, `pinned_at` and `pinned_by` are written together by `POST /api/v1/channels/{id}/messages/{message_id}/pin`. Unpinning clears `pinned_at` and `pinned_by` back to null. `GET /api/v1/channels/{id}/messages/pinned` reads them.
+- `app_id` was added in migration `c92da83b017f`. Messages posted by an app carry its `app_id` and a null `user_id`.
 - `meta` carries the webhook identity for messages posted through a [channel webhook](#channel-webhook-table), under a `webhook` key, which is what lets those messages render with the webhook's name rather than a user account.
 
 ## Message Reaction Table

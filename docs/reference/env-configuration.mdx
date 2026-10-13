@@ -333,6 +333,20 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables channel support.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_APPS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** tab to the admin settings, where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Can also be set in **Settings > Admin > General** (**Apps**).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `APP_ALLOWED_PRIVATE_ORIGINS`
+
+- Type: `str` (comma-separated list of origins)
+- Default: Empty string (' ')
+- Example: `http://127.0.0.1:8000,https://apps.internal.example`
+- Description: App origins (scheme, host and port) that [Apps](/features/channels/apps#private-and-plain-http-app-servers) may reach on private, loopback or reserved addresses. A listed `http://` origin may also use plain HTTP. Every other app URL must use HTTPS and resolve only to public addresses. The match is exact on scheme, host and port; without a port, `https` means 443 and `http` means 80. Write every entry with its scheme, for example `http://host.docker.internal:8000`. An entry without a scheme, or with credentials or a fragment, breaks every app, public ones included: loading app details fails with `Invalid app URL` and installed apps stay on **Connecting**.
+
 #### `CHANNEL_MODEL_RESPONSE_MODE`
 
 - Type: `str`
@@ -2528,7 +2542,7 @@ When setting a custom `PASSWORD_VALIDATION_REGEX_PATTERN`, always set `PASSWORD_
 
 - Type: `str`
 - Default: Automatically generated (see below)
-- Description: The secret key used for signing JSON Web Tokens (JWTs) and **encrypting sensitive data** at rest (including OAuth tokens for MCP). Can be set via the `WEBUI_SECRET_KEY` environment variable or the legacy `WEBUI_JWT_SECRET_KEY` variable (deprecated).
+- Description: The secret key used for signing JSON Web Tokens (JWTs) and **encrypting sensitive data** at rest (including OAuth tokens for MCP and app API keys). Can be set via the `WEBUI_SECRET_KEY` environment variable or the legacy `WEBUI_JWT_SECRET_KEY` variable (deprecated).
 
 :::info How the secret key is generated
 
@@ -2555,6 +2569,7 @@ While the auto-generated key is secure, it is tied to a file inside the containe
 2. **All OAuth sessions become invalid.**
 3. **MCP Tools break** (Error: `Error decrypting tokens`) because tokens encrypted with the previous key cannot be decrypted.
 4. **Open WebUI refuses to start while [MFA](/features/authentication-access/mfa) is on**, because users' authenticator secrets were encrypted with the previous key, unless [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key) is set.
+5. **Installed [apps](/features/channels/apps) stop connecting**, because their API keys and connection credentials were encrypted with the previous key. See [Apps stop connecting after WEBUI_SECRET_KEY changed](/features/channels/apps#apps-stop-connecting-after-webui_secret_key-changed).
 
 To avoid this, explicitly set `WEBUI_SECRET_KEY` to a secure, persistent value that survives container recreates:
 
