@@ -332,7 +332,7 @@ The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Re
 
 ### Sentinel Failover Configuration
 
-Sentinel is enabled by setting `REDIS_SENTINEL_HOSTS` (comma-separated) and optionally `REDIS_SENTINEL_PORT` (default `26379`); `WEBSOCKET_SENTINEL_HOSTS` and `WEBSOCKET_SENTINEL_PORT` do the same for the websocket manager. In that mode the hostname part of `REDIS_URL` is the Sentinel master (service) name, and its database and credentials are reused.
+Sentinel is enabled by setting `REDIS_SENTINEL_HOSTS` (comma-separated) and optionally `REDIS_SENTINEL_PORT` (default `26379`); `WEBSOCKET_SENTINEL_HOSTS` and `WEBSOCKET_SENTINEL_PORT` do the same for the websocket manager. In that mode the hostname part of `REDIS_URL` is the Sentinel master (service) name, and its database and credentials are reused. The master name is case sensitive, so write it exactly as configured in Sentinel (for example `redis://:password@myMaster:6379/0`). The user name and password in the URL are also sent to the Sentinels, so Sentinels protected with the same password work without extra settings.
 
 :::danger Critical: Socket Timeout for Sentinel Deployments
 

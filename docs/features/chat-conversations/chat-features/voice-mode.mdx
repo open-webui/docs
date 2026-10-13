@@ -18,7 +18,7 @@ Admins pick one of two call modes under **Settings > Admin > Audio > Voice calls
 2. Leave the message box empty. While it is empty and nothing is attached, the **Voice mode** button takes the place of the send button.
 3. Click **Voice mode** and allow microphone access when the browser asks.
 
-On a wide screen, Voice Mode opens in the side panel next to the chat, so the transcript stays in view. On a phone or a narrow window, it fills the screen. Your screen is kept awake for as long as Voice Mode is open, where the browser supports it.
+On a wide screen, Voice Mode opens in the side panel next to the chat, so the transcript stays in view. On a phone or a narrow window, it fills the screen. Your screen is kept awake for the whole call, where the browser supports it. That includes Realtime calls, also while their side panel is closed, and the screen can sleep again once the call ends.
 
 To end it, click **End call**. That also turns off the microphone and any camera or screen share.
 
@@ -207,13 +207,24 @@ The call screen centres on an animated voice orb, or on the model's character wh
 
 Camera and screen share, **Display Emoji in Call**, **Allow Voice Interruption in Call**, Response Splitting and the speech engines further down the audio settings all belong to Standard mode. Standard calls can also speak through the realtime models with the [OpenAI Realtime](/features/chat-conversations/audio/text-to-speech/openai-tts-integration#using-the-openai-realtime-engine) Text-to-Speech engine.
 
-### Voice Avatars
+### Requirements and Providers
 
-A model can show up in Realtime calls as an animated 3D character in place of the orb. The character moves its mouth with the assistant's voice, blinks, shifts its pose as it listens and speaks and can perform short gestures that the voice model picks during the conversation. Avatars appear in Realtime calls only.
+- **A Realtime API reachable from the Open WebUI server.** Open WebUI opens a WebSocket to `<OpenAI API Base URL>/realtime?model=<Voice Model>` and sends the key as a bearer token. Any server compatible with the OpenAI Realtime API works there, Azure OpenAI and local speech-to-speech engines included. For a local server that checks no key, enter any placeholder. The base URL must start with `http://` or `https://` and contain no query string, user name or password, so endpoints that need extra query parameters such as `api-version` cannot be used.
+- **Function calling on the voice model.** The server and the voice model must support function calls: questions reach the chat model through `generate_chat_completion` and [voice avatar](#voice-avatars) gestures play through `play_animation`.
+- **One server-configured chat model.** Select exactly one model that you have access to. With a model from a Direct Connection, the call ends with **Select one server-configured chat model.**
+- **Microphone access.** As in Standard mode, browsers only allow the microphone on HTTPS or `localhost`. The browser also needs to support 24 kHz audio processing; when it cannot, the call ends with a message suggesting Standard call mode.
+- **WebSocket support in your reverse proxy.** The call runs over a WebSocket under `/api/`, so a reverse proxy in front of Open WebUI has to pass WebSocket upgrades on that path. The [Nginx guide](/reference/https/nginx) configuration already does. See [WebSocket Troubleshooting](/troubleshooting/connection-error#websocket-troubleshooting).
+- **Costs.** Each call uses the voice model and the transcription model on the realtime provider, plus the chat model for every question it answers.
 
-#### Setting Up an Avatar
+Realtime calls work with every speech-to-text engine setting, **Web API** included, because the provider transcribes your speech.
 
-Open the model in [**Workspace > Models**](/features/workspace/models#voice-avatar). While **Call mode** is **Realtime**, the editor shows a **Voice avatar** row below **Realtime Voice**, reading **Default orb** or **Custom avatar**. A model that already has an avatar keeps the row after Realtime mode is turned off, so the avatar can still be removed. Click **Configure** to open **Avatar setup**:
+## Voice Avatars
+
+A model can show up in voice calls as an animated 3D character. The character moves its mouth with the assistant's voice, blinks, shifts its pose as it listens and speaks and can perform short gestures that the model picks during the conversation. Avatars work in Standard and Realtime calls.
+
+### Setting Up an Avatar
+
+Open the model in [**Workspace > Models**](/features/workspace/models#voice-avatar). The **Voice** row has a **Voice avatar** setting, reading **Default** or **Custom avatar**. Click **Configure** to open **Avatar setup**:
 
 1. Click **Upload VRM** and choose the character file. A live preview of the character appears in the dialog. **Replace avatar** swaps in a different file, and **Use orb** removes the avatar together with all its animations.
 2. Click **Idle**, **Listening** or **Speaking** under the preview to watch how the character moves in each state. The preview is silent; during a call the mouth follows the assistant's audio.
@@ -224,7 +235,7 @@ Open the model in [**Workspace > Models**](/features/workspace/models#voice-avat
 
 Anyone who can edit the model can give it an avatar. The avatar and its animations are stored like other uploaded files, in the configured file storage, and the model keeps a reference to each of them. Everyone the model is shared with can load these files, so every user who calls the model sees the same character.
 
-#### File Requirements
+### File Requirements
 
 The avatar is a rigged humanoid character in the VRM format, version 0.x or 1.0, saved as a single `.vrm` file. Only upload a character you have permission to use.
 
@@ -238,32 +249,29 @@ The avatar is a rigged humanoid character in the VRM format, version 0.x or 1.0,
 
 The mouth moves through the character's built-in "aa" mouth expression and blinking through its blink expressions. **Avatar setup** warns when a character has no mouth or no blink expressions. A character without a mouth expression speaks through body movement alone.
 
-#### Animations and Gestures
+### Animations and Gestures
 
 Out of the box the character uses built-in movement: gentle breathing, a slight sway and small head movements that change as it listens and speaks. Two kinds of optional clips add authored motion. Both use the VRM animation format (`.vrma`, VRMA 1.0) and share these limits: at most 10 MiB and 60 seconds, one animation per file and baked keyframes of body motion only, without meshes or textures. Clips play in place, and the mouth, blinking and gaze stay automatic while they run.
 
 - **State animations.** One clip each for **Idle**, **Listening** and **Speaking**, set with **Upload**, **Replace** and **Remove**. A clip loops while the character is in its state; a state without a clip keeps the built-in movement.
 - **Named gestures.** Up to 16, added with **Add gesture**. Each gesture needs a clip, a name and a description. The name uses lowercase letters, numbers and underscores, starts with a letter, is at most 48 characters long and is unique within the model, for example `wave`. The description, up to 500 characters, tells the voice model when to use the gesture.
 
-**Preview** plays a state or gesture on the character in the dialog. During a call, a model with gestures gives the voice model a `play_animation` function listing each gesture's name and description. The voice model plays a gesture when you ask for one or when it suits the moment. A new gesture replaces the one that is running, and interrupting the assistant stops it.
+**Preview** plays a state or gesture on the character in the dialog. During a call, a model with gestures gets a `play_animation` function listing each gesture's name and description, and plays a gesture when you ask for one or when it suits the moment. A new gesture replaces the one that is running, and interrupting the assistant stops it.
 
-#### What Users See
+In a Realtime call the voice model plays the gestures. In a Standard call the chat model gets `play_animation` as a [built-in tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), which needs:
 
-On the call screen the character takes the place of the orb, with the same status line and controls. A spinner shows while the character loads. Its mouth follows the assistant's audio, it moves between idle, listening and speaking poses as the call goes on and tapping it while the assistant speaks interrupts the reply. Switching to another model in the chat switches to that model's avatar.
+- [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) on the model, the default
+- the model's **Builtin Tools** capability turned on
+- the **Allow Call** permission, which admins always have
+
+When one of them is missing, the character speaks and moves without gestures.
+
+### What Users See
+
+On the call screen the character takes the place of the orb in a Realtime call, and of the model's picture and the **Display Emoji in Call** emoji in a Standard call, with the same status line and controls. While the camera or screen share is on in a Standard call, the video takes its place. A spinner shows while the character loads. Its mouth follows the assistant's audio, it moves between idle, listening and speaking poses as the call goes on and tapping it while the assistant speaks interrupts the reply. Switching to another model in the chat switches to that model's avatar. When a Standard call speaks through the browser's built-in voices (**Web API**), the mouth stays closed while the character still takes its speaking pose.
 
 ![A Realtime call with a voice avatar on the right. The chat shows the spoken greeting, the small talk reply labelled with the voice model's name, the spoken question and the chat model's full answer under its own name](/images/features/audio/realtime-call-avatar.webp)
 
-The character is drawn with WebGL, so the browser needs WebGL turned on. When the avatar file cannot be loaded or the browser's graphics stop working, the call carries on with the orb.
+The character is drawn with WebGL, so the browser needs WebGL turned on. When the avatar file cannot be loaded or the browser's graphics stop working, the call carries on with the orb, or the model's picture in a Standard call.
 
 With the reduce motion accessibility setting of the operating system or browser turned on, the character holds a still pose: built-in movement, state animations and gestures stop, while the mouth and blinking keep following the call.
-
-### Requirements and Providers
-
-- **A Realtime API reachable from the Open WebUI server.** Open WebUI opens a WebSocket to `<OpenAI API Base URL>/realtime?model=<Voice Model>` and sends the key as a bearer token. Any server compatible with the OpenAI Realtime API works there, Azure OpenAI and local speech-to-speech engines included. For a local server that checks no key, enter any placeholder. The base URL must start with `http://` or `https://` and contain no query string, user name or password, so endpoints that need extra query parameters such as `api-version` cannot be used.
-- **Function calling on the voice model.** The server and the voice model must support function calls: questions reach the chat model through `generate_chat_completion` and [voice avatar](#voice-avatars) gestures play through `play_animation`.
-- **One server-configured chat model.** Select exactly one model that you have access to. With a model from a Direct Connection, the call ends with **Select one server-configured chat model.**
-- **Microphone access.** As in Standard mode, browsers only allow the microphone on HTTPS or `localhost`. The browser also needs to support 24 kHz audio processing; when it cannot, the call ends with a message suggesting Standard call mode.
-- **WebSocket support in your reverse proxy.** The call runs over a WebSocket under `/api/`, so a reverse proxy in front of Open WebUI has to pass WebSocket upgrades on that path. The [Nginx guide](/reference/https/nginx) configuration already does. See [WebSocket Troubleshooting](/troubleshooting/connection-error#websocket-troubleshooting).
-- **Costs.** Each call uses the voice model and the transcription model on the realtime provider, plus the chat model for every question it answers.
-
-Realtime calls work with every speech-to-text engine setting, **Web API** included, because the provider transcribes your speech.

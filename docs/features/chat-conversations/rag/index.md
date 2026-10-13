@@ -75,6 +75,8 @@ Configure these under **Settings > Admin > Integrations > External Knowledge Sou
 
 Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. At chat time, Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
 
+In the sources under an answer, each result is listed by its title. When a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
+
 :::info Embedding model must match
 Because Open WebUI embeds the query and searches your database by vector, the vectors stored in your external database must come from the **same embedding model** Open WebUI uses (matching model and dimensions). Mismatched embeddings produce poor or meaningless results.
 :::
