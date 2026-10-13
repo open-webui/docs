@@ -359,7 +359,7 @@ the_file = Path(__files__[0]["file"]["path"])
 assert the_file.exists()
 ```
 
-Note that the same files dict can also be accessed via `__metadata__["files"]` (and its value is `[]` if no files are sent) or via `body["files"]` (but the `files` key is missing entirely from `body` if no files are sent).
+Note that the same files dict can also be accessed via `__metadata__["files"]` (and its value is `None` if no files are sent) or via `body["files"]` (but the `files` key is missing entirely from `body` if no files are sent).
 
 <details>
 <summary>Example</summary>
