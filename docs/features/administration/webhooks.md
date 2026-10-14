@@ -227,6 +227,7 @@ Messages posted via webhooks have a special identity system:
 - The user role is marked as **"webhook"** to distinguish from regular users
 - If a webhook is deleted, its messages remain visible but show "Deleted Webhook" with the default avatar
 - Each message stores the webhook ID in its metadata, allowing proper attribution even if the webhook is later modified or deleted
+- Only Open WebUI writes that metadata. Metadata sent with a regular request to post or edit a message is ignored, so a message posted by an account always shows that account
 
 ## Troubleshooting
 

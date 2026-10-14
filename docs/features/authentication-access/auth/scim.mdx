@@ -76,7 +76,7 @@ Open WebUI's SCIM implementation supports the following operations:
 - **Create User** (`POST /Users`): Create a new user account
 - **Get User** (`GET /Users/{id}`): Retrieve user information
 - **Update User** (`PUT /Users/{id}`, `PATCH /Users/{id}`): Update user attributes
-- **Delete User** (`DELETE /Users/{id}`): Delete the user account with its chats and its sign-in record
+- **Delete User** (`DELETE /Users/{id}`): Delete the user account with its chats and its sign-in record. For an admin account that SCIM can see, the request answers `403` (`The requested action has been restricted as a security measure.`) and the account stays, so a sync that prunes users cannot remove your admins. A locally created admin answers `404`, as described below. Remove admins under **Admin Panel > Users**.
 - **List Users** (`GET /Users`): List externally provisioned users, with filtering support
 
 #### PATCH operations
@@ -96,7 +96,7 @@ This keeps the identity provider's view limited to the accounts it owns. A local
 
 :::info Deprovisioning ends live sessions
 
-The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `pending`, `active: true` sets it back to `user`. Because that is a role change, Open WebUI ends the account's live WebSocket connections as soon as the SCIM update lands, and a `pending` account is then refused on both the API and the WebSocket handshake. Deleting a user through SCIM ends their live connections the same way. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
+The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `pending`, `active: true` sets it back to `user`. Because that is a role change, Open WebUI ends the account's live WebSocket connections as soon as the SCIM update lands, and a `pending` account is then refused on both the API and the WebSocket handshake. Deleting a user through SCIM ends their live connections the same way. An admin account keeps its role whatever `active` says, so a sync cannot demote it. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
 
 :::
 

@@ -124,14 +124,6 @@ Hover any message to react with emoji, pin it for reference, reply inline, or st
 
 The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar and shows no unread count. Only a message that @mentions you still sends a pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications); the unread count stays hidden for it too. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else.
 
-### Bots posting as a model
-
-Any account can post into a channel over the API: a script or bot runs under its own account and posts like any other member. A bot that answers `@mentions` under its own name is an [App](#apps).
-
-A posted message can carry an optional model identity, and the interface then shows that message with the model's name and avatar. A bot that answers on behalf of a model sets this so its replies are presented as that model's replies.
-
-That identity is a label chosen by whoever posts the message. The account that posted stays the recorded author and is what the API returns for the message, so the real sender can always be recovered. Anyone who can post in a channel can set the label, so treat the model name next to a message as presentation only.
-
 ### Apps
 
 External services can also join a channel as [Apps](/features/channels/apps). An admin installs them in **Settings > Admin > Apps**; the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.

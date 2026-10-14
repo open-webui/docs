@@ -844,7 +844,7 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*`, `web-search-*`, or an existing knowledge base). By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
+- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). Names are matched with letter case ignored and hyphens and underscores treated alike, so `File_abc` is checked as `file-abc`. By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -1230,7 +1230,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1248,7 +1248,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `/chats,/chat,/folders`
-- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set.
+- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses.
 
 #### `AUDIT_INCLUDED_PATHS`
 

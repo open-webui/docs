@@ -157,7 +157,7 @@ Open WebUI emits `app:event` and waits for the acknowledgement. Every event carr
 }
 ```
 
-`author.type` is `user`, `model`, `webhook` or `app`. `model` and `webhook` follow the label stored on the message, which any poster can set, so treat them as presentation. For a message with a model label, `channel.message.updated` is sent only once the message is marked done, which for a model's reply means once the reply is complete. Deleted-message events carry only `id`, `channel_id`, `parent_id`, `author` and `updated_at`. Message events are best effort: each is sent once, and events that fail or occur while the app is disconnected are dropped.
+`author.type` is `user`, `model`, `webhook` or `app`. `model` and `webhook` follow the label stored on the message. Only Open WebUI sets it: `webhook` for a message posted through a channel webhook, `model` for a model's reply. A label sent with a request to post or edit a message is ignored. The text of a `model` message can still be edited by the member whose mention triggered it and by admins, and the text of a `webhook` message by the account that created the webhook. For a model's reply, `channel.message.updated` is sent only once the reply is complete. Deleted-message events carry only `id`, `channel_id`, `parent_id`, `author` and `updated_at`. Message events are best effort: each is sent once, and events that fail or occur while the app is disconnected are dropped.
 
 A mention reaches an app with `channels:messages:read` twice: as `channel.mention` and as `channel.message.created`. Answer it in one of the two handlers.
 

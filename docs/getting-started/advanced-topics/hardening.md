@@ -498,7 +498,7 @@ AUDIT_LOG_LEVEL=METADATA
 | Level | What is logged |
 |---|---|
 | `NONE` | Nothing (default) |
-| `METADATA` | User, IP, user agent, method, URL, timestamp |
+| `METADATA` | User, IP, user agent, method, URL, timestamp, requested model |
 | `REQUEST` | Metadata plus request body |
 | `REQUEST_RESPONSE` | Metadata plus request and response bodies |
 
@@ -528,6 +528,14 @@ AUDIT_EXCLUDED_PATHS=/chats,/chat,/folders
 ```
 
 Authentication endpoints (signin, signout, signup and the MFA endpoints) are always audited regardless of path exclusions. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, in any letter case, is masked in both request and response bodies.
+
+Each entry has a `model_id` field with the model the client asked for. It is filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](/reference/env-configuration#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is, so `METADATA` is enough to see who used which model. The default exclusions skip `/api/chat/completions`, the endpoint the chat interface uses. To record those requests, drop `/chat` from the list:
+
+```bash
+AUDIT_EXCLUDED_PATHS=/chats,/folders
+```
+
+Within these filters, the audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the authentication endpoints above. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
 
 ---
 
