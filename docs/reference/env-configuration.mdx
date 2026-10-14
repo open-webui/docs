@@ -3777,7 +3777,7 @@ The Valkey backend is a non-core, independently maintained integration. Fixes co
 :::
 
 :::info Requirements
-Valkey is **opt-in**. Install the client yourself, in the Docker image too (`pip install valkey-glide-sync==2.5.2`), and run **Valkey core 9.0.1+ with the valkey-search module 1.2.0+ loaded**. Open WebUI verifies both versions at startup (on the slim image, at the first upload or knowledge search) and refuses to work with an older server.
+Valkey is **opt-in**. Install the client yourself, in the Docker image too (`pip install --upgrade "valkey-glide-sync>=2.5.2"`), and run **Valkey core 9.0.1+ with the valkey-search module 1.2.0+ loaded**. Open WebUI verifies both versions at startup (on the slim image, at the first upload or knowledge search) and refuses to work with an older server.
 
 Open WebUI's connections report the library name `GlidePySync(open-webui)` in `CLIENT LIST` and `CLIENT INFO`, so its traffic can be told apart on a shared Valkey or ElastiCache server.
 :::
@@ -3786,7 +3786,7 @@ Open WebUI's connections report the library name `GlidePySync(open-webui)` in `C
 v0.12.2 needs valkey-glide-sync 2.5.2 or newer. An install with `VECTOR_DB=valkey` that still has an older version, such as the 2.3.1 named in earlier docs, fails at startup. On the slim image it starts, and then every upload and knowledge search fails until the client is upgraded. Upgrade the client before or with Open WebUI:
 
 ```bash
-pip install valkey-glide-sync==2.5.2
+pip install --upgrade "valkey-glide-sync>=2.5.2"
 ```
 
 In a custom Docker image, change the version in the line that installs it and rebuild the image.
