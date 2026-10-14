@@ -10,7 +10,7 @@ Voice Mode turns a chat into a spoken conversation. You talk, Open WebUI transcr
 Admins pick one of two call modes under **Settings > Admin > Audio > Voice calls**:
 
 - **Standard** (the default) uses the instance's [speech-to-text](/features/chat-conversations/audio/speech-to-text/stt-config) and [text-to-speech](/features/chat-conversations/audio) settings, so it works with whichever engines your admin has set up. The page covers Standard mode first.
-- **Realtime** connects the call to a speech-to-speech model from an OpenAI-compatible Realtime API, which hears you directly and hands real questions to the chat's model. Its own section, [Realtime Calls](#realtime-calls), follows further down.
+- **Realtime** connects the call to a speech-to-speech model from an OpenAI-compatible Realtime API or Azure OpenAI, which hears you directly and hands real questions to the chat's model. Its own section, [Realtime Calls](#realtime-calls), follows further down.
 
 ## Starting Voice Mode
 
@@ -107,14 +107,19 @@ The same permission covers both call modes. In Realtime mode, Open WebUI checks 
 
 Realtime calls show their own messages:
 
-- **"Configure the Realtime API key, model, voice, and transcription model"**: one of the Realtime fields in **Settings > Admin > Audio > Voice calls** is empty.
-- **"Invalid Realtime provider URL"**: the **OpenAI API Base URL** needs to start with `http://` or `https://` and contain no query string, user name or password.
-- **"Voice connection failed"** right after starting: the provider refused the connection, most often because of a wrong API key or a base URL that has no `/realtime` endpoint.
+- **"Configure the Realtime model, voice, and transcription model"**: **Voice Model**, **Voice** or **Input Transcription Model** in **Settings > Admin > Audio > Voice calls** is empty.
+- **"Configure the Realtime API key"**: **API Key** is empty while **Authentication** is **API Key**.
+- **"Invalid Realtime provider URL"**: the **API Base URL** (**Azure OpenAI API Base URL** with Azure) needs to start with `http://` or `https://` and contain no query string, user name or password.
+- **"Realtime provider authentication rejected. Check the credentials and access."**: the provider answered 401 or 403. The API key is wrong, or with Microsoft Entra ID the server's identity has no access to the Azure OpenAI resource.
+- **"Realtime endpoint not found. Check the API base URL and deployment name."**: the provider answered 404. The base URL path is wrong, or with Azure OpenAI no deployment of that name exists on the resource.
+- **"Unable to obtain a Microsoft Entra ID token for Realtime calls"**: the Open WebUI server has no Azure credentials it can sign in with. See [Using Azure OpenAI](#using-azure-openai).
+- **"Microsoft Entra ID requires the Azure OpenAI Realtime provider"**: [`AUDIO_REALTIME_AUTH_TYPE`](/reference/env-configuration#audio_realtime_auth_type) is `microsoft_entra_id` while [`AUDIO_REALTIME_PROVIDER`](/reference/env-configuration#audio_realtime_provider) is `openai`.
+- **"Voice connection failed"** right after starting: the provider could not be reached or refused the connection with an error other than the ones above.
 - **"Provider rejected voice configuration. Check model, voice, and transcription model."**: the provider accepted the key but rejected the **Voice Model**, **Voice** or **Input Transcription Model**.
 - **"Select one server-configured chat model."**: select a single model provided by the server. Models from a user's own Direct Connections need Standard mode.
 - **"Call permission denied"** or **"Chat model access denied"**: the user lacks **Allow Call** or access to the selected model.
 - **"Call session expired. Start a new call."**: the call reached the one-hour limit.
-- **"A voice segment could not be transcribed. Please try again."**: the provider could not transcribe part of what you said. The message shows as an error notification and the call continues, so say it again.
+- **"A voice segment could not be transcribed. Please try again."**: the provider could not transcribe part of what you said. The message shows as an error notification and the call continues, so say it again. The failed segment is also removed from the voice model's conversation.
 - **"This browser cannot use 24 kHz AudioWorklet audio. Use Standard call mode."**: the browser lacks the 24 kHz audio processing Realtime calls need. Use a browser with AudioWorklet support, or have the admin switch to Standard mode.
 
 ## Realtime Calls
@@ -130,14 +135,39 @@ Admins set this up in **Settings > Admin > Audio**, in the **Voice calls** secti
 | Setting | What it does | Default |
 | :--- | :--- | :--- |
 | **Call mode** | **Standard** runs calls through the Speech-to-Text and Text-to-Speech engines further down the page. **Realtime** runs them through the realtime voice model configured here | **Standard** |
-| **OpenAI API Base URL** | Base URL of the OpenAI-compatible Realtime API | `https://api.openai.com/v1` |
-| **API Key** | Key for that API. It stays on the server and is sent only to the provider | empty |
-| **Voice Model** | The realtime model that listens and speaks during the call | `gpt-realtime-2.1-mini` |
+| **Provider** | **OpenAI / compatible** for OpenAI and other OpenAI-compatible Realtime APIs. **Azure OpenAI** for an Azure OpenAI resource, see [Using Azure OpenAI](#using-azure-openai) | **OpenAI / compatible** |
+| **Authentication** | Shown with **Azure OpenAI** only. **API Key** or **Microsoft Entra ID** | **API Key** |
+| **API Base URL** | Base URL of the Realtime API. Labelled **Azure OpenAI API Base URL** with Azure | `https://api.openai.com/v1` |
+| **API Key** | Key for that API. It stays on the server and is sent only to the provider. Hidden with **Microsoft Entra ID** | empty |
+| **Voice Model** | The realtime model that listens and speaks during the call. Labelled **Realtime Deployment Name** with Azure | `gpt-realtime-2.1-mini` |
 | **Voice** | The voice the voice model speaks with | `marin` |
 | **Input Transcription Model** | Writes down what you say, so your spoken words appear in the chat as text | `gpt-transcribe` |
+| **Input Parameters** | Extra settings for the audio input of the call as a JSON object, see [Input Parameters](#input-parameters) | empty |
 | **Prompt Template** | Instructions for the voice model. Leave it empty to use the built-in prompt | empty |
 
-A call needs the API key, **Voice Model**, **Voice** and **Input Transcription Model** to be filled in. Every setting has a matching environment variable, listed under [Realtime Voice Calls](/reference/env-configuration#realtime-voice-calls) in the environment variable reference.
+A call needs **Voice Model**, **Voice** and **Input Transcription Model** to be filled in, and the API key when **Authentication** is **API Key**. Every setting has a matching environment variable, listed under [Realtime Voice Calls](/reference/env-configuration#realtime-voice-calls) in the environment variable reference.
+
+#### Using Azure OpenAI
+
+1. In the Azure portal, deploy a realtime model such as `gpt-realtime` on your Azure OpenAI resource and note the deployment name and the resource endpoint.
+2. Set **Provider** to **Azure OpenAI**.
+3. In **Azure OpenAI API Base URL**, enter the endpoint followed by `/openai/v1`, for example `https://<resource>.openai.azure.com/openai/v1`. Open WebUI connects to `<base URL>/realtime?model=<deployment>`, so no `api-version` is needed.
+4. In **Realtime Deployment Name**, enter the deployment name. It can differ from the model name.
+5. Set **Voice** and **Input Transcription Model** to ones that deployment supports.
+6. Pick the **Authentication**:
+   - **API Key**: paste one of the resource's keys. Open WebUI sends it in the `api-key` header.
+   - **Microsoft Entra ID**: no key is entered. The Open WebUI server signs in to Azure with `DefaultAzureCredential` and uses its own identity, never the signed-in user's account. Give that identity the `Cognitive Services OpenAI User` role on the resource and make credentials available where Open WebUI runs: a managed identity or workload identity on Azure, `AZURE_TENANT_ID`, `AZURE_CLIENT_ID` and `AZURE_CLIENT_SECRET` for a service principal or `az login` with the Azure CLI. The [Azure OpenAI with EntraID](/tutorials/integrations/llm-providers/azure-openai) tutorial covers each of these, and `AZURE_TOKEN_CREDENTIALS` limits which one is tried.
+7. Click **Save** and start a call. A wrong key or missing role shows **"Realtime provider authentication rejected. Check the credentials and access."** and a wrong URL or deployment name shows **"Realtime endpoint not found. Check the API base URL and deployment name."**
+
+#### Input Parameters
+
+**Input Parameters** adds settings to the audio input of every Realtime session. Enter a JSON object, for example to turn on the provider's noise reduction:
+
+```json
+{"noise_reduction": {"type": "near_field"}}
+```
+
+Use `far_field` for a laptop or room microphone. Noise reduction stays off until it is set here. Open WebUI merges the object into the session's audio input settings, and a key you set replaces Open WebUI's own value for it. Open WebUI sets `format`, `transcription` and `turn_detection` itself, and calls depend on those values, so leave them out. Saving text that is not a JSON object shows **Invalid JSON format for Parameters**.
 
 While Realtime mode is on, editing a model in **Workspace > Models** also shows a [**Realtime Voice**](/features/workspace/models#voice-avatar) field. A voice entered there is used for calls with that model, and models without one use the admin's **Voice**. Personal voice choices in **Settings > Audio** apply to Standard calls and Read Aloud.
 
@@ -172,7 +202,7 @@ The built-in prompt will not suit every setup. When the voice model behaves stra
 
 ### How a Realtime Call Works
 
-1. **Connecting.** When you click **Voice mode**, Open WebUI checks your permission and your access to the selected model, then connects to the provider with the admin's API key. Your audio and the spoken replies pass through Open WebUI in both directions as 24 kHz audio. The browser never talks to the provider, so the voice model's instructions and tools stay exactly as the admin configured them.
+1. **Connecting.** When you click **Voice mode**, Open WebUI checks your permission and your access to the selected model, then connects to the provider with the credentials the admin configured. Your audio and the spoken replies pass through Open WebUI in both directions as 24 kHz audio. The browser never talks to the provider, so the voice model's instructions and tools stay exactly as the admin configured them.
 2. **Catching up on the chat.** At the start of the call, the voice model receives the visible text of the current conversation: up to the last 100 user and assistant messages, about 64,000 characters in total. Reasoning and raw tool output stay out.
 3. **You speak.** The provider notices when you stop talking and transcribes what you said with the **Input Transcription Model**. Open WebUI adds the transcript to the chat as your message.
 4. **Small talk.** For greetings, thanks, call status and requests to repeat or shorten an earlier answer, the voice model answers on its own.
@@ -189,13 +219,13 @@ A Realtime call fills the chat like a typed conversation:
 - **Answers from the chat model** are ordinary assistant messages. What the voice model actually said about them is stored with the message as a transcript.
 - **The voice model's own replies**, such as greetings, become assistant messages labelled with the voice model's name, for example `gpt-realtime-2.1-mini`.
 
-Open WebUI keeps text transcripts of the call. The audio itself is streamed and played back only. A call started on a new chat creates the chat with your first spoken message, and calls in a temporary chat follow the usual temporary chat rules.
+Open WebUI keeps text transcripts of the call. The audio itself is streamed and played back only. A call started on a new chat creates the chat with your first spoken message, and calls in a temporary chat follow the usual temporary chat rules. A new chat gets a generated title and tags right away, following your **Title Auto-Generation** and **Chat Tags Auto-Generation** settings in **Settings > Interface**. Without a generated title, the chat is named after the first 100 characters of your first message.
 
 ### During a Realtime Call
 
 The call screen centres on an animated voice orb, or on the model's character when it has a [voice avatar](#voice-avatars). The status under it reads **Connecting...**, **Listening**, **Speaking** or **Microphone off**. When the connection drops it reads **Call disconnected** and shows a **Retry** button. **Mute** and **End call** sit below the orb.
 
-- **Talk over it.** Starting to speak stops the assistant straight away. Tapping the orb while it speaks does the same.
+- **Talk over it.** When you start speaking, the assistant's reply pauses. It stops once your words are transcribed. When the sound gives no transcript, as with wind or background noise, the reply continues where it paused and that sound is removed from the voice model's conversation. Tapping the orb while it speaks stops the reply straight away.
 - **Mute.** Click the microphone button, or press **M** on a keyboard.
 - **Stop.** While the chat model is still working on an answer, the chat's regular **Stop** button cancels that request. Anything a tool already did stays done.
 - **Ask something new.** A new request while the previous one is still running stops the previous one and starts the new one.
@@ -209,7 +239,7 @@ Camera and screen share, **Display Emoji in Call**, **Allow Voice Interruption i
 
 ### Requirements and Providers
 
-- **A Realtime API reachable from the Open WebUI server.** Open WebUI opens a WebSocket to `<OpenAI API Base URL>/realtime?model=<Voice Model>` and sends the key as a bearer token. Any server compatible with the OpenAI Realtime API works there, Azure OpenAI and local speech-to-speech engines included. For a local server that checks no key, enter any placeholder. The base URL must start with `http://` or `https://` and contain no query string, user name or password, so endpoints that need extra query parameters such as `api-version` cannot be used.
+- **A Realtime API reachable from the Open WebUI server.** Open WebUI opens a WebSocket to `<API Base URL>/realtime?model=<Voice Model>`. With **OpenAI / compatible** it sends the key as a bearer token, so any server compatible with the OpenAI Realtime API works, local speech-to-speech engines included. For a local server that checks no key, enter any placeholder. Azure OpenAI has its own **Provider** setting, see [Using Azure OpenAI](#using-azure-openai). The base URL must start with `http://` or `https://` and contain no query string, user name or password, so endpoints that need extra query parameters cannot be used.
 - **Function calling on the voice model.** The server and the voice model must support function calls: questions reach the chat model through `generate_chat_completion` and [voice avatar](#voice-avatars) gestures play through `play_animation`.
 - **One server-configured chat model.** Select exactly one model that you have access to. With a model from a Direct Connection, the call ends with **Select one server-configured chat model.**
 - **Microphone access.** As in Standard mode, browsers only allow the microphone on HTTPS or `localhost`. The browser also needs to support 24 kHz audio processing; when it cannot, the call ends with a message suggesting Standard call mode.
@@ -269,6 +299,17 @@ When one of them is missing, the character speaks and moves without gestures.
 ### What Users See
 
 On the call screen the character takes the place of the orb in a Realtime call, and of the model's picture and the **Display Emoji in Call** emoji in a Standard call, with the same status line and controls. While the camera or screen share is on in a Standard call, the video takes its place. A spinner shows while the character loads. Its mouth follows the assistant's audio, it moves between idle, listening and speaking poses as the call goes on and tapping it while the assistant speaks interrupts the reply. Switching to another model in the chat switches to that model's avatar. When a Standard call speaks through the browser's built-in voices (**Web API**), the mouth stays closed while the character still takes its speaking pose.
+
+You can move the view around the character, in calls and in the **Avatar setup** preview:
+
+| Action | Mouse | Touch |
+| :--- | :--- | :--- |
+| **Turn** | Drag. A quick flick keeps it turning for a moment | Drag with one finger |
+| **Pan** | Right drag, middle drag or Shift drag | Drag with two fingers |
+| **Zoom** | Mouse wheel | Pinch |
+| **Reset** | Double click | Double tap |
+
+In a call, a tap without dragging still interrupts the reply.
 
 ![A Realtime call with a voice avatar on the right. The chat shows the spoken greeting, the small talk reply labelled with the voice model's name, the spoken question and the chat model's full answer under its own name](/images/features/audio/realtime-call-avatar.webp)
 

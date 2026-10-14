@@ -5907,25 +5907,45 @@ These variables configure **Realtime** call mode for [Voice Mode](/features/chat
 - Description: Sets the **Call mode**. `True` selects **Realtime**, which runs voice calls through the realtime voice model configured below. `False` selects **Standard**, which runs them through the speech-to-text and text-to-speech engines.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `AUDIO_REALTIME_PROVIDER`
+
+- Type: `str`
+- Options:
+  - `openai`: OpenAI or another OpenAI-compatible Realtime API (**OpenAI / compatible**).
+  - `azure`: An Azure OpenAI resource (**Azure OpenAI**). `AUDIO_REALTIME_OPENAI_API_BASE_URL` is then the Azure endpoint and `AUDIO_REALTIME_MODEL` the deployment name. See [Using Azure OpenAI](/features/chat-conversations/chat-features/voice-mode#using-azure-openai).
+- Default: `openai`
+- Description: Sets the **Provider** for Realtime calls.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `AUDIO_REALTIME_AUTH_TYPE`
+
+- Type: `str`
+- Options:
+  - `api_key`: Signs in with `AUDIO_REALTIME_OPENAI_API_KEY`.
+  - `microsoft_entra_id`: Signs in with a Microsoft Entra ID token that the Open WebUI server gets through `DefaultAzureCredential`, using the server's own Azure identity (managed identity, service principal environment variables or Azure CLI sign-in). Requires `AUDIO_REALTIME_PROVIDER=azure`; with `openai` the call ends with **"Microsoft Entra ID requires the Azure OpenAI Realtime provider"**.
+- Default: `api_key`
+- Description: Sets the **Authentication** for Realtime calls.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `AUDIO_REALTIME_OPENAI_API_BASE_URL`
 
 - Type: `str`
 - Default: `https://api.openai.com/v1`
-- Description: Sets the base URL of the OpenAI-compatible Realtime API. Open WebUI opens a WebSocket to `<base URL>/realtime?model=<AUDIO_REALTIME_MODEL>`. The URL must start with `http://` or `https://` and contain no query string, user name or password.
+- Description: Sets the base URL of the Realtime API. Open WebUI opens a WebSocket to `<base URL>/realtime?model=<AUDIO_REALTIME_MODEL>`. The URL must start with `http://` or `https://` and contain no query string, user name or password. With `AUDIO_REALTIME_PROVIDER=azure`, use the Azure endpoint followed by `/openai/v1`, for example `https://<resource>.openai.azure.com/openai/v1`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUDIO_REALTIME_OPENAI_API_KEY`
 
 - Type: `str`
 - Default: Empty string
-- Description: Sets the API key for the Realtime API, sent as a bearer token. It stays on the server.
+- Description: Sets the API key for the Realtime API, sent as a bearer token, or in the `api-key` header with `AUDIO_REALTIME_PROVIDER=azure`. It stays on the server. Unused with `AUDIO_REALTIME_AUTH_TYPE=microsoft_entra_id`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUDIO_REALTIME_MODEL`
 
 - Type: `str`
 - Default: `gpt-realtime-2.1-mini`
-- Description: Sets the realtime voice model that listens and speaks during a call. Questions and tasks are still answered by the model selected in the chat.
+- Description: Sets the realtime voice model that listens and speaks during a call. With `AUDIO_REALTIME_PROVIDER=azure`, set the deployment name. Questions and tasks are still answered by the model selected in the chat.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUDIO_REALTIME_VOICE`
@@ -5940,6 +5960,14 @@ These variables configure **Realtime** call mode for [Voice Mode](/features/chat
 - Type: `str`
 - Default: `gpt-transcribe`
 - Description: Sets the model the Realtime API uses to transcribe what the user says, so spoken turns are saved to the chat as text.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `AUDIO_REALTIME_INPUT_PARAMS`
+
+- Type: `str` (JSON object)
+- Default: Empty
+- Description: Sets **Input Parameters**, extra settings merged into the audio input settings of every Realtime session. A key set here replaces Open WebUI's own value for it. Noise reduction stays off until it is set here. Invalid JSON, or JSON that is not an object, is ignored. See [Input Parameters](/features/chat-conversations/chat-features/voice-mode#input-parameters).
+- Example: `{"noise_reduction": {"type": "near_field"}}`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `REALTIME_CALL_PROMPT_TEMPLATE`
