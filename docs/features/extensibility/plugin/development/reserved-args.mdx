@@ -347,7 +347,7 @@ It returns whatever the browser sent back. When it cannot get an answer it retur
 
 ### `__files__`
 
-A `list` of files sent via the chat. Note that images are not considered files and are sent directly to the model as part of the `body["messages"]` list.
+A `list` of files sent via the chat, and an empty list on a message without attachments. Pipes and Tools both receive it. Note that images are not considered files and are sent directly to the model as part of the `body["messages"]` list.
 
 The actual binary of the file is not part of the arguments for performance reason, but the file remain nonetheless accessible by its path if needed. For example using `docker` the python syntax for the path could be:
 

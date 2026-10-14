@@ -118,18 +118,24 @@ This chart helps you:
 
 ### Model Usage Table
 
+Model usage and user activity share one table below the chart. The **Models** / **Users** switch above it picks which list it shows, and **Models** is shown first.
+
 A detailed breakdown of how each model is being used:
 
 | Column | Description |
 |--------|-------------|
-| **#** | Rank by message count |
+| **#** | Rank in the current sort order |
 | **Model** | Model name with icon |
 | **Messages** | Total assistant responses generated |
-| **Tokens** | Total tokens (input + output) consumed |
+| **Users** | Distinct users |
+| **Chats** | Distinct chats |
+| **Input** | Input tokens |
+| **Output** | Output tokens |
+| **Total** | Input and output tokens together |
 | **%** | Percentage share of total messages |
 
 **Features:**
-- **Sortable columns** - Click any column header to sort. The table also has **Users** (distinct users) and **Chats** (distinct chats) columns
+- **Sortable columns** - Click any column header to sort, each of the three token columns included
 - **Model icons** - Visual identification with profile images
 - **Token tracking** - See which models consume the most resources
 - **Clickable rows** - Click any model to open the [Model Details Modal](#model-details-modal)
@@ -178,17 +184,19 @@ This is useful for:
 
 ### User Activity Table
 
-Track user engagement and token consumption per user:
+Pick **Users** in the switch above the table to track user engagement and token consumption per user:
 
 | Column | Description |
 |--------|-------------|
-| **#** | Rank by activity |
+| **#** | Rank in the current sort order |
 | **User** | Username with profile picture |
 | **Messages** | Total messages sent by this user |
-| **Tokens** | Total tokens consumed by this user |
+| **Input** | Input tokens of this user |
+| **Output** | Output tokens of this user |
+| **Total** | Input and output tokens together |
 
 **Features:**
-- **Sortable columns** - Sort by name, messages or tokens. The table shows the 50 users with the most messages in the period. The API's `limit` parameter raises that
+- **Sortable columns** - Sort by name, messages or any of the three token columns. The table shows the 50 users with the most messages in the period. The API's `limit` parameter raises that
 - **User identification** - Profile pictures and display names
 - **Token attribution** - See resource consumption per user
 

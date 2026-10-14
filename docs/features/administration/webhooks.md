@@ -72,7 +72,7 @@ See **[Notifications](/features/chat-conversations/chat-features/notifications)*
 
 ### How it Works
 
-With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**, so you are not pinged about something you are already watching. Setting a target to **always** sends regardless. Channel messages are always delivered, since they come from someone else.
+With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**, so you are not pinged about something you are already watching. Setting a target to **always** sends regardless. Channel messages ignore the delivery mode, in group channels and direct messages too, and are sent only while you have no Open WebUI tab open. A channel set to [**Mentions only**](/features/channels#muting-a-channel) sends only the messages that @mention you.
 
 ### Enabling/Disabling User Webhooks
 

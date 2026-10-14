@@ -104,12 +104,14 @@ Files attached in the chat input normally go to Open WebUI, where their text is 
 
 ## Comparing two files
 
-Select two files, with the checkboxes or `Ctrl`-click, and pick **Compare**. The two are shown side by side with the differences marked.
+Select two files, with the checkboxes or `Ctrl`-click, and pick **Compare**. You can also pick **Select for Compare** in one file's menu and then **Compare with Selected** in the other's. The two are shown side by side with the differences marked.
 
-It compares the **text of each file**, not the raw bytes, so it works on documents as well as source: a Word file against a PDF, or yesterday's spreadsheet against today's, are all fair game.
+Text files open in a read-only compare view: step through the changes with the arrows, **Swap sides** switches which file is on the left and **Refresh** reads both files again. This view takes UTF-8 text files up to 2 MiB each.
+
+Documents (PDF, Word, Excel, PowerPoint, OpenDocument and RTF files) are compared by the **text** extracted from them, so a Word file against a PDF, or yesterday's spreadsheet against today's, are all fair game.
 
 :::info Needs a recent Open Terminal
-Comparing runs on the terminal server. An older one does not offer it and the browser says **"File comparison is not available on this terminal. Update Open Terminal to use Compare."** See [Updating](./setup/updating.mdx).
+Comparing documents runs on the terminal server. An older one does not offer it and the browser says **"File comparison is not available on this terminal. Update Open Terminal to use Compare."** See [Updating](./setup/updating.mdx).
 :::
 
 ## Downloading files

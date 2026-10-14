@@ -112,11 +112,17 @@ Before v0.9.6, tagging a model in a channel only forwarded **images** from the t
 
 Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. Use `#channel-name` to create clickable cross-references between conversations.
 
+You can also type a mention out in full without picking from the list. When you paste or send, `@name` becomes a real mention if it matches exactly one person, model or app, and `#name` if it matches exactly one channel. Two matches with the same name need a pick from the list. Mentions pasted from another message keep pointing at the same person.
+
 Point at someone's profile picture next to their messages or in the channel's member list, or at an `@mention` of them, to open their profile card. It shows their name, online state, status, bio, groups, local time and when they were last active. Local time follows the time zone of the browser they last used Open WebUI in. Every signed-in user can open any other user's card, and the same details, plus email address and role, are available to them through the API.
 
 ### Message interactions
 
 Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation.
+
+### Muting a channel
+
+The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar, shows no unread count and sends no pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications) unless a message @mentions you. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else.
 
 ### Bots posting as a model
 

@@ -75,6 +75,8 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 - **[⌨️ Keyboard Shortcuts](./keyboard-shortcuts.mdx)**: Rebindable shortcuts for the common actions, managed in **Settings > Keyboard**.
 - **Expand the Message Box**: As soon as your prompt runs onto a second line, a button appears in the top right of the message box. It opens **Input**, a full-height editor that shows the whole prompt at once, with the same rich text and formatting toolbar behaviour you have set for the message box. What you write there goes into the message box as you type, so close the editor with the **✕** in its header, `Esc` or a click outside and the text is sitting in the message box ready to send. A single long line that only wraps does not bring the button out.
 
+- **🔀 Compare Text**: **Compare text** in the chat input's **+** menu, or the `/compare` command, opens your current prompt next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, and click **Compare** to see the two side by side with the changes marked. Step through them with the arrows, copy a change into either side with **← Original** and **Proposed revision →** or edit either pane directly. **Use in prompt** puts the right-hand pane into the message box. The same view opens from **Compare revision** in the [skill](/features/workspace/skills#supporting-files) and [prompt](/features/workspace/prompts#creating-a-prompt) editors and on the [model editor's](/features/workspace/models#editor-layout) system prompt, where **Apply to draft** puts the result into the editor and you still save it yourself.
+
 - **Skill Mentions**: Use `$` in the chat input to mention and activate [Skills](/features/workspace/skills) on-the-fly, injecting their full instructions into the conversation.
 
 - **Chat Input Commands**: Typing a trigger character in the chat input opens a suggestion menu:
@@ -98,10 +100,11 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
+  | `/compare` | Opens **Compare text** for the current prompt, the same as the entry in the **+** menu. See **Compare Text** above. |
   | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved privately to your Skills workspace. Offered once the chat has content and you hold the [Skills Access](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission; the model needs built-in tools with the **Skills** category switched on. Anything you type after it steers what the skill covers. |
   | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
-  `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model` and `/settings` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.
+  `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model`, `/settings` and `/compare` are always offered, an empty chat included, and `/model` is the only one that takes anything after it.
 
   `/temporary` is the mirror image: it appears **only before a chat exists**, since the setting cannot change once messages are saved. It is also left out when the **Temporary Chat** permission is withheld, and when an administrator has enforced temporary chat, because in that case there is nothing left to toggle. Turning it on switches you to a new temporary chat and marks the URL with `?temporary-chat=true`.
 

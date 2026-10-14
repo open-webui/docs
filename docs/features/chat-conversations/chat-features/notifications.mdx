@@ -45,7 +45,7 @@ Five events can be subscribed to:
 |---|---|
 | `chat.finished` | A chat response finishes generating. |
 | `chat.failed` | A chat response ends in an error, including when the model provider returns an error status or cannot be reached. The notification carries the error text and a link to the chat. |
-| `channel.message` | A message arrives in a channel you receive notifications for. |
+| `channel.message` | A message arrives in a channel you receive notifications for, group channels and direct messages included. |
 | `calendar.alert` | A calendar event alert triggers. |
 | `retrieval.content.process_failed` | A file fails content extraction. |
 
@@ -54,7 +54,7 @@ Five events can be subscribed to:
 - **`away`** (the default) only sends when you are **not currently active**, so you are not pinged about things you are already watching. You count as active if you have used Open WebUI in roughly the last three minutes.
 - **`always`** sends regardless.
 
-`channel.message` is the exception: it does not check activity and is delivered either way, since a message from someone else is worth having even while you are online.
+`channel.message` is the exception: it ignores the delivery mode and is sent only while you have no Open WebUI tab open. In a channel set to [**Mentions only**](/features/channels#muting-a-channel), only messages that @mention you are sent.
 
 ## The `notify` Tool
 

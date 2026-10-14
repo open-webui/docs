@@ -59,7 +59,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | 🧩 **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
 | 🤖 **Model binding** | Attach skills to models so they're always available |
 | 📦 **Lazy loading** | Model-attached skills inject only a manifest; full content loads on-demand |
-| 📥 **Import/Export** | Import ZIP archives, skill folders, JSON or single `.md` files, or load them from a URL; export as ZIP or JSON |
+| 📥 **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
 | 🌍 **Community** | Find skills on openwebui.com and share your own |
 | 🔒 **Access control** | Private by default, shareable with users or groups |
 | 🔀 **Active/Inactive toggle** | Deactivate skills without deleting them |
@@ -137,7 +137,7 @@ Add a short note in **Describe this change** beside **Save** to label the versio
 
 ### Supporting files
 
-A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
+A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. A text file also has **Copy**, which copies its content, and, when you can edit the skill, **Compare revision**: it opens the file next to an empty **Proposed revision** pane where you paste a revised version, step through the changes, copy each one to either side and click **Apply to draft** to put the result into the file. Save the skill afterwards. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
 
 | Limit | Value |
 | :--- | :--- |
@@ -151,7 +151,7 @@ Text files are stored as text and any other file as binary. `SKILL.md` stays at 
 
 The chevron menu beside **Create** has three import entries:
 
-- **Import** takes one or more `.zip`, `.json` or `.md` files, up to 200 MiB per import. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. A ZIP that contains a symbolic link or another special file is refused with `Archives cannot contain links or special files`. Needs the **Skills Access** and **Import Skills** permissions.
+- **Import** takes one or more `.zip`, `.skill`, `.json` or `.md` files, up to 200 MiB per import. A `.skill` file is a ZIP and is read the same way. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. A ZIP or `.skill` file that contains a symbolic link or another special file is refused with `Archives cannot contain links or special files`. Needs the **Skills Access** and **Import Skills** permissions.
 - **Import from URL** (admins only) downloads skills from a link. See [Importing from a URL](#importing-from-a-url).
 - **Import folder** takes a skill folder from your computer, or a folder holding several skill folders, each with its own `SKILL.md`. Needs the **Skills Access** and **Import Skills** permissions.
 
@@ -181,9 +181,9 @@ description: Step-by-step instructions for thorough code reviews
 | A GitHub repository, such as `https://github.com/owner/repo` | Every skill in the repository: each folder that holds a `SKILL.md`, or the whole repository when `SKILL.md` sits at its root |
 | A GitHub folder, `https://github.com/owner/repo/tree/<branch>/<folder>` | The skills in that folder |
 | A GitHub `SKILL.md`, `https://github.com/owner/repo/blob/<branch>/<folder>/SKILL.md` | The skill in that `SKILL.md`'s folder, with all its files |
-| A direct link to a `.zip`, `.json` or `.md` file | The skills in that file, read the same way as an upload |
+| A direct link to a `.zip`, `.skill`, `.json` or `.md` file | The skills in that file, read the same way as an upload |
 
-GitHub links are downloaded as a ZIP of the repository at that branch, tag or commit, so a skill arrives with its supporting files. A branch name containing `/` has to be URL-encoded (`%2F`), or use a commit link. A ZIP downloaded from any link skips symbolic links and other special files outside the skill folders, so a repository with such links elsewhere still imports. A symbolic link or special file inside a skill folder refuses the import with `Archives cannot contain links or special files`. The skills found open in the same import preview as an upload, where you choose what to create.
+GitHub links are downloaded as a ZIP of the repository at that branch, tag or commit, so a skill arrives with its supporting files. A branch name containing `/` has to be URL-encoded (`%2F`), or use a commit link. A ZIP or `.skill` file downloaded from any link skips symbolic links and other special files outside the skill folders, so a repository with such links elsewhere still imports. A symbolic link or special file inside a skill folder refuses the import with `Archives cannot contain links or special files`. The skills found open in the same import preview as an upload, where you choose what to create.
 
 The link is checked against the same address rules as web fetching before the download starts and again at every redirect, so with [`ENABLE_LOCAL_WEB_FETCH`](/reference/env-configuration#enable_local_web_fetch) off a link that leads into your private network is refused. It follows up to 5 redirects, gives up after 60 seconds and stops at 200 MiB. A link that returns a web page is refused with a hint to use a raw file or a ZIP download link; on GitHub, the repository, folder and `SKILL.md` links above work as they are.
 
@@ -252,6 +252,7 @@ From the Skills workspace list, use the ellipsis menu (**...**) on a skill you c
 | **Edit** | Open the skill in the editor |
 | **Access** | Open the skill's access settings straight from the list. Changes save as you make them |
 | **Clone** | Create a private copy of the current version, with all its files, and open it in the editor. The copy's name and ID get a short random suffix |
+| **Export .skill** | Download the skill with all its files as one `.skill` file, a ZIP holding the skill's folder, which imports back as is. Needs the **Skills Access** and **Export Skills** permissions |
 | **Export JSON** / **Export ZIP** | Download the skill with all its files. Needs the **Skills Access** and **Export Skills** permissions |
 | **Share** | Publish the skill with all its files on openwebui.com. Needs **Community Sharing** on and the **Export Skills** permission. See [Community skills](#community-skills) |
 | **Delete** | Permanently remove the skill and its whole version history (Shift+Click for quick deletion) |
@@ -279,7 +280,7 @@ The version menu at the top of the editor's file panel lists **Current** and eve
 - **Compare to current** shows what differs between that version and the current one: name, description and translations, plus every added, deleted or modified file with a line-by-line diff for text files.
 - **Set as Production** makes that version the current one again. It needs write access. If someone saved the skill after you opened the version, the switch is refused and the editor offers to reload the latest state.
 
-The **...** beside each earlier version holds **Delete**, for users with write access. Versions that were based on a deleted one are linked to its parent, so the chain stays intact. With the **Export Skills** permission, the file panel's **...** menu also exports the version you are viewing as JSON or ZIP.
+The **...** beside each earlier version holds **Delete**, for users with write access. Versions that were based on a deleted one are linked to its parent, so the chain stays intact. With the **Export Skills** permission, the file panel's **...** menu also exports the version you are viewing as `.skill`, JSON or ZIP.
 
 If someone else saves the skill while you edit it, your save is refused and your draft stays in the editor. A banner offers **Reload latest**, **Save draft as copy** or **Keep editing**.
 
@@ -306,8 +307,8 @@ Attaching a skill to a model does **not** bypass access control. When a user cha
 | Permission | What it controls |
 | :--- | :--- |
 | **Workspace > Skills Access** | Access the Skills workspace and create/manage skills |
-| **Workspace > Import Skills** | Import skills from ZIP, folder, JSON or Markdown, and open skills from openwebui.com |
-| **Workspace > Export Skills** | Export skills and their versions as ZIP or JSON, and share skills to openwebui.com |
+| **Workspace > Import Skills** | Import skills from ZIP, `.skill`, folder, JSON or Markdown, and open skills from openwebui.com |
+| **Workspace > Export Skills** | Export skills and their versions as `.skill`, ZIP or JSON, and share skills to openwebui.com |
 | **Sharing > Skills Sharing** | Share skills with individual users or groups |
 | **Sharing > Skills Public Sharing** | Make skills publicly accessible |
 
@@ -329,9 +330,9 @@ The editor's file, version, import and export features are backed by these endpo
 | `POST /id/{id}/update/version` | Makes a stored version the current one. The body carries `version_id` and `expected_version_id`, the version you believe is current; when that no longer matches, the call returns `409`. |
 | `DELETE /id/{id}/history/{history_id}` | Deletes a version other than the current one and links its child versions to its parent. |
 | `POST /id/{id}/clone` | Copies the skill under a new `id` and `name`, optionally from a given `version_id`. The copy is private. |
-| `GET /export` | Exports skills as `format=json` or `format=zip`. Repeat `ids` to pick skills; with exactly one id, `version_id` exports a historical version. |
+| `GET /export` | Exports skills as `format=json`, `format=zip` or `format=skill`. Repeat `ids` to pick skills; `format=skill` takes exactly one. With exactly one id, `version_id` exports a historical version. |
 | `POST /load/url` | Admins only. Downloads the skills behind `{"url": "..."}` (see [Importing from a URL](#importing-from-a-url)) and returns them as skill packages, without saving anything. |
-| `POST /import/preview` | Reads uploaded ZIP, JSON or Markdown files (up to 200 MiB in total) and lists the skills found, flagging IDs and names that already exist. |
+| `POST /import/preview` | Reads uploaded ZIP, `.skill`, JSON or Markdown files (up to 200 MiB in total) and lists the skills found, flagging IDs and names that already exist. |
 | `POST /import` | Imports the same uploads with a `decisions` list, one entry per skill: `action` (`create`, `copy`, `replace` or `skip`), an optional `id` and `name`, plus `expected_version_id` for `replace`. |
 
 `POST /create` and `POST /id/{id}/update` take the skill's files as `files`, and an optional `commit_message` that labels the new version. An update can send `operations` (`put`, `move`, `delete`) to change single files. An update that sends `files` or `operations` needs `expected_version_id` and returns `409` when someone saved the skill in the meantime.

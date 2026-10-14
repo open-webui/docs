@@ -74,6 +74,8 @@ Navigate to **Workspace > Prompts** and click **Create** in the Workspace header
 | **Prompt Content** | The actual text sent to the model, with variables |
 | **Commit Message** | Optional description of changes for version tracking |
 
+**Compare revision**, above the prompt content, opens the content next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, step through the changes, copy each one to either side and click **Apply to draft** to put the result into the editor. Save the prompt afterwards.
+
 Use clear variable names (`{{your_name}}` not `{{var1}}`), add descriptive `placeholder` text, provide `default` values where sensible, and mark only truly essential fields as `:required`. Public prompts appear in every user's `/` suggestions, so be selective about what you make public. Use the enable/disable toggle to shelve prompts you're not actively using.
 
 ---
