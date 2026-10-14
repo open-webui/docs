@@ -99,7 +99,7 @@ In a chat with replies allowed:
 
 - In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
 - A line above the message input shows who is typing.
-- Each person regenerates, continues and stops only the replies to their own messages. Only the owner can edit messages and rate replies, and only on their own messages and the replies to them.
+- Each person regenerates, continues and stops only the replies to their own messages. Only the owner can edit messages and rate replies, and only on their own messages and the replies to them. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
 - Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
 

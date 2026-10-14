@@ -58,7 +58,7 @@ This is the more powerful option. With built-in tools active and the model's **S
 Here's how it works behind the scenes:
 
 1. The AI receives a manifest listing the **name and description** of every active skill you can read, attached ones included, which keeps the full instructions out of the context until needed
-2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the full instructions and the list of the skill's supporting files
+2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the instructions and the list of the skill's supporting files
 3. The AI then follows those instructions to handle your request
 
 This means that with a "Data Report Generator" skill in your workspace, any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.

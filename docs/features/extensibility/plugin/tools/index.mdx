@@ -389,9 +389,10 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). The model receives a summary of every active skill the user can read in its system prompt, attached to the model or not, and loads full instructions and files on demand. `create_skill` is injected for admins and users with the Skills Access permission.* |
+| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). The model receives a summary of every active skill the user can read in its system prompt, attached to the model or not, and loads instructions and files on demand. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is available, `update_skill_files` while at least one workspace skill is. `create_skill` is injected for admins and users with the Skills Access permission.* |
 | `view_skill` | Load a skill's `SKILL.md` and the list of its supporting files by skill id. Resolving a skill follows normal ownership/access-grant checks. |
 | `read_skill_file` | Read one file of a skill by path, paging through long text. |
+| `grep_skill_files` | Search a skill's text files for literal text or a regular expression and return bounded excerpts around the matches. |
 | `update_skill_files` | Save file changes (write, move, delete) to a skill the user can edit, as a new version. Text writes only. |
 | `create_skill` | Create a private workspace skill from `SKILL.md` text and optional text files. |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
@@ -513,10 +514,11 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `update_calendar_event` | `event_id` (required), `title`, `description`, `start`, `end`, `all_day`, `location`, `is_cancelled` (all optional; only provided fields are changed) | `{status, id, title, start, end, ...}` |
 | `delete_calendar_event` | `event_id` (required) | `{status, message}` |
 | **Skills** | | |
-| `view_skill` | `id` (required) | `{id, version_id, name, content, next_offset, files: [{path, size, encoding}]}`, plus `notice` when the file list was shortened. `content` holds up to 100,000 characters; `next_offset` is set when more follows. A terminal skill returns `{name, description, content, next_offset, directory, resources}` |
-| `read_skill_file` | `id` (required), `path` (required), `offset` (default: 0), `max_chars` (default: 10000, at most 100000) | `{path, version_id, content, next_offset}`; for a binary file `{path, size, encoding, version_id, url}` with a link into the skill editor. A terminal skill supports `path: "SKILL.md"` only |
-| `update_skill_files` | `id` (required), `operations` (required; each `{op: "put", path, content}`, `{op: "move", path, destination}` or `{op: "delete", path}`), `commit_message` (optional) | `{id, version_id}` |
-| `create_skill` | `id` (required), `name` (required), `content` (required; the complete `SKILL.md` including `name` and `description` frontmatter), `files` (optional; text files as `{path, content}`), `commit_message` (optional) | `{id, version_id, url}` |
+| `view_skill` | `id` (required) | `{id, name, content, next_offset, files: [{path, size, encoding}]}`, plus `notice` when the file list was shortened. `content` holds the whole `SKILL.md` up to 20,000 characters. A longer one returns its first 5,000 characters, `next_offset` and `headings` (`[{title, level, offset}]`, with `headings_truncated` when the index was cut short). A terminal skill returns `{name, description, directory, content, next_offset, resources}` with the same preview rules |
+| `read_skill_file` | `id` (required), `path` (required), `offset` (default: 0), `max_chars` (default: 10000, at most 20000) | `{path, content, next_offset}`; for a binary file `{path, size, encoding, url}` with a link into the skill editor. A terminal skill supports `path: "SKILL.md"` only |
+| `grep_skill_files` | `id` (required), `pattern` (required; literal text or an RE2 regex, detected automatically; up to 4,096 characters), `path` (optional; one exact file, otherwise every text file), `case_insensitive` (default: true), `max_results` (default: 10, 1-30) | `{matches: [{path, offset, match_length, section, section_offset, excerpt}], total_matches, truncated}`, at most 6,000 characters. When excerpts were left out it adds `notice`, `omitted_matches` (`[{path, offset, section}]`) and `omitted_matches_truncated`. A terminal skill supports `SKILL.md` only. Never creates a skill version |
+| `update_skill_files` | `id` (required), `operations` (required; each `{op: "put", path, content}`, `{op: "move", path, destination}` or `{op: "delete", path}`), `commit_message` (optional) | `{id}`. When the skill changed after the model read it, `{error: {code: "version_conflict", message}}` asks the model to call `view_skill` again and reapply the edit |
+| `create_skill` | `id` (required), `name` (required), `content` (required; the complete `SKILL.md` including `name` and `description` frontmatter), `files` (optional; text files as `{path, content}`), `commit_message` (optional) | `{id, url}` |
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
@@ -641,7 +643,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Task Management** | `create_tasks`, `update_task` | Create a structured task/todo list and update individual task statuses in the active chat |
 | **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
 | **Calendar** | `search_calendar_events`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event` | Search, create, update, and delete calendar events |
-| **Skills** | `view_skill`, `read_skill_file`, `update_skill_files`, `create_skill` | Find, read, edit and create skills |
+| **Skills** | `view_skill`, `read_skill_file`, `grep_skill_files`, `update_skill_files`, `create_skill` | Find, read, search, edit and create skills |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
@@ -649,10 +651,10 @@ All categories are **enabled by default**. Disabling a category prevents those s
 While built-in tools are active for the chat and the model's **Skills** category is on:
 
 1. The model receives a summary (name + description) of **every active skill the user can read** in its system prompt via `<available_skills>` tags, including skills that are not attached to the model or selected for the chat
-2. `view_skill`, `read_skill_file` and `update_skill_files` are injected so the model can load instructions and files on demand and edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
+2. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is listed, so the model can load, read and search instructions and files on demand. `update_skill_files` is injected while at least one workspace skill is listed, to edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
 3. When the user can read no active skill, the `<available_skills>` block is left out
 
-Skills mentioned with `$` in the chat input have their content injected directly into the system prompt, up to the first 100,000 characters of `SKILL.md`. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, skills selected for the chat or attached to the model are injected the same way.
+Skills mentioned with `$` in the chat input have their content injected directly into the system prompt: the whole `SKILL.md` up to 20,000 characters, or for a longer one its first 5,000 characters plus a heading index the model uses to read or search the rest. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, mentioned skills and the skills selected for the chat or attached to the model are injected with the first 100,000 characters of `SKILL.md`.
 
 When the chat has no system prompt, the skill summary is sent as a new system message. A custom backend that only adds its own system prompt when the request carries none needs to merge its prompt into the incoming system message, or its prompt is lost for every user with skill access.
 :::

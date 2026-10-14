@@ -36,7 +36,7 @@ Write guidelines in Markdown. No Python, no API calls, no deployment. If you can
 
 ### On-demand context loading
 
-With native function calling, every active skill the user can read is listed in a lightweight manifest (id, name, description), bound to the model or not. Binding a skill to a model only pre-selects it in the chat. The model loads full instructions when it needs them via the `view_skill` tool and reads the skill's supporting files with `read_skill_file`. In legacy mode every bound, toggled or mentioned skill is injected in full and there is no manifest.
+With native function calling, every active skill the user can read is listed in a lightweight manifest (id, name, description), bound to the model or not. Binding a skill to a model only pre-selects it in the chat. The model loads the instructions when it needs them via the `view_skill` tool, and reads or searches the skill's files with `read_skill_file` and `grep_skill_files`. In legacy mode every bound, toggled or mentioned skill is injected in full and there is no manifest.
 
 ### Reusable across models
 
@@ -55,7 +55,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | 📝 **Markdown content** | Write instructions in plain Markdown |
 | 📁 **Supporting files** | Ship scripts, references, templates and assets next to `SKILL.md` |
 | 🕘 **Version history** | Every save is a version you can compare, export or set back as the current one |
-| ⚡ **$ mention in chat** | Type `$` to inject a skill's full content into the current message |
+| ⚡ **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
 | 🧩 **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
 | 🤖 **Model binding** | Attach skills to models so they're always available |
 | 📦 **Lazy loading** | Model-attached skills inject only a manifest; full content loads on-demand |
@@ -70,7 +70,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 ### User-selected skills ($ mention)
 
-Type `$` in the chat input to open the skill picker, or pick the skill from the `/` menu. Select a skill, and its **full content is injected directly** into the system prompt, in both function calling modes. The model has immediate access to the complete instructions. The injection carries the first 100,000 characters of `SKILL.md`. With the skill tools available it also lists up to 50 of the skill's supporting files, and the model reads those files and the rest of a longer `SKILL.md` through `read_skill_file`. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
+Type `$` in the chat input to open the skill picker, or pick the skill from the `/` menu. Select a skill, and its **content is injected directly** into the system prompt, in both function calling modes, so the model has the instructions right away. With the [skill tools](#skill-tools) available, a `SKILL.md` of up to 20,000 characters is injected in full. A longer one is injected as its first 5,000 characters plus an index of its headings with their character offsets, and the model reads the sections it needs with `read_skill_file` or finds passages with `grep_skill_files`. The injection also lists up to 50 of the skill's supporting files, which the model opens with the same tools. Without the skill tools the first 100,000 characters of `SKILL.md` are injected. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
 
 ### Per-chat skills (Integrations menu)
 
@@ -81,28 +81,29 @@ Open the **+** menu in the chat input and choose **Skills** to toggle individual
 Skills bound to a model use lazy loading:
 
 1. **Manifest injection** - Only the skill's name and description are added to the system prompt.
-2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
+2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. A long `SKILL.md` comes back as an opening preview with a heading index, the same way a `$` mention injects it. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
-The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, each with the first 100,000 characters of its `SKILL.md`. The model cannot read the rest of a longer `SKILL.md` or the supporting files. Switching off a model's **Skills** category under **Builtin Tools** has the same effect: the model can no longer find and load skills by itself, and skills you select or attach are injected the same way. The switch also covers `read_skill_file`, `update_skill_files` and `create_skill`, so `/skills:create` needs it switched on.
+The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected or attached are injected, each with the first 100,000 characters of its `SKILL.md`. The model cannot read the rest of a longer `SKILL.md` or the supporting files. Switching off a model's **Skills** category under **Builtin Tools** has the same effect: the model can no longer find and load skills by itself, and skills you select or attach are injected the same way. The switch also covers `read_skill_file`, `grep_skill_files`, `update_skill_files` and `create_skill`, so `/skills:create` needs it switched on.
 
 ### Skill tools
 
-With built-in tools active and the model's **Skills** category on, the model gets these tools:
+With built-in tools active and the model's **Skills** category on, the model gets these tools. `view_skill`, `read_skill_file` and `grep_skill_files` are offered while at least one active skill is available to the user, from the workspace or a connected terminal. `update_skill_files` is offered while at least one of them is a workspace skill.
 
 | Tool | What it does |
 | :--- | :--- |
-| `view_skill` | Loads a skill's `SKILL.md`, up to 100,000 characters per call, together with the list of its supporting files. |
-| `read_skill_file` | Reads one file of a skill by its path, in pages of up to 100,000 characters. For a binary file it returns the file's size and a link that opens it in the skill editor. |
+| `view_skill` | Loads a skill's `SKILL.md` together with the list of its supporting files. A `SKILL.md` of up to 20,000 characters comes back in full. A longer one comes back as its first 5,000 characters plus an index of its headings with their character offsets, so the model reads or searches only the sections it needs. |
+| `read_skill_file` | Reads one file of a skill by its path, from a given character offset, up to 20,000 characters per call (10,000 by default). For a binary file it returns the file's size and a link that opens it in the skill editor. |
+| `grep_skill_files` | Searches a skill's text files, or one file given by its path, for a word, a phrase or a regular expression (RE2 syntax, recognized automatically). Case is ignored by default. Returns up to 10 excerpts around the matches (1 to 30 on request), at most 6,000 characters in total, and lists where the matches that did not fit are, so the model can read them with `read_skill_file`. On a terminal skill it searches `SKILL.md`. Searching never creates a new version. |
 | `update_skill_files` | Saves file changes (write a file, move a file or folder, delete a file or folder) as a new version of a skill the user can edit. Writes are text only. When someone saved the skill after the model read it, the save is refused with a conflict and the model is told to load the skill again and reapply its edit. |
 | `create_skill` | Creates a new private skill in the workspace from the `SKILL.md` text and optional text files. Offered to admins and to users with the **Skills Access** permission. |
 
-All four follow the skill's access grants. A user with write access to an inactive skill can still have the model load and read it.
+All five follow the skill's access grants. A user with write access to an inactive skill can still have the model load and read it.
 
 ### Skills from a terminal server
 
-A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the full content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md`; its other files stay on the terminal, and the model opens them with the terminal's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
+A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the terminal, and the model opens them with the terminal's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
 
 Writing a terminal server of your own means answering two endpoints:
 
@@ -365,7 +366,7 @@ Open WebUI stores a skill's scripts for the model to read. Running one takes a t
 
 ### Context window with $ mention
 
-When injected via `$` mention, the skill content goes into the system prompt, up to the first 100,000 characters of `SKILL.md`. A very long skill attached to a model with a small context window may crowd out conversation history.
+When injected via `$` mention, the skill content goes into the system prompt. With the skill tools on that is at most 20,000 characters of `SKILL.md`, and for a longer skill its first 5,000 characters plus a heading index. Without them it is up to the first 100,000 characters. A very long skill attached to a model with a small context window may crowd out conversation history.
 
 ### Lazy loading requires function calling
 

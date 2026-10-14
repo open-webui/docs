@@ -275,7 +275,7 @@ A version holds the name, base model, system prompt, parameters and the rest of 
 Setting a version as Production checks everything it points to, because an older version can reference things that have since been deleted or that you cannot reach. The live configuration stays as it was, and the switch is refused, when:
 
 - its base model is no longer available.
-- a knowledge base, knowledge file, skill, tool or terminal it binds is missing or not accessible to you.
+- a knowledge base, knowledge file, note, skill, tool or terminal it binds is missing or not accessible to you.
 - a filter or action function it binds is missing or switched off.
 - its background image or voice avatar files are no longer accessible to you.
 

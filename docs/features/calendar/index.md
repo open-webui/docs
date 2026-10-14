@@ -268,7 +268,7 @@ The default is **10 minutes before**.
 2. **Browser notification**: if browser notifications are enabled in user settings, a native OS notification is shown.
 3. **Webhook**: if the user has a webhook URL configured in **Settings > Notifications**, a `calendar_alert` payload is sent.
 
-Alerts are de-duplicated server-side via `meta.alerted_at`, so each event fires at most once per start time, even across restarts and multi-instance deployments.
+Alerts are de-duplicated server-side via `meta.alerted_at`, so each event fires at most once per start time, even across restarts and multi-instance deployments. Moving an event to a new start time arms its alert again.
 
 The global alert polling window is configurable via [`CALENDAR_ALERT_LOOKAHEAD_MINUTES`](/reference/env-configuration#calendar_alert_lookahead_minutes) (default: 10 minutes).
 
