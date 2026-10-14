@@ -85,6 +85,10 @@ Folders can be configured as full project workspaces with their own AI behavior 
 2. Click the **three-dot menu** (⋯).
 3. Select **"Edit"** to open the folder settings modal.
 
+On desktop, resting the pointer on a folder's name in the sidebar shows a preview of the folder: its number of chats, its default model and how many knowledge items are attached, plus the owner's name for a folder shared with you. With write access, the preview also has an **Edit Folder** button that opens the same settings.
+
+![The hover preview of the shared Product Launch folder: 5 chats, shared by Alex Chen, the Team Assistant default model, two knowledge items and an Edit Folder button](/images/features/chat/folder-hover-preview.webp)
+
 ### Folder Name
 
 Change the name of your folder to better reflect its purpose or project.
@@ -149,11 +153,15 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
 - **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** panel. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
-- **Folder owners see who added each chat.** In a folder you share, every chat in the sidebar shows the profile picture of the person it belongs to, so chats your collaborators added stand out from your own.
+- **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**; click the count to see everyone. Hover or click a picture to open that person's profile card.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
 - **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
+
+![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)
+
+![The profile card of Sam Patel, opened from their picture on a chat in the shared folder, with their status, when they were last active and a Message button](/images/features/chat/shared-folder-writer-profile-card.webp)
 
 Folder sharing is gated by the **Folders Sharing** permission, which is off by default. An administrator enables it per group under **Admin Panel > Users > Groups > Permissions**, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
