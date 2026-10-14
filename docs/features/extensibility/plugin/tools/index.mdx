@@ -405,8 +405,8 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
-| **Voice Avatar** | *Only during a Standard [voice call](/features/chat-conversations/chat-features/voice-mode#animations-and-gestures) with a model whose [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) has named gestures, AND the user holding the **Allow Call** permission (admins always pass). No per-model category of its own.* |
-| `play_animation` | Play one of the avatar's named gestures on the call screen. |
+| **Voice Avatar** | *Only during a [voice call](/features/chat-conversations/chat-features/voice-mode#animations-and-gestures) with a model whose [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) has named gestures, AND the user holding the **Allow Call** permission (admins always pass). No per-model category of its own.* |
+| `play_animation` | Play one of the avatar's named gestures on the call screen. In a Realtime call the voice model plays the gestures, so this tool returns `unavailable` to the chat model. |
 
 #### Attached Chat Files
 

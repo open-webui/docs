@@ -290,7 +290,7 @@ Out of the box the character uses built-in movement: gentle breathing, a slight 
 
 **Preview** plays a state or gesture on the character in the dialog. During a call, a model with gestures gets a `play_animation` function listing each gesture's name and description, and plays a gesture when you ask for one or when it suits the moment. A new gesture replaces the one that is running, and interrupting the assistant stops it.
 
-In a Realtime call the voice model plays the gestures. In a Standard call the chat model gets `play_animation` as a [built-in tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), which needs:
+In a Realtime call the voice model plays the gestures; the chat model is offered `play_animation` there too, and its calls return `unavailable`. In a Standard call the chat model gets `play_animation` as a [built-in tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), which needs:
 
 - [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) on the model, the default
 - the model's **Builtin Tools** capability turned on
