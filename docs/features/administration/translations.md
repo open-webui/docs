@@ -140,10 +140,11 @@ English counts as a language here, which makes this the way to rename things for
 A few rules are enforced when you save, and a save that breaks one is refused with the offending entry named:
 
 - The replacement has to be text. A blank one is dropped, which is how you remove an override.
-- **Delete** on a row removes only the replacement for the language picked in the selector, and its tooltip names that language. Replacements in other languages stay, and the row disappears once none is left.
 - Any `{{ placeholder }}` in the original has to appear in the replacement too, so a rewritten string cannot lose the value that gets substituted into it.
 - The same original text cannot appear in two rows.
 - `__proto__`, `prototype` and `constructor` are refused as a language or an original string.
+
+**Delete** on a row removes only the replacement for the language picked in the selector, and its tooltip names that language. Replacements in other languages stay, and the row disappears once none is left.
 
 Your own session updates the moment you save. Everyone else picks the change up the next time their browser loads Open WebUI.
 

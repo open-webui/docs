@@ -5,7 +5,7 @@ title: "Task Models"
 
 # Task Models
 
-Open WebUI makes small model calls in the background, separately from the answer a user is waiting for. They write chat titles, generate tags, suggest follow-up questions, produce autocomplete ghost text, rewrite a message into a retrieval or web search query, rewrite a message into an image prompt and summarize older messages when [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is on.
+Open WebUI makes small model calls in the background, separately from the answer a user is waiting for. They write chat titles, generate tags, suggest follow-up messages, produce autocomplete ghost text, rewrite a message into a retrieval or web search query, rewrite a message into an image prompt and summarize older messages when [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is on.
 
 By default all of that runs on the model the user is chatting with. On an expensive flagship model it is a bill nobody planned for, and on a slow local model it makes the whole interface feel sluggish. Pointing background work at a small, fast model is the highest-value change an administrator can make here.
 

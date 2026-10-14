@@ -70,7 +70,7 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 
 ### Editor layout
 
-The editor opens on a banner header: the background image fills the banner, with the model's picture, name and ID set over its lower edge. Below it come the description, the base model, the tags and the system prompt. A saved system prompt opens folded to a short preview; click it or **Show more** to edit it. **Compare revision** beside the system prompt opens it next to an empty **Proposed revision** pane: paste a revised version, step through the changes, copy each one to either side and click **Apply to draft** to put the result into the system prompt, then save the model.
+The editor opens on a banner header: the background image fills the banner, with the model's picture, name and ID set over its lower edge. Below it come the description, the base model, the tags and the system prompt. A saved system prompt opens folded to a short preview; click it or **Show more** to edit it. **Compare revision** beside the system prompt opens it next to an empty **Proposed revision** pane. Paste the revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the system prompt, so drop a change you do not want with **Proposed revision →**, which copies the original text of that change into the right-hand pane. Save the model afterwards.
 
 Everything else sits in rows, one per setting. Each row shows a short summary of what is set, such as **Default**, **3 modified**, **Custom · 4** or **Vision, File Upload, Web Search +2**, and opens when you click it. Hover a setting's name to see what it does.
 
@@ -107,7 +107,7 @@ A model already stored with a space in its ID keeps answering requests, but savi
 
 ### System prompt and variables
 
-The system prompt defines the behavior and persona. Use dynamic variables for context-aware instructions:
+The system prompt defines the behavior and persona. To review a rewritten system prompt before using it, use **Compare revision** beside the field (see [Editor layout](#editor-layout)). Use dynamic variables for context-aware instructions:
 
 | Variable | Output example |
 | :--- | :--- |

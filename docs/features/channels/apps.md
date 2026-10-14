@@ -31,7 +31,7 @@ An app granted **Read messages and history in joined channels** receives every m
 
 ### Mention an app
 
-Type `@` in a channel where the app is a member and pick it from the **Apps** group in the suggestion list. Send your message and the app receives it. One message reaches at most the first 10 apps it mentions. The app confirms that it received the message, then posts its answer in the channel when it is ready.
+Type `@` in a channel where the app is a member and pick it from the **Apps** group in the suggestion list. You can also type `@` and the app's full name; see [Tagging people and linking channels](/features/channels#tagging-people-and-linking-channels). Send your message and the app receives it. One message reaches at most the first 10 apps it mentions. The app confirms that it received the message, then posts its answer in the channel when it is ready.
 
 ### Private and channel replies
 
@@ -159,6 +159,7 @@ These messages appear in the app settings dialog while you install, update or co
 | `App manifest endpoint returned HTTP <code>. Check the URL or enter details manually.` | Wrong URL, or the app redirects. Use the final URL, or enter details manually. |
 | `App returned an invalid manifest. Check its app details or enter them manually.` | The app's details are malformed (see [Manifest](/features/channels/building-apps#manifest)). |
 | `App request timed out. Check that the app server is running and reachable.` | The app did not answer within 10 seconds while its details were loaded. |
+| `The app connection failed before a complete response was received.` | The app closed the connection or sent a broken HTTP response while its details loaded. Check the app server logs. |
 | `App TLS verification failed. Check its certificate and hostname.` | The app's certificate is invalid or does not match its hostname. |
 | `App hostname could not be resolved. Check DNS from the WebUI server.` | DNS lookup failed on the Open WebUI server. |
 | `Could not reach the app server. Check its address, port and network access.` | Network path, firewall or port. |
@@ -172,12 +173,12 @@ The TLS, DNS and reachability messages come from loading the app's details. On *
 
 ### In a channel
 
-After a mention, these messages appear in a reply from the app that starts with `App error:`, or under your message when the app cannot post in the channel. After a button click, they appear under the app's message. When the app answers with an error status and its own error text, that text appears, up to 2,000 characters, in place of the status messages in this table.
+After a mention, these messages appear in a reply from the app that starts with `App error:`, or under your message when the app cannot post in the channel. After a button click, they appear under the app's message. When the app answers with an error status and its own error text, you see that text, up to 2,000 characters. The status messages below appear when the app sends a status without text.
 
 | Message | What to check |
 |---------|---------------|
 | `App is disconnected; event was not sent` | Check the status in the **Apps** tab. |
-| `App response timed out; execution outcome may be unknown` | The app did not confirm a mention within 10 seconds, or did not answer a button click within 3 seconds. It may still have acted. After a mention a second line follows: `Delivery was not confirmed. The app may have accepted the message; check before retrying.` |
+| `App response timed out; execution outcome may be unknown` | The app did not confirm a mention within 10 seconds, did not answer a button click within 3 seconds or lost its connection while Open WebUI waited. It may still have acted. After a mention a second line follows: `Delivery was not confirmed. The app may have accepted the message; check before retrying.` |
 | `App returned an invalid delivery receipt` | Shown after a mention. The app answered with something other than its delivery confirmation. An app built with oix needs oix 0.8.0 or newer. |
 | `App is inactive` | The app is disabled or uninstalled. |
 | `App invocation denied` | You are not allowed to use this app. Check its **Access**. |
@@ -189,7 +190,10 @@ After a mention, these messages appear in a reply from the app that starts with 
 | `App returned HTTP <code>. Check the app server logs.` | The app answered with an error status, for example after its handler crashed. |
 | `App processing timed out; execution outcome may be unknown.` | The app's handler ran out of time. It may still have acted. |
 | `App is busy or shutting down. The event was not accepted.` | The app is at capacity or restarting. Try again later. |
-| `App returned an invalid response` | Shown after a button click. The app's reply has unknown fields or breaks a limit. |
+| `App returned an invalid response` | Shown after a button click. The app's reply has unknown fields or breaks a field limit (see [Replying to interactions](/features/channels/building-apps#replying-to-interactions)). |
+| `App returned an invalid or oversized response` | The app's answer is not a JSON object or is larger than 256 KiB. |
+| `Buttons require a channel message` | Shown after a button click. The app sent buttons in a private reply or in a reply other than `message` or `update`. Buttons need `visibility` `channel`. |
+| `App event could not be delivered. Check the WebUI server logs.` | The event for the app is larger than 1 MiB, for example a very long message. |
 
 ### Apps stop connecting after WEBUI_SECRET_KEY changed
 

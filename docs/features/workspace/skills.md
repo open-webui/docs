@@ -22,7 +22,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 Skills are reusable, markdown-based instruction sets that you attach to models or invoke on-the-fly in chat. Unlike [Tools](/features/extensibility/plugin/tools) (executable Python scripts), Skills are plain-text instructions: code review guidelines, writing style rules, troubleshooting playbooks, data analysis workflows. The model reads them and follows them.
 
-Mention a skill with `$` in chat to inject its full content immediately. Or bind skills to a model so they're always available, loaded on-demand to keep the context window efficient.
+Mention a skill with `$` in chat to inject its instructions immediately. Or bind skills to a model so they're always available, loaded on-demand to keep the context window efficient.
 
 ---
 
@@ -58,7 +58,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | ⚡ **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
 | 🧩 **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
 | 🤖 **Model binding** | Attach skills to models so they're always available |
-| 📦 **Lazy loading** | Model-attached skills inject only a manifest; full content loads on-demand |
+| 📦 **Lazy loading** | Model-attached skills inject only a manifest; instructions load on demand |
 | 📥 **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
 | 🌍 **Community** | Find skills on openwebui.com and share your own |
 | 🔒 **Access control** | Private by default, shareable with users or groups |
@@ -70,18 +70,18 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 ### User-selected skills ($ mention)
 
-Type `$` in the chat input to open the skill picker, or pick the skill from the `/` menu. Select a skill, and its **content is injected directly** into the system prompt, in both function calling modes, so the model has the instructions right away. With the [skill tools](#skill-tools) available, a `SKILL.md` of up to 20,000 characters is injected in full. A longer one is injected as its first 5,000 characters plus an index of its headings with their character offsets, and the model reads the sections it needs with `read_skill_file` or finds passages with `grep_skill_files`. The injection also lists up to 50 of the skill's supporting files, which the model opens with the same tools. Without the skill tools the first 100,000 characters of `SKILL.md` are injected. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
+Type `$` in the chat input to open the skill picker, or pick the skill from the `/` menu. Select a skill, and its **content is injected directly** into the system prompt, in both function calling modes, so the model has the instructions right away. With the [skill tools](#skill-tools) available, a `SKILL.md` of up to 20,000 characters is injected in full. A longer one is injected as its first 5,000 characters and the offset where it continues, and the model reads on with `read_skill_file` or finds passages with `grep_skill_files`. The injection also lists up to 50 of the skill's supporting files, which the model opens with the same tools. Without the skill tools the first 100,000 characters of `SKILL.md` are injected. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
 
 ### Per-chat skills (Integrations menu)
 
-Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message, and the toggled skill is listed in the manifest under native function calling (only a `$` mention injects full content there). Under legacy function calling a toggled skill is injected in full, like a `$` mention.
+Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message, and the toggled skill is listed in the manifest under native function calling (only a `$` mention injects the instructions there). Under legacy function calling a toggled skill is injected in full, like a `$` mention.
 
 ### Model-attached skills
 
 Skills bound to a model use lazy loading:
 
 1. **Manifest injection** - Only the skill's name and description are added to the system prompt.
-2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. A long `SKILL.md` comes back as an opening preview with a heading index, the same way a `$` mention injects it. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
+2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. A long `SKILL.md` comes back as its first 5,000 characters and the offset where it continues, the same way a `$` mention injects it. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
 
 This means many skills can be attached to a model without consuming context window space until actually needed.
 
@@ -93,7 +93,7 @@ With built-in tools active and the model's **Skills** category on, the model get
 
 | Tool | What it does |
 | :--- | :--- |
-| `view_skill` | Loads a skill's `SKILL.md` together with the list of its supporting files. A `SKILL.md` of up to 20,000 characters comes back in full. A longer one comes back as its first 5,000 characters plus an index of its headings with their character offsets, so the model reads or searches only the sections it needs. |
+| `view_skill` | Loads a skill's `SKILL.md` together with the list of its supporting files. A `SKILL.md` of up to 20,000 characters comes back in full. A longer one comes back as its first 5,000 characters and the offset where it continues, so the model reads on with `read_skill_file` or searches it with `grep_skill_files`. |
 | `read_skill_file` | Reads one file of a skill by its path, from a given character offset, up to 20,000 characters per call (10,000 by default). For a binary file it returns the file's size and a link that opens it in the skill editor. |
 | `grep_skill_files` | Searches a skill's text files, or one file given by its path, for a word, a phrase or a regular expression (RE2 syntax, recognized automatically). Case is ignored by default. Returns up to 10 excerpts around the matches (1 to 30 on request), at most 6,000 characters in total, and lists where the matches that did not fit are, so the model can read them with `read_skill_file`. On a terminal skill it searches `SKILL.md`. Searching never creates a new version. |
 | `update_skill_files` | Saves file changes (write a file, move a file or folder, delete a file or folder) as a new version of a skill the user can edit. Writes are text only. When someone saved the skill after the model read it, the save is refused with a conflict and the model is told to load the skill again and reapply its edit. |
@@ -137,7 +137,7 @@ Add a short note in **Describe this change** beside **Save** to label the versio
 
 ### Supporting files
 
-A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. A text file also has **Copy**, which copies its content, and, when you can edit the skill, **Compare revision**: it opens the file next to an empty **Proposed revision** pane where you paste a revised version, step through the changes, copy each one to either side and click **Apply to draft** to put the result into the file. Save the skill afterwards. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
+A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. A text file also has **Copy**, which copies its content, and, when you can edit the skill, **Compare revision**: it opens the file next to an empty **Proposed revision** pane. Paste a revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the file, so drop a change you do not want with **Proposed revision →**, which copies the original text of that change into the right-hand pane. Save the skill afterwards. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
 
 | Limit | Value |
 | :--- | :--- |
@@ -252,7 +252,7 @@ From the Skills workspace list, use the ellipsis menu (**...**) on a skill you c
 | **Edit** | Open the skill in the editor |
 | **Access** | Open the skill's access settings straight from the list. Changes save as you make them |
 | **Clone** | Create a private copy of the current version, with all its files, and open it in the editor. The copy's name and ID get a short random suffix |
-| **Export .skill** | Download the skill with all its files as one `.skill` file, a ZIP holding the skill's folder, which imports back as is. Needs the **Skills Access** and **Export Skills** permissions |
+| **Export .skill** | Download the skill with all its files as one `.skill` file, a ZIP holding the skill's folder. On import, the name and description come from the `SKILL.md` frontmatter and the ID from that name; tags stay behind. Use **Export JSON** to keep the ID, name, description and tags. Needs the **Skills Access** and **Export Skills** permissions |
 | **Export JSON** / **Export ZIP** | Download the skill with all its files. Needs the **Skills Access** and **Export Skills** permissions |
 | **Share** | Publish the skill with all its files on openwebui.com. Needs **Community Sharing** on and the **Export Skills** permission. See [Community skills](#community-skills) |
 | **Delete** | Permanently remove the skill and its whole version history (Shift+Click for quick deletion) |
@@ -367,7 +367,7 @@ Open WebUI stores a skill's scripts for the model to read. Running one takes a t
 
 ### Context window with $ mention
 
-When injected via `$` mention, the skill content goes into the system prompt. With the skill tools on that is at most 20,000 characters of `SKILL.md`, and for a longer skill its first 5,000 characters plus a heading index. Without them it is up to the first 100,000 characters. A very long skill attached to a model with a small context window may crowd out conversation history.
+When injected via `$` mention, the skill content goes into the system prompt. With the skill tools on that is at most 20,000 characters of `SKILL.md`, and for a longer skill its first 5,000 characters. Without them it is up to the first 100,000 characters. A very long skill attached to a model with a small context window may crowd out conversation history.
 
 ### Lazy loading requires function calling
 

@@ -114,7 +114,7 @@ For an App URL of `https://app.example.com/events`, Open WebUI connects as a Soc
 
 The connection is then live. Open WebUI authenticates itself with the API key; the app authenticates itself with the signed proof. Each Open WebUI worker opens its own connection, so the app must accept several connections for the same installation.
 
-The whole connection must complete within 20 seconds, and each acknowledgement within 10. Until the app acknowledges `app:ready`, every `app:request` except `ping` fails with `App connection is not ready`.
+The whole connection must complete within 20 seconds, and each acknowledgement within 10. Until Open WebUI has verified the proof, every `app:request` fails with `App connection is not ready`. From then until the app acknowledges `app:ready`, only `ping` works.
 
 ## Events
 
@@ -211,12 +211,12 @@ The app emits `app:request` on the same connection with `{"operation": "<name>",
 | `get_me` | none | none | The app's record |
 | `list_channels` | none | `channels:read` | Joined channels: `id`, `name`, `type`, `is_private` |
 | `list_messages` | `channel_id`, optional `parent_id`, `before`, `limit` (1 to 100, default 50) | `channels:messages:read` | `messages` newest first and `next_cursor` |
-| `create_message` | `channel_id`, `content`, optional `actions`, `embeds`, `parent_id`, `reply_to_id` | `channels:messages:write` | The new message, including its `etag` |
-| `update_message` | `message_id`, `etag`, `content`, optional `actions`, `embeds` | `channels:messages:write` | The updated message |
+| `create_message` | `channel_id`, optional `content`, `actions`, `embeds`, `parent_id`, `reply_to_id` | `channels:messages:write` | The new message, including its `etag` |
+| `update_message` | `message_id`, `etag`, optional `content`, `actions`, `embeds` | `channels:messages:write` | The updated message |
 | `authorize` | `token`: an `execution_token` | the interaction's scope | `authorized`, `operation_id`, `actor`, `channel_id`, `type`, `data` |
 | `verify_event` | `token`: an `event_token` | `channels:messages:read` | The verified event |
 
-`update_message` edits only the app's own messages. `content`, `actions` and `embeds` replace the old values, so omitted `actions` or `embeds` are removed. If the message changed since the `etag` was read, the request fails with status 412 (`Message changed`).
+`update_message` edits only the app's own messages. `content`, `actions` and `embeds` replace the old values, so omitted ones are cleared. If the message changed since the `etag` was read, the request fails with status 412 (`Message changed`).
 
 ## Long-running work
 

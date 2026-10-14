@@ -134,9 +134,11 @@ Link **knowledge bases and files** to your folder:
 
 Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
 
+Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Share** dialog only offers **Private** and has no way to add people. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
+
 1. Hover over a folder in the sidebar and open the **three-dot menu** (⋯).
 2. Select **Share**.
-3. Add the users or groups to share with and choose their access:
+3. Add the users or groups to share with. Each one starts on **Write**; switch it to **Read** in their row of the **Access List** where needed:
    - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it, and dragging a chat over it in the sidebar does not offer it as a drop target.
    - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
 4. Pick the **Sharing mode**, shown once at least one person or group has access:
@@ -162,8 +164,6 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 ![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)
 
 ![The profile card of Sam Patel, opened from their picture on a chat in the shared folder, with their status, when they were last active and a Message button](/images/features/chat/shared-folder-writer-profile-card.webp)
-
-Folder sharing is gated by the **Folders Sharing** permission, which is off by default. An administrator enables it per group under **Admin Panel > Users > Groups > Permissions**, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
 ## Example Use Case
 

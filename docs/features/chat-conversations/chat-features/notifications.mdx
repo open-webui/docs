@@ -9,10 +9,10 @@ Notifications send a webhook to somewhere you actually watch, such as Slack, Dis
 
 Notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
 
-This is **outbound webhooks only**. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated, and handled by your browser.
+This is **outbound webhooks only**. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser.
 
 :::note "Always Play Notification Sound" no longer has a toggle
-A separate **Always Play Notification Sound** setting used to sit under **Settings > Interface**. Its control is gone, but the setting is still honoured: if you had it switched on, sounds keep playing always rather than only when you are away, and there is currently no way to switch it back off from the interface.
+A separate **Always Play Notification Sound** setting used to sit under **Settings > Interface**. Its control is gone, but the setting is still honoured: if you had it switched on, sounds keep playing even while you are active, and there is currently no way to switch it back off from the interface.
 :::
 
 ## Enabling Notifications
@@ -22,7 +22,7 @@ A separate **Always Play Notification Sound** setting used to sit under **Settin
 | [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) | **Settings > Admin > General**, the **User Webhooks** toggle |
 | The `features.webhooks` permission ([`USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`](/reference/env-configuration#user_permissions_features_user_webhooks), default: off) | **Admin Panel > Users > Groups > Permissions** |
 
-Admins always hold the permission. While the feature is off, the endpoints report the feature as absent rather than forbidden, so it stays hidden rather than looking blocked.
+Admins always hold the permission. While the feature is off, the notification endpoints answer `404 Not Found`, so the feature looks absent.
 
 ## Targets
 
@@ -45,7 +45,7 @@ Five events can be subscribed to:
 |---|---|
 | `chat.finished` | A chat response finishes generating. |
 | `chat.failed` | A chat response ends in an error, including when the model provider returns an error status or cannot be reached. The notification carries the error text and a link to the chat. |
-| `channel.message` | A message arrives in a channel you receive notifications for, group channels and direct messages included. |
+| `channel.message` | A person or a bot account posts a message in a channel you belong to, group channels and direct messages included. You belong to a standard channel once you have opened or posted in it. |
 | `calendar.alert` | A calendar event alert triggers. |
 | `retrieval.content.process_failed` | A file fails content extraction. |
 
@@ -75,7 +75,7 @@ Earlier versions had a single **Notification Webhook** URL under **Settings > Ac
 Two changes are worth knowing about:
 
 - Channel and calendar notifications are no longer sent straight from those features. They now flow through the notification system, so a target's event subscriptions and delivery mode decide whether they reach you.
-- Notification settings now live in **Settings > Notifications** rather than **Settings > Account**.
+- Notification settings now live in **Settings > Notifications**. They used to sit under **Settings > Account**.
 
 ## Managing Notifications from Chat
 

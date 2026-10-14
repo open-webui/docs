@@ -5,7 +5,7 @@ title: "Webhook Integrations"
 
 ## Overview
 
-Open WebUI offers three distinct webhook integrations to help you stay informed about events happening within your instance and enable external integrations. These webhooks allow you to receive automated notifications in external services like Discord, Slack, or any other application that supports incoming webhooks, as well as post messages from external services into Open WebUI channels.
+Open WebUI offers three distinct webhook integrations to help you stay informed about events happening within your instance and enable external integrations. These webhooks allow you to receive automated notifications in external services like Discord, Slack or any other application that supports incoming webhooks, as well as post messages from external services into Open WebUI channels.
 
 There are three types of webhooks available:
 
@@ -64,7 +64,7 @@ This webhook lets individual users be notified when something they care about ha
 
 Each user configures one or more **notification targets** in **Settings > Notifications**, and chooses per target which events it receives and whether it fires only while they are away or always. The model can also send a notification itself through the `notify` tool.
 
-See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the five subscribable events, delivery modes, URL masking, and the `notify` tool.
+See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the five subscribable events, delivery modes, URL masking and the `notify` tool.
 
 ### Use Case
 
@@ -72,7 +72,7 @@ See **[Notifications](/features/chat-conversations/chat-features/notifications)*
 
 ### How it Works
 
-With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**, so you are not pinged about something you are already watching. Setting a target to **always** sends regardless. Channel messages ignore the delivery mode, in group channels and direct messages too, and are sent only while you have no Open WebUI tab open. A channel set to [**Mentions only**](/features/channels#muting-a-channel) sends only the messages that @mention you.
+With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**, so you are not pinged about something you are already watching. Setting a target to **always** sends regardless. Channel messages ignore the delivery mode, in group channels and direct messages too, and are sent only while you have no Open WebUI tab open. They are sent for messages that people post, bot accounts posting over the API included. In a standard channel they reach you once you have opened or posted in that channel. A channel set to [**Mentions only**](/features/channels#muting-a-channel) sends only the messages that @mention you.
 
 ### Enabling/Disabling User Webhooks
 
@@ -102,13 +102,13 @@ The single **Notification Webhook** field under **Settings > Account** has been 
 
 ## 3. Channel Webhooks: External Message Integration
 
-Channel Webhooks allow external services, automation tools, or scripts to post messages directly into Open WebUI channels. This enables seamless integration with monitoring systems, CI/CD pipelines, notification services, or any custom automation. A webhook posts messages into one channel. A service that should also answer `@mentions` or post buttons is built as an [App](/features/channels/apps).
+Channel Webhooks let external services, automation tools or scripts post messages directly into Open WebUI channels, for example from monitoring systems, CI/CD pipelines, notification services or any custom automation. A webhook posts messages into one channel. A service that should also answer `@mentions` or post buttons is built as an [App](/features/channels/apps).
 
 ### Use Cases
 
 - **System Monitoring:** Post alerts from monitoring tools (Prometheus, Grafana, Nagios) directly into team channels.
-- **CI/CD Integration:** Send build status notifications from GitHub Actions, GitLab CI, or Jenkins to development channels.
-- **Custom Automation:** Integrate with n8n, Zapier, or custom scripts to automate message posting.
+- **CI/CD Integration:** Send build status notifications from GitHub Actions, GitLab CI or Jenkins to development channels.
+- **Custom Automation:** Integrate with n8n, Zapier or custom scripts to automate message posting.
 - **External Notifications:** Forward notifications from external services into your Open WebUI workspace.
 
 ### How it Works
@@ -119,7 +119,7 @@ Each channel can have multiple webhooks. Each webhook has:
 - An optional **profile image** to visually identify the webhook source
 - A **last used timestamp** to track webhook activity
 
-Messages posted via webhooks appear in the channel with the webhook's identity, making it clear they came from an external source rather than a user.
+Messages posted via webhooks appear in the channel with the webhook's name and image, which marks them as coming from an external source.
 
 ### Managing Channel Webhooks
 
@@ -128,14 +128,14 @@ Only the channel's creator and **administrators** can create and manage webhooks
 #### Creating a Webhook
 
 1.  Navigate to the channel where you want to add a webhook.
-2.  Click the channel menu (⋮) and select **Edit Channel**.
+2.  In the sidebar, open the channel's **...** menu and select **Edit channel**.
 3.  In the channel settings modal, locate the **Webhooks** section.
 4.  Click **Manage** to open the Webhooks modal.
 5.  Click **New Webhook**. This creates a live webhook named "New Webhook" at once. **Save** only applies later name and image edits.
 6.  Configure the webhook:
     - **Name:** The display name that will appear as the message author
     - **Profile Image:** (Optional) Upload an image to represent this webhook
-7.  Click **Save** to create the webhook.
+7.  Click **Save** to apply the name and image.
 8.  Copy the generated webhook URL using the **Copy URL** button.
 
 #### Webhook URL Format

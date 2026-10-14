@@ -110,9 +110,9 @@ Before v0.9.6, tagging a model in a channel only forwarded **images** from the t
 
 ### Tagging people and linking channels
 
-Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. Use `#channel-name` to create clickable cross-references between conversations.
+Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. A tag notifies only people who can read the channel. Use `#channel-name` to create clickable cross-references between conversations.
 
-You can also type a mention out in full without picking from the list. When you paste or send, `@name` becomes a real mention if it matches exactly one person, model or app, and `#name` if it matches exactly one channel. Two matches with the same name need a pick from the list. Mentions pasted from another message keep pointing at the same person.
+You can also type a mention out in full without picking from the list. When you paste or send, `@name` becomes a real mention if it matches the name of exactly one person, model or app, or a model's ID such as `@gpt-5.6`. `#name` becomes a channel link if it matches exactly one channel. Two matches with the same name need a pick from the list. Mentions pasted from another message keep pointing at the same person.
 
 Point at someone's profile picture next to their messages or in the channel's member list, or at an `@mention` of them, to open their profile card. It shows their name, online state, status, bio, groups, local time and when they were last active. Local time follows the time zone of the browser they last used Open WebUI in. Every signed-in user can open any other user's card, and the same details, plus email address and role, are available to them through the API.
 
@@ -122,15 +122,15 @@ Hover any message to react with emoji, pin it for reference, reply inline, or st
 
 ### Muting a channel
 
-The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar, shows no unread count and sends no pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications) unless a message @mentions you. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else.
+The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar and shows no unread count. Only a message that @mentions you still sends a pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications); the unread count stays hidden for it too. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else.
 
 ### Bots posting as a model
 
 Any account can post into a channel over the API: a script or bot runs under its own account and posts like any other member. A bot that answers `@mentions` under its own name is an [App](#apps).
 
-A posted message can carry an optional model identity, and the interface then renders that message under the model's name and avatar in place of the posting account's. A bot that answers on behalf of a model sets this so its replies are presented as that model's replies.
+A posted message can carry an optional model identity, and the interface then shows that message with the model's name and avatar. A bot that answers on behalf of a model sets this so its replies are presented as that model's replies.
 
-That identity is a label chosen by whoever posts the message, and it is not evidence that the server ran the model. The account that posted stays the recorded author and is what the API returns for the message, so the real sender can always be recovered. Anyone who can post in a channel can set the label, so treat the model name next to a message as presentation only.
+That identity is a label chosen by whoever posts the message. The account that posted stays the recorded author and is what the API returns for the message, so the real sender can always be recovered. Anyone who can post in a channel can set the label, so treat the model name next to a message as presentation only.
 
 ### Apps
 

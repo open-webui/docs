@@ -11,13 +11,13 @@ Back up your Milvus data before upgrading, and make sure Milvus has free disk sp
 
 ## What to Expect
 
-- The migration runs when [`ENABLE_DB_MIGRATIONS`](/reference/env-configuration#enable_db_migrations) is on, which is the default. On Milvus older than 2.5 it is skipped and hybrid search keeps working the way it did before.
+- The migration runs when [`ENABLE_DB_MIGRATIONS`](/reference/env-configuration#enable_db_migrations) is on, which is the default. On Milvus older than 2.5 it is skipped and hybrid search keeps working the way it did before. The copy then runs on the first Open WebUI start after Milvus reaches 2.5, so back up and plan the downtime for that start the same way.
 - **Open WebUI does not serve requests until the migration is done.**
 - The log shows `Migrating N Milvus collections to native hybrid search.` when it starts and `Migrated N Milvus collections to native hybrid search.` when it is done. Nothing is logged in between, so use the [monitoring script](#monitoring-progress) below to follow the progress.
 - **Do not restart Open WebUI during the migration.** An interrupted run discards its partial copies on the next start and begins again from zero.
 - Your original collections are deleted only after every copy has succeeded. If a copy fails, the log shows `Milvus migration to native hybrid search failed, all collections are kept unchanged.` and Open WebUI keeps using the original collections.
 - If you run several Open WebUI instances, start only one for the upgrade and start the others after the `Migrated` line appears.
-- With [`ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`](/reference/env-configuration#enable_rag_hybrid_search_enriched_texts) on, Open WebUI keeps its own keyword search and does not use the native one.
+- Once the migration is done, Milvus runs hybrid search itself whenever **Hybrid Search** is on in **Settings > Admin > Documents**. Turning on **Enrich Hybrid Search Text** (or [`ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`](/reference/env-configuration#enable_rag_hybrid_search_enriched_texts)) keeps Open WebUI's own keyword search in use.
 
 ## Reference Speeds
 

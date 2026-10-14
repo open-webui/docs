@@ -111,7 +111,7 @@ More detail: [Prompt Caching (KV Cache) Optimization](/features/chat-conversatio
 By default, background tasks (titles, tags, follow-ups) use your main chat model; autocomplete is off until an admin enables it and **Prompt Autocompletion** is turned on in Settings > Interface (by each user, or for everyone through the admin's Default Interface Settings). Setting a dedicated task model is the easiest way to improve speed and reduce unnecessary API costs.
 :::
 
-Every time Open WebUI needs a short piece of "thinking" for a UI feature (writing a chat **title** for the sidebar, generating **tags**, suggesting **follow-up questions**, powering the **autocomplete** in the prompt box) it calls a **Task Model**. By default that task model is whatever main model you are currently chatting with, which means:
+Every time Open WebUI needs a short piece of "thinking" for a UI feature (writing a chat **title** for the sidebar, generating **tags**, suggesting **follow-up messages**, powering the **autocomplete** in the prompt box) it calls a **Task Model**. By default that task model is whatever main model you are currently chatting with, which means:
 
 - Your expensive flagship model gets invoked every time you open a new chat just to write "Groceries list."
 - On a slow local model, every keystroke feels laggy because autocomplete is waiting on a 30B-parameter model.

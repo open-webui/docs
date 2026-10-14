@@ -47,7 +47,7 @@ There are two ways to use a skill:
 
 **Option 1: Mention it in chat (`$`)**
 
-Type `$` in the chat input, then search for your skill by name. Select it, and the AI receives the **full instructions** for that conversation. This is best when you want to explicitly tell the AI to follow a specific skill right now.
+Type `$` in the chat input, then search for your skill by name. Select it, and the AI receives the **instructions** for that conversation. This is best when you want to explicitly tell the AI to follow a specific skill right now.
 
 ![AI interacting with data using skills and structured workflows](/images/open-terminal-ai-csv-analysis.png)
 

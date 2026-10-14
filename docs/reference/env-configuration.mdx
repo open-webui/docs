@@ -12,7 +12,7 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.11.1](https://github.com/open-webui/open-webui/releases/tag/v0.11.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
+This page is up-to-date with Open WebUI release version [v0.12.1](https://github.com/open-webui/open-webui/releases/tag/v0.12.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
 
 :::
 
@@ -52,9 +52,9 @@ The simplest and safest way to change `ConfigVar` settings is directly through t
 If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker:
 
 ```bash
-docker exec -it open-webui sqlite3 /app/backend/data/webui.db "UPDATE config SET data = json_set(data, '$.ENABLE_SIGNUP', json('true'));"
+docker exec -it open-webui sqlite3 /app/backend/data/webui.db "UPDATE config SET value = json('true') WHERE key = 'ui.enable_signup';"
 ```
-*(Replace `ENABLE_SIGNUP` and `true` with the specific setting and value needed.)*
+*(Each setting is its own row, stored under an internal key that differs from the environment variable name. List the keys with `SELECT key FROM config;`, then replace `ui.enable_signup` and `true` with the setting and value needed.)*
 
 #### Option 4: Resetting for a Fresh Install
 If you are performing a clean installation and want to ensure all environment variables are fresh:
@@ -1529,7 +1529,7 @@ JSON format: { "title": "your concise title here" }
 #### `FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Description: Prompt to use for generating several relevant follow-up questions.
+- Description: Prompt used to generate the follow-up suggestions, the messages the user is likely to send next.
 - Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_FOLLOW_UP_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1979,7 +1979,7 @@ Output:
   - **Tools Workspace**: "Made by Open WebUI Community" section with a link to discover community tools, and a "Share" button in the tool menu dropdown
   - **Models Workspace**: "Made by Open WebUI Community" section with a link to discover community model presets, and a "Share" button in the model menu dropdown
   - **Skills Workspace**: **Discover a skill** and **Share** in the skill menu (see [Community skills](/features/workspace/skills#community-skills))
-  - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions
+  - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions, and a "Share" button in the function menu dropdown
   - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
   - **Stats Sync Modal**: Enables syncing usage statistics with the community
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -4583,7 +4583,8 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `int`
 - Default: `1`
-- Description: Sets the batch size for OpenAI embeddings.
+- Description: Legacy name for [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size). It is read only when `RAG_EMBEDDING_BATCH_SIZE` is unset or empty, and then sets the batch size for every external embedding engine. Use `RAG_EMBEDDING_BATCH_SIZE`.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### Azure OpenAI Embeddings
 
@@ -4992,13 +4993,6 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Type: `int`
 - Default: `0`
 - Description: Limits the number of concurrent search requests to the search engine provider. Set to `0` for unlimited concurrency (default). Set to `1` for sequential execution to prevent rate limiting errors (e.g., Brave Free Tier).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `WEB_FETCH_MAX_CONTENT_LENGTH`
-
-- Type: `int`
-- Default: None (no limit)
-- Description: Maximum number of characters to return from fetched URLs. When set, content exceeding this limit is truncated. Previously hardcoded at 50,000 characters. Leave empty or unset to return full content without truncation. Useful for controlling context window usage with large web pages.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEB_LOADER_CONCURRENT_REQUESTS`
@@ -5966,7 +5960,7 @@ These variables configure **Realtime** call mode for [Voice Mode](/features/chat
 
 - Type: `str` (JSON object)
 - Default: Empty
-- Description: Sets **Input Parameters**, extra settings merged into the audio input settings of every Realtime session. A key set here replaces Open WebUI's own value for it. Noise reduction stays off until it is set here. Invalid JSON, or JSON that is not an object, is ignored. See [Input Parameters](/features/chat-conversations/chat-features/voice-mode#input-parameters).
+- Description: Sets **Input Parameters**, extra settings merged into the audio input settings of every Realtime session. A key set here replaces Open WebUI's own value for it. The provider's noise reduction stays off until it is set here. The browser's own noise suppression is always on. Invalid JSON, or JSON that is not an object, is ignored. See [Input Parameters](/features/chat-conversations/chat-features/voice-mode#input-parameters).
 - Example: `{"noise_reduction": {"type": "near_field"}}`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -6730,6 +6724,7 @@ In any production environment running more than one instance of Open WebUI (e.g.
 - Type: `bool`
 - Default: `False`
 - Description: Ensures the full OAuth scope is included during refresh token requests instead of relying on provider defaults. When enabled, the configured scope (e.g. `MICROSOFT_OAUTH_SCOPE`) is passed to the identity provider during token refresh. This is required for providers like Microsoft where missing scopes can cause refresh failures, especially when using custom API scopes.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_TIMEOUT`
 
@@ -7180,19 +7175,6 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 :::
 
-#### `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE`
-
-- Type: `bool`
-- Default: `False`
-- Description: When enabled, includes the configured OAuth scope in refresh token requests. Some OAuth providers, notably Microsoft Azure AD, require the scope to be explicitly provided when refreshing a token. Without it, Azure AD treats the request as the application requesting a token for itself, resulting in `AADSTS90009` errors. Enable this if you encounter token refresh failures with your OAuth provider.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-:::info
-
-This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org/doc/html/rfc6749#section-6), where the `scope` parameter is optional during refresh token requests. Only enable this for providers that require it, such as certain Azure AD configurations.
-
-:::
-
 ## LDAP
 
 #### `ENABLE_LDAP`
@@ -7351,18 +7333,21 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Type: `bool`
 - Default: `True`
 - Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
 
 - Type: `bool`
 - Default: `True`
 - Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_PARAMS`
 
 - Type: `bool`
 - Default: `True`
 - Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Parameters" section within the chat controls panel. Turning it off also hides the [model controls](/features/workspace/models#using-model-controls-in-chat) icon in the message input.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
 
@@ -7376,6 +7361,7 @@ This setting is compliant with [RFC 6749 Section 6](https://datatracker.ietf.org
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to attach web pages in chats. When `False`, the **Attach Webpage** option stays in the attach menu for non-admins but is greyed out with a tooltip, and an attach sent anyway is refused. Configurable per-group as **Allow Web Upload**.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_DELETE`
 
@@ -7780,12 +7766,14 @@ On instances upgraded from a release predating these two variables, the admin pa
 - Type: `bool`
 - Default: `True`
 - Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`
 
 - Type: `bool`
 - Default: `True`
 - Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Import / Export
 
@@ -7856,6 +7844,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
   - `azure`: uses the Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
+- Slim image: only `local` and `s3` are available. With `gcs` or `azure` the slim image stops at startup with the error `Slim supports local and S3 file storage`. Use the standard image for those providers. In v0.11.4, the first release with the slim image, only `local` was available.
 
 #### `STORAGE_LOCAL_CACHE`
 
