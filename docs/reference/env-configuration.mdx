@@ -337,7 +337,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** tab to the admin settings, where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Can also be set in **Settings > Admin > General** (**Apps**).
+- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** tab to the admin settings, where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > Admin > General** (**Apps**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `APP_ALLOWED_PRIVATE_ORIGINS`
@@ -1459,7 +1459,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request and listed by name in the system prompt, and the model loads the ones it needs with the built-in `search_tools` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
+- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request and listed by name in the system prompt, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.enable`.
 
 #### `TOOL_SEARCH_DEFER_THRESHOLD`
@@ -2348,6 +2348,7 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{FILE_NAME}}` | File name, for file-scoped requests |
 | `{{FILE_CONTENT_TYPE}}` | File MIME type, for file-scoped requests |
 | `{{TASK}}` | Internal task name when the request is a background task, e.g. title or tag generation |
+| `{{MODEL_ID}}` | ID of the model handling the chat request. For a workspace model this is the workspace model's own ID, and in a multi-model chat each model's request carries its own ID. Empty on background task requests from a browser chat, such as title or tag generation. Introduced in v0.12.2 |
 | `{{USER_ID}}` | Signed-in user's ID |
 | `{{USER_NAME}}` | Signed-in user's display name |
 | `{{USER_EMAIL}}` | Signed-in user's email |
@@ -2990,6 +2991,14 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Default: `None`
 - Example: `root:password` (format: `username:password`)
 - Description: Specifies an optional connection token for Milvus. Required when connecting to a remote Milvus server with authentication enabled. Format is `username:password`.
+
+#### `MILVUS_SERVER_PEM_PATH`
+
+- Type: `str`
+- Default: Empty string
+- Example: `/app/certs/milvus-ca.pem`
+- Description: Path to a CA or server certificate file that Open WebUI trusts when it connects to Milvus over TLS. Use it when the Milvus server has a self-signed or company-issued certificate. It takes effect only when [`MILVUS_URI`](#milvus_uri-required) starts with `https://`, and applies in normal and [multitenancy](#enable_milvus_multitenancy_mode) mode. Leave it empty to verify the server against the default trusted certificates. Introduced in v0.12.2.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_INDEX_TYPE`
 
@@ -3763,12 +3772,24 @@ Note: this configuration assumes that AWS credentials will be available to your 
 
 Use [Valkey](https://valkey.io/) with the [valkey-search](https://github.com/valkey-io/valkey-search) module as the vector store by setting `VECTOR_DB=valkey`. Indexing, KNN search and metadata filtering all run server-side in Valkey. The chunk details stored with each vector are written on upload and read back on every knowledge base search, which [`ENABLE_ORJSON`](#enable_orjson) makes faster.
 
-:::warning Community-supported
-The Valkey backend is community-contributed and maintained on a best-effort basis.
+:::warning Non-core integration
+The Valkey backend is a non-core, independently maintained integration. Fixes come from outside the core Open WebUI maintenance path.
 :::
 
 :::info Requirements
-Valkey is **opt-in and not bundled**. Install the client manually (`pip install valkey-glide-sync==2.3.1`) and run **Valkey core 9.0.1+ with the valkey-search module 1.2.0+ loaded**. Open WebUI verifies both versions at startup and refuses to start against an older server.
+Valkey is **opt-in**. Install the client yourself, in the Docker image too (`pip install valkey-glide-sync==2.5.2`), and run **Valkey core 9.0.1+ with the valkey-search module 1.2.0+ loaded**. Open WebUI verifies both versions at startup (on the slim image, at the first upload or knowledge search) and refuses to work with an older server.
+
+Open WebUI's connections report the library name `GlidePySync(open-webui)` in `CLIENT LIST` and `CLIENT INFO`, so its traffic can be told apart on a shared Valkey or ElastiCache server.
+:::
+
+:::warning From v0.12.2: upgrade valkey-glide-sync
+v0.12.2 needs valkey-glide-sync 2.5.2 or newer. An install with `VECTOR_DB=valkey` that still has an older version, such as the 2.3.1 named in earlier docs, fails at startup. On the slim image it starts, and then every upload and knowledge search fails until the client is upgraded. Upgrade the client before or with Open WebUI:
+
+```bash
+pip install valkey-glide-sync==2.5.2
+```
+
+In a custom Docker image, change the version in the line that installs it and rebuild the image.
 :::
 
 #### `VALKEY_URL`
@@ -4082,7 +4103,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `local`
-- Description: `local` posts each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
+- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x or 4.x and uses the matching interface, so both work (4.x from v0.12.2). `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_URL`
@@ -4126,14 +4147,21 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Caps the size, in bytes, of the Markdown the **MinerU** loader returns from a processed document. Output beyond the cap is truncated, guarding against a single huge document flooding context or memory. Leave unset for no limit.
+- Description: Caps the size, in bytes, of the Markdown file Open WebUI reads from a result of the MinerU cloud service. A larger file is rejected and the document fails with `Markdown file in results ZIP is too large`, which guards against a single huge document flooding memory. The cap applies to the cloud service only; results from a self-hosted MinerU server are read in full. Leave unset for no limit.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MINERU_PARAMS`
 
 - Type: `dict` (JSON object)
 - Default: `{}` (engine defaults)
-- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`), and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Documents** when MinerU is the content-extraction engine.
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`) and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Documents** (**Parameters**) when MinerU is the content-extraction engine.
+
+  For a self-hosted MinerU 4.x server, Open WebUI uses only these keys:
+  - `tier`: parsing quality, `flash`, `basic`, `standard` or `advanced`. Leave it out to use the server's default.
+  - `enable_ocr`: `true` forces OCR; `false` lets MinerU decide.
+  - `page_ranges`: pages to parse, for PDF files. The cloud service uses it too; a self-hosted 3.x server ignores it.
+
+  `language`, `model_version` and the other keys apply to MinerU 3.x and the cloud service. MinerU 4.x returns images as base64 data inside the document; Open WebUI leaves them out of the indexed text.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `PADDLEOCR_VL_BASE_URL`
@@ -4529,7 +4557,7 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 :::tip
 
-If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches.
+If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches. From v0.12.2 this limit and [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size) also apply when memories are reindexed: from **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents**, through the API or automatically when a memory is saved after a switch to an embedding model with a different vector size.
 
 :::
 

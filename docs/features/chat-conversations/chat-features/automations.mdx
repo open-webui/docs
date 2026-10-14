@@ -145,7 +145,7 @@ A few rules about how a custom rule is read:
 ## Notes
 
 - Automations run in the background worker loop on a polling interval.
-- Every run records a status (`success` or `error`) and optional error details.
+- Every run records a status (`success` or `error`) and optional error details. A run that replies in a chat is recorded as `success` once the reply has finished. A reply that fails or is cancelled is recorded as `error`, and the run keeps its **View chat** link so you can open the chat.
 - Deleting an automation also removes its run history.
 
 ## Managing Automations from Chat

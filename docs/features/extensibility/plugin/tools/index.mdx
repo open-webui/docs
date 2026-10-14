@@ -315,11 +315,11 @@ An administrator turns it on in **Settings > Admin > Interface**, in the **Chat*
 How it works:
 
 - **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.
-- **What the model sees.** Deferred tools are listed in an `<available_tools>` block at the end of the system prompt, each with its name and a description shortened to 100 characters. A built-in `search_tools` tool is added to the tool list.
-- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches and then calls the tool by name like any other. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by how well the query matches its name, description and parameter names.
+- **What the model sees.** Deferred tools are listed in an `<available_tools>` block at the end of the system prompt, each with its name and a description shortened to 100 characters. Two built-in tools are added to the tool list: `search_tools` and `call_tool`.
+- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by how well the query matches its name, description and parameter names. To run a tool it found, the model calls `call_tool` with `tool_name` set to the tool's exact name and `params` set to the tool's arguments as a JSON-encoded object string, for example `call_tool(tool_name="get_weather", params='{"city":"Dubai"}')`. Open WebUI runs the named tool as if the model had called it directly, so approvals, citations and the tool's behaviour are the same.
 - **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
-- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself.
-- **Backend requirement.** The model calls deferred tools that are not in the tool list sent to the provider, so Tool Search needs a backend that accepts such calls. Anthropic, Google Gemini, Mistral, Alibaba (Qwen) and CoreWeave (Llama 3.3) do. Through OpenRouter, it depends on the provider the request is routed to. A backend that limits tool calls to the tools in that list, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server, can only call the tools sent in full. On such a backend, add the tools you need to **Always Loaded Tools** or turn Tool Search off.
+- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself. The approval for a `call_tool` call names the tool it runs.
+- **Backend support.** Every call the model makes goes to a tool in the list sent to the provider, so Tool Search also works on backends that only accept calls to listed tools, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server. This applies from v0.12.2. Earlier versions had the model call deferred tools by name, which those backends rejected.
 
 Write Always Loaded patterns against the [tool names the model sees](/features/extensibility/mcp#tool-names-the-model-sees). MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
 
@@ -407,6 +407,9 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
 | **Voice Avatar** | *Only during a [voice call](/features/chat-conversations/chat-features/voice-mode#animations-and-gestures) with a model whose [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) has named gestures, AND the user holding the **Allow Call** permission (admins always pass). No per-model category of its own.* |
 | `play_animation` | Play one of the avatar's named gestures on the call screen. In a Realtime call the voice model plays the gestures, so this tool returns `unavailable` to the chat model. |
+| **Tool Search** | *Requires [Tool Search](#tool-search) turned on AND at least one tool deferred in the request. Added even when the model's **Builtin Tools** capability is off. No per-model category of its own.* |
+| `search_tools` | Find deferred tools by keywords or exact name and return their full definitions. |
+| `call_tool` | Run a tool found with `search_tools`, given its `tool_name` and its arguments as a JSON-encoded object string in `params`. |
 
 #### Attached Chat Files
 
@@ -529,6 +532,9 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
+| **Tool Search** | | |
+| `search_tools` | `query` (required; keywords or an exact tool name), `count` (default: `5`, at most `20`) | `{"tools": [...]}` with the full definitions, or `{"tools": [], "message": ...}` when nothing matches |
+| `call_tool` | `tool_name` (required; exact name), `params` (required; the tool's arguments as a JSON-encoded object string, `"{}"` for none) | The named tool's own result, or an `Error: ...` string when the call is malformed or the tool is not available |
 
 :::warning Builtin tools behave differently inside a note-attached chat
 

@@ -443,6 +443,8 @@ You can disable SSL verification for these internal tool connections using the f
 Disabling SSL verification reduces security. Only do this if you trust the network and the services you are connecting to (e.g., functioning within a secure internal network).
 :::
 
+For Milvus over TLS, point [`MILVUS_SERVER_PEM_PATH`](/reference/env-configuration#milvus_server_pem_path) at the CA or server certificate. Verification stays on.
+
 ## 🍏 Podman on MacOS
 
 For Podman on MacOS:
