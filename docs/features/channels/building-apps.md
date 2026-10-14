@@ -15,7 +15,7 @@ The quickest way to build an app is [oix](https://github.com/open-webui/oix#read
 python -m pip install oix
 ```
 
-Embeds and link buttons need oix 0.7.0 or newer.
+Embeds and link buttons need oix 0.7.0 or newer. Mentions need oix 0.8.0 or newer.
 
 ```python
 from oix import App
@@ -120,7 +120,7 @@ The whole connection must complete within 20 seconds, and each acknowledgement w
 
 Open WebUI emits `app:event` and waits for the acknowledgement. Every event carries `type`, `app_id` (Open WebUI's id for the app) and `installation_id`.
 
-**Interactions** go to `channel.mention` and `channel.action`. Answer within **3 seconds**:
+**Interactions** go to `channel.mention` and `channel.action`:
 
 ```json
 {
@@ -136,8 +136,8 @@ Open WebUI emits `app:event` and waits for the acknowledgement. Every event carr
 }
 ```
 
-- `channel.mention`: a user mentioned the app. `data.text` is the raw message, where the mention appears as `<@A:<app_id>|<name>>`. `data.parent_id` is the thread root when the mention was posted in a thread. Requires `channels:mentions:read` or `channels:messages:read`.
-- `channel.action`: a user clicked a button. `data` holds `message_id`, `etag`, `parent_id`, `action_id` and the button's `context`; `source` holds the message's `id` and `updated_at`.
+- `channel.mention`: a user mentioned the app. `data.text` is the raw message, where the mention appears as `<@A:<app_id>|<name>>`. `data.parent_id` is the thread root when the mention was posted in a thread. Requires `channels:mentions:read` or `channels:messages:read`. Acknowledge within **10 seconds** with exactly `{"status": 200, "data": {"received": true}}`. This only confirms delivery. Post the answer afterwards with the `create_message` operation, which needs `channels:messages:write`; pass `data.message_id` as `reply_to_id` and `data.parent_id` as `parent_id` to reply to the mention in the same place.
+- `channel.action`: a user clicked a button. `data` holds `message_id`, `etag`, `parent_id`, `action_id` and the button's `context`; `source` holds the message's `id` and `updated_at`. Answer within **3 seconds** with a [reply](#replying-to-interactions).
 
 **Message events** go to apps with `channels:messages:read`, for every message in the channels they joined, including the app's own messages: `channel.message.created`, `channel.message.updated` and `channel.message.deleted`. Acknowledge with a 2xx `status` within 10 seconds.
 
@@ -165,7 +165,7 @@ A mention reaches an app with `channels:messages:read` twice: as `channel.mentio
 
 ## Replying to interactions
 
-Acknowledge an interaction with `{"status": 200, "data": <reply>}`, at most 256 KiB:
+Acknowledge a button click (`channel.action`) with `{"status": 200, "data": <reply>}`, at most 256 KiB:
 
 ```json
 {
@@ -182,7 +182,7 @@ Acknowledge an interaction with `{"status": 200, "data": <reply>}`, at most 256 
 | Field | Meaning |
 |-------|---------|
 | `type` | `message` (default), `update`, `ack`, `download` or `error`. |
-| `visibility` | `private` (default, only the user who mentioned or clicked) or `channel`. |
+| `visibility` | `private` (default, only the user who clicked) or `channel`. |
 | `content` | Markdown, up to 32,000 characters. |
 | `title` | Optional heading for private replies, up to 200 characters. |
 | `actions` | Up to 30 buttons. Each has a `label` (up to 200 characters) and either an `action_id` (up to 100 characters) with an optional `context` object that comes back in `channel.action`, or a `url`: an `http(s)` link of up to 2,048 characters, without credentials, that opens in a new tab. Only allowed on `message` or `update` with `visibility` `channel`. |
@@ -191,15 +191,15 @@ Acknowledge an interaction with `{"status": 200, "data": <reply>}`, at most 256 
 | `filename` | For `download`: letters, digits, `_`, `.` and `-`, ending in `.md`. Default `report.md`. |
 
 - `message` with `visibility` `channel` posts a channel message and needs `channels:messages:write`.
-- `update` replaces the content, buttons and cards of the message whose button was clicked. It only works for `channel.action` and needs `channels:messages:write`. Set `visibility` to `channel`: with the default `private`, buttons are refused and the user also gets a private copy of the content.
+- `update` replaces the content, buttons and cards of the message whose button was clicked. It needs `channels:messages:write`. Set `visibility` to `channel`: with the default `private`, buttons are refused and the user also gets a private copy of the content.
 - `download` gives the user the `content` as a Markdown file.
-- `error` shows the `content` with a failure notice.
-- Send `download` and `error` with `visibility` `private`, the default. With `channel`, a `download` is shown nowhere and an `error` is shown only after a button click.
+- `error` shows the `content` to the user, or `The app could not complete this operation.` when `content` is empty.
+- Send `download` with `visibility` `private`, the default; with `channel` it is shown nowhere. An `error` is shown only to the user who clicked, with either visibility.
 - `ack` shows nothing. Send it as `{"type": "ack"}`.
 
-Unknown fields make the reply invalid. A non-200 `status` is shown to the user as an error.
+Unknown fields make the reply invalid.
 
-After a mention, a failed reply shows only a generic error in the channel. A button click shows the specific reason under the message, which helps while testing a reply. [Troubleshooting](/features/channels/apps#troubleshooting) lists the messages admins and users see.
+To refuse a mention or a button click, acknowledge with an error `status` and an `error` string, for example `{"status": 403, "error": "Only the on-call team can run this."}`. Open WebUI shows up to 2,000 characters of that string; without it, a message for the status code. After a mention, Open WebUI posts the message in the channel under the app's name, as a reply that starts with `App error:`, so everyone in the channel sees it. If the app cannot post there, only the user who mentioned it sees the message. After a button click, only the user who clicked sees it. [Troubleshooting](/features/channels/apps#troubleshooting) lists the messages admins and users see.
 
 ## Calling Open WebUI
 
@@ -220,12 +220,12 @@ The app emits `app:request` on the same connection with `{"operation": "<name>",
 
 ## Long-running work
 
-An interaction must be answered within 3 seconds. For anything slower:
+A mention only needs its delivery receipt, so the app does the work afterwards and posts the result with `create_message`. A button click must be answered within 3 seconds. For anything slower:
 
 1. Reply `{"type": "ack"}` right away. The user sees nothing.
 2. Do the work.
 3. Optionally call `authorize` with the event's `execution_token` (valid for 24 hours) to confirm the user can still use the app and read the channel.
-4. Post the result with the `create_message` operation, using `data.parent_id` from the event to stay in the thread. This needs `channels:messages:write`, and the result is a channel message that everyone in the channel sees. A private reply is only possible as the direct answer to an interaction.
+4. Post the result with the `create_message` operation, using `data.parent_id` from the event to stay in the thread. This needs `channels:messages:write`, and the result is a channel message that everyone in the channel sees. A private reply is only possible as the direct answer to a button click.
 
 ## Limits
 
@@ -237,7 +237,8 @@ An interaction must be answered within 3 seconds. For anything slower:
 | Manifest response | 256 KiB, within 10 seconds |
 | Message content | 32,000 characters, up to 30 buttons and 10 cards with 6,000 characters of card text |
 | Connection and handshake | 20 seconds in total, 10 seconds per acknowledgement |
-| Interaction answer time | 3 seconds |
+| Mention receipt time | 10 seconds |
+| Button click answer time | 3 seconds |
 | Message event answer time | 10 seconds |
 | `app:request` processing | 10 seconds |
 | `execution_token` lifetime | 24 hours |

@@ -5,7 +5,7 @@ title: "Apps"
 
 # Apps
 
-Apps are external services that join [channels](/features/channels) as members. Mention an app and it answers, either privately to you or in the channel for everyone. Apps can post messages with buttons, update their own messages and, when an admin allows it, follow every message in the channels they belong to.
+Apps are external services that join [channels](/features/channels) as members. Mention an app and it answers in the channel. Apps can post messages with cards and buttons, answer a button click privately to you, update their own messages and, when an admin allows it, follow every message in the channels they belong to.
 
 An app runs on its own server. Open WebUI opens the connection to the app, so Open WebUI itself can stay on a private network with no public callback address. To post messages into a channel without answering anyone, a [channel webhook](/features/administration/webhooks#3-channel-webhooks-external-message-integration) is simpler.
 
@@ -31,18 +31,18 @@ An app granted **Read messages and history in joined channels** receives every m
 
 ### Mention an app
 
-Type `@` in a channel where the app is a member and pick it from the **Apps** group in the suggestion list. Send your message and the app receives it. One message reaches at most the first 10 apps it mentions.
+Type `@` in a channel where the app is a member and pick it from the **Apps** group in the suggestion list. Send your message and the app receives it. One message reaches at most the first 10 apps it mentions. The app confirms that it received the message, then posts its answer in the channel when it is ready.
 
 ### Private and channel replies
 
-An app chooses where its answer goes:
+An app answers a mention with a channel message. A button click can be answered either way:
 
-- **Private replies** appear under the message that triggered them (your message for a mention, the app's message for a button click), marked **Only visible to you**, with a **Dismiss** link. Only you see them, and only until you dismiss them, reload the page or switch to another channel or thread. A private reply appears only if you are still in that channel or thread when it arrives. Errors and file downloads are only ever shown to you.
+- **Private replies** appear under the app's message whose button you clicked, marked **Only visible to you**, with a **Dismiss** link. Only you see them, and only until you dismiss them, reload the page or switch to another channel or thread. A private reply appears only if you are still in that channel or thread when it arrives. File downloads are only ever shown to you.
 - **Channel replies** are posted as normal channel messages under the app's name, with an **App** label. Everyone in the channel sees them and they stay in the history.
 
-An app can also send a Markdown file as a private reply. It shows as a **Download** button with the file name, for example **Download report.md**, that saves the file to your device.
+After a button click, an app can also send a Markdown file as a private reply. It shows as a **Download** button with the file name, for example **Download report.md**, that saves the file to your device.
 
-If the app cannot answer, an error appears under your message. Ask an admin to check the app in **Settings > Admin > Apps**. [Troubleshooting](#troubleshooting) lists the messages you are most likely to see.
+If a mention fails, Open WebUI posts the reason under the app's name as a reply to your message, starting with `App error:`. Everyone in the channel sees it. If the app cannot post in the channel, for example because it is disabled or lacks the scope to post, the reason appears under your message and only you see it. If a button click fails, the reason appears under the app's message and only you see it. Ask an admin to check the app in **Settings > Admin > Apps**. [Troubleshooting](#troubleshooting) lists the messages you are most likely to see.
 
 ### Buttons
 
@@ -74,7 +74,7 @@ For an app on your own network, on the Docker host or on plain HTTP, set up [Pri
 
 If **Connect** fails, the app is still saved, disabled, with its handle. Fix the cause and click **Connect** again.
 
-If the app does not publish its details, fill in **App URL** and **API Key**, then click **Enter details manually**. Enter the name, the app's Ed25519 public key and the scopes yourself. Set **App handle** to exactly the app's ID (`manifest_id` in oix): for a manually entered app Open WebUI uses the handle as that ID, and the connection fails if the two differ. This needs an app ID that is also a valid handle. An app with any other ID has to publish its details.
+If the app does not publish its details, fill in **App URL** and **API Key**, then click **Enter details manually**. Enter the **Name** and the app's Ed25519 **Public key**. Click **Requested scopes**, switch on the scopes the app requests and click **Continue**. Then click **Review** next to **Scopes** and switch on the ones you grant. Set **App handle** to exactly the app's ID (`manifest_id` in oix): for a manually entered app Open WebUI uses the handle as that ID, and the connection fails if the two differ. This needs an app ID that is also a valid handle. An app with any other ID has to publish its details.
 
 The App URL cannot contain credentials, a query (`?`) or a fragment (`#`), and it must answer directly without a redirect. Open WebUI connects to apps directly and ignores `HTTP_PROXY`, `HTTPS_PROXY` and `NO_PROXY`, so the Open WebUI server needs a direct network path to every app.
 
@@ -96,7 +96,9 @@ App connections always verify the app's certificate. For an app on your network 
 
 ### Scopes
 
-Scopes limit what an app can do. You pick which scopes to grant when you install the app, and you can change the selection later in **Configure** with **Edit** next to **Scopes**.
+Scopes limit what an app can do. You pick which scopes to grant when you install the app, and you can change the selection later in **Configure** with **Edit** next to **Scopes**. Both lists offer only the scopes the app requests.
+
+The requested scopes come from the app's details. For an app whose details you entered by hand, change them in **Configure**: click **Edit details manually**, then **Requested scopes**. Switching off a requested scope also removes it from the granted ones.
 
 | Scope | Shown as | What it allows |
 |-------|----------|----------------|
@@ -105,7 +107,7 @@ Scopes limit what an app can do. You pick which scopes to grant when you install
 | `channels:messages:write` | Send messages and edit own messages in joined channels | Post channel messages and edit the app's own messages |
 | `channels:read` | Read joined channel details | List the channels the app was added to, with name, type and whether they are private |
 
-Answering mentions needs `channels:mentions:read` or `channels:messages:read`. Button clicks reach the app with any scopes. Channel replies and button updates need `channels:messages:write`; private replies need no further scope. Every scope applies only to channels the app was added to.
+Receiving mentions needs `channels:mentions:read` or `channels:messages:read`. Answering them needs `channels:messages:write` as well, because the answer is a channel message. Button clicks reach the app with any scopes. Channel replies and button updates need `channels:messages:write`; private replies to a button click need no further scope. Every scope applies only to channels the app was added to.
 
 ### Access
 
@@ -131,6 +133,7 @@ When an app stays on **Connecting** or **Disconnected**, turn its switch off and
 ### Update, disable and uninstall
 
 - **Configure** (gear icon) opens the app's settings. **Update app** (the refresh button next to the URL) loads the app's details again, for example after the operator added a scope or changed the profile image. Saving approves the updated details and selected scopes and reconnects the app. When the public key or the API key changes, saving connects the app again from scratch, as on first install.
+- **Edit details manually** (below the URL) opens the app's **Public key** and **Requested scopes** for editing. Use it for an app that does not publish its details. Saving approves the edited details and reconnects the app the same way.
 - The switch disables an enabled app at once. Turning it back on opens the settings, where **Connect** connects it again.
 - **Uninstall**, at the bottom of the **Configure** dialog, removes the API key, the connection credential and the app's channel memberships. Messages the app already posted stay in the channels. The app stays in the list as **Uninstalled**, with its handle, scopes and access. To use it again, turn its switch on, enter the API key, click **Connect** and add it to its channels again.
 
@@ -169,21 +172,24 @@ The TLS, DNS and reachability messages come from loading the app's details. On *
 
 ### In a channel
 
-These messages appear under a message in the channel.
+After a mention, these messages appear in a reply from the app that starts with `App error:`, or under your message when the app cannot post in the channel. After a button click, they appear under the app's message. When the app answers with an error status and its own error text, that text appears, up to 2,000 characters, in place of the status messages in this table.
 
 | Message | What to check |
 |---------|---------------|
-| `App could not respond. Check access and connection status before retrying.` | Shown after a mention. The app is disconnected, did not answer in time, returned an error or an invalid reply, or lacks a read scope. Or you or the app lost access to the channel. |
-| `App is disconnected; event was not sent` | Shown after a button click. Check the status in the **Apps** tab. |
-| `App response timed out; execution outcome may be unknown` | The app did not answer the button click within 3 seconds. It may still have acted. |
+| `App is disconnected; event was not sent` | Check the status in the **Apps** tab. |
+| `App response timed out; execution outcome may be unknown` | The app did not confirm a mention within 10 seconds, or did not answer a button click within 3 seconds. It may still have acted. After a mention a second line follows: `Delivery was not confirmed. The app may have accepted the message; check before retrying.` |
+| `App returned an invalid delivery receipt` | Shown after a mention. The app answered with something other than its delivery confirmation. An app built with oix needs oix 0.8.0 or newer. |
+| `App is inactive` | The app is disabled or uninstalled. |
 | `App invocation denied` | You are not allowed to use this app. Check its **Access**. |
+| `Channel access denied` | You no longer have access to the channel. |
 | `Invite the app into this channel first` | The app is not a member of the channel. |
-| `App rejected event authorization. Check the app server logs for the verification failure.` | Shown after a button click. The app could not confirm the click with Open WebUI. The app's log names the reason. |
-| `App returned HTTP <code>. Check the app server logs.` | The app answered the click with an error status, for example after its handler crashed. |
+| `App scope was not granted` | After a mention, the app has neither `channels:mentions:read` nor `channels:messages:read`. After a button click, the app tried to post or update a channel message without `channels:messages:write`. Check its scopes. |
+| `App rejected the API key. Update the key in app settings.` | The app refused the event because of its API key. Compare the key in **Configure** with the one on the app server. |
+| `App rejected event authorization. Check the app server logs for the verification failure.` | The app could not confirm the mention or click with Open WebUI. The app's log names the reason. |
+| `App returned HTTP <code>. Check the app server logs.` | The app answered with an error status, for example after its handler crashed. |
 | `App processing timed out; execution outcome may be unknown.` | The app's handler ran out of time. It may still have acted. |
-| `App is busy or shutting down. The event was not accepted.` | The app is at capacity or restarting. Click again later. |
-| `App returned an invalid response` | The app's reply has unknown fields or breaks a limit. |
-| `App scope was not granted` | The app tried to post or update a channel message without `channels:messages:write`. Check its scopes. |
+| `App is busy or shutting down. The event was not accepted.` | The app is at capacity or restarting. Try again later. |
+| `App returned an invalid response` | Shown after a button click. The app's reply has unknown fields or breaks a limit. |
 
 ### Apps stop connecting after WEBUI_SECRET_KEY changed
 

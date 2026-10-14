@@ -151,7 +151,7 @@ Text files are stored as text and any other file as binary. `SKILL.md` stays at 
 
 The chevron menu beside **Create** has three import entries:
 
-- **Import** takes one or more `.zip`, `.json` or `.md` files, up to 200 MiB per import. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. Needs the **Skills Access** and **Import Skills** permissions.
+- **Import** takes one or more `.zip`, `.json` or `.md` files, up to 200 MiB per import. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. A ZIP that contains a symbolic link or another special file is refused with `Archives cannot contain links or special files`. Needs the **Skills Access** and **Import Skills** permissions.
 - **Import from URL** (admins only) downloads skills from a link. See [Importing from a URL](#importing-from-a-url).
 - **Import folder** takes a skill folder from your computer, or a folder holding several skill folders, each with its own `SKILL.md`. Needs the **Skills Access** and **Import Skills** permissions.
 
@@ -183,7 +183,7 @@ description: Step-by-step instructions for thorough code reviews
 | A GitHub `SKILL.md`, `https://github.com/owner/repo/blob/<branch>/<folder>/SKILL.md` | The skill in that `SKILL.md`'s folder, with all its files |
 | A direct link to a `.zip`, `.json` or `.md` file | The skills in that file, read the same way as an upload |
 
-GitHub links are downloaded as a ZIP of the repository at that branch, tag or commit, so a skill arrives with its supporting files. A branch name containing `/` has to be URL-encoded (`%2F`), or use a commit link. The skills found open in the same import preview as an upload, where you choose what to create.
+GitHub links are downloaded as a ZIP of the repository at that branch, tag or commit, so a skill arrives with its supporting files. A branch name containing `/` has to be URL-encoded (`%2F`), or use a commit link. A ZIP downloaded from any link skips symbolic links and other special files outside the skill folders, so a repository with such links elsewhere still imports. A symbolic link or special file inside a skill folder refuses the import with `Archives cannot contain links or special files`. The skills found open in the same import preview as an upload, where you choose what to create.
 
 The link is checked against the same address rules as web fetching before the download starts and again at every redirect, so with [`ENABLE_LOCAL_WEB_FETCH`](/reference/env-configuration#enable_local_web_fetch) off a link that leads into your private network is refused. It follows up to 5 redirects, gives up after 60 seconds and stops at 200 MiB. A link that returns a web page is refused with a hint to use a raw file or a ZIP download link; on GitHub, the repository, folder and `SKILL.md` links above work as they are.
 

@@ -782,7 +782,7 @@ Things to know about the message table:
 - `parent_id` was added in migration `3781e22d8b01` and `reply_to_id` in migration `a5c220713937`. `is_pinned`, `pinned_at` and `pinned_by` were added in migration `2f1211949ecc`.
 - `parent_id` and `reply_to_id` do different jobs. `parent_id` is the thread root: a channel's message list selects rows with a null `parent_id`, and a thread is read by selecting rows whose `parent_id` is the root message. `reply_to_id` points at a single message that the reply quotes, and the quoted message is fetched and attached when a message is served. It has no effect on which list a message appears in.
 - `is_pinned`, `pinned_at` and `pinned_by` are written together by `POST /api/v1/channels/{id}/messages/{message_id}/pin`. Unpinning clears `pinned_at` and `pinned_by` back to null. `GET /api/v1/channels/{id}/messages/pinned` reads them.
-- `app_id` was added in migration `c92da83b017f`. Messages posted by an app carry its `app_id` and a null `user_id`.
+- `app_id` was added in migration `c92da83b017f`. Messages posted by an app carry its `app_id` and a null `user_id`, and keep their buttons and cards in `data` under `app` (`actions` and `embeds`).
 - `meta` carries the webhook identity for messages posted through a [channel webhook](#channel-webhook-table), under a `webhook` key, which is what lets those messages render with the webhook's name rather than a user account.
 
 ## Message Reaction Table
