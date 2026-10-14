@@ -169,7 +169,7 @@ Memory injection writes into the **system message** and is **not** governed by F
 
 ### 6. Voice mode is usually fine
 
-The dynamic voice-mode prompt is prepended once and stays constant while voice mode is active (a voice session typically starts a fresh chat), so it does not churn the cache. Leave it as-is, or disable `task.voice.prompt.enable` if you want a fully fixed system prompt.
+The dynamic voice-mode prompt is prepended once and stays constant while voice mode is active (a voice session typically starts a fresh chat), so it does not churn the cache. A call started in a chat that already has typed messages, Standard or Realtime, rebuilds the cached prefix once on its first spoken turn. Leave it as-is, or disable `task.voice.prompt.enable` if you want a fully fixed system prompt.
 
 ## The result: a stable, append-only request
 

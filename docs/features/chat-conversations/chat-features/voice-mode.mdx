@@ -84,7 +84,7 @@ While Voice Mode is on, Open WebUI adds voice instructions to the start of the s
 
 Admins can turn this off, or replace the instructions with their own, under **Settings > Admin > Interface > Voice Mode Prompt**. The same settings are available as [`ENABLE_VOICE_MODE_PROMPT`](/reference/env-configuration#enable_voice_mode_prompt) and [`VOICE_MODE_PROMPT_TEMPLATE`](/reference/env-configuration#voice_mode_prompt_template). An empty template uses the built-in instructions.
 
-The Voice Mode Prompt belongs to Standard mode. In a Realtime call, the chat model receives your message as an ordinary chat message and answers in its usual written style, and the voice model condenses that answer for speech.
+The Voice Mode Prompt applies in both call modes. In a Realtime call, the chat model gets it with every message while the call is connected, including messages you type during the call, and the voice model speaks the answer.
 
 ## Permissions
 
