@@ -457,7 +457,7 @@ The OpenAI router includes a catch-all proxy endpoint (`/{path:path}`) that forw
 Several features control how data can be shared or exported:
 
 ```bash
-# Allow users to share chats with other authenticated users (default: true)
+# Show the Open WebUI Community share and discover options (default: true)
 ENABLE_COMMUNITY_SHARING=true
 
 # Allow admins to bulk export all user chats from the database (default: true)
@@ -468,7 +468,7 @@ ENABLE_ADMIN_EXPORT=true
 ENABLE_DIRECT_CONNECTIONS=false
 ```
 
-`ENABLE_COMMUNITY_SHARING` lets users generate share links for their chats. Any authenticated user with the link can view the chat. If your deployment contains sensitive conversations, consider setting this to `false`.
+`ENABLE_COMMUNITY_SHARING` shows the options that send chats, models, prompts, tools, functions, skills and usage statistics to the Open WebUI Community, and the links to discover community content. Set it to `false` to keep everything on your instance. Chat share links are a separate feature: a new link stays private until its owner picks who can view it, see [Chat Sharing](/features/chat-conversations/chat-features/chatshare).
 
 `ENABLE_DIRECT_CONNECTIONS`, when enabled, allows users to configure their own API keys and model endpoints in the browser. These connections are made from the backend, so the user's API key is sent to the Open WebUI server. This is off by default.
 
@@ -586,7 +586,7 @@ AIOHTTP_CLIENT_ALLOW_REDIRECTS=false
 Earlier versions applied URL validation and the redirect gate only to the default web loader; the Playwright-based loader (`WEB_LOADER_ENGINE=playwright` / the `playwright` Docker variant) could navigate and follow redirects to internal or blocklisted URLs unchecked. As of v0.9.6 the Playwright path enforces the same `validate_url()` and redirect rules as the default loader, so the SSRF controls above apply regardless of which web loader engine you run. If you use Playwright, ensure you are on v0.9.6 or later.
 :::
 
-[Apps](/features/channels/apps) have their own gate: an app URL must use HTTPS and resolve to public addresses, rejects redirects and always verifies TLS. [`APP_ALLOWED_PRIVATE_ORIGINS`](/reference/env-configuration#app_allowed_private_origins) lists the app origins allowed on private addresses or plain HTTP.
+[Apps](/features/channels/apps) have their own gate: an app URL must use HTTPS and resolve to public addresses. Open WebUI refuses redirects from an app and always verifies its certificate. [`APP_ALLOWED_PRIVATE_ORIGINS`](/reference/env-configuration#app_allowed_private_origins) lists the app origins allowed on private addresses or plain HTTP.
 
 ### Profile image URL forwarding
 
@@ -787,7 +787,7 @@ For Docker deployments, pull the latest image and recreate the container:
 docker pull ghcr.io/open-webui/open-webui:main
 ```
 
-For multi-replica deployments, follow the [rolling update procedure](/troubleshooting/multi-replica#updates-and-migrations) to avoid downtime.
+For multi-replica deployments, update every instance at the same time: stop all replicas, let one instance run the migrations, then bring the rest back on the new version. See [Updates and migrations](/troubleshooting/multi-replica#updates-and-migrations).
 
 ---
 
