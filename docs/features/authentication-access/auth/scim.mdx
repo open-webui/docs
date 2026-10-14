@@ -76,7 +76,7 @@ Open WebUI's SCIM implementation supports the following operations:
 - **Create User** (`POST /Users`): Create a new user account
 - **Get User** (`GET /Users/{id}`): Retrieve user information
 - **Update User** (`PUT /Users/{id}`, `PATCH /Users/{id}`): Update user attributes
-- **Delete User** (`DELETE /Users/{id}`): Deactivate a user account
+- **Delete User** (`DELETE /Users/{id}`): Delete the user account with its chats and its sign-in record
 - **List Users** (`GET /Users`): List externally provisioned users, with filtering support
 
 #### PATCH operations
@@ -189,6 +189,9 @@ If `SCIM_AUTH_PROVIDER` is not set while SCIM is enabled, any operation that req
 4. **500 Error on externalId Operations**
    - Verify that `SCIM_AUTH_PROVIDER` is set to the correct OAuth provider name
 
+5. **SCIM Users Get `401` on SSO Sign-In**
+   - On v0.12.0, update to v0.12.1 or later, see [Sign-in records for SCIM users](#integration-with-sso)
+
 ### Testing SCIM Endpoints
 
 You can test SCIM endpoints using curl:
@@ -245,5 +248,13 @@ SCIM works best when combined with SSO (Single Sign-On). A typical setup include
 2. OIDC for user authentication
 
 This ensures users are automatically created and can immediately authenticate using their corporate credentials.
+
+:::info Sign-in records for SCIM users
+
+Every account SCIM creates gets a sign-in record with a random password that nobody knows, so the user signs in through SSO. An admin can give the user a password as well by editing the user under **Admin Panel > Users**. When SCIM changes a user's email, the sign-in email changes with it.
+
+Before v0.12.1, SCIM created accounts without a sign-in record. v0.12.0 started checking that record on SSO sign-in, so SCIM users got `401` `Invalid authentication request.` when they signed in. Updating to v0.12.1 fixes this for existing accounts too: a database migration adds the missing record on startup, with an empty password that never matches, and the users sign in through SSO again with nothing to change on the identity provider. Back up before updating, see [Before You Update](/getting-started/updating#before-you-update).
+
+:::
 
 For SSO configuration, see the [SSO documentation](https://docs.openwebui.com/features/authentication-access/auth/sso/).

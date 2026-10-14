@@ -194,6 +194,7 @@ Things to know about the auth table:
 - Uses UUID for primary key
 - One-to-One relationship with the `user` table (shared id)
 - `mfa` and `session_stamp` were added by migration `a7d3e9f2b641`. Rows that existed before it start with both empty, and sessions issued before the upgrade stay valid until the account is first signed out everywhere.
+- Migration `0bd252b206fb` (v0.12.1) adds a row for every user that has none, with an empty `password` that never matches. Before v0.12.1, SCIM was the only way an account got created without a row. The migration changes data only, and its downgrade leaves the added rows in place.
 
 ## Channel Table
 

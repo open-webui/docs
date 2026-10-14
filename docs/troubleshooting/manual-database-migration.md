@@ -342,6 +342,8 @@ Downgrading can cause **permanent data loss** if the migration removed columns o
 
 Downgrading past the [Apps](/features/channels/apps) migration (`c92da83b017f`) stops with `Export/remove app messages before downgrading apps` while any message posted by an app exists. Once those messages are gone it removes the app table and every app channel membership.
 
+Downgrading past the migration that adds sign-in records for [SCIM](/features/authentication-access/auth/scim#integration-with-sso) users (`0bd252b206fb`) keeps the records it added, since those accounts may have gained a password or two-factor sign-in after the upgrade.
+
 ```bash title="Terminal - Downgrade Migrations"
 # Downgrade one version
 alembic downgrade -1
