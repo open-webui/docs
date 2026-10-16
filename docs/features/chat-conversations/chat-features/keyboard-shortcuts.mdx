@@ -21,7 +21,7 @@ Nothing locks you out: the **Settings > Keyboard** tab keeps working while short
 
 ## Configurable Shortcuts
 
-These twenty can be rebound:
+These twenty-one can be rebound:
 
 | Action | Default |
 |---|---|
@@ -39,6 +39,7 @@ These twenty can be rebound:
 | Toggle Controls | *(unassigned)* |
 | Close modal | `Escape` |
 | Focus input | `Shift+Escape` |
+| Clear Input Selections | `Escape` |
 | Generate message pair | `Cmd+Shift+Enter` |
 | Regenerate response | `Cmd+R` |
 | Allow tool call | `Cmd+Alt+Enter` |
@@ -47,6 +48,8 @@ These twenty can be rebound:
 | Copy last response | `Cmd+Shift+C` |
 
 **Generate message pair** adds the text in the chat input as your message, with a placeholder reply for each selected model that you can then edit by hand.
+
+**Clear Input Selections** resets the chat input's choices: it removes the model override, deselects tools and filters, and turns off web search, image generation and code interpreter. It only fires while the chat input has focus.
 
 Anything not listed here is fixed and cannot be reassigned.
 

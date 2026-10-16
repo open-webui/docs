@@ -28,7 +28,7 @@ These settings decide the starting values of the options users see. To change th
 
 An on/off option someone has never touched shows a small **Default** label beside its switch in **Settings > Interface**. The options that are not switches carry no label, but they inherit the same way.
 
-Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option.
+Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option. Saving the **Interface** page keeps them inherited, **Font Family** and the **Image Compression** size included.
 
 :::info Matching the default releases the option
 Moving a control to whatever your default currently is releases the override: the **Default** label comes back and the option follows your defaults again. That is how someone undoes a choice they made earlier.
