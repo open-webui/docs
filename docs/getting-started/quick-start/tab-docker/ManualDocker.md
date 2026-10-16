@@ -20,7 +20,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 |-----|----------|
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
-| `:slim`, `:main-slim` | About **196 MB instead of 1.62 GB** to download, **88% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
+| `:slim`, `:main-slim` | About **197 MB instead of 1.62 GB** to download, **88% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
 | `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
@@ -29,17 +29,40 @@ Each variant also has a development build: `:dev-slim`, `:dev-cuda`, `:dev-cuda1
 
 ### Why choose slim? {#what-slim-leaves-out}
 
-**196 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
+**197 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
 
-These are compressed download sizes for Linux/amd64, checked on October 10, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
+These are compressed download sizes for Linux/amd64, checked on October 16, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
 
-<!-- Verified from GHCR manifest layer sizes of the dev images for 0.12.0 on October 10, 2026. dev linux/amd64: sha256:712cd1bd52793dc05c8db263f00852762926c1e82b00fe1fefe664131daa2c24 = 1,618,082,089 bytes; dev-slim linux/amd64: sha256:ef83eab7be31de1e59c8080c66e02f47c4f6ab4b7890c908a5b55e4ece74b15c = 195,786,928 bytes. slim and main-slim are two tags for the same image. -->
+<!-- Verified from GHCR manifest layer sizes on October 16, 2026. main linux/amd64: sha256:d90e4762f94cae56e74d329a176f0dc76c6460ee7cb01ad6e4b91a503aa70d66 = 1,620,712,040 bytes; slim linux/amd64: sha256:c5645947013018ed78b0740ccdb29a01a673dbfd815ac168c641d9a80427ca9f = 197,296,335 bytes. -->
 
 The saving comes from leaving out the bundled machine-learning stack, including PyTorch, local embedding and speech runtimes, plus document-processing tools and optional database and storage clients. If you use Open WebUI to chat with models through an API, those dependencies would otherwise sit unused in your container.
 
 **To get started, change `:main` to `:slim` in the Docker command above.** The default SQLite database and local file storage work as usual. Connect your model provider and start chatting; no extra services are needed for a basic chat setup.
 
 For knowledge search, document extraction or voice, slim connects to services that do that work. It is a good fit if you already use those services or only need chat. Choose the standard image if you want Open WebUI to handle embeddings, speech recognition and document extraction inside its own container. The table below covers the setup for each feature.
+
+#### RAM usage {#slim-memory-usage}
+
+Slim used **about 300 MiB of RAM at idle** in our October 16, 2026 test of Open WebUI 0.12.3 on Linux/arm64 in Docker Desktop. This is the Open WebUI container alone; your browser, Docker's VM and any model server or external services need their own memory. Allow extra memory for startup and active workloads: this idle measurement is not a minimum RAM requirement or a container memory limit.
+
+<details>
+<summary>How we measured</summary>
+
+We ran three fresh containers with the default SQLite database and one Uvicorn worker, with no configured provider, users, chats, uploads or plugins. Each run used a new data directory and no memory limit. Docker's Linux VM had 16 CPUs and 7.65 GiB RAM available; other containers remained running.
+
+After `/health` returned HTTP 200, we waited 30 seconds, then took 12 readings with five seconds between calls:
+
+```bash
+docker stats --no-stream --format '{{.MemUsage}}' <container-name>
+```
+
+Across all 36 samples, memory usage ranged from **291.8 to 292.6 MiB**, with a median of **292.2 MiB**.
+
+On Linux, [Docker's reported memory usage](https://docs.docker.com/reference/cli/docker/container/stats/) excludes inactive file cache. These samples cover an idle instance, not model inference or concurrent chat traffic. Results vary with version, architecture, configuration and workload.
+
+The pinned image was `ghcr.io/open-webui/open-webui@sha256:abd02d41e522d41be389d28d1a73752cd2afc4aa46f980b60d490ecc9379c16b` (Linux/arm64, commit `91ea4e3421d1d8069f13d4a463fcb5986d94ea60`). [Download the measurements and environment details](/benchmarks/slim-memory-2026-10-16.json).
+
+</details>
 
 #### Moving an existing deployment to slim
 

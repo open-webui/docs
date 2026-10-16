@@ -43,7 +43,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
 
 :::tip Pick the right image
-Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a smaller download: **196 MB instead of 1.62 GB (88% smaller)**. It relies on external services for those features. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
+Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a **lean, memory-efficient, scalable** deployment: **197 MB to download** (88% smaller) and **about 300 MiB of RAM at idle** in our [test](/getting-started/quick-start#slim-memory-usage). You get the same chat experience with **minimal overhead** and a **small footprint**, with external services handling embeddings, document extraction and voice. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
 :::
 
 Then open [http://localhost:3000](http://localhost:3000).
