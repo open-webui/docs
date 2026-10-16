@@ -27,6 +27,17 @@ A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/ope
 
 The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
 
+:::tip Reading your plugin's own id
+Before v0.12.0, the module was named just `function_{id}` (or `tool_{id}`), so a plugin could take its own id from `__name__`. That now returns the id with the 32 hex characters attached. Inside a handler, read the [`__id__`](./reserved-args.mdx#__id__) argument instead (Pipes do not receive it). Code that runs at module load, before any handler is called, can strip the prefix and suffix, which works on both the old and the new names:
+
+```python
+import re
+
+PLUGIN_ID = re.sub(r"^(?:function|tool)_|_[0-9a-f]{32}$", "", __name__)
+```
+
+:::
+
 ### When the module is re-executed
 
 Inlet/outlet hooks pass `load_from_db=True`. The loader still serves from cache if the source has not changed, but it consults the database on every call to decide that. Stream hooks pass `load_from_db=False` and read straight from cache.
