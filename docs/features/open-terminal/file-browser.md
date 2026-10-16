@@ -104,7 +104,7 @@ Uploading is switched off in a folder marked **Read-only**, and dropping files o
 
 ### From the chat input
 
-Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the folder open in the file browser and show up here like anything else, and the model opens them with the terminal's tools rather than reading extracted text. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the folder open in the file browser and show up here like anything else. The model opens them with the terminal's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 ---
 
