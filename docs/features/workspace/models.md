@@ -54,7 +54,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | 🏷️ **Dynamic variables** | `{{USER_NAME}}`, `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}` injected automatically |
 | 🔧 **Bound tools** | Force-enable specific tools per model |
 | 📚 **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
-| 🎭 **Skills** | Bind markdown instruction sets loaded on-demand via `view_skill` |
+| 🎭 **Skills** | Bind markdown instruction sets that every new chat starts with selected |
 | 👥 **Access control** | Restrict to specific users or groups |
 | 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
 | 🎚️ **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
@@ -70,7 +70,7 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 
 ### Editor layout
 
-The editor opens on a banner header: the background image fills the banner, with the model's picture, name and ID set over its lower edge. Below it come the description, the base model, the tags and the system prompt. A saved system prompt opens folded to a short preview; click it or **Show more** to edit it. **Compare revision** beside the system prompt opens it next to an empty **Proposed revision** pane. Paste the revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the system prompt, so drop a change you do not want with **Proposed revision →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the model afterwards.
+The editor opens on a banner header: the background image fills the banner, with the model's picture, name and ID set over its lower edge. Below it come the description, the base model, the tags and the system prompt. A saved system prompt opens folded to a short preview; click it or **Show more** to edit it. **Compare revision** beside the system prompt opens it next to an empty **Proposed revision** pane. Paste the revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the system prompt, so drop a change you do not want with **Original →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the model afterwards.
 
 Everything else sits in rows, one per setting. Each row shows a short summary of what is set, such as **Default**, **3 modified**, **Custom · 4** or **Vision, File Upload, Web Search +2**, and opens when you click it. Hover a setting's name to see what it does.
 
@@ -141,7 +141,7 @@ Bind resources in the picker rows:
 | :--- | :--- |
 | **Knowledge** | Bind collections or files. **Upload Files** in the picker adds files straight from your computer. Click an attached item to choose between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
 | **Tools** | Force-enable specific tools (e.g., Calculator for a Math Bot) |
-| **Skills** | Bind [Skills](/features/workspace/skills) so their manifests are always injected |
+| **Skills** | Bind [Skills](/features/workspace/skills). Every new chat with the model starts with them selected, and selected skills send their full instructions with each message. See [Model-attached skills](/features/workspace/skills#model-attached-skills) |
 | **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
 | **Actions** | Attach action scripts (e.g., "Add to Memories"). The row appears once the instance has at least one action function |
 
@@ -323,6 +323,8 @@ These cover chat completions. Background task requests (titles, tags, follow-ups
 | **Custom parameters** | Key-by-key merge | Global adds `service_tier`, model adds `tools` > model gets both, and the model's value wins on a shared name |
 
 Custom parameters are the ones added with **Add Custom Parameter**, stored under `custom_params`. They are the only group merged entry by entry, so a model that defines one of its own keeps the global ones alongside it.
+
+**Default Features** and **Builtin Tools** work as a whole row. Once a model saves its own choice in either row, that choice replaces the global row. A model can switch off any default feature that **Model Defaults** turns on, and a built-in tool that **Model Defaults** turns off stays on for a model that turns it on.
 
 :::info A request that sets a parameter keeps its own value
 Both layers only fill in what the request left out. A parameter sent in the body of a [chat completions](/reference/api-endpoints#-chat-completions) request survives, so an integration that sends its own `temperature` or `max_tokens` gets the value it asked for rather than the model's saved one. The exception is **Stream Chat Response**, which still decides whether the reply streams no matter what the request asked for.

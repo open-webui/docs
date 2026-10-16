@@ -53,7 +53,7 @@ As soon as you set a single parameter, the built-in 1000-token limit on titles a
 
 Five of the controls in the panel have no effect on background requests: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Setting them here changes nothing.
 
-Background requests also receive the task model's own per-model parameters from its model editor, with `TASK_MODEL_PARAMS` winning on conflicting keys. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
+Background requests also receive the task model's own per-model parameters from its model editor, with `TASK_MODEL_PARAMS` winning on conflicting keys. On an Ollama connection, `keep_alive`, `format` and `think` are the exception: a value set in the task model's editor wins over the same key in `TASK_MODEL_PARAMS`. A user's per-chat and per-account [chat parameters](/features/chat-conversations/chat-features/chat-params) never reach them, and neither do the global [model defaults](/features/workspace/models#global-model-defaults-admin).
 
 ---
 

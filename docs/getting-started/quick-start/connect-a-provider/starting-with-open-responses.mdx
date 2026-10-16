@@ -73,6 +73,8 @@ To turn on native web search for a model:
    - **Value**: `[{"type": "web_search"}]`
 4. Save the model.
 
+The model keeps Open WebUI's own tools. Notes, knowledge, tasks, tools attached to the model and the context of attached files all keep working, and the custom `tools` are sent alongside them.
+
 When you chat with that model, the provider performs web searches server-side, and Open WebUI streams:
 
 - A **"Web Search"** status block showing the queries the model ran.

@@ -217,7 +217,7 @@ Turn it off and Markdown characters stay as characters, a pasted URL stays text 
 
 * Navigate to `/notes/new` to create a note titled with today's date
 * Add [query parameters](/features/chat-conversations/chat-features/url-params#12-new-note): `/notes/new?title=My%20Title&content=Initial%20text`
-* Create from global search (`Cmd+K` / `Ctrl+K`) by selecting "Create a new note", which uses the search text as the note's content
+* Create from the [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) (`Cmd+K` / `Ctrl+K`): open its **Actions** menu (`Cmd+K` / `Ctrl+K` again) and select **Create a new note**, which uses the search text as the note's content
 * Import `.md` files by dragging them onto the Notes list
 
 The first three open a **Create a new note** dialog showing the title and content, and the note is created once you confirm.
@@ -225,6 +225,8 @@ The first three open a **Create a new note** dialog showing the title and conten
 ### View options
 
 Toggle between **Created by you** and **Shared with you** filters, and switch between **List** and **Grid** layouts.
+
+The [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) also finds your notes and the notes shared with you, by title and content. Opening a result selects the first match in the note.
 
 ### Quick delete
 

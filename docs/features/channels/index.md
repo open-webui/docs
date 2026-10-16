@@ -57,6 +57,7 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 | 🔒 **Access control** | Public, private, group-based, and direct message channels |
 | 🧠 **AI channel awareness** | Models can search and synthesize across channels autonomously |
 | 🧩 **[Apps](/features/channels/apps)** | External services join channels, answer `@mentions` and post messages with buttons |
+| 🔐 **[Encrypted chats](/features/channels/encrypted-chats)** | Temporary end-to-end encrypted conversations in direct messages and private groups, never saved on the server |
 
 ---
 
@@ -133,6 +134,10 @@ External services can also join a channel as [Apps](/features/channels/apps). An
 A direct message is a conversation between you and the people you pick, and there is one of them per set of participants. Start one from the **Message** button on someone's profile card in a channel, or from **(+)** in the sidebar's **Channels** section with **Channel Type** set to **Direct Message**. Messaging someone you have messaged before reopens the conversation you already have with them, with its history, instead of adding a second one beside it. A name is optional on a direct message; without one it is listed under the names of the other participants.
 
 Membership is measured against the accounts that still exist. When someone's account is deleted, they stop counting towards the conversation: they are gone from the member list and from the member count next to the people icon in the header, and the participants who remain still land back in that same conversation when they message each other again. Group channels count their members the same way. Nothing merges two conversations that already exist for the same set of people, so where a duplicate was created it stays in the sidebar alongside the original, with the messages that were sent in it.
+
+### Encrypted chats
+
+In a direct message or a private group channel, members with the **Encrypted Channels** permission can start a temporary [encrypted chat](/features/channels/encrypted-chats) from the conversation's **...** menu with **Encrypted Chat**. Messages are end-to-end encrypted in the browser and never stored on the server. An administrator turns this on in **Settings > Admin > General** (**Encrypted channels**) and grants the permission, which is off by default.
 
 ---
 

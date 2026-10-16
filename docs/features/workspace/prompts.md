@@ -43,7 +43,7 @@ Every content change creates a new version. Browse the history, preview a versio
 
 ### Controlled sharing
 
-Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away.
+Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away. Saving a prompt with write access keeps the sharing it already has, including a **Public** setting you do not have permission to set yourself.
 
 ---
 
@@ -74,7 +74,7 @@ Navigate to **Workspace > Prompts** and click **Create** in the Workspace header
 | **Prompt Content** | The actual text sent to the model, with variables |
 | **Commit Message** | Optional description of changes for version tracking |
 
-**Compare revision**, above the prompt content, opens the content next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the editor, so drop a change you do not want with **Proposed revision →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the prompt afterwards.
+**Compare revision**, above the prompt content, opens the content next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the editor, so drop a change you do not want with **Original →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the prompt afterwards.
 
 Use clear variable names (`{{your_name}}` not `{{var1}}`), add descriptive `placeholder` text, provide `default` values where sensible, and mark only truly essential fields as `:required`. Public prompts appear in every user's `/` suggestions, so be selective about what you make public. Use the enable/disable toggle to shelve prompts you're not actively using.
 

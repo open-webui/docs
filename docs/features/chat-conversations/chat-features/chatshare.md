@@ -99,7 +99,11 @@ In a chat with replies allowed:
 
 - In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
 - A line above the message input shows who is typing.
-- Each person regenerates, continues and stops only the replies to their own messages. Only the owner can edit messages and rate replies, and only on their own messages and the replies to them. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
+- The chat's top bar shows the other people who have the chat open right now, up to three profile pictures followed by a count such as **+2**. Click the count for the **Collaborators** list, and hover or click a picture to open that person's profile card.
+- Anyone who can write into the chat and has the **Allow Regenerate Response** permission can **Regenerate** any reply. The new version belongs to the person who generated it. Each person continues, stops and rates only the reply versions they generated.
+- Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt. The editor offers **Send**, which adds the edited prompt as a new branch with a new reply and leaves the original as it was. Other people in the chat stay on the branch they had selected.
+- Only the owner can edit replies and save an edit in place, and only on their own messages and the reply versions they generated. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
+- **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version. An admin who is not the owner sees it on the versions they generated when [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) is on.
 - Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
 
@@ -128,6 +132,8 @@ You can copy a chat that belongs to someone else into your own chats whenever yo
 - **Fork chat**, the action under each finished reply, copies the conversation from the start up to that reply into a new chat titled `<original title> (fork)`.
 
 Both need you to be signed in and to have the [**Allow Chat Import**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission (admins always have it). A fork made from a share link holds only what the link shows, so messages added to the original after the link was last updated stay out of it. A fork of someone else's chat goes into your own chats outside any folder and leaves out the owner's pin, tags, chat settings and chat variables.
+
+In the copy, the original owner's prompts and replies become yours, so you can edit them and use **Regenerate** and **Continue Response** on them like in any chat of your own. Messages that other people wrote into a chat with replies allowed keep their authors.
 
 #### Using a Shared Chat as Context
 

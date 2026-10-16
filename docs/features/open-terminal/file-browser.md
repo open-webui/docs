@@ -50,6 +50,9 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
+### Excel workbooks (XLSX, XLS)
+`.xlsx` and `.xls` files open as a table, one sheet at a time. A workbook with several sheets shows a picker to switch between them.
+
 ### Word documents (DOCX)
 `.docx` files are laid out by the terminal itself, using the same engine an office suite uses, and the preview shows the finished document. What you see is what the file prints: real pagination, headers, footers, footnotes and endnotes, embedded images, fonts and spacing.
 
@@ -65,9 +68,14 @@ A numbered **thumbnail strip** of the slides runs down the left side; click a th
 Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. Open the file in its own application when the exact rendering matters.
 
 ### Markdown
-Markdown files show a **rendered preview** (with formatted headings, links, bold text) and a toggle to switch to raw source.
+Markdown files show a **rendered preview** and a toggle to switch to raw source. The preview uses the same renderer as chat replies, so math, footnotes, highlighted code blocks, alerts and Mermaid diagrams all display. Images with a relative path load from the terminal, and a link to another file on the terminal opens that file in the browser.
+
+HTML blocks mixed into the Markdown render together with it, so `<details>` sections and wrappers like `<div align="center">` show their Markdown content formatted. In a file you can edit, the checkboxes of a task list (`- [ ]`) can be ticked in the preview, and the change is saved to the file right away. In a read-only file they stay locked.
 
 ![Rendered markdown with headings, lists, and formatted text](/images/open-terminal-preview-markdown.png)
+
+### Comments in documents
+Word, Excel, PowerPoint and PDF previews show the comments stored in the file, with their replies, anchored where they sit in the document. Hover over a marker to read the thread, or tap it on a touch screen. Comments that have no place in the preview are collected behind a counter in the corner. If the comments cannot be read, the preview says **"Could not read comments. Download the original file to review them."**
 
 ### Images
 Images display inline at a comfortable size.
@@ -98,7 +106,7 @@ Uploading is switched off in a folder marked **Read-only**, and dropping files o
 
 ### From the chat input
 
-Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the current working directory and show up here like anything else, and the model opens them with the terminal's tools rather than reading extracted text. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the folder open in the file browser and show up here like anything else. The model opens them with the terminal's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 ---
 
@@ -106,7 +114,7 @@ Files attached in the chat input normally go to Open WebUI, where their text is 
 
 Select two files, with the checkboxes or `Ctrl`-click, and pick **Compare**. You can also pick **Select for Compare** in one file's menu and then **Compare with Selected** in the other's. The two are shown side by side with the differences marked.
 
-Text files open in a read-only compare view: step through the changes with the arrows, **Swap sides** switches which file is on the left and **Refresh** reads both files again. This view takes UTF-8 text files up to 2 MiB each.
+Text files open in a read-only compare view: step through the changes with the arrows, **Swap sides** switches which file is on the left and **Refresh** reads both files again. The **Comparison options** menu (**...**) has **Ignore whitespace**, **Ignore emphasis markers**, which skips changes that only add or remove `*` and `_`, and **Only show changes**, which folds long runs of unchanged lines. Changed lines are lined up by their matching text. This view takes UTF-8 text files up to 2 MiB each.
 
 Documents (PDF, Word, Excel, PowerPoint, OpenDocument and RTF files) are compared by the **text** extracted from them, so a Word file against a PDF, or yesterday's spreadsheet against today's, are all fair game.
 
@@ -157,6 +165,16 @@ Click the **edit icon** on any text file to open it in an editor. Make your chan
 ![Editing a file directly in the file browser](/images/open-terminal-preview-code.png)
 
 Files marked **Read-only** cannot be edited, so the edit and save buttons stay greyed out for them.
+
+If you leave a file with unsaved edits, for example by opening another file or folder, you are asked to **Save** or **Discard changes** first.
+
+---
+
+## Asking about a selection
+
+Select text in an open file and an **Ask or edit…** box appears next to it. Type a question or an instruction and press `Enter`. The request goes into the chat with the file attached and the selected text quoted, along with its page or sheet where there is one. The model works on the file in the same terminal, so it can answer about it or change it.
+
+You can select up to 16 KiB of text at once. If the file has unsaved edits, you are asked to **Save and send** first. A request sent while a reply is still running waits in the chat's queue and goes out when the reply finishes.
 
 ---
 

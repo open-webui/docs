@@ -256,6 +256,8 @@ client-output-buffer-limit normal 0 0 0 replica 268435456 67108864 60 pubsub 107
 
 This sets the Pub/Sub hard limit to 1 GB and the soft limit to 256 MB for 180 seconds. Tune these values for your available Redis memory and expected websocket payload size. Higher limits make Redis more tolerant of temporary slow subscribers, but they also allow each slow Pub/Sub client to buffer more memory before Redis disconnects it.
 
+With [per-room Redis channels](../../getting-started/advanced-topics/scaling.md#per-room-redis-channels) on (the default), Redis sends each instance only the updates for people connected to it, which keeps these buffers smaller in multi-instance setups. The room channels show up in the slow log as `PUBLISH socketio#...`.
+
 If you changed Redis configuration at runtime, verify the active value:
 
 ```bash
@@ -661,7 +663,7 @@ REDIS_URL="redis://redis:6379/0"
    - `WEBSOCKET_REDIS_URL="redis://redis:6379/1"`
 2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.` (logged at DEBUG level, so it appears only with `GLOBAL_LOG_LEVEL=DEBUG`)
 3. Verify Redis is accessible from Open WebUI container
-4. If your Redis user is restricted by ACLs, check the log for `Redis denied publishing` or `Redis denied subscribing`. Either means the user is missing a command or channel permission; see [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) for the commands and channel patterns it needs.
+4. If your Redis user is restricted by ACLs, check the log for `Redis denied publishing` or `Redis denied subscribing`. Either means the user is missing a command or channel permission, and the log line names the permissions and channels to check. With `WEBSOCKET_REDIS_ROOM_CHANNELS` on (the default), the user needs `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING`, plus access to the channels `&socketio` and `&socketio#*`. See [Per-Room Redis Channels](../../getting-started/advanced-topics/scaling.md#per-room-redis-channels).
 
 #### Issue: "Multiple Open WebUI instances interfering with each other"
 
