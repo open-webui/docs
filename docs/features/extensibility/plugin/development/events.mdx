@@ -202,6 +202,10 @@ When `hidden` is `true`, the status is saved to `statusHistory` but **not shown*
 
 Additionally, when the message has no content yet and the last status has `hidden: true` (or no status exists at all), the frontend shows a pulsing typing cursor in place of the status bar, so hidden statuses don't replace the indicator that something is still running. A visible status suppresses that cursor while the message is still empty; once the first content arrives the cursor trails the text until the message is marked done, whether a status is on screen or not.
 
+#### Long Status Text
+
+The status line above a reply is cut to one line. Users click it to read the full text. When a message has several statuses, the click opens the status history, which shows every entry in full. Longer summaries, such as token usage reports, stay readable this way, also when several models answer side by side.
+
 ---
 
 ### `chat:message:delta` or `message`

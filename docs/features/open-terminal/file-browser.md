@@ -70,6 +70,8 @@ Where the terminal cannot render the deck, the browser draws an approximation of
 ### Markdown
 Markdown files show a **rendered preview** and a toggle to switch to raw source. The preview uses the same renderer as chat replies, so math, footnotes, highlighted code blocks, alerts and Mermaid diagrams all display. Images with a relative path load from the terminal, and a link to another file on the terminal opens that file in the browser.
 
+HTML blocks mixed into the Markdown render together with it, so `<details>` sections and wrappers like `<div align="center">` show their Markdown content formatted. In a file you can edit, the checkboxes of a task list (`- [ ]`) can be ticked in the preview, and the change is saved to the file right away. In a read-only file they stay locked.
+
 ![Rendered markdown with headings, lists, and formatted text](/images/open-terminal-preview-markdown.png)
 
 ### Comments in documents

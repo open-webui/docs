@@ -168,6 +168,8 @@ Field by field:
 
 :::danger Do not send your own `tools` array
 If the request body contains a `tools` key, Open WebUI skips all server-side tool resolution and forwards your definitions to the model verbatim. Sending `"tools": []` is the documented way to opt out of built-in injection entirely.
+
+A `tools` custom parameter set on the model (**Add Custom Parameter** in the model editor) works differently. Open WebUI still resolves its own tools and sends the model's custom tools alongside them.
 :::
 
 ### A3. Wait for it to finish

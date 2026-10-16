@@ -376,6 +376,20 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables the Automations feature globally. When disabled, the scheduler skips automation processing, the automation API endpoints return `403 Forbidden`, automation builtin tools are not injected, and the Automations entry is hidden from the sidebar. Requires the `features.automations` user permission (admins always pass).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `SKILL_CONTENT_MAX_CHARS`
+
+- Type: `int`
+- Default: empty, which uses `20000`
+- Description: The most characters of a skill's text the model gets in one read. It applies to the skill instructions injected into the prompt, to `view_skill` and to each `read_skill_file` call. A `SKILL.md` longer than this is sent as a preview of `SKILL_PREVIEW_MAX_CHARS` characters, and the model reads on from there. Applies while the model has the skill tools (built-in tools active and the **Skills** category on). Without them the first 100,000 characters are injected. Must be a positive integer, or Open WebUI stops at startup. For `0` or a negative number the error is `SKILL_CONTENT_MAX_CHARS must be a positive integer or unset`. See [Skills](/features/workspace/skills).
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Read Limit**. Leave the field empty to use the default.
+
+#### `SKILL_PREVIEW_MAX_CHARS`
+
+- Type: `int`
+- Default: empty, which uses `5000`
+- Description: How many characters of a skill's instructions the model gets when the `SKILL.md` is longer than `SKILL_CONTENT_MAX_CHARS`. With the preview the model gets the skill ID and the `next_offset` where the text continues, so it reads the rest with `read_skill_file`. A value above `SKILL_CONTENT_MAX_CHARS` is capped at that limit. Must be a positive integer, or Open WebUI stops at startup. For `0` or a negative number the error is `SKILL_PREVIEW_MAX_CHARS must be a positive integer or unset`.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Preview Length**. Leave the field empty to use the default.
+
 #### `AUTOMATION_MAX_COUNT`
 
 - Type: `int`
@@ -1099,8 +1113,8 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 #### `USER_AGENT`
 
 - Type: `str`
-- Default: `""` (unset). The default web loader then sends `DefaultLangchainUserAgent`, and the **Attach Webpage** check sends the HTTP library default (`Python/3.x aiohttp/3.x`).
-- Description: Overrides the `User-Agent` header Open WebUI sends when the default web loader fetches pages for web search and the `fetch_url` tool, and on the first request **Attach Webpage** sends to check whether a URL is a page or a file. The default Python library UA is blocked by Cloudflare, Wikipedia and similar bot-detection layers, which shows up as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access.
+- Default: `""` (unset). Open WebUI then sends `DefaultLangchainUserAgent`.
+- Description: Overrides the `User-Agent` header Open WebUI sends when the default web loader fetches pages for web search and the `fetch_url` tool. The first request that checks whether a URL is a web page or a file (for **Attach Webpage** and the `fetch_url` tool) sends the same headers and follows the same SSL setting as the web loader, so a site answers it the same way. The default Python library UA is blocked by Cloudflare, Wikipedia and similar bot-detection layers, which shows up as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access.
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
 
@@ -8561,7 +8575,9 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 - Type: `int` (seconds)
 - Default: `3600`
-- Description: A safety net on the entries Redis holds while a response is streaming, which let a reconnecting browser pick a reply back up where it left off. An entry is deleted as soon as its response finishes, so this timeout is not the normal lifetime of one. It catches the entries whose cleanup never ran, a worker killed mid-stream or a process that died, which previously stayed in Redis forever and accumulated. Lower it to reclaim that memory sooner, raise it if a long-running response could legitimately outlive the default hour, or set `0` to keep orphaned entries indefinitely as before. Applies only when Redis is in use.
+- Description: A safety net on the entries Redis holds while a response is streaming, which let a reconnecting browser pick a reply back up where it left off. An entry is deleted as soon as its response finishes, so this timeout is not the normal lifetime of one. It catches the entries whose cleanup never ran, a worker killed mid-stream or a process that died, which previously stayed in Redis forever and accumulated. Lower it to reclaim that memory sooner, raise it if a response could legitimately go longer than the default hour without new output, or set `0` to keep orphaned entries indefinitely as before. Applies only when Redis is in use.
+
+  Each streaming reply has its own key, `{REDIS_KEY_PREFIX}:tasks:response_streams:<task_id>`. Open WebUI writes a full snapshot of the reply, appends each new piece of text to it and writes a fresh snapshot from time to time, so a long reply is never rewritten in full on every token. Every write restarts the timeout. During a rolling upgrade, replies started on instances still running an older version are read from the shared `{REDIS_KEY_PREFIX}:tasks:response_streams` hash those instances use.
 - Persistence: No
 
 #### `REDIS_TASK_TTL`
@@ -8742,7 +8758,7 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 
 **Every Instance Must Run the Same Mode**
 
-Changing this setting requires stopping or updating all instances together.
+Set the same value on every instance. Changing it needs a full restart of the whole fleet: stop all instances, then start them with the new value. During a rolling restart both modes run side by side, and instances with the setting off miss the live updates that instances with it on send.
 
 :::
 

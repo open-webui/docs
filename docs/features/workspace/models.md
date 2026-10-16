@@ -54,7 +54,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | 🏷️ **Dynamic variables** | `{{USER_NAME}}`, `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}` injected automatically |
 | 🔧 **Bound tools** | Force-enable specific tools per model |
 | 📚 **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
-| 🎭 **Skills** | Bind markdown instruction sets loaded on-demand via `view_skill` |
+| 🎭 **Skills** | Bind markdown instruction sets that every new chat starts with selected |
 | 👥 **Access control** | Restrict to specific users or groups |
 | 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
 | 🎚️ **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
@@ -141,7 +141,7 @@ Bind resources in the picker rows:
 | :--- | :--- |
 | **Knowledge** | Bind collections or files. **Upload Files** in the picker adds files straight from your computer. Click an attached item to choose between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
 | **Tools** | Force-enable specific tools (e.g., Calculator for a Math Bot) |
-| **Skills** | Bind [Skills](/features/workspace/skills) so their manifests are always injected |
+| **Skills** | Bind [Skills](/features/workspace/skills). Every new chat with the model starts with them selected, and selected skills send their full instructions with each message. See [Model-attached skills](/features/workspace/skills#model-attached-skills) |
 | **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
 | **Actions** | Attach action scripts (e.g., "Add to Memories"). The row appears once the instance has at least one action function |
 
