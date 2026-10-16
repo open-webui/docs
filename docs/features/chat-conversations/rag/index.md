@@ -89,7 +89,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 **To Fix This:** Navigate to **Settings > Admin > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
 :::
 
-For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. If it cannot, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. A link to a file, such as a PDF, is read with document extraction. If it cannot read the URL, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 :::tip
 
@@ -373,10 +373,10 @@ When paired with a Google Cloud project that has the Google Picker API and Googl
 ### Detailed Instructions
 
 1. Create an OAuth 2.0 client and configure both the Authorized JavaScript origins & Authorized redirect URI to be the URL (include the port if any) you use to access your Open-WebUI instance.
-2. Make a note of the Client ID associated with that OAuth client.
+2. Make a note of the Client ID associated with that OAuth client. Use it exactly as Google shows it, in the form `<project number>-....apps.googleusercontent.com`. The picker reads the Cloud project number from the leading digits of the Client ID.
 3. Make sure that you enable both Google Drive API and Google Picker API for your project.
-4. Also set your app (project) as Testing and add your Google Drive email to the User List
-5. Set the permission scope to include everything those APIs have to offer. And because the app would be in Testing mode, no verification is required by Google to allow the app from accessing the data of the limited test users.
+4. On the OAuth consent screen, set the app to In production, or keep it in Testing and add your users to the test user list.
+5. Add the `https://www.googleapis.com/auth/drive.file` scope. Open WebUI asks only for this scope, which grants access to the files each user picks. Google classes it as non-sensitive, so a self-hosted install needs no restricted-scope verification or security assessment, and users get no "Google hasn't verified this app" warning.
 6. Go to the Google Picker API page, and click on the create credentials button.
 7. Create an API key and under Application restrictions and choose Websites. Then add your Open-WebUI instance's URL, same as the Authorized JavaScript origins and Authorized redirect URIs settings in the step 1.
 8. Set up API restrictions on the API Key to only have access to Google Drive API & Google Picker API
@@ -385,3 +385,5 @@ When paired with a Google Cloud project that has the Google Picker API and Googl
 11. Set up the `GOOGLE_REDIRECT_URI` to my Open-WebUI instance's URL (include the port, if any).
 12. Then relaunch your Open-WebUI instance with those three environment variables.
 13. After that, make sure Google Drive was enabled under `Settings` > `Admin` > `Documents` > `Google Drive`
+
+The picker opens in list view, because the `drive.file` scope gives it no access to file thumbnails.

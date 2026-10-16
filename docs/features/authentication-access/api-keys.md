@@ -25,7 +25,7 @@ An API key acts as you. It inherits your role and group permissions, and those p
 
 ### Revocable and auditable
 
-A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission. Key creation and deletion are recorded as authentication events.
+A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission. Key creation and deletion are recorded as authentication events. With [audit logging](/getting-started/advanced-topics/hardening#audit-logging) on, requests made with a key appear in the audit log under the key's owner, whether the key arrives as a Bearer token or in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)).
 
 ---
 

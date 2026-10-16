@@ -21,6 +21,7 @@ Open WebUI's standard experience is designed for self-hosted control, auditabili
 | Production database storage exposure | Use PostgreSQL with encrypted volumes, provider encryption, TDE where available, TLS, and encrypted backups |
 | SQLite-only deployments | Put the data directory on an encrypted filesystem (LUKS, BitLocker, FileVault) |
 | Employees asking sensitive or personal questions | Use Temporary Chat, or force Temporary Chat for all users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` |
+| Users messaging each other about sensitive topics | Use [encrypted chats](/features/channels/encrypted-chats) in direct messages and private groups: end-to-end encrypted in the browser and never stored on the server |
 | Keep prompts inside your infrastructure | Use local or private model endpoints and restrict approved models by group |
 | Sensitive documents being uploaded or indexed | Keep file upload and knowledge permissions off by default; grant only by group |
 | Control server-side code execution | Keep Tools and Functions restricted to trusted admins |

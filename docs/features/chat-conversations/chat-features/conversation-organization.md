@@ -134,27 +134,30 @@ Link **knowledge bases and files** to your folder:
 
 Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
 
-Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Share** dialog only offers **Private** and has no way to add people. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
+Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Access** dialog only offers **Restricted** and has no way to add people. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
-1. Hover over a folder in the sidebar and open the **three-dot menu** (⋯).
-2. Select **Share**.
+1. Hover over a folder in the sidebar, open the **three-dot menu** (⋯) and select **Edit**.
+2. Click **Access** at the top of the **Edit Folder** dialog.
 3. Add the users or groups to share with. Each one starts on **Write**; switch it to **Read** in their row of the **Access List** where needed:
    - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it, and dragging a chat over it in the sidebar does not offer it as a drop target.
    - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
-4. Pick the **Sharing mode**, shown once at least one person or group has access:
+4. Pick the **Sharing mode**. You can set it before anyone has access, so the folder is ready when you add people:
    - **Clone only** (default): people you shared with read the folder's chats and clone one to continue it on their own.
-   - **Allow replies**: everyone with access to the folder, read or write, can send messages into the chats directly in it, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). Chats in a subfolder follow that subfolder's own sharing mode, which you set by sharing the subfolder itself; until then they open read-only.
+   - **Allow replies**: everyone with access to the folder, read or write, can send messages into the chats directly in it, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). Chats in a subfolder follow that subfolder's own sharing mode, which you set in the subfolder's own **Access** dialog; until then they open read-only.
 
-Each change applies as soon as you make it.
+Each change applies as soon as you make it. Saving other folder settings in the **Edit Folder** dialog leaves the sharing mode as it is.
 
-Only the folder's owner or an admin can change who a folder is shared with and its sharing mode. People with write access do not get the **Share** entry in the folder menu.
+The **Access** dialog of a subfolder notes that access granted to parent folders also applies there. With no grants of its own, its list reads **No direct access grants.**
+
+Only the folder's owner or an admin can change who a folder is shared with and its sharing mode. People with write access do not get the **Access** button in the **Edit Folder** dialog.
 
 The **Add Access** picker lists only the people and groups the folder is not already shared with, so you cannot add the same person twice and the list shrinks as you go. To move someone between **Read** and **Write**, or to drop them entirely, use their row in the **Access List** instead.
 
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
-- **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
+- **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. When someone has inherited **Write** on a subfolder and a direct **Read** grant on it too, **Write** applies. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
 - **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** panel. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
+- **Edit and regenerate together.** With **Allow replies** on, people with access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). The chat's top bar shows who else has it open right now.
 - **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**; click the count to see everyone. Hover or click a picture to open that person's profile card.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.

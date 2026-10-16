@@ -111,7 +111,7 @@ There's no limit: just ensure each server runs on its own port or address and is
 
 **A:** No. With Redis, Open WebUI caches the list of global tool servers. An empty cached list is only used while no OpenAPI tool server is enabled. If every enabled server was unreachable when the list was loaded, the next request that loads tools tries the servers again. The tools come back on their own once a server is reachable, with no restart, settings save or Redis key deletion.
 
-While an enabled server stays unreachable, each request that loads tools tries it again and can wait up to [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`](/reference/env-configuration#aiohttp_client_timeout_tool_server_data) seconds (10 by default) for it. Disable a server that will stay down for a while.
+While every enabled server stays unreachable, each request that loads tools tries them again and can wait up to [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`](/reference/env-configuration#aiohttp_client_timeout_tool_server_data) seconds (10 by default) for them. Disable a server that will stay down for a while.
 
 This covers the case where every enabled server was unreachable. When at least one server loaded, the cached list keeps the servers that loaded. A server that was down then comes back after a restart or after saving the tool server settings in **Settings → Admin → Integrations**.
 

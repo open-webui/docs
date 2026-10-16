@@ -78,12 +78,12 @@ Open the **+** menu in the chat input and choose **Skills** to toggle individual
 
 ### Model-attached skills
 
-Every new chat with a model starts with the model's skills selected in the **+** Integrations menu, as long as they are active and you can read them. Selected skills send their full instructions with each message, injected the same way as a `$` mention. Switch one off in the chat and it goes back to the manifest.
+Every new chat with a single model starts with the model's skills selected in the **+** Integrations menu, as long as they are active and you can read them. With several models selected, a new chat skips this pre-selection. Selected skills send their full instructions with each message, injected the same way as a `$` mention. Switch one off in the chat and it goes back to the manifest.
 
 Skills that are not selected use lazy loading:
 
 1. **Manifest injection** - Only the skill's name and description are added to the system prompt.
-2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. A long `SKILL.md` comes back as its first 5,000 characters and the offset where it continues, the same way a `$` mention injects it. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
+2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. A `SKILL.md` longer than the [read limit](#read-limits) comes back as its preview and the offset where it continues, the same way a `$` mention injects it. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
 
 This means many skills can be available to a model without consuming context window space until actually needed.
 

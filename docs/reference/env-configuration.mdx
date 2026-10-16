@@ -333,6 +333,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Enables or disables channel support.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_ENCRYPTED_CHANNELS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables temporary end-to-end [encrypted chats](/features/channels/encrypted-chats) in direct messages and private group channels. Messages are encrypted in the browser, and the server only relays them without storing them. Needs [`ENABLE_CHANNELS`](#enable_channels) on as well. Users also need the [`USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`](#user_permissions_features_encrypted_channels) and [`USER_PERMISSIONS_FEATURES_CHANNELS`](#user_permissions_features_channels) permissions; admins always qualify. Encrypted chats need a websocket connection (HTTP long polling is refused), [`WEBSOCKET_SERVER_LOGGING`](#websocket_server_logging) and [`WEBSOCKET_SERVER_ENGINEIO_LOGGING`](#websocket_server_engineio_logging) off and HTTPS when [`ENV`](#env) is `prod`. Can also be set in **Settings > Admin > General** (**Encrypted channels**), which appears once channels are enabled.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `ENABLE_APPS`
 
 - Type: `bool`
@@ -369,13 +376,6 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets the maximum number of files processing allowed per folder.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
-#### `ENABLE_AUTOMATIONS`
-
-- Type: `bool`
-- Default: `True`
-- Description: Enables or disables the Automations feature globally. When disabled, the scheduler skips automation processing, the automation API endpoints return `403 Forbidden`, automation builtin tools are not injected, and the Automations entry is hidden from the sidebar. Requires the `features.automations` user permission (admins always pass).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
 #### `SKILL_CONTENT_MAX_CHARS`
 
 - Type: `int`
@@ -389,6 +389,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: empty, which uses `5000`
 - Description: How many characters of a skill's instructions the model gets when the `SKILL.md` is longer than `SKILL_CONTENT_MAX_CHARS`. With the preview the model gets the skill ID and the `next_offset` where the text continues, so it reads the rest with `read_skill_file`. A value above `SKILL_CONTENT_MAX_CHARS` is capped at that limit. Must be a positive integer, or Open WebUI stops at startup. For `0` or a negative number the error is `SKILL_PREVIEW_MAX_CHARS must be a positive integer or unset`.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Preview Length**. Leave the field empty to use the default.
+
+#### `ENABLE_AUTOMATIONS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables the Automations feature globally. When disabled, the scheduler skips automation processing, the automation API endpoints return `403 Forbidden`, automation builtin tools are not injected, and the Automations entry is hidden from the sidebar. Requires the `features.automations` user permission (admins always pass).
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUTOMATION_MAX_COUNT`
 
@@ -1113,8 +1120,8 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 #### `USER_AGENT`
 
 - Type: `str`
-- Default: `""` (unset). Open WebUI then sends `DefaultLangchainUserAgent`.
-- Description: Overrides the `User-Agent` header Open WebUI sends when the default web loader fetches pages for web search and the `fetch_url` tool. The first request that checks whether a URL is a web page or a file (for **Attach Webpage** and the `fetch_url` tool) sends the same headers and follows the same SSL setting as the web loader, so a site answers it the same way. The default Python library UA is blocked by Cloudflare, Wikipedia and similar bot-detection layers, which shows up as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access.
+- Default: `""` (unset). The default web loader then sends `DefaultLangchainUserAgent`, and the **Attach Webpage** check sends the HTTP library default (`Python/3.x aiohttp/3.x`).
+- Description: Overrides the `User-Agent` header Open WebUI sends when the default web loader fetches pages for web search and the `fetch_url` tool, and on the first request **Attach Webpage** sends to check whether a URL is a page or a file. The `fetch_url` tool's own page-or-file check sends the same headers and follows the same SSL setting as the web loader, so a site answers it the same way. The default Python library UA is blocked by Cloudflare, Wikipedia and similar bot-detection layers, which shows up as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access.
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
 
@@ -2117,6 +2124,8 @@ This variable replaces the deprecated `API_KEY_ALLOWED_ENDPOINTS` environment va
 
 If none of the three is present, the request falls through as anonymous.
 
+The [audit log](#audit_log_level) records requests that carry a key in this header, logged under the key's owner. An attempt with an invalid key is logged without a user.
+
 :::tip Behind a proxy that eats `Authorization`?
 Many corporate gateways (basic auth, mutual TLS adapters, SSO sidecars) consume the `Authorization` header and never forward it upstream. In that case, point your clients at the custom header instead:
 
@@ -2380,7 +2389,7 @@ Custom headers are honored by OpenAI, Ollama and direct model connections, tool 
 
 - Type: `bool`
 - Default: `True`
-- Description: Bypass SSL Verification for RAG on Websites.
+- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
@@ -4883,14 +4892,14 @@ When enabling `ENABLE_GOOGLE_DRIVE_INTEGRATION`, ensure that you have configured
 #### `GOOGLE_DRIVE_CLIENT_ID`
 
 - Type: `str`
-- Description: Sets the client ID for Google Drive (client must be configured with Drive API and Picker API enabled).
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Description: Sets the OAuth client ID for Google Drive (client must be configured with Drive API and Picker API enabled). Use the client ID exactly as Google Cloud shows it, in the form `<project number>-<id>.apps.googleusercontent.com`. The file picker takes the project number from its leading digits and sends it to Google, which needs it to grant access to the picked files. The picker asks only for the `drive.file` scope, which covers the files the user picks.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `GOOGLE_DRIVE_API_KEY`
 
 - Type: `str`
 - Description: Sets the API key for Google Drive integration.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ### OneDrive
 
@@ -7028,7 +7037,7 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
   - `client_secret_post`: Sends the client ID and secret in the request body.
   - `none`: Sends the client ID only, for public clients that use PKCE (see [`OAUTH_CODE_CHALLENGE_METHOD`](#oauth_code_challenge_method)).
 - Default: Not set. The sign-in library then uses `client_secret_basic` when [`OAUTH_CLIENT_SECRET`](#oauth_client_secret) is set and `none` when it is not.
-- Description: Sets how Open WebUI authenticates to the OIDC provider's token endpoint when it exchanges the login code for tokens. Set it when the provider only accepts one method, for example `client_secret_post`. Applies to the generic [OIDC provider](/features/authentication-access/auth/sso#oidc) only. The sign-in client reads this variable once at startup, so set it in the environment and restart; a value saved through the admin API is not used.
+- Description: Sets how Open WebUI authenticates to the OIDC provider's token endpoint when it exchanges the login code for tokens and when it refreshes a user's OAuth token. With `client_secret_basic`, the refresh sends the client ID and secret in the Basic header, the same way as sign-in, and adds `client_id` to the request body only when [`OAUTH_ACCESS_TOKEN_REQUEST_INCLUDE_CLIENT_ID`](#oauth_access_token_request_include_client_id) is on. With any other value, or when unset, the refresh sends the client secret in the request body. Set it when the provider only accepts one method, for example `client_secret_post`. Applies to the generic [OIDC provider](/features/authentication-access/auth/sso#oidc) only. The sign-in client reads this variable once at startup, so set it in the environment and restart; a value saved through the admin API is not used.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `OAUTH_CODE_CHALLENGE_METHOD`
@@ -7184,7 +7193,7 @@ This is useful when you need a JWT access token for downstream validation or whe
 
 - Type: `bool`
 - Default: `False`
-- Description: If enabled, adds `client_id` to the token request that exchanges the authorization code. Some providers reject the exchange without it.
+- Description: If enabled, adds `client_id` to the token request that exchanges the authorization code, and to the token refresh when [`OAUTH_TOKEN_ENDPOINT_AUTH_METHOD`](#oauth_token_endpoint_auth_method) is `client_secret_basic`. Some providers reject the exchange without it.
 
 #### `OAUTH_AUTHORIZE_PARAMS`
 
@@ -7600,6 +7609,13 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 - Description: Gives non-admin users access to the whole [Channels](/features/channels) feature: listing, opening, creating and managing channels, reading and posting messages, reactions and pins, managing channel webhooks and receiving live channel messages. Channel automations a user created run only while they hold this permission. Admins always have access. Messages sent to a channel's incoming webhook URL are accepted whenever [`ENABLE_CHANNELS`](#enable_channels) is on, since that URL carries its own token.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets non-admin users start and join [encrypted chats](/features/channels/encrypted-chats) in the direct messages and private group channels they belong to. Takes effect only together with [`USER_PERMISSIONS_FEATURES_CHANNELS`](#user_permissions_features_channels) and with [`ENABLE_ENCRYPTED_CHANNELS`](#enable_encrypted_channels) on. Admins always have access.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`
 
 - Type: `bool`
@@ -7725,7 +7741,7 @@ These settings control whether the **Access Control** panel shows its access lis
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Share** dialog of chat folders, where users add specific users or groups. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
+- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Sharing (Public)
@@ -8752,7 +8768,7 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 - Type: `bool`
 - Default: `True`
 - Description: Takes effect when `WEBSOCKET_MANAGER=redis`. Live updates addressed to a specific user, channel or note are published on a Redis channel of their own, and each instance skips updates for rooms none of its connected clients have joined. This saves the CPU each instance would spend decoding every update, which adds up on multi-instance deployments. Acknowledgements and control messages stay on the shared channel. Set to `False` to send everything through the one shared channel. See [Per-Room Redis Channels](/getting-started/advanced-topics/scaling#per-room-redis-channels).
-- Redis permissions: room channels use the shared channel `socketio` plus room channels named `socketio#<namespace>#<room>`, subscribed to with the pattern `socketio#*`. A Redis user restricted by ACLs needs the `PUBLISH`, `SUBSCRIBE` and `PSUBSCRIBE` commands and the channel patterns `&socketio` and `&socketio#*`. When one is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
+- Redis permissions: room channels use the shared channel `socketio` plus room channels named `socketio#<namespace>#<room>`. Each instance subscribes only to the rooms its connected clients have joined, and unsubscribes from a room when its last local client leaves it. A Redis user restricted by ACLs needs the `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING` commands and access to the channels `&socketio` and `&socketio#*`. `PSUBSCRIBE` is unused. When one is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
 
 :::warning
 

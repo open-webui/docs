@@ -43,7 +43,7 @@ Every content change creates a new version. Browse the history, preview a versio
 
 ### Controlled sharing
 
-Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away.
+Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away. Saving a prompt with write access keeps the sharing it already has, including a **Public** setting you do not have permission to set yourself.
 
 ---
 
