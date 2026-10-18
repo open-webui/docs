@@ -224,7 +224,7 @@ With many MCP tools enabled, [Tool Search](/features/extensibility/plugin/tools#
 
 ### Structured Tool Results
 
-An MCP tool can return structured data (`structuredContent`) alongside its regular content. Open WebUI adds that data as JSON text to the tool result the model sees. When one of the tool's text results already holds the same JSON, the result goes to the model unchanged, so the data appears once. The same happens when the structured data is only a `result` field whose values match the text results one for one, which is how FastMCP returns plain values and lists.
+An MCP tool can return structured data (`structuredContent`) alongside its regular content. Open WebUI adds that data as JSON text to the tool result the model sees. When one of the tool's text results already holds the same JSON, the result goes to the model unchanged, so the data appears once. The same happens when the structured data is only a `result` field whose values match the text results one for one, which is how servers built with the official MCP Python SDK return plain values and lists.
 
 ### Server Instructions
 
