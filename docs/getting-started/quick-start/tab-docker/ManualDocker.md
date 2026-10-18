@@ -60,7 +60,7 @@ Across all 36 samples, memory usage ranged from **291.8 to 292.6 MiB**, with a m
 
 On Linux, [Docker's reported memory usage](https://docs.docker.com/reference/cli/docker/container/stats/) excludes inactive file cache. These samples cover an idle instance, not model inference or concurrent chat traffic. Results vary with version, architecture, configuration and workload.
 
-The pinned image was `ghcr.io/open-webui/open-webui@sha256:abd02d41e522d41be389d28d1a73752cd2afc4aa46f980b60d490ecc9379c16b` (Linux/arm64, commit `91ea4e3421d1d8069f13d4a463fcb5986d94ea60`). [Download the measurements and environment details](/benchmarks/slim-memory-2026-10-16.json).
+The pinned image was `ghcr.io/open-webui/open-webui@sha256:abd02d41e522d41be389d28d1a73752cd2afc4aa46f980b60d490ecc9379c16b` (Linux/arm64, commit `91ea4e3421d1d8069f13d4a463fcb5986d94ea60`).
 
 </details>
 
