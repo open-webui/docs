@@ -3078,6 +3078,12 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Default: `false`
 - Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
 
+:::tip Turn it on for new Milvus deployments
+
+For any new Milvus deployment, set this to `true` before the first start. Standard mode creates a separate collection for every uploaded file, knowledge base, user's memories and web search, so a busy instance keeps adding collections, slows down and eventually hits Milvus's limit on collections per instance (65,536 by default). Switching an existing instance later works but takes effort: you reindex, and files that are not in a knowledge base lose their vectors (see the migration notes below).
+
+:::
+
 :::info
 
 **Benefits of multitenancy mode:**
