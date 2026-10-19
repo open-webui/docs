@@ -36,7 +36,7 @@ Write guidelines in Markdown. No Python, no API calls, no deployment. If you can
 
 ### On-demand context loading
 
-With native function calling, the skills selected for the chat send their instructions with each message. Every other active skill the user can read is listed in a lightweight manifest (id, name, description). The model loads those instructions when it needs them via the `view_skill` tool, and reads or searches the skill's files with `read_skill_file` and `grep_skill_files`. In legacy mode every bound, toggled or mentioned skill is injected in full and there is no manifest.
+With native function calling, the skills selected for the chat send their instructions with each message, or, with [Load selected skills on demand](#loading-selected-skills-on-demand) turned on, are listed and loaded like the rest. Every other active skill the user can read is listed in a lightweight manifest (id, name, description). The model loads those instructions when it needs them via the `view_skill` tool, and reads or searches the skill's files with `read_skill_file` and `grep_skill_files`. In legacy mode every bound, toggled or mentioned skill is injected in full and there is no manifest.
 
 ### Reusable across models
 
@@ -74,11 +74,11 @@ Type `$` in the chat input to open the skill picker, or pick the skill from the 
 
 ### Per-chat skills (Integrations menu)
 
-Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message. Each selected skill sends its instructions with every message, injected the same way as a `$` mention, in both function calling modes. A skill you switch off stays in the manifest under native function calling, so the model can still load it.
+Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message. Each selected skill sends its instructions with every message, injected the same way as a `$` mention, in both function calling modes, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on. A skill you switch off stays in the manifest under native function calling, so the model can still load it.
 
 ### Model-attached skills
 
-Every new chat with a single model starts with the model's skills selected in the **+** Integrations menu, as long as they are active and you can read them. With several models selected, a new chat skips this pre-selection. Selected skills send their full instructions with each message, injected the same way as a `$` mention. Switch one off in the chat and it goes back to the manifest.
+Every new chat with a single model starts with the model's skills selected in the **+** Integrations menu, as long as they are active and you can read them. With several models selected, a new chat skips this pre-selection. Selected skills send their full instructions with each message, injected the same way as a `$` mention, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on. Switch one off in the chat and it goes back to the manifest.
 
 Skills that are not selected use lazy loading:
 
@@ -88,6 +88,14 @@ Skills that are not selected use lazy loading:
 This means many skills can be available to a model without consuming context window space until actually needed.
 
 The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected, mentioned or attached are injected, each with the first 100,000 characters of its `SKILL.md`. The model's own skills are always injected in this mode, even when you switch them off in the chat. The model cannot read the rest of a longer `SKILL.md` or the supporting files. Switching off a model's **Skills** category under **Builtin Tools** has the same effect: the model can no longer find and load skills by itself, and skills you select or attach are injected the same way. The switch also covers `read_skill_file`, `grep_skill_files`, `update_skill_files` and `create_skill`, so `/skills:create` needs it switched on.
+
+### Loading selected skills on demand
+
+**Load selected skills on demand** in **Admin Settings > General** (off by default, or [`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading)) saves context when chats carry many selected or attached skills. With it on, the skills selected for the chat, including the ones attached to the model, no longer send their instructions with every message. They are listed in the manifest by name and description like every other skill you can read, and the model loads them with `view_skill` when it needs them.
+
+- A skill mentioned with `$` in the message still has its instructions injected right away.
+- The setting applies while the model has the [skill tools](#skill-tools): native function calling, the **Builtin Tools** capability and the model's **Skills** category on. Without them, every selected, attached or mentioned skill is injected in full, whatever the setting says.
+- API requests that pass their own `tools` list are not affected.
 
 ### Skill tools
 

@@ -376,6 +376,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: Sets the maximum number of files processing allowed per folder.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
 
+#### `ENABLE_SKILL_LAZY_LOADING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Makes the skills selected for a chat, including the ones attached to the model, load on demand. Instead of sending their full instructions with every message, they are listed in the skill manifest by name and description like every other skill, and the model loads them with `view_skill` when it needs them. A skill mentioned with `$` in the message still has its instructions injected right away. Applies while the model has the skill tools (native function calling, built-in tools active and the **Skills** category on); without them every selected, attached or mentioned skill is injected in full, whatever this is set to. Requests that pass their own `tools` list are not affected. See [Skills](/features/workspace/skills#loading-selected-skills-on-demand).
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Load selected skills on demand**.
+
 #### `SKILL_CONTENT_MAX_CHARS`
 
 - Type: `int`
