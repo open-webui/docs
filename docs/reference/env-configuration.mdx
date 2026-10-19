@@ -3114,19 +3114,18 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
 - New data is written to the 5 shared multitenancy collections
 - Application treats knowledge bases as empty until reindexed
-- Memories, and files that are not in a knowledge base, are NOT automatically migrated to the new collection schema and will appear missing
+- Memories and files that are not in a knowledge base appear missing until you reindex; files outside knowledge bases stay missing after it
 
 **Clean migration path from normal Milvus to multitenancy milvus:**
 - Before enabling multitenancy, export any critical knowledge content from the UI if possible
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
-- Navigate to `Settings > Admin > Documents > Click Reindex Knowledge Base`
+- Navigate to `Settings > Admin > Documents` and click **Reindex** next to **Reindex Knowledge and Memory Vectors**
 
-**This rebuilds knowledge base vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
-**User memories, web search history and files that were never added to a knowledge base are NOT migrated by this operation**
+**This rebuilds knowledge base vectors and user memory vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
+**Web search history and files that were never added to a knowledge base are NOT migrated by this operation**
 
-**Verify knowledge bases are accessible and functional**
+**Verify knowledge bases and memories are accessible and functional**
 - Re-upload files that live outside any knowledge base if file-based retrieval for them is critical (file metadata remains but their vectors are not migrated)
-- User chat memories will need to be regenerated through new conversations
 
 **Cleaning up legacy collections:**
 After successful migration (from milvus to multitenancy milvus), legacy collections still consume resources. Remove them manually:
@@ -3145,7 +3144,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 **Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
-- Data loss risk: user memory vectors, and the vectors of files that are not in a knowledge base, are NOT migrated automatically. Reindexing migrates knowledge bases along with the per-file vectors of the files they contain.
+- Data loss risk: the vectors of files that are not in a knowledge base are NOT migrated. Reindexing migrates knowledge bases along with the per-file vectors of the files they contain, and user memories.
 - Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
 - No automatic rollback: Disabling multitenancy after data is written will not restore access to the shared collections. Data would need manual extraction and re-import.
 
@@ -3153,7 +3152,7 @@ For fresh installations, no migration concerns exist
 
 **For existing installations with valuable data:**
 - Do not migrate to multitenancy mode if you do not want to handle migration and risk data loss
-- Understand that memories, and files outside knowledge bases, require re-upload/regeneration
+- Understand that files outside knowledge bases require re-upload
 - Test migration on a backup/staging environment first
 - Consider if RAM savings justify the migration effort for your use case
 
@@ -3568,15 +3567,15 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 
 :::info
 
-This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to  `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledges.
+This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to `Admin Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` to migrate existing knowledge bases and memories.
 
 The Qdrant collections created in the previous pattern will still consume resources.
 
 Currently, there is no button in the UI to only reset the vector DB. If you want to migrate knowledge to multitenancy:
 - Remove all collections with the `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) using the native Qdrant client
-- Go to `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledge base
+- Go to `Admin Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` to migrate existing knowledge bases and memories
 
-`Reindex Knowledge Base` migrates knowledge bases and the per-file vectors of the files inside them. Files that were never added to a knowledge base, user memories and cached web search results stay in the old collections.
+`Reindex Knowledge and Memory Vectors` migrates knowledge bases, the per-file vectors of the files inside them and user memories. Files that were never added to a knowledge base and cached web search results stay in the old collections.
 
 :::
 
