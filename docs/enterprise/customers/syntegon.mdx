@@ -1,0 +1,89 @@
+---
+sidebar_position: 5
+title: "Syntegon"
+description: "Syntia (Syntegon Intelligence Assistance) brings multiple AI models and internal knowledge into one governed platform, with 2,000 to 2,500 active users over a reported 14-day period."
+keywords: ["Syntegon AI", "Open WebUI case study", "enterprise AI", "private AI deployment"]
+---
+
+# Industrial equipment supplier Syntegon puts 500+ RAG agents to work with Open WebUI
+
+![Syntegon](/images/enterprise/customers/syntegon/hero.png)
+
+## Overview
+
+:::info
+Syntia (Syntegon Intelligence Assistance) brings multiple AI models and internal knowledge into one governed platform, with 2,000 to 2,500 active users over a reported 14-day period.
+:::
+
+### At a Glance
+
+- **Industry**: Industrial equipment for pharma, biotech and food.
+- **Company size**: 7,300 employees across 49 locations in more than 20 countries.
+- **Active users**: 2,000 to 2,500 in the last 14 days at the time of reporting.
+- **Deployment**: Amazon EKS on AWS Fargate; EU-only data residency.
+- **Access**: Global employee access, subject to geographic compliance restrictions.
+- **Models**: 8+ models, including OpenAI GPT and Anthropic Claude; GPT-5-mini is the default.
+- **Authentication**: Microsoft Entra ID SSO; provisioning through Syntegon IAM.
+
+## About Syntegon
+
+Syntegon is a leading global technology company and strategic life cycle partner to the pharmaceutical, biotech, and food industries. Headquartered in Stuttgart, Germany, the company employs 7,300 people at 49 locations in more than 20 countries. With over 160 years of industry expertise, Syntegon delivers solutions that make a real difference, helping people live better, stay healthier, and trust the products they rely on every day.
+
+## The Challenge: Scaling AI responsibly
+
+Syntegon needed to scale AI across a global engineering organization while controlling models, data sources and governance. Public SaaS tools raised concerns about data residency, intellectual property exposure and vendor lock-in.
+
+- Syntegon-controlled EU cloud infrastructure, Entra ID SSO and role-based access through IAM.
+- Multiple model providers through a unified gateway, with secure internal data integration.
+- Work Council and DPO approval pathways, plus required AI literacy training.
+
+## The Solution: Syntia with Open WebUI on AWS
+
+Open WebUI enabled Syntegon to deploy Syntia without codebase customization.
+
+- **Compute and orchestration**: Amazon EKS on AWS Fargate with Kubernetes autoscaling.
+- **Storage and database**: Amazon Aurora PostgreSQL with pgvector for RAG embeddings; AWS EFS shared storage and daily database/EFS backups.
+- **Networking**: AWS VPC with public and private subnets across two AZs. Application Load Balancer (ALB) in public subnet for ingress and SSL/TLS termination (AWS ACM). NAT Gateway for outbound-only internet access from private subnets. All application workloads run in private subnets with no direct inbound internet access to pods.
+- **Logging and monitoring**: Full audit trail via OpenTelemetry, Prometheus and Grafana for traces, metrics and alerts; LiteLLM for model usage and costs.
+- **Security controls**: MFA, device compliance, group-based roles, EU data residency, SIEM audit exports and egress restrictions.
+- **Content and privacy**: Azure AI Content Safety and AWS Bedrock Guardrails; admin chat access and exports disabled.
+- **CI/CD**: GitOps-based deployment. Terraform for infrastructure as code (state in AWS S3). Kubernetes manifests managed via Git. Planned updates tested on staging environment before production promotion (documented rollback plans in Confluence GCSS space).
+- **Integrations**: Syntia integrates SharePoint, Confluence, Jira and web search.
+- **RAG**: Azure text-embedding-3-large and pgvector support retrieval from internal knowledge bases.
+
+## Adoption and Enablement
+
+Every Syntegon employee globally can self-service onboard via the Syntegon Identity Manager. Training materials, e-learning modules, and a dedicated AI Hub community ensure sustained adoption and upskilling.
+
+Required AI literacy training, e-learning, office hours and functional team sessions support adoption, while the AI Innovation Hub and Product Board coordinate feedback and priorities.
+
+Active use cases span engineering, project management, operations, compliance, sales, and HR:
+
+- **Enterprise knowledge**: Over 500 active RAG agents provide answers grounded in Syntegon product documentation, SharePoint, and Confluence
+- **Multi-language capability**: supporting Syntegon's global workforce (German, English, and other languages via Azure Speech multilingual neural models)
+- **Content creation**: Service brief drafting and image generation/editing for technical and marketing assets.
+
+## Results
+
+![Syntia model selector showing GPT, Claude, and other available models.](/images/enterprise/customers/syntegon/open-webui.png)
+
+> “The biggest win with Open WebUI is having every LLM in one place. Our teams switch between models for reasoning, coding, or RAG-based retrieval on the fly—one interface, full flexibility, no juggling separate tools or accounts.” - Syntegon
+
+- **Adoption**: 2,000 to 2,500 active users over the reported 14-day period.
+- **Knowledge access**: More than 500 active RAG agents provide answers grounded in company documentation.
+- **Productivity**: Syntegon reports faster development cycles, service communications and visual-content turnaround.
+- **Governance**: Syntegon reports Syntia is its only AI platform approved under its data governance and Work Council framework.
+
+## Connected Knowledge Sources
+
+![SharePoint Search and Confluence Search in Syntia’s tools menu.](/images/enterprise/customers/syntegon/search-tools.png)
+
+---
+
+:::tip
+
+**Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** — **[Speak with Our Sales Team Today!](https://docs.openwebui.com/enterprise)**
+
+Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
+
+:::
