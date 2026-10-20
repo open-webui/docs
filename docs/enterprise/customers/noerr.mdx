@@ -1,0 +1,92 @@
+---
+sidebar_position: 4
+title: "Noerr"
+description: "Noerr rolled out its Azure-hosted AI workspace in eight weeks, with more than 600 employees using it in the first seven days."
+keywords: ["Noerr AI", "Open WebUI case study", "enterprise AI", "private AI deployment"]
+---
+
+# How Law Firm Noerr turned an eight-week Open WebUI rollout into 600+ active users in week one
+
+![Noerr](/images/enterprise/customers/noerr/hero.png)
+
+## Overview
+
+:::info
+Noerr rolled out its Azure-hosted AI workspace in eight weeks, with more than 600 employees using it in the first seven days.
+:::
+
+### At a Glance
+
+- **Industry**: Legal services
+- **Deployment**: Noerr’s own Azure subscription; EU-only data residency
+- **Models**: Azure OpenAI GPT-6-Luna and GPT-6.1-Sol, AWS Anthropic Opus-5.5 and Sonnet-5
+- **Time-to-deploy**: 8 weeks from project start to rollout
+- **Usage**: More than 600 employees active in the first seven days
+- **Daily activity**: Daily active usage stabilized at 60-70% of licensed seats in the first two weeks
+
+## About Noerr
+
+Noerr is a top German law firm with more than 450 advisors across six national and four international offices, including London and New York. The firm covers the full depth and breadth of corporate and business law and supports clients with complex, cross-border matters.
+
+To keep its edge, Noerr is investing in responsible AI that enhances the work of lawyers and support professionals without compromising strict client confidentiality and data protection requirements.
+
+## The Challenge: Modernizing legal AI
+
+Before Open WebUI, Noerr operated its own internal interface for LLMs. As the pace of AI innovation increased, the firm needed:
+
+- A modern interface and faster access to new capabilities and features.
+- Deep customization and integration options for legal workflows
+- The option to stay with EU-only hosting and full control over data, encryption, and logs
+
+## The Solution: NoerrGPT with Open WebUI in Noerr’s Azure environment
+
+Noerr chose Open WebUI because it could be fully deployed inside the firm’s own Azure subscription while remaining highly customizable and fast to iterate:
+
+- **Compute / orchestration**: Azure Kubernetes Service (AKS) with GPU node autoscaling for OCR
+- **Storage / DB**: Azure Database for PostgreSQL, encrypted at rest with customer-managed keys
+- **Networking**: Private VNet with LiteLLM as the central hub for LLM requests
+- **Secrets**: Infisical as the secrets manager
+- **CI/CD**: Azure DevOps pipelines with ArgoCD for deployments
+- **Monitoring**: Sentry for error logging and Gatus for uptime monitoring
+- **Model routing**: Azure- and AWS-hosted models in EU regions only, with manual or automatic model selection
+- **RAG**: Hybrid search with Azure reranking model
+- **Secure Web Search integration**: Linkup and Noerr’s own sources.
+- **Sandboxed Terminals**: Isolated terminals on AKS for agentic code execution.
+
+Security and compliance controls include MFA, device compliance checks, RBAC by groups, enforced EU data residency, moderation/guardrails, DLP policies, and audit exports to SIEM.
+
+## Adoption and Enablement
+
+Noerr ran a focused 2-week beta with 15 data and AI experts at the end of the 8-week development period, then opened the platform to the entire organization.
+
+Written documentation and recorded practice sessions with live demos supported internal use cases.
+
+- Agentic data retrieval from core applications and the trade register
+- A pre-populated prompt library for document information extraction for contracts and case files, drafting, analyzing, and modifying clauses.
+- Q&A with specialized bots over internal policies and guidelines
+- Deterministic data wrangling and plotting
+- Fully agentic skill selection and execution
+
+## Results
+
+![NoerrGPT start screen with GPT Sol 6.1 selected and suggested workflows.](/images/enterprise/customers/noerr/open-webui.png)
+
+Noerr highlights three key results:
+
+- **Stability and performance**: All services under Noerr’s control are stable and performant, supporting day-to-day legal work at scale.
+- **High acceptance**: Lawyers and staff gave positive feedback, despite the significant change from the prior interface.
+- **Rapid adoption**: Unique users in the first week equaled the previous platform’s monthly unique users, indicating strong engagement and fit.
+
+## What’s next
+
+With a secure and widely adopted AI workspace in place, Noerr plans to continue expanding use cases, deepening integrations, and refining firm-specific workflows, while maintaining the high bar for data protection and compliance that its clients expect.
+
+---
+
+:::tip
+
+**Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** — **[Speak with Our Sales Team Today!](https://docs.openwebui.com/enterprise)**
+
+Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
+
+:::
