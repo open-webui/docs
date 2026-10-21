@@ -349,7 +349,7 @@ Knowledge bases can be managed programmatically:
 **Files**
 
 - `POST /api/v1/files/`: Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side**, equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing). The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
-- `GET /api/v1/files/{id}/process/status`: Check processing status
+- `GET /api/v1/files/{id}/process/status`: Check processing status. An upload reports `completed` only after its indexing has finished and, when it was sent with a `knowledge_id`, after the link to that knowledge base is saved.
 - `POST /api/v1/files/{id}/rename`: Rename a file
 - `GET /api/v1/files/{id}/content`: Download the original file. Returns 404 with `Original file is unavailable.` for a file stored as text only.
 - `GET /api/v1/files/{id}/content/{file_name}`: Download the file as an attachment. When the original upload is missing, it returns the indexed text as plain text.

@@ -62,10 +62,12 @@ The period covered is the past two years (the last 730 days), the same window fo
 
 At the top right of the Analytics dashboard, you can filter all data by time period:
 
-- **Last 24 hours** - Hourly granularity for real-time monitoring
-- **Last 7 days** - Daily overview of the past week
-- **Last 30 days** - Monthly snapshot
-- **Last 90 days** - Quarterly trends
+- **Last 24 hours**
+- **Last 7 days**
+- **Last 30 days**
+- **Last 90 days**
+- **Year to date** - From 1 January of the current year until now
+- **Last 12 months**
 - **All time** - Complete historical data
 - **Custom range** - A start and an end date you choose
 
@@ -86,16 +88,19 @@ This is useful for:
 - **Cost allocation** - Attribute token consumption to business units
 - **Pilot programs** - Monitor adoption within test groups
 
-All metrics on the page update automatically when you change the time period or group filter, including the hourly timeline shown for **Last 24 hours**.
+All metrics on the page update automatically when you change the time period or group filter, including the usage chart.
 
 ### Summary Statistics
 
 The dashboard header displays key metrics for the selected time period:
 
-- **Total Messages** - Number of assistant responses generated
-- **Total Tokens** - Sum of all input and output tokens processed. Hover it to see the input and output totals separately
-- **Total Chats** - Number of unique conversations
-- **Total Users** - Number of users who sent messages
+- **Tokens** - Sum of all input and output tokens processed
+- **Input** and **Output** - The input and output tokens separately
+- **Messages** - Number of assistant responses generated
+- **Chats** - Number of unique conversations
+- **Users** - Number of users who sent messages
+
+Token figures are shortened, for example `1.2m`. Hover any figure to see the exact value.
 
 :::note Message Counting
 Analytics counts **assistant responses** rather than user messages. This provides a more accurate measure of AI model usage and token consumption.
@@ -103,12 +108,25 @@ Analytics counts **assistant responses** rather than user messages. This provide
 
 ### Message Timeline Chart
 
-The interactive timeline chart visualizes message volume over time, broken down by model. Key features:
+The usage chart shows activity over time, broken down by model. The **Tokens** / **Messages** switch above it picks what is counted, and **Tokens** is shown first. The same switch sets how the tables below are ranked, see [Model Usage Table](#model-usage-table).
 
-- **Hourly or Daily granularity** - Automatically adjusts based on selected time period
-- **Multi-model visualization** - Shows up to 8 models with distinct colors
-- **Hover tooltips** - Display exact counts and percentages for each model at any point in time
-- **Trend identification** - Quickly spot usage patterns, peak hours, and model adoption
+The chart has two views:
+
+- **Volume** - Stacked bars per time step, one color per model
+- **Activity** - A heatmap with one row per model. Each cell is shaded relative to that model's busiest time step, and a blank cell means no recorded usage
+
+Click a model in the legend under the chart, or a row name in the **Activity** view, to show only that model. Click it again or click **All models** to show every model. Hovering a time step shows the value for each model at that point. Times on the chart are server time.
+
+The interval dropdown sets the size of each time step. Its default and its choices follow the time period:
+
+| Time period | Default | Choices |
+|-------------|---------|---------|
+| **Last 24 hours** | **10 min** | **10 min**, **Hourly**, **Daily** |
+| **Last 7 days** | **Hourly** | **Hourly**, **Daily** |
+| **Last 30 days** | **6 hours** | **Hourly**, **3 hours**, **6 hours**, **Daily** |
+| Longer periods | **Daily** | **Daily** |
+
+**Compare** shows the previous period next to the current one in the **Volume** view. The previous period is the window of the same length directly before the selected one. The chart then draws the current period as a solid line and the previous period as a dashed line. Hovering a time step shows both values with their dates and the change in percent. **Compare** is unavailable for **All time**, since that period has nothing before it.
 
 This chart helps you:
 - Identify busy periods for capacity planning
@@ -118,7 +136,7 @@ This chart helps you:
 
 ### Model Usage Table
 
-Model usage and user activity share one table below the chart. The **Models** / **Users** switch above it picks which list it shows, and **Models** is shown first.
+Model usage and user activity share one table below the chart. The **Models** / **Users** switch above it picks which list it shows, and **Models** is shown first. Both lists are sorted by **Total** tokens by default. Picking **Messages** in the switch above the chart sorts them by message count and turns the share column into **Message share**.
 
 A detailed breakdown of how each model is being used:
 
@@ -132,7 +150,7 @@ A detailed breakdown of how each model is being used:
 | **Input** | Input tokens |
 | **Output** | Output tokens |
 | **Total** | Input and output tokens together |
-| **%** | Percentage share of total messages |
+| **Token share** | Percentage share of all tokens. Shows as **Message share** when the chart counts messages |
 
 **Features:**
 - **Sortable columns** - Click any column header to sort, each of the three token columns included
@@ -194,10 +212,11 @@ Pick **Users** in the switch above the table to track user engagement and token 
 | **Input** | Input tokens of this user |
 | **Output** | Output tokens of this user |
 | **Total** | Input and output tokens together |
+| **Token share** | Percentage share of all tokens. Shows as **Message share** when the chart counts messages |
 
 **Features:**
-- **Sortable columns** - Sort by name, messages or any of the three token columns. The table shows the 50 users with the most messages in the period. The API's `limit` parameter raises that
-- **User identification** - Profile pictures and display names
+- **Sortable columns** - Sort by name, messages, share or any of the three token columns. The table shows the 50 users with the most tokens in the period, or with the most messages when the chart counts messages. The API's `limit` parameter raises that
+- **User identification** - Profile pictures and display names. Hover or click a picture to open that person's profile card
 - **Token attribution** - See resource consumption per user
 
 **Use cases:**
@@ -370,6 +389,16 @@ Accepts either `days` (7-732) or an explicit `start_date` / `end_date` range, an
 | `start_date` | int | Unix timestamp (epoch seconds) - start of range |
 | `end_date` | int | Unix timestamp (epoch seconds) - end of range |
 | `group_id` | string | Filter to a specific user group (optional) |
+
+**`/api/v1/analytics/daily` parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `granularity` | string | Size of each time bucket: `10m`, `hourly`, `3h`, `6h` or `daily` (default). Buckets are in server time |
+| `metric` | string | `messages` (default) counts assistant responses, `tokens` sums input and output tokens |
+| `compare` | bool | `true` adds a `previous` object to each bucket with the value for the window of the same length directly before the range, plus the `start` and `end` of both. It needs both `start_date` and `end_date`, with `start_date` not after `end_date`, or the request fails with `400` |
+
+**`/api/v1/analytics/users` parameters:** `metric` set to `tokens` ranks users by total tokens before `limit` is applied. The default `messages` ranks them by message count.
 
 :::tip API Access
 All Analytics endpoints require admin authentication. Include your admin bearer token:

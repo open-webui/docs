@@ -71,6 +71,8 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 3. Any new chat you start will automatically be created inside this folder.
 4. New chats will **inherit the folder's settings** (default model, system prompt and knowledge).
 
+A folder's three-dot menu also has **New Chat**, which opens the folder the same way.
+
 Each folder in the sidebar is a link to its own page, so a middle click or Ctrl/Cmd click opens the folder in a new tab.
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
