@@ -65,4 +65,4 @@ Every file carries metadata that helps both you and the AI understand its contex
 **A:** There is no hard-coded limit in Open WebUI. The scalability depends on your storage (disk/S3) and your Vector Database (e.g., ChromaDB, PGVector).
 
 **Q: Does managing files require Admin privileges?**  
-**A:** Regular users can manage their *own* uploaded files. Administrators have additional tools to manage global files and configuration via the Admin Panel.
+**A:** No. The File Manager lists only your *own* uploaded files. This holds for administrators too, also when `BYPASS_ADMIN_ACCESS_CONTROL` is on. Administrators have additional tools to manage global files and configuration via the Admin Panel.

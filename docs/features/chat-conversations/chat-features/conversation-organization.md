@@ -40,7 +40,7 @@ Folders can be nested within other folders to create hierarchical organization:
 
 - **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
-- **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. There is no move entry. Folders are re-parented by drag and drop only.
+- **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. It is shown only with the [Allow Chat Export](/features/authentication-access/rbac/permissions#3-chat-permissions) permission; admins always see it. There is no move entry. Folders are re-parented by drag and drop only.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 

@@ -583,7 +583,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the file browser list, etc.). When set to `True` (default), those surfaces show every item from every user, convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see.
+- Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the **Attach Files** list in the chat input, etc.). When set to `True` (default), those surfaces show every item from every user, convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see. **Settings > Data Controls > Manage Files** always lists only the admin's own files, whatever this flag is set to.
 
   Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
@@ -872,7 +872,7 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). Names are matched with letter case ignored and hyphens and underscores treated alike, so `File_abc` is checked as `file-abc`. By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
+- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). Names are matched with letter case ignored and hyphens and underscores treated alike, so `File_abc` is checked as `file-abc`. A name that starts with a digit is also checked with a leading `c`, and a name of `c` plus a digit also without it, since Weaviate adds that `C` to collection names that start with a digit. Each of these spellings that names a known collection must pass the access check. A denied spelling always wins, over an allowed spelling and over this setting. By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -2264,7 +2264,7 @@ The four **user-info** headers are forwarded to nearly every outbound backend. T
 
 | Header | Forwarded to |
 |---|---|
-| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio, image and document-loader services (including Mistral OCR) |
+| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio, image and document-loader services (including Mistral OCR) and the connection of a [Realtime voice call](/features/chat-conversations/chat-features/voice-mode#realtime-calls) to the realtime provider |
 | `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers (not Anthropic) |
 | `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP) |
 | `X-OpenWebUI-Auth-Type` | OpenAI and Ollama model connections only, on model listing and chat requests |
@@ -7395,7 +7395,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel. When disabled, the **Valves** button that a pipe model with user valves shows in the chat input is also hidden from non-admins.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
@@ -7451,7 +7451,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file, and the export items are hidden for them: **Download** in the chat menus, **Export** in a folder's menu, **Export** in **Settings > Archived Chats** and **Export Chats** in **Settings > Data Controls**. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
@@ -7510,7 +7510,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use multiple models in chats.
+- Description: Enables or disables user permission to use multiple models in chats. When disabled, a new chat for a non-admin starts with a single model, the first of the models it would otherwise open with.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY`

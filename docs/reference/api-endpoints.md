@@ -335,6 +335,27 @@ The `ui` object in this request is applied field by field. A field you leave out
 
 A script that reads the settings, edits one key and posts the whole object back still works. One that posts a hand-written object expecting everything else to be wiped does not, since nothing it omits is removed any more.
 
+### 🎛️ `PATCH /api/v1/chats/{id}/params` updates chat parameters
+
+This endpoint merges the keys you send into the chat's `params` and returns the full merged `params` object. Keys you leave out keep their current value. Only the chat's owner can call it; anyone else gets `401`. The chat **Controls** use it to save each setting as you change it.
+
+It only merges keys, so it cannot remove one. To clear a parameter, send it as `null`. The key is then stored as `null`, and the chat falls back to the user's default for it.
+
+```bash
+curl -X PATCH http://localhost:3000/api/v1/chats/CHAT_ID/params \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"temperature": 0.2, "system": null}'
+```
+
+### 📁 `GET /api/v1/files/user/search` and `GET /api/v1/files/user/count`
+
+These two endpoints list and count the calling user's own files. They are always scoped to the caller, administrators included, whatever `BYPASS_ADMIN_ACCESS_CONTROL` is set to. The [File Manager](/features/chat-conversations/data-controls/files) in **Settings > Data Controls > Manage Files** uses them, so an administrator sees only their own files there.
+
+`/api/v1/files/user/search` takes `filename` (a pattern with wildcards such as `*.pdf`, default `*`), `content` (default `false`), `skip` (default `0`) and `limit` (default `50`, at most `1000`). It returns an empty list when nothing matches. `/api/v1/files/user/count` returns the number of files as a plain integer.
+
+The older `GET /api/v1/files/search` and `GET /api/v1/files/count` stay unchanged. With `BYPASS_ADMIN_ACCESS_CONTROL` on, they cover every user's files for an administrator.
+
 ### 🗑️ Removed: `POST /api/v1/utils/pdf`
 
 The endpoint that rendered a chat to PDF server-side is gone, along with the fonts and the PDF library behind it. Nothing changes for people using Open WebUI: **Chat > Download > PDF** still works and always renders in the browser. Only a script calling that endpoint directly is affected, and there is no replacement endpoint for it.

@@ -162,6 +162,8 @@ Reopening the connection and clicking **Authorize OAuth** does the same thing fo
 
 `Register Client` is required for both `oauth_2.1` and `oauth_2.1_static`. With static auth, Open WebUI uses your provided credentials and server metadata discovery (no dynamic client registration).
 
+At the token endpoint, static auth sends the client secret with `client_secret_post` (in the request body). When the server's discovery document lists its supported methods and `client_secret_post` is not among them, Open WebUI uses `client_secret_basic` (an HTTP Basic header) if it is listed, whatever its position in the list, and the first listed method otherwise. This way the token request carries the client secret, also for servers such as X Ads.
+
 :::
 
 :::info Resource Indicators (RFC 8707)
