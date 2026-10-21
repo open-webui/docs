@@ -143,7 +143,7 @@ When that message is replayed to the LLM (within a tool-call loop or on the next
 | `llama.cpp` | Top-level `reasoning_content` field on the assistant message |
 | Every other option (`Default`, `Azure OpenAI`, `LM Studio`, `LiteLLM`) | Reasoning is **omitted** from the rebuilt message |
 
-The "omit on default/strict" choice is deliberate: OpenAI, Azure OpenAI, Vertex AI, and similar Chat Completions APIs reject assistant messages with unknown fields, and they don't expect their own reasoning echoed back on the next call (they manage continuity stateside via `previous_response_id` for the Responses API, or simply don't need it). Pipe functions and filters can re-inject reasoning in a provider-specific shape when needed.
+The "omit on default/strict" choice is deliberate: OpenAI, Azure OpenAI, Vertex AI, and similar Chat Completions APIs reject assistant messages with unknown fields, and they don't expect their own reasoning echoed back on the next call (Responses API connections send their stored reasoning items back, see the table below). Pipe functions and filters can re-inject reasoning in a provider-specific shape when needed.
 
 For Ollama, a rebuilt message looks like:
 
@@ -173,7 +173,7 @@ For a `llama.cpp` connection it looks like:
 | OpenAI-compatible APIs that emit `<think>` tags inline (a llama.cpp or vLLM server not configured to split reasoning out, for example) | ✅ Round-trips automatically. | n/a |
 | Ollama (connection auto-tagged as `ollama`) | ✅ Round-trips. | ✅ Rebuilt as `<think>…</think>` in `content`. |
 | llama.cpp (connection *Provider* set to `llama.cpp`) | ✅ Round-trips if the model uses tags. | ✅ Rebuilt as `reasoning_content` field. |
-| OpenAI o-series (Responses API) | n/a (o-series doesn't expose reasoning text). | ⚠️ Reasoning continuity is handled by `previous_response_id`, not by re-sending content. |
+| OpenAI o-series (Responses API) | n/a (o-series doesn't expose reasoning text). | ✅ Stored reasoning items are sent back as input with only `type`, `id`, `summary`, `encrypted_content` and `content`. With `ENABLE_RESPONSES_API_STATEFUL` on, `previous_response_id` carries the state. |
 | OpenAI / Azure / Vertex AI (Chat Completions, *Provider* `Default`) | ✅ Tags pass through as text (most strict providers tolerate them). | ⚠️ Structured reasoning is omitted on rebuild (use a pipe/filter to re-inject if you need it). |
 | Anthropic (extended thinking) | ⚠️ Tags work, but the native API expects `{"type": "thinking"}` blocks for true extended thinking (use a [pipe function](/features/extensibility/plugin/functions/pipe)). | ❌ Not natively supported. |
 

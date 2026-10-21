@@ -303,7 +303,7 @@ def wait_for_processing(token, file_id, timeout=300):
 |--------|---------|
 | `pending` | Waiting to be processed |
 | `processing` | Content extraction and embedding are running |
-| `completed` | Indexed and ready to add to knowledge base. For an upload sent with a `knowledge_id`, the link to that knowledge base is also done |
+| `completed` | Processing finished and the file is ready to add to a knowledge base (video files skip text extraction). For an upload sent with a `knowledge_id`, the link to that knowledge base is also done |
 | `failed` | Processing failed (check error field) |
 
 :::tip

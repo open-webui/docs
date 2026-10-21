@@ -7510,7 +7510,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use multiple models in chats. When disabled, a new chat for a non-admin starts with a single model, the first of the models it would otherwise open with.
+- Description: Enables or disables user permission to use multiple models in chats. When disabled, a new chat for a non-admin starts with a single model, the first of the models it would otherwise open with. Opening an existing multi-model chat also continues it with only its first model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY`

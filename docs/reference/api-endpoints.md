@@ -339,7 +339,7 @@ A script that reads the settings, edits one key and posts the whole object back 
 
 This endpoint merges the keys you send into the chat's `params` and returns the full merged `params` object. Keys you leave out keep their current value. Only the chat's owner can call it; anyone else gets `401`. The chat **Controls** use it to save each setting as you change it.
 
-It only merges keys, so it cannot remove one. To clear a parameter, send it as `null`. The key is then stored as `null`, and the chat falls back to the user's default for it.
+To clear a parameter, send it as `null`. The key is then stored as `null`, and the chat falls back to the user's default for it.
 
 ```bash
 curl -X PATCH http://localhost:3000/api/v1/chats/CHAT_ID/params \

@@ -33,7 +33,7 @@ The **Actions** menu (**...**) in the toolbar switches between **List view** and
 
 ## Previewing files
 
-On a desktop, hovering over a file for a moment shows a small preview card with its name and size, so you can check a file without opening it. Files up to 20 MB are previewed this way; larger ones show **Preview not available**.
+On a desktop, hovering over a file for a moment shows a small card with its name, its size and a preview of its contents, so you can check a file without opening it. Text files up to 1 MB and other files up to 20 MB are previewed this way; anything larger shows **Preview not available**.
 
 Click any file to see a full preview. Different file types display differently:
 
