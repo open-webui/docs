@@ -1,5 +1,4 @@
 ---
-draft: true
 sidebar_position: 4
 sidebar_label: "Noerr Partnerschaftsgesellschaft mbB"
 title: "Noerr"
@@ -14,17 +13,18 @@ keywords: ["Noerr AI", "Open WebUI case study", "enterprise AI", "private AI dep
 ## Overview
 
 :::info
-Noerr rolled out its **Azure-hosted AI workspace** in **eight weeks**, with **more than 600 employees** using it in the **first seven days**.
+Noerr built NoerrGPT, a secure AI workspace for the whole firm, on Open WebUI inside its own Azure subscription. It speeds up legal work while keeping full control over data, models and compliance.
 :::
 
 ### At a Glance
 
 - **Industry**: Legal services
-- **Deployment**: Noerr’s own Azure subscription; EU-only data residency
-- **Models**: Azure OpenAI GPT-6-Luna and GPT-6.1-Sol, AWS Anthropic Opus-5.5 and Sonnet-5
+- **Company size**: 1,000–4,999 employees, including more than 450 advisors
+- **Deployment**: Noerr’s own Azure subscription, with EU-only data residency
+- **Models**: Azure OpenAI GPT-6-Luna and GPT-6.1-Sol; AWS Anthropic Opus-5.5 and Sonnet-5
 - **Time-to-deploy**: 8 weeks from project start to rollout
-- **Usage**: More than 600 employees active in the first seven days
-- **Daily activity**: Daily active usage stabilized at 60-70% of licensed seats in the first two weeks
+- **Usage**: More than 600 employees active in the first 7 days; daily active usage stabilized at 60–70% of licensed seats in the first two weeks
+- **Key results**: Unique users in the first week equaled the previous platform’s monthly unique users
 
 ## About Noerr
 
@@ -32,44 +32,46 @@ Noerr is a top German law firm with more than 450 advisors across six national a
 
 To keep its edge, Noerr is investing in responsible AI that enhances the work of lawyers and support professionals without compromising strict client confidentiality and data protection requirements.
 
-## The Challenge: Modernizing legal AI
+## The Challenge: Modern AI for legal work, without compromise
 
-Before Open WebUI, Noerr operated its own internal interface for LLMs. As the pace of AI innovation increased, the firm needed:
+Before Open WebUI, Noerr ran its own internal interface for LLMs. As the pace of AI innovation increased, the firm needed:
 
-- A modern interface and faster access to new capabilities and features.
+- A cleaner, modern interface that lawyers would actually enjoy using
+- Faster access to new capabilities and models
 - Deep customization and integration options for legal workflows
-- The option to stay with EU-only hosting and full control over data, encryption, and logs
+- The option to stay with EU-only hosting and full control over data, encryption and logs
 
-## The Solution: NoerrGPT with Open WebUI in Noerr’s Azure environment
+Off-the-shelf SaaS tools couldn’t meet Noerr’s standards. Feature rollout was too slow, integrations were limited, and strict internal data protection policies ruled out sending data to external vendors’ infrastructure.
 
-Noerr chose Open WebUI because it could be fully deployed inside the firm’s own Azure subscription while remaining highly customizable and fast to iterate:
+## The Solution: NoerrGPT in Noerr’s Azure environment
 
-- **Compute / orchestration**: Azure Kubernetes Service (AKS) with GPU node autoscaling for OCR
-- **Storage / DB**: Azure Database for PostgreSQL, encrypted at rest with customer-managed keys
-- **Networking**: Private VNet with LiteLLM as the central hub for LLM requests
-- **Secrets**: Infisical as the secrets manager
-- **CI/CD**: Azure DevOps pipelines with ArgoCD for deployments
+Noerr chose Open WebUI because it could be deployed entirely inside the firm’s own Azure subscription while staying highly customizable and fast to iterate.
+
+- **Compute and orchestration**: Azure Kubernetes Service (AKS), with GPU node autoscaling for OCR
+- **Storage and database**: Azure Database for PostgreSQL, encrypted at rest with customer-managed keys
+- **Networking**: A private VNet, with LiteLLM as the central hub for LLM requests
+- **Secrets**: Infisical
+- **CI/CD**: Azure DevOps pipelines, with ArgoCD for deployments
 - **Monitoring**: Sentry for error logging and Gatus for uptime monitoring
-- **Model routing**: Azure- and AWS-hosted models in EU regions only, with manual or automatic model selection
-- **RAG**: Hybrid search with Azure reranking model
-- **Secure Web Search integration**: Linkup and Noerr’s own sources.
-- **Sandboxed Terminals**: Isolated terminals on AKS for agentic code execution.
+- **Sandboxed terminals**: Isolated terminals on AKS for agentic code execution
+- **Security controls**: MFA, device compliance checks, role-based access by group, enforced EU data residency, moderation and guardrails, DLP policies, and audit exports to SIEM
 
-Security and compliance controls include MFA, device compliance checks, RBAC by groups, enforced EU data residency, moderation/guardrails, DLP policies, and audit exports to SIEM.
+## Models, RAG and data protection
+
+Noerr runs Azure- and AWS-hosted models in EU regions only. Users can pick a model themselves or rely on agentic model selection, which chooses the most suitable model for the prompt’s goal.
+
+RAG is set up specifically for legal use cases. It uses hybrid search with an Azure reranking model, and its sources are enriched with internal and with legal-specific content.
+
+To protect highly confidential data, the built-in web search is turned off globally. In its place, a secure web search runs through Linkup and Noerr’s own sources.
 
 ## Adoption and Enablement
 
-Noerr ran a focused 2-week beta with 15 data and AI experts at the end of the 8-week development period, then opened the platform to the entire organization.
+At the end of the 8-week development period, Noerr ran a focused two-week beta with 15 data and AI experts, then opened the platform to the entire firm. NoerrGPT is available to all legal advisors and to support functions, including HR, IT and legal assistants.
 
-Written documentation and recorded practice sessions with live demos supported internal use cases.
+Enablement was intentionally lightweight and lawyer-friendly:
 
-- Agentic data retrieval from core applications and the trade register
-- A pre-populated prompt library for document information extraction for contracts and case files, drafting, analyzing, and modifying clauses.
-- Q&A with specialized bots over internal policies and guidelines
-- Deterministic data wrangling and plotting
-- Fully agentic skill selection and execution
-
-## Results
+- written documentation tailored to internal use cases, and
+- recorded practice sessions with live demos that users could replay on demand.
 
 <img
   src="/images/enterprise/customers/noerr/open-webui.png"
@@ -77,15 +79,32 @@ Written documentation and recorded practice sessions with live demos supported i
   style={{ clipPath: "inset(0.25% round 1.5%)" }}
 />
 
+## Results
+
 Noerr highlights three key results:
 
+- **Rapid adoption**: More than 600 employees used NoerrGPT in its first week. That matched the previous platform’s monthly unique users, a sign of strong engagement and fit. Daily active usage stabilized at 60–70% of licensed seats within the first two weeks.
+- **High acceptance**: Lawyers and staff gave positive feedback, despite the significant change from the previous interface.
 - **Stability and performance**: All services under Noerr’s control are stable and performant, supporting day-to-day legal work at scale.
-- **High acceptance**: Lawyers and staff gave positive feedback, despite the significant change from the prior interface.
-- **Rapid adoption**: Unique users in the first week equaled the previous platform’s monthly unique users, indicating strong engagement and fit.
 
-## What’s next
+## Top Use Cases
 
-With a secure and widely adopted AI workspace in place, Noerr plans to continue expanding use cases, deepening integrations, and refining firm-specific workflows, while maintaining the high bar for data protection and compliance that its clients expect.
+- Agentic data retrieval from core applications and the trade register
+- A pre-populated prompt library for extracting information from contracts and case files, and for drafting, analyzing and modifying clauses
+- Q&A with specialized bots over internal policies and guidelines
+- Deterministic data wrangling and plotting
+- Fully agentic skill selection and execution
+
+## Why Noerr Chose Open WebUI
+
+- **Open architecture**: no vendor lock-in
+- **Speed**: a rapid proof of concept and an 8-week implementation
+- **Full control**: runs entirely in Noerr’s Azure environment, with BYOK encryption and full data ownership
+- **Flexibility**: flexible enough to add custom features and connect to internal tooling
+
+## What’s Next
+
+With a secure and widely adopted AI workspace in place, Noerr plans to keep expanding use cases, deepening integrations and refining firm-specific workflows, while maintaining the high bar for data protection and compliance its clients expect.
 
 ---
 
