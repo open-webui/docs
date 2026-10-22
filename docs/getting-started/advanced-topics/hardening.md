@@ -720,7 +720,7 @@ All default to `false`, meaning only administrators can manage Tools and Functio
 
 ### Base image
 
-The default Dockerfile uses `python:3.11-slim-bookworm`. If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
+The default Dockerfile uses `python:3.12-slim-trixie` (Python 3.12 on Debian 13). If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
 
 ### Non-root execution
 

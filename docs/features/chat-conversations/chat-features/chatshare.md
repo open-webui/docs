@@ -106,6 +106,7 @@ In a chat with replies allowed:
 - **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version. An admin who is not the owner sees it on the versions they generated when [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) is on.
 - Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
+- When a change takes someone's access away, the chat closes for them at once, even while they have it open, and they stop getting its updates. This covers unsharing the chat, **Unshare All**, deleting it and archiving it out of a [shared folder](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
 
 ![The chat owner's view of a chat with replies allowed: another member's message with their name and picture, the model's answer to it, and a line above the input saying that member is typing](/images/features/chat/shared-chat-replies-live.webp)
 

@@ -104,7 +104,7 @@ Earlier releases put the running total in `prompt_tokens` / `completion_tokens` 
 }
 ```
 
-A non-admin caller needs the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) to pick an option. Without them the picks are ignored and each control's default option applies. A pick for a control the model no longer has is ignored, and picking an option the control no longer has returns a `400`.
+Any caller with access to the model can pick an option, whatever their **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) say. A pick for a control the model no longer has is ignored, and picking an option the control no longer has returns a `400`.
 
 **Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless asked. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled, so you do not have to send it. A non-streaming request is left untouched, and a `stream_options` you send keeps its other keys but has `include_usage` forced to `true`, so usage cannot be switched off per request while the capability is on.
 

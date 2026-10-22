@@ -102,15 +102,15 @@ Controls the features available to the user inside the chat interface.
 
 | Permission | Description |
 | :--- | :--- |
-| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt, and Parameters. Also needed for [model controls](/features/workspace/models#using-model-controls-in-chat). |
+| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. Required for Valves, System Prompt and Parameters. When disabled, the **Controls** panel is hidden, along with the **System Prompt** and **Advanced Parameters** sections in **Settings > General**. [Model controls](/features/workspace/models#using-model-controls-in-chat) stay available to anyone with access to the model, so admins can offer curated choices such as a thinking level with this permission off. |
 | **Allow Chat Valves** | *(Requires Allow Chat Controls)* Access to model-specific configuration "valves" ([`USER_PERMISSIONS_CHAT_VALVES`](/reference/env-configuration#user_permissions_chat_valves)). When disabled, the **Valves** button that a pipe model with user valves shows in the chat input is also hidden from non-admins. Admins are always exempt. |
 | **Allow Chat System Prompt** | *(Requires Allow Chat Controls)* Ability to edit the system prompt for a conversation. |
-| **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). Also needed for [model controls](/features/workspace/models#using-model-controls-in-chat). |
+| **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). When disabled, the **Advanced Params** section of the chat controls and the **Advanced Parameters** section in **Settings > General** are hidden. It has no effect on [model controls](/features/workspace/models#using-model-controls-in-chat), and parameters a person saves to their account are kept. These permissions only hide the panels: a user can still set parameters through the API, in a chat request or a settings save. That is the chosen trade-off, so admins can hide the panels and still offer model controls. |
 | **Allow File Upload** | Ability to upload files to the chat. |
 | **Allow Web Upload** | Ability to attach a web page to a chat by URL, using **Attach Webpage** in the message input's attach menu ([`USER_PERMISSIONS_CHAT_WEB_UPLOAD`](/reference/env-configuration#user_permissions_chat_web_upload)). On by default. When disabled, the option is greyed out and the attach is refused. Admins are always exempt. |
 | **Allow Chat Delete** | Ability to delete entire chat conversations ([`USER_PERMISSIONS_CHAT_DELETE`](/reference/env-configuration#user_permissions_chat_delete)). On by default. When disabled, these delete controls are hidden from non-admins: the sidebar chat menu, the **Delete** button for chats selected in the sidebar, the chat's own top-bar menu, the search results, the per-chat delete in **Settings > Archived Chats** and **Delete All Chats** in **Settings > Data Controls**. The **Delete chat** keyboard shortcut stops doing anything, and archiving is unaffected. Deleting a folder that still holds chats needs this permission too. That menu entry stays visible and the delete is refused. Admins are always exempt. |
 | **Allow Delete Messages** | Ability to delete individual messages. |
-| **Allow Chat Edit** | Ability to edit messages. |
+| **Allow Chat Edit** | Ability to edit messages ([`USER_PERMISSIONS_CHAT_EDIT`](/reference/env-configuration#user_permissions_chat_edit)). When disabled, the **Edit** button is hidden on the person's own messages and on responses, so they cannot **Save** or **Send** an edited prompt either. Admins are always exempt. |
 | **Allow Continue Response** | Ability to use the "Continue" feature for truncated responses. |
 | **Allow Regenerate Response**| Ability to regenerate an AI response. |
 | **Allow Rate Response** | Ability to thumbs up/down responses. |
@@ -170,6 +170,7 @@ For Calendar access:
 
 1. **Permission Check for Non-Admins**: Users with the `user` role need **Features > Calendar** (`features.calendar`).
 2. **Admins Are Exempt from `features.calendar`**: Users with the `admin` role can access Calendar without that specific permission.
+3. **Direct Links Redirect**: With Calendar turned off, or for a non-admin without the permission, opening `/calendar` directly sends the user to the home page.
 
 Default permission can be configured via [`USER_PERMISSIONS_FEATURES_CALENDAR`](/reference/env-configuration#user_permissions_features_calendar).
 
@@ -186,7 +187,7 @@ Controls access to user settings areas.
 
 Taking this permission away hides the **Interface** page, so the people affected stay on whatever [Default Interface Settings](/features/administration/interface-defaults) you have configured. Leave it on, and those defaults are only a starting point that each person can change. Admins are exempt.
 
-It reaches no further than that. A save that carries Interface fields anyway, from an older client or a script, is not rejected: those fields are dropped and the rest of the request is saved. Everything outside the Interface page keeps working, so a person without this permission still saves a system prompt (with **Allow Chat Controls** and **Allow Chat System Prompt**), pinned models, audio, notifications and keyboard shortcuts. **Allow Chat System Prompt** and **Allow Chat Params** behave the same way, dropping their own part of a save rather than failing the whole of it.
+It reaches no further than that. A save that carries Interface fields anyway, from an older client or a script, is not rejected: those fields are dropped and the rest of the request is saved. Everything outside the Interface page keeps working, so a person without this permission still saves a system prompt (with **Allow Chat Controls** and **Allow Chat System Prompt**), pinned models, audio, notifications and keyboard shortcuts. **Allow Chat System Prompt** behaves the same way, dropping the system prompt from a save and keeping the rest. **Allow Chat Params** only hides the parameter sections, so parameters in a save are kept.
 
 The one exception is the **default model** a person saves with **Set as default** in the model selector. It is stored as an Interface field, so it stops being saved when this permission is off.
 

@@ -216,7 +216,7 @@ When a selected model has controls, a knobs icon (**Model controls**) appears ne
 
 ![Model controls in the chat shown as menus, with the Thinking submenu open on Default · Medium above Low, Medium and High](/images/features/models/model-controls-menu.webp)
 
-The icon is there only when a selected model has controls and the person has both the **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) (administrators always have them). With two models selected, each model's controls appear under its name, and each model gets its own choices.
+The icon is there whenever a selected model has controls. Anyone with access to the model can pick its options, whatever their **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) say. This lets admins offer a curated choice, such as a thinking level, through model controls while keeping the full Chat Controls panel and raw parameters hidden from users. With two models selected, each model's controls appear under its name, and each model gets its own choices.
 
 - **Choices are saved to the account, per model.** Picking an option saves it right away and it applies to every chat with that model, new and existing, on every device, until the person picks something else.
 - **Default follows the model.** While **Default** is ticked, every message sends the default option's parameters, or nothing from that control when the default option is **None**. If someone later changes the default option, everyone on **Default** moves with it.
@@ -296,6 +296,8 @@ Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** an
 - **Discover**: Browse community presets at the bottom of the page
 
 A model's background image travels with it. Export carries the image inside the file, and import stores it on the target instance as a fresh upload, so a model moved between instances keeps its background without you moving files by hand. See the [API endpoints reference](/reference/api-endpoints) for the export and import calls.
+
+A regular user importing a model whose ID already belongs to a connection model, or to another person's model they cannot edit, gets **Uh-oh! This model id is already registered. Please choose another model id string.** The import stops at that model: the models before it in the file are imported and the ones after it are not. Admins, and users who can edit the existing model, overwrite it.
 
 :::info Downloading base models
 To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.

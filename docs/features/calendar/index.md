@@ -74,6 +74,8 @@ Calendar is permission-gated for non-admin users.
 - **Admins**: always have access to Calendar
 - **Users**: require the **Features > Calendar** permission
 
+With Calendar turned off, or for a user without the permission, opening `/calendar` directly sends them to the home page.
+
 See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
 
 To grant user access:
