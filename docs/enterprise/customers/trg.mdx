@@ -1,0 +1,129 @@
+---
+sidebar_position: 6
+sidebar_label: "TRG (The Richards Group, Inc.)"
+title: "TRG"
+description: "TRG rolled out ChatTRG agency-wide in 90 days, with 80% of targeted users active and 60–80 of 150 licensed seats used daily."
+keywords: ["TRG AI", "Open WebUI case study", "enterprise AI", "private AI deployment"]
+---
+
+# TRG rolls out a secure AI sandbox agency-wide in 90 days, with 80% of targeted users active
+
+![TRG](/images/enterprise/customers/trg/hero.png)
+
+## Overview
+
+:::info
+TRG used Open WebUI to build ChatTRG, a governed AI workspace. It gives teams approved models, shared knowledge stores, reusable prompts and centralized audit trails in one place, replacing scattered personal AI accounts.
+:::
+
+### At a Glance
+
+- **Industry**: Advertising and marketing
+- **Company size**: Fewer than 1,000 employees; headquartered in Dallas, Texas
+- **Time-to-deploy**: Agency-wide rollout completed in 90 days
+- **Usage**: 150 licensed seats, with 60–80 used daily
+- **Deployment**: Self-hosted UI with cloud inference providers (hybrid)
+- **Access**: Internal network or VPN only
+- **Models**: Smaller locally hosted models, plus approved external models through OpenRouter, subject to Zero Data Retention requirements
+- **Key results**: 80% of targeted users active after 90 days; one large-client onboarding cut from days or weeks to roughly a day
+
+## About TRG
+
+TRG (The Richards Group, Inc.) is a Dallas-based advertising and marketing agency. It serves clients through brand, creative, media, digital and client-management work. The agency uses technology and AI to improve the speed, consistency and safety of its internal operations and client service.
+
+## The Challenge: Bringing AI under shared governance
+
+Without a governed platform, AI use at TRG was spread across free and personal accounts, which created risk for agency and client work. Some employees avoided AI altogether because they worried about putting the wrong data into the wrong tool.
+
+TRG needed a safe enterprise sandbox that preserved traceability, handled sensitive information, enabled RAG over internal documents, and managed cost and model choice across very different users. Its non-negotiable requirements were:
+
+- SSO with Microsoft AD, plus role-based access controls
+- Full audit trails with exportable logs
+- The option to use local models for sensitive analysis
+
+Why off-the-shelf options fell short:
+
+- Paid individual accounts reduced training-data risk but still left isolated islands of prompt history and audit trails.
+- A single enterprise frontier-model subscription was expensive for a diverse user base with different token needs and use cases.
+- Local desktop tools such as LM Studio and Msty would have required installation and support on every user’s machine, which was not manageable at enterprise scale.
+
+## The Solution: ChatTRG, powered by Open WebUI
+
+Several TRG users already knew Open WebUI from local experimentation, and it offered an enterprise edition suited to business use. The decisive factor was architectural. Open WebUI acts as the interface and governance layer, while model power comes from separate inference providers. That keeps the server footprint light and lets TRG adopt new models as its needs evolve.
+
+- **Compute and orchestration**: A lightweight, TRG-managed Open WebUI deployment serves as the central AI access layer. Hybrid inference uses smaller local models where appropriate and approved external models through OpenRouter.
+- **Storage and database**: Self-hosted PostgreSQL
+- **Networking**: Accessible only from inside the TRG network or over VPN. Open WebUI is the controlled gateway between users and approved model APIs.
+- **Secrets**: Authorized administrators manage API keys and endpoint credentials centrally, and end users never see them.
+- **Logging and monitoring**: Langfuse, OpenRouter and internal analytics
+- **Security controls**: MFA via the identity provider, group-based roles and egress restrictions. External models must meet Zero Data Retention requirements.
+
+## Models and data handling
+
+Users choose from a curated set of approved models. The right choice depends on task complexity, cost, performance and data sensitivity. Local models cover appropriate sensitive and internal use cases, and approved external models handle higher-capability needs.
+
+RAG is central to the business value. ChatTRG’s purpose is to put unstructured agency and client information to work safely, not to offer generic chat. Docling parses PowerPoint, Word, PDFs, spreadsheets and other files. When configured, it also captions images, chunks content and feeds a vector store. Open WebUI knowledge stores make that context shareable across teams instead of tying it to one chat session.
+
+Sources include scopes of work, project plans, deliverables, brand standards, client summaries, org charts, media plans, marketing priorities, correspondence, transcripts and presentation decks.
+
+## Adoption and Enablement
+
+TRG moved in stages:
+
+1. Local experimentation and small proofs of concept to build familiarity with the architecture
+2. An evaluation of alternatives, including desktop tools and other inference options
+3. An enterprise Open WebUI license for organizational use
+4. Launch of the TRG Sandbox as a safe alternative to free and personal tools
+5. Agency-wide rollout, completed in 90 days
+
+TRG positioned ChatTRG as a safe sandbox with the right tools, rather than leaving employees to experiment with risky external services on their own. Weekly departmental training sessions, recordings and intranet documentation supported the rollout. Shared prompts and client-specific knowledge stores let employees apply AI to familiar workflows instead of starting from scratch.
+
+ChatTRG is now used by developers, brand management, client and account teams, creative and strategy staff, and teams onboarding onto large client accounts.
+
+## Results
+
+> “The sandbox matters. Once people had a safe environment with the right tools, teams that had been afraid to touch AI started using it productively.”
+>
+> — Randy Bradshaw, CTO, TRG
+
+- **Adoption**: 80% of targeted users were active after 90 days, and 60–80 of 150 licensed seats are used daily.
+- **Faster onboarding**: For one large-client ramp-up, client knowledge stores and bespoke model wrappers cut onboarding from days or weeks to roughly a day.
+- **Risk reduction**: Agency and client work moved off free and personal AI tools onto a governed enterprise platform.
+- **Auditability**: Centralized prompt and response logging gives TRG a retrievable source of truth for AI-assisted work, supporting contractual traceability.
+- **Knowledge access**: Teams query scopes of work, brand standards, media plans, transcripts and other documents in natural language.
+- **Productivity**: Teams report dramatic time reductions, getting more work done faster and more consistently with existing resources.
+- **Cost flexibility**: TRG routes each task to the right model and provider rather than paying for one expensive enterprise-wide frontier account.
+
+> “We are not using AI to do more with less; we are using it to do much more with the resources we already have.”
+>
+> — Randy Bradshaw, CTO, TRG
+
+![ChatTRG Sandbox with the Ad Effectiveness knowledge collection attached to a chat.](/images/enterprise/customers/trg/open-webui.png)
+
+## Top Use Cases
+
+- Rewriting emails, summarizing documents and speeding up routine knowledge work
+- Reusable prompts for brand-voice transformations and creative briefs built on the agency’s current template
+- RAG over proprietary agency and client documents
+- Client-specific knowledge stores and model wrappers for onboarding, brand understanding and media and marketing plan context
+- A centralized audit trail where contracts require traceability
+
+![ChatTRG using the Competitive Research Assistant skill with an attached RFP document.](/images/enterprise/customers/trg/skill-document.png)
+
+## Why TRG Chose Open WebUI
+
+- **Model freedom**: Local and external models in one interface, with no lock-in to a single provider
+- **Lightweight footprint**: The UI and governance layer runs separately from inference
+- **Auditability**: Centralized chat logs and exportable history
+- **One workspace**: Knowledge stores, prompts, models, tools, skills and functions in a single enterprise interface
+- **Governance**: SSO, role-based access and Zero Data Retention requirements on every external model
+
+---
+
+:::tip
+
+**Looking for an [Enterprise Plan](https://docs.openwebui.com/enterprise)?** — **[Speak with Our Sales Team Today!](https://docs.openwebui.com/enterprise)**
+
+Get **enhanced capabilities**, including **custom theming and branding**, **Service Level Agreement (SLA) support**, **Long-Term Support (LTS) versions**, and **more!**
+
+:::
