@@ -4152,7 +4152,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: Empty string
-- Description: API key for the MinerU cloud service. Required in `cloud` mode.
+- Description: API key for MinerU. Required in `cloud` mode. In `local` mode, Open WebUI sends it as a bearer token to a MinerU 4.x server, which needs it when started with `--api-key`. Leave it empty for a local server without a key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_TIMEOUT`

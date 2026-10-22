@@ -3,7 +3,7 @@
 1. **Create a Conda Environment:**
 
    ```bash
-   conda create -n open-webui python=3.11
+   conda create -n open-webui python=3.12
    ```
 
 2. **Activate the Environment:**

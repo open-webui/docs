@@ -125,4 +125,6 @@ Key variables:
 
 All of these are persisted settings, so **Settings > Admin > Web Search** is the live source of truth for them. The page fetcher reads proxy trust, loader concurrency and SSL verification from that saved configuration on each search, so a change you save there applies to the next search without a restart, and matches what the same settings do elsewhere. If a change you made in the admin panel appears not to have taken effect, re-check it there rather than assuming the environment variable is still in charge: the variable seeds the initial value, and the saved setting wins afterwards.
 
+**Web Search Engine** and the fields of the chosen engine are required only while **Web Search** is on. With **Web Search** off, the page saves without an engine, so the **Loader** settings can be changed on their own. They apply whenever a user attaches a web page.
+
 ---
