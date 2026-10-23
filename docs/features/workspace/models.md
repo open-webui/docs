@@ -151,7 +151,7 @@ Toggle what the model can do in the **Capabilities** row and the two rows that f
 
 | Setting | What it controls |
 | :--- | :--- |
-| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text |
+| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text. **Capture** in the chat input's **+** menu only shows while at least one selected model has Vision |
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
@@ -183,6 +183,7 @@ The **Advanced Params** row shows how many parameters this model changes, for ex
 
 - **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). One text field, comma-separated.
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
+- **Context Compaction Threshold**: Set this model's own [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) threshold. It only shows while context compaction is on in **Settings > Admin > Interface**. A saved value is kept while compaction is off and applies again when it is turned back on.
 
 What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
 

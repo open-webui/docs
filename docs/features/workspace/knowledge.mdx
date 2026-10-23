@@ -73,7 +73,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
-| 👁️ **File browser with preview** | Browse files in a tree, preview the original file next to the list, and read or edit the indexed text the AI searches |
+| 👁️ **File browser with preview** | Browse files in a tree, preview each file next to the list and read or edit the indexed text the AI searches |
 | 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
@@ -255,7 +255,7 @@ Opening a knowledge base shows its files as a tree on the left and a preview pan
 
 The preview has two views, switched with the buttons above it:
 
-- **Preview** shows the original file as it was uploaded: PDFs, images, audio, video, Word documents, Excel workbooks (with a sheet picker), PowerPoint slides and text-based files such as Markdown, code, CSV, JSON and HTML. For formats with a rendered view, such as Markdown, CSV, JSON, HTML and SVG, the **⋯** menu switches between **View source** and **Rendered preview**.
+- **Preview** shows the file: PDFs, images, audio, video, Word documents, Excel workbooks (with a sheet picker), PowerPoint slides and text-based files such as Markdown, code, CSV, JSON, HTML and SVG. Text-based files and SVG are shown from their indexed text, so the preview matches what retrieval searches. All other formats show the original file as it was uploaded. For formats with a rendered view, such as Markdown, CSV, JSON, HTML and SVG, the **⋯** menu switches between **View source** and **Rendered preview**.
 - **Indexed text** shows the text Open WebUI extracted from the file. This is what retrieval and the knowledge tools search, so it is the place to check when an answer misses something that is in the document.
 
 ![A knowledge base with folders and files on the left and a PDF open in the Preview view on the right](/images/workspace/knowledge-browser-preview.webp)
@@ -266,7 +266,7 @@ If the original file is not available, for example because only its text was sto
 
 **Editing the indexed text**
 
-With write access, click **Edit** to change the indexed text, then **Save** (or **Cancel**). Saving processes the new text again and updates every knowledge base that contains the file, so retrieval uses your corrected text. The original file stays as it was. If processing the text fails, or the text is saved but some knowledge bases could not be updated, an error message says so; save again to retry.
+With write access, click **Edit** to change the indexed text, then **Save** (or **Cancel**). Saving processes the new text again and updates every knowledge base that contains the file, so retrieval uses your corrected text. The original file stays as it was. For text-based files and SVG, the **Preview** view refreshes after saving and shows the new text. The text cannot be empty: saving empty or whitespace-only text is refused with an error. If processing the text fails, or the text is saved but some knowledge bases could not be updated, an error message says so; save again to retry.
 
 While you have unsaved edits, opening another file, closing the preview, deleting an item, syncing, resetting or leaving the page asks **Discard unsaved changes?** first.
 
@@ -354,7 +354,7 @@ Knowledge bases can be managed programmatically:
 - `GET /api/v1/files/{id}/content`: Download the original file. Returns 404 with `Original file is unavailable.` for a file stored as text only.
 - `GET /api/v1/files/{id}/content/{file_name}`: Download the file as an attachment. When the original upload is missing, it returns the indexed text as plain text.
 - `GET /api/v1/files/{id}/data/content`: Read the indexed text
-- `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
+- `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Empty or whitespace-only `content` is rejected with 400 and `The content provided is empty. Please ensure that there is text or data present before proceeding.` Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
 - `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base. A file whose extracted text is already in the knowledge base is rejected with `Duplicate content detected. Please provide unique content to proceed.`
 - `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added. Content batch-added before v0.12.0 has no content hash and is not detected as a duplicate.
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)

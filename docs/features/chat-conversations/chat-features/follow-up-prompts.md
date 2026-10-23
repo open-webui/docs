@@ -22,6 +22,8 @@ Automatically generates follow-up suggestions after each response. These suggest
 - **On**: Follow-up prompts are generated after each model response
 - **Off**: No follow-up suggestions are generated
 
+This switch shows only while the admin has **Follow Up Generation** on in **Settings > Admin > Interface**. Your saved choice is kept while it is hidden and applies again when the admin turns generation back on. The two settings below stay visible either way, because they also apply to follow-ups already saved in your chats.
+
 ### Keep Follow-Up Prompts in Chat
 
 **Default: Off**

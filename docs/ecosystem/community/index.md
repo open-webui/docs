@@ -113,6 +113,7 @@ Turning it off hides these for every user, admins included:
 - **Share to Open WebUI Community** in the chat share dialog
 - **Community Reviews** in the model selector, and the review link after rating a reply
 - the **Sync Usage Stats** dialog
+- the **By** line on a new chat that links a model imported from openwebui.com to its author there; the model keeps its author info, so the link returns once sharing is on again
 
 The stats export behind that dialog still answers admins through the API, and refuses everyone else.
 

@@ -95,6 +95,10 @@ On desktop, resting the pointer on a folder's name in the sidebar shows a previe
 
 Change the name of your folder to better reflect its purpose or project.
 
+### Description
+
+Add a short note on what the folder is for. It shows under the folder's name on the folder's page, cut off after two lines.
+
 ### Folder Background Image
 
 Customize the visual appearance of your folder by uploading a background image. This helps visually distinguish different projects in your workspace.
@@ -198,6 +202,7 @@ In addition to folders, **tags** provide a flexible labeling system for conversa
 - **Adding Tags**: Apply keyword labels to conversations based on content or purpose.
 - **Searching by Tags**: Filter conversations by tags using the search feature.
 - **Flexible Organization**: Tags can be added or removed at any time and don't affect folder structure.
+- **Automatic Tags**: A task model can tag your chats for you. Turn this off for yourself with **Chat Tags Auto-Generation** in **Settings > Interface**. The switch shows only while the admin has **Tags Generation** on in **Settings > Admin > Interface**, and your saved choice is kept while it is hidden.
 
 :::tip **Tagging by Topic**
 
