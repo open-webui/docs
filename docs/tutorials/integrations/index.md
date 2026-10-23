@@ -47,5 +47,6 @@ These community-contributed guides cover specific integration scenarios with ste
 | Tutorial | What you'll achieve | Details |
 |----------|-------------------|---------|
 | [Notion (MCP)](/tutorials/integrations/mcp-notion) | Connect Notion via Model Context Protocol | 👤 User · ⏱️ 5 min |
+| [Local Commander (MCP)](/tutorials/integrations/mcp-local-commander) | Let a model work on files, Git and commands on computers you approve | 👤 User · ⏱️ 10 min |
 | [OneDrive & SharePoint](/tutorials/integrations/onedrive-sharepoint) | Pull Microsoft 365 documents into Open WebUI | 👤 Admin · ⏱️ 30 min |
 | [LibreTranslate](/tutorials/integrations/libre-translate) | Add self-hosted translation capabilities | 👤 Admin · ⏱️ 15 min |

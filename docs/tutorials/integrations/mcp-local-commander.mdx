@@ -1,0 +1,58 @@
+---
+title: Local Commander (MCP)
+sidebar_label: Local Commander MCP Integration
+sidebar_position: 51
+description: Let a model in Open WebUI work on computers you approve (files, Git, commands and local services) through Local Commander's hosted MCP endpoint with OAuth.
+keywords: [local commander, mcp, model context protocol, integration, files, git, terminal, remote computers, streamable http, oauth]
+---
+
+:::warning Community Contribution
+
+This tutorial is a community contribution and is not supported by the Open WebUI team. It serves as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the [contributing tutorial](/tutorials/contributing-tutorial/).
+
+:::
+
+[Local Commander](https://localcmd.app) lets a model work on computers you approve: read and edit files in approved folders, check Git, run commands and look at local services. It is a hosted MCP server at `https://localcmd.app/mcp` plus a small agent on each computer. Open WebUI connects to it natively over **Streamable HTTP** with OAuth 2.1, so there are no API tokens to copy.
+
+## Setup
+
+:::danger Prerequisite: WEBUI_SECRET_KEY
+You **MUST** set the `WEBUI_SECRET_KEY` environment variable to a persistent value. Without it, your OAuth session breaks every time the container restarts, forcing re-authentication. See the [MCP feature docs](/features/extensibility/mcp) for details.
+:::
+
+### 1. Connect a computer
+
+On the computer the model should work on, run:
+
+```bash
+npx local-commander-agent@latest
+```
+
+It needs Node.js 20 or later and runs on Windows, macOS and Linux. Approve the pairing at [localcmd.app](https://localcmd.app). Repeat this on every computer you want to use.
+
+### 2. Add the tool
+
+Go to **Settings > Admin > Integrations** and click **+** to add a new connection. Fill in the following:
+
+| Field | Value |
+|-------|-------|
+| **Type** | MCP Streamable HTTP |
+| **URL** | `https://localcmd.app/mcp` |
+| **Auth** | OAuth 2.1 |
+| **Name** | `Local Commander` |
+
+Click **Register Client** (it changes to "Registered"), then **Save**.
+
+### 3. Authorize
+
+Open the saved connection again and click **Authorize OAuth**. Sign in to Local Commander if asked, check the permissions on the "Open WebUI" screen and click **Allow connection**. You return to Open WebUI.
+
+### 4. Use it in a chat
+
+In a chat, enable Local Commander under **+ > Integrations > Tools** and ask, for example, "list my computers" or "run the tests in my project". Do not make it a default tool of a model; OAuth tools are enabled per chat.
+
+The tool descriptions take about 18,000 tokens of context. With a local model, give it a context window of at least 32k tokens.
+
+## What the model can do
+
+That depends on the access you gave each computer: Full Access by default after your approval, or only selected folders. Folder rules prevent accidents; they are not a sandbox. You can see, cancel and revoke work at [localcmd.app](https://localcmd.app), and remove Open WebUI's access there at any time. The free plan covers up to 5 computers.
