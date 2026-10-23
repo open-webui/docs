@@ -127,6 +127,8 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 3. Select **Attach Notes**
 4. Choose the note(s) to attach
 
+**Attach Notes** shows only while Notes is enabled on the instance and you have the **Notes** permission. Admins always have it.
+
 The full content of the note is injected into the context window for that conversation.
 
 You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **chats**, **folders** and **models** from the sidebar.
@@ -187,13 +189,13 @@ Access management options via the **More (...)** menu in the top right corner.
 
 **Share** in the **More (...)** menu offers **Copy link** and **Copy to clipboard**. A copied link opens the note only for someone who can already reach it.
 
-Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access and is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
+Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access, and for anyone but an admin only with the **Notes Sharing** permission. It is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
 
-The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry, and administrators see it on every note. Each change there is saved right away.
+The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry when you have the **Notes Sharing** permission, and administrators see it on every note. Each change there is saved right away.
 
 Administrators can control sharing via environment variables or the Admin Panel:
 
-* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the access list in the **Access Control** panel (default `False`)
+* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the **Access** button and menu entry, and the access list in the **Access Control** panel (default `False`)
 * [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_notes_allow_public_sharing) for public links (default `False`)
 
 These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).

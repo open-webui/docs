@@ -49,6 +49,8 @@ In addition the instance settings provisioned in the admin panel, there are also
 - **STT Settings:** Contains settings related to Speech-to-Text functionality.
 - **Speech-to-Text Engine:** Determines the engine used for speech recognition (Default or Web API).
 
+These settings are on the **Audio** tab of your **Settings**. The tab shows for admins and for users who hold at least one of **Allow Speech to Text**, **Allow Text to Speech** or **Allow Call** (see [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions)).
+
 ![alt text](/images/tutorials/stt/user-settings.png)
 
 ## Using STT

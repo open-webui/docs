@@ -330,7 +330,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables channel support.
+- Description: Enables or disables channel support. While it is off, the **Compress Images in Channels** setting in **Settings > Interface** is hidden.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_ENCRYPTED_CHANNELS`
@@ -942,7 +942,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables chat title generation.
+- Description: Enables or disables chat title generation. While it is off, the **Title Auto-Generation** switch in **Settings > Interface** is hidden. A saved choice is kept and applies again once generation is turned back on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LICENSE_KEY`
@@ -1459,7 +1459,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `int`
 - Default: `80000`
-- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`.
+- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`. The parameter shows under **Advanced Params** only while `ENABLE_CONTEXT_COMPACTION` is on: in the model editor to anyone who can edit the model, elsewhere to admins. A saved value is kept while compaction is off and applies again when it is turned back on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_CAP`
@@ -1551,7 +1551,7 @@ JSON format: { "title": "your concise title here" }
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables follow up generation.
+- Description: Enables or disables follow up generation. While it is off, the **Follow-Up Auto-Generation** switch in **Settings > Interface** is hidden. A saved choice is kept and applies again once generation is turned back on. The settings for keeping and inserting follow-up prompts stay visible, since they still apply to follow-ups saved in existing chats.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`
@@ -2010,6 +2010,7 @@ Output:
   - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions, and a "Share" button in the function menu dropdown
   - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
   - **Stats Sync Modal**: Enables syncing usage statistics with the community
+  - **New chat screen**: The "By @user" author link to openwebui.com on models imported from openwebui.com
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -2024,7 +2025,7 @@ When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables tag generation.
+- Description: Enables or disables tag generation. While it is off, the **Chat Tags Auto-Generation** switch in **Settings > Interface** is hidden. A saved choice is kept and applies again once generation is turned back on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TAGS_GENERATION_PROMPT_TEMPLATE`
@@ -2484,7 +2485,7 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 - Type: `bool`
 - Default: `False`
-- Description: Requires every user to enter a code from an authenticator app after their password, LDAP, OAuth or trusted-header sign-in. Users without an authenticator set one up at their next sign-in. Needs [`WEBUI_AUTH`](#webui_auth) and [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) on; while it is on, Open WebUI refuses to start if either is off or if a stored authenticator secret cannot be decrypted with the current key (see [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key)). See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa).
+- Description: Requires every user to enter a code from an authenticator app after their password, LDAP, OAuth or trusted-header sign-in. Users without an authenticator set one up at their next sign-in. The **Multi-factor authentication** section in **Settings > Account** only shows to users whose sign-in requires an authenticator, so it is hidden from everyone while this is off. Needs [`WEBUI_AUTH`](#webui_auth) and [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) on; while it is on, Open WebUI refuses to start if either is off or if a stored authenticator secret cannot be decrypted with the current key (see [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key)). See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa).
 - Also a toggle: **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Admin > Authentication**, which applies immediately and needs no restart.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -7451,7 +7452,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file, and the export items are hidden for them: **Download** in the chat menus, **Export** in a folder's menu, **Export** in **Settings > Archived Chats** and **Export Chats** in **Settings > Data Controls**. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file, and the export items are hidden for them: **Download** in the chat menus, **Copy** in the chat's top-bar menu, **Export** in a folder's menu, **Export** in **Settings > Archived Chats** and **Export Chats** in **Settings > Data Controls**. When the top-bar menu has no other entry left, its button is hidden too. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
@@ -7489,21 +7490,21 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use Speech-to-Text in chats.
+- Description: Enables or disables user permission to use Speech-to-Text in chats. The **Audio** settings tab shows to non-admins who hold at least one of [`USER_PERMISSIONS_CHAT_STT`](#user_permissions_chat_stt), [`USER_PERMISSIONS_CHAT_TTS`](#user_permissions_chat_tts) and [`USER_PERMISSIONS_CHAT_CALL`](#user_permissions_chat_call).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TTS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use Text-to-Speech in chats.
+- Description: Enables or disables user permission to use Text-to-Speech in chats. The **Audio** settings tab shows to non-admins who hold at least one of [`USER_PERMISSIONS_CHAT_STT`](#user_permissions_chat_stt), [`USER_PERMISSIONS_CHAT_TTS`](#user_permissions_chat_tts) and [`USER_PERMISSIONS_CHAT_CALL`](#user_permissions_chat_call).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_CALL`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to start [Voice Mode](/features/chat-conversations/chat-features/voice-mode#permissions) calls, in Standard and Realtime call mode.
+- Description: Enables or disables user permission to start [Voice Mode](/features/chat-conversations/chat-features/voice-mode#permissions) calls, in Standard and Realtime call mode. The **Audio** settings tab shows to non-admins who hold at least one of [`USER_PERMISSIONS_CHAT_STT`](#user_permissions_chat_stt), [`USER_PERMISSIONS_CHAT_TTS`](#user_permissions_chat_tts) and [`USER_PERMISSIONS_CHAT_CALL`](#user_permissions_chat_call).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`
@@ -7611,14 +7612,14 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the visibility of the Notes feature to users.
+- Description: Enables or disables the visibility of the Notes feature to users. Without it, non-admins also do not see **Attach Notes** in the chat input's **+** menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CHANNELS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Gives non-admin users access to the whole [Channels](/features/channels) feature: listing, opening, creating and managing channels, reading and posting messages, reactions and pins, managing channel webhooks and receiving live channel messages. Channel automations a user created run only while they hold this permission. Admins always have access. Messages sent to a channel's incoming webhook URL are accepted whenever [`ENABLE_CHANNELS`](#enable_channels) is on, since that URL carries its own token.
+- Description: Gives non-admin users access to the whole [Channels](/features/channels) feature: listing, opening, creating and managing channels, reading and posting messages, reactions and pins, managing channel webhooks and receiving live channel messages. Channel automations a user created run only while they hold this permission. Without it, the **Compress Images in Channels** setting in **Settings > Interface** is hidden too. Admins always have access. Messages sent to a channel's incoming webhook URL are accepted whenever [`ENABLE_CHANNELS`](#enable_channels) is on, since that URL carries its own token.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`
@@ -7705,55 +7706,55 @@ For API Key creation (and the API keys themselves):
 
 ### Sharing (Private)
 
-These settings control whether the **Access Control** panel shows its access list, where users add specific people and groups to an item. Which grants the server accepts is set by [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](#user_permissions_access_grants_allow_users), [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](#user_permissions_access_grants_allow_groups) and the public sharing settings below.
+These settings control whether the **Access Control** panel shows its access list, where users add specific people and groups to an item. With a setting off, non-admins also do not see the **Access** button in that item type's editor or the **Access** entry in its list menu. Which grants the server accepts is set by [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](#user_permissions_access_grants_allow_users), [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](#user_permissions_access_grants_allow_groups) and the public sharing settings below.
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace models.
+- Description: Shows the access list in the **Access Control** panel of workspace models. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace knowledge.
+- Description: Shows the access list in the **Access Control** panel of workspace knowledge. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace prompts.
+- Description: Shows the access list in the **Access Control** panel of workspace prompts. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace tools.
+- Description: Shows the access list in the **Access Control** panel of workspace tools. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace skills.
+- Description: Shows the access list in the **Access Control** panel of workspace skills. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of notes. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
+- Description: Shows the access list in the **Access Control** panel of notes. When `False`, non-admins do not see the **Access** button in the note editor or the **Access** entry in the notes list menu. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
+- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. When `False`, non-admins do not see the **Access** button in folder settings. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Sharing (Public)
@@ -9015,13 +9016,13 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading, tools attached to a model or chosen in a chat are dropped from the request, the **Tools** workspace page and the **Tools Access** permissions are hidden, and creating or updating a tool returns an error. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading, tools attached to a model or chosen in a chat are dropped from the request, the **Tools** workspace page and the **Tools Access** permissions are hidden, **Valves** in **Chat Controls** offers only functions, and creating or updating a tool returns an error. With both this and [`ENABLE_FUNCTIONS`](#enable_functions) off, the **Valves** section of **Chat Controls** is hidden. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_FUNCTIONS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns [**Functions**](/features/extensibility/plugin/functions) on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions disappear from messages, pipe models leave the model list, the admin **Functions** page is hidden, and creating or updating a function returns an error. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns [**Functions**](/features/extensibility/plugin/functions) on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions disappear from messages, pipe models leave the model list, the admin **Functions** page is hidden, **Valves** in **Chat Controls** offers only tools, and creating or updating a function returns an error. With both this and [`ENABLE_TOOLS`](#enable_tools) off, the **Valves** section of **Chat Controls** is hidden. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_TOOL_SERVERS`
 

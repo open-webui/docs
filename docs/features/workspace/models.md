@@ -92,7 +92,7 @@ Everything else sits in rows, one per setting. Each row shows a short summary of
 | **Base Model (From)** | The actual model that powers this agent |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
-| **Access** | The **Access** button at the top right sets who can use the model: private (specific users/groups) or public |
+| **Access** | The **Access** button at the top right sets who can use the model: private (specific users/groups) or public. Shown to non-admins only with the [**Models Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission |
 | **Language** | The globe selector at the top right, next to **Access**, switches the editor to a translation of the name, description, prompt suggestions and model controls. See [Translations](#translations) |
 
 ![The model editor with base model, description and system prompt](/images/workspace/model-editor.png)
@@ -252,7 +252,7 @@ From the model list, click the ellipsis (**...**) on any model:
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Open the configuration panel |
-| **Access** | On models you can edit: opens the editor's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list. Changes save as you make them |
+| **Access** | On models you can edit, and for non-admins only with the **Models Sharing** permission: opens the editor's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list. Changes save as you make them |
 | **Hide Model** / **Show Model** | Remove from the model selector without deleting, or bring it back |
 | **Hide from Sidebar** / **Keep in Sidebar** | Toggle the model's pin in the sidebar |
 | **Clone** | Create an editable copy you can rename and reconfigure |

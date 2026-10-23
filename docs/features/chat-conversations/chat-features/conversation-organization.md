@@ -140,7 +140,7 @@ Link **knowledge bases and files** to your folder:
 
 Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
 
-Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Access** dialog only offers **Restricted** and has no way to add people. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
+Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Access** button in **Edit Folder** is hidden for non-admins. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
 1. Hover over a folder in the sidebar, open the **three-dot menu** (⋯) and select **Edit**.
 2. Click **Access** at the top of the **Edit Folder** dialog.

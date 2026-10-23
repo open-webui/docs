@@ -76,7 +76,7 @@ Skills have access controls. You can:
 - Share with **specific users or groups**
 - Make them **public** (available to everyone on your instance)
 
-Click the **Access** button in the skill editor to configure who can use your skill.
+Click the **Access** button in the skill editor to configure who can use your skill. Users who are not admins see it only with the **Skills Sharing** permission.
 
 ![AI integration settings and access controls](/images/open-terminal-integrations-page.png)
 

@@ -13,7 +13,7 @@ To enable community sharing, follow these steps:
 
 :::note
 
-**Note:** Only Admins can toggle the **Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community.
+**Note:** Only Admins can toggle the **Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community. With it off, the new chat screen also hides the **By** line that links a model imported from openwebui.com to its author there. Other models keep showing their author.
 
 :::
 

@@ -275,7 +275,7 @@ From the Skills workspace list, use the ellipsis menu (**...**) on a skill you c
 | Action | Description |
 | :--- | :--- |
 | **Edit** | Open the skill in the editor |
-| **Access** | Open the skill's access settings straight from the list. Changes save as you make them |
+| **Access** | Open the skill's access settings straight from the list. Changes save as you make them. Shown to non-admins only with the **Skills Sharing** permission |
 | **Clone** | Create a private copy of the current version, with all its files, and open it in the editor. The copy's name and ID get a short random suffix |
 | **Export .skill** | Download the skill with all its files as one `.skill` file, a ZIP holding the skill's folder. On import, the name and description come from the `SKILL.md` frontmatter and the ID from that name; tags stay behind. Use **Export JSON** to keep the ID, name, description and tags. Needs the **Skills Access** and **Export Skills** permissions |
 | **Export JSON** / **Export ZIP** | Download the skill with all its files. Needs the **Skills Access** and **Export Skills** permissions |
@@ -316,7 +316,7 @@ If someone else saves the skill while you edit it, your save is refused and your
 Skills use the same [Access Control](/features/authentication-access/rbac) system as other workspace resources:
 
 - **Private by default**: Only the creator can see and edit a new skill.
-- **Share with users or groups**: Grant `read` or `write` access via the **Access** button in the editor or the **Access** entry in the list menu.
+- **Share with users or groups**: Grant `read` or `write` access via the **Access** button in the editor or the **Access** entry in the list menu. Non-admins see both only with the [**Skills Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission.
 - **Read-only access**: Users with read access can view but not edit. The editor shows a "Read Only" badge.
 
 :::caution Attached skills still require user access
