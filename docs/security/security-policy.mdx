@@ -193,6 +193,8 @@ We aim to triage new reports, ship fixes, and publish advisories promptly. Howev
 
 For findings we judge to have **broad or severe real-world impact** (regardless of CVSS score), we may hold off on publishing for a couple of days, max ~2 weeks after the patched version is released, to give administrators time to update their instances.
 
+Every advisory also waits for GitHub to assign its CVE ID before we publish it, currently two to five weeks. See [CVE Assignment Before Publication](#cve-assignment-before-publication).
+
 ## Report Handling
 
 When multiple independent reporters describe the same vulnerability class **but** each demonstrates a **distinct and separate exploitation vector** (for example, the same missing authorization check reached through different endpoints), we will consolidate them into the earliest filing **and credit every reporter who demonstrated a distinct path on the consolidated advisory**. Only one CVE will be issued for the consolidated advisory.
@@ -230,6 +232,14 @@ We respond to such records by:
 **Channel compliance does not entitle a CNA to override vendor disposition.** Reporters who escalate a closed-as-out-of-scope/not-a-vulnerability GHSA report to a third-party CNA after vendor disposition has been issued are likewise considered to have acted against vendor disposition, and **may be barred from future GHSA submissions.**
 
 This rule exists because the cost of these escalations is not symmetric. An identifier can be minted in days, and removing an inaccurate one takes months of correspondence across the issuing CNA, the CVE Program and every downstream database that mirrored it, with none of that effort falling on the party that created the record. For the full reasoning, and the record of what these escalations have actually cost, see [The CVE System and Why This Page Exists](./vendor-dispositions/#the-cve-system-and-why-this-page-exists).
+
+## CVE Assignment Before Publication
+
+**We publish a security advisory only after GitHub has assigned its CVE ID.** GitHub is the CVE Numbering Authority (CNA) for the CVEs we request through GitHub Security Advisories. Once an advisory is fixed and ready, we request its CVE, and the advisory stays unpublished until the ID is assigned. At GitHub's current assignment speed, <ins>**this delays the publication of every Open WebUI advisory by two to five weeks.**</ins>
+
+**Why this rule exists.** On 2026-10-12, VulnCheck, a CNA, reserved and published CVE records for 19 Open WebUI advisories within hours. We had published those advisories on 27 and 28 September 2026 and had requested a CVE from GitHub for each one before publishing it. All 19 requests were still pending at GitHub. VulnCheck never contacted us before assigning. Its CNA scope covers only vulnerabilities that are not in another CNA's scope, and a CVE requested by the code owner through GitHub Security Advisories is in GitHub's scope. GitHub then declined all 19 of our requests as duplicates of VulnCheck's records.
+
+Coordinated disclosure depends on a CNA contacting the vendor before it assigns. VulnCheck did not. An advisory that is public without its CVE ID leaves the window VulnCheck used open, and holding publication until the ID is assigned closes it. The cost falls on every Open WebUI administrator, who now learns about fixed vulnerabilities weeks later than before.
 
 ## For Non-Vulnerability Related Security Concerns
 
@@ -313,4 +323,4 @@ If you have an immediate and actionable security concern, please create a report
 
 ---
 
-_Last updated on **2026-10-07**._
+_Last updated on **2026-10-23**._
