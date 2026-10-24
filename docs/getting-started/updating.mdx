@@ -50,7 +50,7 @@ Browse all available tags on the [GitHub releases page](https://github.com/open-
 3. **Clear your browser cache** after updating (`Ctrl+F5` / `Cmd+Shift+R`) to avoid stale frontend assets.
 
 :::info v0.11.4 hides the personal Integrations tab
-Since v0.11.4, personal tool servers sit behind the **Direct Integrations** switch in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which starts off. Users who had the `direct_tool_servers` permission lose sight of the **Integrations** tab in their settings until you turn it on, admins included. Servers they already added keep working the whole time, so nothing breaks; they just cannot add or edit one until the switch is on.
+Since v0.11.4, personal tool servers sit behind the **Direct Integrations** switch in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which starts off. Users who had the `direct_tool_servers` permission lose sight of the **Integrations** tab in their settings until you turn it on, admins included. Since v0.12.4, the tool servers and Open Terminal connections they already saved there are also not used in chats while the switch is off. They stay saved and apply again once you turn it on.
 :::
 
 :::info v0.12.1 adds sign-in records for SCIM users

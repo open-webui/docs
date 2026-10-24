@@ -123,6 +123,8 @@ Adding a terminal connection via personal Settings sends the API key to your bro
 
 If you need to test a connection without admin access, you can add one from the **Personal** part of settings, under *Services*, at **Integrations → Open Terminal**. The same URL and API key fields apply, and the connection is yours alone rather than the instance's.
 
+The personal **Integrations** tab shows only while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)). While it is off, Open Terminal connections and tool servers saved there are not used in chats, for admins as well. They stay saved and apply again once it is turned back on.
+
 ---
 
 ## Chat Uploads

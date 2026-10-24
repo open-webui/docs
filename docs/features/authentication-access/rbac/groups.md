@@ -114,6 +114,7 @@ A user's own default model, saved with **Set as default** in the model selector,
 When editing a group, you can toggle specific permissions.
 *   **Default State**: By default, a group grants *no* extra permissions; members rely on the global defaults.
 *   **Granting Access**: Toggling a permission (e.g., "Web Search") to **ON** for a group means all members get that feature, even if it's disabled globally. Members of its subgroups get it too.
+*   **Instance-wide features**: Toggles such as Web Search, Channels, Notes, API Keys and Allow Rate Response only show while that feature is on for the whole instance. A hidden toggle keeps its saved value and applies again once the feature is back on (see [Permissions](./permissions.md#permission-categories)).
 
 ## Resource Access (RBAC)
 

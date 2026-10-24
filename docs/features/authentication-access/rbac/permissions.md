@@ -37,6 +37,8 @@ This approach ensures that new users don't accidentally get access to sensitive 
 
 Permissions are organized into five main categories: **Workspace**, **Sharing**, **Chat**, **Features**, and **Settings**.
 
+Some toggles only show while their feature is on for the whole instance: **Tools Access**, **Import Tools** and **Export Tools** (Tools), **Notes Sharing** and **Notes Public Sharing** (Notes), **Folders Sharing** (Folders), **Calendars Public Sharing** (Calendar, and only while the group's **Calendar** toggle is on), **Allow Rate Response** (message rating) and, under Features, **API Keys**, **Notes**, **Channels**, **Encrypted Channels**, **Folders**, **Direct Tool Servers** (Direct Integrations), **Web Search**, **Image Generation**, **Code Interpreter**, **Memories**, **Automations**, **Calendar** and **User Webhooks**. A hidden toggle keeps its saved value, so turning the feature back on restores each group's setting.
+
 ### 1. Workspace Permissions
 Controls access to the "Workspace" section where users create and manage resources.
 Some permissions are **dependent** on others (e.g., you cannot import models if you cannot access the Models workspace).
@@ -139,7 +141,7 @@ Controls access to broad platform capabilities.
 | **Web Search** | Ability to use Web Search integration. |
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. |
-| **Direct Tool Servers** | Ability to connect to custom Tool Servers in settings. |
+| **Direct Tool Servers** | Ability to add personal tool servers and Open Terminal connections in the **Integrations** tab of **Settings**. Needs [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations) on. While it is off, this toggle is hidden and saved connections are not used in chats. |
 | **Memories** | Access to the Memories feature for persistent user context. Taking it away hides the **Personalization** settings tab, blocks the memory API endpoints, withholds the memory tools from the model and stops stored memories being injected into the chat's system context. The injection check runs server-side on every chat request, so a client that still asks for memory does not get it. Admins are always exempt. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
