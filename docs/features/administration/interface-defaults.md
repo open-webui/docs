@@ -99,7 +99,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `showUpdateToast` | Toast Notifications for New Updates | `true` |
 | `showChangelog` | Show "What's New" Modal on Login | `true` |
 
-`textScale` is the **UI Scale** slider and `highContrastMode` is **Accessibility Mode**, which was called **High Contrast Mode** before v0.11.2. The key kept its old name, so existing defaults keep working untouched.
+`textScale` is the **UI Scale** slider and `highContrastMode` is **Accessibility Mode**, which was called **High Contrast Mode** before v0.11.2. The key kept its old name, so existing defaults keep working untouched. With Accessibility Mode on, phones allow pinch zoom up to 5x; with it off, zoom stays locked so phones do not zoom into small text fields on their own.
 
 `fontFamily` names a font that has to be installed on each person's own machine. Nothing is downloaded, so a default naming a font your users do not have simply falls back to the standard one, and everybody sees the usual interface. Set it only where you know what is installed, such as a managed fleet with a corporate typeface.
 

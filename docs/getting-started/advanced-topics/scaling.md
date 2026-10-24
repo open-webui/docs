@@ -253,6 +253,8 @@ If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE`, `
 
 `WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel again. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
 
+On v0.12.3, a dropped Redis connection could leave new browser connections hanging until a restart. See [Redis troubleshooting](/tutorials/integrations/redis) and update to v0.12.4.
+
 ### Speed Up Name Lookups
 
 Hostname lookups queue behind each other under load, delaying the request each one belongs to. The c-ares resolver removes that queue:
