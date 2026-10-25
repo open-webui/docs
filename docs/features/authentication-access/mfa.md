@@ -19,7 +19,7 @@ The setting covers every user on the instance. Users who have not set up an auth
 - **Persistent configuration turned on.** [`ENABLE_PERSISTENT_CONFIG`](/reference/env-configuration#enable_persistent_config) must stay at its default `True`.
 - **A stable encryption key.** The secret behind each user's authenticator is stored encrypted in the database. The key is derived from [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key), or taken from [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) when that is set. If the key changes after users have enrolled, their authenticators can no longer be read.
 
-While MFA is on, Open WebUI checks all of this at startup and refuses to start when authentication or persistent configuration is off, when `MFA_ENCRYPTION_KEY` is not a valid key, or when a stored authenticator secret cannot be decrypted with the current key. Restore the previous key to get the instance running again.
+While MFA is on, Open WebUI checks all of this at startup and refuses to start when authentication or persistent configuration is off, when `MFA_ENCRYPTION_KEY` is not a valid key, or when a stored authenticator secret cannot be decrypted with the current key. In that last case, the log shows `ValueError: Stored MFA secrets cannot be decrypted. Restore the WEBUI_SECRET_KEY or MFA_ENCRYPTION_KEY they were encrypted with.` Restore the previous key to get the instance running again.
 
 ---
 

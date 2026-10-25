@@ -206,7 +206,7 @@ With 20 messages, `{{MESSAGES:MIDDLETRUNCATE:6}}` keeps messages 1-3 and 18-20, 
 
 ## Version History
 
-Every save creates a new version. When editing a prompt, the history menu above the prompt content starts on **Live**, the active production version. Open it to list the versions newest first, each with its commit message and author (hover for the date), and **Load more** for older ones.
+Every save that changes the prompt's content creates a new version. When editing a prompt, the history menu above the prompt content starts on **Live**, the active production version. Open it to list the versions newest first, each with its commit message and author (hover for the date), and **Load more** for older ones.
 
 - **Preview** any version by clicking it. Its content opens read-only, with the version ID and date underneath.
 - **Compare to current** shows what differs between that version and the live one: the name and tags side by side, then the prompt content as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.

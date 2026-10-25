@@ -43,6 +43,7 @@ Click the **Import Chats** button and select a JSON file to restore conversation
 - Imported chats are added to your existing conversations (they don't replace them)
 - Each imported chat receives a new unique ID, so re-importing the same file will create duplicates
 - If using ChatGPT exports, the format is automatically detected and converted
+- Tags your account does not have yet are created from the file. An export stores each tag in lowercase with underscores, so a tag named Import Test comes back as import_test
 
 ## Chat Import JSON Schema
 
