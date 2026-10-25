@@ -208,7 +208,7 @@ Notes carry their own files. Pick **Upload files** in the **More (...)** menu. N
 
 Two things to know:
 
-* **Images uploaded from the menu are invisible.** They are stored on the note but are neither shown as a chip nor placed in the text. To get an image into the note, paste it into the editor, which inserts it where the cursor is. Dropping files onto a note does nothing in this release.
+* **Images go into the text, not the chip row.** An image picked with **Upload files** or pasted into the editor is inserted where the cursor is, and an image dropped onto the note is inserted where you drop it.
 * Attached files feed the note's chat. Every non-image attachment is added as retrieval context on every message you send in a chat opened from this note.
 
 ### Formatting

@@ -79,6 +79,10 @@ This method is perfect if you want to skip navigating through the Admin Settings
 
 Ollama can also download GGUF models straight from Hugging Face. In **Pull a model from Ollama.com** or the model selector, enter the model as `hf.co/{username}/{repository}:{quantization}`, for example `hf.co/ggml-org/gemma-3-270m-it-GGUF:Q8_0`. The quantization matches the one in the GGUF file's name, such as `Q4_K_M` or `Q8_0`. The model is then listed under that full name. See Hugging Face's [Ollama guide](https://huggingface.co/docs/hub/en/ollama) for which repositories work.
 
+### Uploading a GGUF File
+
+To use a GGUF file you already have, open the connection's **Manage** dialog and click **Show** next to the **Experimental** badge at the bottom. The mode button under **Upload a GGUF model** picks the source. **File Mode** uploads a `.gguf` file from your computer, and **URL Mode** takes a Hugging Face resolve (download) URL. Open WebUI sends the file to that Ollama server and creates a model named after the file without its extension, then shows **Model created successfully!**. To give it a system prompt or parameters, base a new model on it as described in [Creating a Model](#creating-a-model).
+
 ---
 
 ## Updating and Deleting Models
