@@ -144,6 +144,8 @@ Four things change with it:
 - **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
 
+On a terminal whose **Chat** context is **Per chat** (see [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)), a new chat has no terminal of its own until its first message is sent. A file attached before that waits in the input. When you send the message, the chat is created and the file uploads into that chat's terminal. Then the message goes out with it. If that upload fails, the message is not sent and the file stays attached, so you can send again.
+
 The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
 ![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)

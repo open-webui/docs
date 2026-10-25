@@ -95,13 +95,15 @@ Admins can control access to Voice Mode on a per-role or per-group basis.
 
 If disabled, users do not see the **Voice mode** button. Admins always do.
 
+Unless Realtime mode is on, a call also needs the server to transcribe your speech. The **Voice mode** button then shows only while the admin's speech-to-text engine is not **Web API** and you have the **Allow Speech to Text** permission (admins always have it). Without that permission, a `?call=true` link or the desktop app's call shortcut does not start a call either.
+
 The same permission covers both call modes. In Realtime mode, Open WebUI checks it again when the call connects and every minute during the call.
 
 ## Troubleshooting
 
 - **"Permission denied when accessing media devices"**: the browser blocked the microphone. Browsers only allow microphone access on HTTPS or `localhost`, so opening Open WebUI by its IP address from another device usually causes this. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues).
 - **"Select only one model to call"**: more than one model is selected. Remove the others and try again.
-- **"Call feature is not supported when using Web STT engine"**: the admin's speech-to-text engine is set to **Web API**. An admin needs to choose a server-side engine in **Settings > Admin > Audio**.
+- **"Call feature is not supported when using Web STT engine"**: a call link or the desktop app's call shortcut was used while the admin's speech-to-text engine is set to **Web API**. The **Voice mode** button is hidden in that case. An admin needs to choose a server-side engine in **Settings > Admin > Audio**.
 - **It keeps listening and never sends**: Voice Mode sends after about two seconds of silence, so steady background noise can keep it recording. Mute while it is noisy, or move somewhere quieter.
 - **No sound from the model**: see [Text-to-Speech (TTS) Issues](/troubleshooting/audio#text-to-speech-tts-issues).
 

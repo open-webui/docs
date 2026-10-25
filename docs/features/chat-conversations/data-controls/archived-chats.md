@@ -37,6 +37,12 @@ From the Data Controls tab, you can also perform bulk operations:
 
 :::
 
+:::info Archive hidden by the admin
+
+An admin can hide **Archive** under **Visible controls** in **Settings > Admin > Interface**. That removes **Archive** from chat menus and from the sidebar's selection bar, and also hides **Unarchive Chat** on each archived chat, **Unarchive All** and **Archive All Chats**. Chats that are already archived stay archived and can still be opened and deleted here. Admins always see every control.
+
+:::
+
 ## FAQ
 
 **Q: Can I search within archived chats?**  

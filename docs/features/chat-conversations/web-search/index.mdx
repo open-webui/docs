@@ -36,7 +36,7 @@ Think of looking up a recipe online. You type “chocolate cake recipe” into G
 
 That is why there are two settings: one chooses **who finds the links**, and the other chooses **how to read the pages behind those links**.
 
-The web loader settings apply with web search off too. **Web Search Engine** is required only while **Web Search** is on, so the **Loader** settings save without an engine.
+The web loader settings apply with web search off too. **Web Search Engine** is required only while **Web Search** is on, so the **Loader** settings save without an engine. While **Web Search** is off, the page hides **Web Search Confirmation**, **Web Search Engine** and its settings, **Search Limits**, **Fetch URL Content Length Limit**, **Domain Filter List** and **Bypass Web Loader**. Their saved values are kept. **Bypass Embedding and Retrieval** and **Trust Proxy Environment** stay visible.
 
 ## Why are there so many options?
 
@@ -63,7 +63,7 @@ Finding a page does not guarantee Open WebUI can read it. A website may appear i
 ![Web search settings](/images/admin/admin-web-search.png)
 
 :::tip Require confirmation before searching
-Admins can require users to **confirm before a web search runs**, so a query is never sent to an external provider unintentionally. Enable it in **Settings → Admin → Web Search** (or via [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation)); the prompt text is set by [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content).
+Admins can require users to **confirm before a web search runs**, so a query is never sent to an external provider unintentionally. Enable it in **Settings → Admin → Web Search**, where the switch shows while **Web Search** is on (or via [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation)); the prompt text is set by [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content).
 :::
 
 <DocCardList />

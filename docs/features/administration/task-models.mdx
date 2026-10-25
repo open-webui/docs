@@ -72,7 +72,9 @@ Each background task has a switch under **Generation** in the same panel, and an
 
 Turning off **Title Generation**, **Tags Generation** or **Follow Up Generation** also hides the matching switch in each user's **Settings > Interface**. A choice a user saved there is kept and applies again once the generation is back on. **Keep Follow-Up Prompts in Chat** and **Insert Follow-Up Prompt to Input** stay visible, since they still apply to follow-ups saved in existing chats.
 
-Image prompt generation is switched off in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)).
+**Web Search Query Generation** shows only while web search is on in **Settings > Admin > Web Search**. Its saved value is kept while it is hidden.
+
+Image prompt generation is switched off in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)). Its **Image Prompt Generation** switch shows there only while **Image Generation** is on.
 
 :::tip Weak hardware
 Autocomplete is the first thing to turn off. It fires as users type, so a slow task model turns the prompt box to molasses.

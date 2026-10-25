@@ -280,6 +280,90 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 :::
 
+#### `UI_VISIBILITY`
+
+- Type: `dict` (JSON object)
+- Default: `{}` (every control shown)
+- Description: Hides controls from non-admin users. Set a control ID to `false` to hide it, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Admins always see every control. Hiding a control only removes it from view: its current value and the feature behind it stay in effect, so with `chat.attach_files` hidden, users can still drag files into the chat. A hidden personal setting also drops out of the search in **Settings**. Also configurable as **Visible controls** in **Admin Panel > Settings > Interface**, under **Visibility**.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.visibility`.
+
+:::info
+
+`UI_VISIBILITY` is read from the environment as a JSON string at startup.
+
+- Use a JSON object whose values are `true` or `false` (for example: `{"chat.archive": false}`). `true` and a missing ID both show the control
+- If parsing fails, or a value is not a JSON boolean, Open WebUI logs the error and every control is shown
+
+:::
+
+| Control ID | Label in **Visible controls** | What it hides |
+| :--- | :--- | :--- |
+| `model_editor.capabilities.vision` | Vision | **Vision** under **Capabilities** in the model editor |
+| `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Capabilities** in the model editor |
+| `model_editor.capabilities.file_context` | File Context | **File Context** under **Capabilities** in the model editor |
+| `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Capabilities** in the model editor |
+| `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Capabilities** in the model editor |
+| `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Capabilities** in the model editor |
+| `model_editor.capabilities.terminal` | Terminal | **Terminal** under **Capabilities** in the model editor |
+| `model_editor.capabilities.usage` | Usage | **Usage** under **Capabilities** in the model editor |
+| `model_editor.capabilities.citations` | Citations | **Citations** under **Capabilities** in the model editor |
+| `model_editor.capabilities.status_updates` | Status Updates | **Status Updates** under **Capabilities** in the model editor |
+| `model_editor.capabilities.memory` | Memory | **Memory** under **Capabilities** in the model editor |
+| `model_editor.capabilities.builtin_tools` | Builtin Tools | **Builtin Tools** under **Capabilities** in the model editor |
+| `model_editor.defaults.web_search` | Web Search | **Web Search** under **Default Features** in the model editor |
+| `model_editor.defaults.image_generation` | Image Generation | **Image Generation** under **Default Features** in the model editor |
+| `model_editor.defaults.code_interpreter` | Code Interpreter | **Code Interpreter** under **Default Features** in the model editor |
+| `model_editor.tools.time` | Time & Calculation | **Time & Calculation** under **Builtin Tools** in the model editor |
+| `model_editor.tools.user_input` | Ask User | **Ask User** under **Builtin Tools** in the model editor |
+| `model_editor.tools.memory` | Memory | **Memory** under **Builtin Tools** in the model editor |
+| `model_editor.tools.chats` | Chat History | **Chat History** under **Builtin Tools** in the model editor |
+| `model_editor.tools.notes` | Notes | **Notes** under **Builtin Tools** in the model editor |
+| `model_editor.tools.knowledge` | Knowledge Base | **Knowledge Base** under **Builtin Tools** in the model editor |
+| `model_editor.tools.files` | Files | **Files** under **Builtin Tools** in the model editor |
+| `model_editor.tools.channels` | Channels | **Channels** under **Builtin Tools** in the model editor |
+| `model_editor.tools.notifications` | Notifications | **Notifications** under **Builtin Tools** in the model editor |
+| `model_editor.tools.web_search` | Web Search | **Web Search** under **Builtin Tools** in the model editor |
+| `model_editor.tools.image_generation` | Image Generation | **Image Generation** under **Builtin Tools** in the model editor |
+| `model_editor.tools.code_interpreter` | Code Interpreter | **Code Interpreter** under **Builtin Tools** in the model editor |
+| `model_editor.tools.tasks` | Task Management | **Task Management** under **Builtin Tools** in the model editor |
+| `model_editor.tools.automations` | Automations | **Automations** under **Builtin Tools** in the model editor |
+| `model_editor.tools.calendar` | Calendar | **Calendar** under **Builtin Tools** in the model editor |
+| `model_editor.tools.subagents` | Sub-agents | **Sub-agents** under **Builtin Tools** in the model editor |
+| `model_editor.tools.skills` | Skills | **Skills** under **Builtin Tools** in the model editor |
+| `chat.capture` | Capture | **Capture** in the chat input's **+** menu |
+| `chat.compare` | Compare text | **Compare text** in the **+** menu and the `/compare` command |
+| `chat.attach_webpage` | Attach Webpage | **Attach Webpage** in the **+** menu |
+| `chat.attach_files` | Attach Files | **Attach Files** in the **+** menu |
+| `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu |
+| `chat.attach_knowledge` | Attach Knowledge | **Attach Knowledge** in the **+** menu |
+| `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu |
+| `chat.status` | /status | The `/status` command |
+| `chat.model_command` | /model | The `/model` command |
+| `chat.settings_command` | /settings | The `/settings` command |
+| `chat.usage` | Usage | The usage info button under a response |
+| `chat.merge` | Merge Responses | **Merge Responses** under multi-model responses |
+| `chat.code_preview` | Preview | **Preview** on code blocks |
+| `chat.fork` | Fork chat | **Fork chat** under a response and the `/fork` command |
+| `chat.artifacts` | Artifacts | **Artifacts** in the chat's top-bar menu |
+| `chat.archive` | Archive | **Archive** in the chat menus and for chats selected in the sidebar, **Unarchive Chat** and **Unarchive All** in **Settings > Archived Chats** and **Archive All Chats** in **Settings > Data Controls** |
+| `chat.tags` | Tags | **Tags** in the chat's top-bar menu |
+| `models.set_default` | Set as default | **Set as default** in the model selector |
+| `models.pin` | Keep in Sidebar | **Keep in Sidebar** in the model selector and the Models workspace menus |
+| `settings.usage` | Usage | The **Usage** tab in **Settings** |
+| `settings.speech_to_text_engine` | Speech-to-Text Engine | **Speech-to-Text Engine** in **Settings > Audio** |
+| `settings.text_to_speech_engine` | Text-to-Speech Engine | **Text-to-Speech Engine** in **Settings > Audio** |
+| `settings.user_location` | Allow User Location | **Allow User Location** in **Settings > Interface** |
+| `settings.chat_bubble` | Chat Bubble UI | **Chat Bubble UI** in **Settings > Interface** |
+| `settings.widescreen` | Widescreen Mode | **Widescreen Mode** in **Settings > Interface** |
+| `settings.floating_action_buttons` | Floating Quick Actions | **Floating Quick Actions** in **Settings > Interface** |
+| `settings.rich_text_input` | Rich Text Input for Chat | **Rich Text Input for Chat** in **Settings > Interface** |
+| `settings.large_text_as_file` | Paste Large Text as File | **Paste Large Text as File** in **Settings > Interface** |
+| `settings.detect_artifacts` | Detect Artifacts Automatically | **Detect Artifacts Automatically** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_scripts` | iframe Sandbox Allow Scripts | **iframe Sandbox Allow Scripts** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_same_origin` | iframe Sandbox Allow Same Origin | **iframe Sandbox Allow Same Origin** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_forms` | iframe Sandbox Allow Forms | **iframe Sandbox Allow Forms** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_downloads` | iframe Sandbox Allow Downloads | **iframe Sandbox Allow Downloads** in **Settings > Interface** |
+
 #### `DEFAULT_USER_ROLE`
 
 - Type: `str`
@@ -1152,7 +1236,7 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 
 - Type: `int`
 - Default: `10`
-- Description: Timeout in seconds for the MCP `session.initialize()` handshake, which performs a list-tools round-trip. Raise it if your MCP server cold-starts slowly or exposes many tools and connections fail with a timeout during initialization; a server advertising dozens of tools can need 30 to 60 seconds.
+- Description: Timeout in seconds for each request Open WebUI sends to an MCP server other than a tool call: the connection handshake of servers on protocol versions before 2026-07-28, tool lists, resource lists and resource reads. Raise it if your MCP server cold-starts slowly or exposes many tools and connections fail with a timeout; a server advertising dozens of tools can need 30 to 60 seconds. Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](#aiohttp_client_timeout_tool_server). The check for the stateless 2026-07-28 protocol, which runs when connecting, has its own fixed 10-second limit. MCP connections follow a redirect only when it stays on the same origin.
 
 #### `AIOHTTP_POOL_CONNECTIONS`
 
@@ -4469,8 +4553,15 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Extracts images from PDFs using OCR when loading documents.
+- Description: Extracts images from PDFs using OCR when loading documents. Also configurable as **PDF Extract Images (OCR)** in **Admin Panel > Settings > Documents**. The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAPIDOCR_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{"EngineConfig.onnxruntime.intra_op_num_threads": 1}`
+- Description: Settings passed to RapidOCR, the OCR engine that reads images in PDFs while [`PDF_EXTRACT_IMAGES`](#pdf_extract_images) is on, as a JSON object of RapidOCR parameter names and values. The default gives the OCR of each upload one processor thread, so several uploads at once do not compete for every core. On an idle server with many cores, raise `EngineConfig.onnxruntime.intra_op_num_threads` to process a single upload faster. A value you set replaces the default as a whole, so include the thread setting if you want to keep it. Invalid JSON, or a value that is not a JSON object, falls back to RapidOCR's own defaults.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `PDF_LOADER_MODE`
 

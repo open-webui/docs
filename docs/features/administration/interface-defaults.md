@@ -135,6 +135,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `displayMultiModelResponsesInTabs` | Display Multi-model Responses in Tabs | `false` |
 | `showFilesOnTerminalSelect` | Show Files on Terminal Select | `true` |
 | `terminalFileDisplay` | Terminal File Display | `sidebar` |
+| `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
 | `stylizedPdfExport` | Stylized PDF Export | `true` |
 | `showFloatingActionButtons` | Floating Quick Actions | `true` |
 | `floatingActionButtons` | Floating Quick Actions > **Manage** | `null` |
@@ -160,7 +161,6 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `detectArtifacts` | Detect Artifacts Automatically | `true` |
 | `iframeSandboxAllowScripts` | iframe Sandbox Allow Scripts | `true` |
 | `iframeSandboxAllowSameOrigin` | iframe Sandbox Allow Same Origin | `false` |
-| `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
 | `iframeSandboxAllowForms` | iframe Sandbox Allow Forms | `true` |
 | `iframeSandboxAllowDownloads` | iframe Sandbox Allow Downloads | `true` |
 
@@ -181,14 +181,14 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `imageCompressionInChannels` | Compress Images in Channels | `true` |
 
 :::note Rows that are not always on screen
-A few controls only appear under a condition: **Toast Notifications for New Updates** and **Show "What's New" Modal on Login** are shown to admins only, **Display the Username Instead of You in the Chat** appears when **Chat Bubble UI** is off, **Temporary Chat by Default** needs the temporary-chat permission, **Prompt Autocompletion** needs autocomplete generation enabled on the instance, **Title Auto-Generation**, **Follow-Up Auto-Generation** and **Chat Tags Auto-Generation** need title, follow-up and tag generation enabled on the instance, **Show Formatting Toolbar** and **Insert Prompt as Rich Text** appear when **Rich Text Input for Chat** is on, **Web Search in Chat** needs web search enabled on the instance and the user allowed to use it, the **Voice** section (**Allow Voice Interruption in Call** and **Display Emoji in Call**) needs the **Allow Call** permission, and **Compress Images in Channels** appears when **Image Compression** is on and the user can use channels. Setting a default for any of them still works; it simply takes effect for the people who can see the control.
+A few controls only appear under a condition: **Toast Notifications for New Updates** and **Show "What's New" Modal on Login** are shown to admins only, **Display the Username Instead of You in the Chat** appears when **Chat Bubble UI** is off, **Temporary Chat by Default** needs the temporary-chat permission, **Prompt Autocompletion** needs autocomplete generation enabled on the instance, **Title Auto-Generation**, **Follow-Up Auto-Generation** and **Chat Tags Auto-Generation** need title, follow-up and tag generation enabled on the instance, **Show Formatting Toolbar** and **Insert Prompt as Rich Text** appear when **Rich Text Input for Chat** is on, **Regenerate Menu** needs the **Allow Regenerate Response** permission, **Terminal File Display**, **Show Files on Terminal Select** and **Terminal Preview Allow Same Origin** appear once the user can reach a terminal (one an admin set up or one of their own) and show in the admin editor whenever the instance offers terminals, **Web Search in Chat** needs web search enabled on the instance and the user allowed to use it, the **Voice** section (**Allow Voice Interruption in Call** and **Display Emoji in Call**) needs the **Allow Call** permission, and **Compress Images in Channels** appears when **Image Compression** is on and the user can use channels. Rows hidden with [Visible controls](#hiding-controls) are also missing for everyone except admins. Setting a default for any of them still works; it simply takes effect for the people who can see the control.
 :::
 
 ---
 
 ## What this does not do
 
-- **It does not restrict anyone.** Everyone keeps full control of every option in **Settings > Interface**. To actually hold people to your values, take **Interface Settings Access** away from them, see [Locking the defaults](#locking-the-defaults).
+- **It does not restrict anyone.** Everyone keeps full control of every option in **Settings > Interface**. To actually hold people to your values, take **Interface Settings Access** away from them (see [Locking the defaults](#locking-the-defaults)) or hide single options with [Visible controls](#hiding-controls).
 - **It does not wipe anyone's existing choices.** Whatever someone already set for themselves keeps its value. What changes is the options they never set: those move from the built-in value to yours.
 - **It does not cover Theme or Language.** Both are stored in the browser rather than on the account, so they are not part of this. Use [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale) to choose the starting language.
 
@@ -197,6 +197,28 @@ A few controls only appear under a condition: **Toast Notifications for New Upda
 ## Locking the defaults
 
 If a set of accounts should stay exactly on your values, remove the **Interface Settings Access** permission from them (see [Permissions](/features/authentication-access/rbac/permissions)). Doing so hides the **Interface** page and refuses any attempt to save personal settings, so those accounts keep whatever you have configured. Admins are exempt from the permission and can always change their own settings.
+
+---
+
+## Hiding controls
+
+**Visible controls** in **Settings > Admin > Interface** chooses which controls users see. Click **Show** next to it to open the list, switch off the controls to hide and click **Save**. The list has six groups: the model editor's **Capabilities**, **Default Features** and **Builtin Tools**, then **Chat**, **Models** and **Settings**.
+
+Hiding a control only removes it from the interface. Its current value and the feature behind it stay in effect. With **Attach Files** hidden, for example, files can still be dragged into the chat, and a hidden **Chat Bubble UI** keeps whatever value the user or your [defaults](#configuring-the-defaults) set. To stop people from using a feature, use its [permission](/features/authentication-access/rbac/permissions). Admins always see the controls this list hides.
+
+Hiding **Archive** also hides **Unarchive Chat**, **Unarchive All** and **Archive All Chats**.
+
+For automated deployments, set the same list with the `UI_VISIBILITY` environment variable: a JSON object that maps control IDs to `false`, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Every value must be `true` or `false`. A value that is not valid JSON or holds anything else is ignored, and every control stays visible.
+
+```yaml
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    environment:
+      - 'UI_VISIBILITY={"chat.fork": false, "models.pin": false, "settings.usage": false}'
+```
+
+The full list of control IDs is in [`UI_VISIBILITY`](/reference/env-configuration#ui_visibility).
 
 ---
 

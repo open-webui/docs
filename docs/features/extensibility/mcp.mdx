@@ -239,7 +239,7 @@ An MCP server can ask you for input in the middle of a tool call (MCP elicitatio
 - **Form requests** show a form with the fields the server asks for. **Submit** sends your answers. Open WebUI checks them against the server's schema and only sends answers that match it.
 - **Link requests** show a link to open. Opening it tells the server that you went ahead. A link that does not start with `http://` or `https://`, or that contains a user name or password, is cancelled before any dialog appears.
 
-**Decline** refuses the request and **Cancel** dismisses it, and the server decides how the tool call goes on. The dialog waits up to 120 seconds, or [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is lower, and then cancels the request. The dialog appears only while that chat is the one open in a browser tab; otherwise the request is cancelled at once.
+**Decline** refuses the request and **Cancel** dismisses it, and the server decides how the tool call goes on. The dialog waits up to 120 seconds, or [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is lower, and then cancels the request. In a saved chat, if the connection drops while the dialog is open, the request waits up to 60 seconds for the user to reopen that chat and then shows the dialog again. The dialog appears only while that chat is the one open in a browser tab; otherwise the request is cancelled at once.
 
 ## Troubleshooting
 
@@ -254,7 +254,7 @@ The server log records each failure at error level as `Failed to connect to MCP 
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
-4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, the `session.initialize()` handshake can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds).
+4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, connecting, listing its tools or reading a resource can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds). It limits every MCP request except tool calls, which use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server), and the check for the 2026-07-28 protocol, which has a fixed 10-second limit.
 
 ### Infinite loading screen after adding External Tool
 

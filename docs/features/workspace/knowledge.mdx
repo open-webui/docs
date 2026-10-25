@@ -143,7 +143,7 @@ In agentic flows, a typical pattern is: `query_knowledge_files` to locate the re
 `view_file` supports two addressing modes:
 
 - **Character pagination**: `offset` + `max_chars` (default `10000`, hard cap `100000`; both configurable with [`VIEW_FILE_DEFAULT_MAX_CHARS`](/reference/env-configuration#view_file_default_max_chars) and [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars)). Best for streaming through a long document; the response includes `next_offset` when the file is truncated.
-- **Line range**: `start_line` + optional `end_line` (1-indexed, inclusive). Overrides `offset`/`max_chars` when set; pairs naturally with `grep_knowledge_files`' line numbers. Pass `line_numbers: true` to also get a `<n>: <line>` prefix on each returned line.
+- **Line range**: `start_line` and/or `end_line` (1-indexed, inclusive). `end_line` alone reads from line 1. Overrides `offset`/`max_chars` when set; pairs naturally with `grep_knowledge_files`' line numbers. Pass `line_numbers: true` to also get a `<n>: <line>` prefix on each returned line.
 
 The line-range response includes `total_lines`, `showing_lines`, and `next_start_line` for follow-up reads.
 

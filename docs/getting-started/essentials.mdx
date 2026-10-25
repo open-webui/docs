@@ -159,7 +159,7 @@ This error comes from your model provider, not from Open WebUI. Every time you s
 
 ### The built-in answer: Context Compaction
 
-Open WebUI ships **Context Compaction** for exactly this. Once a chat's estimated context passes a token threshold, a model summarizes the older messages, and the conversation continues from that summary plus the most recent messages, so a long chat keeps going instead of hitting the wall. It runs server-side and changes only what is sent to the model on that turn. Your chat is still stored and displayed in full, and nothing is deleted.
+Open WebUI ships **Context Compaction** for exactly this. Once a chat's estimated context passes a token threshold, a model summarizes the older messages, and the conversation continues from that summary plus the most recent messages, so a long chat keeps going instead of hitting the wall. It runs server-side and changes only what is sent to the model on that turn. Your chat is still stored and displayed in full, and nothing is deleted. A **Context compacted** line marks the message where older messages were summarized, and clicking it shows the summary. While compaction runs, the chat shows **Compacting context** in that place, and an error there if it fails.
 
 It is **off by default**. An administrator turns it on in **Settings > Admin > Interface**, where the token threshold (default `80000`), the model that writes the summaries, the share of recent messages kept verbatim and an optional custom summary prompt are all configurable. Set the threshold below your model's real context window.
 

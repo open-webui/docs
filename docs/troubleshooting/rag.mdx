@@ -391,6 +391,7 @@ If PDFs containing images with text are returning empty content:
 
 2. **Enable PDF Image Extraction**:
    - In **Settings > Admin > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+   - The OCR of those images uses one processor thread per upload by default (`{"EngineConfig.onnxruntime.intra_op_num_threads": 1}`). On an idle server with many cores, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster. The variable takes a JSON object of RapidOCR settings; a value that is not a valid JSON object is ignored and RapidOCR uses its own defaults
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats

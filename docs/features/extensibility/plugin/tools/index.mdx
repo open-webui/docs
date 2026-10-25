@@ -340,8 +340,8 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `query_knowledge_files` | Search file contents via the RAG retrieval pipeline (hybrid + rerank when enabled). Main tool for finding answers in docs. |
 | `search_knowledge_files` | Search files by filename. |
 | `grep_knowledge_files` | Exact text / regex search across knowledge file content. Returns matching lines with line numbers. Complements `query_knowledge_files` (semantic) when you need literal matches. |
-| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, optional `line_numbers`). |
-| `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
+| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered); `line_numbers` numbers character pages. |
+| `view_knowledge_file` | Read a knowledge-base file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered); `line_numbers` numbers character pages. |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
 | **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **File Context** off for this is also the setup that keeps the prompt prefix cacheable, so turn **Citations** off alongside it and put your citation rules in the system prompt instead; see [prompt caching](/features/chat-conversations/prompt-caching).* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
@@ -473,7 +473,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
 | `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional, single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches by default, see [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable), `line_numbers` (default: false), `start_line` / `end_line` (optional; line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}`, includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
-| `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable) | `{id, filename, content, knowledge_id, knowledge_name}`, includes pagination metadata when truncated |
+| `view_knowledge_file` | Same parameters as `view_file` | `{id, filename, content, updated_at, created_at, knowledge_id, knowledge_name}`, with the same pagination and line-mode fields as `view_file` |
 | `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed |
@@ -535,6 +535,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Tool Search** | | |
 | `search_tools` | `query` (required; keywords or an exact tool name), `count` (default: `5`, at most `20`) | `{"tools": [...]}` with the full definitions, or `{"tools": [], "message": ...}` when nothing matches |
 | `call_tool` | `tool_name` (required; exact name), `params` (required; the tool's arguments as a JSON-encoded object string, `"{}"` for none) | The named tool's own result, or an `Error: ...` string when the call is malformed or the tool is not available |
+
+In `view_file` and `view_knowledge_file` line mode, `end_line` without `start_line` reads from line 1, and `start_line` without `end_line` returns 100 lines. Character paging with `line_numbers` on returns every character exactly once: following `next_offset` page after page reads the whole file with no gaps.
 
 :::warning Builtin tools behave differently inside a note-attached chat
 

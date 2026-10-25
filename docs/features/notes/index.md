@@ -127,7 +127,7 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 3. Select **Attach Notes**
 4. Choose the note(s) to attach
 
-**Attach Notes** shows only while Notes is enabled on the instance and you have the **Notes** permission. Admins always have it.
+**Attach Notes** shows only while Notes is enabled on the instance and you have the **Notes** permission. Admins always have it. An admin can also hide it for non-admins under **Visible controls** in **Settings > Admin > Interface**.
 
 The full content of the note is injected into the context window for that conversation.
 
