@@ -84,7 +84,7 @@ Valve titles, help text and dropdown option labels can be stored per language, f
 
 Valves support special input types that change how fields are rendered in the UI. You can configure these using `json_schema_extra` with the `input` key in your Pydantic `Field` definitions.
 
-The renderer picks the control in a fixed order. A `Literal` or enum field always renders as a select, a `bool` as a switch, a multiselect as its own control, and any other non-string type as a plain text box that ignores `input.type`. The `password` and `select` input types therefore only take effect on `str` fields.
+The renderer picks the control in a fixed order. A `Literal` or enum field always renders as a select, a `bool` as a switch, a multiselect as its own control, a range as a slider, and any other non-string type as a plain text box that ignores `input.type`. The `password` and `select` input types therefore only take effect on `str` fields.
 
 ### Password Input (Masked Fields)
 
@@ -271,3 +271,24 @@ Dynamic options are particularly useful for:
 - Any scenario where options change based on runtime context
 :::
 
+### Slider Input (Number Ranges)
+
+When a number has a sensible range, such as a temperature or how many results to fetch, use the range input type. It renders a slider with a small number box beside it, the same row the model parameters use in the chat controls, so whoever sets the value can see the allowed range before saving:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class UserValves(BaseModel):
+        temperature: float = Field(
+            default=0.7,
+            ge=0,
+            le=2,
+            description="Sampling temperature",
+            json_schema_extra={"input": {"type": "range", "step": 0.1}}
+        )
+```
+
+The slider's ends come from `ge` and `le`, the same limits Open WebUI checks when the value is saved, so the slider never offers a value the save would reject. `step` is optional. Without it, the slider moves in whole numbers. Always set `ge` and `le` on a range field. Without them, the slider falls back to the browser's default of 0 to 100 for any number. Nothing on save holds the value to that range.
+
+In the chat controls, a UserValves slider saves once when you let go of it, not on every step of the drag. Number fields without the range input type keep their plain text box.
