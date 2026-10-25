@@ -92,7 +92,7 @@ Opens the full chat interface in a pane beside the note. It is the same componen
 
 **Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
 
-**Insert a response into the note.** Every assistant response carries an **Insert** button that drops that response into the note at the cursor. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
+**Insert a response into the note.** With write access on the note, every assistant response carries an **Insert into note** button that drops that response into the note at the cursor. A read-only collaborator does not get the button. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
 
 **Several conversations per note.** The panel header is a dropdown listing every chat attached to this note. Use it to switch between them, start a new one or delete one. A new conversation is only stored once you send its first message, so opening one and walking away leaves nothing behind. Deleting the last remaining chat immediately recreates an empty one.
 
@@ -182,8 +182,8 @@ Access management options via the **More (...)** menu in the top right corner.
 
 ### Export
 
-* **Plain text (.txt)** or **Markdown (.md)** for raw content
-* **PDF (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
+* **Plain text (.txt)** or **Plain text (.md)** for raw content
+* **PDF document (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
 
 ### Sharing
 

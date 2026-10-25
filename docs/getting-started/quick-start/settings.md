@@ -44,7 +44,7 @@ User Settings control personal preferences: your default model, interface theme,
 
 **Examples of what lives here:**
 
-- Preferred default model and system prompt
+- System prompt, and the default model you save with **Set as default** in the model selector
 - Interface theme and language
 - Personal API keys (if [Direct Connections](/features/chat-conversations/direct-connections) are enabled)
 - Per-feature toggles like autocomplete or rich text input

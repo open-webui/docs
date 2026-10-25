@@ -295,7 +295,7 @@ Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** an
 ### Import and export
 
 - **Import**: From `.json` files or Open WebUI community links
-- **Export**: Download all custom model configurations as a single `.json`
+- **Export**: Download every custom model you can edit as a single `.json`, whatever the search box or filter shows. Admins get every custom model while `BYPASS_ADMIN_ACCESS_CONTROL` is on, which is the default
 - **Discover**: Browse community presets at the bottom of the page
 
 A model's background image travels with it. Export carries the image inside the file, and import stores it on the target instance as a fresh upload, so a model moved between instances keeps its background without you moving files by hand. See the [API endpoints reference](/reference/api-endpoints) for the export and import calls.

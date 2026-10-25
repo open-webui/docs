@@ -34,6 +34,7 @@ Each target has:
 - **Events** it subscribes to.
 - **Enabled**, to pause a target without deleting it.
 - **Automatic Delivery**, either `away` or `always`.
+- **Target ID for notify**, the name the `notify` tool uses to pick this target. Left empty, it becomes the webhook's host name. It is saved in lowercase. Each run of characters other than letters, digits, `_` and `-` becomes a single `-`, so `Work/Slack` is saved as `work-slack`.
 
 Use **Send Test** to fire a test notification and confirm the endpoint works.
 
