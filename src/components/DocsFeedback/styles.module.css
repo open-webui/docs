@@ -1,0 +1,20 @@
+.card {
+	margin-top: 1.5rem;
+	padding: 1rem;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.card p {
+	margin: 0.5rem 0;
+}
+
+.card a {
+	font-weight: 600;
+}
+
+@media (width >= 997px) {
+	.footer-with-sidebar {
+		display: none;
+	}
+}
