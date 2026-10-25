@@ -130,12 +130,20 @@ LDAP_APP_PASSWORD="admin"
 LDAP_SEARCH_BASE="dc=example,dc=org"
 LDAP_ATTRIBUTE_FOR_USERNAME="uid"
 LDAP_ATTRIBUTE_FOR_MAIL="mail"
+# Optional: email domain for users without a mail attribute (see the warning below)
+# LDAP_DEFAULT_EMAIL_DOMAIN="example.org"
 # LDAP_SEARCH_FILTER is optional and used for additional filtering conditions.
 # The username filter is automatically added by Open WebUI, so do NOT include 
 # user placeholder syntax like %(user)s or %s - these are not supported.
 # Leave empty for simple setups, or add group membership filters, e.g.:
 # LDAP_SEARCH_FILTER="(memberOf=cn=allowed-users,ou=groups,dc=example,dc=org)"
 ```
+
+:::warning Users without an email address
+
+Open WebUI needs an email address for every account. A user whose mail attribute is empty cannot sign in and gets the error `User does not have a valid email address.` Set [`LDAP_DEFAULT_EMAIL_DOMAIN`](/reference/env-configuration#ldap_default_email_domain) (**Default Email Domain** in the UI) to sign such users in as `username@domain`, where `username` is the name they typed on the sign-in page. If an Open WebUI account with that address already exists, the LDAP user signs in to that account. Use a domain you control, so no LDAP user can take over an account that belongs to someone else.
+
+:::
 
 ### UI Configuration
 

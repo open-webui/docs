@@ -29,6 +29,8 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 You can now call tools exposed by your MCP server from Open WebUI.
 
+Open WebUI connects to servers on the stateless `2026-07-28` protocol revision and to servers on older revisions. It detects which one a server speaks when it connects. A redirect from the server is followed only when it stays on the same origin (same scheme, host and port, or http to https on the same host with default ports); any other redirect fails the request.
+
 The **External Tool Servers** section is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
 
 :::warning Common Mistake: Wrong Connection Type

@@ -48,6 +48,7 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Models Access** | **(Parent)** Access the **Models** workspace to create or edit custom models. |
 | **Import Models** | *(Requires Models Access)* Ability to import models from JSON/files. |
 | **Export Models** | *(Requires Models Access)* Ability to export models to files. |
+| **Hidden Models** | *(Requires Models Access)* Ability to pick hidden models as the base model of a workspace model ([`USER_PERMISSIONS_WORKSPACE_MODELS_HIDDEN`](/reference/env-configuration#user_permissions_workspace_models_hidden)). Off by default. Hidden models still stay out of the user's model selector in the chat. The permission changes only the base model list in the model editor, not who can use a hidden model. Admins always have it. |
 | **Knowledge Access** | Access the **Knowledge** workspace to manage knowledge bases. |
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
 | **Import Prompts** | *(Requires Prompts Access)* Ability to import prompts. |
@@ -66,28 +67,35 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 ### 2. Sharing Permissions
 Controls what users can share with the community or make public.
 
-Each **(Parent)** permission sets what the **Access Control** panel offers for that item type: with it on, the panel shows the access list for adding users and groups and, together with the matching public permission, the **Public** option. With it off, non-admins do not see the **Access** button in that item type's editor or the **Access** entry in its list menu. The server decides which grants to accept through the **Public Sharing** permissions and the two **Allow Sharing With ...** permissions below.
+Each **(Parent)** permission decides whether a user can share that item type at all. With it on, the **Access Control** panel shows the access list for adding users and groups and, together with the matching public permission, the **Public** option. With it off, non-admins do not see the **Access** button in that item type's editor or the **Access** entry in its list menu, and the server refuses to share that item type for them, through the API too. The only change such a user can make is to remove all sharing from an item. Within an item type the user may share, the **Public Sharing** permissions and the two **Allow Sharing With ...** permissions below decide which audiences they can add.
+
+The server enforces all of these permissions:
+
+- **Changing access** is refused as a whole when it asks for an audience the user's permissions do not allow. The request fails with `403` and the message `You do not have permission to share with the requested audience`, and the item keeps its current sharing. The check covers the whole access list the change sends, grants already on the item included. A user who may not add an audience the item already has, such as **Public** on an item someone else made public, can change its access only by removing that audience.
+- **Creating an item** with sharing included keeps only the grants the user may set. Without the parent permission, the new item is private.
+- **Saving an item** through its update endpoint never changes its sharing. Sharing changes only through the item's access endpoint, which is what the **Access** panel uses.
+- **Admins** are exempt from these permissions, with two limits that apply to everyone: folders can never be public, and only chat share links can be open to people without an account (see **Chats Open Sharing**).
 
 | Permission | Description |
 | :--- | :--- |
-| **Models Sharing** | **(Parent)** Shows the access list in the Access Control panel of models. |
+| **Models Sharing** | **(Parent)** Ability to share models. Shows the access list in the Access Control panel of models. |
 | **Models Public Sharing** | *(Requires Models Sharing)* Ability to make models publicly discoverable. |
-| **Knowledge Sharing** | **(Parent)** Shows the access list in the Access Control panel of knowledge bases. |
+| **Knowledge Sharing** | **(Parent)** Ability to share knowledge bases. Shows the access list in the Access Control panel of knowledge bases. |
 | **Knowledge Public Sharing** | *(Requires Knowledge Sharing)* Ability to make knowledge bases public. |
-| **Prompts Sharing** | **(Parent)** Shows the access list in the Access Control panel of prompts. |
+| **Prompts Sharing** | **(Parent)** Ability to share prompts. Shows the access list in the Access Control panel of prompts. |
 | **Prompts Public Sharing** | *(Requires Prompts Sharing)* Ability to make prompts public. |
-| **Tools Sharing** | **(Parent)** Shows the access list in the Access Control panel of tools. |
+| **Tools Sharing** | **(Parent)** Ability to share tools. Shows the access list in the Access Control panel of tools. |
 | **Tools Public Sharing** | *(Requires Tools Sharing)* Ability to make tools public. |
-| **Skills Sharing** | **(Parent)** Shows the access list in the Access Control panel of skills. |
+| **Skills Sharing** | **(Parent)** Ability to share skills. Shows the access list in the Access Control panel of skills. |
 | **Skills Public Sharing** | *(Requires Skills Sharing)* Ability to make skills public. |
-| **Notes Sharing** | **(Parent)** Shows the access list in the Access Control panel of Notes. |
+| **Notes Sharing** | **(Parent)** Ability to share Notes. Shows the access list in the Access Control panel of Notes. |
 | **Notes Public Sharing** | *(Requires Notes Sharing)* Ability to make Notes public. |
-| **Folders Sharing** | Shows the access list in a chat folder's [**Access**](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) dialog, for sharing the folder (and the chats inside it) with specific users or groups, with read or write access. When disabled, the **Access** button in folder settings is hidden. Subfolders inherit the share, and folders cannot be shared publicly. Admins are always exempt. |
+| **Folders Sharing** | Ability to share chat folders. Shows the access list in a chat folder's [**Access**](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) dialog, for sharing the folder (and the chats inside it) with specific users or groups, with read or write access. When disabled, the **Access** button in folder settings is hidden. Subfolders inherit the share. Folders can never be public, for admins too. Otherwise admins are always exempt. |
 | **Chats Public Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link reachable by every signed-in user of the instance. Opening the link still requires logging in. When disabled, users can still share chats with specific users or groups via the access-control selector, but the "Public" option is hidden for non-admins. Admins are always exempt. |
-| **Chats Open Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and open grants are stripped from update payloads. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
-| **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, wildcard access grants are stripped from calendar create/update payloads; owners can still share with specific users or groups. Admins are always exempt. |
-| **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, individual-user grants are stripped from create/update payloads; group and public sharing are unaffected. Admins are always exempt. |
-| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, group grants are stripped from create/update payloads; individual-user and public sharing are unaffected. Admins are always exempt. |
+| **Chats Open Sharing** | *(Requires Allow Chat Share)* Ability to make a chat share link readable **without signing in**, by anyone on the internet who has the link. This is the only permission that exposes content outside the instance, it grants read access only, and it applies to chats alone. Off by default. When disabled, the "Open" option is hidden for non-admins and a change that adds an open grant is refused. Admins are always exempt. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). |
+| **Calendars Public Sharing** | *(Requires Features > Calendar)* Ability to make a calendar publicly readable or writable by every user with the Calendar feature. When disabled, a change that makes a calendar public is refused, and a calendar created with public access is created without it; owners can still share with specific users or groups. Calendars cannot be open to people without an account, for admins too. Otherwise admins are always exempt. |
+| **Allow Sharing With Users** | Ability to share a resource with **specific individual users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). When disabled, a change that shares with an individual user is refused, and individual-user grants are dropped from a new item; group and public sharing are unaffected. Admins are always exempt. |
+| **Allow Sharing With Groups** | Ability to share a resource with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). When disabled, a change that shares with a group is refused, and group grants are dropped from a new item; individual-user and public sharing are unaffected. Admins are always exempt. |
 
 Every toggle in the panel's **Sharing Permissions** section is off unless you turn it on, and a public toggle is only drawn once the parent permission named in its row is on. The two **Allow Sharing With ...** rows sit in a separate **Access Grants** section and are on by default.
 

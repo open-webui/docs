@@ -140,7 +140,7 @@ Link **knowledge bases and files** to your folder:
 
 Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
 
-Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Access** button in **Edit Folder** is hidden for non-admins. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
+Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Access** button in **Edit Folder** is hidden for non-admins. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing). The server enforces it, the API included: without it, a sharing change is refused with **You do not have permission to share with the requested audience**.
 
 1. Hover over a folder in the sidebar, open the **three-dot menu** (⋯) and select **Edit**.
 2. Click **Access** at the top of the **Edit Folder** dialog.
@@ -170,7 +170,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access at once, and those of them who have it open are sent back to a new chat. **Archive All Chats** does the same for every chat you own.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
-- **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link.
+- **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link. This holds for admins too: the server refuses a public grant on a folder.
 
 ![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)
 

@@ -218,8 +218,7 @@ Calendars support the same access grant system used by knowledge bases, models, 
 
 ### Share a calendar
 
-1. Open the calendar's **settings** (via the calendar list or edit endpoint)
-2. Add access grants for specific users or groups with `read` or `write` permission
+Sharing is set through the API: send the calendar's full list of access grants to `POST /api/v1/calendars/{calendar_id}/access/update`, each grant naming a user or group with `read` or `write` permission. Updating a calendar's name or color through its update endpoint leaves its sharing unchanged.
 
 ### What shared access provides
 
@@ -230,8 +229,8 @@ Calendars support the same access grant system used by knowledge bases, models, 
 
 Only the calendar **owner** (or an admin) can manage access grants and delete the calendar itself.
 
-:::info Public sharing is permission-gated
-Wildcard access grants (calendar readable or writable by every user with the Calendar feature) are gated by the **Calendars Public Sharing** permission. When disabled for a non-admin owner, public principals are silently stripped from the access grant list on calendar create/update; per-user and per-group grants remain unaffected. Admins always retain the ability to share publicly. Configurable per-group in **Admin Panel > Users > Groups > Permissions** or via [`USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_calendar_allow_public_sharing).
+:::info Sharing is permission-gated
+Users who are not admins can share only as far as their [sharing permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions) allow: **Allow Sharing With Users** for specific users, **Allow Sharing With Groups** for groups and **Calendars Public Sharing** for a wildcard grant that opens the calendar to every user with the Calendar feature. A change those permissions do not allow is refused with a 403 error, "You do not have permission to share with the requested audience", and the calendar keeps its current sharing. Grants a new calendar carries at creation are filtered by the same permissions. Calendars can never be shared with people who are not signed in, by admins either. Admins can otherwise share freely. Configurable per-group in **Admin Panel > Users > Groups > Permissions** or via [`USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_calendar_allow_public_sharing).
 :::
 
 ---

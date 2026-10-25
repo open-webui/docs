@@ -42,7 +42,7 @@ The modal shows an **Access Control** selector for who can open the link, offeri
 
 **Open** is the only setting that makes a chat readable without an Open WebUI account. Anyone holding the link can read the conversation straight from the internet, with no login and no record of who viewed it.
 
-It is off by default. A non-admin needs the **Chats Open Sharing** permission ([`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](/reference/env-configuration#user_permissions_chat_allow_open_sharing), default `False`) before the option appears at all. Without it the dropdown shows only **Private** and **Public**, and an open grant submitted directly to the API is dropped rather than saved.
+It is off by default. A non-admin needs the **Chats Open Sharing** permission ([`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](/reference/env-configuration#user_permissions_chat_allow_open_sharing), default `False`) before the option appears at all. Without it the dropdown shows only **Private** and **Public**. An open grant submitted directly to the API is refused with **You do not have permission to share with the requested audience**, and the chat's sharing stays as it was. The same applies to a public grant without **Chats Public Sharing**.
 
 What an open link does and does not allow:
 

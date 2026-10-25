@@ -89,10 +89,10 @@ Everything else sits in rows, one per setting. Each row shows a short summary of
 | **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
 | **Background** | An image shown in the editor's banner and behind the chat whenever this model is in use. Hover the banner and use **Add background**, **Change** or **Remove**. It has to be uploaded here, since only a file held by this instance is accepted: an external URL or a pasted data URI is refused outright. PNG, JPEG, WebP or GIF, at most 5 MiB and 25 megapixels |
 | **Name and ID** | Display name and unique identifier. An ID holds no spaces or tabs and is at most 256 characters |
-| **Base Model (From)** | The actual model that powers this agent |
+| **Base Model (From)** | The actual model that powers this agent. Admins can pick hidden models here. Other users see them in this list only with the [**Hidden Models**](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission, which is off by default. Hidden models still stay out of their chat model selector. The permission changes only this list, not who can use a hidden model |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
-| **Access** | The **Access** button at the top right sets who can use the model: private (specific users/groups) or public. Shown to non-admins only with the [**Models Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission |
+| **Access** | The **Access** button at the top right sets who can use the model: private (specific users/groups) or public. Shown to non-admins only with the [**Models Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission. On a saved model each change saves right away, without **Save & Update**. A change your sharing permissions do not allow is refused with "You do not have permission to share with the requested audience" |
 | **Language** | The globe selector at the top right, next to **Access**, switches the editor to a translation of the name, description, prompt suggestions and model controls. See [Translations](#translations) |
 
 ![The model editor with base model, description and system prompt](/images/workspace/model-editor.png)

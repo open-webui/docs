@@ -193,6 +193,8 @@ Granting that reach is the **Access** button, at the top right beside the **More
 
 The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry when you have the **Notes Sharing** permission, and administrators see it on every note. Each change there is saved right away.
 
+The server checks these permissions on every sharing change, the API included. A change your permissions do not allow is refused with **You do not have permission to share with the requested audience**, and the note's sharing stays as it was. Saving a note's title or content never changes who it is shared with.
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the **Access** button and menu entry, and the access list in the **Access Control** panel (default `False`)

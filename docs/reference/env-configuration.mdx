@@ -1342,7 +1342,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the reported token counts in a `usage` field, linked to the request's entry through `extra.request_id`; see [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1360,7 +1360,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `/chats,/chat,/folders`
-- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses.
+- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses. Remove it to record chat requests and the per-reply model usage entries described in [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging).
 
 #### `AUDIT_INCLUDED_PATHS`
 
@@ -7365,6 +7365,13 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 - Description: Sets the attribute to use as mail for LDAP authentication.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `LDAP_DEFAULT_EMAIL_DOMAIN`
+
+- Type: `str`
+- Default: Empty string (`''`)
+- Description: Gives LDAP users without an email address one built from their sign-in name. When the attribute set by `LDAP_ATTRIBUTE_FOR_MAIL` is empty for a user, Open WebUI uses `username@domain`, where `username` is the name typed on the sign-in page. Leave it empty to turn this off; such users then cannot sign in and get the error `User does not have a valid email address.` If an Open WebUI account with that address already exists, for example one created through sign-up or SSO, the LDAP user signs in to that account. Set a domain you control, so no LDAP user can take over an account that belongs to someone else. Also configurable as **Default Email Domain** in **Admin Panel > Settings > Authentication > LDAP**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `LDAP_ATTRIBUTE_FOR_USERNAME`
 
 - Type: `str`
@@ -7797,55 +7804,57 @@ For API Key creation (and the API keys themselves):
 
 ### Sharing (Private)
 
-These settings control whether the **Access Control** panel shows its access list, where users add specific people and groups to an item. With a setting off, non-admins also do not see the **Access** button in that item type's editor or the **Access** entry in its list menu. Which grants the server accepts is set by [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](#user_permissions_access_grants_allow_users), [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](#user_permissions_access_grants_allow_groups) and the public sharing settings below.
+These settings decide whether non-admins can share an item type at all. With a setting on, the **Access Control** panel shows its access list, where users add specific people and groups to an item. With it off, non-admins do not see the **Access** button in that item type's editor or the **Access** entry in its list menu, and the server refuses to share that item type for them, through the API too; the only change left to them is removing all sharing from an item. Which audiences a user may add is set by [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](#user_permissions_access_grants_allow_users), [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](#user_permissions_access_grants_allow_groups) and the public sharing settings below.
+
+The server checks every sharing setting in this section and the two below. A change to an item's access that asks for an audience the user may not add is refused as a whole with `403` and the message `You do not have permission to share with the requested audience`, and the item keeps its current sharing. An item created with sharing included keeps only the grants the user may set. Saving an item through its update endpoint never changes its sharing, which changes only through the item's access endpoint. Admins are exempt, except that folders can never be public and only chat share links can be open to people without an account. See [Sharing Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace models. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
+- Description: Lets non-admins share workspace models and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace models for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace knowledge. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
+- Description: Lets non-admins share workspace knowledge and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace knowledge for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace prompts. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
+- Description: Lets non-admins share workspace prompts and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace prompts for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace tools. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
+- Description: Lets non-admins share workspace tools and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace tools for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace skills. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu.
+- Description: Lets non-admins share workspace skills and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace skills for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of notes. When `False`, non-admins do not see the **Access** button in the note editor or the **Access** entry in the notes list menu. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
+- Description: Lets non-admins share notes and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the note editor or the **Access** entry in the notes list menu, and the server refuses to share notes for them. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. When `False`, non-admins do not see the **Access** button in folder settings. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
+- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. When `False`, non-admins do not see the **Access** button in folder settings, and the server refuses to share folders for them. Folders can never be public, for admins too. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Sharing (Public)
@@ -7883,7 +7892,7 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from tool create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Tools Public Sharing**.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, a change that makes a tool public is refused and a new tool is created without public access, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Tools Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -7897,7 +7906,7 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from note create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Notes Public Sharing**.
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, a change that makes a note public is refused and a new note is created without public access, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Notes Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`
@@ -7911,14 +7920,14 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `False`
-- Description: Allows non-admin users to mark a chat share link **Open**, readable by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and only chats accept this kind of grant. When disabled, the **Open** option is hidden and an open grant sent to the API is stripped before saving. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
+- Description: Allows non-admin users to mark a chat share link **Open**, readable by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and only chats accept this kind of grant. When disabled, the **Open** option is hidden and a change that adds an open grant through the API is refused. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Calendars Public Sharing**.
+- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot make a calendar readable or writable by every user with the Calendar feature: a change that asks for it is refused, and a calendar created with public access is created without it. Per-user and per-group grants remain unaffected. Admins can always share calendars publicly. Calendars cannot be open to people without an account, for admins too. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Calendars Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Access Grants
@@ -7927,14 +7936,14 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
+- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, tools, folders, channels, calendars and chat share links) with **specific individual users**. When set to `False`, a change that shares with an individual user is refused, and individual-user grants are dropped from a new item; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`
 
 - Type: `bool`
 - Default: `True`
-- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
+- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, a change that shares with a group is refused, and group grants are dropped from a new item; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Import / Export
@@ -7951,6 +7960,13 @@ On instances upgraded from a release predating these two variables, the admin pa
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables user permission to export workspace models.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_HIDDEN`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets non-admin users pick hidden models as the **Base Model (From)** of a workspace model. Hidden models still stay out of their model selector in the chat. It changes only the base model list in the model editor, not who can use a hidden model. Admins always have it. Configurable per-group as **Hidden Models** under **Models Access**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_IMPORT`

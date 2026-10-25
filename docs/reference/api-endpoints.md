@@ -348,6 +348,33 @@ curl -X PATCH http://localhost:3000/api/v1/chats/CHAT_ID/params \
   -d '{"temperature": 0.2, "system": null}'
 ```
 
+### 🔐 Sharing changes only through the access endpoints
+
+Each item type that can be shared has its own endpoint for changing who has access. It takes the item's complete new access list in `access_grants` and replaces the stored one:
+
+| Item | Endpoint | Who can call it |
+| :--- | :--- | :--- |
+| Model | `POST /api/v1/models/model/access/update` (body also carries the model `id`) | Owner, users with write access, admins |
+| Knowledge base | `POST /api/v1/knowledge/{id}/access/update` | Owner, users with write access, admins |
+| Prompt | `POST /api/v1/prompts/id/{prompt_id}/access/update` | Owner, users with write access, admins |
+| Tool | `POST /api/v1/tools/id/{id}/access/update` | Owner, users with write access, admins |
+| Skill | `POST /api/v1/skills/id/{id}/access/update` | Owner, users with write access, admins while `BYPASS_ADMIN_ACCESS_CONTROL` is on |
+| Note | `POST /api/v1/notes/{id}/access/update` | Owner, users with write access, admins |
+| Folder | `POST /api/v1/folders/{id}/access/update` | Owner, admins |
+| Channel | `POST /api/v1/channels/{id}/access/update` | Owner, admins. Group and direct message channels are refused with `403`, since membership decides who is in them |
+| Calendar | `POST /api/v1/calendars/{calendar_id}/access/update` | Owner, admins |
+| Shared chat | `POST /api/v1/chats/shared/{id}/access/update` | Owner, and admins while [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) is on |
+
+The update endpoints of models, knowledge bases, prompts, tools, skills, notes, channels and calendars never change sharing. An `access_grants` field sent to them is ignored, so saving an item keeps its current access. A create request can include `access_grants`; grants the caller may not set are dropped and the item is created with the rest.
+
+An access change is checked against the caller's [sharing permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions) as a whole. If any grant in the list asks for an audience the caller may not add, nothing changes and the request fails with `403`:
+
+```json
+{"detail": "You do not have permission to share with the requested audience"}
+```
+
+The list is checked in full, grants the item already has included. Without the item type's sharing permission, the only accepted list is an empty one, which removes all sharing. Admins skip the permission checks, but a public grant on a folder and an open (no sign-in) grant on anything other than a shared chat are refused for them too.
+
 ### 📁 `GET /api/v1/files/user/search` and `GET /api/v1/files/user/count`
 
 These two endpoints list and count the calling user's own files. They are always scoped to the caller, administrators included, whatever `BYPASS_ADMIN_ACCESS_CONTROL` is set to. The [File Manager](/features/chat-conversations/data-controls/files) in **Settings > Data Controls > Manage Files** uses them, so an administrator sees only their own files there.
