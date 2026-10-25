@@ -15,6 +15,7 @@ import type { Props } from "@theme/CodeBlock";
 import useIsBrowser from "@docusaurus/useIsBrowser";
 import StringContent from "@theme/CodeBlock/Content/String";
 import clsx from "clsx";
+import { captureCodeCopy } from "../../clientModules/analytics";
 
 /** Recursively extract every text-node from a React tree. */
 function extractText(node: ReactNode): string {
@@ -31,12 +32,22 @@ function extractText(node: ReactNode): string {
 function CopyButton({ code }: { code: string }) {
 	const [copied, setCopied] = useState(false);
 
-	const handleCopy = useCallback(() => {
-		navigator.clipboard.writeText(code).then(() => {
-			setCopied(true);
-			setTimeout(() => setCopied(false), 1500);
-		});
-	}, [code]);
+	const handleCopy = useCallback(
+		(event: React.MouseEvent<HTMLButtonElement>) => {
+			const button = event.currentTarget;
+			navigator.clipboard
+				.writeText(code)
+				.then(() => {
+					setCopied(true);
+					setTimeout(() => setCopied(false), 1500);
+					captureCodeCopy(button);
+				})
+				.catch(() => {
+					/* A denied copy must not report success. */
+				});
+		},
+		[code]
+	);
 
 	return (
 		<button

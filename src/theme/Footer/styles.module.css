@@ -1,0 +1,41 @@
+.settings {
+	padding: 0 1rem 1rem;
+	text-align: center;
+}
+
+.settings button,
+.notice button {
+	border: 0;
+	background: transparent;
+	color: var(--ifm-font-color-base);
+	font: inherit;
+	font-size: 0.8rem;
+	cursor: pointer;
+	min-height: 44px;
+	padding: 0.5rem 0.75rem;
+}
+
+.notice {
+	position: fixed;
+	bottom: 1rem;
+	right: 1rem;
+	z-index: 9999;
+	max-width: min(30rem, calc(100vw - 2rem));
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--ifm-color-emphasis-200);
+	background: var(--ifm-background-color);
+	color: var(--ifm-font-color-base);
+	font-size: 0.8rem;
+}
+
+.notice p {
+	margin: 0 0 0.5rem;
+}
+.notice a {
+	text-decoration: underline;
+}
+.notice > div {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}

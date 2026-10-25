@@ -18,9 +18,6 @@ const shikiPlugin: [typeof rehypeShiki, RehypeShikiOptions] = [
 	},
 ];
 
-const shouldEnableGtag =
-	process.env.NODE_ENV === "production" && !process.argv.includes("start");
-
 const config: Config = {
 	title: "Open WebUI",
 	titleDelimiter: "/",
@@ -57,7 +54,7 @@ const config: Config = {
 			onBrokenMarkdownLinks: "throw",
 		},
 	},
-	clientModules: ["./src/clientModules/ensure-gtag.js"],
+	clientModules: ["./src/clientModules/analytics.js"],
 	themes: [
 		"@docusaurus/theme-mermaid",
 		[
@@ -76,14 +73,6 @@ const config: Config = {
 		[
 			"classic",
 			{
-				...(shouldEnableGtag
-					? {
-							gtag: {
-								trackingID: "G-522JSJVWTB",
-								anonymizeIP: false,
-							},
-						}
-					: {}),
 				docs: {
 					sidebarPath: "./sidebars.ts",
 					routeBasePath: "/",

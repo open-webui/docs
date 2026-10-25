@@ -12,6 +12,7 @@
 		"search-corpus": "node scripts/generate-search-corpus.mjs",
 		"llms-files": "node scripts/generate-llms-files.mjs",
 		"test:docs-search": "node scripts/test-docs-search.mjs",
+		"test:analytics": "node scripts/test-analytics.mjs",
 		"swizzle": "docusaurus swizzle",
 		"deploy": "docusaurus deploy",
 		"clear": "docusaurus clear",
@@ -28,7 +29,6 @@
 	},
 	"dependencies": {
 		"@docusaurus/core": "^3.5.2",
-		"@docusaurus/plugin-google-gtag": "^3.7.0",
 		"@docusaurus/preset-classic": "^3.5.2",
 		"@docusaurus/theme-mermaid": "^3.5.2",
 		"@easyops-cn/docusaurus-search-local": "^0.55.2",
@@ -37,6 +37,7 @@
 		"clsx": "^2.1.1",
 		"docusaurus-plugin-sass": "^0.2.5",
 		"marked": "^17.0.1",
+		"posthog-js": "^1.438.21",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"sass": "^1.79.3",
