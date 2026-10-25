@@ -73,7 +73,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
 | 📄 **Full context mode** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
-| 👁️ **File browser with preview** | Browse files in a tree, preview the original file next to the list, and read or edit the indexed text the AI searches |
+| 👁️ **File browser with preview** | Browse files in a tree, preview each file next to the list and read or edit the indexed text the AI searches |
 | 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
 | 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
@@ -120,7 +120,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | `view_knowledge_file` | ✅ | ✅ | Read file content from any accessible KB |
 | `view_note` | ✅ | ❌ | Read attached notes |
 
-"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, so it can point a query at one knowledge base rather than searching blind.
+"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, which it uses to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
 
 The key split: `list_knowledge` and `list_knowledge_bases` are mutually exclusive. Attaching a KB scopes the model to only those documents. Leaving it unscoped lets the model discover everything the user has access to.
 
@@ -143,7 +143,7 @@ In agentic flows, a typical pattern is: `query_knowledge_files` to locate the re
 `view_file` supports two addressing modes:
 
 - **Character pagination**: `offset` + `max_chars` (default `10000`, hard cap `100000`; both configurable with [`VIEW_FILE_DEFAULT_MAX_CHARS`](/reference/env-configuration#view_file_default_max_chars) and [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars)). Best for streaming through a long document; the response includes `next_offset` when the file is truncated.
-- **Line range**: `start_line` + optional `end_line` (1-indexed, inclusive). Overrides `offset`/`max_chars` when set; pairs naturally with `grep_knowledge_files`' line numbers. Pass `line_numbers: true` to also get a `<n>: <line>` prefix on each returned line.
+- **Line range**: `start_line` and/or `end_line` (1-indexed, inclusive). `end_line` alone reads from line 1. Overrides `offset`/`max_chars` when set; pairs naturally with `grep_knowledge_files`' line numbers. Pass `line_numbers: true` to also get a `<n>: <line>` prefix on each returned line.
 
 The line-range response includes `total_lines`, `showing_lines`, and `next_start_line` for follow-up reads.
 
@@ -247,7 +247,7 @@ For the initial create, upload, and chat steps, see [Ask your first document que
 
 Once you have more than a handful, the list can be reordered by clicking the **Title** or **Updated at** column headers. Clicking the header you are already sorted by reverses the direction. The list starts on **Updated at**, newest first.
 
-To change who can see or edit a knowledge base, open the three-dot menu on its row and choose **Access**. This opens the access settings directly, without opening the knowledge base, and every change saves as soon as you make it. Admins see the menu on every knowledge base; other users see it on the ones they can edit. Saving a knowledge base's name or description with write access keeps its sharing as it is, including a **Public** setting you do not have permission to set yourself. [Resource Access](/features/authentication-access/rbac/groups#resource-access-rbac) explains visibility and access grants.
+To change who can see or edit a knowledge base, open the three-dot menu on its row and choose **Access**. This opens the access settings directly, without opening the knowledge base, and every change saves as soon as you make it. Admins see the menu on every knowledge base; other users see it on the ones they can edit, and only with the [**Knowledge Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission. The **Access** button inside a knowledge base follows the same rule. Saving a knowledge base's name or description with write access keeps its sharing as it is, including a **Public** setting you do not have permission to set yourself. [Resource Access](/features/authentication-access/rbac/groups#resource-access-rbac) explains visibility and access grants.
 
 ### Browsing and previewing files
 
@@ -255,7 +255,7 @@ Opening a knowledge base shows its files as a tree on the left and a preview pan
 
 The preview has two views, switched with the buttons above it:
 
-- **Preview** shows the original file as it was uploaded: PDFs, images, audio, video, Word documents, Excel workbooks (with a sheet picker), PowerPoint slides and text-based files such as Markdown, code, CSV, JSON and HTML. For formats with a rendered view, such as Markdown, CSV, JSON, HTML and SVG, the **⋯** menu switches between **View source** and **Rendered preview**.
+- **Preview** shows the file: PDFs, images, audio, video, Word documents, Excel workbooks (with a sheet picker), PowerPoint slides and text-based files such as Markdown, code, CSV, JSON, HTML and SVG. Text-based files and SVG are shown from their indexed text, so the preview matches what retrieval searches. All other formats show the original file as it was uploaded. For formats with a rendered view, such as Markdown, CSV, JSON, HTML and SVG, the **⋯** menu switches between **View source** and **Rendered preview**.
 - **Indexed text** shows the text Open WebUI extracted from the file. This is what retrieval and the knowledge tools search, so it is the place to check when an answer misses something that is in the document.
 
 ![A knowledge base with folders and files on the left and a PDF open in the Preview view on the right](/images/workspace/knowledge-browser-preview.webp)
@@ -266,7 +266,7 @@ If the original file is not available, for example because only its text was sto
 
 **Editing the indexed text**
 
-With write access, click **Edit** to change the indexed text, then **Save** (or **Cancel**). Saving processes the new text again and updates every knowledge base that contains the file, so retrieval uses your corrected text. The original file stays as it was. If processing the text fails, or the text is saved but some knowledge bases could not be updated, an error message says so; save again to retry.
+With write access, click **Edit** to change the indexed text, then **Save** (or **Cancel**). Saving processes the new text again and updates every knowledge base that contains the file, so retrieval uses your corrected text. The original file stays as it was. For text-based files and SVG, the **Preview** view refreshes after saving and shows the new text. The text cannot be empty: saving empty or whitespace-only text is refused with an error. If processing the text fails, or the text is saved but some knowledge bases could not be updated, an error message says so; save again to retry.
 
 While you have unsaved edits, opening another file, closing the preview, deleting an item, syncing, resetting or leaving the page asks **Discard unsaved changes?** first.
 
@@ -349,12 +349,12 @@ Knowledge bases can be managed programmatically:
 **Files**
 
 - `POST /api/v1/files/`: Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side**, equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing). The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
-- `GET /api/v1/files/{id}/process/status`: Check processing status
+- `GET /api/v1/files/{id}/process/status`: Check processing status. An upload reports `completed` only after its indexing has finished and, when it was sent with a `knowledge_id`, after the link to that knowledge base is saved.
 - `POST /api/v1/files/{id}/rename`: Rename a file
 - `GET /api/v1/files/{id}/content`: Download the original file. Returns 404 with `Original file is unavailable.` for a file stored as text only.
 - `GET /api/v1/files/{id}/content/{file_name}`: Download the file as an attachment. When the original upload is missing, it returns the indexed text as plain text.
 - `GET /api/v1/files/{id}/data/content`: Read the indexed text
-- `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
+- `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Empty or whitespace-only `content` is rejected with 400 and `The content provided is empty. Please ensure that there is text or data present before proceeding.` Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
 - `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base. A file whose extracted text is already in the knowledge base is rejected with `Duplicate content detected. Please provide unique content to proceed.`
 - `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added. Content batch-added before v0.12.0 has no content hash and is not detected as a duplicate.
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)

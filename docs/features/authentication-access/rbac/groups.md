@@ -114,12 +114,13 @@ A user's own default model, saved with **Set as default** in the model selector,
 When editing a group, you can toggle specific permissions.
 *   **Default State**: By default, a group grants *no* extra permissions; members rely on the global defaults.
 *   **Granting Access**: Toggling a permission (e.g., "Web Search") to **ON** for a group means all members get that feature, even if it's disabled globally. Members of its subgroups get it too.
+*   **Instance-wide features**: Toggles such as Web Search, Channels, Notes, API Keys and Allow Rate Response only show while that feature is on for the whole instance. A hidden toggle keeps its saved value and applies again once the feature is back on (see [Permissions](./permissions.md#permission-categories)).
 
 ## Resource Access (RBAC)
 
 You can restrict access to specific objects (like a proprietary Model or sensitive Knowledge Base) using Groups or individual user grants.
 
-1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**. On resources you can edit, **Access** in the **⋯** menu of the **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists opens the same settings.
+1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**. On resources you can edit, **Access** in the **⋯** menu of the **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists opens the same settings. Non-admins see the **Access** button and menu entry only with the matching [sharing permission](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once. A grant to a group also reaches the members of its subgroups.
 
 The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.** instead of leaving a **Users** heading above an empty list.
@@ -162,7 +163,7 @@ At a deeper level, resource access is managed through normalized **access grants
 For example, granting the "Marketing" group read access and a specific editor user write access to a model would create two separate grant entries. Public access is represented by a user grant with a wildcard (`*`) principal.
 
 *   **Read**: Users can view and use the resource.
-*   **Write**: Owner-equivalent access to that resource. Users can update or delete it, and manage its access list, which includes sharing it onward with other users and groups. Grant write only to people you would trust with the resource as if it were their own.
+*   **Write**: Owner-equivalent access to that resource. Users can update or delete it, and manage its access list, which includes sharing it onward with other users and groups. Sharing onward is still limited by that user's own [sharing permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions). Channels, calendars and folders are the exception: only their owner or an admin changes who has access. Grant write only to people you would trust with the resource as if it were their own.
 
 ### Previewing Access (Audit)
 

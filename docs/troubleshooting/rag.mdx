@@ -301,8 +301,9 @@ def wait_for_processing(token, file_id, timeout=300):
 **Status Values:**
 | Status | Meaning |
 |--------|---------|
-| `pending` | Still processing |
-| `completed` | Ready to add to knowledge base |
+| `pending` | Waiting to be processed |
+| `processing` | Content extraction and embedding are running |
+| `completed` | Processing finished and the file is ready to add to a knowledge base (video files skip text extraction). For an upload sent with a `knowledge_id`, the link to that knowledge base is also done |
 | `failed` | Processing failed (check error field) |
 
 :::tip
@@ -390,6 +391,7 @@ If PDFs containing images with text are returning empty content:
 
 2. **Enable PDF Image Extraction**:
    - In **Settings > Admin > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+   - The OCR of those images uses one processor thread per upload by default (`{"EngineConfig.onnxruntime.intra_op_num_threads": 1}`). On an idle server with many cores, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster. The variable takes a JSON object of RapidOCR settings; a value that is not a valid JSON object is ignored and RapidOCR uses its own defaults
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
@@ -545,7 +547,7 @@ Attaching one file with `#` retrieves nothing, while attaching the knowledge bas
 
 ✅ **Solutions:**
 
-1. **Re-index** at **Settings > Admin > Documents > Reindex Knowledge Base Vectors**. This rebuilds each knowledge base and the per-file index of every file inside it. It re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
+1. **Re-index** at **Settings > Admin > Documents > Reindex Knowledge and Memory Vectors**. This rebuilds each knowledge base, the per-file index of every file inside it and every user's memories. It re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
 2. **Re-upload the file** if it is not in any knowledge base, since re-indexing only covers knowledge bases.
 
 ---

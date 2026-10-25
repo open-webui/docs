@@ -535,6 +535,8 @@ Each entry has a `model_id` field with the model the client asked for. It is fil
 AUDIT_EXCLUDED_PATHS=/chats,/folders
 ```
 
+With chat requests recorded, every model reply to a `/api/chat/completions` request writes its own audit entry next to the entry for the request. When a reply calls tools, each round of the model's answer between tool calls gets one. Such an entry has the model that answered in `model_id` and the token counts the provider reported in `usage` (`input_tokens`, `output_tokens` and `total_tokens`). Its `extra.request_id` holds the `id` of the request's entry, which links the two. A reply whose provider reports no token counts writes none. Background tasks, such as title and tag generation, write none either.
+
 Within these filters, the audit log covers HTTP requests that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
 
 ---
@@ -720,7 +722,7 @@ All default to `false`, meaning only administrators can manage Tools and Functio
 
 ### Base image
 
-The default Dockerfile uses `python:3.11-slim-bookworm`. If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
+The default Dockerfile uses `python:3.12-slim-trixie` (Python 3.12 on Debian 13). If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
 
 ### Non-root execution
 

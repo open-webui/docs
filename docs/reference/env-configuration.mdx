@@ -280,6 +280,90 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 :::
 
+#### `UI_VISIBILITY`
+
+- Type: `dict` (JSON object)
+- Default: `{}` (every control shown)
+- Description: Hides controls from non-admin users. Set a control ID to `false` to hide it, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Admins always see every control. Hiding a control only removes it from view: its current value and the feature behind it stay in effect, so with `chat.attach_files` hidden, users can still drag files into the chat. A hidden personal setting also drops out of the search in **Settings**. Also configurable as **Visible controls** in **Admin Panel > Settings > Interface**, under **Visibility**.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.visibility`.
+
+:::info
+
+`UI_VISIBILITY` is read from the environment as a JSON string at startup.
+
+- Use a JSON object whose values are `true` or `false` (for example: `{"chat.archive": false}`). `true` and a missing ID both show the control
+- If parsing fails, or a value is not a JSON boolean, Open WebUI logs the error and every control is shown
+
+:::
+
+| Control ID | Label in **Visible controls** | What it hides |
+| :--- | :--- | :--- |
+| `model_editor.capabilities.vision` | Vision | **Vision** under **Capabilities** in the model editor |
+| `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Capabilities** in the model editor |
+| `model_editor.capabilities.file_context` | File Context | **File Context** under **Capabilities** in the model editor |
+| `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Capabilities** in the model editor |
+| `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Capabilities** in the model editor |
+| `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Capabilities** in the model editor |
+| `model_editor.capabilities.terminal` | Terminal | **Terminal** under **Capabilities** in the model editor |
+| `model_editor.capabilities.usage` | Usage | **Usage** under **Capabilities** in the model editor |
+| `model_editor.capabilities.citations` | Citations | **Citations** under **Capabilities** in the model editor |
+| `model_editor.capabilities.status_updates` | Status Updates | **Status Updates** under **Capabilities** in the model editor |
+| `model_editor.capabilities.memory` | Memory | **Memory** under **Capabilities** in the model editor |
+| `model_editor.capabilities.builtin_tools` | Builtin Tools | **Builtin Tools** under **Capabilities** in the model editor |
+| `model_editor.defaults.web_search` | Web Search | **Web Search** under **Default Features** in the model editor |
+| `model_editor.defaults.image_generation` | Image Generation | **Image Generation** under **Default Features** in the model editor |
+| `model_editor.defaults.code_interpreter` | Code Interpreter | **Code Interpreter** under **Default Features** in the model editor |
+| `model_editor.tools.time` | Time & Calculation | **Time & Calculation** under **Builtin Tools** in the model editor |
+| `model_editor.tools.user_input` | Ask User | **Ask User** under **Builtin Tools** in the model editor |
+| `model_editor.tools.memory` | Memory | **Memory** under **Builtin Tools** in the model editor |
+| `model_editor.tools.chats` | Chat History | **Chat History** under **Builtin Tools** in the model editor |
+| `model_editor.tools.notes` | Notes | **Notes** under **Builtin Tools** in the model editor |
+| `model_editor.tools.knowledge` | Knowledge Base | **Knowledge Base** under **Builtin Tools** in the model editor |
+| `model_editor.tools.files` | Files | **Files** under **Builtin Tools** in the model editor |
+| `model_editor.tools.channels` | Channels | **Channels** under **Builtin Tools** in the model editor |
+| `model_editor.tools.notifications` | Notifications | **Notifications** under **Builtin Tools** in the model editor |
+| `model_editor.tools.web_search` | Web Search | **Web Search** under **Builtin Tools** in the model editor |
+| `model_editor.tools.image_generation` | Image Generation | **Image Generation** under **Builtin Tools** in the model editor |
+| `model_editor.tools.code_interpreter` | Code Interpreter | **Code Interpreter** under **Builtin Tools** in the model editor |
+| `model_editor.tools.tasks` | Task Management | **Task Management** under **Builtin Tools** in the model editor |
+| `model_editor.tools.automations` | Automations | **Automations** under **Builtin Tools** in the model editor |
+| `model_editor.tools.calendar` | Calendar | **Calendar** under **Builtin Tools** in the model editor |
+| `model_editor.tools.subagents` | Sub-agents | **Sub-agents** under **Builtin Tools** in the model editor |
+| `model_editor.tools.skills` | Skills | **Skills** under **Builtin Tools** in the model editor |
+| `chat.capture` | Capture | **Capture** in the chat input's **+** menu |
+| `chat.compare` | Compare text | **Compare text** in the **+** menu and the `/compare` command |
+| `chat.attach_webpage` | Attach Webpage | **Attach Webpage** in the **+** menu |
+| `chat.attach_files` | Attach Files | **Attach Files** in the **+** menu |
+| `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu |
+| `chat.attach_knowledge` | Attach Knowledge | **Attach Knowledge** in the **+** menu |
+| `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu |
+| `chat.status` | /status | The `/status` command |
+| `chat.model_command` | /model | The `/model` command |
+| `chat.settings_command` | /settings | The `/settings` command |
+| `chat.usage` | Usage | The usage info button under a response |
+| `chat.merge` | Merge Responses | **Merge Responses** under multi-model responses |
+| `chat.code_preview` | Preview | **Preview** on code blocks |
+| `chat.fork` | Fork chat | **Fork chat** under a response and the `/fork` command |
+| `chat.artifacts` | Artifacts | **Artifacts** in the chat's top-bar menu |
+| `chat.archive` | Archive | **Archive** in the chat menus and for chats selected in the sidebar, **Unarchive Chat** and **Unarchive All** in **Settings > Archived Chats** and **Archive All Chats** in **Settings > Data Controls** |
+| `chat.tags` | Tags | **Tags** in the chat's top-bar menu |
+| `models.set_default` | Set as default | **Set as default** in the model selector |
+| `models.pin` | Keep in Sidebar | **Keep in Sidebar** in the model selector and the Models workspace menus |
+| `settings.usage` | Usage | The **Usage** tab in **Settings** |
+| `settings.speech_to_text_engine` | Speech-to-Text Engine | **Speech-to-Text Engine** in **Settings > Audio** |
+| `settings.text_to_speech_engine` | Text-to-Speech Engine | **Text-to-Speech Engine** in **Settings > Audio** |
+| `settings.user_location` | Allow User Location | **Allow User Location** in **Settings > Interface** |
+| `settings.chat_bubble` | Chat Bubble UI | **Chat Bubble UI** in **Settings > Interface** |
+| `settings.widescreen` | Widescreen Mode | **Widescreen Mode** in **Settings > Interface** |
+| `settings.floating_action_buttons` | Floating Quick Actions | **Floating Quick Actions** in **Settings > Interface** |
+| `settings.rich_text_input` | Rich Text Input for Chat | **Rich Text Input for Chat** in **Settings > Interface** |
+| `settings.large_text_as_file` | Paste Large Text as File | **Paste Large Text as File** in **Settings > Interface** |
+| `settings.detect_artifacts` | Detect Artifacts Automatically | **Detect Artifacts Automatically** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_scripts` | iframe Sandbox Allow Scripts | **iframe Sandbox Allow Scripts** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_same_origin` | iframe Sandbox Allow Same Origin | **iframe Sandbox Allow Same Origin** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_forms` | iframe Sandbox Allow Forms | **iframe Sandbox Allow Forms** in **Settings > Interface** |
+| `settings.iframe_sandbox_allow_downloads` | iframe Sandbox Allow Downloads | **iframe Sandbox Allow Downloads** in **Settings > Interface** |
+
 #### `DEFAULT_USER_ROLE`
 
 - Type: `str`
@@ -323,14 +407,14 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations are automatically surfaced as virtual events on a dedicated "Scheduled Tasks" calendar. Requires the `features.calendar` user permission (admins always pass).
+- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations are automatically surfaced as virtual events on a dedicated "Scheduled Tasks" calendar. Requires the `features.calendar` user permission (admins always pass). When disabled, opening `/calendar` directly sends every user, admins included, to the home page.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_CHANNELS`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables channel support.
+- Description: Enables or disables channel support. While it is off, the **Compress Images in Channels** setting in **Settings > Interface** is hidden.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_ENCRYPTED_CHANNELS`
@@ -375,6 +459,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+
+#### `ENABLE_SKILL_LAZY_LOADING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Makes the skills selected for a chat, including the ones attached to the model, load on demand. They are listed in the skill manifest by name and description like every other skill, and the model loads them with `view_skill` when it needs them. A skill mentioned with `$` anywhere in the chat still has its instructions injected with every message. Applies while the model has the skill tools (native function calling, built-in tools active and the **Skills** category on; in note chats only the **Skills** category); without them every selected, attached or mentioned skill is injected in full, whatever this is set to. Requests that carry their own `tools` field, even an empty one, are not affected, and API requests made without a web UI session never have the skill tools. See [Skills](/features/workspace/skills#loading-selected-skills-on-demand).
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Load selected skills on demand**.
 
 #### `SKILL_CONTENT_MAX_CHARS`
 
@@ -576,7 +667,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the file browser list, etc.). When set to `True` (default), those surfaces show every item from every user, convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see.
+- Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the **Attach Files** list in the chat input, etc.). When set to `True` (default), those surfaces show every item from every user, convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see. **Settings > Data Controls > Manage Files** always lists only the admin's own files, whatever this flag is set to.
 
   Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
@@ -865,7 +956,7 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). Names are matched with letter case ignored and hyphens and underscores treated alike, so `File_abc` is checked as `file-abc`. By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
+- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). Names are matched with letter case ignored and hyphens and underscores treated alike, so `File_abc` is checked as `file-abc`. A name that starts with a digit is also checked with a leading `c`, and a name of `c` plus a digit also without it, since Weaviate adds that `C` to collection names that start with a digit. Each of these spellings that names a known collection must pass the access check. A denied spelling always wins, over an allowed spelling and over this setting. By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -935,7 +1026,7 @@ WEBUI_BANNERS="[{\"id\": \"1\", \"type\": \"warning\", \"title\": \"Your message
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables chat title generation.
+- Description: Enables or disables chat title generation. While it is off, the **Title Auto-Generation** switch in **Settings > Interface** is hidden. A saved choice is kept and applies again once generation is turned back on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LICENSE_KEY`
@@ -1145,7 +1236,7 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 
 - Type: `int`
 - Default: `10`
-- Description: Timeout in seconds for the MCP `session.initialize()` handshake, which performs a list-tools round-trip. Raise it if your MCP server cold-starts slowly or exposes many tools and connections fail with a timeout during initialization; a server advertising dozens of tools can need 30 to 60 seconds.
+- Description: Timeout in seconds for each request Open WebUI sends to an MCP server other than a tool call: the connection handshake of servers on protocol versions before 2026-07-28, tool lists, resource lists and resource reads. Raise it if your MCP server cold-starts slowly or exposes many tools and connections fail with a timeout; a server advertising dozens of tools can need 30 to 60 seconds. Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](#aiohttp_client_timeout_tool_server). The check for the stateless 2026-07-28 protocol, which runs when connecting, has its own fixed 10-second limit. MCP connections follow a redirect only when it stays on the same origin.
 
 #### `AIOHTTP_POOL_CONNECTIONS`
 
@@ -1251,7 +1342,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the reported token counts in a `usage` field, linked to the request's entry through `extra.request_id`; see [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1269,7 +1360,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `/chats,/chat,/folders`
-- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses.
+- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses. Remove it to record chat requests and the per-reply model usage entries described in [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging).
 
 #### `AUDIT_INCLUDED_PATHS`
 
@@ -1452,7 +1543,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `int`
 - Default: `80000`
-- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`.
+- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`. The parameter shows under **Advanced Params** only while `ENABLE_CONTEXT_COMPACTION` is on: in the model editor to anyone who can edit the model, elsewhere to admins. A saved value is kept while compaction is off and applies again when it is turned back on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_CAP`
@@ -1544,7 +1635,7 @@ JSON format: { "title": "your concise title here" }
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables follow up generation.
+- Description: Enables or disables follow up generation. While it is off, the **Follow-Up Auto-Generation** switch in **Settings > Interface** is hidden. A saved choice is kept and applies again once generation is turned back on. The settings for keeping and inserting follow-up prompts stay visible, since they still apply to follow-ups saved in existing chats.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`
@@ -1760,7 +1851,7 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Admin > Integrations**, in the **User Connections** section. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is no longer enough. Connections that already exist keep being used while the tab is hidden, so switching this off takes the entry point away without breaking anything already wired up.
+- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers and Open Terminal connections. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Admin > Integrations**, in the **User Connections** section. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is not enough. While it is off, the tool servers and Open Terminal connections that users and admins saved in that tab are not used in chats, and the server ignores them even when a request still includes them. They stay saved and apply again once it is turned on. The **Direct Tool Servers** toggle in the group and default permissions only shows while it is on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TOOL_SERVER_CONNECTIONS`
@@ -2003,6 +2094,7 @@ Output:
   - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions, and a "Share" button in the function menu dropdown
   - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
   - **Stats Sync Modal**: Enables syncing usage statistics with the community
+  - **New chat screen**: The "By @user" author link to openwebui.com on models imported from openwebui.com
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -2017,7 +2109,7 @@ When `ENABLE_COMMUNITY_SHARING` is set to `False`, all community sharing buttons
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables tag generation.
+- Description: Enables or disables tag generation. While it is off, the **Chat Tags Auto-Generation** switch in **Settings > Interface** is hidden. A saved choice is kept and applies again once generation is turned back on.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TAGS_GENERATION_PROMPT_TEMPLATE`
@@ -2257,7 +2349,7 @@ The four **user-info** headers are forwarded to nearly every outbound backend. T
 
 | Header | Forwarded to |
 |---|---|
-| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio, image and document-loader services (including Mistral OCR) |
+| `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role` | OpenAI, Ollama and Anthropic model connections, tool servers (OpenAPI and MCP), plus external embedding, reranking, web-search, audio, image and document-loader services (including Mistral OCR) and the connection of a [Realtime voice call](/features/chat-conversations/chat-features/voice-mode#realtime-calls) to the realtime provider |
 | `X-OpenWebUI-Chat-Id` | OpenAI and Ollama model connections, and tool servers (not Anthropic) |
 | `X-OpenWebUI-Message-Id` | Tool servers only (OpenAPI and MCP) |
 | `X-OpenWebUI-Auth-Type` | OpenAI and Ollama model connections only, on model listing and chat requests |
@@ -2477,7 +2569,7 @@ directly. Ensure that no users are present in the database if you intend to turn
 
 - Type: `bool`
 - Default: `False`
-- Description: Requires every user to enter a code from an authenticator app after their password, LDAP, OAuth or trusted-header sign-in. Users without an authenticator set one up at their next sign-in. Needs [`WEBUI_AUTH`](#webui_auth) and [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) on; while it is on, Open WebUI refuses to start if either is off or if a stored authenticator secret cannot be decrypted with the current key (see [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key)). See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa).
+- Description: Requires every user to enter a code from an authenticator app after their password, LDAP, OAuth or trusted-header sign-in. Users without an authenticator set one up at their next sign-in. The **Multi-factor authentication** section in **Settings > Account** only shows to users whose sign-in requires an authenticator, so it is hidden from everyone while this is off. Needs [`WEBUI_AUTH`](#webui_auth) and [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) on; while it is on, Open WebUI refuses to start if either is off or if a stored authenticator secret cannot be decrypted with the current key (see [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key)). See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa).
 - Also a toggle: **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Admin > Authentication**, which applies immediately and needs no restart.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -3078,6 +3170,12 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Default: `false`
 - Description: Enables multitenancy pattern for Milvus collections management, which significantly reduces RAM usage and computational overhead by consolidating similar vector data structures. Controls whether Milvus uses multitenancy collection architecture. When enabled, all vector data is consolidated into 5 shared collections (memories, knowledge, files, web_search, hash_based) instead of creating individual collections per resource. Data isolation is achieved via a resource_id field rather than collection-level separation.
 
+:::tip Turn it on for new Milvus deployments
+
+For any new Milvus deployment, set this to `true` before the first start. Standard mode creates a separate collection for every uploaded file, knowledge base, user's memories and web search, so a busy instance keeps adding collections, slows down and eventually hits Milvus's limit on collections per instance (65,536 by default). Switching an existing instance later works but takes effort: you reindex, and files that are not in a knowledge base lose their vectors (see the migration notes below).
+
+:::
+
 :::info
 
 **Benefits of multitenancy mode:**
@@ -3114,19 +3212,18 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Existing collections (pattern: `open_webui_{collection_name}`) remain in Milvus but **become inaccessible** to Open WebUI
 - New data is written to the 5 shared multitenancy collections
 - Application treats knowledge bases as empty until reindexed
-- Memories, and files that are not in a knowledge base, are NOT automatically migrated to the new collection schema and will appear missing
+- Memories and files that are not in a knowledge base appear missing until you reindex; files outside knowledge bases stay missing after it
 
 **Clean migration path from normal Milvus to multitenancy milvus:**
 - Before enabling multitenancy, export any critical knowledge content from the UI if possible
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
-- Navigate to `Settings > Admin > Documents > Click Reindex Knowledge Base`
+- Navigate to `Settings > Admin > Documents` and click **Reindex** next to **Reindex Knowledge and Memory Vectors**
 
-**This rebuilds knowledge base vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
-**User memories, web search history and files that were never added to a knowledge base are NOT migrated by this operation**
+**This rebuilds knowledge base vectors and user memory vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
+**Web search history and files that were never added to a knowledge base are NOT migrated by this operation**
 
-**Verify knowledge bases are accessible and functional**
+**Verify knowledge bases and memories are accessible and functional**
 - Re-upload files that live outside any knowledge base if file-based retrieval for them is critical (file metadata remains but their vectors are not migrated)
-- User chat memories will need to be regenerated through new conversations
 
 **Cleaning up legacy collections:**
 After successful migration (from milvus to multitenancy milvus), legacy collections still consume resources. Remove them manually:
@@ -3145,7 +3242,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 **Critical Considerations**
 
 **Before enabling multitenancy on an existing installation:**
-- Data loss risk: user memory vectors, and the vectors of files that are not in a knowledge base, are NOT migrated automatically. Reindexing migrates knowledge bases along with the per-file vectors of the files they contain.
+- Data loss risk: the vectors of files that are not in a knowledge base are NOT migrated. Reindexing migrates knowledge bases along with the per-file vectors of the files they contain, and user memories.
 - Collection naming dependency: Multitenancy relies on Open WebUI's internal collection naming conventions (user-memory-, file-, web-search-, hash patterns). **If Open WebUI changes these conventions in future updates, multitenancy routing may break, causing data corruption or incorrect data retrieval across isolated resources.**
 - No automatic rollback: Disabling multitenancy after data is written will not restore access to the shared collections. Data would need manual extraction and re-import.
 
@@ -3153,7 +3250,7 @@ For fresh installations, no migration concerns exist
 
 **For existing installations with valuable data:**
 - Do not migrate to multitenancy mode if you do not want to handle migration and risk data loss
-- Understand that memories, and files outside knowledge bases, require re-upload/regeneration
+- Understand that files outside knowledge bases require re-upload
 - Test migration on a backup/staging environment first
 - Consider if RAM savings justify the migration effort for your use case
 
@@ -3568,15 +3665,15 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 
 :::info
 
-This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to  `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledges.
+This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to `Admin Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` to migrate existing knowledge bases and memories.
 
 The Qdrant collections created in the previous pattern will still consume resources.
 
 Currently, there is no button in the UI to only reset the vector DB. If you want to migrate knowledge to multitenancy:
 - Remove all collections with the `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) using the native Qdrant client
-- Go to `Admin Settings` > `Documents` > `Reindex Knowledge Base` to migrate existing knowledge base
+- Go to `Admin Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` to migrate existing knowledge bases and memories
 
-`Reindex Knowledge Base` migrates knowledge bases and the per-file vectors of the files inside them. Files that were never added to a knowledge base, user memories and cached web search results stay in the old collections.
+`Reindex Knowledge and Memory Vectors` migrates knowledge bases, the per-file vectors of the files inside them and user memories. Files that were never added to a knowledge base and cached web search results stay in the old collections.
 
 :::
 
@@ -4140,7 +4237,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: Empty string
-- Description: API key for the MinerU cloud service. Required in `cloud` mode.
+- Description: API key for MinerU. Required in `cloud` mode. In `local` mode, Open WebUI sends it as a bearer token to a MinerU 4.x server, which needs it when started with `--api-key`. Leave it empty for a local server without a key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_TIMEOUT`
@@ -4456,8 +4553,15 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Extracts images from PDFs using OCR when loading documents.
+- Description: Extracts images from PDFs using OCR when loading documents. Also configurable as **PDF Extract Images (OCR)** in **Admin Panel > Settings > Documents**. The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAPIDOCR_PARAMS`
+
+- Type: `dict` (JSON object)
+- Default: `{"EngineConfig.onnxruntime.intra_op_num_threads": 1}`
+- Description: Settings passed to RapidOCR, the OCR engine that reads images in PDFs while [`PDF_EXTRACT_IMAGES`](#pdf_extract_images) is on, as a JSON object of RapidOCR parameter names and values. The default gives the OCR of each upload one processor thread, so several uploads at once do not compete for every core. On an idle server with many cores, raise `EngineConfig.onnxruntime.intra_op_num_threads` to process a single upload faster. A value you set replaces the default as a whole, so include the thread setting if you want to keep it. Invalid JSON, or a value that is not a JSON object, falls back to RapidOCR's own defaults.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `PDF_LOADER_MODE`
 
@@ -7261,6 +7365,13 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 - Description: Sets the attribute to use as mail for LDAP authentication.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `LDAP_DEFAULT_EMAIL_DOMAIN`
+
+- Type: `str`
+- Default: Empty string (`''`)
+- Description: Gives LDAP users without an email address one built from their sign-in name. When the attribute set by `LDAP_ATTRIBUTE_FOR_MAIL` is empty for a user, Open WebUI uses `username@domain`, where `username` is the name typed on the sign-in page. Leave it empty to turn this off; such users then cannot sign in and get the error `User does not have a valid email address.` If an Open WebUI account with that address already exists, for example one created through sign-up or SSO, the LDAP user signs in to that account. Set a domain you control, so no LDAP user can take over an account that belongs to someone else. Also configurable as **Default Email Domain** in **Admin Panel > Settings > Authentication > LDAP**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `LDAP_ATTRIBUTE_FOR_USERNAME`
 
 - Type: `str`
@@ -7376,14 +7487,14 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**.
+- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**. It also hides the **System Prompt** and **Advanced Parameters** sections in the user's **Settings > General**. [Model controls](/features/workspace/models#using-model-controls-in-chat) stay available to anyone with access to the model. Configurable per-group as **Allow Chat Controls**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_VALVES`
 
 - Type: `bool`
 - Default: `True`
-- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel.
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel. When disabled, the **Valves** button that a pipe model with user valves shows in the chat input is also hidden from non-admins.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
@@ -7397,7 +7508,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Parameters" section within the chat controls panel. Turning it off also hides the [model controls](/features/workspace/models#using-model-controls-in-chat) icon in the message input.
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Params" section within the chat controls panel and the **Advanced Parameters** section in the user's **Settings > General**. It has no effect on [model controls](/features/workspace/models#using-model-controls-in-chat), which anyone with access to the model can pick. Parameters a user saves to their account are kept whatever this setting is. These permissions only hide the panels: a user can still set parameters through the API, in a chat request or a settings save. That is the chosen trade-off, so admins can hide the panels and still offer model controls. Configurable per-group as **Allow Chat Params**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
@@ -7425,7 +7536,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to edit chats.
+- Description: Enables or disables user permission to edit messages. When `False`, non-admins do not see the **Edit** button on their own messages or on responses. Configurable per-group as **Allow Chat Edit**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_SHARE`
@@ -7439,7 +7550,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file, and the export items are hidden for them: **Download** in the chat menus, **Copy** in the chat's top-bar menu, **Export** in a folder's menu, **Export** in **Settings > Archived Chats** and **Export Chats** in **Settings > Data Controls**. When the top-bar menu has no other entry left, its button is hidden too. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
@@ -7477,28 +7588,28 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use Speech-to-Text in chats.
+- Description: Enables or disables user permission to use Speech-to-Text in chats. The **Audio** settings tab shows to non-admins who hold at least one of [`USER_PERMISSIONS_CHAT_STT`](#user_permissions_chat_stt), [`USER_PERMISSIONS_CHAT_TTS`](#user_permissions_chat_tts) and [`USER_PERMISSIONS_CHAT_CALL`](#user_permissions_chat_call).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TTS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use Text-to-Speech in chats.
+- Description: Enables or disables user permission to use Text-to-Speech in chats. The **Audio** settings tab shows to non-admins who hold at least one of [`USER_PERMISSIONS_CHAT_STT`](#user_permissions_chat_stt), [`USER_PERMISSIONS_CHAT_TTS`](#user_permissions_chat_tts) and [`USER_PERMISSIONS_CHAT_CALL`](#user_permissions_chat_call).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_CALL`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to start [Voice Mode](/features/chat-conversations/chat-features/voice-mode#permissions) calls, in Standard and Realtime call mode.
+- Description: Enables or disables user permission to start [Voice Mode](/features/chat-conversations/chat-features/voice-mode#permissions) calls, in Standard and Realtime call mode. The **Audio** settings tab shows to non-admins who hold at least one of [`USER_PERMISSIONS_CHAT_STT`](#user_permissions_chat_stt), [`USER_PERMISSIONS_CHAT_TTS`](#user_permissions_chat_tts) and [`USER_PERMISSIONS_CHAT_CALL`](#user_permissions_chat_call).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to use multiple models in chats.
+- Description: Enables or disables user permission to use multiple models in chats. When disabled, a new chat for a non-admin starts with a single model, the first of the models it would otherwise open with. Opening an existing multi-model chat also continues it with only its first model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY`
@@ -7581,7 +7692,7 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 This setting maps to **Features > Calendar** in RBAC permissions.
 
-- Non-admin users need this permission to access and use Calendar.
+- Non-admin users need this permission to access and use Calendar. Without it, opening `/calendar` directly sends them to the home page.
 - Admin users are exempt from this specific permission check.
 
 See [Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for role/permission behavior.
@@ -7599,14 +7710,14 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the visibility of the Notes feature to users.
+- Description: Enables or disables the visibility of the Notes feature to users. Without it, non-admins also do not see **Attach Notes** in the chat input's **+** menu.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CHANNELS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Gives non-admin users access to the whole [Channels](/features/channels) feature: listing, opening, creating and managing channels, reading and posting messages, reactions and pins, managing channel webhooks and receiving live channel messages. Channel automations a user created run only while they hold this permission. Admins always have access. Messages sent to a channel's incoming webhook URL are accepted whenever [`ENABLE_CHANNELS`](#enable_channels) is on, since that URL carries its own token.
+- Description: Gives non-admin users access to the whole [Channels](/features/channels) feature: listing, opening, creating and managing channels, reading and posting messages, reactions and pins, managing channel webhooks and receiving live channel messages. Channel automations a user created run only while they hold this permission. Without it, the **Compress Images in Channels** setting in **Settings > Interface** is hidden too. Admins always have access. Messages sent to a channel's incoming webhook URL are accepted whenever [`ENABLE_CHANNELS`](#enable_channels) is on, since that URL carries its own token.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`
@@ -7693,55 +7804,57 @@ For API Key creation (and the API keys themselves):
 
 ### Sharing (Private)
 
-These settings control whether the **Access Control** panel shows its access list, where users add specific people and groups to an item. Which grants the server accepts is set by [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](#user_permissions_access_grants_allow_users), [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](#user_permissions_access_grants_allow_groups) and the public sharing settings below.
+These settings decide whether non-admins can share an item type at all. With a setting on, the **Access Control** panel shows its access list, where users add specific people and groups to an item. With it off, non-admins do not see the **Access** button in that item type's editor or the **Access** entry in its list menu, and the server refuses to share that item type for them, through the API too; the only change left to them is removing all sharing from an item. Which audiences a user may add is set by [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](#user_permissions_access_grants_allow_users), [`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](#user_permissions_access_grants_allow_groups) and the public sharing settings below.
+
+The server checks every sharing setting in this section and the two below. A change to an item's access that asks for an audience the user may not add is refused as a whole with `403` and the message `You do not have permission to share with the requested audience`, and the item keeps its current sharing. An item created with sharing included keeps only the grants the user may set. Saving an item through its update endpoint never changes its sharing, which changes only through the item's access endpoint. Admins are exempt, except that folders can never be public and only chat share links can be open to people without an account. See [Sharing Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 
 #### `USER_PERMISSIONS_WORKSPACE_MODELS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace models.
+- Description: Lets non-admins share workspace models and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace models for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace knowledge.
+- Description: Lets non-admins share workspace knowledge and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace knowledge for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace prompts.
+- Description: Lets non-admins share workspace prompts and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace prompts for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace tools.
+- Description: Lets non-admins share workspace tools and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace tools for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of workspace skills.
+- Description: Lets non-admins share workspace skills and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the editor or the **Access** entry in the list menu, and the server refuses to share workspace skills for them.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access Control** panel of notes. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
+- Description: Lets non-admins share notes and shows the access list in their **Access Control** panel. When `False`, non-admins do not see the **Access** button in the note editor or the **Access** entry in the notes list menu, and the server refuses to share notes for them. Parent of [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](#user_permissions_notes_allow_public_sharing).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
+- Description: Shows the access list in the **Access** dialog of chat folders, opened from **Edit** on the folder, where users add specific users or groups. When `False`, non-admins do not see the **Access** button in folder settings, and the server refuses to share folders for them. Folders can never be public, for admins too. See [Sharing Folders](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Sharing (Public)
@@ -7779,7 +7892,7 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from tool create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Tools Public Sharing**.
+- Description: Enables or disables **public sharing** of workspace tools. Requires `USER_PERMISSIONS_WORKSPACE_TOOLS_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, a change that makes a tool public is refused and a new tool is created without public access, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Tools Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ALLOW_PUBLIC_SHARING`
@@ -7793,7 +7906,7 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, public grants are stripped from note create and update payloads, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Notes Public Sharing**.
+- Description: Enables or disables **public sharing** of notes. Requires `USER_PERMISSIONS_NOTES_ALLOW_SHARING`; with that off, neither the **Public** option nor this toggle is shown. When disabled, a change that makes a note public is refused and a new note is created without public access, leaving per-user and per-group grants alone. Admins are exempt. Configurable per-group as **Notes Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_ALLOW_PUBLIC_SHARING`
@@ -7807,14 +7920,14 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `False`
-- Description: Allows non-admin users to mark a chat share link **Open**, readable by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and only chats accept this kind of grant. When disabled, the **Open** option is hidden and an open grant sent to the API is stripped before saving. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
+- Description: Allows non-admin users to mark a chat share link **Open**, readable by anyone holding the link with no account and no sign-in. This is the only sharing setting that exposes content beyond the instance's own users, so leave it disabled unless publishing conversations to the internet is intended. It grants read access only, and only chats accept this kind of grant. When disabled, the **Open** option is hidden and a change that adds an open grant through the API is refused. Requires `USER_PERMISSIONS_CHAT_SHARE`. Admins are exempt. Configurable per-group as **Chats Open Sharing**. See [Open links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot attach a wildcard `read` or `write` access grant to a calendar on create or update. Public principals are silently filtered out of the access grant list, so a calendar cannot be made readable or writable by every user with the Calendar feature without an admin-granted sharing permission. Per-user and per-group grants remain unaffected. Admins always retain the ability to share calendars publicly. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Calendars Public Sharing**.
+- Description: Enables or disables **public sharing** of calendars. When disabled, non-admin owners cannot make a calendar readable or writable by every user with the Calendar feature: a change that asks for it is refused, and a calendar created with public access is created without it. Per-user and per-group grants remain unaffected. Admins can always share calendars publicly. Calendars cannot be open to people without an account, for admins too. Configurable per-group in **Admin Panel > Users > Groups > Permissions > Calendars Public Sharing**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Access Grants
@@ -7823,14 +7936,14 @@ On instances upgraded from a release predating these two variables, the admin pa
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, and tools) with **specific individual users**. When set to `False`, individual user grants are silently stripped from access grant lists; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
+- Description: Controls whether non-admin users can share resources (knowledge bases, models, prompts, notes, skills, tools, folders, channels, calendars and chat share links) with **specific individual users**. When set to `False`, a change that shares with an individual user is refused, and individual-user grants are dropped from a new item; group sharing and public sharing remain unaffected. Admins always retain the ability to share with individual users regardless of this setting. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Users**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`
 
 - Type: `bool`
 - Default: `True`
-- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, group grants are silently stripped from access grant lists on save; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
+- Description: The group counterpart of the variable above: controls whether non-admin users can share resources with **groups**. When set to `False`, a change that shares with a group is refused, and group grants are dropped from a new item; individual-user sharing and public sharing remain unaffected. Admins always retain the ability to share with groups. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Access Grants > Allow Sharing With Groups**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Import / Export
@@ -7847,6 +7960,13 @@ On instances upgraded from a release predating these two variables, the admin pa
 - Type: `bool`
 - Default: `False`
 - Description: Enables or disables user permission to export workspace models.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_WORKSPACE_MODELS_HIDDEN`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets non-admin users pick hidden models as the **Base Model (From)** of a workspace model. Hidden models still stay out of their model selector in the chat. It changes only the base model list in the model editor, not who can use a hidden model. Admins always have it. Configurable per-group as **Hidden Models** under **Models Access**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_PROMPTS_IMPORT`
@@ -9003,13 +9123,13 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading, tools attached to a model or chosen in a chat are dropped from the request, the **Tools** workspace page and the **Tools Access** permissions are hidden, and creating or updating a tool returns an error. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading, tools attached to a model or chosen in a chat are dropped from the request, the **Tools** workspace page and the **Tools Access** permissions are hidden, **Valves** in **Chat Controls** offers only functions, and creating or updating a tool returns an error. With both this and [`ENABLE_FUNCTIONS`](#enable_functions) off, the **Valves** section of **Chat Controls** is hidden. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_FUNCTIONS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns [**Functions**](/features/extensibility/plugin/functions) on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions disappear from messages, pipe models leave the model list, the admin **Functions** page is hidden, and creating or updating a function returns an error. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns [**Functions**](/features/extensibility/plugin/functions) on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions disappear from messages, pipe models leave the model list, the admin **Functions** page is hidden, **Valves** in **Chat Controls** offers only tools, and creating or updating a function returns an error. With both this and [`ENABLE_TOOLS`](#enable_tools) off, the **Valves** section of **Chat Controls** is hidden. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_TOOL_SERVERS`
 

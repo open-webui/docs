@@ -43,7 +43,7 @@ Every content change creates a new version. Browse the history, preview a versio
 
 ### Controlled sharing
 
-Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away. Saving a prompt with write access keeps the sharing it already has, including a **Public** setting you do not have permission to set yourself.
+Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, and with the **Prompts Sharing** permission, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away. Saving a prompt with write access keeps the sharing it already has, including a **Public** setting you do not have permission to set yourself.
 
 ---
 
@@ -69,7 +69,7 @@ Navigate to **Workspace > Prompts** and click **Create** in the Workspace header
 | :--- | :--- |
 | **Name** | Descriptive title for identification |
 | **Tags** | Categorize for filtering |
-| **Access** | Control who can view and use the prompt |
+| **Access** | Control who can view and use the prompt. Shown to non-admins only with the [**Prompts Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission |
 | **Command** | The slash command trigger (e.g., `/summarize`) |
 | **Prompt Content** | The actual text sent to the model, with variables |
 | **Commit Message** | Optional description of changes for version tracking |

@@ -71,7 +71,7 @@ What you say is always transcribed on the server with the admin's speech-to-text
 
 ## Your Voice Mode Settings
 
-Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mode. Both are off by default.
+Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mode. Both are off by default. The **Voice** section shows only to admins and to users with the [**Allow Call**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. A value you saved is kept while it is hidden.
 
 | Setting | What it does |
 | :--- | :--- |
@@ -95,13 +95,15 @@ Admins can control access to Voice Mode on a per-role or per-group basis.
 
 If disabled, users do not see the **Voice mode** button. Admins always do.
 
+Unless Realtime mode is on, a call also needs the server to transcribe your speech. The **Voice mode** button then shows only while the admin's speech-to-text engine is not **Web API** and you have the **Allow Speech to Text** permission (admins always have it). Without that permission, a `?call=true` link or the desktop app's call shortcut does not start a call either.
+
 The same permission covers both call modes. In Realtime mode, Open WebUI checks it again when the call connects and every minute during the call.
 
 ## Troubleshooting
 
 - **"Permission denied when accessing media devices"**: the browser blocked the microphone. Browsers only allow microphone access on HTTPS or `localhost`, so opening Open WebUI by its IP address from another device usually causes this. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues).
 - **"Select only one model to call"**: more than one model is selected. Remove the others and try again.
-- **"Call feature is not supported when using Web STT engine"**: the admin's speech-to-text engine is set to **Web API**. An admin needs to choose a server-side engine in **Settings > Admin > Audio**.
+- **"Call feature is not supported when using Web STT engine"**: a call link or the desktop app's call shortcut was used while the admin's speech-to-text engine is set to **Web API**. The **Voice mode** button is hidden in that case. An admin needs to choose a server-side engine in **Settings > Admin > Audio**.
 - **It keeps listening and never sends**: Voice Mode sends after about two seconds of silence, so steady background noise can keep it recording. Mute while it is noisy, or move somewhere quieter.
 - **No sound from the model**: see [Text-to-Speech (TTS) Issues](/troubleshooting/audio#text-to-speech-tts-issues).
 
@@ -241,7 +243,7 @@ Camera and screen share, **Display Emoji in Call**, **Allow Voice Interruption i
 
 ### Requirements and Providers
 
-- **A Realtime API reachable from the Open WebUI server.** Open WebUI opens a WebSocket to `<API Base URL>/realtime?model=<Voice Model>`. With **OpenAI / compatible** it sends the key as a bearer token, so any server compatible with the OpenAI Realtime API works, local speech-to-speech engines included. For a local server that checks no key, enter any placeholder. Azure OpenAI has its own **Provider** setting, see [Using Azure OpenAI](#using-azure-openai). The base URL must start with `http://` or `https://` and contain no query string, user name or password, so endpoints that need extra query parameters cannot be used.
+- **A Realtime API reachable from the Open WebUI server.** Open WebUI opens a WebSocket to `<API Base URL>/realtime?model=<Voice Model>`. With **OpenAI / compatible** it sends the key as a bearer token, so any server compatible with the OpenAI Realtime API works, local speech-to-speech engines included. For a local server that checks no key, enter any placeholder. Azure OpenAI has its own **Provider** setting, see [Using Azure OpenAI](#using-azure-openai). The base URL must start with `http://` or `https://` and contain no query string, user name or password, so endpoints that need extra query parameters cannot be used. With [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) on, the WebSocket also carries the caller's user info headers, or the signed user JWT when [`FORWARD_USER_INFO_HEADER_JWT_SECRET`](/reference/env-configuration#forward_user_info_header_jwt_secret) is set, so a gateway in front of the provider can tell which user is on the call.
 - **Function calling on the voice model.** The server and the voice model must support function calls: questions reach the chat model through `generate_chat_completion` and [voice avatar](#voice-avatars) gestures play through `play_animation`.
 - **One server-configured chat model.** Select exactly one model that you have access to. With a model from a Direct Connection, the call ends with **Select one server-configured chat model.**
 - **Microphone access.** As in Standard mode, browsers only allow the microphone on HTTPS or `localhost`. The browser also needs to support 24 kHz audio processing; when it cannot, the call ends with a message suggesting Standard call mode.

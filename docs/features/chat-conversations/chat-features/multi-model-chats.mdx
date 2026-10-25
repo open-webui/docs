@@ -34,7 +34,7 @@ Admins can control access to Multi-Model Chats on a per-role or per-group basis.
 *   **Location**: Admin Panel > Users > Groups > **Default permissions** > **Permissions** > **Allow Multiple Models in Chat**. To set a group-specific value, edit the group and open its **Permissions** tab.
 *   **Environment Variable**: `USER_PERMISSIONS_CHAT_MULTIPLE_MODELS` (Default: `True`)
 
-If disabled, users will not see the **Compare** button in the model picker and cannot initiate multi-model sessions.
+If disabled, users will not see the **Compare** button in the model picker and cannot initiate multi-model sessions. A new chat then starts with a single model, the first of the models it would otherwise open with. Opening an existing multi-model chat also continues it with only its first model. Admins are always exempt.
 
 ---
 
@@ -49,7 +49,7 @@ Merging takes the outputs from all your active models and sends them (along with
 ### How to Merge
 
 1.  Start a **Multi-Model Chat** and get responses from your selected models.
-2.  Click the branch-shaped icon below the responses, at the right, whose tooltip reads **Merge Responses**. It only appears on the last exchange in the chat, and only once every model has finished.
+2.  Click the branch-shaped icon below the responses, at the right, whose tooltip reads **Merge Responses**. It only appears on the last exchange in the chat, and only once every model has finished. An admin can hide it for non-admins under **Visible controls** in **Settings > Admin > Interface**.
 3.  Open WebUI adds a **Merged Response** below the individual answers, aggregating the best parts of the previous outputs.
 
 The merged answer is stored with the chat, so it is still there when you come back to the conversation. Merging works the same on a conversation you have reopened as on one you have only just generated, so you can leave a comparison sitting for days and merge it whenever you return to it.

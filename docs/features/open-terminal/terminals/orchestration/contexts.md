@@ -48,7 +48,7 @@ A terminal that is **Off** for chats is not listed in the chat terminal picker, 
 
 A per chat workspace belongs to a specific conversation, so the conversation has to exist first. It does once the first message has been sent and the chat appears in the sidebar.
 
-- In a new conversation that has not been sent yet, the terminal panel and file browser for that terminal are not available. They appear once the chat is saved.
+- In a new conversation that has not been sent yet, the terminal panel and file browser for that terminal are not available. They appear once the chat is saved. A file attached to the first message with [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads) set to `Filesystem` waits until you send it, then uploads into the new chat's workspace.
 - In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions), a per chat terminal has nothing to attach to, because a temporary chat is never saved. The picker drops the terminal once the temporary chat exists. Before its first message the picker still lists it, and a message sent with it selected fails with `Terminal unavailable: Terminal server '<name>' requires a saved chat context`.
 - Nothing in the interface quietly falls back to the shared workspace. Before the chat is saved the terminal is refused, and a model told to use it reports an error naming the terminal.
 - A request that reaches the proxy with no chat id at all, such as a direct API call, is not scoped to any chat and lands in the shared workspace even when the row is **Per chat**. The Open WebUI interface always sends the chat id.

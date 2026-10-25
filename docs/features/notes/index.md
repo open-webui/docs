@@ -127,6 +127,8 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 3. Select **Attach Notes**
 4. Choose the note(s) to attach
 
+**Attach Notes** shows only while Notes is enabled on the instance and you have the **Notes** permission. Admins always have it. An admin can also hide it for non-admins under **Visible controls** in **Settings > Admin > Interface**.
+
 The full content of the note is injected into the context window for that conversation.
 
 You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **chats**, **folders** and **models** from the sidebar.
@@ -142,7 +144,7 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 | `search_notes` | Search your notes by title and content |
 | `view_note` | Read the full content of a note |
 | `write_note` | Create a new note |
-| `replace_note_content` | Update an existing note, either replacing the whole content or editing a range of it in place |
+| `replace_note_content` | Update an existing note, either replacing the whole content or editing part of it in place |
 
 > **You:** Search my "Project X" notes and find the database schema.
 >
@@ -187,13 +189,15 @@ Access management options via the **More (...)** menu in the top right corner.
 
 **Share** in the **More (...)** menu offers **Copy link** and **Copy to clipboard**. A copied link opens the note only for someone who can already reach it.
 
-Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access and is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
+Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access, and for anyone but an admin only with the **Notes Sharing** permission. It is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
 
-The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry, and administrators see it on every note. Each change there is saved right away.
+The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry when you have the **Notes Sharing** permission, and administrators see it on every note. Each change there is saved right away.
+
+The server checks these permissions on every sharing change, the API included. A change your permissions do not allow is refused with **You do not have permission to share with the requested audience**, and the note's sharing stays as it was. Saving a note's title or content never changes who it is shared with.
 
 Administrators can control sharing via environment variables or the Admin Panel:
 
-* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the access list in the **Access Control** panel (default `False`)
+* [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the **Access** button and menu entry, and the access list in the **Access Control** panel (default `False`)
 * [`USER_PERMISSIONS_NOTES_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_notes_allow_public_sharing) for public links (default `False`)
 
 These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sharing** and **Notes Public Sharing**. Both start off, and the public toggle is only shown once **Notes Sharing** is on. Admins can share notes publicly regardless. See [Permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions).
@@ -264,6 +268,11 @@ Attaching a note injects the full text. A very large note attached to a model wi
 
 When manually attached, notes are **read-only**. In **Native Mode** with the `replace_note_content` tool enabled, models can modify your notes. Review changes and use **Undo/Redo** if needed.
 
-The tool has two modes. Passing whole `content` replaces the entire note, so anything the model leaves out is gone. Passing `replace_range` operations changes only the given character range and leaves the rest of the note untouched; each operation carries an `expected` field with the current text of that range, and a mismatch rejects the edit instead of applying it. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for range operations.
+The tool has two modes. Passing whole `content` replaces the entire note, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the note and leaves the rest untouched. Each operation names the text to change in one of two ways:
+
+- **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, the note stays unchanged and the model gets back each match's position with 50 characters of context on either side, so it can choose.
+- **By position.** `start` and `end` give a character range. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
+
+The older `replace_range` action still works as an alias of the position form, but it is deprecated. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for these operations.
 
 Notes keep no server-side history. **Undo/Redo** only walks the versions the editor recorded, which happens when you insert a chat response into the note or step through versions, so a tool edit on a note without such versions cannot be undone there. The previous text is still in the chat: the model reads the note with `view_note` before editing, and that tool result stays in the chat message. Expand the tool call in that message to copy the old content back.

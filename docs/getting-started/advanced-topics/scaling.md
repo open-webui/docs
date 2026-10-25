@@ -253,6 +253,8 @@ If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE`, `
 
 `WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel again. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
 
+On v0.12.3, a dropped Redis connection could leave new browser connections hanging until a restart. See [Redis troubleshooting](/tutorials/integrations/redis) and update to v0.12.4.
+
 ### Speed Up Name Lookups
 
 Hostname lookups queue behind each other under load, delaying the request each one belongs to. The c-ares resolver removes that queue:
@@ -313,7 +315,7 @@ Only PGVector and ChromaDB will be consistently maintained by the Open WebUI tea
 :::tip
 **PGVector** is the simplest choice if you're already running PostgreSQL for the main database. It adds vector search to the database you already have, with no additional infrastructure.
 
-For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** both support **multitenancy mode** (`ENABLE_MILVUS_MULTITENANCY_MODE=True` / `ENABLE_QDRANT_MULTITENANCY_MODE=True`), which provides better resource sharing at scale.
+For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** both support **multitenancy mode** (`ENABLE_MILVUS_MULTITENANCY_MODE=True` / `ENABLE_QDRANT_MULTITENANCY_MODE=True`), which provides better resource sharing at scale. Turn it on before the first start of a new deployment, since switching an existing instance later needs a reindex.
 :::
 
 ---

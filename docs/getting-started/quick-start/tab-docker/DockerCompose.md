@@ -87,7 +87,7 @@ This setup ensures that your application can leverage GPU resources when availab
 
 A set of helper scripts is included with the codebase to streamline common Docker workflows:
 
-- `docker-compose-launcher.sh`: Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, a host data mount for Ollama's models, and optional Playwright support. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project.
+- `docker-compose-launcher.sh`: Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, a host data mount for Ollama's models, and optional Playwright support. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project. Put options with square brackets in quotes, as in `./docker-compose-launcher.sh '--enable-gpu[count=1]'`, since zsh (the default shell on macOS) otherwise stops with `no matches found`.
 - `docker-cleanup.sh`: Stops the Compose project and **deletes all volumes**, including persistent data. Prompts for confirmation before destroying data.
 - `docker-run.sh`: Builds the Open WebUI image and runs a single container, exposing it on `OPEN_WEBUI_PORT` (default `3000`). It sets no `WEBUI_SECRET_KEY`, so add one to its `docker run` line before using the container for anything beyond a quick test.
 - `docker-ollama.sh`: Pulls and runs the official Ollama container with optional GPU passthrough, exposing it on `OLLAMA_PORT` (default `11434`).

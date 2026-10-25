@@ -29,6 +29,8 @@ You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setu
 
 You can now call tools exposed by your MCP server from Open WebUI.
 
+Open WebUI connects to servers on the stateless `2026-07-28` protocol revision and to servers on older revisions. It detects which one a server speaks when it connects. A redirect from the server is followed only when it stays on the same origin (same scheme, host and port, or http to https on the same host with default ports); any other redirect fails the request.
+
 The **External Tool Servers** section is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
 
 :::warning Common Mistake: Wrong Connection Type
@@ -44,7 +46,7 @@ Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI con
 
 MCP servers can only be added by **administrators**, under **Settings > Admin > Integrations**. Regular users cannot register their own, by design.
 
-This is **not** the same restriction as OpenAPI. When you grant the **Direct Tool Servers** permission (per user or per group, off by default), users can add their own **OpenAPI** tool servers under **Settings > Integrations**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
+This is **not** the same restriction as OpenAPI. When an admin turns on **Direct Integrations** ([`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations), off by default) and grants the **Direct Tool Servers** permission (per user or per group, also off by default), users can add their own **OpenAPI** tool servers under **Settings > Integrations**, but that path is OpenAPI-only: the connection type is locked, with no MCP option.
 
 The difference is capability. A user-supplied OpenAPI server is a stateless HTTP URL exposing a fixed set of declared endpoints. An MCP server is far more powerful: it is stateful and capability-rich (sampling, elicitation, persistent sessions and arbitrary host command execution over stdio transports), and it runs inside Open WebUI's trust boundary with the connecting user's full scope. In practice a malicious or compromised MCP server could execute code and read or exfiltrate data with that user's access, so the capability stays admin-gated. Open WebUI's own MCP support is Streamable HTTP only, but the protocol's privileged nature is why adding one is reserved for admins.
 
@@ -162,6 +164,8 @@ Reopening the connection and clicking **Authorize OAuth** does the same thing fo
 
 `Register Client` is required for both `oauth_2.1` and `oauth_2.1_static`. With static auth, Open WebUI uses your provided credentials and server metadata discovery (no dynamic client registration).
 
+At the token endpoint, static auth sends the client secret with `client_secret_post` (in the request body). When the server's discovery document lists its supported methods and `client_secret_post` is not among them, Open WebUI uses `client_secret_basic` (an HTTP Basic header) if it is listed, whatever its position in the list, and the first listed method otherwise. This way the token request carries the client secret, also for servers such as X Ads.
+
 :::
 
 :::info Resource Indicators (RFC 8707)
@@ -224,7 +228,7 @@ With many MCP tools enabled, [Tool Search](/features/extensibility/plugin/tools#
 
 ### Structured Tool Results
 
-An MCP tool can return structured data (`structuredContent`) alongside its regular content. Open WebUI adds that data as JSON text to the tool result the model sees. When one of the tool's text results already holds the same JSON, the result goes to the model unchanged, so the data appears once. The same happens when the structured data is only a `result` field whose values match the text results one for one, which is how FastMCP returns plain values and lists.
+An MCP tool can return structured data (`structuredContent`) alongside its regular content. Open WebUI adds that data as JSON text to the tool result the model sees. When one of the tool's text results already holds the same JSON, the result goes to the model unchanged, so the data appears once. The same happens when the structured data is only a `result` field whose values match the text results one for one, which is how servers built with the official MCP Python SDK return plain values and lists.
 
 ### Server Instructions
 
@@ -237,7 +241,7 @@ An MCP server can ask you for input in the middle of a tool call (MCP elicitatio
 - **Form requests** show a form with the fields the server asks for. **Submit** sends your answers. Open WebUI checks them against the server's schema and only sends answers that match it.
 - **Link requests** show a link to open. Opening it tells the server that you went ahead. A link that does not start with `http://` or `https://`, or that contains a user name or password, is cancelled before any dialog appears.
 
-**Decline** refuses the request and **Cancel** dismisses it, and the server decides how the tool call goes on. The dialog waits up to 120 seconds, or [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is lower, and then cancels the request. The dialog appears only while that chat is the one open in a browser tab; otherwise the request is cancelled at once.
+**Decline** refuses the request and **Cancel** dismisses it, and the server decides how the tool call goes on. The dialog waits up to 120 seconds, or [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is lower, and then cancels the request. In a saved chat, if the connection drops while the dialog is open, the request waits up to 60 seconds for the user to reopen that chat and then shows the dialog again. The dialog appears only while that chat is the one open in a browser tab; otherwise the request is cancelled at once.
 
 ## Troubleshooting
 
@@ -252,7 +256,7 @@ The server log records each failure at error level as `Failed to connect to MCP 
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
-4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, the `session.initialize()` handshake can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds).
+4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, connecting, listing its tools or reading a resource can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds). It limits every MCP request except tool calls, which use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server), and the check for the 2026-07-28 protocol, which has a fixed 10-second limit.
 
 ### Infinite loading screen after adding External Tool
 

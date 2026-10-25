@@ -25,13 +25,13 @@ Once `uv` is installed, running Open WebUI is a breeze. Use the command below, e
 - **macOS/Linux**:
 
   ```bash
-  DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
+  DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
   ```
 
 - **Windows** (PowerShell):
 
   ```powershell
-  $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.11 open-webui@latest serve
+  $env:DATA_DIR="C:\open-webui\data"; uvx --python 3.12 open-webui@latest serve
   ```
 
 Open WebUI is now running at [http://localhost:8080](http://localhost:8080).

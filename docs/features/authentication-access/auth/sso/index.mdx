@@ -199,6 +199,7 @@ WARNING | Token refresh failed for user xxx, deleting session
 Basic chat functionality (which uses Open WebUI's JWT) is **not** affected, but the following features **will** fail:
 
 - MCP tool servers using `auth_type: "system_oauth"`
+- Model connections using **Auth** set to **OAuth**
 - OneDrive / SharePoint file access
 
 Profile pictures are unaffected: the picture is fetched during the login callback with the access token just issued, so it needs no refresh token.

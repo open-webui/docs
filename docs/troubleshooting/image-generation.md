@@ -15,6 +15,19 @@ title: "Image Generation"
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
 
+- **Images settings refuse to save** (saving **Settings** > **Admin** > **Images** shows an error such as `OpenAI API Key is required.`):
+    - Keys and URLs are checked only while their feature is on. The image generation engine needs its key or URL while **Image Generation** is on. A Gemini **Image Edit Engine** needs its **API Key** while **Image Edit** is on.
+    - With both switches off, the page saves without any key, so you can set up one feature while the other has none.
+    - Switching **Image Generation** on without its key or URL, or **Image Edit** on without the Gemini **API Key**, is refused. Fill in the field, or switch the feature off, and save again.
+    - The **Image Generation** switch stays on next to the error, so the missing field stays in view. Nothing is saved until you fill it in.
+
+- **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
+    - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Switching it on shows them right away, so you can set everything up before saving. Their saved values are kept while they are hidden.
+
+- **Editing a WebP image fails** (the provider rejects the image, while PNG and JPEG images edit fine):
+    - Fixed in v0.12.4. Open WebUI sends WebP images to the provider typed as `image/webp`, in the Docker image too. This covers uploaded WebP images and WebP images a provider generated.
+    - On older versions, convert the image to PNG or JPEG and upload it again.
+
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
     - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
     - The usual cause is that the file behind it is gone, deleted through **Settings** > **Data Controls** > **Manage Files** or wiped along with the data directory. A deleted file cannot be brought back, so the placeholder stays on that message.

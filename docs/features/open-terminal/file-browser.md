@@ -25,11 +25,17 @@ Click folders to navigate, and click files to preview them. A breadcrumb bar at 
 
 Use the toolbar above the file list to sort by **Name** or **Date Modified**, ascending or descending. Folders always group ahead of files, so the sort order only reorders entries within each group. Each row shows its modified time next to the size, making it easier to find the latest output the AI just dropped into a working directory.
 
+### Grid and list view
+
+The **Actions** menu (**...**) in the toolbar switches between **List view** and **Grid view**. The grid shows each entry as a tile with its name and, for a file, its type and size. Folders show how many items they hold in both views. The choice is remembered in your browser.
+
 ---
 
 ## Previewing files
 
-Click any file to see a preview. Different file types display differently:
+On a desktop, hovering over a file for a moment shows a small card with its name, its size and a preview of its contents, so you can check a file without opening it. Text files up to 1 MB and other files up to 20 MB are previewed this way; anything larger shows **Preview not available**.
+
+Click any file to see a full preview. Different file types display differently:
 
 :::info Word and PowerPoint rendering needs a recent terminal
 The terminal lays those files out itself, which needs Open Terminal 0.12.1 or newer running the default image. On anything older, or on the smaller images, the browser draws an approximation instead. See [Updating](./setup/updating.mdx) if your previews look rougher than the ones described here.
@@ -180,7 +186,7 @@ You can select up to 16 KiB of text at once. If the file has unsaved edits, you 
 
 ## Creating and deleting
 
-You can create new files and folders, or delete things you don't need anymore, directly from the file browser. Both are switched off in a folder marked **Read-only**.
+You can create new files and folders, or delete things you don't need anymore, directly from the file browser. A folder's menu also has **New File** and **New Folder**, which open that folder and start the new entry there. Both are switched off in a folder marked **Read-only**.
 
 ![File browser action bar with New File, New Folder options](/images/open-terminal-file-browser-home.png)
 

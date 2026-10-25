@@ -73,7 +73,7 @@ Codes change every 30 seconds. Open WebUI also accepts the code just before and 
 
 ## Managing Your Authenticator
 
-Users find their authenticator under **Settings > Account > Multi-factor authentication**. It shows whether an authenticator is set up and how many recovery codes are left. When the way they signed in requires an authenticator, **Manage** offers two actions:
+Users find their authenticator under **Settings > Account > Multi-factor authentication**. It shows whether an authenticator is set up and how many recovery codes are left. The section only shows when the way they signed in requires an authenticator: MFA is on and their sign-in method is not exempt. There, **Manage** offers two actions:
 
 - **Replace authenticator**: moves the account to a new app or phone. After the new one is confirmed, a fresh set of ten recovery codes is shown.
 - **Generate recovery codes**: issues ten new recovery codes. The old ones stop working.

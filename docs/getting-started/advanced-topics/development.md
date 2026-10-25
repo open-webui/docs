@@ -46,8 +46,8 @@ Testing it and reporting what you find is the lowest-effort way to help, and it 
 :::info Python version compatibility
 Open WebUI supports **Python 3.11 and 3.12**. **3.13 is not supported yet**: a few of our dependencies still need to ship 3.13-compatible releases, and until they do, installs on 3.13 will fail or break at runtime.
 
-- **For production**, use the [Docker image](/getting-started/quick-start) or the **latest Python 3.11**. This is the combination we test against most heavily.
-- **3.12 also works**, but we have seen very rare reports of odd behaviour on 3.12 that we have not reproduced on 3.11. If you are running into something inexplicable on 3.12, dropping to the latest 3.11 is the first thing to try.
+- **For production**, use the [Docker image](/getting-started/quick-start) or the **latest Python 3.12**. The Docker image runs Python 3.12 on Debian 13.
+- **3.11 also works** for development and pip installs.
 :::
 
 :::warning Separate your data
@@ -79,7 +79,7 @@ npm run build
 npm run dev
 ```
 
-`npm run build` compiles the frontend and catches build-time errors early. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). It will show a waiting screen until the backend is running.
+`npm run build` compiles the frontend and catches build-time errors early. It runs Vite with a 12 GB Node.js heap limit, the same script the Docker image build uses, and works on Windows, macOS and Linux. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). It will show a waiting screen until the backend is running.
 
 :::tip
 If `npm install` fails with compatibility warnings, run `npm install --force`.
@@ -99,7 +99,7 @@ Create and activate a virtual environment (Conda or venv):
 
 ```bash
 # Option A: Conda
-conda create --name open-webui python=3.11
+conda create --name open-webui python=3.12
 conda activate open-webui
 
 # Option B: venv
@@ -139,7 +139,7 @@ export CORS_ALLOW_ORIGIN="http://localhost:5173;http://localhost:8080;http://192
 
 ### "FATAL ERROR: Reached Heap Limit"
 
-Node.js is running out of memory during the build. Increase the heap size before running frontend commands:
+Node.js is running out of memory. `npm run build` already sets a 12 GB heap limit of its own. For `npm run dev` and other frontend commands, increase the heap size before running them:
 
 ```bash
 export NODE_OPTIONS="--max-old-space-size=4096"

@@ -698,6 +698,12 @@ Turn it on only for a server you control that authenticates the person behind th
 
 :::
 
+:::info OAuth auth type
+
+With **Auth** set to **OAuth**, Open WebUI sends the access token from the user's SSO sign-in to this server as a bearer token. A chat in the browser uses the sign-in of that browser session. When that session has no token, or the request has no browser session at all (an API call with an API key or bearer token), the user's most recent SSO sign-in is used. A user who never signed in through SSO sends no token.
+
+:::
+
 ## The Provider Setting
 
 Every OpenAI connection has a **Provider** dropdown, hidden behind **Advanced** in the connection dialog. It is a hint about what the server on the other end actually is. Open WebUI cannot tell a llama.cpp server from a LiteLLM proxy by looking at `/v1/chat/completions`, since both answer it the same way, so the dropdown is how you tell it, and each option switches on the extras that server supports.

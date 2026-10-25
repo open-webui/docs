@@ -78,7 +78,7 @@ Never import a Tool you don’t recognize or trust. These are Python scripts and
 
 ### Sharing a tool
 
-The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list, without opening the editor. It appears on tools you can edit.
+The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list, without opening the editor. It appears on tools you can edit, and for anyone but an admin only with the **Tools Sharing** permission. The **Access** button in the tool editor follows the same permission.
 
 ### Version history
 
@@ -340,8 +340,8 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `query_knowledge_files` | Search file contents via the RAG retrieval pipeline (hybrid + rerank when enabled). Main tool for finding answers in docs. |
 | `search_knowledge_files` | Search files by filename. |
 | `grep_knowledge_files` | Exact text / regex search across knowledge file content. Returns matching lines with line numbers. Complements `query_knowledge_files` (semantic) when you need literal matches. |
-| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, optional `line_numbers`). |
-| `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
+| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered); `line_numbers` numbers character pages. |
+| `view_knowledge_file` | Read a knowledge-base file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered); `line_numbers` numbers character pages. |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
 | **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **File Context** off for this is also the setup that keeps the prompt prefix cacheable, so turn **Citations** off alongside it and put your citation rules in the system prompt instead; see [prompt caching](/features/chat-conversations/prompt-caching).* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
@@ -366,7 +366,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `search_notes` | Search the user's notes by title and content. |
 | `view_note` | Get the full markdown content of a specific note. |
 | `write_note` | Create a new private note for the user. |
-| `replace_note_content` | Update an existing note, replacing the whole content or applying range edits to part of it. |
+| `replace_note_content` | Update an existing note, replacing the whole content or editing part of it by exact text or by character range. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the full message history of a specific chat by ID. |
@@ -389,7 +389,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). Skills selected for the chat (the model's skills are selected in every new chat) send their instructions with each message. The model receives a summary of every other active skill the user can read in its system prompt and loads instructions and files on demand. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is available, `update_skill_files` while at least one workspace skill is. `create_skill` is injected for admins and users with the Skills Access permission.* |
+| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). Skills selected for the chat (the model's skills are selected in every new chat) send their instructions with each message, or, with [Load selected skills on demand](/features/workspace/skills#loading-selected-skills-on-demand) on, are listed in the summary like the rest. The model receives a summary of every other active skill the user can read in its system prompt and loads instructions and files on demand. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is available, `update_skill_files` while at least one workspace skill is. `create_skill` is injected for admins and users with the Skills Access permission.* |
 | `view_skill` | Load a skill's `SKILL.md` and the list of its supporting files by skill id. Resolving a skill follows normal ownership/access-grant checks. |
 | `read_skill_file` | Read one file of a skill by path, paging through long text. |
 | `grep_skill_files` | Search a skill's text files for literal text or a regular expression and return bounded excerpts around the matches. |
@@ -469,11 +469,11 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_bases` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` by similarity |
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
-| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
+| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional, picks the bases to search when the model has no attached knowledge; with attached knowledge the search covers that attached set), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
 | `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional, single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches by default, see [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable), `line_numbers` (default: false), `start_line` / `end_line` (optional; line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}`, includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
-| `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable) | `{id, filename, content, knowledge_id, knowledge_name}`, includes pagination metadata when truncated |
+| `view_knowledge_file` | Same parameters as `view_file` | `{id, filename, content, updated_at, created_at, knowledge_id, knowledge_name}`, with the same pagination and line-mode fields as `view_file` |
 | `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed |
@@ -493,7 +493,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
 | `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
 | `write_note` | `title` (required), `content` (required; markdown text. A JSON object or array is stored as a fenced `json` code block rather than left in the note as structured data) | `{status: "success", id}` |
-| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
+| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; each `{"action": "replace", "content": ...}`, `{"action": "replace_text", "find", "content", "occurrence", "replace_all"}` or `{"action": "replace_text", "start", "end", "content", "expected"}`. `find` is literal and case sensitive. With several matches, `occurrence` picks one (0-indexed) and `replace_all: true` replaces all of them; with neither set, nothing changes and the error lists every match. `replace_range` is a deprecated alias of the `start`/`end` form), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count, applied_ranges}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `text_not_found`, `ambiguous_match`, `invalid_find`, `invalid_occurrence`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …). An `ambiguous_match` error carries `matches`, each with `start`, `end` and `context` (the match with up to 50 characters on either side) |
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
@@ -535,6 +535,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Tool Search** | | |
 | `search_tools` | `query` (required; keywords or an exact tool name), `count` (default: `5`, at most `20`) | `{"tools": [...]}` with the full definitions, or `{"tools": [], "message": ...}` when nothing matches |
 | `call_tool` | `tool_name` (required; exact name), `params` (required; the tool's arguments as a JSON-encoded object string, `"{}"` for none) | The named tool's own result, or an `Error: ...` string when the call is malformed or the tool is not available |
+
+In `view_file` and `view_knowledge_file` line mode, `end_line` without `start_line` reads from line 1, and `start_line` without `end_line` returns 100 lines. Character paging with `line_numbers` on returns every character exactly once: following `next_offset` page after page reads the whole file with no gaps.
 
 :::warning Builtin tools behave differently inside a note-attached chat
 
@@ -656,12 +658,12 @@ All categories are **enabled by default**. Disabling a category prevents those s
 :::info Skills
 While built-in tools are active for the chat and the model's **Skills** category is on:
 
-1. Skills selected for the chat send their instructions with each message. Every new chat pre-selects the skills set on the model in the model editor
+1. Skills selected for the chat send their instructions with each message, unless [Load selected skills on demand](/features/workspace/skills#loading-selected-skills-on-demand) is on. Every new chat pre-selects the skills set on the model in the model editor
 2. The model receives a summary (name + description) of **every other active skill the user can read** in its system prompt via `<available_skills>` tags, including skills that are not attached to the model and skills the user switched off in the chat
 3. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is listed, so the model can load, read and search instructions and files on demand. `update_skill_files` is injected while at least one workspace skill is listed, to edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
 4. When the user can read no active skill, the `<available_skills>` block is left out
 
-Skills mentioned with `$` in the chat input or selected for the chat have their content injected directly into the system prompt: the whole `SKILL.md` up to the **Skill Read Limit** (20,000 characters by default), or for a longer one its first **Skill Preview Length** characters (5,000 by default) and the offset where it continues, so the model reads on with `read_skill_file` or searches the rest with `grep_skill_files`. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, mentioned skills and the skills selected for the chat or attached to the model are injected with the first 100,000 characters of `SKILL.md`. A skill attached to the model is injected even when the user switches it off in the chat.
+Skills mentioned with `$` in the chat input or selected for the chat have their content injected directly into the system prompt: the whole `SKILL.md` up to the **Skill Read Limit** (20,000 characters by default), or for a longer one its first **Skill Preview Length** characters (5,000 by default) and the offset where it continues, so the model reads on with `read_skill_file` or searches the rest with `grep_skill_files`. With [Load selected skills on demand](/features/workspace/skills#loading-selected-skills-on-demand) on, selected and model skills are listed in the manifest like the rest, and only mentioned skills are injected. Without built-in tools (legacy function calling, or the **Builtin Tools** capability turned off) or with the **Skills** category off, mentioned skills and the skills selected for the chat or attached to the model are injected with the first 100,000 characters of `SKILL.md`. A skill attached to the model is injected even when the user switches it off in the chat.
 
 When the chat has no system prompt, the skill summary is sent as a new system message. A custom backend that only adds its own system prompt when the request carries none needs to merge its prompt into the incoming system message, or its prompt is lost for every user with skill access.
 :::

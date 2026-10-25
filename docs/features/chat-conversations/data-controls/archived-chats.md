@@ -25,7 +25,7 @@ The **Archived Chats** view provides tools to manage your archived conversations
 
 From the Data Controls tab, you can also perform bulk operations:
 
-- **Archive All Chats**: Move all your current conversations to the archive at once. This is useful for periodic cleanup.
+- **Archive All Chats**: Move all your current conversations to the archive at once. This is useful for periodic cleanup. Archived chats leave their folders, so people who could open them through a [shared folder](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) lose access at once.
 - **Delete All Chats**: Permanently remove all conversations (both active and archived). 
   - :::warning
     This action cannot be undone. All chat history will be permanently deleted.
@@ -34,6 +34,12 @@ From the Data Controls tab, you can also perform bulk operations:
 :::info Deleting needs the Chat Delete permission
 
 **Delete** on an archived chat and **Delete All Chats** are drawn only for people who hold **Allow Chat Delete**. Without it neither appears, so there is no button that refuses when you press it, and archiving and **Unarchive All** work as before. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
+
+:::
+
+:::info Archive hidden by the admin
+
+An admin can hide **Archive** under **Visible controls** in **Settings > Admin > Interface**. That removes **Archive** from chat menus and from the sidebar's selection bar, and also hides **Unarchive Chat** on each archived chat, **Unarchive All** and **Archive All Chats**. Chats that are already archived stay archived and can still be opened and deleted here. Admins always see every control.
 
 :::
 

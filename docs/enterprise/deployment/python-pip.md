@@ -82,7 +82,7 @@ Place your environment variables in `/etc/open-webui/env` (see [Critical Configu
 | Consideration | Detail |
 | :--- | :--- |
 | **OS patching** | You are responsible for OS updates, security patches, and Python runtime management. |
-| **Python environment** | Pin your Python version (3.11 recommended) and use a virtual environment or system-level install. |
+| **Python environment** | Pin your Python version (3.12 recommended) and use a virtual environment or system-level install. |
 | **Storage** | Use object storage (such as S3) or a shared filesystem (such as NFS) since VMs in an auto-scaling group do not share a local filesystem. |
 | **Tika sidecar** | Run a Tika server on each VM or as a shared service. A shared instance simplifies management. |
 | **Updates** | Scale the group to 1 instance, update the package (`pip install --upgrade open-webui`), wait for database migrations to complete, then scale back up. |
