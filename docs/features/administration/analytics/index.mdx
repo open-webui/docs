@@ -58,6 +58,8 @@ The period covered is the past two years (the last 730 days), the same window fo
 
 ## Dashboard Features
 
+The **Overview** / **Sessions** switch picks the view. Both follow the same period and group filter. [Sessions](#sessions) lists single chats.
+
 ### Time Period Selection
 
 At the top right of the Analytics dashboard, you can filter all data by time period:
@@ -227,6 +229,34 @@ Pick **Users** in the switch above the table to track user engagement and token 
 
 ---
 
+## Sessions
+
+:::info Admin Chat Access Required
+The **Sessions** view is only shown when [**`ENABLE_ADMIN_CHAT_ACCESS`**](/reference/env-configuration#enable_admin_chat_access) is enabled. It shows chat titles, tool calls and errors from other users' chats.
+:::
+
+**Sessions** lists one row per chat with messages in the selected period, filtered by group. Sub-agent, timer and note chats are included and labelled. The summary shows totals for sessions, prompts, tokens and response errors. Click a token range below it to filter the list.
+
+| Column | Description |
+|--------|-------------|
+| **Session** | Chat title, with its folder or model |
+| **User** | Owner of the chat |
+| **Last active** | Time of the last saved message |
+| **Responses** | Assistant responses in the period |
+| **Tokens** | Recorded input and output tokens. `-` means none were recorded, `*` means partial |
+| **Response errors** | Responses that ended in an error |
+| **Span** | Time from the first to the last saved message, idle time included |
+
+**Not logged** means a timestamp is missing. Search by chat title, user or folder, filter by model, or hide sub-agent chats in the **Session options** menu.
+
+### Session Details
+
+Click a session to see its token and cache totals, a chart per response (**Tokens** or **Timeline**) and the execution trace: each response with its tool calls, results and errors, their outcome and duration. **All**, **Tools** and **Errors** filter the trace. **Open chat** opens the chat in a new tab. Timing is saved for new replies only.
+
+Titles are cut to 10 words. Links, file paths, long identifiers and values that follow words like token or password are removed.
+
+---
+
 ## Token Usage Tracking
 
 ### What Are Tokens?
@@ -242,6 +272,8 @@ Open WebUI automatically captures token usage from model responses and stores it
 - **Total tokens** - Sum of input and output
 
 Token data is normalized across different model providers (OpenAI, Ollama, llama.cpp, etc.) to provide consistent metrics regardless of which backend you're using.
+
+Each call to the provider counts once, even when the provider resends its usage with every streamed chunk. When a reply makes several calls because the model uses tools, their usage is added up. A reply without usage stays unrecorded, and one where only some calls report usage is marked partial.
 
 The figures are the ones the provider reports, and most OpenAI-compatible providers report nothing on a streamed reply unless they are asked. Asking is what the **Usage** capability in **Workspace > Models > Edit** does, so a model without it can show no tokens at all. See [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
 
@@ -376,6 +408,15 @@ GET /api/v1/analytics/models/{model_id}/chats    # Get chats using this model
 GET /api/v1/analytics/models/{model_id}/overview # Get feedback history and tags
 ```
 
+**Session Endpoints** (admin only, `403` when `ENABLE_ADMIN_CHAT_ACCESS` is off):
+```
+GET /api/v1/analytics/sessions                                          # One session per chat
+GET /api/v1/analytics/sessions/{chat_id}                                # Messages of a session with shortened, redacted previews
+GET /api/v1/analytics/sessions/{chat_id}/messages/{message_id}/events   # Saved steps of one response with redacted snippets
+GET /api/v1/analytics/sessions/{chat_id}/trace                          # Execution trace of a session
+```
+All four take the common query parameters below plus `skip` and `limit` (at most 50).
+
 **Personal Usage Endpoint** (any signed-in user, returns only their own data):
 ```
 GET /api/v1/users/usage
@@ -419,9 +460,10 @@ Analytics tracks:
 - ✅ Token usage per message
 - ✅ Model IDs and user IDs
 - ✅ Chat IDs and message relationships
+- ✅ Start and end times of responses and tool calls
 
 Analytics **does not** track:
-- ❌ Message content display in the dashboard (only metadata)
+- ❌ Message content in the dashboard. [Sessions](#sessions) shows shortened chat titles and tool names
 - ❌ External sharing or exports
 - ❌ Individual message content outside the database
 
@@ -448,7 +490,7 @@ Token accuracy depends on your model provider:
 - **llama.cpp** - Reports tokens when available
 - **Custom providers** - Depends on implementation
 
-Missing token data appears as 0 in analytics.
+A response without token data adds nothing to the totals.
 
 ### Can I export analytics data?
 
