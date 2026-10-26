@@ -13,7 +13,7 @@ To enable community sharing, follow these steps:
 
 :::note
 
-**Note:** Only Admins can toggle the **Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community. With it off, the new chat screen also hides the **By** line that links a model imported from openwebui.com to its author there. Other models keep showing their author.
+**Note:** Only Admins can toggle the **Community Sharing** option. If this option is toggled off, users and Admins will not see the **Share to Open WebUI Community** option for sharing their chats. Community sharing must be enabled by an Admin for users to share chats to the Open WebUI community. With it off, the openwebui.com author link on imported models is hidden too.
 
 :::
 
@@ -42,7 +42,7 @@ The modal shows an **Access Control** selector for who can open the link, offeri
 
 **Open** is the only setting that makes a chat readable without an Open WebUI account. Anyone holding the link can read the conversation straight from the internet, with no login and no record of who viewed it.
 
-It is off by default. A non-admin needs the **Chats Open Sharing** permission ([`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](/reference/env-configuration#user_permissions_chat_allow_open_sharing), default `False`) before the option appears at all. Without it the dropdown shows only **Private** and **Public**. An open grant submitted directly to the API is refused with **You do not have permission to share with the requested audience**, and the chat's sharing stays as it was. The same applies to a public grant without **Chats Public Sharing**.
+It is off by default. A non-admin needs the **Chats Open Sharing** permission ([`USER_PERMISSIONS_CHAT_ALLOW_OPEN_SHARING`](/reference/env-configuration#user_permissions_chat_allow_open_sharing), default `False`) before the option appears at all. Without it the dropdown shows only **Private** and **Public**, and the server refuses open grants.
 
 What an open link does and does not allow:
 
@@ -103,10 +103,10 @@ In a chat with replies allowed:
 - Anyone who can write into the chat and has the **Allow Regenerate Response** permission can **Regenerate** any reply. The new version belongs to the person who generated it. Each person continues, stops and rates only the reply versions they generated.
 - Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt. The editor offers **Send**, which adds the edited prompt as a new branch with a new reply and leaves the original as it was. Other people in the chat stay on the branch they had selected.
 - Only the owner can edit replies and save an edit in place, and only on their own messages and the reply versions they generated. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
-- **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version. An admin who is not the owner sees it on the versions they generated when [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) is on.
+- **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version.
 - Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
-- When a change takes someone's access away, the chat closes for them at once, even while they have it open, and they stop getting its updates. This covers unsharing the chat, **Unshare All**, deleting it and archiving it out of a [shared folder](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).
+- When someone loses access, the chat closes for them at once and they stop getting its updates.
 
 ![The chat owner's view of a chat with replies allowed: another member's message with their name and picture, the model's answer to it, and a line above the input saying that member is typing](/images/features/chat/shared-chat-replies-live.webp)
 

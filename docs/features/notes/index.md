@@ -127,7 +127,7 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 3. Select **Attach Notes**
 4. Choose the note(s) to attach
 
-**Attach Notes** shows only while Notes is enabled on the instance and you have the **Notes** permission. Admins always have it. An admin can also hide it for non-admins under **Visible controls** in **Settings > Admin > Interface**.
+**Attach Notes** needs Notes enabled and the **Notes** permission.
 
 The full content of the note is injected into the context window for that conversation.
 
@@ -189,11 +189,11 @@ Access management options via the **More (...)** menu in the top right corner.
 
 **Share** in the **More (...)** menu offers **Copy link** and **Copy to clipboard**. A copied link opens the note only for someone who can already reach it.
 
-Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button appears only with write access, and for anyone but an admin only with the **Notes Sharing** permission. It is disabled unless you own the note or are an admin; a read-only collaborator sees a **Read-Only Access** label instead. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
+Granting that reach is the **Access** button, at the top right beside the **More (...)** menu. It opens the **Access Control** panel, where you set the note's visibility and share it with people and groups at either **Read**, which opens the note and lets them start chats from it while the editor stays read-only, or **Write**, which also allows editing the body and its files. The button needs write access and the **Notes Sharing** permission, and only the owner or an admin can change sharing. The list works the same as [anywhere else in Open WebUI](/features/authentication-access/rbac/groups#resource-access-rbac).
 
-The same panel opens from the Notes list: the **⋯** menu of a note you own has an **Access** entry when you have the **Notes Sharing** permission, and administrators see it on every note. Each change there is saved right away.
+The same panel opens from the **⋯** menu of a note in the Notes list.
 
-The server checks these permissions on every sharing change, the API included. A change your permissions do not allow is refused with **You do not have permission to share with the requested audience**, and the note's sharing stays as it was. Saving a note's title or content never changes who it is shared with.
+Saving a note never changes who it is shared with.
 
 Administrators can control sharing via environment variables or the Admin Panel:
 
@@ -270,7 +270,7 @@ When manually attached, notes are **read-only**. In **Native Mode** with the `re
 
 The tool has two modes. Passing whole `content` replaces the entire note, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the note and leaves the rest untouched. Each operation names the text to change in one of two ways:
 
-- **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, the note stays unchanged and the model gets back each match's position with 50 characters of context on either side, so it can choose.
+- **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, nothing changes and the model gets the positions of all matches to choose from.
 - **By position.** `start` and `end` give a character range. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
 
 The older `replace_range` action still works as an alias of the position form, but it is deprecated. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for these operations.

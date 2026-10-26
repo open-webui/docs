@@ -40,7 +40,7 @@ Folders can be nested within other folders to create hierarchical organization:
 
 - **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
-- **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. It is shown only with the [Allow Chat Export](/features/authentication-access/rbac/permissions#3-chat-permissions) permission; admins always see it. There is no move entry. Folders are re-parented by drag and drop only.
+- **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. It needs the [Allow Chat Export](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. There is no move entry. Folders are re-parented by drag and drop only.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
@@ -140,7 +140,7 @@ Link **knowledge bases and files** to your folder:
 
 Share a folder, and the chats inside it, with specific users or groups so a team can work from the same set of conversations.
 
-Sharing a folder needs the **Folders Sharing** permission, which is off by default. Without it, the **Access** button in **Edit Folder** is hidden for non-admins. An administrator turns it on under **Admin Panel > Users > Groups**, in **Default permissions** for everyone or in a group's **Permissions** tab, or sets the default with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing). The server enforces it, the API included: without it, a sharing change is refused with **You do not have permission to share with the requested audience**.
+Sharing a folder needs the **Folders Sharing** permission, which is off by default. An administrator turns it on under **Admin Panel > Users > Groups** or with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
 1. Hover over a folder in the sidebar, open the **three-dot menu** (⋯) and select **Edit**.
 2. Click **Access** at the top of the **Edit Folder** dialog.
@@ -151,9 +151,8 @@ Sharing a folder needs the **Folders Sharing** permission, which is off by defau
    - **Clone only** (default): people you shared with read the folder's chats and clone one to continue it on their own.
    - **Allow replies**: everyone with access to the folder, read or write, can send messages into the chats directly in it, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). Chats in a subfolder follow that subfolder's own sharing mode, which you set in the subfolder's own **Access** dialog; until then they open read-only.
 
-Each change applies as soon as you make it. Saving other folder settings in the **Edit Folder** dialog leaves the sharing mode as it is.
+Each change applies as soon as you make it.
 
-The **Access** dialog of a subfolder notes that access granted to parent folders also applies there. With no grants of its own, its list reads **No direct access grants.**
 
 Only the folder's owner or an admin can change who a folder is shared with and its sharing mode. People with write access do not get the **Access** button in the **Edit Folder** dialog.
 
@@ -163,14 +162,14 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. When someone has inherited **Write** on a subfolder and a direct **Read** grant on it too, **Write** applies. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
 - **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** panel. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
-- **The folder's owner can tidy up other people's chats.** In a folder you own, a chat someone else started shows a pencil button to rename it, and you can double-click its title too. Only the title changes. You can also drag such a chat into another of your folders in the same shared tree. The topmost shared folder above the chat bounds that tree, so the chat cannot be moved into a folder outside it or out of the folders altogether.
+- **The folder's owner can tidy up other people's chats.** In a folder you own, you can rename chats other people started (title only) and move them to other folders in the same shared tree.
 - **Edit and regenerate together.** With **Allow replies** on, people with access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). The chat's top bar shows who else has it open right now.
 - **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**; click the count to see everyone. Hover or click a picture to open that person's profile card.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
-- **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access at once, and those of them who have it open are sent back to a new chat. **Archive All Chats** does the same for every chat you own.
+- **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
-- **Folders cannot be shared publicly.** Sharing is always to specific users or groups, with no public link. This holds for admins too: the server refuses a public grant on a folder.
+- **Folders cannot be shared publicly**, by admins either. Sharing is always to specific users or groups.
 
 ![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)
 
@@ -203,7 +202,7 @@ In addition to folders, **tags** provide a flexible labeling system for conversa
 - **Adding Tags**: Apply keyword labels to conversations based on content or purpose.
 - **Searching by Tags**: Type `tag:<name>` in the search window to list your chats with that tag, or `tag:none` for chats without tags. See [Filtering results](/features/chat-conversations/chat-features/history-search#filtering-results).
 - **Flexible Organization**: Tags can be added or removed at any time and don't affect folder structure.
-- **Automatic Tags**: A task model can tag your chats for you. Turn this off for yourself with **Chat Tags Auto-Generation** in **Settings > Interface**. The switch shows only while the admin has **Tags Generation** on in **Settings > Admin > Interface**, and your saved choice is kept while it is hidden.
+- **Automatic Tags**: A task model can tag your chats for you. Turn this off for yourself with **Chat Tags Auto-Generation** in **Settings > Interface**. The switch shows only while the admin has **Tags Generation** on.
 
 :::tip **Tagging by Topic**
 
