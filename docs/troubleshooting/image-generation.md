@@ -24,10 +24,6 @@ title: "Image Generation"
 - **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
     - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Switching it on shows them right away, so you can set everything up before saving. Their saved values are kept while they are hidden.
 
-- **Editing a WebP image fails** (the provider rejects the image, while PNG and JPEG images edit fine):
-    - Fixed in v0.12.4. Open WebUI sends WebP images to the provider typed as `image/webp`, in the Docker image too. This covers uploaded WebP images and WebP images a provider generated.
-    - On older versions, convert the image to PNG or JPEG and upload it again.
-
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
     - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
     - The usual cause is that the file behind it is gone, deleted through **Settings** > **Data Controls** > **Manage Files** or wiped along with the data directory. A deleted file cannot be brought back, so the placeholder stays on that message.

@@ -424,8 +424,6 @@ connection timed out, timeout 30.00
 
 Increasing `DATABASE_POOL_SIZE` just moves the breaking point. More connections means more concurrent slow `fsync`s against the same slow storage: the filesystem is still the bottleneck, and you can't pool your way past it.
 
-Before v0.12.4, SQLite on fast local storage could reach the same state another way. Closing a page while the server was still sending it data (a file's processing status, a chat export) lost the pool connection used for it. Some later requests hung, and once enough connections were lost, every request needing the database waited 30 seconds and failed with a 503. This is fixed in v0.12.4.
-
 **And WAL over NFS is specifically broken.** SQLite's WAL mode uses an `mmap`-backed `-shm` file for cross-process coordination. [SQLite upstream says plainly](https://www.sqlite.org/faq.html#q5) that `mmap` on NFS is unreliable: some NFS versions don't support it at all. Under low concurrency it was merely slow; under async concurrency you can hit actual locking pathologies (deadlocks, `PRAGMA journal_mode=WAL` that starts and never completes, multi-minute stalls on trivial queries).
 
 **Why Postgres is the fix, not a bigger pool:** the Postgres server manages its own I/O concurrency against its own local storage. Your app hits it over a network socket, but that hop is orders of magnitude cheaper than NFS `fsync`, and Postgres was designed from day one for concurrent writers: no file-level locking, no cross-process `mmap` coordination, no WAL-on-network-FS caveats. A dedicated async driver (`asyncpg`) talks to it directly. That's the only database shape that actually composes with async concurrency when the storage isn't guaranteed-fast-local.

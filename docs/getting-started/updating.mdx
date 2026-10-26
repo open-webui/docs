@@ -53,12 +53,6 @@ Browse all available tags on the [GitHub releases page](https://github.com/open-
 Since v0.11.4, personal tool servers sit behind the **Direct Integrations** switch in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which starts off. Users who had the `direct_tool_servers` permission lose sight of the **Integrations** tab in their settings until you turn it on, admins included.
 :::
 
-:::info v0.12.4 changes personal connections and Manage Files
-[`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations) defaults to off. On an instance that never turned it on, the tool servers and Open Terminal connections that users saved in their **Integrations** settings stop being used in chats after the upgrade, for admins and users alike. They stay saved. To keep using them, turn on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations**.
-
-**Settings > Data Controls > Manage Files** lists only your own files, admins included. [`BYPASS_ADMIN_ACCESS_CONTROL`](/reference/env-configuration#bypass_admin_access_control) is on by default, so on a default install admins lose the view of every user's files there. A script that needs every user's files can still call `GET /api/v1/files/search`.
-:::
-
 :::info v0.12.1 adds sign-in records for SCIM users
 This release runs a database migration that adds a sign-in record to every account that lacks one, in practice the accounts created through [SCIM](/features/authentication-access/auth/scim#integration-with-sso). It changes data only. Back up first. The added records carry no usable password, so these users keep signing in through SSO.
 :::

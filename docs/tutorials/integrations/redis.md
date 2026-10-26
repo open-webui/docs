@@ -664,7 +664,6 @@ REDIS_URL="redis://redis:6379/0"
 2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.` (logged at DEBUG level, so it appears only with `GLOBAL_LOG_LEVEL=DEBUG`)
 3. Verify Redis is accessible from Open WebUI container
 4. If your Redis user is restricted by ACLs, check the log for `Redis denied publishing` or `Redis denied subscribing`. Either means the user is missing a command or channel permission, and the log line names the permissions and channels to check. With `WEBSOCKET_REDIS_ROOM_CHANNELS` on (the default), the user needs `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING`, plus access to the channels `&socketio` and `&socketio#*`. See [Per-Room Redis Channels](../../getting-started/advanced-topics/scaling.md#per-room-redis-channels).
-5. If new browser connections hang after the Redis connection dropped and came back, and only a restart helps, update to v0.12.4 or later. On v0.12.3, an instance with [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) on (the default) and `retry_on_timeout` in [`WEBSOCKET_REDIS_OPTIONS`](/reference/env-configuration#websocket_redis_options) could stop accepting new browser connections after such a reconnect. From v0.12.4 it accepts them again as soon as Redis is back.
 
 #### Issue: "Multiple Open WebUI instances interfering with each other"
 

@@ -237,7 +237,7 @@ For the full breakdown of what it covers, the two behaviour differences worth kn
 
 With `WEBSOCKET_MANAGER=redis`, every live update (each streamed token, each channel message, each note edit) used to go out on one shared Redis channel, and every instance decoded every update to find out whether any of its users needed it. With 16 instances, each token was decoded 16 times and thrown away 15 times. Profiling a loaded fleet of 16 instances and about 4,000 users put roughly 31% of all active CPU in that decoding, the largest single cost.
 
-From v0.12.0, updates addressed to a specific user, channel or note are published on a Redis channel of their own. Each instance subscribes only to the rooms of the people connected to it, so Redis never sends it live updates for chats it does not serve. This cuts the Redis output and the traffic each instance receives. Acknowledgements and control messages stay on the shared channel. This is on by default, and the saving grows with the number of instances:
+Updates addressed to a specific user, channel or note are published on a Redis channel of their own. Each instance subscribes only to the rooms of the people connected to it, so Redis never sends it live updates for chats it does not serve. This cuts the Redis output and the traffic each instance receives. Acknowledgements and control messages stay on the shared channel. This is on by default, and the saving grows with the number of instances:
 
 ```
 WEBSOCKET_REDIS_ROOM_CHANNELS=True
@@ -252,8 +252,6 @@ Every instance must run the same mode. Changing this setting needs a full restar
 If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING` commands and access to the channels `&socketio` and `&socketio#*`. The room channels are named `socketio#<namespace>#<room>`. Each instance subscribes to the room channels of its connected users and unsubscribes when the last of them leaves. `PSUBSCRIBE` is no longer used. When a permission is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`, together with the permissions and channels to check.
 
 `WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel again. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
-
-On v0.12.3, a dropped Redis connection could leave new browser connections hanging until a restart. See [Redis troubleshooting](/tutorials/integrations/redis) and update to v0.12.4.
 
 ### Speed Up Name Lookups
 

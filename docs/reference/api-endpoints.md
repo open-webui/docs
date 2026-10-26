@@ -85,8 +85,6 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 
 A reply can involve several model calls, one per round of tool use. Every field of the `usage` block covers the **whole reply**, all calls added up.
 
-From v0.11.0 through v0.12.4, `prompt_tokens` and `completion_tokens` held the most recent model call only.
-
 :::
 
 **The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#-anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
