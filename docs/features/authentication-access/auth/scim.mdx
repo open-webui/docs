@@ -189,8 +189,6 @@ If `SCIM_AUTH_PROVIDER` is not set while SCIM is enabled, any operation that req
 4. **500 Error on externalId Operations**
    - Verify that `SCIM_AUTH_PROVIDER` is set to the correct OAuth provider name
 
-5. **SCIM Users Get `401` on SSO Sign-In**
-   - On v0.12.0, update to v0.12.1 or later, see [Sign-in records for SCIM users](#integration-with-sso)
 
 ### Testing SCIM Endpoints
 
@@ -252,8 +250,6 @@ This ensures users are automatically created and can immediately authenticate us
 :::info Sign-in records for SCIM users
 
 Every account SCIM creates gets a sign-in record with a random password that nobody knows, so the user signs in through SSO. An admin can give the user a password as well by editing the user under **Admin Panel > Users**. When SCIM changes a user's email, the sign-in email changes with it.
-
-Before v0.12.1, SCIM created accounts without a sign-in record. v0.12.0 started checking that record on SSO sign-in, so SCIM users got `401` `Invalid authentication request.` when they signed in. Updating to v0.12.1 fixes this for existing accounts too: a database migration adds the missing record on startup, with an empty password that never matches, and the users sign in through SSO again with nothing to change on the identity provider. Back up before updating, see [Before You Update](/getting-started/updating#before-you-update).
 
 :::
 

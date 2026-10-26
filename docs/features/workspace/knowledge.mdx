@@ -330,7 +330,7 @@ Behavior to be aware of:
 - Hidden files and folders (anything beginning with `.`) are skipped.
 - Files modified locally upload with a new content hash; the old file entry is removed from the KB and replaced.
 - Files removed locally are deleted from the KB during the cleanup step.
-- The action is **non-destructive** for unchanged files. Earlier versions of the same menu action used to wipe and re-upload everything; that is no longer the case as of v0.9.6.
+- The action is **non-destructive** for unchanged files.
 
 For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
 
@@ -348,7 +348,7 @@ Knowledge bases can be managed programmatically:
 
 **Files**
 
-- `POST /api/v1/files/`: Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side**, equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path (added in v0.9.6, fixing files left unlinked when the uploader disconnected mid-processing). The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
+- `POST /api/v1/files/`: Upload files. Pass `knowledge_id` (and optionally `directory_id`) in the upload metadata to have the backend **auto-link and process the file into that knowledge base server-side**, equivalent to a follow-up `POST /api/v1/knowledge/{id}/file/add`, but it does not depend on the client staying connected after upload. This is the recommended single-call path. The server SHA-256-hashes the uploaded bytes into `file.meta.file_hash`; clients can pre-compute and send `file_hash` in metadata to skip server-side hashing (used by the incremental sync flow below).
 - `GET /api/v1/files/{id}/process/status`: Check processing status. An upload reports `completed` only after its indexing has finished and, when it was sent with a `knowledge_id`, after the link to that knowledge base is saved.
 - `POST /api/v1/files/{id}/rename`: Rename a file
 - `GET /api/v1/files/{id}/content`: Download the original file. Returns 404 with `Original file is unavailable.` for a file stored as text only.
@@ -356,7 +356,7 @@ Knowledge bases can be managed programmatically:
 - `GET /api/v1/files/{id}/data/content`: Read the indexed text
 - `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Empty or whitespace-only `content` is rejected with 400 and `The content provided is empty. Please ensure that there is text or data present before proceeding.` Returns 500 when processing fails, or when the text was saved but some knowledge bases could not be reindexed; send the request again to retry.
 - `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base. A file whose extracted text is already in the knowledge base is rejected with `Duplicate content detected. Please provide unique content to proceed.`
-- `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added. Content batch-added before v0.12.0 has no content hash and is not detected as a duplicate.
+- `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added.
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)
 
 **Directories**
@@ -365,7 +365,7 @@ Knowledge bases can be managed programmatically:
 - `POST /api/v1/knowledge/{id}/dirs/{dir_id}/update`: Rename or re-parent a directory (body: `name` and/or `parent_id`)
 - `DELETE /api/v1/knowledge/{id}/dirs/{dir_id}/delete?move_files=true`: Delete a directory. With `move_files=true` (default), contained files are re-parented; with `move_files=false`, they're deleted along with the directory.
 
-**Incremental directory sync** (added in v0.9.6)
+**Incremental directory sync**
 
 - `POST /api/v1/knowledge/{id}/sync/diff`: Submit a local manifest (`manifest: [{path, filename, checksum}]` where `checksum` is the SHA-256 of the file bytes) and receive `{added, modified, deleted, mkdir, rmdir, unmodified_count}` describing exactly what to upload, replace, delete and which directories to create/remove. Read-only, does not mutate the KB. A file uploaded to the KB less than an hour ago that is still pending or processing counts as unmodified when its path, name and checksum match, so a second sync does not upload it again. After an hour it is offered for upload again.
 - After acting on the diff (create `mkdir` paths, upload `added` + `modified` files with their hashes via `POST /api/v1/files/`), call:

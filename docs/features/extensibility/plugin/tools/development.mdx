@@ -33,7 +33,7 @@ licence: MIT
 """
 ```
 
-:::tip Metadata auto-fill (v0.9.6+)
+:::tip Metadata auto-fill
 When you create a **new** tool (also applies to functions and skills), the editor reads the frontmatter as you paste or type code and auto-fills the **Name**, **ID**, and **Description** fields from `title` and `description` if you haven't already filled them in. It never overwrites a value you've entered, and it does not re-derive fields when editing an existing item, so you no longer need to retype metadata that's already declared in the source.
 :::
 
@@ -209,7 +209,7 @@ else:
 ```
 
 :::caution Do not check for `"native"` or `"default"`
-Before v0.10.0 an unset model carried `"default"`, and tools detected Native with `function_calling == "native"`. That is now wrong. An unset model runs **Native** but does not carry the string `"native"`, so a `== "native"` test (or treating a `"default"` fallback as non-native) misclassifies the now-default case as Legacy and feeds it Legacy-only events that silently break. Test for `== "legacy"` and treat everything else as Native.
+An unset model runs **Native** but does not carry the string `"native"`, so a `== "native"` test (or treating a `"default"` fallback as non-native) misclassifies the now-default case as Legacy and feeds it Legacy-only events that silently break. Test for `== "legacy"` and treat everything else as Native.
 :::
 
 #### Complete Event Type Compatibility Matrix

@@ -71,7 +71,7 @@ When using **Native function calling mode** with a current model (at minimum GPT
 **Requirements:**
 1. `ENABLE_CODE_INTERPRETER` must be enabled globally
 2. Model must have `code_interpreter` capability enabled
-3. Model must be in **Native** function calling mode (the default as of v0.10.0; only an issue if it was switched to **Legacy** in the model's advanced params)
+3. Model must be in **Native** function calling mode (the default; only an issue if it was switched to **Legacy** in the model's advanced params)
 
 For more details on builtin tools and native mode, see the [Tool Development Guide](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 

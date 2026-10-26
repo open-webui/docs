@@ -369,7 +369,7 @@ See the [Scaling Guide](/getting-started/advanced-topics/scaling#step-1-switch-t
 
 ### SQLCipher
 
-SQLCipher is not supported since v0.9.0, and Open WebUI refuses to start with `DATABASE_TYPE=sqlite+sqlcipher`. For SQLite deployments that need encryption at rest, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
+SQLCipher is not supported, and Open WebUI refuses to start with `DATABASE_TYPE=sqlite+sqlcipher`. For SQLite deployments that need encryption at rest, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
 
 ### Connection pool tuning
 
@@ -591,10 +591,6 @@ Outbound HTTP requests also do not follow `3xx` redirects by default. Without th
 ```bash
 AIOHTTP_CLIENT_ALLOW_REDIRECTS=false
 ```
-
-:::note Playwright loader (v0.9.6+)
-Earlier versions applied URL validation and the redirect gate only to the default web loader; the Playwright-based loader (`WEB_LOADER_ENGINE=playwright` / the `playwright` Docker variant) could navigate and follow redirects to internal or blocklisted URLs unchecked. As of v0.9.6 the Playwright path enforces the same `validate_url()` and redirect rules as the default loader, so the SSRF controls above apply regardless of which web loader engine you run. If you use Playwright, ensure you are on v0.9.6 or later.
-:::
 
 [Apps](/features/channels/apps) have their own gate: an app URL must use HTTPS and resolve to public addresses. Open WebUI refuses redirects from an app and always verifies its certificate. [`APP_ALLOWED_PRIVATE_ORIGINS`](/reference/env-configuration#app_allowed_private_origins) lists the app origins allowed on private addresses or plain HTTP.
 

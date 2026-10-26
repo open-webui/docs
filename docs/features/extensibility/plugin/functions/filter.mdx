@@ -27,7 +27,7 @@ Filters sit in the middle of the flow (like checkpoints) where you decide what n
 Here’s a quick summary of what Filters do:
 
 1. **Modify User Inputs (Inlet Function)**: Tweak the input data before it reaches the AI model. This is where you enhance clarity, add context, sanitize text, or reformat messages to match specific requirements.
-2. **Modify Every Outgoing Call (Request Function)**: Adjust the payload immediately before it is handed to the model provider, every single time one is sent. Added in v0.11.2, and covered in [The `request` step](#the-request-step) below.
+2. **Modify Every Outgoing Call (Request Function)**: Adjust the payload immediately before it is handed to the model provider, every single time one is sent. Covered in [The `request` step](#the-request-step) below.
 3. **Intercept Model Outputs (Stream Function)**: Capture and adjust the AI’s responses **as they’re generated** by the model. This is useful for real-time modifications, like filtering out sensitive information or formatting the output for better readability.
 4. **Modify Model Outputs (Outlet Function)**: Adjust the AI's response **after it’s processed**, before showing it to the user. This can help refine, log, or adapt the data for a cleaner user experience.
 
@@ -81,7 +81,7 @@ class Filter:
 
 ### The `request` step
 
-`request` was added in **v0.11.2**. It receives the payload that is about to be sent to the model provider, and whatever it returns is what gets sent.
+`request` receives the payload that is about to be sent to the model provider, and whatever it returns is what gets sent.
 
 ```python
     async def request(self, body: dict, __user__: Optional[dict] = None) -> dict:
@@ -560,11 +560,11 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 | `inlet()` | ✅ Always called | ✅ Always called |
 | `request()` | ✅ Called before every provider call | ✅ Called before every provider call |
 | `stream()` | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ✅ Runs by default since v0.10.0, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
+| `outlet()` | ✅ Called after response | ✅ Runs by default, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
 | `__event_emitter__` | ✅ Shows UI feedback | ⚠️ A real but invisible callable in `inlet()` and the first `request()`, and `None` in `stream()` and `outlet()` |
 
 :::info outlet() on Direct API Calls
-Since v0.10.0, `outlet()` runs for direct `/api/chat/completions` callers **by default**, on **both** the non-streaming and streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). On the streaming path the server accumulates the full response and runs `outlet()` once the stream completes. Set `ENABLE_API_OUTLET_FILTERS=False` to skip outlet filters on direct API traffic.
+`outlet()` runs for direct `/api/chat/completions` callers **by default**, on **both** the non-streaming and streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). On the streaming path the server accumulates the full response and runs `outlet()` once the stream completes. Set `ENABLE_API_OUTLET_FILTERS=False` to skip outlet filters on direct API traffic.
 
 **Response visibility:** `outlet()`'s side effects run (DB update, `__event_emitter__`, external calls like logging/tracing), but it does **not** rewrite the HTTP response body, and a streaming client has already received the stream before `outlet()` fires. To observe `outlet()`'s output, read the chat record back, subscribe to the `chat:outlet` WebSocket event, or use `/api/chat/completed`. `__event_emitter__` is `None` in `outlet()` for pure API callers.
 :::
@@ -1306,7 +1306,7 @@ Each message carries its `id`, `role`, `content`, `info` and `timestamp`, plus `
 - **Quality scoring**: Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-Since v0.10.0, `outlet()` runs by default for direct `/api/chat/completions` callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). With it switched off, a direct API integration has to follow the request with `POST /api/chat/completed`. Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
+`outlet()` runs by default for direct `/api/chat/completions` callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). With it switched off, a direct API integration has to follow the request with `POST /api/chat/completed`. Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
 An outlet that changes the reply edits both its `content` and the text in its `output`, because the chat shows the reply from `output`.

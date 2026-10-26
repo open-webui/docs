@@ -410,16 +410,6 @@ The upgrade step that moves an account's identity provider subject into its curr
 
 ---
 
-### 13. SCIM Users Get 401 on SSO Sign-In
-
-**Problem:** On v0.12.0, users created through [SCIM](/features/authentication-access/auth/scim) cannot sign in through SSO. The provider sign-in succeeds, then Open WebUI answers `401` with `Invalid authentication request.`. Accounts created any other way sign in fine.
-
-SCIM created accounts without a sign-in record, and v0.12.0 started checking that record on SSO sign-in.
-
-**Solution:** Update to v0.12.1 or later. A database migration adds the missing record on startup, and the users sign in again with nothing to change on the identity provider. See [Sign-in records for SCIM users](/features/authentication-access/auth/scim#integration-with-sso).
-
----
-
 ## Advanced Troubleshooting Tips
 
 ### Check Token Storage Method

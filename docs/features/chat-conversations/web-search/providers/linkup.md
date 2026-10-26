@@ -25,7 +25,6 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 [Linkup](https://www.linkup.so/) is a search API built for AI applications. Integrating it with Open WebUI lets your language model perform real-time web searches and ground responses in current sources. This tutorial guides you through configuring Linkup as a web search provider.
 
-Linkup support was added in Open WebUI v0.9.6.
 
 ## Prerequisites
 

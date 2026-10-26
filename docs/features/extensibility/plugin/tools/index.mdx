@@ -131,8 +131,8 @@ Attaching a workspace tool to a model does **not** bypass access control. When a
 
 ## Tool Calling Modes: Native vs. Legacy {#tool-calling-modes-default-vs-native}
 
-:::danger Native is the default as of v0.10.0; "Legacy" (formerly "Default") is the unsupported opt-out
-**Native (Agentic) Mode is now the default.** As of **v0.10.0**, every chat and model that has not explicitly chosen a tool-calling mode runs **Native**, which relies on the model's built-in function-calling support. The old prompt-injection approach, previously called **Default**, is now renamed **Legacy**. It is the explicit opt-out and remains **unsupported**: no feature work, no bug fixes, no built-in system tools, and incompatible with modern Open WebUI features (Agentic Research, Interleaved Thinking, the built-in Memory/Notes/Knowledge/Channels tools, and web-search/image-gen/code-interpreter tool injection).
+:::danger Native is the default; "Legacy" is the unsupported opt-out
+**Native (Agentic) Mode is the default.** Every chat and model that has not explicitly chosen a tool-calling mode runs **Native**, which relies on the model's built-in function-calling support. The prompt-injection approach, **Legacy**, is the explicit opt-out and remains **unsupported**: no feature work, no bug fixes, no built-in system tools, and incompatible with modern Open WebUI features (Agentic Research, Interleaved Thinking, the built-in Memory/Notes/Knowledge/Channels tools, and web-search/image-gen/code-interpreter tool injection).
 
 **Breaking change:** if any of your models depended on the old prompt-based behavior, they now run Native unless you switch them back to **Legacy**, [per chat, per model, or globally in your default model parameters](#enable-legacy-for-all-models). If a model struggles with Native, the right fix is a stronger tool-calling model, not falling back to Legacy.
 :::
@@ -156,7 +156,7 @@ Why it is legacy:
 
 #### How to switch all models to Legacy {#enable-legacy-for-all-models}
 
-Since v0.10.0 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
+Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
     *   Navigate to **Settings → Admin → Models**.
@@ -176,7 +176,7 @@ DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 :::
 
 ### 🟢 Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
-Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** as of v0.10.0 and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
+Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
 **Agentic tool calling needs a model that is current, not one that is expensive.** Very small or older models often struggle with the multi-step reasoning and strict state management involved, and may produce malformed JSON. A cheap, fast, current model is plenty: **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B**.
@@ -191,7 +191,7 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 - **System Tools**: Only Native Mode unlocks the [built-in system tools](#built-in-system-tools-nativeagentic-mode) (memory, notes, knowledge, channels, etc.).
 
 #### How to Enable Native Mode (Agentic Mode)
-Native Mode is the **default** as of v0.10.0, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
+Native Mode is the **default**, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
     *   Navigate to **Settings → Admin → Models**.
@@ -319,7 +319,7 @@ How it works:
 - **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by how well the query matches its name, description and parameter names. To run a tool it found, the model calls `call_tool` with `tool_name` set to the tool's exact name and `params` set to the tool's arguments as a JSON-encoded object string, for example `call_tool(tool_name="get_weather", params='{"city":"Dubai"}')`. Open WebUI runs the named tool as if the model had called it directly, so approvals, citations and the tool's behaviour are the same.
 - **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
 - **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself. The approval for a `call_tool` call names the tool it runs.
-- **Backend support.** Every call the model makes goes to a tool in the list sent to the provider, so Tool Search also works on backends that only accept calls to listed tools, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server. This applies from v0.12.2. Earlier versions had the model call deferred tools by name, which those backends rejected.
+- **Backend support.** Every call the model makes goes to a tool in the list sent to the provider, so Tool Search also works on backends that only accept calls to listed tools, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server.
 
 Write Always Loaded patterns against the [tool names the model sees](/features/extensibility/mcp#tool-names-the-model-sees). MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
 

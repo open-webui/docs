@@ -70,7 +70,7 @@ Reference reading:
 
 ## Tool Calling (Native vs Legacy)
 
-Almost everything else on this page (Web Search, Knowledge retrieval, Memory, Code Interpreter, Open Terminal) reaches the model as a **tool** it can call mid-answer. One instance-wide switch decides *how* the model calls those tools, and it changed in v0.10.0.
+Almost everything else on this page (Web Search, Knowledge retrieval, Memory, Code Interpreter, Open Terminal) reaches the model as a **tool** it can call mid-answer. One instance-wide switch decides *how* the model calls those tools.
 
 **Native is now the default.** Every model that has not explicitly picked a mode uses **Native (Agentic) Mode**, which relies on the model's own built-in function-calling. This is what lets the model decide on its own when to search the web, look something up in a knowledge base or save a memory, instead of you toggling each tool by hand. It is faster, keeps the KV cache warm and is the only mode that unlocks the built-in system tools (Memory, Notes, Knowledge, Channels, Agentic Research).
 

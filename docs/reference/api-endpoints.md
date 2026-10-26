@@ -356,7 +356,7 @@ The `inlet()` function always executes, making it ideal for:
 - **Input validation**: Reject invalid requests before they reach the model
 
 :::danger Outlet Behavior for Direct API Calls, Read Carefully
-Since v0.10.0, `outlet()` runs inline after `/api/chat/completions` **by default**, on **both** the streaming and non-streaming paths, gated by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). A `chat_id` and a message `id` are **not** required: when neither is in the request body, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Set `ENABLE_API_OUTLET_FILTERS=False` to turn inline execution off for direct API traffic. Before v0.10.0, `outlet()` only ran when the caller sent the second POST to `/api/chat/completed`.
+`outlet()` runs inline after `/api/chat/completions` **by default**, on **both** the streaming and non-streaming paths, gated by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). A `chat_id` and a message `id` are **not** required: when neither is in the request body, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Set `ENABLE_API_OUTLET_FILTERS=False` to turn inline execution off for direct API traffic.
 
 What `chat_id` and `id` decide is where the response goes. Send both and the request takes the path built for the WebUI: the server consumes the upstream stream itself and routes the content to the user's WebSocket, so the HTTP response to a streaming caller is effectively empty. Omit them and the upstream stream is relayed to you over HTTP as usual, with `outlet()` running once it has finished.
 
@@ -367,7 +367,7 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
 
 #### Legacy / Supported-for-API Endpoint: `/api/chat/completed`
 
-`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. It is marked deprecated since v0.10.0, when inline execution arrived, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
+`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. It is marked deprecated, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
 
 - **Endpoint**: `POST /api/chat/completed`
 - **Description**: Runs `outlet()` filters (and pipeline outlet filters) unconditionally over a completed chat payload. Returns the filtered payload.
@@ -660,7 +660,7 @@ After uploading, you can group files into a knowledge collection or reference th
       return response.json()
   ```
 
-A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added. Content added through the batch endpoint before v0.12.0 carries no content hash, so it is not detected as a duplicate.
+A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added.
 
 
 #### Processing Web URLs into Knowledge Collections

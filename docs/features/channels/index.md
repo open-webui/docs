@@ -105,10 +105,6 @@ Mentioning a model in a channel runs through the same chat-completion pipeline a
 
 In other words, a channel-summoned model is a fully-equipped agent, not a one-shot completion.
 
-:::note Document attachments in channels (v0.9.6+)
-Before v0.9.6, tagging a model in a channel only forwarded **images** from the thread. Uploaded PDFs, DOCX, and other non-image documents were ignored, so summarization and document-comparison prompts silently had nothing to work with. As of v0.9.6 these files are forwarded the same way they are in a direct chat, so document workflows behave identically in channels.
-:::
-
 ### Tagging people and linking channels
 
 Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. A tag notifies only people who can read the channel. Use `#channel-name` to create clickable cross-references between conversations.

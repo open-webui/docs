@@ -10,8 +10,6 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 :::
 
 > [!WARNING]
-> This documentation reflects schema changes up to Open WebUI v0.12.0.
-
 ## Open-WebUI Internal SQLite Database
 
 For Open-WebUI, the SQLite database serves as the backbone for user management, chat history, file storage, and various other core functionalities. Understanding this structure is essential for anyone looking to contribute to or maintain the project effectively.
@@ -129,7 +127,7 @@ Things to know about the access_grant table:
 - Indexed on (`resource_type`, `resource_id`) and (`principal_type`, `principal_id`) for efficient lookups
 - Replaces the former `access_control` JSON column that was previously embedded in each resource table
 - `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
-- `principal_type` of `anyone` (added in v0.11.0) is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
+- `principal_type` of `anyone` is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
 - A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants
 
@@ -157,7 +155,7 @@ Things to know about the api_key table:
 
 ## App Table
 
-Added in v0.12.1 (migration `c92da83b017f`) for [Apps](/features/channels/apps).
+Added by migration `c92da83b017f` for [Apps](/features/channels/apps).
 
 | **Column Name** | **Data Type** | **Constraints**              | **Description**                                    |
 | --------------- | ------------- | ---------------------------- | -------------------------------------------------- |
@@ -194,7 +192,7 @@ Things to know about the auth table:
 - Uses UUID for primary key
 - One-to-One relationship with the `user` table (shared id)
 - `mfa` and `session_stamp` were added by migration `a7d3e9f2b641`. Rows that existed before it start with both empty, and sessions issued before the upgrade stay valid until the account is first signed out everywhere.
-- Migration `0bd252b206fb` (v0.12.1) adds a row for every user that has none, with an empty `password` that never matches. Before v0.12.1, SCIM was the only way an account got created without a row. The migration changes data only, and its downgrade leaves the added rows in place.
+- Migration `0bd252b206fb` adds a row for every user that has none, with an empty `password` that never matches. The migration changes data only, and its downgrade leaves the added rows in place.
 
 ## Channel Table
 
@@ -329,8 +327,8 @@ Things to know about the chat table:
 - `tasks` and `summary` support structured planning/status UX in chat sessions.
 - `last_read_at` is used by sidebar unread state logic (compare with `updated_at`).
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
-- `current_message_id` was added in v0.11.0 (migration `9a1b2c3d4e5f`). It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
-- `variables` was added in v0.11.0 (migration `c49178636c78`). It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when the chat's owner forks or clones it. A copy made by anyone else starts with an empty map. Temporary chats keep their values in the request only, so nothing is stored.
+- `current_message_id` was added by migration `9a1b2c3d4e5f`. It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
+- `variables` was added by migration `c49178636c78`. It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when the chat's owner forks or clones it. A copy made by anyone else starts with an empty map. Temporary chats keep their values in the request only, so nothing is stored.
 - A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
 
 ## Shared Chat Table
@@ -369,12 +367,12 @@ The `chat_message` table is the **normalized per-message store** for chat conver
 | files           | JSON          | nullable                                 | Attached files                                           |
 | sources         | JSON          | nullable                                 | Retrieval/citation sources                              |
 | embeds          | JSON          | nullable                                 | Embedded artifacts                                       |
-| meta            | JSON          | nullable                                 | Message metadata; marks internal sub-agent and timer messages (added in v0.11.0) |
+| meta            | JSON          | nullable                                 | Message metadata; marks internal sub-agent and timer messages |
 | done            | Boolean       | default=True                             | Whether generation completed                             |
 | status_history  | JSON          | nullable                                 | Streamed status updates during generation                |
 | error           | JSON          | nullable                                 | Error payload when generation failed                     |
 | usage           | JSON          | nullable                                 | Token/usage statistics                                   |
-| context_summary | Text          | nullable                                 | Per-message context summary (added in v0.10.0)           |
+| context_summary | Text          | nullable                                 | Per-message context summary           |
 | created_at      | BigInteger    | indexed                                  | Creation timestamp                                       |
 | updated_at      | BigInteger    | -                                        | Last update timestamp                                    |
 
@@ -382,8 +380,8 @@ Things to know about the chat_message table:
 
 - Deleting a chat cascades to delete its messages (`chat_id` foreign key with `ON DELETE CASCADE`).
 - Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
-- `context_summary` was added in v0.10.0 (migration `4c5ce3d2f27f`) to store a summary of the message's context.
-- `meta` was added in v0.11.0 (migration `856c5b02fb54`). It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
+- `context_summary` was added by migration `4c5ce3d2f27f` to store a summary of the message's context.
+- `meta` was added by migration `856c5b02fb54`. It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
 - [Chat search](/features/chat-conversations/chat-features/history-search) reads a different set of stores per backend. On PostgreSQL it matches `chat_message.content` as well as the `history.messages` map and the older flat `messages` array inside the `chat.chat` blob. On SQLite it matches those two JSON locations only.
 
 ## Automation Table
@@ -406,7 +404,7 @@ Things to know about the automation table:
 
 - `next_run_at` is indexed for efficient due-run polling.
 - `data.rrule` defines recurrence and drives scheduler calculations.
-- `folder_id` was added in v0.11.0 (migration `959eaac8f909`) together with a (`user_id`, `folder_id`) index, so an owner's automations can be listed per folder. It is not a foreign key: deleting a folder clears the column on that owner's automations instead of deleting the automation, and a run whose folder has disappeared in the meantime clears the column and files its chat outside any folder.
+- `folder_id` was added by migration `959eaac8f909` together with a (`user_id`, `folder_id`) index, so an owner's automations can be listed per folder. It is not a foreign key: deleting a folder clears the column on that owner's automations instead of deleting the automation, and a run whose folder has disappeared in the meantime clears the column and files its chat outside any folder.
 
 ## Automation Run Table
 
@@ -531,7 +529,7 @@ Note on the `chatidtag` table: it is a **legacy** table from before chat tags mo
 
 ## Config
 
-As of v0.10.0 the config table is **per-key**: every setting is its own row keyed by a dot-notation path, replacing the previous single-row JSON blob.
+The config table is **per-key**: every setting is its own row keyed by a dot-notation path.
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**                                          |
 | --------------- | ------------- | --------------- | -------------------------------------------------------- |
@@ -627,7 +625,7 @@ Things to know about the folder table:
 
 Things to know about the function table:
 
-- `type` is one of: `pipe`, `filter`, `action`, `event` (the `event` type was added in v0.10.0). The type is auto-detected from the top-level class name in the function's source code.
+- `type` is one of: `pipe`, `filter`, `action`, `event`. The type is auto-detected from the top-level class name in the function's source code.
 
 ## Function History Table
 
@@ -746,18 +744,18 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | --------------- | ------------- | -------------------------- | ------------------------ |
 | id              | String        | PRIMARY KEY                | Unique identifier (UUID) |
 | user_id         | String        | indexed                    | Memory owner             |
-| type            | String        | default `context`, indexed | Memory type: `user` or `context` (added in v0.10.0) |
-| path            | Text          | nullable                   | Optional path for organizing memories into a hierarchy (added in v0.10.0) |
+| type            | String        | default `context`, indexed | Memory type: `user` or `context` |
+| path            | Text          | nullable                   | Optional path for organizing memories into a hierarchy |
 | content         | Text          | -                          | Memory content           |
-| meta            | JSON          | nullable                   | Optional metadata (added in v0.10.0) |
+| meta            | JSON          | nullable                   | Optional metadata |
 | created_at      | BigInteger    | -                          | Creation timestamp       |
 | updated_at      | BigInteger    | -                          | Last update timestamp    |
 
 Things to know about the memory table:
 
 - `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
-- `path` and `meta` (added in a later v0.10.0 migration) back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
-- A covering index on `(id, user_id)` was added in v0.11.0 (migration `55f1302ac17c`) to speed up per-user memory lookups.
+- `path` and `meta` back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
+- A covering index on `(id, user_id)` was added by migration `55f1302ac17c` to speed up per-user memory lookups.
 
 ## Message Table
 
@@ -1024,8 +1022,8 @@ Things to know about the user table:
 - One-to-Many relationship with `oauth_session` table (via `user_id` foreign key), one row per sign-in
 - `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
 - The `email` column carries no plain `UNIQUE` constraint in the database, which is why the row above shows none. The SQLAlchemy model declares `unique=True` on it, but the schema is built only from the migrations and none of them creates that constraint, so the index above is the whole of the enforcement.
-- `variables` was added in v0.11.0 (migration `b0018471bbbe`). It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
-- `oauth` replaced the single `oauth_sub` text column in v0.6.41 (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases that were still older than v0.6.41 when they were upgraded on a v0.9.6 or newer build had that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
+- `variables` was added by migration `b0018471bbbe`. It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
+- `oauth` replaced the single `oauth_sub` text column (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases upgraded across a long gap could have that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
 - The `api_key` column was removed in v0.6.41 (the same migration `b10670c03dd5`). API keys are now rows in the dedicated [API Key Table](#api-key-table). The migration copies each existing key across before dropping the column.
 - `profile_banner_image_url`, `timezone`, `presence_state`, `status_emoji`, `status_message` and `status_expires_at` were all added in v0.6.41 (migration `b10670c03dd5`).
 - `timezone` holds an IANA zone name (for example `Europe/Vienna`), written by `POST /api/v1/auths/update/timezone`. Calendar recurrence expansion, automation scheduling and the per-user usage statistics read it. An unset or unrecognised value falls back to the server's zone for calendars and automations, and to UTC for usage statistics.
@@ -1503,9 +1501,9 @@ erDiagram
 
 ## Database Encryption with SQLCipher
 
-:::danger Removed in v0.9.0
+:::danger Not supported
 
-SQLCipher is not supported since v0.9.0. The async database layer introduced in that release has no SQLCipher driver, so Open WebUI refuses to start when `DATABASE_TYPE=sqlite+sqlcipher` or a `sqlite+sqlcipher://` URL is set.
+SQLCipher is not supported. The async database layer has no SQLCipher driver, so Open WebUI refuses to start when `DATABASE_TYPE=sqlite+sqlcipher` or a `sqlite+sqlcipher://` URL is set.
 
 :::
 
@@ -1513,7 +1511,7 @@ For encryption at rest, put the data directory on an encrypted filesystem (LUKS 
 
 ### Upgrading an Existing SQLCipher Database
 
-Decrypt the database into a plain SQLite file with the `sqlcipher` CLI before starting v0.9.0 or later:
+Decrypt the database into a plain SQLite file with the `sqlcipher` CLI before starting Open WebUI:
 
 ```sql
 -- run inside: sqlcipher webui.db

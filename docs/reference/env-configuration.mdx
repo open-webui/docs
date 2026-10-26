@@ -12,8 +12,6 @@ As new variables are introduced, this page will be updated to reflect the growin
 
 :::info
 
-This page is up-to-date with Open WebUI release version [v0.12.1](https://github.com/open-webui/open-webui/releases/tag/v0.12.1), but is still a work in progress to later include more accurate descriptions, listing out options available for environment variables, defaults, and improving descriptions.
-
 :::
 
 ### Important Note on `ConfigVar` Environment Variables
@@ -922,10 +920,10 @@ It is recommended to set this to a high single-digit to low double-digit number 
 
 - Type: `int`
 - Default: `256`
-- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The pre-v0.9.6 name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` (old default `30`) is still honored as a fallback if this is unset; prefer the new name.
+- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The older name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` is still honored as a fallback if this is unset.
 
-:::info Hitting the limit is visible (since v0.9.6)
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. Before v0.9.6 it stopped silently (looked like the model "froze"); upgrading is the fix. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is now reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+:::info Hitting the limit is visible
+On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -962,7 +960,7 @@ On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations
 
 - Type: `str`
 - Default: `dev-build`
-- Description: Used for identifying the Git SHA of the build for releases. The Docker image sets it to the commit it was built from (the `BUILD_HASH` build argument). Up to v0.11.4 the image set it as `WEBUI_BUILD_VERSION`.
+- Description: Used for identifying the Git SHA of the build for releases. The Docker image sets it to the commit it was built from (the `BUILD_HASH` build argument).
 
 #### `WEBUI_BANNERS`
 
@@ -1079,8 +1077,8 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 #### `ENABLE_ORJSON`
 
 - Type: `bool`
-- Default: `True` from v0.12.0 (`False` before)
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. orjson is stricter about what it accepts, but rejected payloads fall back to the standard library automatically, as does anything encoded with a request orjson has no equivalent for, such as indented output or a custom rule for converting values before they are written. Set it to `False` to go back to the standard library. On v0.11.0 to v0.11.4 it is off by default and worth enabling on clustered, Redis-backed deployments. Read once at startup, so a restart is required. Added in v0.11.0.
+- Default: `True`
+- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. orjson is stricter about what it accepts, but rejected payloads fall back to the standard library automatically, as does anything encoded with a request orjson has no equivalent for, such as indented output or a custom rule for converting values before they are written. Set it to `False` to go back to the standard library. Read once at startup, so a restart is required.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -1178,7 +1176,7 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 - Type: `bool` or `str`
 - Default: `True`
-- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings, and, since v0.9.6, Speech-to-Text / Text-to-Speech audio endpoints). Accepts `True` (verify, the default), `False` (disable verification, allowing self-signed or custom certificates) or a path to a CA bundle file (e.g. `/etc/ssl/certs/corporate-ca.crt`) to verify against your own certificate authority. When set to `True`, it uses `AIOHTTP_CLIENT_SSL_CERT_FILE` as the CA bundle if that variable is configured.
+- Description: Controls SSL/TLS verification for AIOHTTP client sessions when connecting to external APIs (e.g., Ollama Embeddings and Speech-to-Text / Text-to-Speech audio endpoints). Accepts `True` (verify, the default), `False` (disable verification, allowing self-signed or custom certificates) or a path to a CA bundle file (e.g. `/etc/ssl/certs/corporate-ca.crt`) to verify against your own certificate authority. When set to `True`, it uses `AIOHTTP_CLIENT_SSL_CERT_FILE` as the CA bundle if that variable is configured.
 
 #### `AIOHTTP_CLIENT_SSL_CERT_FILE`
 
@@ -1190,7 +1188,7 @@ If this variable is unset or invalid, Open WebUI falls back to `AIOHTTP_CLIENT_T
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether outbound HTTP requests across the application follow `3xx` redirects. When `False` (the default since v0.9.6), redirects are not followed. This closes a class of SSRF where a public, validated URL `302`-redirects to an internal address (RFC 1918, loopback `127.0.0.1`, cloud-metadata `169.254.169.254`) that bypasses the original allowlist check. Affected call sites include the RAG web loader, image loading and base64 conversion, OAuth pre-flight, code-interpreter login, and tool-server execution. Set to `True` only if your deployment legitimately requires redirect following (e.g. shortlink-style URLs) AND you have other SSRF protections in place, typically an egress firewall or `WEB_FETCH_FILTER_LIST` covering your internal ranges.
+- Description: Controls whether outbound HTTP requests across the application follow `3xx` redirects. When `False` (the default), redirects are not followed. This closes a class of SSRF where a public, validated URL `302`-redirects to an internal address (RFC 1918, loopback `127.0.0.1`, cloud-metadata `169.254.169.254`) that bypasses the original allowlist check. Affected call sites include the RAG web loader, image loading and base64 conversion, OAuth pre-flight, code-interpreter login, and tool-server execution. Set to `True` only if your deployment legitimately requires redirect following (e.g. shortlink-style URLs) AND you have other SSRF protections in place, typically an egress firewall or `WEB_FETCH_FILTER_LIST` covering your internal ranges.
 
 #### `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`
 
@@ -2058,7 +2056,7 @@ Output:
 #### `ENABLE_EVALUATION_ARENA_MODELS`
 
 - Type: `bool`
-- Default: `False` from v0.12.0 (`True` before)
+- Default: `False`
 - Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Admin > Evaluations**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -2463,7 +2461,7 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{FILE_NAME}}` | File name, for file-scoped requests |
 | `{{FILE_CONTENT_TYPE}}` | File MIME type, for file-scoped requests |
 | `{{TASK}}` | Internal task name when the request is a background task, e.g. title or tag generation |
-| `{{MODEL_ID}}` | ID of the model handling the chat request. For a workspace model this is the workspace model's own ID, and in a multi-model chat each model's request carries its own ID. Empty on background task requests from a browser chat, such as title or tag generation. Introduced in v0.12.2 |
+| `{{MODEL_ID}}` | ID of the model handling the chat request. For a workspace model this is the workspace model's own ID, and in a multi-model chat each model's request carries its own ID. Empty on background task requests from a browser chat, such as title or tag generation. |
 | `{{USER_ID}}` | Signed-in user's ID |
 | `{{USER_NAME}}` | Signed-in user's display name |
 | `{{USER_EMAIL}}` | Signed-in user's email |
@@ -2475,7 +2473,7 @@ Available placeholders, substituted at request time (any placeholder that has no
 
 The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
-Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections. Introduced in v0.10.0, which expanded the placeholder set (the message, file, task and user-agent placeholders) beyond the earlier chat and user variables.
+Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections.
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
@@ -2746,7 +2744,7 @@ Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key). A key o
 
 - Type: `bool`
 - Default: `True`
-- Description: When enabled, the application makes automatic update checks and notifies you about version updates. From v0.12.0 only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks.
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks.
 
 :::info
 
@@ -3049,9 +3047,9 @@ For multi-worker or multi-replica setups, you **must** configure `CHROMA_HTTP_HO
 
 ### Milvus
 
-:::danger Milvus: back up before upgrading to v0.12.0
+:::danger Milvus: back up before the hybrid search migration
 
-v0.12.0 moves Milvus, in both regular and multitenancy mode, to native hybrid search, and **existing data is migrated the first time the new version starts**.
+Open WebUI runs Milvus, in both regular and multitenancy mode, with native hybrid search. **Data from older versions is migrated the first time Open WebUI starts.**
 
 What to expect during the migration, reference speeds and a script to follow its progress: [Milvus Native Hybrid Search Migration](/tutorials/maintenance/milvus-hybrid-search-migration).
 
@@ -3112,7 +3110,7 @@ Open WebUI checks a file's content hash against the collection before storing it
 - Type: `str`
 - Default: Empty string
 - Example: `/app/certs/milvus-ca.pem`
-- Description: Path to a CA or server certificate file that Open WebUI trusts when it connects to Milvus over TLS. Use it when the Milvus server has a self-signed or company-issued certificate. It takes effect only when [`MILVUS_URI`](#milvus_uri-required) starts with `https://`, and applies in normal and [multitenancy](#enable_milvus_multitenancy_mode) mode. Leave it empty to verify the server against the default trusted certificates. Introduced in v0.12.2.
+- Description: Path to a CA or server certificate file that Open WebUI trusts when it connects to Milvus over TLS. Use it when the Milvus server has a self-signed or company-issued certificate. It takes effect only when [`MILVUS_URI`](#milvus_uri-required) starts with `https://`, and applies in normal and [multitenancy](#enable_milvus_multitenancy_mode) mode. Leave it empty to verify the server against the default trusted certificates.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MILVUS_INDEX_TYPE`
@@ -3902,8 +3900,8 @@ Valkey is **opt-in**. Install the client yourself, in the Docker image too (`pip
 Open WebUI's connections report the library name `GlidePySync(open-webui)` in `CLIENT LIST` and `CLIENT INFO`, so its traffic can be told apart on a shared Valkey or ElastiCache server.
 :::
 
-:::warning From v0.12.2: upgrade valkey-glide-sync
-v0.12.2 needs valkey-glide-sync 2.5.2 or newer. An install with `VECTOR_DB=valkey` that still has an older version, such as the 2.3.1 named in earlier docs, fails at startup. On the slim image it starts, and then every upload and knowledge search fails until the client is upgraded. Upgrade the client before or with Open WebUI:
+:::warning Valkey needs valkey-glide-sync 2.5.2 or newer
+Open WebUI needs valkey-glide-sync 2.5.2 or newer. An install with `VECTOR_DB=valkey` that has an older version fails at startup. On the slim image it starts, and then every upload and knowledge search fails until the client is upgraded. Upgrade the client before or with Open WebUI:
 
 ```bash
 pip install --upgrade "valkey-glide-sync>=2.5.2"
@@ -4223,7 +4221,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `local`
-- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x or 4.x and uses the matching interface, so both work (4.x from v0.12.2). `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
+- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x or 4.x and uses the matching interface, so both work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_URL`
@@ -4299,7 +4297,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info Supported file types
-As of v0.11.0, PaddleOCR-vl only receives `pdf`, `png`, `jpg`, `jpeg`, `bmp`, `tiff` and `webp` files. Every other extension (`txt`, `md`, `docx`, `xlsx`, `csv` and the rest) skips the engine entirely and goes to the default loader chain, so those files are still parsed and indexed, just by the built-in loaders. Size and provision your PaddleOCR-vl server for PDFs and images only. Before v0.11.0 all file types were sent to the server, and unsupported ones failed to index.
+PaddleOCR-vl only receives `pdf`, `png`, `jpg`, `jpeg`, `bmp`, `tiff` and `webp` files. Every other extension (`txt`, `md`, `docx`, `xlsx`, `csv` and the rest) skips the engine entirely and goes to the default loader chain, so those files are still parsed and indexed, just by the built-in loaders. Size and provision your PaddleOCR-vl server for PDFs and images only.
 
 Of the files it does receive, images are dispatched with `fileType=1` and PDFs with `fileType=0`. Output is per-page Markdown, so downstream chunking behaves the same as other engines.
 :::
@@ -4684,7 +4682,7 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 :::tip
 
-If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches. From v0.12.2 this limit and [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size) also apply when memories are reindexed: from **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents**, through the API or automatically when a memory is saved after a switch to an embedding model with a different vector size.
+If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches. This limit and [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size) also apply when memories are reindexed: from **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents**, through the API or automatically when a memory is saved after a switch to an embedding model with a different vector size.
 
 :::
 
@@ -8022,7 +8020,7 @@ These variables are not specific to Open WebUI but can still be valuable in cert
   - `azure`: uses the Azure client library and related environment variables mentioned in [Microsoft Azure Storage](#microsoft-azure-storage)
 - Default: empty string (' '), which defaults to `local`
 - Description: Sets the storage provider.
-- Slim image: only `local` and `s3` are available. With `gcs` or `azure` the slim image stops at startup with the error `Slim supports local and S3 file storage`. Use the standard image for those providers. In v0.11.4, the first release with the slim image, only `local` was available.
+- Slim image: only `local` and `s3` are available. With `gcs` or `azure` the slim image stops at startup with the error `Slim supports local and S3 file storage`. Use the standard image for those providers.
 
 #### `STORAGE_LOCAL_CACHE`
 
@@ -8430,9 +8428,9 @@ Enabling this on low-spec hardware (e.g., Raspberry Pi, containers with limited 
 
 ### Encrypted SQLite with SQLCipher
 
-:::danger Removed in v0.9.0
+:::danger Not supported
 
-SQLCipher is not supported since v0.9.0. The async database layer introduced in that release has no SQLCipher driver, so Open WebUI refuses to start when `DATABASE_TYPE=sqlite+sqlcipher` or a `sqlite+sqlcipher://` URL is set. For encryption at rest, use an encrypted filesystem or PostgreSQL with encrypted storage. To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
+SQLCipher is not supported. The async database layer has no SQLCipher driver, so Open WebUI refuses to start when `DATABASE_TYPE=sqlite+sqlcipher` or a `sqlite+sqlcipher://` URL is set. For encryption at rest, use an encrypted filesystem or PostgreSQL with encrypted storage. To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
 
 :::
 
@@ -8673,7 +8671,7 @@ redis-cli CONFIG GET timeout
 
 :::info
 
-From v0.12.1 the master name is used exactly as written in `REDIS_URL`. Earlier versions lowercased it, so a `REDIS_URL` whose master name differs from the Sentinel configuration only in capitalization stops connecting after the upgrade, with "No master found" errors. Write it with the same capitalization as in Sentinel.
+The master name is used exactly as written in `REDIS_URL`, so write it with the same capitalization as in Sentinel. A mismatch fails with "No master found" errors.
 
 :::
 

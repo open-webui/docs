@@ -252,15 +252,15 @@ See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_hear
 
 #### JSON Encoder
 
-Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. From v0.12.0 all of that goes through [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard-library `json` module. On v0.11.0 to v0.11.4, set `ENABLE_ORJSON=True` to switch to it; it is already installed as a dependency.
+Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple workers or replicas. All of that goes through [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard-library `json` module.
 
 *   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
 *   **Where else it shows up**: saving and opening chats, so the cost follows the length of the chat.
 *   **Where it is not**: a single-user instance with ordinary-sized chats.
-*   **Why it was opt-in before v0.12.0**: anything orjson cannot encode falls back to the standard library automatically, so nothing breaks, but the old default kept behaviour identical to earlier releases. One change to know about: `NaN` and `Infinity` floats serialize as `null`; the standard library raises an error.
+*   **Fallback**: anything orjson cannot encode falls back to the standard library automatically, so nothing breaks. One change to know about: `NaN` and `Infinity` floats serialize as `null`; the standard library raises an error.
 
 - **Env Var**: `ENABLE_ORJSON=True`
-  *   *Recommendation*: on by default from v0.12.0; leave it on. On v0.11.x, enable it on any Redis-backed multi-worker or multi-replica deployment (requires a restart).
+  *   *Recommendation*: leave it on.
 
 See [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full breakdown, and [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself.
 
@@ -619,7 +619,7 @@ For multi-user or growing deployments the durable fix is **PostgreSQL**, not SQL
 12. **Compression**: `ENABLE_COMPRESSION_MIDDLEWARE=False` **if** your load balancer / ingress / CDN compresses responses (enable it there instead). Saves ~3–4% CPU on every worker. See [HTTP Response Compression](#http-response-compression).
 13. **WebSocket Heartbeats**: `WEBSOCKET_HEARTBEAT_INTERVAL=60`. Halves the idle heartbeat traffic from every open tab, at the cost of a disconnected user lingering in the active count. See [WebSocket Heartbeats](#websocket-heartbeats).
 14. **WebSocket Compression**: `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Streaming sends one tiny frame per token, and compressing each of them costs CPU per subscriber for almost no saving. See [WebSocket Frame Compression](#websocket-frame-compression).
-15. **JSON Encoder**: `ENABLE_ORJSON=True`, on by default from v0.12.0; leave it on (on v0.11.x, set it yourself). Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
+15. **JSON Encoder**: `ENABLE_ORJSON=True`, on by default; leave it on. Cuts the cost of the heaviest JSON work in a clustered deployment: encoding Socket.IO events, parsing streamed provider chunks and saving and opening whole chats. See [JSON Encoder](#json-encoder).
 
 #### Redis Tuning
 

@@ -13,4 +13,4 @@ title: "Maintenance"
 | [Database Management](/tutorials/maintenance/database) | Manage, migrate, and troubleshoot the application database | 👤 Admin · ⏱️ 20 min |
 | [Offline Mode](/tutorials/maintenance/offline-mode) | Run Open WebUI without internet access | 👤 Admin · ⏱️ 30 min |
 | [S3 Storage](/tutorials/maintenance/s3-storage) | Store uploads and artifacts in S3-compatible object storage | 👤 Admin · ⏱️ 20 min |
-| [Milvus Native Hybrid Search Migration](/tutorials/maintenance/milvus-hybrid-search-migration) | Upgrade Milvus data to native hybrid search in v0.12.0 and follow its progress | 👤 Admin · ⏱️ 10 min |
+| [Milvus Native Hybrid Search Migration](/tutorials/maintenance/milvus-hybrid-search-migration) | Upgrade Milvus data to native hybrid search and follow its progress | 👤 Admin · ⏱️ 10 min |

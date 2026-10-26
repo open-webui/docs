@@ -3,7 +3,7 @@ sidebar_position: 320
 title: "Milvus Native Hybrid Search Migration"
 ---
 
-v0.12.0 brings native hybrid search to Milvus 2.5 and newer. To use it, Open WebUI migrates your existing Milvus data once, on the first start of the new version. Nothing is re-embedded: Open WebUI copies each collection with its existing vectors and text into a new collection, and Milvus builds the keyword index from the stored text. Depending on the size of your data this takes minutes or hours.
+Open WebUI uses native hybrid search on Milvus 2.5 and newer. Milvus data from older versions is migrated once, on the first start. Nothing is re-embedded: Open WebUI copies each collection with its existing vectors and text into a new collection, and Milvus builds the keyword index from the stored text. Depending on the size of your data this takes minutes or hours.
 
 :::danger Back up first
 Back up your Milvus data before upgrading, and make sure Milvus has free disk space for a full second copy of it. See the [Milvus warning in the environment reference](/reference/env-configuration#milvus) for the full checklist.

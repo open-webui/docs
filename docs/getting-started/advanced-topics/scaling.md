@@ -223,13 +223,13 @@ location ^~ /_app/immutable/ {
 
 ### Switch the JSON Encoder to orjson
 
-Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Open WebUI uses [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, by default from v0.12.0. On earlier versions, turn it on with [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson):
+Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Open WebUI uses [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, by default, controlled by [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson):
 
 ```
 ENABLE_ORJSON=True
 ```
 
-It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so it cannot turn a working payload into an error. The setting exists from v0.11.0.
+It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so it cannot turn a working payload into an error.
 
 For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
 
@@ -557,7 +557,7 @@ DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 # Finished responses are deleted immediately; 0 keeps orphans forever
 # REDIS_RESPONSE_STREAM_TTL=3600
 
-# Faster JSON encoder (v0.11.0+, default from v0.12.0): biggest win is Socket.IO/Redis event
+# Faster JSON encoder (on by default): biggest win is Socket.IO/Redis event
 # encoding in clustered deployments; see Step 3
 ENABLE_ORJSON=True
 

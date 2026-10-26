@@ -10,7 +10,7 @@ Apps are external services that join [channels](/features/channels) as members. 
 An app runs on its own server. Open WebUI opens the connection to the app, so Open WebUI itself can stay on a private network with no public callback address. To post messages into a channel without answering anyone, a [channel webhook](/features/administration/webhooks#3-channel-webhooks-external-message-integration) is simpler.
 
 :::info
-Apps were added in v0.12.1 and are experimental. **Settings > Admin > Apps** shows an **Experimental** badge.
+Apps are experimental. **Settings > Admin > Apps** shows an **Experimental** badge.
 :::
 
 ---

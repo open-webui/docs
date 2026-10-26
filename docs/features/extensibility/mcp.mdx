@@ -204,14 +204,14 @@ Both MCP and OpenAPI tool-server connections accept a free-form **Headers** fiel
 | `{{USER_GROUP_IDS}}` | Comma-separated IDs of those same groups. |
 | `{{CHAT_ID}}` | The current chat ID (empty in non-chat contexts like the **Verify Connection** button). |
 | `{{MESSAGE_ID}}` | The current message ID (empty in non-chat contexts). |
-| `{{MODEL_ID}}` | The ID of the model handling the chat request: the workspace model's own ID for a workspace model and each model's own ID in a multi-model chat (empty in non-chat contexts). Added in v0.12.2. |
+| `{{MODEL_ID}}` | The ID of the model handling the chat request: the workspace model's own ID for a workspace model and each model's own ID in a multi-model chat (empty in non-chat contexts). |
 
 The group tokens are resolved with a membership lookup that only runs when a header value actually contains one of them, so connections that do not use them are unaffected. Use them to let a tool server authorize by group instead of by individual user.
 
 Unknown tokens are passed through as literal text. Non-string header values are coerced to strings before substitution. The same tokens are honored on custom headers attached to OpenAI-compatible model connections in **Settings > Admin > Connections** (the **OpenAI** section), so you can use the feature for tenant routing or audit-trail propagation across both surfaces.
 
 :::note
-`{{USER_EMAIL}}` and `{{USER_ROLE}}` were added in v0.9.6. The same release also fixed MCP server connections, where custom-header templates were previously stored but **not** interpolated at request time. They now expand the same way they always have for direct connections and OpenAPI tool servers.
+Custom-header templates on MCP server connections expand the same way as for direct connections and OpenAPI tool servers.
 :::
 
 ### Function Name Filter List

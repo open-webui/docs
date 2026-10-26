@@ -27,7 +27,7 @@ Unlike a one-time upload, which is stale the moment the source changes, oikb doe
 It is a separate program (a command-line tool plus an optional long-running [daemon](/ecosystem/knowledge-base-sync/daemon)), not part of the Open WebUI server, but it is built for Open WebUI and talks to it over the normal REST API.
 
 :::info Requires Open WebUI 0.9.6+
-oikb drives the incremental sync endpoints (`POST /api/v1/knowledge/{id}/sync/diff` and `.../sync/cleanup`) that landed in **v0.9.6**. Against an older server there is nothing for it to call. The server side of these endpoints is documented under [Knowledge → Syncing a local directory](/features/workspace/knowledge#syncing-a-local-directory).
+oikb drives the incremental sync endpoints (`POST /api/v1/knowledge/{id}/sync/diff` and `.../sync/cleanup`). The server side of these endpoints is documented under [Knowledge → Syncing a local directory](/features/workspace/knowledge#syncing-a-local-directory).
 :::
 
 ---
@@ -346,7 +346,6 @@ Split one repo across two Knowledge Bases with filters: prose under `docs/**` in
 
 ### Requires Open WebUI 0.9.6+
 
-The incremental sync endpoints landed in v0.9.6. Against an older server there is nothing for oikb to call.
 
 ### The daemon runs as one process
 

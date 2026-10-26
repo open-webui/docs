@@ -28,7 +28,7 @@ A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/ope
 The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
 
 :::tip Reading your plugin's own id
-Before v0.12.0, the module was named just `function_{id}` (or `tool_{id}`), so a plugin could take its own id from `__name__`. That now returns the id with the 32 hex characters attached. Inside a handler, read the [`__id__`](./reserved-args.mdx#__id__) argument instead (Pipes do not receive it). Code that runs at module load, before any handler is called, can strip the prefix and suffix, which works on both the old and the new names:
+`__name__` returns the id with 32 hex characters attached, so a plugin cannot take its own id from it. Inside a handler, read the [`__id__`](./reserved-args.mdx#__id__) argument instead (Pipes do not receive it). Code that runs at module load, before any handler is called, can strip the prefix and suffix, which works on both the old and the new names:
 
 ```python
 import re
@@ -111,7 +111,7 @@ Runs at module load (once per source version). The patch persists in `sys.module
 Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
 
 :::tip Check whether the `request` filter hook covers you first
-The most common reason people patched `generate_chat_completion` or `process_chat_payload` was to reach the payload on **every** provider call, not just the first one, because `inlet` runs once per user turn and never sees a tool-loop continuation. Since **v0.11.2** the [`request` filter hook](/features/extensibility/plugin/functions/filter#the-request-step) does exactly that as a supported hook, with no patching, no load-order hazard and no restart needed to roll back.
+The most common reason people patched `generate_chat_completion` or `process_chat_payload` was to reach the payload on **every** provider call, not just the first one, because `inlet` runs once per user turn and never sees a tool-loop continuation. The [`request` filter hook](/features/extensibility/plugin/functions/filter#the-request-step) does exactly that as a supported hook, with no patching, no load-order hazard and no restart needed to roll back.
 
 If you are on 0.11.2+ and your patch exists to intercept outgoing payloads, migrate it to `request` and delete the patch. Note that a patch installed by an earlier version of your plugin stays live in every worker process that loaded it, so a fleet-wide restart is still required to actually drop it.
 :::

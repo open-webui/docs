@@ -354,7 +354,7 @@ environment:
 If your STT or TTS engine is hosted behind a self-signed certificate or an internal CA and requests fail with TLS verification errors (e.g. `SSLCertVerificationError`, `certificate verify failed`):
 
 - Set [`AIOHTTP_CLIENT_SESSION_SSL=False`](/reference/env-configuration#aiohttp_client_session_ssl) to disable certificate verification for these upstream calls.
-- Text-to-speech has honored this setting since May 2025, and speech-to-text since v0.9.6 (before that STT ignored it and always verified). If it still appears ignored, confirm you are on v0.9.6 or later.
+- Text-to-speech and speech-to-text both honor this setting.
 - Prefer installing the internal CA into the container's trust store where possible; disabling verification removes protection against man-in-the-middle interception on that connection.
 
 ---
@@ -457,7 +457,7 @@ curl http://your-tts-service:port/health
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible STT |
 | `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |
 | `DEEPGRAM_API_KEY` | Deepgram API key |
-| `AIOHTTP_CLIENT_SESSION_SSL` | TLS verification for outbound STT/TTS API calls (default: `True`; set `False` for self-signed certs; honored by audio engines since v0.9.6) |
+| `AIOHTTP_CLIENT_SESSION_SSL` | TLS verification for outbound STT/TTS API calls (default: `True`; set `False` for self-signed certs) |
 
 For a complete list of audio environment variables, see [Environment Variable Configuration](/reference/env-configuration#audio).
 
