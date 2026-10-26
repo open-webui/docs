@@ -69,7 +69,7 @@ Navigate to **Workspace > Prompts** and click **Create** in the Workspace header
 | :--- | :--- |
 | **Name** | Descriptive title for identification |
 | **Tags** | Categorize for filtering |
-| **Access** | Control who can view and use the prompt. Shown to non-admins only with the [**Prompts Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission |
+| **Access** | Control who can view and use the prompt. Needs the [**Prompts Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission |
 | **Command** | The slash command trigger (e.g., `/summarize`) |
 | **Prompt Content** | The actual text sent to the model, with variables |
 | **Commit Message** | Optional description of changes for version tracking |

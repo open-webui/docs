@@ -123,7 +123,7 @@ Adding a terminal connection via personal Settings sends the API key to your bro
 
 If you need to test a connection without admin access, you can add one from the **Personal** part of settings, under *Services*, at **Integrations → Open Terminal**. The same URL and API key fields apply, and the connection is yours alone rather than the instance's.
 
-The personal **Integrations** tab shows only while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)). While it is off, Open Terminal connections and tool servers saved there are not used in chats, for admins as well. They stay saved and apply again once it is turned back on.
+The personal **Integrations** tab shows only while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)). While it is off, connections saved there are not used in chats.
 
 ---
 
@@ -144,7 +144,7 @@ Four things change with it:
 - **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
 
-On a terminal whose **Chat** context is **Per chat** (see [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)), a new chat has no terminal of its own until its first message is sent. A file attached before that waits in the input. When you send the message, the chat is created and the file uploads into that chat's terminal. Then the message goes out with it. If that upload fails, the message is not sent and the file stays attached, so you can send again.
+On a [**Per chat**](/features/open-terminal/terminals/orchestration/contexts) terminal, a file attached to a new chat's first message uploads into that chat's terminal when you send it.
 
 The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 

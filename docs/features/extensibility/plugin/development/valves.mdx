@@ -9,7 +9,7 @@ Valves and UserValves are used to allow users to provide dynamic details such as
 
 Hence, Valves and UserValves class can be defined in a `Pipe`, `Filter`, `Action` or `Tools` class. An `Event` class can carry `Valves` too, but never `UserValves`, since event handlers run without a user.
 
-Function Valves are configurable by admins alone, since Functions are admin-only. Tool Valves can also be edited by the tool's owner and by anyone holding a write grant on it, so treat a tool's valves as readable by everyone you share write access with. UserValves are configurable by any user directly from a chat session, in the **Valves** section of **Chat Controls**. Its picker offers **Tools** only while [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) is on and **Functions** only while [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) is on. With both off, the section is hidden. Users who are not admins also need the **Allow Chat Valves** permission.
+Function Valves are configurable by admins alone, since Functions are admin-only. Tool Valves can also be edited by the tool's owner and by anyone holding a write grant on it, so treat a tool's valves as readable by everyone you share write access with. UserValves are configurable by any user directly from a chat session, in the **Valves** section of **Chat Controls**. The section lists only enabled tools and functions.
 
 <details>
 <summary>Commented example</summary>
@@ -289,4 +289,4 @@ class Tools:
         )
 ```
 
-`step` is optional. Without it the slider moves in whole steps of 1. Without `ge` and `le` the browser's default range of 0 to 100 applies. The slider works the same in `Valves` and `UserValves`. Number fields without the range input type keep the plain text box.
+`step` is optional. Without it the slider moves in whole steps of 1. It works in `Valves` and `UserValves`.

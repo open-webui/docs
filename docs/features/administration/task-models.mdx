@@ -70,11 +70,11 @@ Each background task has a switch under **Generation** in the same panel, and an
 | Query rewriting for knowledge retrieval | **Retrieval Query Generation** | [`ENABLE_RETRIEVAL_QUERY_GENERATION`](/reference/env-configuration#enable_retrieval_query_generation) |
 | Query rewriting for web search | **Web Search Query Generation** | [`ENABLE_SEARCH_QUERY_GENERATION`](/reference/env-configuration#enable_search_query_generation) |
 
-Turning off **Title Generation**, **Tags Generation** or **Follow Up Generation** also hides the matching switch in each user's **Settings > Interface**. A choice a user saved there is kept and applies again once the generation is back on. **Keep Follow-Up Prompts in Chat** and **Insert Follow-Up Prompt to Input** stay visible, since they still apply to follow-ups saved in existing chats.
+Turning off **Title Generation**, **Tags Generation** or **Follow Up Generation** also hides the matching switch in each user's **Settings > Interface**.
 
-**Web Search Query Generation** shows only while web search is on in **Settings > Admin > Web Search**. Its saved value is kept while it is hidden.
+**Web Search Query Generation** shows only while web search is on.
 
-Image prompt generation is switched off in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)). Its **Image Prompt Generation** switch shows there only while **Image Generation** is on.
+Image prompt generation is switched off in **Settings > Admin > Images** instead ([`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)).
 
 :::tip Weak hardware
 Autocomplete is the first thing to turn off. It fires as users type, so a slow task model turns the prompt box to molasses.

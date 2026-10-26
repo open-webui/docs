@@ -303,7 +303,7 @@ def wait_for_processing(token, file_id, timeout=300):
 |--------|---------|
 | `pending` | Waiting to be processed |
 | `processing` | Content extraction and embedding are running |
-| `completed` | Processing finished and the file is ready to add to a knowledge base (video files skip text extraction). For an upload sent with a `knowledge_id`, the link to that knowledge base is also done |
+| `completed` | Processing finished, including any knowledge base link |
 | `failed` | Processing failed (check error field) |
 
 :::tip
@@ -391,7 +391,7 @@ If PDFs containing images with text are returning empty content:
 
 2. **Enable PDF Image Extraction**:
    - In **Settings > Admin > Documents**, ensure **PDF Extract Images (OCR)** is enabled
-   - The OCR of those images uses one processor thread per upload by default (`{"EngineConfig.onnxruntime.intra_op_num_threads": 1}`). On an idle server with many cores, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster. The variable takes a JSON object of RapidOCR settings; a value that is not a valid JSON object is ignored and RapidOCR uses its own defaults
+   - OCR uses one processor thread per upload. On an idle many-core server, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster.
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats

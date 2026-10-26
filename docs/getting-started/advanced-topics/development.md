@@ -79,7 +79,7 @@ npm run build
 npm run dev
 ```
 
-`npm run build` compiles the frontend and catches build-time errors early. It runs Vite with a 12 GB Node.js heap limit, the same script the Docker image build uses, and works on Windows, macOS and Linux. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). It will show a waiting screen until the backend is running.
+`npm run build` compiles the frontend and catches build-time errors early. It runs Vite with a 12 GB Node.js heap limit. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). It will show a waiting screen until the backend is running.
 
 :::tip
 If `npm install` fails with compatibility warnings, run `npm install --force`.

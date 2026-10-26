@@ -92,7 +92,7 @@ Everything else sits in rows, one per setting. Each row shows a short summary of
 | **Base Model (From)** | The actual model that powers this agent. Admins can pick hidden models here. Other users see them in this list only with the [**Hidden Models**](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission, which is off by default. Hidden models still stay out of their chat model selector. The permission changes only this list, not who can use a hidden model |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
-| **Provider details** | Admins only, and hidden in the read-only view. Shows what the provider's model list reports for the model: **Inputs** and **Outputs** (such as text, image or audio), **Context window** and **Supported parameters**. **Provider context** appears when the provider names a context length of its own that differs from the context window, and **Max output** when the provider reports one. A field the provider leaves out shows **Not provided**. For a custom model the details come from its base model |
+| **Provider details** | Admins only. What the provider's model list reports for the model: inputs and outputs, context window, max output and supported parameters. **Not provided** when the provider leaves a field out |
 | **Access** | The **Access** button at the top right sets who can use the model: private (specific users/groups) or public. Shown to non-admins only with the [**Models Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission. On a saved model each change saves right away, without **Save & Update**. A change your sharing permissions do not allow is refused with "You do not have permission to share with the requested audience" |
 | **Language** | The globe selector at the top right, next to **Access**, switches the editor to a translation of the name, description, prompt suggestions and model controls. See [Translations](#translations) |
 
@@ -142,19 +142,19 @@ Bind resources in the picker rows:
 | :--- | :--- |
 | **Knowledge** | Bind collections or files. **Upload Files** in the picker adds files straight from your computer. Click an attached item to choose between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
 | **Tools** | Force-enable specific tools (e.g., Calculator for a Math Bot) |
-| **Skills** | Bind [Skills](/features/workspace/skills). Every new chat with the model starts with them selected, and selected skills send their full instructions with each message, unless [Load selected skills on demand](/features/workspace/skills#loading-selected-skills-on-demand) is on. See [Model-attached skills](/features/workspace/skills#model-attached-skills) |
+| **Skills** | Bind [Skills](/features/workspace/skills). Every new chat with the model starts with them selected. See [Model-attached skills](/features/workspace/skills#model-attached-skills) |
 | **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
 | **Actions** | Attach action scripts (e.g., "Add to Memories"). The row appears once the instance has at least one action function |
 
 Toggle what the model can do in the **Capabilities** row and the two rows that follow it:
 
-The editor shows only the options that can work on this instance. **Web Search**, **Image Generation**, **Code Interpreter** and **Memory** hide while the admin has that feature off for the whole instance, and so do their **Default Features** and built-in tool categories. **Terminal** and **Default terminal** hide while no enabled terminal server exists and Direct Integrations is off. A hidden option keeps the value saved on the model, so turning the feature back on restores it. Admins can also hide single controls from users with [Visible controls](/features/administration/interface-defaults#hiding-controls).
+The editor shows only the options that can work on this instance, for example **Web Search** only while web search is on. A hidden option keeps its saved value.
 
 ![Capabilities and built-in tool categories in the model editor](/images/workspace/model-editor-capabilities.png)
 
 | Setting | What it controls |
 | :--- | :--- |
-| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text. **Capture** in the chat input's **+** menu only shows while at least one selected model has Vision |
+| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text. |
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
@@ -163,7 +163,7 @@ The editor shows only the options that can work on this instance. **Web Search**
 | **Citations** | Show the sources behind a reply, from knowledge, file retrieval and the builtin tools that return them. On by default; with it off no sources are shown. Web search hits are not sources in Native mode, see [Agentic Search](/features/chat-conversations/web-search/agentic-search) |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
-| **Builtin Tools** | The capability switches the built-in tools on as a whole. While it is on, a **Builtin Tools** row below **Capabilities** controls which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills. A category shows only while it can apply: Memory, Notes, Channels, Notifications (user webhooks), Web Search, Image Generation, Code Interpreter, Automations, Calendar and Sub-agents while that feature is on for the instance; Memory, Web Search, Image Generation and Code Interpreter also while the same capability is on for this model; Files while **File Upload** is on and **File Context** is off |
+\1 A category shows only while its feature is on |
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **File Context** disappears from this editor since there is nothing to extract |
 | **File Context** | When enabled, attached files are processed via RAG. When disabled, no file content is extracted |
 | **Default Features** | The row right below **Capabilities** lists **Web Search**, **Image Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |
@@ -186,7 +186,7 @@ The **Advanced Params** row shows how many parameters this model changes, for ex
 
 - **Stop Sequences**: Force-stop generation on specific strings (e.g., `<|end_of_text|>`, `User:`). One text field, comma-separated.
 - **Temperature, Top P, etc.**: Adjust creativity and determinism.
-- **Context Compaction Threshold**: Set this model's own [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) threshold. It only shows while context compaction is on in **Settings > Admin > Interface**. A saved value is kept while compaction is off and applies again when it is turned back on.
+- **Context Compaction Threshold**: Set this model's own [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) threshold. It only shows while context compaction is on.
 
 What you set here applies to every chat that does not set the same parameter itself. A user who sets one in **Chat Controls** or in their own **Settings > General**, and an API caller who sends one in the request, use their own value instead. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params).
 
@@ -301,7 +301,7 @@ Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** an
 
 A model's background image travels with it. Export carries the image inside the file, and import stores it on the target instance as a fresh upload, so a model moved between instances keeps its background without you moving files by hand. See the [API endpoints reference](/reference/api-endpoints) for the export and import calls.
 
-A regular user importing a model whose ID already belongs to a connection model, or to another person's model they cannot edit, gets **Uh-oh! This model id is already registered. Please choose another model id string.** The import stops at that model: the models before it in the file are imported and the ones after it are not. Admins, and users who can edit the existing model, overwrite it.
+A model whose ID is already taken by a model you cannot edit stops the import with **Uh-oh! This model id is already registered. Please choose another model id string.** Models before it in the file are imported.
 
 :::info Downloading base models
 To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.

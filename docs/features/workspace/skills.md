@@ -22,7 +22,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 Skills are reusable, markdown-based instruction sets that you attach to models or invoke on-the-fly in chat. Unlike [Tools](/features/extensibility/plugin/tools) (executable Python scripts), Skills are plain-text instructions: code review guidelines, writing style rules, troubleshooting playbooks, data analysis workflows. The model reads them and follows them.
 
-Mention a skill with `$` in chat to inject its instructions immediately. Or bind skills to a model so every new chat with it starts with them selected. Every other skill you can read stays available, and the model loads it on demand to keep the context window efficient.
+Mention a skill with `$` in chat, or bind it to a model so every new chat starts with it selected. Every other skill you can read stays available, and the model loads it when needed.
 
 ---
 
@@ -36,7 +36,7 @@ Write guidelines in Markdown. No Python, no API calls, no deployment. If you can
 
 ### On-demand context loading
 
-With native function calling, the skills selected for the chat send their instructions with each message, or, with [Load selected skills on demand](#loading-selected-skills-on-demand) turned on, are listed and loaded like the rest. Every other active skill the user can read is listed in a lightweight manifest (id, name, description). The model loads those instructions when it needs them via the `view_skill` tool, and reads or searches the skill's files with `read_skill_file` and `grep_skill_files`. In legacy mode every bound, toggled or mentioned skill is injected in full and there is no manifest.
+Selected skills send their instructions with each message. Every other skill you can read is listed by name and description, and the model loads it when needed.
 
 ### Reusable across models
 
@@ -58,7 +58,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | ⚡ **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
 | 🧩 **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
 | 🤖 **Model binding** | Attach skills to models so new chats start with them selected |
-| 📦 **Lazy loading** | Skills you did not select, and with **Load selected skills on demand** also the selected ones, are listed in a manifest; instructions load on demand |
+| 📦 **Lazy loading** | Skills you did not select are listed in a manifest and load on demand |
 | 📥 **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
 | 🌍 **Community** | Find skills on openwebui.com and share your own |
 | 🔒 **Access control** | Private by default, shareable with users or groups |
@@ -70,57 +70,50 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 ### User-selected skills ($ mention)
 
-Type `$` in the chat input to open the skill picker, or pick the skill from the `/` menu. Select a skill, and its **content is injected directly** into the system prompt, in both function calling modes, so the model has the instructions right away. With the [skill tools](#skill-tools) available, a `SKILL.md` of up to 20,000 characters is injected in full (the [read limit](#read-limits)). A longer one is injected as its first 5,000 characters (the preview length) and the offset where it continues, and the model reads on with `read_skill_file` or finds passages with `grep_skill_files`. The injection also lists up to 50 of the skill's supporting files, which the model opens with the same tools. Without the skill tools the first 100,000 characters of `SKILL.md` are injected. A message that is only a `$` mention is sent with the skill names as its text, so providers that reject empty content do not fail.
+Type `$` in the chat input, or use the `/` menu, and pick a skill. Its instructions go into the system prompt with every message. A message that is only a `$` mention is sent with the skill names as its text.
 
 ### Per-chat skills (Integrations menu)
 
-Open the **+** menu in the chat input and choose **Skills** to toggle individual skills on for the current chat, the same place you enable Tools. A badge shows how many are active. The selection **persists for that chat** and is sent with every message. Each selected skill sends its instructions with every message, injected the same way as a `$` mention, in both function calling modes, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on. A skill you switch off stays in the manifest under native function calling, so the model can still load it.
+The **+** menu > **Skills** turns skills on for the current chat. A badge shows how many are on. Selected skills send their instructions with every message.
 
 ### Model-attached skills
 
-Every new chat with a single model starts with the model's skills selected in the **+** Integrations menu, as long as they are active and you can read them. With several models selected, a new chat skips this pre-selection. Selected skills send their full instructions with each message, injected the same way as a `$` mention, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on. Switch one off in the chat and it goes back to the manifest.
+A new chat with a single model starts with the model's skills selected.
 
-Skills that are not selected use lazy loading:
+Skills that are not selected use lazy loading. With the [skill tools](#skill-tools), every other active skill you can read is listed in a manifest by name and description. The model loads one with `view_skill` when it needs it, so many skills cost little context. A skill you switch off in the chat stays in the manifest.
 
-1. **Manifest injection** - Only the skill's name and description are added to the system prompt.
-2. **On-demand loading** - The model receives a `view_skill` built-in tool. When it determines it needs a skill's full instructions, it calls `view_skill(id)` with the skill id from the manifest to load them. A `SKILL.md` longer than the [read limit](#read-limits) comes back as its preview and the offset where it continues, the same way a `$` mention injects it. The result also lists the skill's supporting files, which the model opens with `read_skill_file`.
+Without the skill tools there is no manifest. Selected, mentioned and model skills are injected up to the first 100,000 characters of `SKILL.md`, and model skills are injected even when switched off in the chat.
 
-This means many skills can be available to a model without consuming context window space until actually needed.
-
-The manifest reaches further than the model's own skills. As long as built-in tools are active for the chat, **every active skill you have access to is listed in it**, so the model can find and load one you never selected or attached. Without built-in tools there is no manifest and no `view_skill`, and only the skills you selected, mentioned or attached are injected, each with the first 100,000 characters of its `SKILL.md`. The model's own skills are always injected in this mode, even when you switch them off in the chat. The model cannot read the rest of a longer `SKILL.md` or the supporting files. Switching off a model's **Skills** category under **Builtin Tools** has the same effect: the model can no longer find and load skills by itself, and skills you select or attach are injected the same way. The switch also covers `read_skill_file`, `grep_skill_files`, `update_skill_files` and `create_skill`, so `/skills:create` needs it switched on.
+A `SKILL.md` longer than the [read limit](#read-limits) arrives as a preview, and the model reads on with `read_skill_file`.
 
 ### Loading selected skills on demand
 
-**Load selected skills on demand** in **Admin Settings > General** (off by default, or [`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading)) saves context when chats carry many selected or attached skills. With it on, the skills selected for the chat, including the ones attached to the model, are listed in the manifest by name and description like every other skill you can read, and the model loads them with `view_skill` when it needs them.
-
-- A skill mentioned with `$` anywhere in the chat still has its instructions injected with every message.
-- The setting applies while the model has the [skill tools](#skill-tools): native function calling, the **Builtin Tools** capability and the model's **Skills** category on. In note chats only the **Skills** category is needed. Without them, every selected, attached or mentioned skill is injected in full, whatever the setting says.
-- Requests that carry their own `tools` field, even an empty one, are not affected. API requests made without a web UI session never have the skill tools, so their skills are always injected in full.
+**Load selected skills on demand** in **Admin Settings > General** ([`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading), off by default) lists selected and model skills in the manifest too, so they load only when needed. A skill mentioned with `$` in the chat is still sent with every message. The setting needs the skill tools.
 
 ### Skill tools
 
-With built-in tools active and the model's **Skills** category on, the model gets these tools. `view_skill`, `read_skill_file` and `grep_skill_files` are offered while at least one active skill is available to the user, from the workspace or a connected terminal. `update_skill_files` is offered while at least one of them is a workspace skill.
+With native function calling, the **Builtin Tools** capability and the model's **Skills** category on, the model gets these tools. `/skills:create` needs them too.
 
 | Tool | What it does |
 | :--- | :--- |
-| `view_skill` | Loads a skill's `SKILL.md` together with the list of its supporting files. A `SKILL.md` up to the read limit (20,000 characters by default) comes back in full. A longer one comes back as its preview (the first 5,000 characters by default) and the offset where it continues, so the model reads on with `read_skill_file` or searches it with `grep_skill_files`. |
-| `read_skill_file` | Reads one file of a skill by its path, from a given character offset, up to the read limit per call (10,000 characters when the model asks for no amount). For a binary file it returns the file's size and a link that opens it in the skill editor. |
-| `grep_skill_files` | Searches a skill's text files, or one file given by its path, for a word, a phrase or a regular expression (RE2 syntax, recognized automatically). Case is ignored by default. Returns up to 10 excerpts around the matches (1 to 30 on request), at most 6,000 characters in total, and lists where the matches that did not fit are, so the model can read them with `read_skill_file`. On a terminal skill it searches `SKILL.md`. Searching never creates a new version. |
-| `update_skill_files` | Saves file changes (write a file, move a file or folder, delete a file or folder) as a new version of a skill the user can edit. Writes are text only. When someone saved the skill after the model read it, the save is refused with a conflict and the model is told to load the skill again and reapply its edit. |
+| `view_skill` | Loads a skill's `SKILL.md` and the list of its files, up to the read limit. |
+| `read_skill_file` | Reads one file of a skill from a given offset, up to the read limit per call. For a binary file it returns the size and a link to the skill editor. |
+| `grep_skill_files` | Searches a skill's text files for a word, phrase or regular expression and returns up to 10 excerpts. |
+| `update_skill_files` | Saves file changes as a new version of a skill the user can edit. Refused with a conflict when someone saved the skill in the meantime. |
 | `create_skill` | Creates a new private skill in the workspace from the `SKILL.md` text and optional text files. Offered to admins and to users with the **Skills Access** permission. |
 
 All five follow the skill's access grants. A user with write access to an inactive skill can still have the model load and read it.
 
 ### Read limits
 
-Two settings in **Admin Settings > General** set how much of a skill the model gets at once while it has the skill tools:
+Two settings in **Admin Settings > General** set how much of a skill the model gets at once:
 
 | Setting | Default | What it sets |
 | :--- | :--- | :--- |
-| **Skill Read Limit** | 20,000 | The most characters of a skill the model gets in one read: injected instructions, `view_skill` and each `read_skill_file` call. |
-| **Skill Preview Length** | 5,000 | How many characters the model gets when a `SKILL.md` is longer than the read limit. With the preview it gets the skill ID and the offset where the text continues, and reads the rest with `read_skill_file`. A value above the read limit is capped at the read limit. |
+| **Skill Read Limit** | 20,000 | Most characters the model gets in one read |
+| **Skill Preview Length** | 5,000 | Characters the model gets first when `SKILL.md` is longer than the read limit |
 
-Leave a field empty to use the default. The environment variables [`SKILL_CONTENT_MAX_CHARS`](/reference/env-configuration#skill_content_max_chars) and [`SKILL_PREVIEW_MAX_CHARS`](/reference/env-configuration#skill_preview_max_chars) set the same values. Without the skill tools the first 100,000 characters of `SKILL.md` are injected, whatever these settings say.
+Leave a field empty for the default, or set [`SKILL_CONTENT_MAX_CHARS`](/reference/env-configuration#skill_content_max_chars) and [`SKILL_PREVIEW_MAX_CHARS`](/reference/env-configuration#skill_preview_max_chars).
 
 ### Skills from a terminal server
 
@@ -260,11 +253,7 @@ This is the standard Open WebUI itself follows when it writes a skill through `/
 3. Pick the skills you want this model to always have access to.
 4. Click **Save & Update**.
 
-Every new chat with the model starts with these skills selected, and selected skills send their full instructions with each message, in both function calling modes, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on. In native mode the manifest already lists every skill the user can read, so a skill needs no binding to be available. Bind a skill when the model should follow it in every chat.
-
-:::tip Upgrading from an earlier version
-Bound skills used to appear only in the manifest under native function calling, and the model loaded them with `view_skill`. They now send their full instructions with each message, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on, which brings back the old behaviour. If you bound skills to a model only to make them available, remove them from the model to keep the prompt short; every skill the user can read is listed for the model anyway. Under legacy function calling, or with built-in tools off, nothing changed.
-:::
+Every new chat with the model starts with these skills selected. The manifest already lists every skill the user can read, so bind a skill only when the model should follow it in every chat.
 
 ---
 
@@ -392,8 +381,8 @@ Open WebUI stores a skill's scripts for the model to read. Running one takes a t
 
 ### Context window with $ mention
 
-When injected via `$` mention, the skill content goes into the system prompt. With the skill tools on that is at most the [read limit](#read-limits) of `SKILL.md` (20,000 characters by default), and for a longer skill its preview (5,000 characters by default). Without them it is up to the first 100,000 characters. Skills bound to a model or selected in the chat are injected the same way with every message, unless [Load selected skills on demand](#loading-selected-skills-on-demand) is on. A very long skill attached to a model with a small context window may crowd out conversation history.
+Selected skills go into the system prompt with every message. A very long skill on a model with a small context window can crowd out the conversation.
 
 ### Lazy loading requires function calling
 
-The manifest and the `view_skill` built-in tool need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with **Builtin Tools** enabled. Without them there is no lazy loading at all: every bound, toggled or mentioned skill is injected into the system prompt, up to the first 100,000 characters of its `SKILL.md`. A skill bound to the model is injected even when the user switches it off in the chat. Reading a skill's supporting files takes the skill tools, so it needs native function calling too.
+The manifest and the skill tools need [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) with **Builtin Tools** enabled. See [Model-attached skills](#model-attached-skills).

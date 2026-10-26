@@ -57,7 +57,7 @@ The reply is spoken in:
 
 **Speech Playback Speed** in **Settings > Audio** sets how fast replies are read.
 
-The speech itself comes from the text-to-speech engine your admin chose in **Settings > Admin > Audio**. If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser. **Read Aloud** under a reply then uses the Kokoro voice too, also when the admin's engine is **Web API**.
+The speech itself comes from the text-to-speech engine your admin chose in **Settings > Admin > Audio**. If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser. **Read Aloud** then uses it too.
 
 The admin's **Response Splitting** setting decides how much of the reply is spoken at once:
 
@@ -71,7 +71,7 @@ What you say is always transcribed on the server with the admin's speech-to-text
 
 ## Your Voice Mode Settings
 
-Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mode. Both are off by default. The **Voice** section shows only to admins and to users with the [**Allow Call**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. A value you saved is kept while it is hidden.
+Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mode. Both are off by default. The section needs the [**Allow Call**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission.
 
 | Setting | What it does |
 | :--- | :--- |
@@ -95,7 +95,7 @@ Admins can control access to Voice Mode on a per-role or per-group basis.
 
 If disabled, users do not see the **Voice mode** button. Admins always do.
 
-Unless Realtime mode is on, a call also needs the server to transcribe your speech. The **Voice mode** button then shows only while the admin's speech-to-text engine is not **Web API** and you have the **Allow Speech to Text** permission (admins always have it). Without that permission, a `?call=true` link or the desktop app's call shortcut does not start a call either.
+Unless Realtime mode is on, a call also needs the server to transcribe your speech. The **Voice mode** button needs a speech-to-text engine other than **Web API** and the **Allow Speech to Text** permission.
 
 The same permission covers both call modes. In Realtime mode, Open WebUI checks it again when the call connects and every minute during the call.
 

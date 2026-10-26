@@ -282,7 +282,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}` (every control shown)
-- Description: Hides controls from non-admin users. Set a control ID to `false` to hide it, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Admins always see every control. Hiding a control only removes it from view: its current value and the feature behind it stay in effect, so with `chat.attach_files` hidden, users can still drag files into the chat. A hidden personal setting also drops out of the search in **Settings**. Also configurable as **Visible controls** in **Admin Panel > Settings > Interface**, under **Visibility**.
+- Description: Hides controls from non-admin users. Set a control ID to `false` to hide it, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Admins always see every control. Hiding only removes the control from view; the feature behind it keeps working. Also configurable as **Visible controls** in **Admin Panel > Settings > Interface**, under **Visibility**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.visibility`.
 
 :::info
@@ -405,7 +405,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations are automatically surfaced as virtual events on a dedicated "Scheduled Tasks" calendar. Requires the `features.calendar` user permission (admins always pass). When disabled, opening `/calendar` directly sends every user, admins included, to the home page.
+- Description: Enables or disables the Calendar feature. When enabled, users can create calendars, manage events, and share calendars with other users or groups via access grants. Active automations show on a "Scheduled Tasks" calendar. Requires the `features.calendar` user permission.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_CHANNELS`
@@ -462,21 +462,21 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `False`
-- Description: Makes the skills selected for a chat, including the ones attached to the model, load on demand. They are listed in the skill manifest by name and description like every other skill, and the model loads them with `view_skill` when it needs them. A skill mentioned with `$` anywhere in the chat still has its instructions injected with every message. Applies while the model has the skill tools (native function calling, built-in tools active and the **Skills** category on; in note chats only the **Skills** category); without them every selected, attached or mentioned skill is injected in full, whatever this is set to. Requests that carry their own `tools` field, even an empty one, are not affected, and API requests made without a web UI session never have the skill tools. See [Skills](/features/workspace/skills#loading-selected-skills-on-demand).
+- Description: Lists the skills selected for a chat, including model skills, in the skill manifest, so the model loads them only when needed. A skill mentioned with `$` is still sent with every message. Needs the skill tools. See [Skills](/features/workspace/skills#loading-selected-skills-on-demand).
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Load selected skills on demand**.
 
 #### `SKILL_CONTENT_MAX_CHARS`
 
 - Type: `int`
 - Default: empty, which uses `20000`
-- Description: The most characters of a skill's text the model gets in one read. It applies to the skill instructions injected into the prompt, to `view_skill` and to each `read_skill_file` call. A `SKILL.md` longer than this is sent as a preview of `SKILL_PREVIEW_MAX_CHARS` characters, and the model reads on from there. Applies while the model has the skill tools (built-in tools active and the **Skills** category on). Without them the first 100,000 characters are injected. Must be a positive integer, or Open WebUI stops at startup. For `0` or a negative number the error is `SKILL_CONTENT_MAX_CHARS must be a positive integer or unset`. See [Skills](/features/workspace/skills).
+- Description: The most characters of a skill's text the model gets in one read. A longer `SKILL.md` is sent as a preview of `SKILL_PREVIEW_MAX_CHARS` characters. Must be a positive integer, or Open WebUI stops at startup. See [Skills](/features/workspace/skills).
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Read Limit**. Leave the field empty to use the default.
 
 #### `SKILL_PREVIEW_MAX_CHARS`
 
 - Type: `int`
 - Default: empty, which uses `5000`
-- Description: How many characters of a skill's instructions the model gets when the `SKILL.md` is longer than `SKILL_CONTENT_MAX_CHARS`. With the preview the model gets the skill ID and the `next_offset` where the text continues, so it reads the rest with `read_skill_file`. A value above `SKILL_CONTENT_MAX_CHARS` is capped at that limit. Must be a positive integer, or Open WebUI stops at startup. For `0` or a negative number the error is `SKILL_PREVIEW_MAX_CHARS must be a positive integer or unset`.
+- Description: How many characters of a skill's instructions the model gets when the `SKILL.md` is longer than `SKILL_CONTENT_MAX_CHARS`. Capped at `SKILL_CONTENT_MAX_CHARS`. Must be a positive integer, or Open WebUI stops at startup.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Preview Length**. Leave the field empty to use the default.
 
 #### `ENABLE_AUTOMATIONS`
@@ -1210,7 +1210,7 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 
 - Type: `str`
 - Default: `""` (unset). The default web loader then sends `DefaultLangchainUserAgent`, and the **Attach Webpage** check sends the HTTP library default (`Python/3.x aiohttp/3.x`).
-- Description: Overrides the `User-Agent` header Open WebUI sends when the default web loader fetches pages for web search and the `fetch_url` tool, and on the first request **Attach Webpage** sends to check whether a URL is a page or a file. The `fetch_url` tool's own page-or-file check sends the same headers and follows the same SSL setting as the web loader, so a site answers it the same way. The default Python library UA is blocked by Cloudflare, Wikipedia and similar bot-detection layers, which shows up as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access.
+- Description: Overrides the `User-Agent` header Open WebUI sends when the default web loader fetches pages for web search and the `fetch_url` tool, and when **Attach Webpage** checks a URL. The default Python library UA is blocked by Cloudflare, Wikipedia and similar bot-detection layers, which shows up as empty results or 403s when scraping or searching the public web. Set this to a real browser-like UA (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`) to restore access.
 
 #### `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA`
 
@@ -1234,7 +1234,7 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 
 - Type: `int`
 - Default: `10`
-- Description: Timeout in seconds for each request Open WebUI sends to an MCP server other than a tool call: the connection handshake of servers on protocol versions before 2026-07-28, tool lists, resource lists and resource reads. Raise it if your MCP server cold-starts slowly or exposes many tools and connections fail with a timeout; a server advertising dozens of tools can need 30 to 60 seconds. Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](#aiohttp_client_timeout_tool_server). The check for the stateless 2026-07-28 protocol, which runs when connecting, has its own fixed 10-second limit. MCP connections follow a redirect only when it stays on the same origin.
+- Description: Timeout in seconds for MCP requests other than tool calls: connecting, listing tools and reading resources. Raise it if a server cold-starts slowly or exposes many tools; dozens of tools can need 30 to 60 seconds. Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](#aiohttp_client_timeout_tool_server).
 
 #### `AIOHTTP_POOL_CONNECTIONS`
 
@@ -1541,7 +1541,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `int`
 - Default: `80000`
-- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`. The parameter shows under **Advanced Params** only while `ENABLE_CONTEXT_COMPACTION` is on: in the model editor to anyone who can edit the model, elsewhere to admins. A saved value is kept while compaction is off and applies again when it is turned back on.
+- Description: The estimated context size, in tokens, above which older messages are compacted when `ENABLE_CONTEXT_COMPACTION` is on. Lower it for smaller-context models, raise it for larger ones. This is the global default threshold: an individual model can override it with the **Context Compaction Threshold** advanced parameter (`compact_token_threshold`), setting a higher or lower value of its own, bounded by `CONTEXT_COMPACTION_TOKEN_CAP`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_CAP`
@@ -3170,7 +3170,7 @@ Open WebUI checks a file's content hash against the collection before storing it
 
 :::tip Turn it on for new Milvus deployments
 
-For any new Milvus deployment, set this to `true` before the first start. Standard mode creates a separate collection for every uploaded file, knowledge base, user's memories and web search, so a busy instance keeps adding collections, slows down and eventually hits Milvus's limit on collections per instance (65,536 by default). Switching an existing instance later works but takes effort: you reindex, and files that are not in a knowledge base lose their vectors (see the migration notes below).
+Set this to `true` before the first start of a new Milvus deployment. Standard mode creates a collection per file, knowledge base, user's memories and web search, so a busy instance slows down and hits Milvus's collection limit (65,536 by default). Switching later needs a reindex, and files outside knowledge bases lose their vectors.
 
 :::
 
@@ -4558,7 +4558,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `dict` (JSON object)
 - Default: `{"EngineConfig.onnxruntime.intra_op_num_threads": 1}`
-- Description: Settings passed to RapidOCR, the OCR engine that reads images in PDFs while [`PDF_EXTRACT_IMAGES`](#pdf_extract_images) is on, as a JSON object of RapidOCR parameter names and values. The default gives the OCR of each upload one processor thread, so several uploads at once do not compete for every core. On an idle server with many cores, raise `EngineConfig.onnxruntime.intra_op_num_threads` to process a single upload faster. A value you set replaces the default as a whole, so include the thread setting if you want to keep it. Invalid JSON, or a value that is not a JSON object, falls back to RapidOCR's own defaults.
+- Description: Settings passed to RapidOCR, the OCR engine that reads images in PDFs while [`PDF_EXTRACT_IMAGES`](#pdf_extract_images) is on, as a JSON object of RapidOCR parameter names and values. The default gives each upload one processor thread. On an idle many-core server, raise `EngineConfig.onnxruntime.intra_op_num_threads` to process a single upload faster. A value you set replaces the default as a whole.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `PDF_LOADER_MODE`
@@ -8709,9 +8709,9 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 - Type: `int` (seconds)
 - Default: `3600`
-- Description: A safety net on the entries Redis holds while a response is streaming, which let a reconnecting browser pick a reply back up where it left off. An entry is deleted as soon as its response finishes, so this timeout is not the normal lifetime of one. It catches the entries whose cleanup never ran, a worker killed mid-stream or a process that died, which previously stayed in Redis forever and accumulated. Lower it to reclaim that memory sooner, raise it if a response could legitimately go longer than the default hour without new output, or set `0` to keep orphaned entries indefinitely as before. Applies only when Redis is in use.
+- Description: Expiry for the Redis entries that let a reconnecting browser resume a streaming reply. Entries are deleted when the reply finishes; this only removes ones left behind by a crashed worker. Raise it if a reply can go longer than an hour without output, or set `0` to never expire them. Applies only with Redis.
 
-  Each streaming reply has its own key, `{REDIS_KEY_PREFIX}:tasks:response_streams:<task_id>`. Open WebUI writes a full snapshot of the reply, appends each new piece of text to it and writes a fresh snapshot from time to time, so a long reply is never rewritten in full on every token. Every write restarts the timeout. During a rolling upgrade, replies started on instances still running an older version are read from the shared `{REDIS_KEY_PREFIX}:tasks:response_streams` hash those instances use.
+  Each streaming reply has its own key, `{REDIS_KEY_PREFIX}:tasks:response_streams:<task_id>`. Every write restarts the timeout.
 - Persistence: No
 
 #### `REDIS_TASK_TTL`
@@ -8886,7 +8886,7 @@ When deploying Open WebUI with `UVICORN_WORKERS > 1` or in a multi-node/worker c
 - Type: `bool`
 - Default: `True`
 - Description: Takes effect when `WEBSOCKET_MANAGER=redis`. Live updates addressed to a specific user, channel or note are published on a Redis channel of their own, and each instance skips updates for rooms none of its connected clients have joined. This saves the CPU each instance would spend decoding every update, which adds up on multi-instance deployments. Acknowledgements and control messages stay on the shared channel. Set to `False` to send everything through the one shared channel. See [Per-Room Redis Channels](/getting-started/advanced-topics/scaling#per-room-redis-channels).
-- Redis permissions: room channels use the shared channel `socketio` plus room channels named `socketio#<namespace>#<room>`. Each instance subscribes only to the rooms its connected clients have joined, and unsubscribes from a room when its last local client leaves it. A Redis user restricted by ACLs needs the `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING` commands and access to the channels `&socketio` and `&socketio#*`. `PSUBSCRIBE` is unused. When one is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
+- Redis permissions: room channels use the shared channel `socketio` plus room channels named `socketio#<namespace>#<room>`. A Redis user restricted by ACLs needs the `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING` commands and access to the channels `&socketio` and `&socketio#*`. When one is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`.
 
 :::warning
 
@@ -9121,13 +9121,13 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading, tools attached to a model or chosen in a chat are dropped from the request, the **Tools** workspace page and the **Tools Access** permissions are hidden, **Valves** in **Chat Controls** offers only functions, and creating or updating a tool returns an error. With both this and [`ENABLE_FUNCTIONS`](#enable_functions) off, the **Valves** section of **Chat Controls** is hidden. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading and their pages, permissions and valves are hidden. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_FUNCTIONS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns [**Functions**](/features/extensibility/plugin/functions) on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions disappear from messages, pipe models leave the model list, the admin **Functions** page is hidden, **Valves** in **Chat Controls** offers only tools, and creating or updating a function returns an error. With both this and [`ENABLE_TOOLS`](#enable_tools) off, the **Valves** section of **Chat Controls** is hidden. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns [**Functions**](/features/extensibility/plugin/functions) on or off: filters, actions, pipes and event functions. Set to `False`, filters are skipped, actions and pipe models disappear, and the **Functions** page and function valves are hidden. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_TOOL_SERVERS`
 

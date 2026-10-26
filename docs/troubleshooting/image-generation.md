@@ -16,13 +16,10 @@ title: "Image Generation"
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
 
 - **Images settings refuse to save** (saving **Settings** > **Admin** > **Images** shows an error such as `OpenAI API Key is required.`):
-    - Keys and URLs are checked only while their feature is on. The image generation engine needs its key or URL while **Image Generation** is on. A Gemini **Image Edit Engine** needs its **API Key** while **Image Edit** is on.
-    - With both switches off, the page saves without any key, so you can set up one feature while the other has none.
-    - Switching **Image Generation** on without its key or URL, or **Image Edit** on without the Gemini **API Key**, is refused. Fill in the field, or switch the feature off, and save again.
-    - The **Image Generation** switch stays on next to the error, so the missing field stays in view. Nothing is saved until you fill it in.
+    - Keys and URLs are only required while their feature is on. Fill in the field, or switch the feature off, and save again.
 
 - **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
-    - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Switching it on shows them right away, so you can set everything up before saving. Their saved values are kept while they are hidden.
+    - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Their saved values are kept while hidden.
 
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
     - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
