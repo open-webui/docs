@@ -83,12 +83,9 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 
 :::warning Reading `usage` from a reply that used tools
 
-A reply can involve several model calls, one per round of tool use, and the `usage` block distinguishes the two things you might want from that:
+A reply can involve several model calls, one per round of tool use. Every field of the `usage` block covers the **whole reply**, every call added up: `input_tokens`, `output_tokens` and `total_tokens`, and `prompt_tokens` and `completion_tokens` with the same values as `input_tokens` and `output_tokens`.
 
-- `prompt_tokens` and `completion_tokens` report the **most recent model call** only.
-- `input_tokens`, `output_tokens` and `total_tokens` report the **whole reply**, every call added up.
-
-Earlier releases put the running total in `prompt_tokens` / `completion_tokens` as well. If you bill or meter on those two fields, read `input_tokens` / `output_tokens` instead, or a tool-using reply will now be undercounted. The split exists because a context-window gauge needs the size of the latest request, while billing needs the sum, and one pair of fields cannot be both.
+In v0.12.4, `prompt_tokens` and `completion_tokens` held the most recent model call only. If you read those two fields on v0.12.4, a tool-using reply was undercounted there; `input_tokens` and `output_tokens` hold the sum in both versions.
 
 :::
 

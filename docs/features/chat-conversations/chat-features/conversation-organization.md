@@ -201,7 +201,7 @@ Imagine you're working on a Python development project:
 In addition to folders, **tags** provide a flexible labeling system for conversations:
 
 - **Adding Tags**: Apply keyword labels to conversations based on content or purpose.
-- **Searching by Tags**: Filter conversations by tags using the search feature.
+- **Searching by Tags**: Type `tag:<name>` in the search window to list your chats with that tag, or `tag:none` for chats without tags. See [Filtering results](/features/chat-conversations/chat-features/history-search#filtering-results).
 - **Flexible Organization**: Tags can be added or removed at any time and don't affect folder structure.
 - **Automatic Tags**: A task model can tag your chats for you. Turn this off for yourself with **Chat Tags Auto-Generation** in **Settings > Interface**. The switch shows only while the admin has **Tags Generation** on in **Settings > Admin > Interface**, and your saved choice is kept while it is hidden.
 
