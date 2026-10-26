@@ -111,7 +111,7 @@ See the [Azure AI Speech STT guide](/features/chat-conversations/audio/speech-to
 | `AUDIO_TTS_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
 
 :::info
-When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `mistral-tts-latest` when `AUDIO_TTS_MODEL` is empty.
+When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `voxtral-mini-tts-2603` when `AUDIO_TTS_MODEL` is empty.
 :::
 
 ### Azure TTS

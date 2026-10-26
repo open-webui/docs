@@ -21,7 +21,7 @@ In **Settings > Admin > Documents**, set **Content Extraction Engine** to **Exte
 
 - **Document Loader URL**: the base URL of your service. Open WebUI appends `/process` to it.
 - **API Key**: sent as a bearer token. It is required. With the engine set to External but no key saved, Open WebUI silently falls back to its built-in loaders and never calls your service, and the admin panel does not warn about it.
-- **Headers** (optional): a JSON object of additional headers to send with every request, see [templating](#the-contract) below.
+- **Headers** (optional): a JSON object of additional headers to send with every request, see [templating](#the-contract) below. If it is not a valid JSON object, **Save** shows `Headers must be a valid JSON object` and stores nothing, even with another engine selected. Switch back to **External** to fix or clear the field.
 
 The same settings are available as environment variables: [`CONTENT_EXTRACTION_ENGINE=external`](/reference/env-configuration#content_extraction_engine), [`EXTERNAL_DOCUMENT_LOADER_URL`](/reference/env-configuration#external_document_loader_url), [`EXTERNAL_DOCUMENT_LOADER_API_KEY`](/reference/env-configuration#external_document_loader_api_key), [`EXTERNAL_DOCUMENT_LOADER_HEADERS`](/reference/env-configuration#external_document_loader_headers).
 

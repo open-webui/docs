@@ -20,6 +20,7 @@ title: "Image Generation"
     - With both switches off, the page saves without any key, so you can set up one feature while the other has none.
     - Switching **Image Generation** on without its key or URL, or **Image Edit** on without the Gemini **API Key**, is refused. Fill in the field, or switch the feature off, and save again.
     - The **Image Generation** switch stays on next to the error, so the missing field stays in view. Nothing is saved until you fill it in.
+    - Invalid JSON in **Additional Parameters**, for the OpenAI or AUTOMATIC1111 engine, is refused with `Invalid JSON format for Parameters`. Fix the JSON, or clear the field, and save again.
 
 - **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
     - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Switching it on shows them right away, so you can set everything up before saving. Their saved values are kept while they are hidden.
