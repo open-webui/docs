@@ -4702,13 +4702,15 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the prefix string prepended to document content before generating embeddings. Some embedding models (e.g., nomic-embed-text) require task-specific prefixes to differentiate between content being stored vs. queries being searched. For nomic-embed-text, set this to `search_document: `. Only needed if your embedding model's documentation specifies a content/document prefix.
+- Description: Sets the prefix string prepended to document content before generating embeddings. Some embedding models (e.g., nomic-embed-text) require task-specific prefixes to differentiate between content being stored vs. queries being searched. For nomic-embed-text, set this to `search_document: `. Only needed if your embedding model's documentation specifies a content/document prefix. Also configurable as **Content Prefix** in **Admin Panel > Settings > Documents**, under **Advanced** in the embedding settings. Include any trailing space the model expects. Reindex existing data after changing it.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_EMBEDDING_QUERY_PREFIX`
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the prefix string prepended to user queries before generating embeddings for retrieval. This is the counterpart to `RAG_EMBEDDING_CONTENT_PREFIX`. For nomic-embed-text, set this to `search_query: `. Only needed if your embedding model's documentation specifies a query prefix.
+- Description: Sets the prefix string prepended to user queries before generating embeddings for retrieval. This is the counterpart to `RAG_EMBEDDING_CONTENT_PREFIX`. For nomic-embed-text, set this to `search_query: `. Only needed if your embedding model's documentation specifies a query prefix. Also configurable as **Query Prefix** in **Admin Panel > Settings > Documents**, under **Advanced** in the embedding settings. Include any trailing space the model expects.
+- Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
 

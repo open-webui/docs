@@ -83,7 +83,7 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 
 :::warning Reading `usage` from a reply that used tools
 
-A reply can involve several model calls, one per round of tool use. Every field of the `usage` block covers the **whole reply**, all calls added up.
+A reply can involve several model calls, one per round of tool use. `input_tokens`, `output_tokens`, `total_tokens` and `cost` add up all calls. `prompt_tokens` and `completion_tokens` hold the latest call only, which is what context compaction reads.
 
 :::
 
