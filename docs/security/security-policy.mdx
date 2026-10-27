@@ -237,9 +237,11 @@ This rule exists because the cost of these escalations is not symmetric. An iden
 
 **We publish a security advisory only after GitHub has assigned its CVE ID.** GitHub is the CVE Numbering Authority (CNA) for the CVEs we request through GitHub Security Advisories. Once an advisory is fixed and ready, we request its CVE, and the advisory stays unpublished until the ID is assigned. At GitHub's current assignment speed, <ins>**this delays the publication of every Open WebUI advisory by two to five weeks.**</ins>
 
-**Why this rule exists.** On 2026-10-12, two weeks after we published them, VulnCheck, a CNA, reserved and published CVE records for 19 Open WebUI advisories. We had published those advisories on 27 and 28 September 2026 and had requested a CVE from GitHub for each one **before publishing it**. All 19 CVE-assignment requests were pending at GitHub for weeks. VulnCheck never contacted us before assigning these 19 CVEs. Its CNA scope covers only vulnerabilities that are not in another CNA's scope, and a CVE requested by the code owner through GitHub Security Advisories is **in GitHub's scope**. GitHub then (correctly) declined all 19 of our requests as duplicates of VulnCheck's records.
+**Before this rule** we requested the CVE and published the advisory right away. The issue was already fixed in a release, and publishing is what tells administrators which versions are affected: the advisory feeds the GitHub Advisory Database and Dependabot alerts. GitHub attached the CVE ID later.
 
-**Coordinated disclosure depends on a CNA contacting the vendor before it assigns. VulnCheck did not**. An advisory that is public without its CVE ID leaves the window VulnCheck used open, and holding publication until the ID is assigned closes it.
+**What happened.** On 27 and 28 September 2026 we published 19 advisories this way, and the CVE requests sat pending at GitHub for weeks. On 2026-10-12 VulnCheck, another CNA, published its own CVE records for all 19 without contacting us, although a CVE requested by the code owner through GitHub Security Advisories is **in GitHub's scope**. GitHub then (correctly) declined our requests as duplicates.
+
+**Why this rule exists.** GitHub builds its CVE record from the advisory we wrote. VulnCheck's records were copies made without us, and they carried wrong severity scores, wrong credits and missing weakness types, which we only found and got corrected after the fact. **Coordinated disclosure depends on a CNA contacting the vendor before it assigns. VulnCheck did not.** Holding publication until GitHub has assigned the ID closes that opening, at the cost of administrators learning about fixed vulnerabilities weeks later.
 
 ## For Non-Vulnerability Related Security Concerns
 
