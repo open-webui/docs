@@ -67,7 +67,7 @@ Once Open WebUI is running:
     *   *One entry per ID*: Leading and trailing spaces are stripped from what you type, and an ID that is already on the list is refused with **Model ID is already added**. Reopening a connection whose stored list contains duplicates collapses them to one entry each, and saving writes the cleaned list back.
 
 *   **Prefix ID**:
-    *   If you connect multiple providers that have models with the same name (e.g., two providers both offering `qwen3.6`), add a prefix here (e.g., `groq`) to distinguish them. Open WebUI joins the prefix and the model ID with a dot, so the model appears as `groq.qwen3.6`, and strips the prefix again before the request goes upstream. A prefix typed as `groq/` produces `groq/.qwen3.6`.
+    *   If you connect multiple providers that have models with the same name (e.g., two providers both offering `qwen3.6`), add a prefix here (e.g., `groq`) to distinguish them. Open WebUI joins the prefix and the model ID with a dot, so the model appears as `groq.qwen3.6`, and strips the prefix again before the request goes upstream. A prefix typed as `groq/` produces `groq/.qwen3.6`. Without a prefix, Open WebUI keeps one model per ID: when two connections return the same ID, it lists only the copy from the connection higher in the list and drops the other without a warning.
 
 *   **Provider**:
     *   Tells Open WebUI what kind of server is behind the URL, which switches on extras such as Azure routing, local model management or Anthropic passthrough. Leave it at **Default** for OpenAI. See [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting).
