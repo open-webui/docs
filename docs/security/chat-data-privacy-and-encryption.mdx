@@ -15,7 +15,7 @@ Open WebUI's standard experience is designed for self-hosted control, auditabili
 
 | Concern | Best available measure |
 | :--- | :--- |
-| Reduce admin product access to employee chats | Set `ENABLE_ADMIN_CHAT_ACCESS=false` |
+| Hide user chats from admins in the interface | Set `ENABLE_ADMIN_CHAT_ACCESS=false` |
 | Control admin product exports | Set `ENABLE_ADMIN_EXPORT=false` |
 | Scope admin workspace list/selector visibility | Set `BYPASS_ADMIN_ACCESS_CONTROL=false` |
 | Production database storage exposure | Use PostgreSQL with encrypted volumes, provider encryption, TDE where available, TLS, and encrypted backups |
@@ -41,7 +41,7 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
 Database encryption protects data at rest. The running Open WebUI application uses the database key to serve authenticated users and normal product workflows.
 
-For SQLite-only deployments, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). SQLCipher is not supported since v0.9.0.
+For SQLite-only deployments, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). SQLCipher is not supported.
 
 ### Limit Admin Chat and Export Surfaces
 
@@ -51,7 +51,7 @@ ENABLE_ADMIN_EXPORT=false
 BYPASS_ADMIN_ACCESS_CONTROL=false
 ```
 
-These reduce what admins can access through Open WebUI. Direct database, host, backup, and application-secret access should be limited to operators inside your approved trust boundary.
+These hide other users' chats and exports from admins in the interface. They do not keep an admin away from the data; see [Admin Users](#admin-users).
 
 ### Use SSO and Restrict Accounts
 
@@ -124,7 +124,7 @@ Regular users can read their own chats and chats explicitly shared with them. Ac
 
 ### Admin Users
 
-Admins have broad control by design. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` prevent casual access through Open WebUI product surfaces. Infrastructure-level access should be handled through operator trust, access review, and separation of duties.
+Admins control the instance, so treat every admin as able to read every chat. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` only hide other users' chats and exports in the interface. An admin can still reach the data in other ways, for example by installing a function or tool that runs code on the server, and through internal chats such as sub-agent chats, which stay readable by id. Limit the admin role, and database, host and backup access, to people you trust with the data.
 
 ### Database, Host, and Backup Operators
 

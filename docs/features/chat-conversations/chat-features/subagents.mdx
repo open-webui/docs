@@ -85,6 +85,8 @@ Sub-agents are deliberately narrower than the chat that starts them:
 - **No code interpreter in the background**, unless the engine is Jupyter, since the browser-based Pyodide engine needs a live session.
 - **No user tool servers in the background.** A foreground sub-agent inherits the tool servers the user added in their own Settings, which run from the browser; a background one does not. Tool servers an admin added (OpenAPI and MCP) stay available to both. If a delegated task depends on a [user tool server](/features/extensibility/plugin/tools/openapi-servers/open-webui), keep it in the foreground.
 
+Each sub-agent runs in its own chat. These chats are hidden from chat lists and search, and are deleted together with the parent chat. Admins can read them by id even with [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) off.
+
 ## Cost
 
 Every delegation is another full chat completion, with the same model and tools, and may loop up to the iteration limit. One reply can start several at once, and each background result restarts the parent chat to process it, which is another turn.
