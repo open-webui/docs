@@ -1218,6 +1218,12 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 - Default: `10`
 - Description: Sets the timeout in seconds for retrieving tool server metadata/configuration (for example, loading server data/spec information).
 
+#### `AIOHTTP_CLIENT_TIMEOUT_TERMINAL`
+
+- Type: `int`
+- Default: `60`. When unset, it inherits `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA` if that is set.
+- Description: Timeout in seconds for Open WebUI's requests to a terminal, such as reading its working folder and skills or uploading chat files to it. An empty value or `0` disables it.
+
 #### `AIOHTTP_FILE_STREAM_CHUNK_SIZE`
 
 - Type: `int`

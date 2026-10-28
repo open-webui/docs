@@ -55,7 +55,8 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | 🤖 **AI Enhance** | Ask the note's chat to rewrite or improve selected text in place |
 | 💬 **Chat sidebar** | The full chat interface inside the note, with as many conversations per note as you want |
 | 📎 **Context injection** | Attach notes to any chat for full-fidelity context |
-| 📄 **Attachments** | Upload files onto the note itself, listed above the note body |
+| 📑 **Pages** | Split a note into pages and subpages |
+| 📄 **Attachments** | Files sit as blocks inside the page where you added them |
 | 📌 **Pin to sidebar** | Pin frequently used notes for quick access from the sidebar |
 | 🔍 **Agentic access** | Models can search, read, and update notes autonomously |
 | 📤 **Export** | Download as `.txt`, `.md`, or `.pdf` |
@@ -78,9 +79,21 @@ This editor can also be enabled for standard chats: **Settings > Interface > Ric
 
 ---
 
+## Pages
+
+A note holds pages, and each page can hold subpages. Click the open page's title at the top of the editor to show the **Pages** panel.
+
+* **Add page** adds a top-level page, and the **+** next to a page adds a subpage
+* Drag a page to reorder it or to nest it inside another page
+* Each page's **⋯** menu offers **Add subpage**, **Rename page**, **Move up**, **Move down**, **Move page…** (pick a parent page or **Top level**; its subpages move along), **Copy page link**, **Download page** and **Delete page**
+
+Deleting a page moves its subpages up one level. The first page cannot be moved or deleted. A page link opens the note on that page, and search results and note links open the page that matches.
+
+---
+
 ## AI Integration
 
-Open the note's chat with the **speech bubble** button in the editor toolbar, at the top of the note next to Undo/Redo. Everything the AI does to a note now runs through that chat.
+Open the note's chat with the **speech bubble** button in the editor toolbar, at the top of the note next to Undo/Redo. Everything the AI does to a note runs through that chat, and it works on the page you have open.
 
 ### Enhance
 
@@ -102,11 +115,10 @@ Opens the full chat interface in a pane beside the note. It is the same componen
 
 :::info How the model actually sees the note
 
-The note is not pasted into the conversation. The chat carries a system prompt with the note's id, and the model reads the note with `view_note` and edits it with `replace_note_content`. Edits land in the editor as the model makes them, without a reload.
+The note is not pasted into the conversation. The chat carries a system prompt with the note's id, each message names the page you have open, and the model reads the page with `view_note` and edits it with `replace_note_content`. Edits land in the editor as the model makes them, without a reload.
 
 Two consequences. A model that cannot call tools will not see the note content at all. And builtin tools behave differently in this chat than anywhere else: the note tools are always injected, and the whole builtin-tool surface is force-enabled even for models an administrator configured without it. See [Builtin tools in a note-attached chat](/features/extensibility/plugin/tools#tool-reference).
 
-Non-image files attached to the note are injected as retrieval context on every message in the note's chats.
 
 :::
 
@@ -142,9 +154,9 @@ With [**native function calling**](/features/extensibility/plugin/tools#tool-cal
 | Tool | What it does |
 |------|-------------|
 | `search_notes` | Search your notes by title and content |
-| `view_note` | Read the full content of a note |
+| `view_note` | Read one page, or the whole note with its list of pages |
 | `write_note` | Create a new note |
-| `replace_note_content` | Update an existing note, either replacing the whole content or editing part of it in place |
+| `replace_note_content` | Update one page of a note, either replacing it whole or editing part of it in place |
 
 > **You:** Search my "Project X" notes and find the database schema.
 >
@@ -185,6 +197,8 @@ Access management options via the **More (...)** menu in the top right corner.
 * **Plain text (.txt)** or **Markdown (.md)** for raw content
 * **PDF (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
 
+**Download** in the **More (...)** menu exports the whole note, with each page under its own heading. **Download page** in a page's **⋯** menu exports that page alone.
+
 ### Sharing
 
 **Share** in the **More (...)** menu offers **Copy link** and **Copy to clipboard**. A copied link opens the note only for someone who can already reach it.
@@ -195,6 +209,8 @@ The same panel opens from the **⋯** menu of a note in the Notes list.
 
 Saving a note never changes who it is shared with.
 
+People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor.
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the **Access** button and menu entry, and the access list in the **Access Control** panel (default `False`)
@@ -204,12 +220,9 @@ These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sha
 
 ### Attachments
 
-Notes carry their own files. Pick **Upload files** in the **More (...)** menu. Non-image files appear as a row of chips above the note body; click one to open it, or use its **✕** to detach it. Uploading is only offered with write access on the note, and read-only collaborators cannot detach files either. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This applies to files the note's owner uploaded, and those files stay read-only for them.
+Files live inside the page where you add them. Drop or paste a file into the editor, or pick **Upload files** in the **More (...)** menu, and it lands at the cursor. Images show inline. Other files become a file block that you can drag, click to open or remove with its **✕**. Adding and removing files needs write access on the note. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This applies to files the note's owner uploaded, and those files stay read-only for them.
 
-Two things to know:
-
-* **Images uploaded from the menu are invisible.** They are stored on the note but are neither shown as a chip nor placed in the text. To get an image into the note, paste it into the editor, which inserts it where the cursor is. Dropping files onto a note does nothing in this release.
-* Attached files feed the note's chat. Every non-image attachment is added as retrieval context on every message you send in a chat opened from this note.
+The files on the open page are added as retrieval context on every message you send in a chat opened from this note.
 
 ### Formatting
 
@@ -230,7 +243,7 @@ The first three open a **Create a new note** dialog showing the title and conten
 
 Toggle between **Created by you** and **Shared with you** filters, and switch between **List** and **Grid** layouts.
 
-The [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) also finds your notes and the notes shared with you, by title and content. Opening a result selects the first match in the note.
+The [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) also finds your notes and the notes shared with you, by title and content.
 
 ### Quick delete
 
@@ -268,11 +281,13 @@ Attaching a note injects the full text. A very large note attached to a model wi
 
 When manually attached, notes are **read-only**. In **Native Mode** with the `replace_note_content` tool enabled, models can modify your notes. Review changes and use **Undo/Redo** if needed.
 
-The tool has two modes. Passing whole `content` replaces the entire note, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the note and leaves the rest untouched. Each operation names the text to change in one of two ways:
+The tool edits one page. The model must read the page with `view_note` first, and an edit to a page that changed since that read is refused.
+
+The tool has two modes. Passing whole `content` replaces the entire page, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the page and leaves the rest untouched. Each operation names the text to change in one of two ways:
 
 - **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, nothing changes and the model gets the positions of all matches to choose from.
 - **By position.** `start` and `end` give a character range. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
 
 The older `replace_range` action still works as an alias of the position form, but it is deprecated. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for these operations.
 
-Notes keep no server-side history. **Undo/Redo** only walks the versions the editor recorded, which happens when you insert a chat response into the note or step through versions, so a tool edit on a note without such versions cannot be undone there. The previous text is still in the chat: the model reads the note with `view_note` before editing, and that tool result stays in the chat message. Expand the tool call in that message to copy the old content back.
+Notes keep no server-side history. **Undo/Redo** only walks the versions the editor recorded, which happens when you insert a chat response into the note or step through versions, so a tool edit on a note without such versions cannot be undone there. The previous text is still in the chat: the model reads the note with `view_note` before editing, and that tool result stays in the chat message. Expand the tool call in that message to copy the old content back. If the model edits a page you have open, or someone deletes it, a banner also offers your previous text as a download.

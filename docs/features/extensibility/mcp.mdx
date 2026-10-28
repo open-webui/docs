@@ -250,7 +250,7 @@ An MCP server can ask you for input in the middle of a tool call (MCP elicitatio
 **Symptom**: 
 The chat shows "Failed to connect to MCP server" when using a tool, even if the verify button in settings reported success. On a connection using either OAuth 2.1 mode that button reads **Check OAuth Discovery**, and it confirms only that the authorization server's discovery document was found and could be parsed.
 
-The server log records each failure at error level as `Failed to connect to MCP server '<id>'`, followed by the cause, so check it first.
+The server log records each failure at error level as `Failed to connect to MCP server '<id>'`, followed by the cause, so check it first. A server that becomes unreachable during a chat fails only that tool call: the model gets the connection error as the tool result and finishes its reply.
 
 **Solutions**:
 1.  **Check Authentication**: Ensure you haven't selected `Bearer` without a key. Switch to `None` if no token is needed.

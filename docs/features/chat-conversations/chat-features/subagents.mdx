@@ -65,7 +65,7 @@ Configure these in **Settings > Admin > Sub-agents**, or with the matching envir
 |---|---|---|---|
 | Max concurrent | [`SUBAGENTS_MAX_CONCURRENT`](/reference/env-configuration#subagents_max_concurrent) | `20` | Foreground sub-agents at once. Extra ones wait for a slot. `-1` is unlimited. |
 | Max background | [`SUBAGENTS_MAX_ASYNC`](/reference/env-configuration#subagents_max_async) | `20` | Background sub-agents at once. Extra ones are refused immediately. `-1` is unlimited. |
-| Max iterations | [`SUBAGENTS_MAX_ITERATIONS`](/reference/env-configuration#subagents_max_iterations) | `30` | Tool-call loops one sub-agent may run before it is stopped. |
+| Max iterations | [`SUBAGENTS_MAX_ITERATIONS`](/reference/env-configuration#subagents_max_iterations) | `30` | Tool-call loops one sub-agent may run before it is stopped. The parent then gets the error plus what the sub-agent wrote so far. |
 | Max output | [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output) | `30000` | Characters returned to the parent. Longer results are truncated. |
 | System prompt | [`SUBAGENTS_SYSTEM_PROMPT`](/reference/env-configuration#subagents_system_prompt) | Built-in | Added on top of the model's own system prompt. |
 

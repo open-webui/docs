@@ -215,7 +215,7 @@ The chip being present = the filter is enabled for the next request. The chip be
 - Stored in the browser as **sessionStorage draft state**, keyed per chat.
 - Survives page reloads in the same browser session but is **not persisted to the chat record on the server**.
 - Initial state comes from the model's `defaultFilterIds` (Settings > Admin > Models → Edit the model → **Filters** → **Start enabled in new chats**). Admins decide which toggleable filters start **on** vs **off** per model.
-- Resets when the user switches to a different model.
+- Switching models applies the new model's default filters and keeps the ones the user turned on or off.
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
 

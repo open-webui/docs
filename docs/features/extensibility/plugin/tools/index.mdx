@@ -364,9 +364,9 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `delete_memory` | Deletes a memory by its ID. |
 | **Notes** | *Requires `ENABLE_NOTES` AND per-model "Notes" category enabled (default: on) AND the user's `features.notes` permission. Inside a note-attached chat these three checks are skipped and the note tools are always injected; see the note below.* |
 | `search_notes` | Search the user's notes by title and content. |
-| `view_note` | Get the full markdown content of a specific note. |
+| `view_note` | Read one page of a note, or the whole note with its list of pages. |
 | `write_note` | Create a new private note for the user. |
-| `replace_note_content` | Update an existing note, replacing the whole content or editing part of it by exact text or by character range. |
+| `replace_note_content` | Update one page of an existing note, replacing its whole content or editing part of it by exact text or by character range. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the full message history of a specific chat by ID. |
@@ -490,10 +490,10 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `delete_memory` | `memory_id` (required) | `{status: "success", message}` |
 | `list_memories` | None | Array of `{id, type, path, content, created_at, updated_at}` |
 | **Notes** | | |
-| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
-| `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
+| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, page_id, page_title, url, updated_at}`, where the snippet and link come from the best matching page |
+| `view_note` | `note_id` (required), `page_id` (optional; omit it to read the whole note) | `{id, title, content, page_id, page_title, pages: [{id, title, parent_id}], updated_at, created_at}`. Without `page_id`, `content` holds every page under its own heading |
 | `write_note` | `title` (required), `content` (required; markdown text. A JSON object or array is stored as a fenced `json` code block rather than left in the note as structured data) | `{status: "success", id}` |
-| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; each `{"action": "replace", "content": ...}`, `{"action": "replace_text", "find", "content", "occurrence", "replace_all"}` or `{"action": "replace_text", "start", "end", "content", "expected"}`. `find` is literal and case sensitive. With several matches, `occurrence` picks one (0-indexed) and `replace_all: true` replaces all of them; with neither set, nothing changes and the error lists every match. `replace_range` is a deprecated alias of the `start`/`end` form), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count, applied_ranges}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `text_not_found`, `ambiguous_match`, `invalid_find`, `invalid_occurrence`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …). An `ambiguous_match` error carries `matches`, each with `start`, `end` and `context` (the match with up to 50 characters on either side) |
+| `replace_note_content` | `note_id` (required), `page_id` (required on notes with several pages), `content` (optional; the new markdown for the whole page. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; each `{"action": "replace", "content": ...}`, `{"action": "replace_text", "find", "content", "occurrence", "replace_all"}` or `{"action": "replace_text", "start", "end", "content", "expected"}`. `find` is literal and case sensitive. With several matches, `occurrence` picks one (0-indexed) and `replace_all: true` replaces all of them; with neither set, nothing changes and the error lists every match. `replace_range` is a deprecated alias of the `start`/`end` form), `title` (optional) | `{status: "success", id, page_id, title, updated_at, applied_operation_count, applied_ranges}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `read_required` (the page was not read with `view_note` earlier in the same reply), `page_conflict` (no `page_id` on a note with several pages, the page is gone or it changed since it was read), `text_not_found`, `ambiguous_match`, `invalid_find`, `invalid_occurrence`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …). An `ambiguous_match` error carries `matches`, each with `start`, `end` and `context` (the match with up to 50 characters on either side) |
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
@@ -548,7 +548,7 @@ The chat opened from a note is an internal chat of type `note`, and builtin tool
 
 Separately, `view_note` and `replace_note_content` **short-circuit access control for admins**: an admin reads or rewrites any note without the owner or grant check other users are subject to. Consistent with admins being root-equivalent elsewhere, but worth knowing if you relied on the previous behaviour, where admins were checked like everyone else.
 
-Note attachments are also injected: every non-image file on the note is added as retrieval context on **every** message in that chat.
+Note attachments are also injected: every file on the page the user has open is added as retrieval context on **every** message in that chat.
 
 :::
 

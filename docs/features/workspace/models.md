@@ -424,6 +424,8 @@ Switch models mid-conversation without losing context. Select up to two models s
 
 You can also switch without opening the picker. Send `/model` followed by a model id, for example `/model gpt-5.1`, and the chat moves to that model; send `/model` on its own and it tells you which model the chat is on. The id has to match exactly, the display name will not do, and an id you cannot reach reports `Model not found`. Picking **Model** from the `/` menu opens the picker with its search box focused instead. See [Chat Features](/features/chat-conversations/chat-features/) for the other built-in slash commands.
 
+A model change is saved with the chat right away, so the chat reopens on that model. Switching applies the new model's default tools, skills, filters, features and terminal, and keeps anything you turned on or off yourself. Features and filters the new model cannot use are turned off. Sending a message to a model picked with `@` switches the chat to that model.
+
 ---
 
 ## Use Cases

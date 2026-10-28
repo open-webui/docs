@@ -37,6 +37,9 @@ title: "Image Generation"
         3. Click "Save (API Format)" in the menu.
     - **Do not** use the standard "Save" button or standard JSON export.
 
+- **Generation or editing shows an error** (the workflow failed inside ComfyUI):
+    - The Open WebUI server log names the failed node and its error as `ComfyUI <node type> failed: <message>`. Fix that node in the workflow.
+
 - **Image Editing / Image Variation Fails** (generating from text works, but editing or image-to-image fails silently):
     - If you are using Image Editing or Image+Image generation, your custom workflow **must** have nodes configured to accept an input image (usually a `LoadImage` node replaced/linked effectively).
     - Check the default "Image Editing" workflow in the Open WebUI settings for the required node structure to ensure compatibility.
