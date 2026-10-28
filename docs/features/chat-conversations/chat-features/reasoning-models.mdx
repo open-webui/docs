@@ -38,7 +38,7 @@ If your model uses different tags, you can provide a list of tag pairs in the `r
 ## Configuration & Behavior
 
 - **Stripping from Payload**: The `reasoning_tags` parameter itself is an Open WebUI-specific control and is **stripped** from the payload before being sent to the LLM backend (OpenAI, Ollama, etc.). This ensures compatibility with providers that do not recognize this parameter.
-- **Chat History**: Reasoning content is preserved in chat history and **sent back to the model** across turns. When building messages for subsequent requests, Open WebUI serializes the reasoning content with its original tags (e.g., `<think>...</think>`) and includes it in the assistant message's `content` field. This allows the model to "remember" its previous reasoning steps across the entire conversation.
+- **Chat History**: Reasoning is kept in chat history. Whether it is sent back to the model depends on the connection; see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back).
 - **UI Rendering**: Internally, reasoning blocks are processed and rendered using a specialized UI component. When saved or exported, they may be represented as HTML `<details type="reasoning">` tags.
 
 ---
@@ -86,7 +86,7 @@ This Ollama-specific setting controls the model's built-in reasoning feature. Ol
 | **Off** | `think: false` | Disables thinking mode |
 
 :::note
-This setting sends the `think` parameter directly to Ollama, which returns the trace in a separate `thinking` field that Open WebUI reads as reasoning (see [Path 2](#path-2-reasoning-captured-into-a-structured-output-array) below). It's separate from how Open WebUI parses `<think>` tags in text, which only matters for models that write their reasoning inline.
+This setting sends the `think` parameter directly to Ollama, which returns the trace in a separate `thinking` field that Open WebUI reads as reasoning (see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back)). It's separate from how Open WebUI parses `<think>` tags in text, which only matters for models that write their reasoning inline.
 :::
 
 ### Reasoning Effort
@@ -116,72 +116,25 @@ When a model uses **native function calling** (tool use) within a single turn, O
 
 During a multi-step tool calling turn, Open WebUI:
 
-1. **Captures** reasoning content from the model's response (via `reasoning_content`, `reasoning`, or `thinking` fields in the delta)
-2. **Stores** it in content blocks alongside tool calls
-3. **Serializes** the reasoning with its original tags (e.g., `<think>...</think>`) when building messages for the next API call
-4. **Includes** the serialized content in the assistant message's `content` field
-
-This ensures the model has access to its previous thought process when deciding on subsequent actions within the same turn.
+1. **Captures** reasoning from the model's response, from `<think>`-style tags or from `reasoning_content`, `reasoning` or `thinking` fields
+2. **Stores** it alongside the tool calls
+3. **Sends it back** on the next call in the format the connection expects; see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back)
 
 ### How Reasoning Is Sent Back
 
-There are two parallel paths, and which one applies depends on **how the prior turn's reasoning was captured**, not on the provider you're sending to.
+Open WebUI stores reasoning separately from the answer, whether the model wrote it as `<think>`-style tags or sent it in a separate field. When a message is replayed, within a tool-call loop or on the next turn, the reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Admin → Connections → OpenAI → Advanced → Provider**, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically). The same rules apply within a turn and across turns. See [Provider Compatibility](#provider-compatibility).
 
-#### Path 1: Reasoning embedded in `content` (default for most providers)
-
-When a model streams reasoning as `<think>…</think>` (or any other configured tag pair) inline in its content, Open WebUI keeps those tags as part of `message.content`. On the next turn the message is forwarded to the LLM verbatim, tags and all. Nothing is dropped, no provider-specific handling kicks in. This is the path you're most likely already on. It is also what the [Interleaved Thinking with Tool Calls](#interleaved-thinking-with-tool-calls) section above describes.
-
-#### Path 2: Reasoning captured into a structured `output` array
-
-If the upstream stream emits `reasoning_content` / `reasoning` / `thinking` deltas (rather than text tags), typical for **OpenAI o-series**, **DeepSeek's official API**, **llama.cpp** with reasoning enabled, or **Ollama** with `think` on (its separate `thinking` field is read as one of these deltas), Open WebUI captures those deltas into a separate `reasoning` item inside the assistant message's `output` array. The displayed `content` only contains a `<details type="reasoning">` block for the UI; the structured form lives on `output`.
-
-When that message is replayed to the LLM (within a tool-call loop or on the next user turn), Open WebUI rebuilds it from `output` rather than forwarding the rendered `content`. The format used for the rebuilt reasoning depends on the **connection's `Provider` setting** (**Settings → Admin → Connections → OpenAI → Advanced → Provider** dropdown, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically):
-
-| Connection `Provider` | Rebuilt reasoning format |
-| :--- | :--- |
-| Ollama (auto-detected) | Wrapped in tags inside `content`: `<think>…</think>` |
-| `llama.cpp` | Top-level `reasoning_content` field on the assistant message |
-| Every other option (`Default`, `Azure OpenAI`, `LM Studio`, `LiteLLM`) | Reasoning is **omitted** from the rebuilt message |
-
-The "omit on default/strict" choice is deliberate: OpenAI, Azure OpenAI, Vertex AI, and similar Chat Completions APIs reject assistant messages with unknown fields, and they don't expect their own reasoning echoed back on the next call (Responses API connections send their stored reasoning items back, see the table below). Pipe functions and filters can re-inject reasoning in a provider-specific shape when needed.
-
-For Ollama, a rebuilt message looks like:
-
-```json
-{
-  "role": "assistant",
-  "content": "<think>Let me search for the current weather data...</think>",
-  "tool_calls": [...]
-}
-```
-
-For a `llama.cpp` connection it looks like:
-
-```json
-{
-  "role": "assistant",
-  "content": "",
-  "reasoning_content": "Let me search for the current weather data...",
-  "tool_calls": [...]
-}
-```
+Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning is left out there. Pipe functions and filters can add it back in a provider-specific shape.
 
 ### Provider Compatibility
 
-| Provider type | Path 1 (tags in `content`) | Path 2 (structured `output`) |
-| :--- | :--- | :--- |
-| OpenAI-compatible APIs that emit `<think>` tags inline (a llama.cpp or vLLM server not configured to split reasoning out, for example) | ✅ Round-trips automatically. | n/a |
-| Ollama (connection auto-tagged as `ollama`) | ✅ Round-trips. | ✅ Rebuilt as `<think>…</think>` in `content`. |
-| llama.cpp (connection *Provider* set to `llama.cpp`) | ✅ Round-trips if the model uses tags. | ✅ Rebuilt as `reasoning_content` field. |
-| OpenAI o-series (Responses API) | n/a (o-series doesn't expose reasoning text). | ✅ Stored reasoning items are sent back as input with only `type`, `id`, `summary`, `encrypted_content` and `content`. With `ENABLE_RESPONSES_API_STATEFUL` on, `previous_response_id` carries the state. |
-| OpenAI / Azure / Vertex AI (Chat Completions, *Provider* `Default`) | ✅ Tags pass through as text (most strict providers tolerate them). | ⚠️ Structured reasoning is omitted on rebuild (use a pipe/filter to re-inject if you need it). |
-| Anthropic (extended thinking) | ⚠️ Tags work, but the native API expects `{"type": "thinking"}` blocks for true extended thinking (use a [pipe function](/features/extensibility/plugin/functions/pipe)). | ❌ Not natively supported. |
-
-### Important Notes
-
-- **Detection is unchanged.** Reasoning is detected from incoming streams the same way it always was: `<think>`-style tag matching for Path 1, `reasoning_content` / `reasoning` / `thinking` deltas for Path 2. The provider-aware behavior added here only governs how Path 2 reasoning is **rebuilt** when the message is replayed.
-- **Within-turn vs. cross-turn use the same logic.** The same rebuild rules apply whether Open WebUI is sending the message inside a multi-step tool-call loop or building the payload for a fresh user turn.
-- **Most users are on Path 1.** Models that emit `<think>` tags inline (the DeepSeek-R1 family on Ollama, Qwen3, MiniMax M3, etc.) keep their reasoning in `content` and continue to round-trip without any provider configuration.
+| Provider | Reasoning on replay |
+| :--- | :--- |
+| Ollama | ✅ Sent back in the `thinking` field |
+| llama.cpp (*Provider* `llama.cpp`) | ✅ Sent back as `reasoning_content` |
+| OpenAI Responses API | ✅ Stored reasoning items sent back. With `ENABLE_RESPONSES_API_STATEFUL` on, `previous_response_id` carries the state |
+| OpenAI / Azure / Vertex AI (Chat Completions, *Provider* `Default`) | ⚠️ Left out (use a pipe or filter to add it back) |
+| Anthropic (extended thinking) | ❌ Not supported natively; use a [pipe function](/features/extensibility/plugin/functions/pipe) |
 
 ---
 
@@ -338,7 +291,7 @@ a final `assistant` message must start with a thinking block.
 
 **Cause:** This is a fundamental architectural difference. Open WebUI follows the **OpenAI Chat Completions API standard** and does not natively support Anthropic's proprietary API format. Anthropic's extended thinking requires structured content blocks with `{"type": "thinking"}` or `{"type": "redacted_thinking"}`, which are Anthropic-specific formats that don't exist in the OpenAI standard.
 
-Open WebUI serializes reasoning as text wrapped in tags (e.g., `<think>...</think>`) inside the message content field. This works with OpenAI-compatible APIs but does not satisfy Anthropic's requirement for structured thinking blocks.
+Open WebUI does not send Anthropic-style thinking blocks back, so Anthropic's requirement for structured thinking blocks is not met.
 
 **Why Open WebUI Doesn't Support This Natively:**
 
@@ -371,18 +324,4 @@ If the model uses tags that are not in the default list and have not been config
 
 ### Does the model see its own thinking?
 
-**Yes.** Reasoning content is preserved and sent back to the model in both scenarios:
-
-- **Within the same turn (during tool calls)**: **Yes**. When a model makes tool calls, Open WebUI preserves the reasoning content and sends it back to the API as part of the assistant message. This enables the model to maintain context about what it was thinking when it made the tool call.
-
-- **Across different turns**: **Yes**. When building messages for subsequent requests, Open WebUI serializes reasoning content from previous turns with its original tags (e.g., `<think>...</think>`) and includes it in the assistant message's `content` field. This allows the model to reference its previous reasoning throughout the conversation.
-
-### How is reasoning sent during tool calls?
-
-When tool calls are involved, reasoning is serialized as text with its original tags and included in the assistant message's `content` field. For example:
-
-```
-<think>Let me search for the current weather...</think>
-```
-
-This text-based format works with most OpenAI-compatible providers. However, some providers (like Anthropic) may expect structured thinking content blocks in a specific format. Open WebUI currently uses text-based serialization rather than provider-specific structured formats.
+It depends on the connection. Ollama, llama.cpp and the OpenAI Responses API get the model's earlier reasoning back, within a tool-call loop and across turns. Other Chat Completions connections do not. See [How Reasoning Is Sent Back](#how-reasoning-is-sent-back).
