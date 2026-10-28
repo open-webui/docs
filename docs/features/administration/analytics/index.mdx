@@ -398,7 +398,12 @@ Accepts either `days` (7-732) or an explicit `start_date` / `end_date` range, an
 | `metric` | string | `messages` (default) counts assistant responses, `tokens` sums input and output tokens |
 | `compare` | bool | `true` adds a `previous` object to each bucket with the value for the window of the same length directly before the range, plus the `start` and `end` of both. It needs both `start_date` and `end_date`, with `start_date` not after `end_date`, or the request fails with `400` |
 
-**`/api/v1/analytics/users` parameters:** `metric` set to `tokens` ranks users by total tokens before `limit` is applied. The default `messages` ranks them by message count.
+**`/api/v1/analytics/users` parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `metric` | string | `messages` (default) ranks users by assistant responses, `tokens` ranks them by total input and output tokens |
+| `limit` | int | How many of the top-ranked users to return, 50 users by default. Users are ranked before the cut, and there is no `skip` or other offset, so to get every user in the range, set `limit` to at least your user count |
 
 :::tip API Access
 All Analytics endpoints require admin authentication. Include your admin bearer token:
