@@ -122,7 +122,7 @@ During a multi-step tool calling turn, Open WebUI:
 
 ### How Reasoning Is Sent Back
 
-Open WebUI stores reasoning separately from the answer, whether the model wrote it as `<think>`-style tags or sent it in a separate field. When a message is replayed, within a tool-call loop or on the next turn, the reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Admin → Connections → OpenAI → Advanced → Provider**, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically). The same rules apply within a turn and across turns. See [Provider Compatibility](#provider-compatibility).
+Open WebUI stores reasoning separately from the answer, whether the model wrote it as `<think>`-style tags or sent it in a separate field. When a message is replayed, within a tool-call loop or on the next turn, the reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Admin → Connections → OpenAI → Advanced → Provider**, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically). The same rules apply within a turn and across turns. See [Provider Compatibility](#provider-compatibility). With **Stream Chat Response** off, `<think>` tags a model writes inside its reply are stored as reply text, so they go back to the model with it.
 
 Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning is left out there. Pipe functions and filters can add it back in a provider-specific shape.
 
