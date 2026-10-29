@@ -104,6 +104,8 @@ WebUI exports the following metrics via OpenTelemetry:
 
 Metrics are sent via OTLP (default every 10 seconds, configurable via `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`) and can be visualized in **Grafana** (via Prometheus/Mimir).
 
+To leave routes such as health checks out of both traces and HTTP metrics, set `OTEL_PYTHON_FASTAPI_EXCLUDED_URLS` (or `OTEL_PYTHON_EXCLUDED_URLS`) to comma-separated regular expressions. Each is matched anywhere in the request URL, so `/health,/_app/immutable/.*` also covers `/health/db`.
+
 ## 🔧 Custom Collector Setup
 
 To use a different (external) OpenTelemetry Collector/Stack:

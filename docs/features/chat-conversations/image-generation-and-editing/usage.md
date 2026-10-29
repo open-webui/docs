@@ -28,6 +28,8 @@ If **Image** is missing from the **Integrations** menu entirely, then either ima
 The model selector at the top of the chat stays on your normal chat model. The image model is configured once in the admin image settings and is never selected there.
 
 Picking the image model as the chat model is the most common setup mistake. Everything looks configured, and generation fails or returns nothing useful, because an image model cannot hold a conversation and is not being asked for a picture in the way it expects. If image generation has stopped working and the settings look right, check what the model selector says first.
+
+The exception is a chat model that creates images itself on a connection whose **API Type** is `Responses`, such as a Gemini image model through OpenRouter. Its images show in the reply.
 :::
 
 What happens next depends on the **Function Calling** mode. It can be set per chat in **Chat Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.

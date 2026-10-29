@@ -46,6 +46,10 @@ This documentation provides a step-by-step guide to integrating Mistral OCR with
 
 By default, Open WebUI uploads a PDF to Mistral's file store and then runs OCR on it. Enabling **Use Base64** in **Settings → Admin → Documents** (or [`MISTRAL_OCR_USE_BASE64=true`](/reference/env-configuration#mistral_ocr_use_base64)) instead sends the PDF **inline as a base64 data URL** in a single request, skipping the separate upload step. This helps in proxy or air-gapped setups, or when the upload step fails; the trade-off is a larger single request.
 
+### Optional: Choose the OCR Model
+
+The **Parameters** field in **Settings → Admin → Documents** (or [`MISTRAL_OCR_PARAMS`](/reference/env-configuration#mistral_ocr_params)) takes a JSON object that is merged into every OCR request. For example, `{"model": "mistral-ocr-2512"}` replaces the default `mistral-ocr-latest` model.
+
 ### What Is Sent and What Happens on Failure
 
 Open WebUI sends only `.pdf` uploads to Mistral OCR. Every other file type, images included, goes through the built-in loaders. A failed OCR call does not fail the upload: the file is indexed with a single chunk that reads `Error during processing: ...`, so check the file's extracted content when a document looks processed but returns nothing useful.

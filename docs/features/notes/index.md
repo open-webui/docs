@@ -71,7 +71,7 @@ Notes uses a context-aware **floating toolbar** for formatting:
 * **Double-click text** to apply bold, italic, underline, strikethrough, or inline code
 * **Drag-and-drop** list items to reorder
 
-The top bar shows real-time **word and character counts**, and a **microphone icon** enables voice dictation.
+The top bar shows real-time **word and character counts**. The **microphone icon** offers **Record**, **Capture Audio** and **Upload Audio**. The recording is saved to the note as soon as it is uploaded, and its transcription finishes on the server.
 
 :::info Rich Text in Chats
 This editor can also be enabled for standard chats: **Settings > Interface > Rich Text Input for Chat** and **Show Formatting Toolbar**.

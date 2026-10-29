@@ -118,6 +118,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | `grep_knowledge_files` | ✅ (scoped) | ✅ | Exact text / regex search across knowledge files (returns matching lines with line numbers; auto-detects regex like `error|warn`) |
 | `view_file` | ✅ | ❌ | Read file content with pagination (`offset`/`max_chars`) or by line range (`start_line`/`end_line`, optional `line_numbers`) |
 | `view_knowledge_file` | ✅ | ✅ | Read file content from any accessible KB |
+| `display_file` | ✅ | ✅ | Show a file to the user inline in the chat, optionally at a page or slide |
 | `view_note` | ✅ | ❌ | Read attached notes |
 
 "Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, which it uses to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
@@ -357,6 +358,7 @@ Knowledge bases can be managed programmatically:
 - `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Empty `content` is rejected with `400`.
 - `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base. A file whose extracted text is already in the knowledge base is rejected with `Duplicate content detected. Please provide unique content to proceed.`
 - `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added.
+- `GET /api/v1/knowledge/{id}/files`: List the files of a knowledge base, paginated with `page`. The calls that add or update files return only those files in `files`, and removing a file, renaming the knowledge base or changing its access return an empty `files` list, so read the full list from here.
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)
 
 **Directories**

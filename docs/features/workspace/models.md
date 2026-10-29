@@ -154,7 +154,7 @@ The editor shows only the options that can work on this instance, for example **
 
 | Setting | What it controls |
 | :--- | :--- |
-| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text. |
+| **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text. With Vision off, images returned by tools reach the model as a short `[image]` note. |
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |

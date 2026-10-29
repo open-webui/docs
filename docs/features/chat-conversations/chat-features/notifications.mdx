@@ -39,7 +39,7 @@ Use **Send Test** to fire a test notification and confirm the endpoint works.
 
 ### Events
 
-Five events can be subscribed to:
+Six events can be subscribed to:
 
 | Event | Fires when |
 |---|---|
@@ -48,6 +48,7 @@ Five events can be subscribed to:
 | `channel.message` | A person or a bot account posts a message in a channel you belong to, group channels and direct messages included. You belong to a standard channel once you have opened or posted in it. |
 | `calendar.alert` | A calendar event alert triggers. |
 | `retrieval.content.process_failed` | A file fails content extraction. |
+| `automation.run_failed` | One of your [automations](/features/chat-conversations/chat-features/automations) fails, on a schedule or when run by hand. The notification carries the automation name and the error. |
 
 ### Delivery: away or always
 
@@ -70,7 +71,7 @@ Pairing this with [Timers](/features/chat-conversations/chat-features/timers) is
 
 ## Upgrading From the Old Notification Webhook
 
-Earlier versions had a single **Notification Webhook** URL under **Settings > Account** that fired on chat responses. That field is replaced by targets, and an existing URL is **migrated automatically** into a target subscribed to all five events, so notifications keep arriving without any action.
+Earlier versions had a single **Notification Webhook** URL under **Settings > Account** that fired on chat responses. That field is replaced by targets, and an existing URL is **migrated automatically** into a target subscribed to all events, so notifications keep arriving without any action.
 
 Two changes are worth knowing about:
 

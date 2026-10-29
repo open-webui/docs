@@ -335,6 +335,12 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu |
 | `chat.attach_knowledge` | Attach Knowledge | **Attach Knowledge** in the **+** menu |
 | `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu |
+| `chat.selected_tools` | Selected Tools | The selected tools indicator in the chat input |
+| `chat.selected_skills` | Selected Skills | The selected skills indicator in the chat input |
+| `chat.selected_filters` | Selected Filters | The indicators for toggled-on filters in the chat input |
+| `chat.selected_web_search` | Selected Web Search | The **Web Search** indicator in the chat input while web search is on |
+| `chat.selected_image_generation` | Selected Image Generation | The **Image** indicator in the chat input while image generation is on |
+| `chat.selected_code_interpreter` | Selected Code Interpreter | The **Code Interpreter** indicator in the chat input while it is on |
 | `chat.status` | /status | The `/status` command |
 | `chat.model_command` | /model | The `/model` command |
 | `chat.settings_command` | /settings | The `/settings` command |
@@ -4004,6 +4010,13 @@ In a custom Docker image, change the version in the line that installs it and re
 - Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Documents**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `MISTRAL_OCR_PARAMS`
+
+- Type: `str` (JSON object)
+- Default: Empty (the request is sent unchanged)
+- Description: JSON object merged into every Mistral OCR request, e.g. `{"model": "mistral-ocr-2512"}` to pick the OCR model. Also configurable as **Parameters** in **Settings → Admin → Documents** when Mistral OCR is the extraction engine.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
 
 - Type: `str`
@@ -4360,7 +4373,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `float`
 - Default: `0.0`
-- Description: Sets the relevance threshold to consider for documents when used with reranking.
+- Description: Sets the relevance threshold to consider for documents when used with reranking. Only chunks scoring at or above this value are kept. `0` means no threshold. Negative values are valid for rerankers that return raw scores outside the 0 to 1 range.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_HYBRID_SEARCH`
@@ -4658,6 +4671,12 @@ Check if your API and embedding model supports batched processing.
 Only increase this variable's value if it does. Otherwise you might run into unexpected issues.
 
 :::
+
+#### `RAG_EMBEDDING_BUFFER_SIZE`
+
+- Type: `int`
+- Default: `1000`
+- Description: Number of chunks embedded and saved to the vector database per step while a document is processed. Rounded up to a whole multiple of [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size). Must be a positive integer.
 
 #### `ENABLE_ASYNC_EMBEDDING`
 

@@ -342,12 +342,14 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `grep_knowledge_files` | Exact text / regex search across knowledge file content. Returns matching lines with line numbers. Complements `query_knowledge_files` (semantic) when you need literal matches. |
 | `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered); `line_numbers` numbers character pages. |
 | `view_knowledge_file` | Read a knowledge-base file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered); `line_numbers` numbers character pages. |
+| `display_file` | Show a knowledge-base file to the user inline in the chat, optionally opened at a page or slide. |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
 | **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **File Context** off for this is also the setup that keeps the prompt prefix cacheable, so turn **Citations** off alongside it and put your citation rules in the system prompt instead; see [prompt caching](/features/chat-conversations/prompt-caching).* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
 | `query_chat_files` | Semantic / RAG search across the attached files, or one file when given its ID. Results are returned as cited chunks. |
 | `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. Capped at 50 matches by default, the same [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches) limit the knowledge greps use. |
 | `view_file` | Read one of the attached files by ID, with character pagination or a line range. Same tool, and the same [`VIEW_FILE_DEFAULT_MAX_CHARS`](/reference/env-configuration#view_file_default_max_chars) / [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars) sizing, as when it reads a knowledge file. |
+| `display_file` | Show one of the attached files to the user inline in the chat. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
@@ -441,6 +443,7 @@ Use this quick matrix instead of memorizing per-row caveats.
 | `grep_knowledge_files` | ✅ (auto-scoped) | ✅ |
 | `view_file` | ✅ (when attached items include files/collections) | ❌ |
 | `view_knowledge_file` | ✅ (when attached items include files/collections) | ✅ |
+| `display_file` | ✅ (when attached items include files/collections) | ✅ |
 | `view_note` | ✅ (when attached items include notes) | ❌ |
 
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
@@ -454,7 +457,7 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 When the **Knowledge Base** category is enabled and any of these are present, the model's system prompt gains an `<attached_knowledge>` block listing each item's type, ID, name, and which of the three it came from. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
 
 :::info `kb_exec` replaces the matrix when enabled
-When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI injects `kb_exec` instead of the file-oriented tools listed above. Still injected alongside it: `query_knowledge_files` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
+When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI replaces the file-oriented tools listed above with `kb_exec`. Still injected alongside it: `query_knowledge_files` and `display_file` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
 :::
 
 #### Tool Reference
@@ -474,6 +477,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional, single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches by default, see [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable), `line_numbers` (default: false), `start_line` / `end_line` (optional; line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}`, includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
 | `view_knowledge_file` | Same parameters as `view_file` | `{id, filename, content, updated_at, created_at, knowledge_id, knowledge_name}`, with the same pagination and line-mode fields as `view_file` |
+| `display_file` | `path` (required; a `file_id` or `/api/v1/files/<file_id>/content`), `page` (optional; 1-based page or slide for PDF, DOCX and PPTX previews) | `{type, source, exists, displayed, path, name, content_type}`; the file is shown inline in the chat |
 | `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed. With a terminal selected, each image also carries `terminal_path` |
@@ -643,7 +647,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file` (or `kb_exec` + `query_knowledge_files` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `display_file` (or `kb_exec` + `query_knowledge_files` + `display_file` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |

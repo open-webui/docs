@@ -139,8 +139,8 @@ Enable **Builtin Tools** on the model and leave the categories you need switched
 
 | Resource | Tools | Category |
 |---|---|---|
-| Files attached to the chat | `list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file` | **Files** |
-| Knowledge bases and collections, including the knowledge of the folder the chat is in | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
+| Files attached to the chat | `list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file` | **Files** |
+| Knowledge bases and collections, including the knowledge of the folder the chat is in | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, `display_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
 | Notes | `search_notes`, `view_note` | **Notes** |
 | Referenced chats | `search_chats`, `view_chat` | **Chat History** |
 
