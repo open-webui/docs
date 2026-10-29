@@ -25,7 +25,7 @@ An API key acts as you. It inherits your role and group permissions, and those p
 
 ### Revocable and auditable
 
-A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission. Key creation and deletion are recorded as authentication events. With [audit logging](/getting-started/advanced-topics/hardening#audit-logging) on, requests made with a key appear in the audit log under the key's owner, whether the key arrives as a Bearer token or in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)).
+A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission or [deleting it for them](#managing-a-users-key-admin). Key creation and deletion are recorded as authentication events. With [audit logging](/getting-started/advanced-topics/hardening#audit-logging) on, requests made with a key appear in the audit log under the key's owner, whether the key arrives as a Bearer token or in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)).
 
 ---
 
@@ -101,6 +101,16 @@ Admins see their current **JWT Token** in the same block. That is the browser se
 :::warning
 Treat your API key like a password. Store it in a secrets manager, never commit it to version control, and never share it in public channels. If it is compromised, create a new key immediately, which overwrites the compromised one.
 :::
+
+### Managing a User's Key (Admin)
+
+Admins can replace or remove any user's key. Open the user in **Admin Panel > Users** and use **Rotate** or **Delete** next to **API Key** in the edit dialog.
+
+- **Rotate** issues a new key and shows it once, so copy it before closing the dialog. It needs the global **API Keys** toggle on and a user who is allowed to have a key.
+- **Delete** removes the key and works even while API keys are turned off.
+- Only the [primary administrator](/features/authentication-access/rbac/roles#the-primary-administrator) can change the primary administrator's key.
+
+Scripts can do the same with an administrator's API key: `POST /api/v1/users/{user_id}/api_key/rotate` returns the new key, and `DELETE /api/v1/users/{user_id}/api_key` removes it.
 
 ---
 

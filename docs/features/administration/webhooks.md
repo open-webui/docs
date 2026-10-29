@@ -33,6 +33,8 @@ You can configure the admin webhook in two ways:
 4.  Enter the webhook URL provided by your external service (e.g., Discord, Slack).
 5.  Click **"Save"**.
 
+**Send events for** sets the audience. **All users and system events** sends everything that matches the event filter. **System events only** sends only events tied to no user, such as startup and shutdown. **Specific users or groups** sends events in which one of the chosen users or group members is involved, for example a failed run of an automation they own.
+
 #### Option 2: Through Environment Variables
 
 A `WEBHOOK_URL` environment variable is migrated once at startup into a **Default webhook** subscribed to every event. Narrow it to `auth.signup` or `user.created` if you only want sign-ups. For more details, refer to the [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration/#webhook_url) documentation.
@@ -64,7 +66,7 @@ This webhook lets individual users be notified when something they care about ha
 
 Each user configures one or more **notification targets** in **Settings > Notifications**, and chooses per target which events it receives and whether it fires only while they are away or always. The model can also send a notification itself through the `notify` tool.
 
-See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the five subscribable events, delivery modes, URL masking and the `notify` tool.
+See **[Notifications](/features/chat-conversations/chat-features/notifications)** for the full feature: targets, the subscribable events, delivery modes, URL masking and the `notify` tool.
 
 ### Use Case
 

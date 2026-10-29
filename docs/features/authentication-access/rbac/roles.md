@@ -91,7 +91,7 @@ Open the user in **Admin Panel > Users** and click **Sign out all devices** at t
 
 ![The Sign out all devices? confirmation, which says the user will need to sign in again on every device and that API keys remain active](/images/features/auth/sign-out-all-devices.webp)
 
-- **API keys stay active.** Delete or regenerate the user's key to cut off scripts and integrations.
+- **API keys stay active.** [Delete or rotate the user's key](/features/authentication-access/api-keys#managing-a-users-key-admin) to cut off scripts and integrations.
 - **Works without Redis.** The sign-out is stored in the database, so it applies on every worker and replica.
 - **The primary administrator** can only be signed out this way by themselves.
 
