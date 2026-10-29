@@ -48,11 +48,17 @@ Use `:main` for built-in embeddings, document extraction and speech recognition.
 
 Then open [http://localhost:3000](http://localhost:3000).
 
-<img
-  alt="Open WebUI running a live analysis: Claude Opus 5 reads a spreadsheet through Open Terminal and renders an interactive revenue dashboard inline in the chat"
-  src={useBaseUrl('/images/landing/hero.png')}
-  style={{ width: '100%', borderRadius: 12, margin: '0.75rem 0 0.5rem' }}
-/>
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  poster={useBaseUrl('/images/landing/hero.png')}
+  aria-label="Open WebUI running a live analysis: a local model reads a spreadsheet through Open Terminal, totals it with Python and draws an interactive revenue dashboard inline in the chat"
+  style={{ display: 'block', width: '100%', borderRadius: 12, margin: '0.75rem 0 0.5rem' }}
+>
+  <source src={useBaseUrl('/images/landing/hero.mp4')} type="video/mp4" />
+</video>
 
 <p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
   Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
