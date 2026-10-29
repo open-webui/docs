@@ -33,8 +33,7 @@ export default function FooterWrapper(props) {
 					data-no-analytics
 				>
 					<p>
-						Allow optional analytics to help us improve our documentation and
-						marketing pages? Your choice applies to both sites.{" "}
+						Allow optional analytics to help us improve our websites?{" "}
 						<a href="https://openwebui.com/privacy">Privacy policy</a>
 					</p>
 					<div>

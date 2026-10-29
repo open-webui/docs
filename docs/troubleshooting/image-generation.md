@@ -17,6 +17,7 @@ title: "Image Generation"
 
 - **Images settings refuse to save** (saving **Settings** > **Admin** > **Images** shows an error such as `OpenAI API Key is required.`):
     - Keys and URLs are only required while their feature is on. Fill in the field, or switch the feature off, and save again.
+    - Invalid JSON in **Additional Parameters** is refused with `Invalid JSON format for Parameters`. Fix or clear it and save again.
 
 - **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
     - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Their saved values are kept while hidden.

@@ -2300,7 +2300,7 @@ For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODE
 
 - Type: `str`
 - Default: `4w`
-- Description: Sets the JWT expiration time in seconds. Valid time units: `s`, `m`, `h`, `d`, `w` or `-1` for no expiration.
+- Description: Sets how long a sign-in token stays valid, as a number followed by a unit: `ms`, `s`, `m`, `h`, `d` or `w`, for example `4w` or `12h`. Use `-1` for no expiration. A number without a unit, such as `30`, is not valid, and **Admin Panel > Settings > Authentication** does not save it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning
@@ -2756,7 +2756,7 @@ Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key). A key o
 
 - Type: `bool`
 - Default: `True`
-- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks.
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks. If the check cannot reach GitHub within one second, **Admin Panel > Settings > General** and **Settings > About** show **Could not check for updates** and the server logs `Version update check failed` as a warning.
 
 :::info
 
@@ -5987,7 +5987,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `str`
 - Default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`
-- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). Configurable via **Settings → Admin → Audio → STT**.
+- Description: Comma-separated list of audio file extensions accepted by the Speech-to-Text upload endpoint. Uploads with extensions outside this list are rejected with `400 Invalid audio file extension`. Comparison is case-insensitive. Set to an empty value to skip the extension check (MIME-type validation via `AUDIO_STT_SUPPORTED_CONTENT_TYPES` still applies). The admin **Audio** settings do not show this list, and saving them leaves it unchanged.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Text-to-Speech
@@ -6200,7 +6200,7 @@ These variables configure **Realtime** call mode for [Voice Mode](/features/chat
 
 :::info
 
-When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `mistral-tts-latest` when `AUDIO_TTS_MODEL` is empty.
+When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `voxtral-mini-tts-2603` when `AUDIO_TTS_MODEL` is empty.
 
 :::
 
@@ -7554,7 +7554,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to delete chats. When `False`, the delete controls are hidden from non-admins rather than offered and refused, in the sidebar, the chat menu, search, archived chats and data controls, and the **Delete chat** shortcut stops doing anything. Archiving is unaffected. Deleting a folder that still holds chats needs the same permission and is refused rather than hidden. Configurable per-group as **Allow Chat Delete**.
+- Description: Enables or disables user permission to delete chats. When `False`, the delete controls are hidden from non-admins rather than offered and refused, in the sidebar, the chat menu, search, archived chats and data controls, and the **Delete chat** shortcut stops doing anything. Archiving is unaffected. Deleting a folder with **Delete all contents inside this folder** ticked needs the same permission and is refused rather than hidden. With the box unticked, the folder is deleted and its chats are kept. Configurable per-group as **Allow Chat Delete**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_EDIT`

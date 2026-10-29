@@ -123,6 +123,8 @@ Click the small **+** button next to the **Calendars** heading in the calendar s
 
 Click any event on the calendar to open the event editor. From there you can update details or delete the event. Automation-generated virtual events cannot be edited directly; clicking them navigates to the automation or the run's chat.
 
+Clicking one occurrence of a repeating event opens the whole series, dated from its first occurrence. **Save** changes every occurrence, and **Delete** removes the series.
+
 ---
 
 ## Calendar Views

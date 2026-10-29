@@ -105,7 +105,7 @@ Opens the full chat interface in a pane beside the note. It is the same componen
 
 **Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
 
-**Insert a response into the note.** Every assistant response carries an **Insert** button that drops that response into the note at the cursor. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
+**Insert a response into the note.** With write access on the note, every assistant response carries an **Insert into note** button that drops that response into the note at the cursor. A read-only collaborator does not get the button. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
 
 **Several conversations per note.** The panel header is a dropdown listing every chat attached to this note. Use it to switch between them, start a new one or delete one. A new conversation is only stored once you send its first message, so opening one and walking away leaves nothing behind. Deleting the last remaining chat immediately recreates an empty one.
 
@@ -194,8 +194,8 @@ Access management options via the **More (...)** menu in the top right corner.
 
 ### Export
 
-* **Plain text (.txt)** or **Markdown (.md)** for raw content
-* **PDF (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
+* **Plain text (.txt)** or **Plain text (.md)** for raw content
+* **PDF document (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
 
 **Download** in the **More (...)** menu exports the whole note, with each page under its own heading. **Download page** in a page's **⋯** menu exports that page alone.
 
@@ -222,7 +222,7 @@ These can also be configured in **Admin Panel > Users > Groups**, as **Notes Sha
 
 Files live inside the page where you add them. Drop or paste a file into the editor, or pick **Upload files** in the **More (...)** menu, and it lands at the cursor. Images show inline. Other files become a file block that you can drag, click to open or remove with its **✕**. Adding and removing files needs write access on the note. Anyone with read access to a shared note can open the files attached to it, and the note's chat uses them too. This applies to files the note's owner uploaded, and those files stay read-only for them.
 
-The files on the open page are added as retrieval context on every message you send in a chat opened from this note.
+The non-image files on the open page are added as retrieval context on every message you send in a chat opened from this note.
 
 ### Formatting
 

@@ -1,0 +1,49 @@
+name: Docs feedback
+description: Report missing, unclear, outdated, or incorrect documentation.
+title: "[Docs feedback]: "
+labels: [documentation]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve the docs by describing where you got stuck.
+        This report will be public. Please do not include passwords, API keys, or private logs.
+        For general help with Open WebUI, use [community discussions](https://github.com/open-webui/open-webui/discussions).
+  - type: input
+    id: page-title
+    attributes:
+      label: Page title
+      placeholder: Which documentation page needs improvement?
+    validations:
+      required: true
+  - type: input
+    id: page-url
+    attributes:
+      label: Page URL
+      placeholder: https://docs.openwebui.com/...
+    validations:
+      required: true
+  - type: dropdown
+    id: problem-type
+    attributes:
+      label: What needs improvement?
+      options:
+        - Missing information
+        - Unclear explanation
+        - Outdated or incorrect instructions
+        - Broken example or link
+        - Other documentation problem
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What went wrong?
+      description: What were you trying to do, and where did you get stuck? If you know a correction, include it here.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Open WebUI version (optional)
+      description: Include your version if the instructions do not match what you see.

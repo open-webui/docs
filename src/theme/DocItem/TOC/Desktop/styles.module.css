@@ -1,0 +1,27 @@
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	position: sticky;
+	top: calc(var(--ifm-navbar-height) + 1rem);
+	max-height: calc(100vh - var(--ifm-navbar-height) - 2rem);
+	overflow-y: auto;
+	padding-bottom: 1px;
+}
+
+/* Scroll long tables of contents while keeping the feedback card visible. */
+.sidebar > div {
+	position: static;
+	min-height: 0;
+	max-height: none;
+	overflow-y: auto;
+}
+
+.sidebar > aside {
+	flex-shrink: 0;
+}
+
+@media (width <= 996px) {
+	.sidebar {
+		display: none;
+	}
+}

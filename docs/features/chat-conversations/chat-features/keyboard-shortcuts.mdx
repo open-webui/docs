@@ -15,6 +15,8 @@ An **Enable Keyboard Shortcuts** toggle at the top of **Settings > Keyboard** sw
 
 Turn it off when Open WebUI's shortcuts collide with ones your browser or operating system already uses, `Cmd+Shift+C` for the browser inspector being a common example. While it is off, the configurable shortcuts below do not fire and the key combinations pass through to the browser or OS untouched, dictation included, and the small hotkey hints stop appearing in the interface.
 
+To stop a single shortcut, unassign it. Its key combination then reaches the browser like any other. That is the usual fix for **Regenerate response**, bound by default to the keys browsers use to reload the page.
+
 Nothing locks you out: the **Settings > Keyboard** tab keeps working while shortcuts are disabled, so you can rebind them or switch them back on at any time. The chat input triggers (`/`, `@`, `#`), `Tab` to accept an autocomplete suggestion, and `Esc` to stop a response or close a dialog are unaffected, since they are not global shortcuts.
 
 `Cmd` below means the `Ctrl` key on Windows and Linux. On macOS it means the `Command` key specifically: `Ctrl` is treated as its own modifier there and does not stand in for `Cmd`, so `Ctrl+K` will not open search on a Mac, only `Cmd+K` will.
@@ -50,6 +52,8 @@ These twenty-one can be rebound:
 **Generate message pair** adds the text in the chat input as your message, with a placeholder reply for each selected model that you can then edit by hand.
 
 **Clear Input Selections** resets the chat input's choices: it removes the model override, deselects tools and filters and turns off web search, image generation and code interpreter. It only fires while the chat input has focus.
+
+**Close modal** closes only the dialog on top, so a confirmation opened over **Settings** closes and leaves **Settings** open. `Escape` always closes dialogs, so keys you assign here work alongside `Escape`, not in place of it.
 
 Anything not listed here is fixed and cannot be reassigned.
 
@@ -98,6 +102,6 @@ The `/` menu includes a **Model** entry that opens the model picker with its sea
 
 Distinct from the shortcuts above, stepping through the interface with `Tab` and `Shift+Tab` works everywhere and is unaffected by the **Enable Keyboard Shortcuts** toggle. Whatever you have reached is marked with a clear outline, so you can always see where you are. Buttons that normally appear under the pointer, such as the actions under a message, appear when you reach them with `Tab` as well.
 
-The first `Tab` on a page reaches a **Skip to main content** link. Tooltips also show on keyboard focus, and `Escape` closes them. Arrow keys move through the **+** and **Integrations** menus.
+The first `Tab` on a page reaches a **Skip to main content** link. Tooltips also show on keyboard focus, and `Escape` closes them. Opening a menu from the keyboard moves focus to its first item, and arrow keys move through it.
 
 Screen readers get names for icon buttons and hear reply status, notifications and the call status as they change.

@@ -117,6 +117,10 @@ Point at someone's profile picture next to their messages or in the channel's me
 
 Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation.
 
+You can delete your own messages, and an admin can delete anyone's. Deleting a message that started a thread also deletes every reply in that thread, including replies other people wrote.
+
+If you can only read a channel, messages show no hover actions and the reactions under them cannot be clicked. The message box reads **You do not have permission to send messages in this channel.**
+
 ### Muting a channel
 
 The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar and shows no unread count. Only a message that @mentions you still sends a pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications); the unread count stays hidden for it too. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else.

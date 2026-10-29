@@ -91,7 +91,7 @@ A sharing change that asks for an audience the user may not add is refused with 
 | **Allow Sharing With Users** | Ability to share with **specific users** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_USERS`](/reference/env-configuration#user_permissions_access_grants_allow_users)). |
 | **Allow Sharing With Groups** | Ability to share with **groups** ([`USER_PERMISSIONS_ACCESS_GRANTS_ALLOW_GROUPS`](/reference/env-configuration#user_permissions_access_grants_allow_groups)). |
 
-Every toggle in the panel's **Sharing Permissions** section is off unless you turn it on, and a public toggle is only drawn once the parent permission named in its row is on. The two **Allow Sharing With ...** rows sit in a separate **Access Grants** section and are on by default.
+Every toggle in the panel's **Sharing Permissions** section is off unless you turn it on, and a public toggle is only drawn once the parent permission named in its row is on. The two **Allow Sharing With ...** rows sit in a separate **Access Grants** section and are on by default. With **Allow Sharing With Groups** off, the **Add Access** picker lists no groups. With **Allow Sharing With Users** off, it lists no users.
 
 :::warning Re-check Tools and Notes public sharing after an upgrade
 
@@ -112,7 +112,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). When disabled, the **Advanced Params** sections in the chat and in **Settings > General** are hidden. This only hides them: users can still set parameters through the API. That trade-off lets admins hide the panels and still offer [model controls](/features/workspace/models#using-model-controls-in-chat). |
 | **Allow File Upload** | Ability to upload files to the chat. |
 | **Allow Web Upload** | Ability to attach a web page to a chat by URL, using **Attach Webpage** in the message input's attach menu ([`USER_PERMISSIONS_CHAT_WEB_UPLOAD`](/reference/env-configuration#user_permissions_chat_web_upload)). On by default. When disabled, the option is greyed out and the attach is refused. Admins are always exempt. |
-| **Allow Chat Delete** | Ability to delete chats ([`USER_PERMISSIONS_CHAT_DELETE`](/reference/env-configuration#user_permissions_chat_delete)). On by default. When disabled, every chat delete control is hidden, including **Delete All Chats**, and deleting a folder that still holds chats is refused. Archiving still works. |
+| **Allow Chat Delete** | Ability to delete chats ([`USER_PERMISSIONS_CHAT_DELETE`](/reference/env-configuration#user_permissions_chat_delete)). On by default. When disabled, every chat delete control is hidden, including **Delete All Chats**, and deleting a folder together with its chats is refused. Archiving still works. |
 | **Allow Delete Messages** | Ability to delete individual messages. |
 | **Allow Chat Edit** | Ability to edit messages ([`USER_PERMISSIONS_CHAT_EDIT`](/reference/env-configuration#user_permissions_chat_edit)), both your own and responses. |
 | **Allow Continue Response** | Ability to use the "Continue" feature for truncated responses. |

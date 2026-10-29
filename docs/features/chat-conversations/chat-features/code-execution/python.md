@@ -275,7 +275,7 @@ This is a known compatibility issue between Edge's enhanced security mode and We
 
 - **Mention the environment**: Tell the LLM it's running in a "Pyodide environment" or "code interpreter" for better code generation
 - **Be explicit about output**: Ask for "base64 data URL output" for images
-- **Use print statements**: Results must be printed to appear in the output
+- **Use print statements**: Printed output appears under **STDOUT/STDERR**. When the last line of a block is an expression, such as `square(7)`, its value also shows under **RESULT**
 - **Check library support**: Verify the libraries you need are available in Pyodide
 
 ## Further Reading
