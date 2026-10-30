@@ -81,7 +81,7 @@ This editor can also be enabled for standard chats: **Settings > Interface > Ric
 
 ## Pages
 
-A note holds pages, and each page can hold subpages. Click the open page's title at the top of the editor to show the **Pages** panel.
+A note holds pages, and each page can hold subpages. Click the open page's title at the top of the editor to show the **Pages** panel. On screens at least 768 px wide it opens beside the note, and on narrower ones over it.
 
 * **Add page** adds a top-level page, and the **+** next to a page adds a subpage
 * Drag a page to reorder it or to nest it inside another page
@@ -101,7 +101,7 @@ Rewriting happens in the chat, there is no separate **Enhance** button. Select t
 
 ### Chat Sidebar
 
-Opens the full chat interface in a pane beside the note. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+Opens the full chat interface in a pane beside the note, or over it on screens narrower than 768 px. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
 
 **Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
 
@@ -209,7 +209,7 @@ The same panel opens from the **⋯** menu of a note in the Notes list.
 
 Saving a note never changes who it is shared with.
 
-People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor.
+People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
 
 Administrators can control sharing via environment variables or the Admin Panel:
 

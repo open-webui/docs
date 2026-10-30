@@ -250,6 +250,14 @@ Once you have more than a handful, the list can be reordered by clicking the **T
 
 To change who can see or edit a knowledge base, open the three-dot menu on its row and choose **Access**. This opens the access settings directly, without opening the knowledge base, and every change saves as soon as you make it. Admins see the menu on every knowledge base; other users see it on the ones they can edit, and only with the [**Knowledge Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission. The **Access** button inside a knowledge base follows the same rule. Saving a knowledge base's name or description with write access keeps its sharing as it is, including a **Public** setting you do not have permission to set yourself. [Resource Access](/features/authentication-access/rbac/groups#resource-access-rbac) explains visibility and access grants.
 
+### File limits
+
+Admins set global limits in **Admin Settings > Documents**: **Knowledge Batch Upload Limit** (files per upload), **Knowledge File Size Limit** (MB per file) and **Knowledge File Count Limit** (total files per knowledge base). Empty means no limit. The same values can be set with [`KNOWLEDGE_MAX_UPLOAD_COUNT`](/reference/env-configuration#knowledge_max_upload_count), [`KNOWLEDGE_MAX_FILE_SIZE`](/reference/env-configuration#knowledge_max_file_size) and [`KNOWLEDGE_MAX_FILE_COUNT`](/reference/env-configuration#knowledge_max_file_count).
+
+The owner of a knowledge base or an admin can set a lower **File count limit** and **File size limit (MB)** for one knowledge base, under **Advanced** when creating it or later through the three-dot menu > **Settings** on the knowledge base page. When both a global and a local limit are set, the lower one applies. External knowledge bases have no local limits.
+
+An upload that would exceed a limit is rejected with an error such as `Knowledge base file limit exceeded (N files maximum).` or `You can only upload a maximum of N file(s) per batch.`
+
 ### Browsing and previewing files
 
 Opening a knowledge base shows its files as a tree on the left and a preview pane on the right. Click a file to open it in the preview; on small screens the preview slides in over the list. Drag the divider to make the file list wider or narrower.
@@ -358,6 +366,7 @@ Knowledge bases can be managed programmatically:
 - `POST /api/v1/files/{id}/data/content/update`: Replace the indexed text (body: `content`) and reprocess it in every knowledge base that contains the file. Empty `content` is rejected with `400`.
 - `POST /api/v1/knowledge/{id}/file/add`: Add files to a knowledge base. A file whose extracted text is already in the knowledge base is rejected with `Duplicate content detected. Please provide unique content to proceed.`
 - `POST /api/v1/knowledge/{id}/files/batch/add`: Add several files at once. The same duplicate check applies: a duplicate is reported as a failed file and the other files are still added.
+- `POST /api/v1/knowledge/{id}/files/validate`: Check an upload against the [file limits](#file-limits) before sending it (body: `count`, optional `file_size` in bytes and `removed_file_ids`). Returns `{"status": true}` or the same error the upload would get.
 - `GET /api/v1/knowledge/{id}/files`: List the files of a knowledge base, paginated with `page`. The calls that add or update files return only those files in `files`, and removing a file, renaming the knowledge base or changing its access return an empty `files` list, so read the full list from here.
 - `POST /api/v1/knowledge/{id}/file/move`: Move a file between directories within the same KB (body: `file_id`, `directory_id`, where `null` moves to the KB root)
 

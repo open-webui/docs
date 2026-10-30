@@ -76,6 +76,10 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code on your host system. **Crucially, ensure you only grant "Tool" permissions to trusted users**, as the ability to create or import tools is equivalent to the ability to run arbitrary code on the server.
 :::
 
+### Turning a tool off
+
+The switch on a tool's row in **Workspace > Tools** turns it on or off. It appears on tools you can edit. A disabled tool is left out of chats, including chats that already have it selected, and its Python requirements are not installed.
+
 ### Sharing a tool
 
 The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list, without opening the editor. It appears on tools you can edit, and for anyone but an admin only with the **Tools Sharing** permission. The **Access** button in the tool editor follows the same permission.

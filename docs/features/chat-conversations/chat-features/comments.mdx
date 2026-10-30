@@ -1,0 +1,31 @@
+---
+sidebar_position: 18
+title: "Comments"
+---
+
+# Comments
+
+Comments let people discuss a model, knowledge base, prompt, skill, tool, note or chat right next to it. An admin turns them on with **Comments** in **Admin Settings > General** or with the [`ENABLE_COMMENTS`](/reference/env-configuration#enable_comments) environment variable. They are off by default.
+
+## Who Can Comment
+
+Anyone who can read an item can read its comments and add their own. Comments on a note also need the [notes feature](/features/notes). A temporary chat has no comments. A model that comes straight from a connection and has never been saved with its own settings can only be commented on by admins.
+
+## Where to Find Them
+
+- **Chats**: the **Comments** tab in the chat controls panel, or **Comments** in the chat's menu in the top bar.
+- **Notes**: **Comments** in the note's **More (...)** menu opens them beside the note.
+- **Models**: **Comments** in a model's menu in the model picker.
+- **Workspace**: **Comments** in an item's menu, a side panel on the item's page and in the model editor, and a comment count in each list.
+
+## Writing Comments
+
+Reply to a comment, react to it with an emoji or `@mention` someone. The mention list only offers people who can see the item.
+
+To comment on a specific passage, select it in a chat message or a note page and click **Comment**. The passage stays highlighted, and hovering it previews its comments. If the text changed meanwhile, select the passage again.
+
+You can edit your own comments. A comment can be deleted by its author, the item's owner or an admin.
+
+Deleting an item deletes its comments. When a user account is deleted, its comments keep their text and lose their author.
+
+The API is under `/api/v1/comments`.

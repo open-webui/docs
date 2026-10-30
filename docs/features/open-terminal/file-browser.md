@@ -8,7 +8,7 @@ title: "File Browser"
 When Open Terminal is connected, a **file browser** appears in the sidebar of your chat. It works like the file explorer on your computer. You can browse folders, open files, upload things, and download results. Everything the AI creates shows up here automatically.
 
 :::tip Auto-open behavior
-By default the file browser opens automatically when you select a terminal. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
+By default the file browser opens automatically when you select a terminal on a screen at least 768 px wide. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
 :::
 
 ![Chat interface with the file browser sidebar](/images/open-terminal-file-browser.png)
@@ -71,7 +71,7 @@ Where the terminal cannot lay the document out, the browser draws it instead and
 
 A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
 
-Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. Open the file in its own application when the exact rendering matters.
+Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. That approximation draws single bar, line, pie and doughnut charts, negative values included. Stacked and combined charts and other chart types show **Chart preview unavailable**. Open the file in its own application when the exact rendering matters.
 
 ### Markdown
 Markdown files show a **rendered preview** and a toggle to switch to raw source. The preview uses the same renderer as chat replies, so math, footnotes, highlighted code blocks, alerts and Mermaid diagrams all display. Images with a relative path load from the terminal, and a link to another file on the terminal opens that file in the browser.

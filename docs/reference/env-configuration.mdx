@@ -604,6 +604,13 @@ The foreground limit is applied to a semaphore created on the first delegation a
 - Description: Enables or disables the [notes feature](/features/notes), allowing users to create and manage personal notes within Open WebUI. Set to `False`, it hides Notes in the interface and the notes API (`/api/v1/notes`) answers every request with a `403` error, for administrators too, so existing notes are also out of reach for scripts and integrations.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `ENABLE_COMMENTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Turns on [comments](/features/chat-conversations/chat-features/comments). Also set in **Admin Settings > General > Comments**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `ENABLE_MEMORIES`
 
 - Type: `bool`
@@ -713,7 +720,7 @@ Whether a deployment has to mark or disclose AI-generated content, and in what f
 
 - Type: `str`
 - Default: Empty string (no CSP injected)
-- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, and citation modals. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset to keep the existing behavior (sandbox-only).
+- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, citation modals and MCP Apps. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset for sandbox-only.
 
 #### `THREAD_POOL_SIZE`
 
@@ -925,11 +932,11 @@ It is recommended to set this to a high single-digit to low double-digit number 
 #### `CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`
 
 - Type: `int`
-- Default: `256`
-- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `256`. The older name `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` is still honored as a fallback if this is unset.
+- Default: `1024`
+- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `1024`. `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` is read when this is unset.
 
 :::info Hitting the limit is visible
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is reported the same way, as an error on the message rather than only a debug log line, so a run that ends early tells you why instead of just stopping. The same applies to the code interpreter's continuation loop. `256` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is reported the same way. The same applies to the code interpreter's continuation loop. `1024` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -4606,7 +4613,28 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 #### `RAG_FILE_MAX_COUNT`
 
 - Type: `int`
-- Description: Sets the maximum number of files that can be uploaded at once for document ingestion.
+- Description: Sets the maximum number of files that can be uploaded at once in a chat. Knowledge base uploads use [`KNOWLEDGE_MAX_UPLOAD_COUNT`](#knowledge_max_upload_count).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `KNOWLEDGE_MAX_UPLOAD_COUNT`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Sets the maximum number of files per upload batch into a knowledge base. Covers file and folder uploads, directory sync and the batch add endpoint. Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Admin Settings > Documents > Knowledge Batch Upload Limit**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `KNOWLEDGE_MAX_FILE_COUNT`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Sets the maximum total number of files in each knowledge base. A knowledge base can set a lower limit of its own; see [File limits](/features/workspace/knowledge#file-limits). Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Admin Settings > Documents > Knowledge File Count Limit**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `KNOWLEDGE_MAX_FILE_SIZE`
+
+- Type: `int`
+- Default: unset (no limit)
+- Description: Sets the maximum size in megabytes of a file added to a knowledge base. [`RAG_FILE_MAX_SIZE`](#rag_file_max_size) applies as well, and a knowledge base can set a lower limit of its own; see [File limits](/features/workspace/knowledge#file-limits). Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Admin Settings > Documents > Knowledge File Size Limit**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_CONTENT_SEARCH_MAX_CHARS`

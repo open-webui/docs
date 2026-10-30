@@ -660,7 +660,7 @@ After uploading, you can group files into a knowledge collection or reference th
       return response.json()
   ```
 
-A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added.
+A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added. Both calls are subject to the knowledge base [file limits](/features/workspace/knowledge#file-limits).
 
 
 #### Processing Web URLs into Knowledge Collections

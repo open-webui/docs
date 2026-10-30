@@ -243,6 +243,14 @@ An MCP server can ask you for input in the middle of a tool call (MCP elicitatio
 
 **Decline** refuses the request and **Cancel** dismisses it, and the server decides how the tool call goes on. The dialog waits up to 120 seconds, or [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is lower, and then cancels the request. The dialog appears only while that chat is the one open in a browser tab; otherwise the request is cancelled at once.
 
+### MCP Apps
+
+An MCP tool can come with an interactive app ([MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview)). When the tool's `_meta.ui.resourceUri` points to a `ui://` resource of type `text/html;profile=mcp-app` (up to 5 MB), Open WebUI shows that app inline in the chat after the tool runs.
+
+The app runs in a sandboxed iframe that may run scripts, download files and open popups, with no access to Open WebUI's origin. Its Content-Security-Policy comes from the resource's `csp` metadata (`resourceDomains`, `connectDomains`, `frameDomains`, `baseUriDomains`), and [`IFRAME_CSP`](/reference/env-configuration#iframe_csp) applies on top. The app can read and list the server's resources, open `http` and `https` links in a new tab and call the server's tools. Each tool call from the app asks you to confirm it first.
+
+A tool's `_meta.ui.visibility` decides who can use it: a tool without `model` is hidden from the model, and a tool without `app` cannot be called by apps. MCP Apps need a stable [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key).
+
 ## Troubleshooting
 
 ### "Failed to connect to MCP server"
