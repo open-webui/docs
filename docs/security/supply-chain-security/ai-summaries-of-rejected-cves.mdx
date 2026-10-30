@@ -33,13 +33,13 @@ The output is not a hallucination in the usual sense. The model is faithfully su
 
 ## Two examples
 
-Both of these are live at the time of writing and can be checked directly.
+Both can be checked directly. We last confirmed the BaseFortify example on 2026-10-30 and the Vulners example on 2026-08-08.
 
 ### An executive summary beside the withdrawal notice
 
-On [BaseFortify](./vulnerability-databases/basefortify.mdx) the entry for a withdrawn record carries the CNA's rejection notice in the description, and an AI-generated Executive Summary in the right-hand column of the same screen explains how the vulnerability is exploited, including that it is remotely exploitable without authentication. Neither statement is hidden from the other. A reader sees the correct answer and the wrong one in one glance, and only the wrong one is written as an assessment.
+On [BaseFortify](./vulnerability-databases/basefortify.mdx) the entry for a withdrawn record carries a Rejected badge and the CNA's rejection notice in the description, and an AI-generated Executive Summary on the same page explains how the vulnerability is exploited. For CVE-2024-7959 it states that the flaw "can be exploited to access internal services and potentially execute commands by accessing instance secrets". Neither statement is hidden from the other. A reader sees the correct answer and the wrong one together, and only the wrong one is written as an assessment.
 
-Around it, every structured field still describes a current finding: a status of Received, CVSS across three versions with a plotted vector, an EPSS probability, a CPE range, and an attack-flow graph mapping the record through CWE and CAPEC into MITRE ATT&CK.
+Around it, the structured fields still describe a current finding: a CVSS base score of 7.7 HIGH, an EPSS probability at the 97.6th percentile, a CPE for Open WebUI 0.3.8 and an attack-flow graph mapping the record through CWE into CAPEC.
 
 ### Generated text that recommends an upgrade
 
