@@ -40,6 +40,10 @@ See the companion guide: [Using OpenAI for Speech-to-Text](/features/chat-conver
 | `tts-1` | Standard quality, lower latency | Real-time applications, faster responses |
 | `tts-1-hd` | Higher quality audio | Pre-recorded content, premium audio quality |
 
+:::caution OpenAI is retiring these models
+OpenAI is removing `tts-1`, `tts-1-hd` and `gpt-4o-mini-tts` from its API on 2027-01-06. Its recommended replacement, `gpt-realtime-2.1-mini`, is not supported on the `/audio/speech` endpoint that the `OpenAI` engine calls, so changing the **TTS Model** is not enough. To keep using OpenAI for speech, switch to the [OpenAI Realtime engine](#using-the-openai-realtime-engine). See [OpenAI's deprecations page](https://developers.openai.com/api/docs/deprecations#2026-10-01-text-to-speech-models) for details.
+:::
+
 ## Available Voices
 
 OpenAI provides 6 built-in voices:
@@ -230,6 +234,7 @@ When reading long responses, Open WebUI can split text into chunks before sendin
 1. Check your OpenAI API key is valid and has Audio API access
 2. Verify the API Base URL is correct (`https://api.openai.com/v1`)
 3. Check browser console (F12) for errors
+4. If the API Base URL points to another OpenAI-compatible service, replace the default `tts-1` and `alloy` with a **TTS Model** and **TTS Voice** that service supports
 
 ### Audio Quality Issues
 
