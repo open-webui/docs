@@ -121,7 +121,7 @@ To view a shared chat:
 3. The chat will be displayed in a read-only format. With [Allow replies](#allowing-replies), you are taken to the chat itself and can write into it.
 4. If the Admin of the Open WebUI instance from which the shared link was shared has Text-to-Speech set up, there may be an audio button for messages to be read aloud to you (situational).
 
-A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** panel labels its message nodes the same way.
+A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** window labels its message nodes the same way.
 
 Anyone other than the owner gets the conversation only: the owner's advanced parameters, selected tools, tool servers and filters, chat variables and per-message settings stay with the owner.
 

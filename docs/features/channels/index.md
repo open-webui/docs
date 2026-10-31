@@ -123,7 +123,7 @@ If you can only read a channel, messages show no hover actions and the reactions
 
 ### Muting a channel
 
-The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar and shows no unread count. Only a message that @mentions you still sends a pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications); the unread count stays hidden for it too. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else.
+The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar and shows no unread count. Only a message that @mentions you still sends a pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications); the unread count stays hidden for it too. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else. See also your [inbox](/features/chat-conversations/chat-features/notifications#inbox).
 
 ### Apps
 

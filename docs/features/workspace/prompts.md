@@ -96,6 +96,7 @@ Automatically replaced with their value at runtime:
 | `{{CURRENT_WEEKDAY}}` | Current day of the week |
 | `{{USER_NAME}}` | Your display name |
 | `{{USER_EMAIL}}` | Your email address |
+| `{{USER_ROLE}}` | Your role, such as `admin` or `user` |
 | `{{USER_BIO}}` | Bio from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_GENDER}}` | Gender from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_BIRTH_DATE}}` | Birth date from Settings > Account > User Profile (unreplaced if not set) |

@@ -7,13 +7,19 @@ title: "Notifications"
 
 Notifications send a webhook to somewhere you actually watch, such as Slack, Discord or your own endpoint, when something happens in Open WebUI that you care about. Each user sets up their own **targets** and chooses which events reach them, so a long answer, a channel message or a calendar alert can find you after you have moved on.
 
-Notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
+Webhook notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
 
-This is **outbound webhooks only**. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser.
+The [inbox](#inbox) in the sidebar needs no setup. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser.
 
-:::note "Always Play Notification Sound" no longer has a toggle
-A separate **Always Play Notification Sound** setting used to sit under **Settings > Interface**. Its control is gone, but the setting is still honoured: if you had it switched on, sounds keep playing even while you are active, and there is currently no way to switch it back off from the interface.
+:::note "Always Play Notification Sound" has no toggle
+If **Always Play Notification Sound** was switched on for your account, sounds play even while you are active, and the interface has no control to switch it off.
 :::
+
+## Inbox
+
+The bell button at the top of the sidebar opens your inbox and shows a badge with the number of entries that arrived since you last opened it. It lists comments on your items, replies to your comments and mentions in comments; mentions and replies in channels; failed runs of your automations, which open the run; and your calendar alerts. From a muted channel only mentions arrive. An entry only shows while you can still open the item it points to.
+
+The inbox is on for all users by default. Admins switch it off in **Admin Settings > General > Notifications** or with [`ENABLE_NOTIFICATIONS`](/reference/env-configuration#enable_notifications).
 
 ## Enabling Notifications
 
@@ -40,7 +46,7 @@ Use **Send Test** to fire a test notification and confirm the endpoint works.
 
 ### Events
 
-Six events can be subscribed to:
+Five events can be subscribed to:
 
 | Event | Fires when |
 |---|---|
@@ -48,7 +54,6 @@ Six events can be subscribed to:
 | `chat.failed` | A chat response ends in an error, including when the model provider returns an error status or cannot be reached. The notification carries the error text and a link to the chat. |
 | `channel.message` | A person or a bot account posts a message in a channel you belong to, group channels and direct messages included. You belong to a standard channel once you have opened or posted in it. |
 | `calendar.alert` | A calendar event alert triggers. |
-| `retrieval.content.process_failed` | A file fails content extraction. |
 | `automation.run_failed` | One of your [automations](/features/chat-conversations/chat-features/automations) fails, on a schedule or when run by hand. The notification carries the automation name and the error. |
 
 ### Delivery: away or always

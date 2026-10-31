@@ -70,6 +70,7 @@ Notes uses a context-aware **floating toolbar** for formatting:
 * **Click on empty space** to start new headers, lists, or task lists
 * **Double-click text** to apply bold, italic, underline, strikethrough, or inline code
 * **Drag-and-drop** list items to reorder
+* **Drag the handle** (⋮⋮) beside any top-level block to move it, or click it for **Move up** and **Move down**
 
 The top bar shows real-time **word and character counts**. The **microphone icon** offers **Record**, **Capture Audio** and **Upload Audio**. The recording is saved to the note as soon as it is uploaded, and its transcription finishes on the server.
 

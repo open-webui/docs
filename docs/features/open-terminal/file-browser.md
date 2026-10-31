@@ -23,7 +23,7 @@ Click folders to navigate, and click files to preview them. A breadcrumb bar at 
 
 ### Sorting
 
-Use the toolbar above the file list to sort by **Name** or **Date Modified**, ascending or descending. Folders always group ahead of files, so the sort order only reorders entries within each group. Each row shows its modified time next to the size, making it easier to find the latest output the AI just dropped into a working directory.
+Use the toolbar above the file list to sort by **Name**, **Size**, **Date Modified** or **Date Added**, ascending or descending. Folders always group ahead of files, so the sort order only reorders entries within each group. Sorting by date shows that date on each row next to the size, making it easier to find the latest output the AI just dropped into a working directory. Sorting by **Date Added** needs a terminal that reports when files were created.
 
 ### Grid and list view
 
@@ -87,6 +87,10 @@ Word, Excel, PowerPoint and PDF previews show the comments stored in the file, w
 Images display inline at a comfortable size.
 
 ![File browser displaying an image preview](/images/open-terminal-file-browser-home.png)
+
+### 3D models
+
+`.glb`, `.gltf`, `.stl`, `.obj` and `.ply` files open in a 3D viewer. Drag to rotate and scroll to zoom; **Reset view** puts the model back in frame. Textures and material files load from paths relative to the model.
 
 ### HTML
 
