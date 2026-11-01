@@ -655,6 +655,23 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **API Key** | Leave blank (unless configured) |
 
   </TabItem>
+  <TabItem value="rapid-mlx" label="Rapid-MLX">
+
+  **Rapid-MLX** is a local OpenAI-compatible inference server for Apple Silicon, built on MLX. See [Rapid-MLX on GitHub](https://github.com/raullenchai/Rapid-MLX).
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `http://localhost:8000/v1` |
+  | **API Key** | Leave blank (unless configured) |
+
+  **Quick start:**
+
+  ```bash
+  curl -fsSL https://rapidmlx.com/install.sh | bash
+  rapid-mlx serve qwen3.5-4b-4bit --port 8000
+  ```
+
+  </TabItem>
   <TabItem value="localai" label="LocalAI">
 
   **LocalAI** is a drop-in OpenAI-compatible replacement that runs models locally.
