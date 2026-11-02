@@ -95,10 +95,10 @@ services:
 
 A sleeping host serves nothing.
 
-- **macOS:** **System Settings → Battery → Options → Prevent automatic sleeping when the display is off** (applies on the power adapter). Or ad hoc from a terminal: `caffeinate -s` keeps the Mac awake while it runs.
+- **macOS:** **System Settings → Battery → Options → Prevent automatic sleeping when the display is off** (applies on the power adapter). Or ad hoc from a terminal: `caffeinate -s` keeps the Mac awake while it runs (on the power adapter only).
 - **Linux:** desktop distros suspend by default. Disable automatic suspend in your desktop's power settings, or set `IdleAction=ignore` in `/etc/systemd/logind.conf`.
 - **Windows:** **Settings → System → Power** → set "When plugged in, put my device to sleep" to **Never**.
-- **Laptops with the lid closed:** closing the lid sleeps the machine regardless of the above. Keep it plugged in and set "do nothing" on lid close (macOS needs the prevent-sleep setting above; Linux: `HandleLidSwitch=ignore` in `logind.conf`; Windows: lid-close action in power settings).
+- **Laptops with the lid closed:** closing the lid sleeps the machine regardless of the above. Keep it plugged in and set "do nothing" on lid close (Linux: `HandleLidSwitch=ignore` in `logind.conf`; Windows: lid-close action in power settings). macOS has no lid-close action. The exception to the above is `caffeinate -s` on the power adapter: while it runs, a closed MacBook keeps running with the display off (dark wake). The prevent-sleep setting does not do this, and on battery `caffeinate -s` does nothing. Without it, a closed MacBook stays awake only in closed-display mode (power, an external display and a keyboard or mouse connected), or after `sudo pmset -a disablesleep 1`, which turns off all sleep, on battery too, and stays on after a restart until `sudo pmset -a disablesleep 0`. `pmset -g | grep SleepDisabled` shows `1` while it is on.
 
 ## Verify
 
