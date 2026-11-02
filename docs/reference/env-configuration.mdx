@@ -328,6 +328,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.calendar` | Calendar | **Calendar** under **Builtin Tools** in the model editor |
 | `model_editor.tools.subagents` | Sub-agents | **Sub-agents** under **Builtin Tools** in the model editor |
 | `model_editor.tools.skills` | Skills | **Skills** under **Builtin Tools** in the model editor |
+| `model_editor.tools.tools` | Tool Creation | **Tool Creation** under **Builtin Tools** in the model editor |
 | `chat.capture` | Capture | **Capture** in the chat input's **+** menu |
 | `chat.compare` | Compare text | **Compare text** in the **+** menu and the `/compare` command |
 | `chat.attach_webpage` | Attach Webpage | **Attach Webpage** in the **+** menu |
@@ -528,7 +529,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same model, tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_BACKGROUND_ENABLED`
@@ -541,8 +542,8 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 #### `SUBAGENTS_MAX_CONCURRENT`
 
 - Type: `int`
-- Default: `20`
-- Description: Maximum number of foreground sub-agents running at once. Delegations beyond the limit **wait** for a slot rather than failing. Set `-1` for unlimited. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
+- Default: `("") empty string` (unlimited)
+- Description: Maximum number of foreground sub-agents running at once. Delegations beyond the limit **wait** for a free slot. Empty or `-1` means no limit. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning `SUBAGENTS_MAX_CONCURRENT` needs a restart to change
@@ -554,22 +555,22 @@ The foreground limit is applied to a semaphore created on the first delegation a
 #### `SUBAGENTS_MAX_ASYNC`
 
 - Type: `int`
-- Default: `20`
-- Description: Maximum number of background sub-agents running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Set `-1` for unlimited. Also counted per worker process.
+- Default: `("") empty string` (unlimited)
+- Description: Maximum number of background sub-agents running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty or `-1` means no limit. Also counted per worker process.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_ITERATIONS`
 
 - Type: `int`
-- Default: `30`
-- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, keeping a delegated task from looping expensively. The sub-agent reports that it hit the limit rather than failing silently.
+- Default: `("") empty string` (unlimited)
+- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty means no limit even when that one is set. The sub-agent reports that it hit the limit rather than failing silently.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_OUTPUT`
 
 - Type: `int` (characters)
-- Default: `30000`
-- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. This caps only what is returned to the parent; the sub-agent's own chat keeps the full text.
+- Default: `("") empty string` (unlimited)
+- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. Empty means no limit. This caps only what is returned to the parent; the sub-agent's own chat keeps the full text.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_SYSTEM_PROMPT`
@@ -7547,28 +7548,28 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Acts as a master switch to enable or disable the main "Controls" button and panel in the chat interface. **If this is set to False, users will not see the Controls button, and the granular permissions below will have no effect**. It also hides the **System Prompt** and **Advanced Parameters** sections in the user's **Settings > General**. [Model controls](/features/workspace/models#using-model-controls-in-chat) stay available to anyone with access to the model. Configurable per-group as **Allow Chat Controls**.
+- Description: Acts as a master switch for the **Controls** section of the **Model controls** menu next to the message input, which holds chat files, valves, system prompt and advanced parameters. **If this is set to False, users will not see Controls, and the granular permissions below will have no effect**. It also hides the **System Prompt** and **Advanced Parameters** sections in the user's **Settings > General**. [Model controls](/features/workspace/models#using-model-controls-in-chat) stay available to anyone with access to the model. Configurable per-group as **Allow Chat Controls**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_VALVES`
 
 - Type: `bool`
 - Default: `True`
-- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section within the chat controls panel. When disabled, the **Valves** button that a pipe model with user valves shows in the chat input is also hidden from non-admins.
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Valves" section under **Controls** in the **Model controls** menu. When disabled, the **Valves** button that a pipe model with user valves shows in the chat input is also hidden from non-admins.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_SYSTEM_PROMPT`
 
 - Type: `bool`
 - Default: `True`
-- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section within the chat controls panel, folders and the user settings.
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the customizable "System Prompt" section under **Controls** in the **Model controls** menu, in folders and in the user settings.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_PARAMS`
 
 - Type: `bool`
 - Default: `True`
-- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Params" section within the chat controls panel and the **Advanced Parameters** section in the user's **Settings > General**. It has no effect on [model controls](/features/workspace/models#using-model-controls-in-chat), which anyone with access to the model can pick. Parameters a user saves to their account are kept whatever this setting is. These permissions only hide the panels: a user can still set parameters through the API, in a chat request or a settings save. That is the chosen trade-off, so admins can hide the panels and still offer model controls. Configurable per-group as **Allow Chat Params**.
+- Description: When `USER_PERMISSIONS_CHAT_CONTROLS` is enabled, this setting specifically controls the visibility of the "Advanced Params" section under **Controls** in the **Model controls** menu and the **Advanced Parameters** section in the user's **Settings > General**. It has no effect on [model controls](/features/workspace/models#using-model-controls-in-chat), which anyone with access to the model can pick. Parameters a user saves to their account are kept whatever this setting is. These permissions only hide the panels: a user can still set parameters through the API, in a chat request or a settings save. That is the chosen trade-off, so admins can hide the panels and still offer model controls. Configurable per-group as **Allow Chat Params**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_FILE_UPLOAD`
@@ -7677,6 +7678,13 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to create temporary chats. **Note:** Temporary chats disable backend document parsing for privacy.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_CHAT_SIDE_CHAT`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to open [side chats](/features/chat-conversations/chat-features/#tabs-side-panel). Takes effect only together with [`USER_PERMISSIONS_CHAT_TEMPORARY`](#user_permissions_chat_temporary). Administrators always have it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
@@ -7838,7 +7846,7 @@ For API Key creation (and the API keys themselves):
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables user permission to access workspace tools.
+- Description: Enables or disables user permission to access workspace tools. It also lets the user's models create workspace tools from chat through the **Tool Creation** builtin tool, and saving a tool runs its Python code on the server.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_WORKSPACE_SKILLS_ACCESS`
@@ -9183,7 +9191,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading and their pages, permissions and valves are hidden. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns workspace [**Tools**](/features/extensibility/plugin/tools) (the Python tools users write or import) on or off. Set to `False`, tools stop loading, their pages, permissions and valves are hidden and the **Tool Creation** builtin tool is removed. Tool servers are covered by [`ENABLE_TOOL_SERVERS`](#enable_tool_servers). Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 #### `ENABLE_FUNCTIONS`
 

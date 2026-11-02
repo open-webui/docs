@@ -182,7 +182,7 @@ When using the Pyodide engine, a persistent virtual filesystem is mounted at `/m
 - **Cross-execution persistence**: files written by one code execution are accessible in subsequent executions.
 - **Cross-reload persistence** *(opt-in)*: files survive page reloads only when [`ENABLE_PYODIDE_FILE_PERSISTENCE=true`](/reference/env-configuration#enable_pyodide_file_persistence) (off by default). With it off, Pyodide runs sandboxed at an opaque origin and the IndexedDB-backed filesystem is not retained across reloads.
 - **Automatic upload mounting**: files attached to messages are fetched from the server and placed in `/mnt/uploads/` before code execution, so the model can read them directly.
-- **File browser panel**: when Code Interpreter is enabled, a file browser appears in the chat controls sidebar. You can browse, preview, upload, download, and delete files, no terminal needed.
+- **File browser panel**: when Code Interpreter is enabled, a **Files** tab appears in the chat's [side panel](/features/chat-conversations/chat-features/#tabs-side-panel). You can browse, preview, upload, download and delete files, no terminal needed.
 
 ### Working with Files in Code
 

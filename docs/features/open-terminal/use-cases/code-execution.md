@@ -54,7 +54,7 @@ The AI:
 2. Installs dependencies
 3. Sets up the database
 4. Starts the server
-5. Verifies the result in the web preview
+5. Verifies the result in a Browser tab
 
 ![AI listing files and describing the project structure](/images/open-terminal-ai-file-listing.png)
 

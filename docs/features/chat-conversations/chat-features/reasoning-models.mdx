@@ -47,7 +47,7 @@ If your model uses different tags, you can provide a list of tag pairs in the `r
 
 Open WebUI provides several built-in settings to configure reasoning model behavior. These can be found in:
 
-- **Chat Controls** (sidebar) → **Advanced Parameters**: per-chat settings
+- **Model controls** (next to the message input) → **Controls** → **Advanced Params**: per-chat settings
 - **Workspace** → **Models** → **Edit Model** → **Advanced Parameters**: per-model settings (Admin only)
 - **Settings** → **Admin** → **AI** → **Models** → select a model → **Advanced Parameters**: alternative per-model settings location
 
@@ -213,7 +213,7 @@ ollama --version
 
 #### Step 2: Turn Thinking On for the Model
 
-Open **Chat Controls > Advanced Params** (or the model's **Advanced Params** in the model editor) and set **think (Ollama)** to **On**, or to **Custom** with a level (`low`, `medium`, `high` or `max`) for models such as GPT-OSS that accept only a level. **Default** leaves the choice to Ollama, which turns thinking on for supported models.
+Open **Model controls > Controls > Advanced Params** (or the model's **Advanced Params** in the model editor) and set **think (Ollama)** to **On**, or to **Custom** with a level (`low`, `medium`, `high` or `max`) for models such as GPT-OSS that accept only a level. **Default** leaves the choice to Ollama, which turns thinking on for supported models.
 
 #### Step 3: Verify in Open WebUI
 
@@ -246,7 +246,7 @@ Not all models output reasoning in the same format. Verify your model's document
 
 If non-streaming isn't working, try enabling streaming in your chat:
 
-1. Go to **Chat Controls** (sidebar)
+1. Open **Model controls > Controls > Advanced Params** next to the message input
 2. Ensure streaming is enabled (this is the default)
 3. Test the model again
 
@@ -320,7 +320,7 @@ This limitation applies specifically to combining Anthropic's extended thinking 
 ## Frequently Asked Questions
 
 ### Why is the thinking block showing as raw text?
-If the model uses tags that are not in the default list and have not been configured in `reasoning_tags`, Open WebUI will treat them as regular text. You can fix this by adding the correct tags to the `reasoning_tags` parameter in the Model Settings or Chat Controls.
+If the model uses tags that are not in the default list and have not been configured in `reasoning_tags`, Open WebUI will treat them as regular text. You can fix this by adding the correct tags to the `reasoning_tags` parameter in the Model Settings or under **Model controls > Controls** in the chat.
 
 ### Does the model see its own thinking?
 

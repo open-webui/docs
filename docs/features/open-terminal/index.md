@@ -153,10 +153,10 @@ Open Terminal needs a model that performs tool calling at agentic quality, not j
 - **[Code execution](/features/open-terminal/use-cases/code-execution)**: write, run, and debug scripts
 - **[Software development](/features/open-terminal/use-cases/software-development)**: repos, tests, debugging, refactoring, Git
 - **[Document & data analysis](/features/open-terminal/use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
-- **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites
+- **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites in the Browser tab
 - **[System automation](/features/open-terminal/use-cases/system-automation)**: file management, backups, batch operations
 - **[Advanced workflows](/features/open-terminal/use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
-- **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files
+- **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files, Git
 
 ---
 

@@ -58,7 +58,7 @@ Translated text follows the resource everywhere it is named: model and tool pick
 
 ## Translating valve labels
 
-Tools and functions carry [valves](/features/extensibility/plugin/development/valves), the settings an admin or a user fills in. Their labels can be translated too, which matters most for user valves, since those are the ones ordinary users see in **Chat Controls**.
+Tools and functions carry [valves](/features/extensibility/plugin/development/valves), the settings an admin or a user fills in. Their labels can be translated too, which matters most for user valves, since those are the ones ordinary users see under **Model controls > Controls** in the chat.
 
 Pick a language in a tool or function editor and the code editor is replaced by a translation table listing every label the plugin exposes, both admin valves and user valves. Each row shows the key, the original text and a box for your version, with an arrow button to clear that row back to the original.
 

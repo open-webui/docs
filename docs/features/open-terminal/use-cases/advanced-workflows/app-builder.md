@@ -17,7 +17,7 @@ Describe what you want and get a working app with frontend, backend, and databas
 3. Creates a polished frontend with dashboard, charts, and search
 4. Seeds it with sample data
 5. Starts the server and tests every endpoint
-6. The port preview shows the running app
+6. The running app opens from the **Ports** list of a [Browser tab](../web-development.md#the-browser-tab)
 
 ![The running inventory dashboard in the live port preview](/images/open-terminal-app-builder-dashboard.png)
 

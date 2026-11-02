@@ -106,7 +106,7 @@ Controls the features available to the user inside the chat interface.
 
 | Permission | Description |
 | :--- | :--- |
-| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. When disabled, the **Controls** panel and the **System Prompt** and **Advanced Parameters** sections in **Settings > General** are hidden. [Model controls](/features/workspace/models#using-model-controls-in-chat) stay available, so admins can offer choices such as a thinking level without the full panel. |
+| **Allow Chat Controls** | **(Parent)** Access to advanced chat settings. When disabled, **Controls** in the chat's **Model controls** menu and the **System Prompt** and **Advanced Parameters** sections in **Settings > General** are hidden. [Model controls](/features/workspace/models#using-model-controls-in-chat) stay available, so admins can offer choices such as a thinking level without the full **Controls** section. |
 | **Allow Chat Valves** | *(Requires Allow Chat Controls)* Access to [valves](/features/extensibility/plugin/development/valves) ([`USER_PERMISSIONS_CHAT_VALVES`](/reference/env-configuration#user_permissions_chat_valves)), including a pipe model's **Valves** button in the chat input. |
 | **Allow Chat System Prompt** | *(Requires Allow Chat Controls)* Ability to edit the system prompt for a conversation. |
 | **Allow Chat Params** | *(Requires Allow Chat Controls)* Ability to adjust LLM parameters (e.g., temperature, top_k). When disabled, the **Advanced Params** sections in the chat and in **Settings > General** are hidden. This only hides them: users can still set parameters through the API. That trade-off lets admins hide the panels and still offer [model controls](/features/workspace/models#using-model-controls-in-chat). |
@@ -126,6 +126,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Call** | Ability to start a [Voice Mode](/features/chat-conversations/chat-features/voice-mode) call, in both Standard and Realtime call mode. |
 | **Allow Multiple Models in Chat** | Ability to use several models at once ([`USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`](/reference/env-configuration#user_permissions_chat_multiple_models)). When disabled, chats use only their first model. |
 | **Allow Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
+| **Allow Side Chat** | *(Requires Allow Temporary Chat)* Ability to open a [side chat](/features/chat-conversations/chat-features/#tabs-side-panel) ([`USER_PERMISSIONS_CHAT_SIDE_CHAT`](/reference/env-configuration#user_permissions_chat_side_chat)). Off by default. Admins always have it. |
 | **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled) ([`USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`](/reference/env-configuration#user_permissions_chat_temporary_enforced)). |
 
 The **Audio** tab in **Settings** needs at least one of **Allow Speech to Text**, **Allow Text to Speech** and **Allow Call**.

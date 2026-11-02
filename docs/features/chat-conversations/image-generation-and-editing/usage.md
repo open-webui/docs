@@ -32,7 +32,7 @@ Picking the image model as the chat model is the most common setup mistake. Ever
 The exception is a chat model that creates images itself on a connection whose **API Type** is `Responses`, such as a Gemini image model through OpenRouter. Its images show in the reply.
 :::
 
-What happens next depends on the **Function Calling** mode. It can be set per chat in **Chat Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.
+What happens next depends on the **Function Calling** mode. It can be set per chat in **Model controls** > **Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.
 
 **Native** takes the tool path described below. In **Legacy** mode every message you send while the toggle is on goes straight to the image engine, whatever you asked for. It edits instead of creating when the recent conversation carries images and **Image Edit** is on. On the create path a task model rewrites your message into the image prompt first, unless you switch **Image Prompt Generation** off in the admin settings. In both modes, with a terminal selected in the chat, generated and edited images are also saved to its working directory, so the model can keep working on them with terminal tools.
 

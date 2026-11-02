@@ -160,7 +160,7 @@ Tool instructions are part of the cached prefix of every request, so each change
 
 ## User Shell Tools
 
-The **Shell** tab of the [terminal pane](../terminal-pane.md) is your own shell. Two tools let the model read that shell's recent output and send input to it. **User Shell Tools**, under **Advanced**, decides when the model gets them:
+A **New Terminal** tab, from the **+** menu of the **Tabs** side panel, is your own shell. Two tools let the model read that shell's recent output and send input to it. **User Shell Tools**, under **Advanced**, decides when the model gets them:
 
 - `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks your browser whether it is.
 - `Always Include`: on every message, open shell or not. The tool list stays the same from message to message, which keeps the [prompt cache](/features/chat-conversations/prompt-caching) intact when you open and close the shell.

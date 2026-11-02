@@ -5,17 +5,9 @@ title: "Terminal Pane"
 
 # The Terminal Pane
 
-Under the [file browser](./file-browser.md) sits a terminal. It is both your own shell on the connected terminal and a live view of what the AI is running, because every command the AI starts gets its own tab next to yours.
+Under the [file browser](./file-browser.md) sits a live view of what the AI is running: every command the AI starts gets its own tab. For your own interactive shell, pick **New Terminal** from the **+** menu of the **Tabs** side panel; you can open several side by side.
 
-It starts collapsed as a single strip labelled **Terminal**. When commands are running, the strip carries a count of how many. Click the strip, or the chevron at its right, to open it.
-
----
-
-## The Shell tab
-
-The first tab is **Shell**: a real interactive terminal on the connected machine, in the same workspace the AI is working in. Type in it like any other terminal.
-
-Closing it with the **✕** on the tab ends that session and leaves a **+** in its place. Clicking the **+** opens a fresh shell.
+It appears once the AI has run a command, collapsed as a single strip labelled **Sessions**. When commands are running, the strip carries a count of how many. Click the strip, or the chevron at its right, to open it.
 
 ---
 
@@ -40,11 +32,11 @@ Tabs for commands that have finished carry a **✕** that dismisses them. A runn
 ## Good to know
 
 :::tip It is a window, not a leash
-Dismissing a tab, closing the shell, or collapsing the whole pane changes nothing about what the AI is doing. These are your views of the terminal, not controls over it.
+Dismissing a tab or collapsing the whole pane changes nothing about what the AI is doing. These are your views of the terminal, not controls over it.
 :::
 
-:::info Only the tab you are looking at is polled
-Output is fetched for the tab currently on screen, and only while the pane is open. Leaving a long command in a background tab does not mean its output is being streamed to your browser the whole time; it is fetched when you switch to it.
+:::info Only the tab you are looking at sends output
+The command list streams live, and so does the output of the tab on screen while the pane is open. A command in a background tab sends no output to your browser until you switch to it.
 :::
 
 :::info One terminal at a time

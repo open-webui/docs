@@ -238,7 +238,7 @@ Mounting the socket is not a narrow permission. It hands the container the same 
 
 ## Port previews run sandboxed
 
-When the agent starts a server, the port preview shows it inside a sandboxed frame. Scripts, forms, popups, modals and downloads are permitted, so an ordinary app behaves normally, but the frame is treated as a separate origin from Open WebUI by default, which keeps whatever is running in the terminal away from your session.
+When the agent starts a server, the [Browser tab](../use-cases/web-development.md#the-browser-tab) shows it inside a sandboxed frame. Scripts, forms, popups, modals and downloads are permitted, so an ordinary app behaves normally, but the frame is treated as a separate origin from Open WebUI by default, which keeps whatever is running in the terminal away from your session.
 
 **Settings > Interface > Terminal Preview Allow Same Origin** relaxes that, and it is off unless you turn it on. Switch it on only for something you wrote and trust that genuinely needs same-origin browser APIs, such as storage or cookies, and remember that the code being previewed is often code the agent has just written.
 

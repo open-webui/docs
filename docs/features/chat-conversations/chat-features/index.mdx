@@ -53,7 +53,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **👁️ Sidebar Hover Previews**: Resting the pointer on a chat in the sidebar opens a small preview of its most recent messages, scrolled to the end, so you can identify a conversation without opening it. Its header shows the number of turns. Only one preview is shown at a time, and moving to another row replaces it. Turn it off with **Chat Hover Previews** in **Settings > Interface > Chat** if you want a quieter sidebar, are sharing your screen or are on a connection slow enough that the previews lag. Previews need a pointer, so they do not appear on a touchscreen.
 
-- **📱 Swipe the Sidebar**: On a phone or tablet, drag right with one finger to pull the sidebar in and left to push it away. It tracks your finger and dims the conversation behind it as it moves, a quick flick settles it either way, and every chat row carries an always-visible three-dot menu (⋯) so its actions are reachable without a hover. On a phone, swipe left across the conversation to open the chat controls panel, and right to close it.
+- **📱 Swipe the Sidebar**: On a phone or tablet, drag right with one finger to pull the sidebar in and left to push it away. It tracks your finger and dims the conversation behind it as it moves, a quick flick settles it either way, and every chat row carries an always-visible three-dot menu (⋯) so its actions are reachable without a hover. On a phone, swipe left across the conversation to open the side panel, and right to close it.
 - **[🕒 Temporal Awareness](./temporal-awareness.mdx)**: How models understand time and date, including native tools for precise time calculations.
 
 - **[🎙️ Voice Mode](./voice-mode.mdx)**: Start a hands-free voice conversation with your model using the **Voice mode** button, either through the configured speech engines or as a [Realtime call](/features/chat-conversations/chat-features/voice-mode#realtime-calls) with an OpenAI-compatible realtime voice model. The overlay includes a mute/unmute toggle to temporarily silence your microphone without ending the session, useful in noisy or public environments.
@@ -66,7 +66,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **[✅ Task Management](./task-management.mdx)**: Let agentic models keep a structured task/todo list in chat for multi-step workflows and transparent progress tracking.
 
-- **[🤖 Sub-agents](./subagents.mdx)**: Let a model delegate focused work to parallel sub-agents that run the same model and tools, and report back.
+- **[🤖 Sub-agents](./subagents.mdx)**: Let a model delegate focused work to parallel sub-agents that run with the same tools, and report back.
 
 - **[⏰ Timers](./timers.mdx)**: One-shot timers that send a prompt back into the chat when they fire, so a model can pick something up later.
 
@@ -100,13 +100,15 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/compact` | Compacts the conversation now, without waiting for it to cross the threshold. Only offered when [Context Compaction](/troubleshooting/context-window#the-built-in-option-context-compaction) is enabled, and not while a response is generating. A **Context compacted** line marks where older messages were summarized; click it to read the summary. A skipped run says why: the chat is too short, empty or compaction is disabled. |
   | `/status` | Opens a status panel for the chat showing **Context usage**, **Queued messages**, **Tasks** currently running, and the **Chat ID**. |
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
+  | `/side` | Opens a [side chat](#tabs-side-panel) on the current conversation. `/btw` does the same. Text after the command becomes its first message. |
+  | `/comments` | Opens the chat's [Comments](./comments.mdx) tab in the side panel. Offered in a saved chat when comments are turned on. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
   | `/compare` | Opens **Compare text** for the current prompt, the same as the entry in the **+** menu. See **Compare Text** above. |
   | `/skills:create` | Turns the conversation into a reusable [skill](/features/workspace/skills#from-a-chat-with-skillscreate), saved privately to your Skills workspace. Offered once the chat has content and you hold the [Skills Access](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission; the model needs built-in tools with the **Skills** category switched on. Anything you type after it steers what the skill covers. |
   | `/temporary` | Turns temporary chat on or off for the chat you are about to start. The menu entry shows the current state beside it, **On** or **Off**. |
 
-  `/compact`, `/status` and `/fork` only show up once the chat has messages, and are typed on their own with nothing after them. `/model`, `/settings` and `/compare` are offered in an empty chat too, unless an admin has hidden them, and `/model` is the only one that takes anything after it.
+  `/compact`, `/status`, `/fork` and `/side` only show up once the chat has messages, and all but `/side` are typed on their own with nothing after them. `/model`, `/settings` and `/compare` are offered in an empty chat too, unless an admin has hidden them, and `/model` is the only one of these that takes anything after it.
 
   `/temporary` is the mirror image: it appears **only before a chat exists**, since the setting cannot change once messages are saved. It is also left out when the **Temporary Chat** permission is withheld, and when an administrator has enforced temporary chat, because in that case there is nothing left to toggle. Turning it on switches you to a new temporary chat and marks the URL with `?temporary-chat=true`.
 
@@ -121,3 +123,13 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   Each block is headed by its type (**Writing**, **Code Execution**), unless the model put attributes in braces on the opening line, as in `:::writing{variant="email" subject="Short question" recipient="mail@example.com"}`. Then `subject` becomes the heading and `recipient` follows it, so a chat holding several drafted emails shows their subjects instead of one identical **Writing** heading after another. A heading too wide for the row is cut short and shown in full when you rest the pointer on it. The recipient is plain text: it is not a link, and there is no send action. Attributes are read only from between the braces, so a `key="value"` written in ordinary prose on that opening line is ignored, as is a brace that is never closed, and a block with no attributes looks exactly as it did before.
 
 - **Structured Response Editing**: Clicking the edit icon on an assistant response that contains tool calls, reasoning blocks, or code-interpreter output opens a structured editor instead of a plain textarea. Each output item (text, thought, tool call, code block, web/file/computer search) becomes its own collapsible field, and a **JSON** toggle exposes the underlying [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) payload for direct editing. Reasoning/thinking blocks are editable here too. The previous textarea editor reduced them to a non-editable `<details>` placeholder. Plain text-only responses keep the original textarea behavior. Editing rewrites the message's `output` array; Open WebUI re-derives the displayed `content` (including `<details>` blocks for thoughts and tool calls) on save, so the rendered message stays consistent.
+
+## Tabs Side Panel
+
+The **Tabs** button (split panel icon) in the top bar opens a side panel next to the chat.
+
+The panel holds these tabs when they apply: **Files** for the [Open Terminal](/features/open-terminal) or [Code Interpreter](./code-execution/python.md) files, **Artifacts**, **Preview** for embeds and opened citations, **Voice** for a running [voice call](./voice-mode.mdx) and **Comments** for a saved chat with [comments](./comments.mdx) turned on.
+
+**Side chat** in the **+** menu, or `/side` in the chat input, opens a temporary chat tab that starts from the current conversation, so you can ask something on the side without adding to the chat. It needs exactly one selected model and the [Allow Side Chat](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. Its messages disappear when you close the tab.
+
+With a terminal selected, the **+** menu adds **New File**, a file you write and store in the terminal with **Save As**, and **New Terminal**, another shell next to the ones already open. **Browser** and **Desktop** show on terminals that support them, see [The Browser tab](/features/open-terminal/use-cases/web-development#the-browser-tab). A file opened from the file browser gets its own tab, with a dot for unsaved changes. Drag tabs to reorder them, or press Alt+Shift+Left/Right on a selected tab, and close one with its **x**.

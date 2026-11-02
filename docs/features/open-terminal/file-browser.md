@@ -5,7 +5,7 @@ title: "File Browser"
 
 # The File Browser
 
-When Open Terminal is connected, a **file browser** appears in the sidebar of your chat. It works like the file explorer on your computer. You can browse folders, open files, upload things, and download results. Everything the AI creates shows up here automatically.
+When Open Terminal is connected, the **Files** tab of the **Tabs** side panel holds a **file browser**. It works like the file explorer on your computer. You can browse folders, open files, upload things and download results. Everything the AI creates shows up here automatically.
 
 :::tip Auto-open behavior
 By default the file browser opens automatically when you select a terminal on a screen at least 768 px wide. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
@@ -208,6 +208,18 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ---
 
+## Git
+
+When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the **Tabs** side panel. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
+
+- **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
+- **History**: past commits and their diffs.
+- **Pull requests**, for GitHub repositories when the terminal supports them: list, search, create, edit, comment, approve, request changes, merge, close, reopen, check out and mark ready.
+
+The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. A file with changes gets **Show diff** in the file browser toolbar.
+
+---
+
 ## Good to know
 
 :::tip Files update automatically
@@ -218,8 +230,12 @@ When the AI creates or changes files, the file browser refreshes automatically. 
 The file browser remembers which folder you were in, even when you switch between chats or terminals.
 :::
 
+:::tip Live updates
+On a terminal server that reports live events, the Git panel and the **Ports** list of the [Browser tab](./use-cases/web-development.md#the-browser-tab) update live. Otherwise the Git panel refreshes when expanded and the **Ports** list has a **Refresh** button.
+:::
+
 :::tip The terminal sits below it
-The bottom of the same sidebar holds the [terminal pane](./terminal-pane.md): your own shell, plus a tab per command the AI runs.
+The bottom of the **Files** tab holds the [terminal pane](./terminal-pane.md), with a tab per command the AI runs.
 :::
 
 :::tip Multiple terminals

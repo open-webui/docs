@@ -104,7 +104,7 @@ The same actions are available over the API: `GET /api/v1/tools/id/{id}/history`
 
 ### Translating a tool
 
-The globe selector in the tool editor stores a name, a description and valve labels per language. User valve labels are the ones worth translating first, since those are what ordinary users see in Chat Controls. See [Translations](/features/administration/translations).
+The globe selector in the tool editor stores a name, a description and valve labels per language. User valve labels are the ones worth translating first, since those are what ordinary users see under **Controls** in the **Model controls** menu. See [Translations](/features/administration/translations).
 
 ---
 
@@ -167,7 +167,7 @@ Native is the default, so you never need to "turn Native on". The only tool-call
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
 2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and open the **Advanced Params** row and set **Function Calling** to `Legacy`. Overrides the global default for that model only.
-3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
+3.  **Per-Chat Override**: inside a chat, open the **Model controls** menu next to the message input, then **Controls → Advanced Params**, and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
 To move an entire instance to Legacy through env vars, set the same global default with:
@@ -207,7 +207,7 @@ Native Mode is the **default**, so new and existing models use it unless they ar
     *   Open the **Advanced Params** row and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
-    *   Inside a chat, open **Chat Controls** (right sidebar).
+    *   Inside a chat, open the **Model controls** menu next to the message input and expand **Controls**.
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
@@ -223,8 +223,6 @@ DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 
 Leaving `function_calling` unset (or `"native"`) keeps the default, Native.
 :::
-
-![Chat Controls](/images/features/plugin/tools/chat-controls.png)
 
 #### Model Requirements & Caveats
 
@@ -289,7 +287,7 @@ Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with
 | Mode | Behaviour |
 | :--- | :--- |
 | **Full access** (default) | Tool calls run immediately, as they always have. |
-| **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
+| **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. While it waits, the chat's sidebar entry shows a yellow dot labelled **Waiting for approval**. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
 
 You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
 
@@ -401,13 +399,15 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `grep_skill_files` | Search a skill's text files for literal text or a regular expression and return bounded excerpts around the matches. |
 | `update_skill_files` | Save file changes (write, move, delete) to a skill the user can edit, as a new version. Text writes only. |
 | `create_skill` | Create a private workspace skill from `SKILL.md` text and optional text files. |
+| **Tool Creation** | *Requires [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) AND per-model "Tool Creation" category enabled (default: on) AND the user's **Tools Access** permission (admins always pass).* |
+| `create_tool` | Create a private Python workspace tool from chat. Saving runs the module on the server, like any [workspace tool](#2-workspace-tools-custom-plugins). |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
 | **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
 | **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
-| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
+| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
@@ -530,13 +530,15 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `grep_skill_files` | `id` (required), `pattern` (required; literal text or an RE2 regex, detected automatically; up to 4,096 characters), `path` (optional; one exact file, otherwise every text file), `case_insensitive` (default: true), `max_results` (default: 10, 1-30) | `{matches: [{path, offset, match_length, section, section_offset, excerpt}], total_matches, truncated}`, at most 6,000 characters. When excerpts were left out it adds `notice`, `omitted_matches` (`[{path, offset, section}]`) and `omitted_matches_truncated`. A terminal skill supports `SKILL.md` only. Never creates a skill version |
 | `update_skill_files` | `id` (required), `operations` (required; each `{op: "put", path, content}`, `{op: "move", path, destination}` or `{op: "delete", path}`), `commit_message` (optional) | `{id}`. When the skill changed after the model read it, `{error: {code: "version_conflict", message}}` asks the model to call `view_skill` again and reapply the edit |
 | `create_skill` | `id` (required), `name` (required), `content` (required; the complete `SKILL.md` including `name` and `description` frontmatter), `files` (optional; text files as `{path, content}`), `commit_message` (optional) | `{id, url}` |
+| **Tool Creation** | | |
+| `create_tool` | `id` (required; lowercase Python identifier), `name` (required), `description` (required), `content` (required; the complete Python source with a `Tools` class) | `{id, url}`, or `{error}` |
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
 | **Ask User** | | |
 | `ask_user` | `questions` (required, 1-3 objects of `{id, header, question, options}` where `options` is 2-3 `{label, description}` pairs and an optional per-question `allow_other`), `allow_other` (default: `true`), `timeout_ms` (default: `120000`, clamped to 60000-240000) | `{status: "answered", answers}` keyed by question id, or `{status: "cancelled", answers: {}}` when the card times out. Dismissing the card returns a rejection error instead |
 | **Sub-agents** | | |
-| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `model_id` (optional; one of the model's [sub-agent models](/features/workspace/models#capabilities-and-bindings), offered only when some are set; omitted, the current model runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
@@ -660,6 +662,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
 | **Calendar** | `search_calendar_events`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event` | Search, create, update, and delete calendar events |
 | **Skills** | `view_skill`, `read_skill_file`, `grep_skill_files`, `update_skill_files`, `create_skill` | Find, read, search, edit and create skills |
+| **Tool Creation** | `create_tool` | Create Python workspace tools from chat. Needs [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) and, for non-admins, the **Tools Access** permission |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
