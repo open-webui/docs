@@ -78,7 +78,7 @@ Place your environment variables in `/etc/open-webui/env` (see [Critical Configu
 - **Horizontal scaling**: Configure your auto-scaling group to add or remove VMs based on CPU utilization or request count.
 - **Health checks**: Point your load balancer health check at `/ready`, which answers once startup has finished and the database and Redis respond. `/health` only shows the process is running.
 - **One process per VM**: Keep `UVICORN_WORKERS=1` and let the auto-scaler manage capacity.
-- **Sticky sessions**: Needed only when WebSockets are turned off (`ENABLE_WEBSOCKET_SUPPORT=false`), since polling sends each request separately.
+- **Sticky sessions**: Optional; required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions).
 
 ## Key Considerations
 

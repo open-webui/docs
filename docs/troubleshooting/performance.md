@@ -171,7 +171,7 @@ For a step-by-step walkthrough of the entire scaling journey (PostgreSQL, Redis,
 
 *   **Kubernetes / Helm**: For deploying on K8s with multiple replicas, see the **[Multi-Replica & High Availability Guide](/troubleshooting/multi-replica)**.
 *   **Redis (Mandatory)**: When running multiple replicas, **Redis is required** to handle WebSocket connections and session syncing. See **[Redis Integration](/tutorials/integrations/redis)**.
-*   **Load Balancing**: Plain round-robin works. Session affinity (sticky sessions) is needed only with `ENABLE_WEBSOCKET_SUPPORT=false`.
+*   **Load Balancing**: Plain round-robin works. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions) for when sticky sessions help.
 *   **Reverse Proxy Caching**: Configure your reverse proxy (e.g., Nginx, Caddy, Cloudflare) to **cache static assets** (JS, CSS, Images). This significantly reduces load on the application server. See **[Nginx Config](/reference/https/nginx)** or **[Caddy Config](/reference/https/caddy)**.
 *   **Disable Proxy Buffering (Critical for Streaming)**: If using Nginx, you **must** disable `proxy_buffering` for Open WebUI. Proxy buffering re-chunks SSE streams, causing garbled markdown and slow streaming. Add `proxy_buffering off;` and `proxy_cache off;` to your location block. See **[Streaming Troubleshooting](/troubleshooting/connection-error#-garbled-markdown--streaming-response-corruption)**.
 

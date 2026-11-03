@@ -103,7 +103,7 @@ In the Cloud Run console, deploy `openwebui` with the same image, identity, VPC 
 | Instances | Minimum `1`, maximum `1` until verification passes. |
 | Concurrency | Start at `20` and tune with realistic chat/ingestion traffic. |
 | Request timeout | `3600` seconds; clients still need to reconnect. |
-| Session affinity | Needed only when WebSockets are turned off (`ENABLE_WEBSOCKET_SUPPORT=false`). |
+| Session affinity | Optional; required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). |
 | Startup probe | HTTP `/ready`, port `8080`, 10-second period, 5-second timeout, failure threshold `24`. |
 | Liveness probe | HTTP `/health`, port `8080`, with a suitable interval and failure threshold. |
 

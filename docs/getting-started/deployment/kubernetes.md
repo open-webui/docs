@@ -341,7 +341,7 @@ This disables migrations on all replicas, applies the desired replica count, and
 
 Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. See [connection troubleshooting](/troubleshooting/connection-error).
 
-Session affinity is needed only when WebSockets are turned off ([`ENABLE_WEBSOCKET_SUPPORT=false`](/reference/env-configuration#enable_websocket_support)), because Socket.IO then falls back to polling with separate HTTP requests. Affinity does not replace Redis. On the NGINX Ingress Controller, add these annotations to the Ingress resource:
+Session affinity is optional with WebSockets on and required with [`ENABLE_WEBSOCKET_SUPPORT=false`](/reference/env-configuration#enable_websocket_support); see [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Affinity does not replace Redis. On the NGINX Ingress Controller, add these annotations to the Ingress resource:
 
 ```yaml
 metadata:

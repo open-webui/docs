@@ -117,7 +117,7 @@ Create an ECS service using the **application** task definition, with `ENABLE_DB
 
 Set the target group's health-check path to `/ready`, which answers once startup has finished and the database and Redis respond. Start with a service health-check grace period of 300 seconds and adjust it to the measured startup time. `/health` serves as a separate process-liveness check. Model APIs and S3 permissions need the checks under [Verify Before Adding Users](#verify-before-adding-users).
 
-Set ALB idle timeouts for your streaming workload. Target-group stickiness is needed only when WebSockets are turned off (`ENABLE_WEBSOCKET_SUPPORT=false`). Verify WebSockets and streamed responses through the ALB.
+Set ALB idle timeouts for your streaming workload. Target-group stickiness is optional; it is required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Verify WebSockets and streamed responses through the ALB.
 
 Use the AWS CLI to wait and inspect service events, replacing the identifiers:
 

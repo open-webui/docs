@@ -56,7 +56,7 @@ Avoid the rolling `:main` and `:latest` tags in production; pin a `v0.x.y` tag f
 - **Platform-native auto-scaling**: Configure your container service to scale on CPU utilization, memory, or request count.
 - **Health checks**: Use `/health` for liveness and `/ready` for readiness; `/ready` waits for startup to finish and checks database and Redis connectivity.
 - **Task-level env vars**: Pass all shared infrastructure configuration as environment variables or secrets in your task definition.
-- **Session affinity**: Needed only when WebSockets are turned off (`ENABLE_WEBSOCKET_SUPPORT=false`), since polling sends each request separately. Redis handles cross-instance coordination either way.
+- **Session affinity**: Optional; required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). With `WEBSOCKET_MANAGER=redis`, Redis carries live updates between instances either way.
 
 ## Key Considerations
 
