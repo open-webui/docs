@@ -237,7 +237,7 @@ Back up the database first. Putting the old image back does not undo a migration
 
 ### Session Affinity (Sticky Sessions)
 
-With Redis configured and WebSockets on (the default), any replica can serve any request, so sticky sessions are not needed. If streamed responses or tool calls still arrive in the browser unreliably, turning them on is worth a try. They are required when `ENABLE_WEBSOCKET_SUPPORT=false`, because long-polling needs every request of a connection to reach the same replica.
+With Redis configured and WebSockets on (the default), any replica can serve any request, so sticky sessions are not needed. On an unstable network, a blip or reconnect can still disturb how streamed responses or tool calls reach the browser; if you see that, turning them on is worth a try. They are required when `ENABLE_WEBSOCKET_SUPPORT=false`, because long-polling needs every request of a connection to reach the same replica.
 
 - **Nginx Ingress:** `nginx.ingress.kubernetes.io/affinity: "cookie"`
 - **AWS ALB:** enable Target Group Stickiness.
