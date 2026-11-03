@@ -139,6 +139,8 @@ Open WebUI includes a browser-based Python environment using [Pyodide](https://p
 
 The Pyodide worker is **persistent**: it is created once and reused across code executions. This means variables, imported modules, and files written to the virtual filesystem are retained between executions within the same session.
 
+The **Run** button is controlled by [`ENABLE_CODE_EXECUTION`](/reference/env-configuration#enable_code_execution) alone and is available to every user. The **Code Interpreter** group permission and model capability do not affect it. With the default Pyodide engine the code runs in the user's own browser; with [`CODE_EXECUTION_ENGINE`](/reference/env-configuration#code_execution_engine) set to `jupyter` it runs on the Jupyter server instead.
+
 ### Running Code Manually
 
 1. Ask an LLM to write Python code

@@ -143,7 +143,7 @@ Controls access to broad platform capabilities.
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
-| **Code Interpreter** | Ability to use the Python Code Interpreter. |
+| **Code Interpreter** | Ability to use the Python Code Interpreter. Manual code execution (the **Run** button on code blocks) has no permission of its own; it follows [`ENABLE_CODE_EXECUTION`](/reference/env-configuration#enable_code_execution) for everyone. See [Manual Code Execution](/features/chat-conversations/chat-features/code-execution/python#manual-code-execution-pyodide). |
 | **Direct Tool Servers** | Ability to add personal tool servers and Open Terminal connections under **Settings > Integrations**. Also needs [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations). |
 | **Memories** | Access to the Memories feature for persistent user context. Taking it away hides the **Personalization** settings tab, blocks the memory API endpoints, withholds the memory tools from the model and stops stored memories being injected into the chat's system context. The injection check runs server-side on every chat request, so a client that still asks for memory does not get it. Admins are always exempt. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
