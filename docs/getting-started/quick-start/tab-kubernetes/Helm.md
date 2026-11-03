@@ -1,12 +1,12 @@
 
 # Helm Setup for Kubernetes
 
-Helm helps you manage Kubernetes applications.
+This is the fastest way to try Open WebUI on a cluster. For a persistent or production installation (pinned versions, secrets, PostgreSQL, Redis, object storage, ingress and safe updates), follow the [Kubernetes Deployment](/deployment/kubernetes) guide.
 
 ## Prerequisites
 
-- Kubernetes cluster is set up.
-- Helm is installed.
+- A running Kubernetes cluster, with `kubectl` configured for it.
+- Helm 3.
 
 ## Helm Steps
 
@@ -23,50 +23,25 @@ Helm helps you manage Kubernetes applications.
    helm install openwebui open-webui/open-webui
    ```
 
+   With its default values the chart also deploys Ollama, Pipelines and a Redis instance, and stores Open WebUI's data on a 2 GiB PVC. Add `--set ollama.enabled=false --set pipelines.enabled=false` if you connect to models elsewhere.
+
 3. **Verify Installation:**
 
    ```bash
    kubectl get pods
    ```
 
-:::warning
-
-If you intend to scale Open WebUI using multiple nodes/pods/workers in a clustered environment, you need to setup a NoSQL key-value database (Redis).
-There are some [environment variables](https://docs.openwebui.com/reference/env-configuration/) that need to be set to the same value for all service-instances, otherwise consistency problems, faulty sessions and other issues will occur!
-
-**Important:** The default vector database (ChromaDB) uses a local SQLite-backed client that is **not safe for multi-replica or multi-worker deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** switch to an external vector database (PGVector, Milvus, Qdrant) via [`VECTOR_DB`](https://docs.openwebui.com/reference/env-configuration#vector_db), or run ChromaDB as a separate HTTP server via [`CHROMA_HTTP_HOST`](https://docs.openwebui.com/reference/env-configuration#chroma_http_host).
-
-For the complete step-by-step scaling walkthrough, see [Scaling Open WebUI](https://docs.openwebui.com/getting-started/advanced-topics/scaling). For troubleshooting multi-replica issues, see the [Scaling & HA guide](https://docs.openwebui.com/troubleshooting/multi-replica).
-
-:::
-
-:::danger Critical for Updates
-If you run Open WebUI with multiple replicas/pods (`replicaCount > 1`) or `UVICORN_WORKERS > 1`, you **MUST** scale down to a single replica/pod during updates.
-1. Scale down deployment to 1 replica.
-2. Apply the update (new image version).
-3. Wait for the pod to be fully ready (database migrations complete).
-4. Scale back up to your desired replica count.
-
-**Failure to do this can result in database corruption due to concurrent migrations.**
-:::
+Before running more than one replica or worker, read [Scaling Open WebUI](/getting-started/advanced-topics/scaling). Updates across replicas follow [Updates and Recovery](/deployment/kubernetes#updates-and-recovery).
 
 ## Access the WebUI
 
-You can access Open WebUI by port-forwarding or configuring an Ingress.
+Forward the service to your machine and open [http://localhost:3000](http://localhost:3000):
 
-### Ingress Configuration (Nginx)
-If you are using the **NGINX Ingress Controller**, you can enable session affinity (sticky sessions) to improve WebSocket stability. Add the following annotation to your Ingress resource:
-
-```yaml
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "open-webui-session"
-    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+```bash
+kubectl port-forward service/openwebui-open-webui 3000:80
 ```
 
-This ensures that a user's session remains connected to the same pod, reducing issues with WebSocket connections in multi-replica setups (though correct Redis configuration makes this less critical).
+To expose it through an ingress controller, see [Finish the Production Installation](/deployment/kubernetes#finish-the-production-installation).
 
 ## Uninstall
 
@@ -74,9 +49,10 @@ This ensures that a user's session remains connected to the same pod, reducing i
     ```bash
     helm uninstall openwebui
     ```
+    With the default values this also deletes Open WebUI's PVC and the data on it. To keep the data across an uninstall, follow [Uninstall Without Accidentally Deleting Data](/deployment/kubernetes#uninstall-without-accidentally-deleting-data).
 
-2.  **Remove Persistent Volume Claims (WARNING: Deletes all data):**
-    Helm does not automatically delete PVCs to prevent accidental data loss. You must delete them manually if you want to wipe everything.
+2.  **Remove Remaining Persistent Volume Claims (WARNING: Deletes all data):**
+    To make sure no volume of this release is left:
     ```bash
     kubectl delete pvc -l app.kubernetes.io/instance=openwebui
     ```

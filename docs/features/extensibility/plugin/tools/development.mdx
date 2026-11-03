@@ -1358,9 +1358,9 @@ We strongly recommend using an [OpenAPI tool server](/features/extensibility/plu
 
 :::
 
-:::danger Production / Multi-Worker Deployments
+:::danger Production Deployments
 
-**Do not rely on runtime pip installation in production environments.** When running with `UVICORN_WORKERS > 1` or multiple replicas, each worker/replica attempts to install packages independently on startup. This causes **race conditions** where concurrent pip processes crash with `AssertionError` because pip's internal locking detects the simultaneous installs.
+**Do not rely on runtime pip installation in production environments.** Every replica installs the packages on its own at startup. With `UVICORN_WORKERS > 1`, every worker installs into the same environment at once, and the concurrent pip processes crash with `AssertionError`.
 
 **Set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) in production** to disable runtime pip installs entirely. Then pre-install all required packages at image build time using a custom Dockerfile:
 
@@ -1370,7 +1370,7 @@ FROM ghcr.io/open-webui/open-webui:main
 RUN pip install --no-cache-dir python-docx requests beautifulsoup4
 ```
 
-Runtime installation is only suitable for **single-worker development or homelab environments** where you're experimenting with new functions and tools. For any deployment serving multiple users, bake your dependencies into the container image.
+Runtime installation is only suitable for **development or homelab environments** where you're experimenting with new functions and tools. For any deployment serving multiple users, bake your dependencies into the container image.
 
 :::
 

@@ -193,9 +193,9 @@ Two ways to use it, in order of simplicity:
 
 The defaults are reasonable for getting started. When you outgrow them, there are three knobs that matter most:
 
-- **Embedding engine.** The default (SentenceTransformers `all-MiniLM-L6-v2`) runs locally on CPU and consumes roughly 500 MB of RAM per worker. For any multi-user deployment, point at an external embeddings API (OpenAI, or Ollama with `nomic-embed-text`) via `RAG_EMBEDDING_ENGINE`.
+- **Embedding engine.** The default (SentenceTransformers `all-MiniLM-L6-v2`) runs locally on CPU and consumes roughly 500 MB of RAM per replica. For any multi-user deployment, point at an external embeddings API (OpenAI, or Ollama with `nomic-embed-text`) via `RAG_EMBEDDING_ENGINE`.
 - **Content extraction engine.** The default uses `pypdf`, which leaks memory during heavy ingestion. For anything beyond casual use, switch to **Tika** or **Docling** via `CONTENT_EXTRACTION_ENGINE`, or point it at your own service with the [external engine](/features/chat-conversations/rag/document-extraction/external) if you need per-file-type routing or custom logic.
-- **Vector database.** The default ChromaDB (local SQLite-backed; the `:slim` image defaults to PGVector instead) does not tolerate multi-worker deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available as non-core integrations: they may break on upgrades, and fixes come from outside the core Open WebUI maintenance path. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the integration disclaimers on each provider.
+- **Vector database.** The default ChromaDB (local SQLite-backed; the `:slim` image defaults to PGVector instead) does not tolerate multi-replica deployments. At scale, switch to **PGVector**. It is the only vector database officially supported and maintained by the Open WebUI team. Milvus, Qdrant, and MariaDB Vector are also available as non-core integrations: they may break on upgrades, and fixes come from outside the core Open WebUI maintenance path. See the [env-configuration reference](/reference/env-configuration#vector_db) for setup and the integration disclaimers on each provider.
 
 :::note When to worry about this
 None of these matter for "a single user with a handful of PDFs." All of them start mattering the moment you have 100 documents or 10 concurrent users.
@@ -214,7 +214,7 @@ Set these in **Settings > Admin > Documents**:
 | **Chunk Size** | `1000` | `2000` | Larger chunks preserve more surrounding context per retrieval hit |
 | **Chunk Overlap** | `100` | `200` | More overlap means less chance of cutting a key sentence in half |
 | **Top K** | `3` | `15` | Retrieves more candidate chunks, giving the model a wider pool of relevant context. If you are working with local models that have constrained context sizes, lower this to `5` to avoid filling the context window with retrieved chunks |
-| **Embedding Model** | `all-MiniLM-L6-v2` (local CPU) | External (OpenAI or Ollama) | The default works for a single user but consumes ~500 MB RAM per worker. For any multi-user setup, use an external embedding API instead |
+| **Embedding Model** | `all-MiniLM-L6-v2` (local CPU) | External (OpenAI or Ollama) | The default works for a single user but consumes ~500 MB RAM per replica. For any multi-user setup, use an external embedding API instead |
 
 :::tip Embedding model
 The default SentenceTransformers model runs locally on CPU and is fine for a single user getting started. For anything beyond that, point at an external embeddings API: set `RAG_EMBEDDING_ENGINE=openai` with an OpenAI API key, or `RAG_EMBEDDING_ENGINE=ollama` with any Ollama embedding model (e.g., `nomic-embed-text`). This offloads the work and frees significant RAM.
@@ -228,7 +228,7 @@ More detail:
 - [RAG overview](/features/chat-conversations/rag/)
 - [Knowledge workspace](/features/workspace/knowledge)
 - [Performance tuning for RAG](/troubleshooting/performance#embedding-engine)
-- [Scaling: external vector database](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database), required for multi-worker and multi-replica deployments
+- [Scaling: external vector database](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database), required for multi-replica deployments
 - [Scaling: content extraction & embeddings](/getting-started/advanced-topics/scaling#step-6-fix-content-extraction--embeddings), fixing memory leaks at scale
 
 ---

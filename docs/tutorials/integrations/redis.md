@@ -13,63 +13,17 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Overview
 
-This documentation page outlines the steps required to integrate Redis with Open WebUI for websocket support. By following these steps, you will be able to enable websocket functionality in your Open WebUI instance, allowing for real-time communication and updates between clients and your application.
+This page sets up Redis for Open WebUI: the Redis server settings it needs, the Open WebUI variables, Sentinel and Cluster, and troubleshooting.
 
 ## When is Redis Required?
 
-Redis serves two distinct purposes in Open WebUI, and understanding when it's required is crucial for proper deployment. For a high-level overview of all scaling requirements (PostgreSQL, Redis, vector DB, storage), see the [Scaling Open WebUI](/getting-started/advanced-topics/scaling) guide.
-
-### Single Instance Deployments
-
-If you're running Open WebUI as a **single instance** with `UVICORN_WORKERS=1` (the default), Redis is **not required for basic functionality**. The application will function normally without it for most operations.
-
-:::warning Security: Signing Out of a Single Session Requires Redis
-
-Without Redis, **signing out does not invalidate a user's JWT token**. The token remains valid and usable until it expires naturally (default: 4 weeks). Signing a user out everywhere works without Redis: a password change or an administrator's [**Sign out all devices**](/features/authentication-access/rbac/roles#signing-a-user-out-of-every-device) ends every session of that account.
-
-For production-facing deployments, either configure Redis or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See the [Hardening guide](/getting-started/advanced-topics/hardening#token-revocation) for details.
-
-:::
-
-### Multi-Worker and Multi-Instance Deployments
-
-Redis becomes **mandatory** in the following scenarios:
-
-1. **Multiple Uvicorn Workers** (`UVICORN_WORKERS > 1`)
-   - Running multiple worker processes on a single host
-   - Requires Redis to share session state, websocket pools, locks and token revocations between workers
-
-2. **Multi-Node Deployments**
-   - Kubernetes clusters with multiple pods
-   - Docker Swarm with multiple replicas
-   - Load-balanced setups with multiple Open WebUI instances
-   - Requires Redis to coordinate state across all instances
-
-3. **High Availability Setups**
-   - Any deployment pattern where multiple Open WebUI processes run simultaneously
-   - Requires Redis for session management, websocket coordination, and state synchronization
-
-:::warning
-
-**Critical Requirement**
-
-Without Redis in multi-worker or multi-instance scenarios, you will experience:
-
-- Session management failures across workers
-- Inconsistent application state between instances
-- Non-functional websocket connections
-- Intermittent authentication failures
-- Loss of real-time chat updates
-
-:::
+Redis is required as soon as more than one Open WebUI process runs (several Uvicorn workers or several instances), and it is what makes signing out revoke a token. [Step 2: Add Redis](/getting-started/advanced-topics/scaling#step-2-add-redis) explains what it coordinates and when a single instance needs it.
 
 ### Prerequisites
 
-- A current Open WebUI release
-- A Redis container (we will use `redis:7-alpine` in this example)
-- Docker Composer (version 2.0 or higher) installed on your system
-- A Docker network for communication between Open WebUI and Redis
-- Basic understanding of Docker, Redis, and Open WebUI
+- A Redis container (this example uses `redis:7-alpine`)
+- Docker Compose v2
+- A Docker network shared by Open WebUI and Redis
 
 ### Critical: Redis Server Configuration
 
@@ -103,7 +57,7 @@ Add these settings to your Redis configuration:
 maxclients 10000
 
 # Close idle connections after 30 minutes (1800 seconds)
-# This does NOT affect session validity — only the TCP connection to Redis
+# Affects only idle TCP connections to Redis, not sessions
 timeout 1800
 ```
 
@@ -272,56 +226,21 @@ docker network create openwebui-network
 
 ## Configuring Open WebUI
 
-To enable Redis support in Open WebUI, you need to configure different environment variables depending on your deployment type.
-
 ### Basic Configuration (All Deployments)
-
-For **all deployments** using Redis (single or multi-instance), set the following base environment variable:
 
 ```bash
 REDIS_URL="redis://redis:6379/0"
+WEBSOCKET_MANAGER="redis"
 ```
 
-This variable configures the primary Redis connection for application state management, session storage, and coordination between instances.
+`REDIS_URL` is the connection for token revocation, locks, task tracking, rate limits and shared caches. `WEBSOCKET_MANAGER=redis` makes the websocket layer use Redis as well, so live updates reach users connected to any worker or instance.
 
 ### Websocket Configuration
 
-To enable websocket support specifically, add these additional environment variables:
+WebSockets are on by default ([`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support)). The websocket layer uses `REDIS_URL` and follows `REDIS_CLUSTER`. Set [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) (and `WEBSOCKET_REDIS_CLUSTER`) only to put websocket traffic on a different Redis server or database, for example `redis://redis:6379/1`.
 
-```bash
-ENABLE_WEBSOCKET_SUPPORT="true"
-WEBSOCKET_MANAGER="redis"
-WEBSOCKET_REDIS_URL="redis://redis:6379/1"
-```
-
-:::danger Critical: Configure CORS for WebSocket Connections
-
-A very common and difficult-to-debug issue with WebSocket connections is a misconfigured Cross-Origin Resource Sharing (CORS) policy. If your Open WebUI instance is accessed from a different domain or port than the backend (e.g., behind a reverse proxy), you **must** set the `CORS_ALLOW_ORIGIN` environment variable. This variable tells the server which origins are permitted to access its resources.
-
-Failure to configure this correctly will cause WebSocket connections to fail silently or with cryptic browser errors and forgetting to set this variable is a common cause of WebSocket connection issues.
-
-**Example:**
-If you access your UI at `https://my-open-webui.com`, you must set:
-
-```bash
-CORS_ALLOW_ORIGIN="https://my-open-webui.com"
-```
-
-You can also provide a semicolon-separated list of allowed domains. **Do not skip this step in a production or reverse-proxied setup.**
-
-:::
-
-:::info
-
-**Redis Database Numbers**
-
-Notice the different database numbers (`/0` vs `/1`) in the URLs:
-
-- `REDIS_URL` uses database `0` for general application state
-- `WEBSOCKET_REDIS_URL` uses database `1` for websocket-specific data (when unset it defaults to `REDIS_URL`, and `WEBSOCKET_REDIS_CLUSTER` defaults to `REDIS_CLUSTER`)
-
-This separation helps isolate different types of data. You can use the same database number for both if preferred, but using separate databases is recommended for better organization and potential performance optimization.
-
+:::warning CORS and websockets
+If you set [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin), include every origin users open Open WebUI from, for example `https://chat.example.com`, separated by semicolons. Websocket connections from any other origin are refused. See [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
 :::
 
 ### Optional Configuration
@@ -334,7 +253,7 @@ The `REDIS_KEY_PREFIX` allows multiple Open WebUI instances to share the same Re
 
 ### Sentinel Failover Configuration
 
-Sentinel is enabled by setting `REDIS_SENTINEL_HOSTS` (comma-separated) and optionally `REDIS_SENTINEL_PORT` (default `26379`); `WEBSOCKET_SENTINEL_HOSTS` and `WEBSOCKET_SENTINEL_PORT` do the same for the websocket manager. In that mode the hostname part of `REDIS_URL` is the Sentinel master (service) name, and its database and credentials are reused. The master name is case sensitive, so write it exactly as configured in Sentinel (for example `redis://:password@myMaster:6379/0`). The user name and password in the URL are also sent to the Sentinels, so Sentinels protected with the same password work without extra settings.
+Sentinel is enabled by setting `REDIS_SENTINEL_HOSTS` (comma-separated) and optionally `REDIS_SENTINEL_PORT` (default `26379`); set `WEBSOCKET_SENTINEL_HOSTS` and `WEBSOCKET_SENTINEL_PORT` as well, because the websocket manager does not read the `REDIS_SENTINEL_*` pair. In that mode the hostname part of `REDIS_URL` is the Sentinel master (service) name, and its database and credentials are reused. The master name is case sensitive, so write it exactly as configured in Sentinel (for example `redis://:password@myMaster:6379/0`). The user name and password in the URL are also sent to the Sentinels, so Sentinels protected with the same password work without extra settings.
 
 :::danger Critical: Socket Timeout for Sentinel Deployments
 
@@ -432,15 +351,10 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 ### Complete Example Configuration
 
-Here's a complete example showing all Redis-related environment variables:
 ```bash
-# Required for multi-worker/multi-instance deployments
+# Required for multi-replica deployments
 REDIS_URL="redis://redis:6379/0"
-
-# Required for websocket support
-ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
-WEBSOCKET_REDIS_URL="redis://redis:6379/1"
 
 # Recommended for Sentinel deployments (prevents failover hangs)
 REDIS_SOCKET_CONNECT_TIMEOUT=5
@@ -452,35 +366,19 @@ REDIS_HEALTH_CHECK_INTERVAL=60
 
 # Recommended: enable TCP keepalive for dead-peer detection at the kernel level
 REDIS_SOCKET_KEEPALIVE=True
-
-# Optional
-REDIS_KEY_PREFIX="open-webui"
 ```
-
-For Redis Sentinel deployments specifically, ensure `REDIS_SOCKET_CONNECT_TIMEOUT` is set to prevent application hangs during master failover.
 
 #### Redis Cluster Mode Example
 
-For Redis Cluster deployments (including AWS Elasticache Serverless):
-
 ```bash
-# Required for Redis Cluster
 REDIS_URL="rediss://your-cluster-endpoint:6379/0"
 REDIS_CLUSTER="true"
-
-# Required for websocket support
-ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
-WEBSOCKET_REDIS_URL="rediss://your-cluster-endpoint:6379/0"
-WEBSOCKET_REDIS_CLUSTER="true"
-
-# Optional
-REDIS_KEY_PREFIX="open-webui"
 ```
 
 ### Docker Run Example
 
-When running Open WebUI using Docker, connect it to the same Docker network and include all necessary Redis variables:
+Connect Open WebUI to the same Docker network as Redis:
 
 ```bash
 docker run -d \
@@ -488,11 +386,9 @@ docker run -d \
   --network openwebui-network \
   -v open-webui:/app/backend/data \
   -p 3000:8080 \
+  -e WEBUI_SECRET_KEY="your-secret-key" \
   -e REDIS_URL="redis://redis:6379/0" \
-  -e ENABLE_WEBSOCKET_SUPPORT="true" \
   -e WEBSOCKET_MANAGER="redis" \
-  -e WEBSOCKET_REDIS_URL="redis://redis:6379/1" \
-  -e REDIS_KEY_PREFIX="open-webui" \
   ghcr.io/open-webui/open-webui:main
 ```
 
@@ -507,48 +403,6 @@ In the examples above, we use `redis://redis:6379` because:
 - This is the recommended approach for Docker deployments
 
 Do **not** use `127.0.0.1` or `localhost` when connecting from one container to another. These refer to the container's own localhost, not the Redis container.
-
-:::
-
-### Multi-Worker Configuration
-
-If you're running multiple Uvicorn workers on a single host, add this variable:
-
-```bash
-UVICORN_WORKERS="4"  # Adjust based on your CPU cores
-REDIS_URL="redis://redis:6379/0"  # Required when UVICORN_WORKERS > 1
-```
-
-:::warning Prefer more containers over more workers
-
-Raising `UVICORN_WORKERS` is the weakest way to scale Open WebUI. It requires the same external services as running several containers, Redis included, while leaving every worker inside one container that shares a single memory limit and fails as a unit. Run replicas with Docker Compose, Kubernetes or the Helm chart instead, keeping one worker each. See [Scaling Open WebUI](/getting-started/advanced-topics/scaling).
-
-:::
-
-:::danger
-
-**Critical: Redis Required for UVICORN_WORKERS > 1**
-
-If you set `UVICORN_WORKERS` to any value greater than 1, you **must** configure `REDIS_URL`. Failing to do so will cause:
-
-- Session state to be lost between requests
-- Authentication to fail intermittently
-- Application configuration to be inconsistent
-- Websockets to malfunction
-
-:::
-
-:::danger
-
-**Critical: Default ChromaDB (SQLite) Not Compatible with Multiple Workers**
-
-In addition to Redis, you must also address the **vector database**. The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not fork-safe**. When uvicorn forks multiple workers, concurrent writes to the same SQLite file will crash workers instantly during document uploads (`Child process died`).
-
-You must either:
-- Switch to a client-server vector database (`VECTOR_DB=pgvector`, `mariadb-vector`, `milvus`, or `qdrant`)
-- Run ChromaDB as a separate HTTP server and set `CHROMA_HTTP_HOST` / `CHROMA_HTTP_PORT`
-
-See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for details.
 
 :::
 
@@ -598,17 +452,9 @@ You can also verify that Open WebUI is actually writing data to Redis:
 docker exec -it redis redis-cli --scan --pattern "open-webui*"
 ```
 
-If Redis is configured correctly, you should see keys with your configured prefix, such as `open-webui:ratelimit:*` within a few minutes of a password sign-in and `open-webui:auth:token:*:revoked` after a sign-out. The websocket pools (`open-webui:session_pool`, `open-webui:usage_pool`) live in the `WEBSOCKET_REDIS_URL` database, so with the example above add `-n 1` to the command to see them. Persisted configuration is shared through the database `config` table, not Redis.
+If Redis is configured correctly, you should see keys with your configured prefix, such as `open-webui:session_pool` and `open-webui:usage_pool` once someone has the UI open, `open-webui:ratelimit:*` after a password sign-in and `open-webui:auth:token:*:revoked` after a sign-out. If you set `WEBSOCKET_REDIS_URL` to another database, the two pools live there (add `-n <db>` to the command). Persisted configuration is shared through the database, not Redis.
 
-### Test Multi-Worker Setup
-
-If you're running with `UVICORN_WORKERS > 1`, test that sessions persist across workers:
-
-1. Log in to Open WebUI
-2. Refresh the page multiple times
-3. You should remain logged in consistently
-
-If you're logged out randomly or see authentication errors, Redis is likely not configured correctly.
+The `/ready` endpoint also returns 503 while Redis does not answer, so a readiness probe on it catches a lost Redis connection.
 
 ## Troubleshooting
 
@@ -630,23 +476,6 @@ If you're logged out randomly or see authentication errors, Redis is likely not 
 4. Ensure the `REDIS_URL` uses the correct container name, not `127.0.0.1` or `localhost`
 5. Check that both containers are on the same Docker network
 
-#### Issue: "Session lost after page refresh" (with UVICORN_WORKERS > 1)
-
-**Symptoms:**
-
-- Users are logged out randomly
-- Authentication works but doesn't persist
-- Different behavior on each page refresh
-
-**Cause:** `REDIS_URL` is not configured when using multiple workers
-
-**Solution:**
-Add the `REDIS_URL` environment variable:
-
-```bash
-REDIS_URL="redis://redis:6379/0"
-```
-
 #### Issue: "Websockets not working"
 
 **Symptoms:**
@@ -657,10 +486,7 @@ REDIS_URL="redis://redis:6379/0"
 
 **Solutions:**
 
-1. Verify all websocket environment variables are set:
-   - `ENABLE_WEBSOCKET_SUPPORT="true"`
-   - `WEBSOCKET_MANAGER="redis"`
-   - `WEBSOCKET_REDIS_URL="redis://redis:6379/1"`
+1. Verify `WEBSOCKET_MANAGER="redis"` is set on every instance, and that `ENABLE_WEBSOCKET_SUPPORT` is not set to `false` on only some of them.
 2. Check logs for: `DEBUG:open_webui.socket.main:Using Redis to manage websockets.` (logged at DEBUG level, so it appears only with `GLOBAL_LOG_LEVEL=DEBUG`)
 3. Verify Redis is accessible from Open WebUI container
 4. If your Redis user is restricted by ACLs, check the log for `Redis denied publishing` or `Redis denied subscribing`. Either means the user is missing a command or channel permission, and the log line names the permissions and channels to check. With `WEBSOCKET_REDIS_ROOM_CHANNELS` on (the default), the user needs `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING`, plus access to the channels `&socketio` and `&socketio#*`. See [Per-Room Redis Channels](../../getting-started/advanced-topics/scaling.md#per-room-redis-channels).
@@ -669,9 +495,8 @@ REDIS_URL="redis://redis:6379/0"
 
 **Symptoms:**
 
-- Configuration changes affect other instances
-- Sessions conflict between deployments
-- Unexpected behavior when running multiple Open WebUI installations
+- Two separate Open WebUI installations share one Redis server
+- Active-user counts or model lists of one installation show up in the other
 
 **Solution:**
 Use different `REDIS_KEY_PREFIX` values for each installation:
@@ -817,5 +642,3 @@ If you continue to experience issues after following this guide:
 3. Verify all containers can communicate on the Docker network
 4. Collect relevant logs from both Open WebUI and Redis containers
 5. Join the [Open WebUI Discord](https://discord.gg/5rJgQTnV4s) for community support
-
-By following these steps and troubleshooting tips, you should be able to set up Redis with Open WebUI for both application state management and websocket support, enabling reliable multi-instance deployments and real-time communication between clients and your application.

@@ -38,7 +38,7 @@ helm repo update
 
 **Expected result:** your nodes are ready and the `openwebui` namespace exists. If it already exists, reuse it.
 
-This guide pins **chart 16.5.0** and **application v0.11.3**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-16.5.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
+This guide pins **chart 17.5.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-17.5.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
 
 ## 2. Configure the Application
 
@@ -79,7 +79,7 @@ strategy:
   type: Recreate
 image:
   repository: ghcr.io/open-webui/open-webui
-  tag: v0.11.3
+  tag: v0.13.0
 ollama:
   enabled: false
 pipelines:
@@ -110,7 +110,7 @@ startupProbe:
   failureThreshold: 60
 readinessProbe:
   httpGet:
-    path: /health/db
+    path: /ready
     port: http
   periodSeconds: 10
   timeoutSeconds: 5
@@ -132,7 +132,7 @@ extraEnvVars:
 
 </details>
 
-These values give the application predictable resource names, reference its credentials through a Secret, and configure health probes. `Recreate` stops the old application pods before starting replacements during a rollout. Resource requests and limits are starting points; tune them from observed usage.
+These values give the application predictable resource names, reference its credentials through a Secret, and configure health probes. `/ready` answers once startup has finished and the database and Redis (when configured) respond. `Recreate` stops the old application pods before starting replacements during a rollout. Resource requests and limits are starting points; tune them from observed usage.
 
 The chart supports map-style `extraEnvVars`, used here to merge settings across files. Helm 3 may report a coalescing warning because the chart's default is a list; confirm the environment and secret references in the rendered manifest before installing.
 
@@ -185,15 +185,13 @@ Provision these services before installing. The chart configuration below connec
 | Service | What to prepare |
 | :--- | :--- |
 | PostgreSQL + PGVector | An application database and role with schema migration permissions. Have the database administrator enable the `vector` extension in that database. |
-
-:::warning The default vector store cannot be shared
-ChromaDB's default client is SQLite on local disk. Its connections are not fork-safe, so several replicas or workers writing at once crash them. Any deployment past a single replica needs an external vector store, PGVector, Milvus or Qdrant through [`VECTOR_DB`](/reference/env-configuration#vector_db), or ChromaDB run as its own server through [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host).
-:::
 | Redis | A shared endpoint, with authentication and TLS where configured. |
 | S3-compatible storage | An existing bucket and credentials for the required read, write, list, and delete operations. |
 | Embedding API | An OpenAI-compatible embedding endpoint, its API key, and a supported embedding model ID. |
 | Content extraction | A reachable Apache Tika service. |
 | HTTPS access | An installed ingress controller, a DNS hostname, and its TLS certificate and key. |
+
+PGVector replaces the default ChromaDB, whose local SQLite store cannot be shared by several replicas. See [external vector database](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database).
 
 From the application network, verify database login and the vector extension, Redis access, bucket upload/download/delete, a model response, an embedding request, and Tika access. Configure network policies and private CA trust for these services as needed.
 
@@ -258,11 +256,6 @@ extraEnvVars:
         name: openwebui-backends
         key: DATABASE_URL
   VECTOR_DB: pgvector
-  PGVECTOR_DB_URL:
-    valueFrom:
-      secretKeyRef:
-        name: openwebui-backends
-        key: DATABASE_URL
   PGVECTOR_CREATE_EXTENSION: 'false'
   RAG_EMBEDDING_ENGINE: openai
   RAG_EMBEDDING_MODEL: REPLACE_WITH_EMBEDDING_MODEL_ID
@@ -279,9 +272,11 @@ extraEnvVars:
 
 </details>
 
-The chart sets both application and WebSocket Redis URLs from the same Secret. PostgreSQL holds application records and vectors; the bucket holds uploaded files. `/app/backend/data` is ephemeral with this profile, so local caches and feature-specific files outside those shared backends do not survive pod replacement.
+The chart sets both application and WebSocket Redis URLs from the same Secret. PostgreSQL holds application records and vectors (PGVector uses `DATABASE_URL` unless you set [`PGVECTOR_DB_URL`](/reference/env-configuration#pgvector_db_url)); the bucket holds uploaded files. `/app/backend/data` is ephemeral with this profile, so local caches and feature-specific files outside those shared backends do not survive pod replacement.
 
 For one production replica, set `replicaCount: 1` in this file. Additional replicas require sufficient database connection capacity and shared services; place them on different nodes when you need resilience to a node failure. See [scaling guidance](/getting-started/advanced-topics/scaling).
+
+The slim image supports every service this profile uses, so with it you can set `image.tag: v0.13.0-slim` for a much smaller image without the local machine-learning stack. See [what slim leaves out](/getting-started/quick-start#what-slim-leaves-out).
 
 ## 4. Install with Helm
 
@@ -297,13 +292,13 @@ Both paths start with exactly **one migration-enabled worker** and ingress disab
 
 ```bash
 helm template openwebui open-webui/open-webui \
-  --version 16.5.0 --namespace openwebui \
+  --version 17.5.0 --namespace openwebui \
   -f values-common.yaml -f "$OPENWEBUI_PROFILE" \
   --set replicaCount=1 --set ingress.enabled=false \
   --set-string extraEnvVars.ENABLE_DB_MIGRATIONS=true > rendered.yaml
 
 helm install openwebui open-webui/open-webui \
-  --version 16.5.0 --namespace openwebui \
+  --version 17.5.0 --namespace openwebui \
   -f values-common.yaml -f "$OPENWEBUI_PROFILE" \
   --set replicaCount=1 --set ingress.enabled=false \
   --set-string extraEnvVars.ENABLE_DB_MIGRATIONS=true \
@@ -335,7 +330,7 @@ For the production path, apply the saved profile after the first replica initial
 
 ```bash
 helm upgrade openwebui open-webui/open-webui \
-  --version 16.5.0 --namespace openwebui \
+  --version 17.5.0 --namespace openwebui \
   -f values-common.yaml -f values-production.yaml \
   --wait --timeout 15m
 kubectl -n openwebui rollout status deployment/openwebui --timeout=10m
@@ -344,9 +339,9 @@ kubectl -n openwebui get pods,ingress
 
 This disables migrations on all replicas, applies the desired replica count, and enables ingress. Expect a brief restart. Point DNS at your ingress controller, then open your HTTPS hostname.
 
-Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Session affinity may be needed for Socket.IO polling. Affinity does not replace Redis; see [connection troubleshooting](/troubleshooting/connection-error).
+Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. See [connection troubleshooting](/troubleshooting/connection-error).
 
-On the NGINX Ingress Controller, sticky sessions are these annotations on the Ingress resource:
+Session affinity is needed only when WebSockets are turned off ([`ENABLE_WEBSOCKET_SUPPORT=false`](/reference/env-configuration#enable_websocket_support)), because Socket.IO then falls back to polling with separate HTTP requests. Affinity does not replace Redis. On the NGINX Ingress Controller, add these annotations to the Ingress resource:
 
 ```yaml
 metadata:
@@ -357,8 +352,6 @@ metadata:
     nginx.ingress.kubernetes.io/session-cookie-max-age: '172800'
 ```
 
-They keep a user on the same pod, which steadies WebSocket connections across replicas.
-
 ### Verify the Deployment
 
 - **Chat:** Sign in, stream a model response, and reopen the saved conversation.
@@ -366,7 +359,7 @@ They keep a user on the same pod, which steadies WebSocket connections across re
 - **Production documents:** Upload a small document containing a distinctive fact. Confirm indexing finishes and a question about that fact retrieves the correct source. Check that the uploaded object exists in the bucket.
 - **Multiple replicas:** Port-forward two different pods on different local ports, sign in to each, and verify that both can access the same saved conversation and uploaded file. Also test through ingress. A stream on a replaced pod may need to be retried.
 
-A ready pod checks application/database health; it does not prove model APIs, Redis, storage, or licensing work. Many application settings persist after first startup, so later environment changes may not override them. See [configuration persistence](/reference/env-configuration#important-note-on-configvar-environment-variables).
+A ready pod has reached its database and Redis; model APIs, storage and licensing need the checks above. Many application settings persist after first startup, so later environment changes may not override them. See [configuration persistence](/reference/env-configuration#important-note-on-configvar-environment-variables).
 
 ## Enterprise Licensing and Branding
 
@@ -402,7 +395,7 @@ For internally maintained branding, build your licensed fork and push its image 
 ```yaml
 image:
   repository: registry.example.com/platform/openwebui
-  tag: v0.11.3-branding.1
+  tag: v0.13.0-branding.1
 imagePullSecrets:
   - name: openwebui-registry
 ```
@@ -417,7 +410,7 @@ kubectl -n openwebui create secret generic openwebui-registry \
 
 Use immutable image tags and deploy through the update procedure. Changes made inside a running pod will be lost on replacement.
 
-Managed branding is delivered through license configuration. The [v0.11.3 license implementation](https://github.com/open-webui/open-webui/blob/v0.11.3/backend/open_webui/utils/auth.py) attempts startup retrieval over HTTPS through `api.openwebui.com` and `licenses.api.openwebui.com`. Allow DNS resolution and outbound HTTPS for that workflow. A custom branding image does not itself remove license network requirements. For disconnected deployments, obtain supported offline license provisioning instructions from your enterprise contact; `OFFLINE_MODE` alone does not provision a license.
+Managed branding is delivered through license configuration. The [license implementation](https://github.com/open-webui/open-webui/blob/v0.13.0/backend/open_webui/utils/auth.py) attempts startup retrieval over HTTPS through `api.openwebui.com` and `licenses.api.openwebui.com`. Allow DNS resolution and outbound HTTPS for that workflow. A custom branding image does not itself remove license network requirements. For disconnected deployments, obtain supported offline license provisioning instructions from your enterprise contact; `OFFLINE_MODE` alone does not provision a license.
 
 </details>
 
@@ -440,7 +433,7 @@ kubectl -n openwebui wait --for=delete pod \
 
 ```bash
 helm upgrade openwebui open-webui/open-webui \
-  --version 16.5.0 --namespace openwebui \
+  --version 17.5.0 --namespace openwebui \
   -f values-common.yaml -f "$OPENWEBUI_PROFILE" \
   --set replicaCount=1 --set ingress.enabled=false \
   --set-string extraEnvVars.ENABLE_DB_MIGRATIONS=true \
@@ -457,7 +450,7 @@ When changing the chart version, also review its release notes and update `--ver
 <details>
 <summary>Add an HPA and PodDisruptionBudget after the production deployment works</summary>
 
-Chart 16.5.0 does not create these through dedicated values. Save these separate resources as `scaling.yaml`. The HPA requires a working metrics API and CPU requests; first confirm `kubectl top pods -n openwebui` works.
+Chart 17.5.0 does not create these through dedicated values. Save these separate resources as `scaling.yaml`. The HPA requires a working metrics API and CPU requests; first confirm `kubectl top pods -n openwebui` works.
 
 ```yaml title="scaling.yaml"
 apiVersion: autoscaling/v2

@@ -29,7 +29,7 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock nickfedor/wat
 3. Start the container again:
 
    ```bash
-   docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
+   docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data \
      -e WEBUI_SECRET_KEY="your-secret-key" \
      --name open-webui --restart always \
      ghcr.io/open-webui/open-webui:main

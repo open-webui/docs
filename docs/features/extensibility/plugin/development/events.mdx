@@ -957,7 +957,7 @@ There is **no timeout** on pipe, tool, or action execution. Your code can run fo
 
 ### Which Event Types Are Persisted to the Database?
 
-The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**. These writes are independent of the `ENABLE_REALTIME_CHAT_SAVE` setting.
+The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**.
 
 #### ✅ Persisted (survive tab close)
 
@@ -972,7 +972,7 @@ Nothing below is written for a temporary chat or a channel message, since neithe
 | `files` | Merged into the message's `files` array, newest first |
 | `source` / `citation` | Appended to the message's `sources` array, but only when the payload has no `type` field of its own. A typed source such as `code_execution` is not written by the event emitter; it reaches the browser, which stores it on the message when it saves the chat. |
 
-These 6 types write to the database inside the event emitter function itself, completely independent of `ENABLE_REALTIME_CHAT_SAVE`.
+These 6 types write to the database inside the event emitter function itself.
 
 :::warning Use Short Names for Persistence
 The backend event emitter only recognizes the short names above for DB writes. If you emit `"chat:message:embeds"` instead of `"embeds"`, the frontend handles it identically, but the **backend won't persist it**. Always use the short names (`"status"`, `"message"`, `"replace"`, `"embeds"`, `"files"`, `"source"`) if you need persistence.
@@ -1025,11 +1025,7 @@ The final return value of your function is **always saved to the database** when
 
 #### Pipes
 
-When a pipe's `pipe()` method returns (or its generator finishes yielding), the streaming handler saves the final result at completion:
-- If `ENABLE_REALTIME_CHAT_SAVE` is **on**: intermediate chunks are saved during streaming
-- If `ENABLE_REALTIME_CHAT_SAVE` is **off**: the full final content is saved in one write at completion
-
-Either way, the final assistant message is always persisted. When you reopen the chat, it will be there.
+When a pipe's `pipe()` method returns (or its generator finishes yielding), the streaming handler saves the full final content in one write. The final assistant message is always persisted. When you reopen the chat, it will be there.
 
 :::caution
 The return value takes precedence over event-emitted content. If your pipe emits `"message"` events but returns `None`, the saved content will be empty, since the frontend's final save overwrites whatever the event emitter wrote to the database. Always return or yield your content directly from the `pipe()` method.

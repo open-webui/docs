@@ -29,7 +29,7 @@ Each variant also has a development build: `:dev-slim`, `:dev-cuda`, `:dev-cuda1
 
 ### Why choose slim? {#what-slim-leaves-out}
 
-**197 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance—even one on the same machine.
+**197 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance, even one on the same machine.
 
 These are compressed download sizes for Linux/amd64, checked on October 16, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
 
@@ -78,7 +78,7 @@ Slim checks these settings at startup and reports an error for unsupported confi
 | If you want | Point slim at | Otherwise |
 |---|---|---|
 | **Documents, knowledge or RAG** | An embedding provider: `RAG_EMBEDDING_ENGINE` set to `ollama`, `openai` or `azure_openai` | Embedding calls fail with 503, and the admin panel refuses to save the local engine |
-| | PostgreSQL with pgvector: `VECTOR_DB=pgvector` and `PGVECTOR_DB_URL`. It is the only vector store slim carries a client for | 503 the first time retrieval runs. Nothing else is affected, the store is only opened when it is used |
+| | PostgreSQL with pgvector, slim's default and only vector store. It uses `DATABASE_URL` when that points at PostgreSQL; otherwise set `PGVECTOR_DB_URL` | 503 the first time retrieval runs. Nothing else is affected, the store is only opened when it is used |
 | **PDFs and Office files** | Tika, Docling, an external extractor or a cloud engine | Uploading one returns 503. Plain text formats are still read by slim itself |
 | **Voice input** | Any external speech-to-text engine: OpenAI, Deepgram, Azure, Mistral and so on | Local Whisper is not offered, and the admin panel refuses to select it |
 | **Spoken replies** | Any external text-to-speech engine | The local Transformers voice is not offered, and requesting speech returns 503 |
@@ -104,7 +104,7 @@ If you use Open WebUI as a chat front end for hosted models, none of the above a
 
 Slim never downloads a model, because it cannot run one, and an air-gapped deployment otherwise only has to reach whichever services it uses on your own network. `OFFLINE_MODE=true` still blocks the Hugging Face traffic and the version check.
 
-The one exception is the **code interpreter**. The standard image bundles the Python packages it runs; slim ships only the Pyodide runtime and points the package list at `cdn.jsdelivr.net`, so the browser pulls them from the internet on first use. Air-gapped instances should leave the code interpreter off, or use the standard image.
+Two features reach the internet on first use. The **token text splitter** downloads its tiktoken encoding, so offline instances should use the character splitter. The **code interpreter** has the browser pull its Python packages from `cdn.jsdelivr.net`, because slim ships only the Pyodide runtime while the standard image bundles them. Air-gapped instances should leave the code interpreter off, or use the standard image.
 
 ### How the tags update
 
@@ -132,6 +132,7 @@ For production environments, pin a specific version instead of using floating ta
 
 ```bash
 docker pull ghcr.io/open-webui/open-webui:vX.Y.Z
+docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-slim
 docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
 docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
 ```

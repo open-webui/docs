@@ -15,7 +15,7 @@ Before proceeding, ensure you have configured the [shared infrastructure require
 
 - Your organization runs Kubernetes and has platform engineering expertise
 - You need declarative infrastructure-as-code with GitOps workflows
-- You require advanced scaling (HPA), rolling updates, and pod disruption budgets
+- You require autoscaling (HPA), declarative updates, and pod disruption budgets
 - You are deploying for hundreds to thousands of users in a mission-critical environment
 
 ## Architecture
@@ -84,8 +84,10 @@ websocket:
 tika:
   enabled: true
 
-# -- Ollama: disable if using external model APIs or a separate Ollama deployment
+# -- Ollama and Pipelines are deployed by default; disable what you do not use
 ollama:
+  enabled: false
+pipelines:
   enabled: false
 
 # -- Storage: use object storage instead of local PVC for multi-replica
@@ -111,11 +113,6 @@ ingress:
   host: "ai.example.com"
   tls: true
   existingSecret: "openwebui-tls"
-  annotations:
-    nginx.ingress.kubernetes.io/affinity: "cookie"
-    nginx.ingress.kubernetes.io/session-cookie-name: "open-webui-session"
-    nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
-    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
 
 # -- Remaining settings that don't have dedicated chart values
 extraEnvVars:
@@ -125,12 +122,7 @@ extraEnvVars:
         name: openwebui-secrets
         key: secret-key
   - name: VECTOR_DB
-    value: "pgvector"
-  - name: PGVECTOR_DB_URL
-    valueFrom:
-      secretKeyRef:
-        name: openwebui-secrets
-        key: database-url
+    value: "pgvector"  # uses DATABASE_URL unless PGVECTOR_DB_URL is set
   - name: UVICORN_WORKERS
     value: "1"
   - name: ENABLE_DB_MIGRATIONS
@@ -148,14 +140,7 @@ extraEnvVars:
 ## Update Procedure
 
 :::danger Critical Update Process
-When running multiple replicas, you **must** follow this process for every update:
-
-1. Scale the deployment to **1 replica**
-2. Apply the new image version (with `ENABLE_DB_MIGRATIONS=true` on the single replica)
-3. Wait for the pod to become **fully ready** (database migrations complete)
-4. Scale back to your desired replica count (with `ENABLE_DB_MIGRATIONS=false`)
-
-Skipping this process risks database corruption from concurrent migrations.
+Never let several replicas run migrations at once, and never let old and new versions serve the same database. Stop all replicas, start one with `ENABLE_DB_MIGRATIONS=true` on the new version, wait until it is ready, then scale back up with migrations off. Helm rollback does not undo migrations. The full procedure with commands is in [Updates and Recovery](/deployment/kubernetes#updates-and-recovery).
 :::
 
 ## Key Considerations

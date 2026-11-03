@@ -57,10 +57,10 @@ Since v0.11.4, personal tool servers sit behind the **Direct Integrations** swit
 This release runs a database migration that adds a sign-in record to every account that lacks one, in practice the accounts created through [SCIM](/features/authentication-access/auth/scim#integration-with-sso). It changes data only. Back up first. The added records carry no usable password, so these users keep signing in through SSO.
 :::
 
-:::warning Running multiple workers or replicas?
-Update every instance at the same time. Rolling updates are not supported across a release that changes the database schema: the migration moves the whole database forward at once, while the instances still on the old version keep querying the old shape. Stop all replicas and workers, let one instance migrate, then bring the rest back up on the new version.
+:::warning Running multiple replicas?
+Update every instance at the same time. Rolling updates are not supported across a release that changes the database schema: the migration moves the whole database forward at once, while the instances still on the old version keep querying the old shape. Stop all replicas, let one instance migrate, then bring the rest back up on the new version.
 
-Setting `UVICORN_WORKERS=1` or `ENABLE_DB_MIGRATIONS=false` on all but one instance decides **which** instance runs the migration, it does not make a mixed-version fleet safe. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the full procedure and the [Scaling guide](/getting-started/advanced-topics/scaling) for the surrounding setup.
+Setting `ENABLE_DB_MIGRATIONS=false` on all but one instance decides **which** instance runs the migration, it does not make a mixed-version fleet safe. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the full procedure and the [Scaling guide](/getting-started/advanced-topics/scaling) for the surrounding setup.
 :::
 
 ---
@@ -318,7 +318,7 @@ For database-specific recovery, see the [Manual Database Migration](/troubleshoo
 
 ## Related Guides
 
-- [Scaling Open WebUI](/getting-started/advanced-topics/scaling): multi-worker and multi-instance deployments
+- [Scaling Open WebUI](/getting-started/advanced-topics/scaling): multi-replica deployments
 - [Connection Errors](/troubleshooting/connection-error): troubleshooting post-update connectivity issues
 - [Environment Variable Reference](/reference/env-configuration): all configuration options including `WEBUI_SECRET_KEY`
 - [Release Notes](https://github.com/open-webui/open-webui/releases): changelog for every version

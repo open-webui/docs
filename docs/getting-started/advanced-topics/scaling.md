@@ -5,196 +5,149 @@ title: "Scaling Open WebUI"
 
 # Scaling Open WebUI
 
-Open WebUI is designed to scale with your needs, from a single user to organization-wide rollouts across entire enterprises and institutions. The steps below walk you through how to configure your deployment as your needs grow.
+Open WebUI scales from a single user to organization-wide rollouts. It follows a **stateless, container-first architecture**, so scaling it works like scaling any modern web application: move state into shared services, then add instances behind a load balancer.
 
-Open WebUI follows a **stateless, container-first architecture**, which means scaling it looks a lot like scaling any modern web application. Whether you're moving from a hobby setup to supporting a department, or growing from hundreds to thousands of users, the same set of building blocks apply.
-
-This guide walks you through the key concepts and configurations at a high level. For exact environment variable details, see the [Environment Variable Reference](/reference/env-configuration).
+This guide covers the steps at a high level. For exact variable details, see the [Environment Variable Reference](/reference/env-configuration). For tuning a single instance, see [Optimization, Performance & RAM Usage](/troubleshooting/performance). When something breaks in a scaled deployment, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica).
 
 ---
 
 ## Understanding the Defaults
 
-Open WebUI defaults to a **self-contained, single-instance deployment**. The standard Docker setup includes:
+Open WebUI defaults to a **self-contained, single-instance deployment**. The standard Docker image includes:
 
 - **Embedded SQLite** for application data on a persistent volume
 - **Embedded ChromaDB** (also backed by SQLite) for RAG embeddings
 - **Local file storage** (`STORAGE_PROVIDER=local`) for uploads under `DATA_DIR/uploads`
 - **A single Uvicorn worker**, with no external database or Redis required
 
-This approach was chosen to **minimize time to deployment and operational overhead**: you can start using Open WebUI without first provisioning separate database or coordination services. Keeping these dependencies local also simplifies **air-gapped deployment** when models and required assets are provisioned within the isolated environment.
+This keeps time to deployment and operational overhead low, and simplifies **air-gapped deployment**.
 
-**Horizontal scaling requires shared persistence and coordination**, so every replica operates on the same data. Before adding replicas or workers, replace the embedded database configuration with PostgreSQL and a client-server vector database, configure shared file storage, and add Redis for coordination. This separates state from individual instances, allowing the **stateless application tier** to scale independently behind a load balancer.
+**Horizontal scaling requires shared persistence and coordination**, so every replica works on the same data. Before adding replicas, switch to PostgreSQL and a client-server vector database, configure shared file storage and add Redis. The application tier then scales independently behind a load balancer.
 
 :::warning External databases do not share uploaded files
-PostgreSQL stores file metadata and storage paths, while the vector database stores embeddings. Neither replaces file storage. Before adding replicas, configure **external object storage (S3, GCS, or Azure Blob)** or a **shared filesystem** accessible to every replica. Separate local volumes leave attachments unavailable when a request reaches another instance. See [Step 5](#step-5-share-file-storage-across-instances).
+PostgreSQL stores file metadata and storage paths, and the vector database stores embeddings. Neither stores the files. Before adding replicas, configure **external object storage (S3, GCS or Azure Blob)** or a **shared filesystem** that every replica can reach. See [Step 5](#step-5-share-file-storage-across-instances).
 :::
 
 ---
 
 ## Step 1: Switch to PostgreSQL
 
-**When:** You plan to run more than one Open WebUI instance, or you want better performance and reliability for your database. **You should also switch if your SQLite file lives on anything other than a locally-attached SSD/NVMe**: see the callout below.
+**When:** You plan to run more than one Open WebUI instance, or your SQLite file lives on anything other than a locally attached SSD/NVMe.
 
 :::tip You don't need this step if you're a single-replica deployment on local disk
-**Staying on SQLite is fine for:** single-replica deployments, personal use, evaluation, home lab setups, and small teams, **as long as the database file lives on a locally-attached SSD/NVMe and you're not running multiple replicas or workers.** The 0.8 → 0.9 async-backend story only bites when `webui.db` is on network storage; on local disk, SQLite is fast, supported, and a perfectly reasonable default. No migration needed. Skip this step and move on to whichever later step you actually need.
+SQLite is fine for single-replica deployments, personal use, evaluation, home labs and small teams, **as long as the database file lives on a locally attached SSD/NVMe.** Skip to whichever later step you need.
 :::
 
-SQLite stores everything in a single file and doesn't handle concurrent writes from multiple processes well. PostgreSQL is a production-grade database that supports many simultaneous connections.
+SQLite stores everything in a single file and handles concurrent writes from several processes poorly. PostgreSQL supports many simultaneous connections.
 
 **What to do:**
 
-Set the `DATABASE_URL` environment variable to point to your PostgreSQL server:
+Set [`DATABASE_URL`](/reference/env-configuration#database_url) to your PostgreSQL server:
 
 ```
 DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 ```
 
+Use a plain `postgresql://` URL. Open WebUI picks the async driver (psycopg 3) itself.
+
 **Key things to know:**
 
 - Open WebUI does **not** migrate data between databases, so plan this before you have production data in SQLite.
-- For high-concurrency deployments, tune `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` to match your usage patterns. See [Database Optimization](/troubleshooting/performance#-database-optimization) for detailed guidance.
-- Remember that **each Open WebUI instance maintains its own connection pool**, so total connections = pool size × number of instances.
-- If you skip this step and run multiple instances with SQLite, you will see `database is locked` errors and data corruption. See [Database Corruption / "Locked" Errors](/troubleshooting/multi-replica#4-database-corruption--locked-errors) for details.
-
-:::tip
-A good starting point for tuning is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`. Keep the combined total per instance well below your PostgreSQL `max_connections` limit (default is 100).
-:::
+- **Connection pool.** With [`DATABASE_POOL_SIZE`](/reference/env-configuration#database_pool_size) unset, each process uses SQLAlchemy's default of 5 connections plus 10 overflow. Once you set `DATABASE_POOL_SIZE`, the overflow default drops to `0`, so set [`DATABASE_POOL_MAX_OVERFLOW`](/reference/env-configuration#database_pool_max_overflow) too. `DATABASE_POOL_SIZE=0` disables pooling. `DATABASE_POOL_SIZE=15` with `DATABASE_POOL_MAX_OVERFLOW=20` is a good start for busy instances.
+- **Every replica has its own pool.** The maximum number of connections is `(DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × replicas`. Keep that below PostgreSQL's `max_connections` (default 100) with room for other clients. With the values above, 3 replicas can open 105 connections.
+- For single-instance pool tuning, see [Connection Pool Sizing](/troubleshooting/performance#connection-pool-sizing).
 
 For credential handling and encryption at rest, see the [Database section of the Hardening guide](/getting-started/advanced-topics/hardening#database).
 
 ### Why SQLite on network storage fails the moment you scale (or upgrade)
 
-Since 0.9.0 the backend data layer is **fully async** (async SQLAlchemy + `aiosqlite`). That change made Open WebUI dramatically more concurrent and, as a side effect, made every pre-existing "SQLite is slow on NFS/CephFS/Azure Files" problem go from *tolerable* to *fatal* overnight. Many operators hit this right after upgrading from 0.8.x without changing anything else in their deployment.
+SQLite on NFS, CephFS, Azure Files or a network-backed Kubernetes PVC works at low load and then fails under concurrency: connection pool timeouts, `database is locked` and simple queries that stall for seconds or minutes. Every commit waits on a slow network `fsync`, and SQLite's file locking is [unreliable over network filesystems](https://www.sqlite.org/faq.html#q5). A bigger pool makes it worse.
 
-The mechanism in one paragraph: SQLite's durability guarantee is `fsync()` on every commit. On local SSD that's ~100 μs. On NFS / CephFS / Azure Files / Kubernetes PVCs backed by network storage that's 50 to 500 ms, sometimes seconds. In the old sync backend, FastAPI's ~40-thread worker pool acted as a natural throttle, so slow storage meant "slow app." In the async backend there's no thread-pool ceiling: the asyncio loop schedules thousands of DB coroutines in parallel, every slow `fsync` keeps a connection checked out for the full duration, and the SQLAlchemy async pool (default `pool_size=5` + `max_overflow=10` = 15 connections) saturates almost instantly. You then see:
-
-```
-sqlalchemy.exc.TimeoutError: QueuePool limit of size 5 overflow 10 reached,
-connection timed out, timeout 30.00
-```
-
-Making the pool bigger just moves the breaking point. More connections means more concurrent slow `fsync`s hitting the same slow storage; the filesystem is still the bottleneck.
-
-On top of that, SQLite's WAL mode relies on a memory-mapped `-shm` file for cross-process coordination, and `mmap` over NFS is [officially unreliable per SQLite upstream](https://www.sqlite.org/faq.html#q5): with high async concurrency it can produce actual locking pathologies (deadlocks, `PRAGMA journal_mode=WAL` that starts but never completes, multi-minute stalls on trivial queries).
-
-**There is no setting that fixes this while SQLite stays on network storage.** The three options are:
-
-1. **Best: switch to PostgreSQL (this step).** The DB server manages its own I/O against its own local storage. Your app reaches it over a network socket, but that hop is orders of magnitude cheaper than NFS `fsync`, and Postgres was designed from day one for concurrent writers. This is the only supported configuration for multi-replica, multi-user, or Kubernetes/Swarm deployments.
-2. **Move `webui.db` off network storage onto a local SSD/NVMe.** Only appropriate for single-node, low-user deployments. Your RAG files and uploads on NFS are fine: SQLite specifically is the problem, not the shared filesystem in general.
-3. **Temporary workaround if you cannot do either yet:**
-   ```bash
-   DATABASE_POOL_SIZE=1
-   DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
-   ```
-   Serializes to a single async connection, trading concurrency for stability. **Not supported long-term**: plan the real migration.
-
-The short version: sync backends throttled concurrency through thread pools, so slow storage just made things *slow*. Async backends allow massive concurrency, which means slow `fsync`s stack up, connections stay checked out longer, the pool saturates, and the whole thing wedges. The same storage was tolerable before because the app wasn't asking it to do 20 concurrent `fsync`s.
+No setting fixes this while SQLite stays on network storage. Switch to PostgreSQL (this step), or move `webui.db` to a local SSD/NVMe for a single-node deployment. Uploads and RAG files can stay on the shared filesystem. For the mechanism, see [Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage). For symptoms and a stopgap, see [Database Corruption / "Locked" Errors](/troubleshooting/multi-replica#4-database-corruption--locked-errors).
 
 ---
 
 ## Step 2: Add Redis
 
-**When:** You want to run multiple Open WebUI instances (horizontal scaling) or multiple Uvicorn workers.
+**When:** You run more than one Open WebUI instance.
 
-Redis acts as a **shared state store** so that all your Open WebUI instances can coordinate sessions, websocket connections, and application state. Without it, users would see inconsistent behavior depending on which instance handles their request.
+Redis lets all instances coordinate. It has two roles:
 
-Open WebUI talks to Redis through the standard client and uses ordinary commands, so a Redis-protocol server should work in its place. [**Valkey**](/tutorials/integrations/valkey), the BSD-licensed fork most distributions now ship, and **Dragonfly** both fit that description: same `REDIS_*` settings, same URL scheme, only the image changes.
-
-Neither is part of what Open WebUI tests, so neither is officially supported yet. If you run one, use a **recent release**. Older Dragonfly builds report a version string the pinned client refuses. Run Dragonfly standalone as well, since its cluster mode does not carry pub/sub, which is what coordinates websockets.
+- [`REDIS_URL`](/reference/env-configuration#redis_url): token revocation on sign-out, stopping and resuming responses running on another instance, sign-in rate limiting, OAuth token refresh locks and the optional base-model cache.
+- [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager): delivers live updates (streamed tokens, channel messages, note edits) to users connected to other instances, and shares the model list, active users and presence between them. It connects to [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url), which defaults to `REDIS_URL`.
 
 **What to do:**
 
-Set these environment variables:
+Set both on every instance:
 
 ```
 REDIS_URL=redis://redis-host:6379/0
 WEBSOCKET_MANAGER=redis
-ENABLE_WEBSOCKET_SUPPORT=true
 ```
+
+Keep [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) at its default `true`.
+
+Open WebUI uses ordinary Redis commands, so a Redis-protocol server such as [**Valkey**](/tutorials/integrations/valkey) or **Dragonfly** works with the same settings. Neither is part of what Open WebUI tests. Use a recent release, and run Dragonfly standalone, since its cluster mode does not carry the pub/sub that live updates depend on.
 
 **Key things to know:**
 
-- Redis is **not needed** for single-instance deployments for basic functionality. However, **without Redis, signing out does not revoke tokens**: they remain valid until they expire (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. If your deployment is production-facing or handles sensitive data, Redis is strongly recommended even for a single instance, or alternatively shorten `JWT_EXPIRES_IN` to limit exposure. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation) in the Hardening guide for details.
-- If you're using Redis Sentinel for high availability, also set `REDIS_SENTINEL_HOSTS` and consider setting `REDIS_SOCKET_CONNECT_TIMEOUT=5` to prevent hangs during failover.
-- For AWS Elasticache or other managed Redis Cluster services, set `REDIS_CLUSTER=true`.
-- Make sure your Redis server has `timeout 1800` and a high enough `maxclients` (10000+) to prevent connection exhaustion over time.
-- For high-concurrency websocket streaming, review Redis Pub/Sub output buffer limits. Large Socket.IO events can disconnect Pub/Sub clients if Redis uses small default buffers; see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
-- All instances must use the same [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) value, so change it on every instance at once. See [Per-Room Redis Channels](#per-room-redis-channels).
-- A **single Redis instance** is sufficient for the vast majority of deployments, even with thousands of users. You almost certainly do not need Redis Cluster unless you have specific HA/bandwidth requirements. If you think you need Redis Cluster, first check whether your connection count and memory usage are caused by fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
-- Without Redis in a multi-instance setup, you will experience [WebSocket 403 errors](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures), [configuration sync issues](/troubleshooting/multi-replica#3-model-not-found-or-configuration-mismatch), and intermittent authentication failures.
+- Single instances work without Redis, but then **signing out does not revoke the session token**: it stays valid until it expires (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. For production or sensitive data, add Redis or shorten `JWT_EXPIRES_IN`. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+- **Redis Sentinel:** set [`REDIS_SENTINEL_HOSTS`](/reference/env-configuration#redis_sentinel_hosts) and [`WEBSOCKET_SENTINEL_HOSTS`](/reference/env-configuration#websocket_sentinel_hosts) (the websocket manager reads only the second). The host part of `REDIS_URL` is the master's service name. Set `REDIS_SOCKET_CONNECT_TIMEOUT=5` so failover does not hang.
+- **Redis Cluster** (for example AWS ElastiCache in cluster mode): set [`REDIS_CLUSTER=true`](/reference/env-configuration#redis_cluster). The websocket manager follows it.
+- Set the Redis server `timeout` (for example `1800`) and a high enough `maxclients` (10000+) to prevent connection exhaustion.
+- For heavy streaming, raise Redis's Pub/Sub output buffer limits; see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
+- All instances must use the same [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) value. See [Per-Room Redis Channels](#per-room-redis-channels).
+- A **single Redis instance** is enough for the vast majority of deployments, even with thousands of users. Before reaching for Redis Cluster, check for fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
 
-For a complete step-by-step Redis setup (Docker Compose, Sentinel, Cluster mode, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
+For a full Redis setup (Docker Compose, Sentinel, Cluster, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
 
 ---
 
 ## Step 3: Run Multiple Instances
 
-**When:** You need to handle more users or want high availability (no downtime during deploys or if a container crashes).
+**When:** You need to serve more users or want high availability.
 
-Open WebUI is stateless, so you can run as many instances as needed behind a **load balancer**. Each instance is identical and interchangeable.
+With shared state in place, run as many identical instances as you need behind a **load balancer**.
 
 :::warning
-Before running multiple instances, ensure you have completed **Steps 1 and 2** (PostgreSQL and Redis). You also need a shared `WEBUI_SECRET_KEY` across all replicas. Without it, users will experience [login loops and 401 errors](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors). For how to generate, store, and rotate that key (plus the matching `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`), see [Secret Key](/getting-started/advanced-topics/hardening#secret-key) in the Hardening guide. For a full pre-flight checklist, see the [Core Requirements Checklist](/troubleshooting/multi-replica#core-requirements-checklist).
+Complete **Steps 1, 2, 4 and 5** first. All replicas also need the same `WEBUI_SECRET_KEY`, or users get [login loops and 401 errors](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors). For generating, storing and rotating it (plus `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`), see [Secret Key](/getting-started/advanced-topics/hardening#secret-key). For a pre-flight list, see the [Core Requirements Checklist](/troubleshooting/multi-replica#core-requirements-checklist).
 :::
 
-### Option A: Container Orchestration (Recommended)
+Keep one worker per instance ([`UVICORN_WORKERS=1`](/reference/env-configuration#uvicorn_workers), the default) and scale by changing the number of replicas. Each replica then has its own memory limit and can be restarted on its own.
 
-Use Kubernetes, Docker Swarm, or similar platforms to manage multiple replicas:
+- **Docker Compose** (one host): set `deploy.replicas` on the Open WebUI service, or run `docker compose up -d --scale open-webui=3`. Remove the fixed host port mapping (such as `3000:8080`) from that service, because only one container can bind a host port. Put a reverse proxy (Nginx, Traefik or Caddy) in the same Compose project and point it at `open-webui:8080`; Docker's DNS returns every replica for the service name, and the proxy spreads requests across them round-robin. With WebSockets on (the default), plain round-robin works without sticky sessions. Nginx resolves that name only at startup, so reload it after changing the replica count.
+- **Docker Swarm** or **Kubernetes** (several hosts): set the replica count of the service or Deployment, or let an autoscaler manage it. See [Docker Swarm](/deployment/docker-swarm) and [Kubernetes](/deployment/kubernetes).
 
-- Keep `UVICORN_WORKERS=1` per container (let the orchestrator handle scaling, not the app)
-- Set `ENABLE_DB_MIGRATIONS=false` on all replicas except one designated "primary" pod to prevent migration race conditions: see [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations) for the safe procedure
-- Scale up/down by adjusting your replica count
-
-### Option B: Multiple Workers per Container (Last Resort)
-
-On a single machine with no orchestrator at all, you can raise `UVICORN_WORKERS`:
-
-```
-UVICORN_WORKERS=4
-```
-
-:::warning This is the weakest way to scale
-
-Prefer more containers even on one machine: Docker Compose runs replicas on a single host perfectly well, and gets you restarts one at a time and a per-container memory limit.
-
-Extra workers cost you everything replicas cost, PostgreSQL, Redis and a client-server vector database are all still required, and return none of the benefit. They share one container, so they share its memory limit and die with it, and they cannot be spread across machines when one stops being enough.
-
-:::
-
-:::caution Every worker runs the migrations
-
-Each worker is a full Open WebUI process, so each one runs the startup migrations, all at the same time. `ENABLE_DB_MIGRATIONS` cannot pick one of them: every worker in a container reads the same value. Start a new version with `UVICORN_WORKERS=1`, wait until the migrations have finished, then raise it again.
-
-:::
+Let only one process run database migrations; see [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations). Compose gives every replica the same settings, so `ENABLE_DB_MIGRATIONS` cannot pick one of them. Upgrade by scaling down to one replica (`docker compose up -d --scale open-webui=1`), wait until it is healthy, then scale back up.
 
 ### Offload HTTP Compression to the Load Balancer
 
-Once a load balancer, ingress, or CDN sits in front of Open WebUI, let **it** handle HTTP response compression and disable the application-level compression middleware:
+Once a load balancer, ingress or CDN sits in front of Open WebUI, let it compress HTTP responses and turn off the app's compression:
 
 ```
 ENABLE_COMPRESSION_MIDDLEWARE=false
 ```
 
-By default every Open WebUI worker compresses its own HTTP responses (JSON API responses and static assets) with ZStd/Brotli/Gzip. Profiling shows this costs roughly **3–4% CPU per worker**, multiplied across every replica in a scaled deployment. Enabling compression at the proxy layer instead (e.g. Nginx `gzip on;`, Traefik's compress middleware, Cloudflare's default compression) keeps responses just as small on the wire while freeing that CPU on every worker, and lets CDNs cache static assets in pre-compressed form.
+Every replica otherwise spends a few percent of its CPU compressing responses. Streaming chat responses and WebSocket traffic are unaffected either way. If nothing in front compresses, the first page load and large JSON responses get bigger. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware).
 
-WebSocket traffic and streaming chat responses (SSE) are never compressed by this middleware anyway, so disabling it has no effect on the chat streaming path. If nothing in front of Open WebUI compresses responses, the main cost of disabling is a larger first (uncached) page load, several megabytes of JavaScript/CSS, and larger big-JSON payloads (long chat histories, large model lists), which matters mostly on slow or mobile links. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) for the full trade-off discussion.
-
-WebSocket frames are compressed separately, by the websocket server itself, and that is worth switching off under heavy streaming:
+WebSocket frames are compressed by the WebSocket server itself. Under heavy streaming, turn that off:
 
 ```
 UVICORN_WS_PER_MESSAGE_DEFLATE=false
 ```
 
-Chat responses stream as a very small frame per token, so compressing each one costs processor time for every subscriber and saves almost nothing at that size. The frames that did benefit, a finished message or a set of sources, are a few hundred kilobytes at most even for a very long reply. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
+Chat responses stream as one small frame per token, so compressing each frame costs CPU for every subscriber and saves almost nothing. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
 
-Two more websocket settings matter once a deployment is large. Each open tab sends a heartbeat every thirty seconds by default, so an instance holding thousands of idle tabs handles a steady stream of messages carrying nothing; `WEBSOCKET_HEARTBEAT_INTERVAL=60` halves that, at the cost of a disconnected user staying in the active count for longer, since the server holds a presence entry for four times the interval. And a response being streamed is held in Redis so a reconnecting browser can resume it, with the entry deleted as soon as that response finishes; `REDIS_RESPONSE_STREAM_TTL` puts an hour's expiry on the leftovers from workers killed mid-stream, which previously stayed forever. See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_heartbeat_interval) and [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
+Two more WebSocket settings matter at size:
+
+- **Heartbeats.** Each open tab sends a heartbeat every 30 seconds. [`WEBSOCKET_HEARTBEAT_INTERVAL=60`](/reference/env-configuration#websocket_heartbeat_interval) halves that traffic. A disconnected user then stays in the active count longer, since presence lasts four times the interval (at least 120 seconds).
+- **Leftover streams.** A response being streamed is kept in Redis so a reconnecting browser can resume it, and is deleted when it finishes. [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl) (default `3600` seconds) expires entries left behind by replicas killed mid-stream. `0` keeps them forever.
 
 #### Pair It with Static Asset Caching at the Proxy
 
-Disabling app-side compression works best when the proxy also **caches the static assets aggressively**, so the "larger first page load" downside effectively disappears: each browser downloads the (proxy-compressed) bundles once and then never asks for them again.
+Disabling app-side compression works best when the proxy also **caches the static assets**, so each browser downloads the compressed bundles once.
 
-Open WebUI's frontend is a SvelteKit app: all of its JavaScript/CSS lives under `/_app/immutable/` with **content-hashed filenames**. A given URL never changes content, an upgrade produces new filenames, so these files are safe to cache essentially forever. The HTML shell and `/_app/version.json` are the opposite: they must stay short-lived, because they are how browsers discover a new build (Open WebUI polls `version.json` to detect upgrades and reload).
+All frontend JavaScript and CSS lives under `/_app/immutable/` with **content-hashed filenames**. A given URL never changes content, so these files are safe to cache for a long time. The HTML shell and `/_app/version.json` must stay short-lived, because browsers use them to discover a new build.
 
 Example for Nginx:
 
@@ -202,7 +155,7 @@ Example for Nginx:
 proxy_cache_path /var/cache/nginx/openwebui levels=1:2 keys_zone=OPENWEBUI_STATIC:10m
                  max_size=1g inactive=7d use_temp_path=off;
 
-# Content-hashed SvelteKit bundles — immutable by construction, cache "forever"
+# Content-hashed bundles: immutable by construction
 location ^~ /_app/immutable/ {
     proxy_pass http://openwebui;
     proxy_http_version 1.1;
@@ -216,28 +169,18 @@ location ^~ /_app/immutable/ {
 }
 ```
 
-- The `immutable` keyword stops browsers from revalidating on reload/F5, `max-age` alone doesn't. If a year feels uncomfortable, 30 days (`max-age=2592000, immutable`) gives nearly the same effect; the hashed filenames make staleness impossible either way.
-- **Do not** apply long caching to the HTML shell or `/_app/version.json`, leave those uncached or at a few minutes at most, or users won't pick up upgrades. Open WebUI sends the HTML shell with `Cache-Control: no-cache` unless [`CACHE_CONTROL`](/reference/env-configuration#cache_control) is set, so browsers revalidate it on every visit; keep that header as it is at the proxy.
-- `proxy_cache` means each asset is fetched from a worker once per cache lifetime instead of once per user, removing the static file serving load from the Python workers entirely.
-- If Nginx compresses on the fly, note that it compresses on **every response** (its proxy cache stores the uncompressed body), so prefer moderate levels, `gzip_comp_level 4;` / brotli quality 4–5 gets ~95% of the ratio of level 6 at roughly half the CPU, and set `gzip_min_length 1000;` so tiny responses skip the compressor.
+- `immutable` stops browsers from revalidating on reload. `max-age=2592000, immutable` (30 days) works nearly as well.
+- Keep the HTML shell and `/_app/version.json` uncached or at a few minutes, or users miss upgrades. Open WebUI sends the HTML shell with `Cache-Control: no-cache` unless [`CACHE_CONTROL`](/reference/env-configuration#cache_control) is set; keep that header at the proxy.
+- `proxy_cache` fetches each asset from a replica once per cache lifetime instead of once per user.
+- Nginx compresses on every response (its cache stores the uncompressed body), so use moderate levels: `gzip_comp_level 4;` or brotli quality 4 to 5, plus `gzip_min_length 1000;`.
 
 ### Switch the JSON Encoder to orjson
 
-Multiple instances mean Socket.IO events travel through Redis, and every one of them is encoded and decoded as JSON. That encoding was the single largest cost measured on the workers handling live updates in clustered deployments. Open WebUI uses [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard library, by default, controlled by [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson):
-
-```
-ENABLE_ORJSON=True
-```
-
-It covers HTTP request and response bodies, saving and opening chats (a whole conversation is encoded on every save and decoded again on every open), reading settings, the requests sent to model providers, upstream provider responses including the per-chunk parsing of streamed completions and the Socket.IO and Redis payloads. `orjson` already ships as a dependency, so nothing needs installing, and the setting is read once at startup. orjson is stricter about what it accepts, and anything it rejects falls back to the standard library automatically, so it cannot turn a working payload into an error.
-
-For the full breakdown of what it covers, the two behaviour differences worth knowing and when it is not worth enabling, see [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
+With several instances, every live update crosses Redis and is encoded and decoded as JSON. [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) (default `True`) uses the much faster [orjson](https://pypi.org/project/orjson/) library for this and for the rest of the app. Keep it on. For the behaviour differences, see [Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder).
 
 ### Per-Room Redis Channels
 
-With `WEBSOCKET_MANAGER=redis`, every live update (each streamed token, each channel message, each note edit) used to go out on one shared Redis channel, and every instance decoded every update to find out whether any of its users needed it. With 16 instances, each token was decoded 16 times and thrown away 15 times. Profiling a loaded fleet of 16 instances and about 4,000 users put roughly 31% of all active CPU in that decoding, the largest single cost.
-
-Updates addressed to a specific user, channel or note are published on a Redis channel of their own. Each instance subscribes only to the rooms of the people connected to it, so Redis never sends it live updates for chats it does not serve. This cuts the Redis output and the traffic each instance receives. Acknowledgements and control messages stay on the shared channel. This is on by default, and the saving grows with the number of instances:
+With `WEBSOCKET_MANAGER=redis`, live updates addressed to a specific user, channel or note go out on a Redis channel of their own. Each instance subscribes only to the rooms of the users connected to it, so it skips decoding updates meant for other instances. Acknowledgements and control messages stay on the shared channel. The saving grows with the number of instances. This is on by default:
 
 ```
 WEBSOCKET_REDIS_ROOM_CHANNELS=True
@@ -245,13 +188,13 @@ WEBSOCKET_REDIS_ROOM_CHANNELS=True
 
 :::warning Update all instances together
 
-Every instance must run the same mode. Changing this setting needs a full restart of the whole fleet. A rolling restart leaves instances in different modes, and live updates then go missing between them. Stop all instances, change the setting everywhere, then start them again.
+Every instance must run the same mode. A rolling restart leaves instances in different modes, and live updates then go missing between them. Stop all instances, change the setting everywhere, then start them again.
 
 :::
 
-If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING` commands and access to the channels `&socketio` and `&socketio#*`. The room channels are named `socketio#<namespace>#<room>`. Each instance subscribes to the room channels of its connected users and unsubscribes when the last of them leaves. `PSUBSCRIBE` is no longer used. When a permission is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`, together with the permissions and channels to check.
+If your Redis user is restricted by ACLs, it needs the `PUBLISH`, `SUBSCRIBE`, `UNSUBSCRIBE` and `PING` commands and access to the channels `&socketio` and `&socketio#*`. Room channels are named `socketio#<namespace>#<room>`. When a permission is missing, live updates fail and the log shows `Redis denied publishing` or `Redis denied subscribing`, together with the permissions and channels to check.
 
-`WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel again. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
+`WEBSOCKET_REDIS_ROOM_CHANNELS=False` sends everything through the one shared channel. See [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels).
 
 ### Speed Up Name Lookups
 
@@ -261,17 +204,17 @@ Hostname lookups queue behind each other under load, delaying the request each o
 AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 ```
 
-It is opt-in because c-ares reads fewer name sources than the operating system does. See [DNS Resolver](../../troubleshooting/performance.md#dns-resolver) for the trade-off and what to test afterwards.
+It is opt-in because c-ares reads fewer name sources than the operating system does. See [DNS Resolver](/troubleshooting/performance#dns-resolver) for what to test afterwards.
 
 ---
 
 ## Step 4: Switch to an External Vector Database
 
-**When:** You run more than one Uvicorn worker (`UVICORN_WORKERS > 1`) or more than one replica. **This is not optional.**
+**When:** You run more than one replica. **This is required.**
 
 :::danger Default ChromaDB Will Crash in Multi-Process Setups
 
-The default vector database (ChromaDB) uses a local `PersistentClient` backed by **SQLite**. SQLite connections are **not fork-safe**: when uvicorn forks multiple workers, each process inherits the same database connection. Concurrent writes (e.g., during document uploads) cause **instant worker death**:
+The default ChromaDB runs embedded in the Open WebUI process and stores its data in local SQLite files under `DATA_DIR/vector_db`. Only one process may write to them. With several replicas, concurrent writes (for example during document uploads) kill the process:
 
 ```
 save_docs_to_vector_db:1619 - adding to collection file-id
@@ -279,15 +222,13 @@ INFO:     Waiting for child process [pid]
 INFO:     Child process [pid] died
 ```
 
-This is a [well-known SQLite limitation](https://www.sqlite.org/howtocorrupt.html#_carrying_an_open_database_connection_across_a_fork_), not a bug. It also affects multi-replica deployments where multiple containers access the same ChromaDB data directory.
-
-For the full crash sequence analysis, see [Worker Crashes During Document Upload](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) or [RAG Troubleshooting: Worker Dies During Upload](/troubleshooting/rag#12-worker-dies-during-document-upload).
+See [Worker Crashes During Document Upload](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker).
 
 :::
 
 **What to do:**
 
-Set the `VECTOR_DB` environment variable to a client-server vector database:
+Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to a client-server vector database:
 
 ```
 VECTOR_DB=pgvector
@@ -297,51 +238,53 @@ VECTOR_DB=pgvector
 
 | Vector DB | Best For | Configuration |
 |---|---|---|
-| **PGVector** | Teams already using PostgreSQL, reuses your existing database infrastructure | `VECTOR_DB=pgvector` + `PGVECTOR_DB_URL=postgresql://...` |
-| **MariaDB Vector** | HNSW-based vector search, performance comparable to other implementations, with stronger scalability under multi-connection workloads | `VECTOR_DB=mariadb-vector` + `MARIADB_VECTOR_DB_URL=mariadb+mariadbconnector://...` |
-| **Milvus** | Large-scale self-hosted deployments with high query throughput; supports multitenancy for per-user isolation | `VECTOR_DB=milvus` + `MILVUS_URI=http://milvus-host:19530` |
-| **Qdrant** | Self-hosted deployments needing efficient filtering and metadata search; supports multitenancy | `VECTOR_DB=qdrant` + `QDRANT_URI=http://qdrant-host:6333` |
-| **Pinecone** | Fully managed cloud service, zero infrastructure to maintain, pay-per-use | `VECTOR_DB=pinecone` + `PINECONE_API_KEY=...` |
-| **ChromaDB (HTTP mode)** | Keeping ChromaDB but making it multi-process safe by running it as a separate server | `VECTOR_DB=chroma` + `CHROMA_HTTP_HOST=chroma-host` + `CHROMA_HTTP_PORT=8000` |
+| **PGVector** | Teams already running PostgreSQL | `VECTOR_DB=pgvector` + `PGVECTOR_DB_URL=postgresql://...` (defaults to `DATABASE_URL`) |
+| **MariaDB Vector** | Teams running MariaDB | `VECTOR_DB=mariadb-vector` + `MARIADB_VECTOR_DB_URL=mariadb+mariadbconnector://...` |
+| **Milvus** | Large self-hosted deployments with high query throughput | `VECTOR_DB=milvus` + `MILVUS_URI=http://milvus-host:19530` |
+| **Qdrant** | Self-hosted deployments needing efficient filtering and metadata search | `VECTOR_DB=qdrant` + `QDRANT_URI=http://qdrant-host:6333` |
+| **Pinecone** | Fully managed cloud service | `VECTOR_DB=pinecone` + `PINECONE_API_KEY=...` |
+| **ChromaDB (HTTP mode)** | Keeping ChromaDB, run as a separate server | `VECTOR_DB=chroma` + `CHROMA_HTTP_HOST=chroma-host` + `CHROMA_HTTP_PORT=8000` |
 
 :::note
 
-Only PGVector and ChromaDB will be consistently maintained by the Open WebUI team. The other vector stores are mainly community-added vector databases.
+The core team maintains PGVector and ChromaDB. The other vector stores are contributed integrations.
 
 :::
 
 :::tip
-**PGVector** is the simplest choice if you're already running PostgreSQL for the main database. It adds vector search to the database you already have, with no additional infrastructure.
+**PGVector** is the simplest choice if you already run PostgreSQL for the main database: no additional infrastructure.
 
-For maximum scalability in self-hosted environments, **Milvus** and **Qdrant** both support **multitenancy mode** (`ENABLE_MILVUS_MULTITENANCY_MODE=True` / `ENABLE_QDRANT_MULTITENANCY_MODE=True`), which provides better resource sharing at scale. Turn it on before the first start; switching later needs a reindex.
+**Milvus** and **Qdrant** support a multitenancy mode that shares resources better at scale. It is on by default for Qdrant ([`ENABLE_QDRANT_MULTITENANCY_MODE`](/reference/env-configuration#enable_qdrant_multitenancy_mode)) and off for Milvus ([`ENABLE_MILVUS_MULTITENANCY_MODE`](/reference/env-configuration#enable_milvus_multitenancy_mode)). Decide before the first start; switching later needs a reindex.
 :::
+
+The slim image supports only PGVector, its default `VECTOR_DB`.
 
 ---
 
 ## Step 5: Share File Storage Across Instances
 
-**When:** You're running multiple instances. **Shared access to uploaded files is required** for attachments, knowledge documents, and generated images to work across replicas.
+**When:** You're running multiple instances. **Shared access to uploaded files is required** for attachments, knowledge documents and generated images to work across replicas.
 
-By default, Open WebUI stores uploaded files on the local filesystem under `DATA_DIR` (typically `/app/backend/data`). In a multi-instance setup, each instance needs access to the same files. Without shared storage, you will see [uploaded files and RAG knowledge become inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible) when requests hit different replicas.
+By default, Open WebUI stores uploaded files under `DATA_DIR` (typically `/app/backend/data`). Every instance needs access to the same files, or [uploaded files and RAG knowledge become inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible) when requests hit different replicas.
 
 ### Do I need cloud storage (S3)?
 
-**External object storage is one option; shared file access is the requirement.** Use S3, GCS, or Azure Blob to keep uploaded files independent of individual containers, or keep `STORAGE_PROVIDER=local` and mount the same shared filesystem at the same path on every replica. UUID-based upload names avoid collisions between new uploads, but do not eliminate concurrent access to existing files or local working copies.
+**Shared file access is the requirement; object storage is one way to get it.** Use S3, GCS or Azure Blob, or keep `STORAGE_PROVIDER=local` and mount the same shared filesystem at the same path on every replica.
 
 **Your options:**
 
 | Approach | When to Use |
 |---|---|
-| **Shared filesystem** (NFS, AWS EFS, CephFS, or a shared volume on one host) | Use when you already operate shared storage. Mount the same directory at the same path on all instances; multi-node Kubernetes deployments need storage supporting ReadWriteMany (RWX). |
-| **External object storage** (S3, GCS, Azure Blob) | Use when replicas run on separate hosts or need uploaded files to survive container replacement without a shared upload volume. Configure `STORAGE_PROVIDER` and the same bucket/container on every replica. |
+| **Shared filesystem** (NFS, AWS EFS, CephFS or a shared volume on one host) | You already operate shared storage. Mount the same directory at the same path on all instances; multi-node Kubernetes needs ReadWriteMany (RWX) storage. |
+| **External object storage** (S3, GCS, Azure Blob) | Replicas run on separate hosts, or files must survive container replacement without a shared volume. Configure `STORAGE_PROVIDER` and the same bucket or container on every replica. |
 
 :::info What does STORAGE_PROVIDER actually control?
-`STORAGE_PROVIDER` controls files saved through Open WebUI's file upload API, including documents, attachments, and generated images. It does **not** move the main database (use `DATABASE_URL`), the vector database (use `VECTOR_DB`), or the entire `DATA_DIR` to object storage. Files served directly from `/cache/`, such as some tool outputs, still use the filesystem and need shared access if another replica must serve them.
+`STORAGE_PROVIDER` covers files saved through Open WebUI's file upload API: documents, attachments and generated images. The main database (`DATABASE_URL`), the vector database (`VECTOR_DB`) and the rest of `DATA_DIR` stay where they are. Files served directly from `/cache/`, such as some tool outputs, use the filesystem and need shared access if another replica must serve them.
 :::
 
 ### Option A: Shared Filesystem (Simplest)
 
-Keep `STORAGE_PROVIDER=local` and ensure all instances mount the same directory at the same path:
+Keep `STORAGE_PROVIDER=local` and mount the same directory at the same path on all instances:
 
 **Example Kubernetes:**
 ```yaml
@@ -357,17 +300,17 @@ volumes:
   - /opt/data/openwebui-data:/app/backend/data
 ```
 
-This bind mount shares files only between containers on the **same host**. On separate hosts, the source directory must itself be backed by shared storage. Giving Docker volumes the same name on different hosts does not share their contents.
+This bind mount shares files only between containers on the **same host**. On separate hosts, the source directory must itself be on shared storage. Docker volumes with the same name on different hosts are separate volumes.
 
 :::warning
-Do **not** store the SQLite database on a network filesystem. SQLite's file locking does not work reliably over NFS. This is another reason to switch to PostgreSQL (Step 1) before scaling to multiple instances.
+Keep the SQLite database off network filesystems. This is another reason to switch to PostgreSQL ([Step 1](#step-1-switch-to-postgresql)) before scaling.
 :::
 
-Once your data directory is shared, lock down what can land in it: see [File upload limits](/getting-started/advanced-topics/hardening#file-upload-limits) for size, count, and extension caps, and [Data directory](/getting-started/advanced-topics/hardening#data-directory) for filesystem-permission and backup guidance.
+Once your data directory is shared, lock down what can land in it: see [File upload limits](/getting-started/advanced-topics/hardening#file-upload-limits) for size, count and extension caps, and [Data directory](/getting-started/advanced-topics/hardening#data-directory) for filesystem permissions and backups.
 
 ### Option B: Cloud Object Storage
 
-Set `STORAGE_PROVIDER` and the corresponding bucket/container and credentials on **every replica**. All replicas must use the same storage destination, including the same `S3_KEY_PREFIX` if configured, with permission to read, write, and delete files.
+Set `STORAGE_PROVIDER` and the bucket or container and credentials on **every replica**. All replicas must use the same destination, including the same `S3_KEY_PREFIX` if set, with permission to read, write and delete files.
 
 **Supported providers:**
 
@@ -387,31 +330,29 @@ S3_REGION_NAME=us-east-1
 # S3_ADDRESSING_STYLE=path
 ```
 
-For S3, omit `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` to use the default AWS credential chain (for example, an IAM role), or supply both through your deployment's secret management. GCS uses `GCS_BUCKET_NAME` with application default credentials or `GOOGLE_APPLICATION_CREDENTIALS_JSON`. Azure uses `AZURE_STORAGE_ENDPOINT` and `AZURE_STORAGE_CONTAINER_NAME`, with `AZURE_STORAGE_KEY` or the default Azure credential. The slim image supports only `local` and `s3`; use the standard image for GCS or Azure.
+For S3, omit `S3_ACCESS_KEY_ID` and `S3_SECRET_ACCESS_KEY` to use the default AWS credential chain (for example an IAM role), or supply both through your secret management. GCS uses `GCS_BUCKET_NAME` with application default credentials or `GOOGLE_APPLICATION_CREDENTIALS_JSON`. Azure uses `AZURE_STORAGE_ENDPOINT` and `AZURE_STORAGE_CONTAINER_NAME`, with `AZURE_STORAGE_KEY` or the default Azure credential. The slim image supports only `local` and `s3`.
 
 See the [Environment Variable Reference](/reference/env-configuration#cloud-storage) for all provider settings and the [S3 Storage tutorial](/tutorials/maintenance/s3-storage) for a worked example.
 
 :::warning Object storage still needs local disk
-Cloud providers first write uploads to `DATA_DIR/uploads`, then upload them to the bucket/container. Reads download files there before Open WebUI processes or serves them. Give every replica a writable data directory with enough disk space and I/O capacity for concurrent uploads and downloads.
+Uploads are first written to `DATA_DIR/uploads` and then sent to the bucket. Reads download files there before Open WebUI processes or serves them. Give every replica a writable data directory with enough space and I/O capacity for concurrent transfers.
 
-`STORAGE_LOCAL_CACHE=false` removes cloud-backed local copies after the file-processing handler finishes. It does **not** eliminate temporary disk use or clean up every download and unprocessed upload. Plan local disk capacity even with this setting enabled.
+`STORAGE_LOCAL_CACHE=false` removes local copies of cloud-backed files after processing. Plan local disk capacity anyway, since downloads and unprocessed uploads still use it.
 :::
 
 ### Switching an Existing Deployment
 
-Changing `STORAGE_PROVIDER` does **not** migrate existing files or rewrite their stored paths. Plan the transfer of existing objects and corresponding file records before switching providers; simply copying files into a bucket is insufficient. Back up both the application database and files before the move.
+Changing `STORAGE_PROVIDER` does **not** migrate existing files or rewrite their stored paths. Plan the transfer of existing objects and their file records before switching; copying files into a bucket is not enough. Back up the database and files first.
 
-Before sending production traffic to multiple replicas, upload a file through one replica and download it through another. Verify knowledge-document access and generated images too, then repeat after replacing the uploading replica. This catches configurations that appear to work only because the original local files are still present.
+Before sending production traffic to multiple replicas, upload a file through one replica and download it through another. Check knowledge documents and generated images too, then repeat after replacing the uploading replica.
 
 ---
 
 ## Step 6: Fix Content Extraction & Embeddings
 
-**When:** You process documents regularly (RAG, knowledge bases) and are running in production.
+**When:** You process documents regularly (RAG, knowledge bases) in production.
 
-:::danger These Defaults Cause Memory Leaks at Scale
-The default content extraction engine (pypdf) and default embedding engine (SentenceTransformers) are the **two most common causes of memory leaks** in production Open WebUI deployments. Fixing these is just as important as switching to PostgreSQL or adding Redis.
-:::
+The default content extractor (pypdf) and the default local embedding model (SentenceTransformers) run inside every Open WebUI process, so their memory use repeats for every replica, and the extractor is a common source of memory growth. Move both to external services.
 
 **What to do:**
 
@@ -422,7 +363,7 @@ CONTENT_EXTRACTION_ENGINE=tika
 TIKA_SERVER_URL=http://tika:9998
 ```
 
-If Tika or Docling don't cover your document types, or you need to route different file types to different backends, run your own service instead and set `CONTENT_EXTRACTION_ENGINE=external`. See [External Document Extraction](/features/chat-conversations/rag/document-extraction/external) for the HTTP contract.
+To route different file types to different backends, run your own service and set `CONTENT_EXTRACTION_ENGINE=external`. See [External Document Extraction](/features/chat-conversations/rag/document-extraction/external).
 
 2. **Switch the embedding engine** to an external provider:
 
@@ -434,33 +375,32 @@ RAG_EMBEDDING_ENGINE=ollama
 
 **Key things to know:**
 
-- The default content extractor (pypdf) has unavoidable **known memory leaks** that cause your Open WebUI process to grow in memory continuously. An external extractor (Tika, Docling) runs in its own process/container, isolating these leaks.
-- The default SentenceTransformers embedding model loads ~500MB per worker process. With 8 workers, that's 4GB of RAM just for embeddings. External embedding eliminates this.
-- For detailed guidance and configuration options, see [Content Extraction Engine](/troubleshooting/performance#content-extraction-engine) and [Embedding Engine](/troubleshooting/performance#embedding-engine) in the Performance guide.
-- External Tika, Docling, or embedding endpoints become a new outbound destination from Open WebUI. Reach them over the internal network only, and review the [Network and outbound requests](/getting-started/advanced-topics/hardening#network-and-outbound-requests) section of the Hardening guide for SSRF defaults (`AIOHTTP_CLIENT_ALLOW_REDIRECTS=false`, `WEB_FETCH_FILTER_LIST`) so a misconfigured extractor URL cannot be redirected onto an internal address.
+- For details and options, see [Content Extraction Engine](/troubleshooting/performance#content-extraction-engine) and [Embedding Engine](/troubleshooting/performance#embedding-engine).
+- The slim image has no local embedding or reranking models, so it requires an external embedding engine.
+- External Tika, Docling or embedding endpoints are new outbound destinations. Reach them over the internal network only, and review [Network and outbound requests](/getting-started/advanced-topics/hardening#network-and-outbound-requests) in the Hardening guide (`AIOHTTP_CLIENT_ALLOW_REDIRECTS=false`, `WEB_FETCH_FILTER_LIST`).
 
 ---
 
 ## Step 7: Add Observability
 
-**When:** You want to monitor performance, troubleshoot issues, and understand how your deployment is behaving at scale.
+**When:** You want to monitor performance and troubleshoot a deployment at scale.
 
-Open WebUI supports **OpenTelemetry** for exporting traces, metrics, and logs to your observability platform (Grafana, Datadog, New Relic, etc.):
+Open WebUI exports traces, metrics and logs over **OpenTelemetry** to Grafana, Datadog, New Relic and similar platforms. Turn on the master switch and each signal you want:
 
 ```
 ENABLE_OTEL=true
+ENABLE_OTEL_TRACES=true
+ENABLE_OTEL_METRICS=true
 OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
 ```
 
-This gives you visibility into request latency, database query performance, error rates, and more.
-
-For the full setup guide, see [OpenTelemetry Monitoring](/reference/monitoring/otel). For application-level log configuration (log levels, debug output), see [Logging Open WebUI](/getting-started/advanced-topics/logging). For structured-logging defaults aimed at log aggregators, plus the dedicated audit log that records auth events, admin actions, and data access, see [Observability](/getting-started/advanced-topics/hardening#observability) and [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging) in the Hardening guide.
+For the full setup, see [OpenTelemetry Monitoring](/reference/monitoring/otel). For log levels, see [Logging Open WebUI](/getting-started/advanced-topics/logging). For structured logging and the audit log, see [Observability](/getting-started/advanced-topics/hardening#observability) and [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging) in the Hardening guide.
 
 ---
 
 ## Putting It All Together
 
-Here's what a production-ready scaled deployment typically looks like:
+A production-ready scaled deployment typically looks like this:
 
 ```mermaid
 flowchart TD
@@ -500,95 +440,78 @@ flowchart TD
     Storage -.-> StoreNote
 ```
 
-**Running into issues?** The [Scaling & HA Troubleshooting](/troubleshooting/multi-replica) guide covers common problems (login loops, WebSocket failures, database locks, worker crashes) and their solutions. For performance tuning at scale, see [Optimization, Performance & RAM Usage](/troubleshooting/performance).
+**Running into issues?** See [Scaling & HA Troubleshooting](/troubleshooting/multi-replica) for login loops, WebSocket failures, database locks and crashes during uploads.
 
 ### Minimum Environment Variables for Scaled Deployments
 
 ```bash
+# Same value on every replica
+WEBUI_SECRET_KEY=your-shared-secret
+
 # Database
 DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
+DATABASE_POOL_SIZE=15
+DATABASE_POOL_MAX_OVERFLOW=20
 
-# Vector Database (do NOT use default ChromaDB with multiple workers/replicas)
+# Vector database (never the embedded ChromaDB with several replicas)
 VECTOR_DB=pgvector
 PGVECTOR_DB_URL=postgresql://user:password@db-host:5432/openwebui
 
 # Redis
 REDIS_URL=redis://redis-host:6379/0
 WEBSOCKET_MANAGER=redis
-ENABLE_WEBSOCKET_SUPPORT=true
 
-# File storage — REQUIRED across replicas; configure ONE option on all of them:
-# Option A: STORAGE_PROVIDER=local with the same shared filesystem and mount path
-#          Separate per-host Docker volumes do not share files.
-# Option B: external object storage (same bucket and any key prefix on all replicas)
+# File storage: required across replicas, configure ONE option on all of them.
+# Option A: STORAGE_PROVIDER=local with the same shared filesystem and mount path.
+#           Separate per-host Docker volumes do not share files.
+# Option B: external object storage (same bucket and key prefix on all replicas)
 # STORAGE_PROVIDER=s3
 # S3_BUCKET_NAME=my-openwebui-bucket
 # S3_REGION_NAME=us-east-1
-# Supply credentials via an IAM role or your deployment's secret management.
 # Object storage still needs writable local disk; see Step 5.
 
-# Content Extraction (do NOT use default pypdf in production)
+# Content extraction and embeddings outside the app process
 CONTENT_EXTRACTION_ENGINE=tika
 TIKA_SERVER_URL=http://tika:9998
-
-# Embeddings (do NOT use default SentenceTransformers at scale)
 RAG_EMBEDDING_ENGINE=openai
 # or: RAG_EMBEDDING_ENGINE=ollama
 
-# Workers (let orchestrator scale, keep workers at 1)
-UVICORN_WORKERS=1
-
-# Migrations (set to false on all but one instance)
+# Migrations: false on all but one instance; see Updates and Migrations
 ENABLE_DB_MIGRATIONS=false
 
-# Concurrency & DB write throttling (REQUIRED at scale — see note below)
+# Room for blocking work (DB calls, file I/O); the default limit is 40
 THREAD_POOL_SIZE=2000
-DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL=120
 
-# HTTP compression — disable in the app IF your LB/ingress/CDN compresses
-# responses instead (saves ~3-4% CPU on every worker; see Step 3)
+# Only if your load balancer, ingress or CDN compresses responses
 # ENABLE_COMPRESSION_MIDDLEWARE=false
 
-# Websocket heartbeats: one message per open tab every 30s by default.
-# Raising it cuts idle traffic; a dropped user lingers in the active count
+# Per-token WebSocket compression costs CPU for little gain
+# UVICORN_WS_PER_MESSAGE_DEFLATE=false
+
+# Fewer idle heartbeats; a dropped user lingers longer in the active count
 # WEBSOCKET_HEARTBEAT_INTERVAL=60
 
-# Expiry on stream entries left behind by workers killed mid-response.
-# Finished responses are deleted immediately; 0 keeps orphans forever
-# REDIS_RESPONSE_STREAM_TTL=3600
-
-# Faster JSON encoder (on by default): biggest win is Socket.IO/Redis event
-# encoding in clustered deployments; see Step 3
-ENABLE_ORJSON=True
-
-# Grow streamed responses in place instead of re-copying them per chunk.
-# Pays off with long answers under concurrency; also lowers peak memory
+# Grow streamed responses in place; helps long answers under concurrency
 ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND=True
 
-# Faster name lookups: removes the queueing delay in front of every outbound
-# request. Verify your names still resolve after enabling it; see Step 3
+# Faster name lookups; verify your names still resolve after enabling
 AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True
 ```
 
-:::warning Two settings people forget, and then their scaled deployment stalls
-- **`THREAD_POOL_SIZE=2000`**: Open WebUI offloads blocking work (DB calls, file I/O, sync handlers) to a thread pool whose default concurrency ceiling is only **40**. At scale, once 40 blocking operations are in flight every further request **queues**, and the whole app appears to freeze even though CPU/RAM look fine. `2000` is a *lower* bound for large instances; it is a concurrency ceiling, **not** a CPU/thread count, so a high value is not a contention risk. Never lower it. (The only exception is genuinely tiny hardware, which is not a "scaled deployment".)
-- **`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`**: presence tracking writes each user's `last_active_at` to the database. The default throttles that to one write per user per 60 seconds, so the flood of tiny write transactions is already avoided and there is usually nothing to change. `120` is the value to use if you set one: it halves the writes again and still leaves a full minute of headroom inside the 180 second window that active presence counts users over. Anything at or above 180 makes users drop out of the count between writes. Setting it to `0` turns throttling off and returns to roughly one `UPDATE` plus `COMMIT` per authenticated request, which saturates the connection pool for no functional gain.
-
-Both are read once at startup and are not configurable from the Admin UI. See [Performance → Database Optimization](/troubleshooting/performance#-database-optimization) and [Performance → High-Concurrency](/troubleshooting/performance#-high-concurrency--network-optimization).
+:::warning Don't skip THREAD_POOL_SIZE
+Open WebUI runs blocking work (database calls, file I/O, sync handlers) in a thread pool limited to **40** concurrent operations by default. Once 40 are in flight, further requests queue and the app appears to freeze while CPU and RAM look fine. `THREAD_POOL_SIZE` raises that limit. Threads are created only when needed, so a high value is safe. See [Thread Pool Size](/troubleshooting/performance#thread-pool-size).
 :::
 
 ### Security defaults to revisit at scale
 
-A few defaults that are reasonable for single-user evaluation become less so once you put the deployment behind SSO and serve real users. The full discussion lives in the [Hardening guide](/getting-started/advanced-topics/hardening); the items most often missed in enterprise rollouts:
+A few defaults that are reasonable for a single-user evaluation matter more once real users sign in through SSO. The full discussion lives in the [Hardening guide](/getting-started/advanced-topics/hardening). The items most often missed:
 
-- **Disable external profile image redirects**: `ENABLE_PROFILE_IMAGE_URL_FORWARDING=false`. By default the user/model profile-image endpoints `302` to whatever external URL `profile_image_url` holds, which makes every browser viewing an avatar leak its IP, User-Agent, and Referer to that origin. Set this to `false` for shared deployments **unless** your IdP supplies avatars only as `data:` URIs (which Open WebUI persists locally and is unaffected) or you have a deliberate reason to keep IdP-hosted avatars rendering, e.g. your `OAUTH_PICTURE_CLAIM` returns Google/Gravatar URLs and you want them to display. See [SSO configuration](/features/authentication-access/auth/sso) for the matching OAuth picture-claim settings.
-- **Set `WEBUI_SECRET_KEY` and `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`** to the same value across every replica. Without this, sessions break on rolling restart and OAuth tokens written by one pod cannot be decrypted by another.
-- **Lower `JWT_EXPIRES_IN`** from the four-week default if your deployment carries sensitive data, especially if Redis is not yet in place to revoke tokens on signout. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
-- **Disable `ENABLE_OAUTH_ID_TOKEN_COOKIE`** (`false`) once all clients are on the new server-side session model. The legacy cookie carried the raw IdP id_token to the browser; the new model keeps it server-side.
+- **Disable external profile image redirects** with `ENABLE_PROFILE_IMAGE_URL_FORWARDING=false`. By default the profile image endpoints redirect to whatever external URL `profile_image_url` holds, so every browser showing that avatar sends its IP, User-Agent and Referer to that origin. Keep the default only if you want IdP-hosted avatars (for example Google or Gravatar URLs from `OAUTH_PICTURE_CLAIM`) to display; `data:` URI avatars are stored locally either way. See [SSO configuration](/features/authentication-access/auth/sso).
+- **Set `WEBUI_SECRET_KEY`** to the same value on every replica. `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY` defaults to it; if you set it separately, it must also match everywhere. Otherwise sessions break across replicas and OAuth tokens stored by one pod cannot be decrypted by another.
+- **Lower `JWT_EXPIRES_IN`** from the four-week default if your deployment carries sensitive data, especially without Redis for sign-out revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+- **Set `ENABLE_OAUTH_ID_TOKEN_COOKIE=false`.** By default the raw IdP id_token is also sent to the browser as a cookie. Open WebUI keeps the id_token in the server-side OAuth session and uses that copy for sign-out.
 
-These are configuration defaults, not new features: the existing knobs simply matter more once a deployment has multiple users and a real identity provider in front of it.
-
-Beyond this short list, the Hardening guide groups the same concerns by topic so you can work through them step by step: [Network Placement](/getting-started/advanced-topics/hardening#network-placement), [Authentication and Signup](/getting-started/advanced-topics/hardening#authentication-and-signup), [Session and Cookie Security](/getting-started/advanced-topics/hardening#session-and-cookie-security), [Security Headers](/getting-started/advanced-topics/hardening#security-headers), [Access Control](/getting-started/advanced-topics/hardening#access-control), [Tools, Functions, and Pipelines](/getting-started/advanced-topics/hardening#tools-functions-and-pipelines), and the [Security-First Deployment](/getting-started/advanced-topics/hardening#security-first-deployment) checklist at the end.
+Beyond this list, the Hardening guide works through the same concerns by topic: [Network Placement](/getting-started/advanced-topics/hardening#network-placement), [Authentication and Signup](/getting-started/advanced-topics/hardening#authentication-and-signup), [Session and Cookie Security](/getting-started/advanced-topics/hardening#session-and-cookie-security), [Security Headers](/getting-started/advanced-topics/hardening#security-headers), [Access Control](/getting-started/advanced-topics/hardening#access-control), [Tools, Functions, and Pipelines](/getting-started/advanced-topics/hardening#tools-functions-and-pipelines) and the [Security-First Deployment](/getting-started/advanced-topics/hardening#security-first-deployment) checklist.
 
 ---
 
@@ -599,19 +522,18 @@ Beyond this short list, the Hardening guide groups the same concerns by topic so
 | Scenario | PostgreSQL | Redis | External Vector DB | Ext. Content Extraction | Ext. Embeddings | Shared Storage |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Single user / evaluation | ✗ | ✗ | ✗ | ✗ | ✗ | ✗ |
-| Small team (< 50 users, single instance) | Recommended | Recommended† | ✗ | Recommended | ✗ | ✗ |
-| Multiple Uvicorn workers | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | ✗ (same filesystem) |
+| Small team (< 50 users, single instance) | Optional | Recommended† | ✗ | Recommended | ✗ | ✗ |
 | Multiple instances / HA | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Required** (shared filesystem or object storage) |
 | Large scale (1000+ users) | **Required** | **Required** | **Required** | **Strongly Recommended** | **Strongly Recommended** | **Required across replicas** |
 
 </div>
 
-†Without Redis, signing out does **not** revoke the token of that session: it remains valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. For production deployments handling sensitive data, Redis is recommended for proper token revocation. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+†Without Redis, signing out does **not** revoke the session token: it stays valid until `JWT_EXPIRES_IN` expires (default: 4 weeks). See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
 
 :::note About "External Vector DB"
-The default ChromaDB uses a local SQLite backend that crashes under multi-process access. "External Vector DB" means either a client-server database (PGVector, Milvus, Qdrant, Pinecone) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4-switch-to-an-external-vector-database) for details.
+A client-server database (PGVector, Milvus, Qdrant, Pinecone and others) or ChromaDB running as a separate HTTP server. See [Step 4](#step-4-switch-to-an-external-vector-database).
 :::
 
 :::note About "Shared Storage"
-For multiple instances, all replicas must access the same uploaded files through **external object storage** (S3/GCS/Azure) or a **shared filesystem** (NFS, EFS, CephFS, or a volume shared on one host). External object storage is optional; shared file access is not. Object storage still needs local working space and does not cover files served directly from `/cache/`. See [Step 5](#step-5-share-file-storage-across-instances) for configuration and migration guidance.
+All replicas must reach the same uploaded files through **external object storage** (S3, GCS, Azure) or a **shared filesystem** (NFS, EFS, CephFS or a volume shared on one host). See [Step 5](#step-5-share-file-storage-across-instances).
 :::

@@ -761,6 +761,8 @@ JSON logging is designed for log aggregators like ELK, Datadog, or Splunk.
 
 ```bash
 ENABLE_OTEL=true
+ENABLE_OTEL_TRACES=true
+ENABLE_OTEL_METRICS=true
 OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
 OTEL_SERVICE_NAME=open-webui
 ```

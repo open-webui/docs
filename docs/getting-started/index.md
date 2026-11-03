@@ -114,11 +114,11 @@ Open WebUI isn't just a local interface for AI. It is designed to be a centraliz
 
 **Scale, observe, and customize your deployment.**
 
-Go beyond the basics. Configure environment variables, connect external databases, add cloud storage, enable OpenTelemetry, or scale horizontally with Redis and multiple workers.
+Go beyond the basics. Configure environment variables, connect external databases, add cloud storage, enable OpenTelemetry, or scale horizontally with Redis and multiple replicas.
 
 | | |
 | :--- | :--- |
-| ⚖️ **Scaling** | Multi-worker, multi-node, Redis-backed sessions |
+| ⚖️ **Scaling** | Multiple replicas, multi-node, Redis-backed sessions |
 | 📊 **Logging & observability** | OpenTelemetry traces, metrics, and structured logs |
 | 🧪 **Development setup** | Run from source for local development and testing |
 
