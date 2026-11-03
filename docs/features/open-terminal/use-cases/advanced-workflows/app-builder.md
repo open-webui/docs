@@ -19,7 +19,7 @@ Describe what you want and get a working app with frontend, backend, and databas
 5. Starts the server and tests every endpoint
 6. The running app opens from the **Ports** list of a [Browser tab](../web-development.md#the-browser-tab)
 
-![The running inventory dashboard in the live port preview](/images/open-terminal-app-builder-dashboard.png)
+![The running inventory dashboard in a Browser tab](/images/open-terminal-app-builder-dashboard.png)
 
 ![The generated project structure in the file browser](/images/open-terminal-app-builder-structure.png)
 

@@ -19,7 +19,7 @@ Upload bank statements and get a spending analysis with charts.
 4. Creates a dashboard with monthly trends, category breakdown, and top merchants
 5. Flags anomalies: unusually large charges, new subscriptions, possible duplicates
 
-![The generated spending dashboard previewed in the file browser](/images/open-terminal-finance-dashboard.png)
+![The generated spending dashboard open in its file tab](/images/open-terminal-finance-dashboard.png)
 
 ![The AI flagging unusual transactions in the statement](/images/open-terminal-finance-anomalies.png)
 

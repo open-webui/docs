@@ -22,7 +22,7 @@ Upload messy data, and the AI cleans it, analyzes it, builds charts, and produce
 
 ![The cleaned data and generated charts in the file browser](/images/open-terminal-data-report-outputs.png)
 
-![A generated chart previewed in the file browser](/images/open-terminal-data-report-chart.png)
+![A generated chart displayed inline in the chat](/images/open-terminal-data-report-chart.png)
 
 {/* TODO: Screenshot: A page inside the generated PDF showing a bar chart, key findings, and a summary table. */}
 

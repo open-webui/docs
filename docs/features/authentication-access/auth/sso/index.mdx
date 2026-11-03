@@ -80,9 +80,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 - A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.
 - Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
 
-This replaces the older behavior, where the fields were editable, a save appeared to succeed and the values reverted to the environment on the next restart.
-
-Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
+Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. Changes to the provider connection settings (such as the provider URL, client ID and secret, redirect URI and scopes) take effect once every Open WebUI instance has been restarted. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
 
 `ENABLE_PERSISTENT_CONFIG` is the one in charge. When it is `false`, nothing is saved to the database whatever `ENABLE_OAUTH_PERSISTENT_CONFIG` says, so the OAuth variable then only decides whether the section can be typed into, not whether the values survive a restart. Both must be `true` to manage OAuth from the Admin Panel.
 

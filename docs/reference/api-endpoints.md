@@ -79,7 +79,7 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 ### 💬 Chat Completions
 
 - **Endpoint**: `POST /api/chat/completions`
-- **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
+- **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models. A model on a Responses API connection also answers in Chat Completions format, streamed or not, with `finish_reason` set to `length` or `content_filter` when the reply was cut off.
 
 :::warning Reading `usage` from a reply that used tools
 

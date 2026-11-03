@@ -19,7 +19,7 @@ One of the most impressive things Open Terminal can do: the AI builds a website,
 
 This needs a terminal that supports browser sessions.
 
-![AI creating a landing page with file browser showing the created files](/images/open-terminal-ai-web-dev.png)
+![AI checking that the status page on port 8080 responds and summarising it](/images/open-terminal-ai-web-dev.png)
 
 ---
 

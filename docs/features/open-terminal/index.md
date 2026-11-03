@@ -27,7 +27,7 @@ That means the agent can do real work. Not just answer questions about a task, a
 
 Despite the name, Open Terminal is not just a terminal panel. It is the computer-like workspace that makes Open WebUI's agent loop capable of acting on files, code, packages, servers, documents, and generated artifacts. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
 
-![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
+![Open WebUI with Open Terminal selected and the Files tab open beside a new chat](/images/open-terminal-file-browser.png)
 
 ## The Right Mental Model
 

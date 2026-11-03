@@ -73,7 +73,7 @@ Three limits are worth understanding before changing them:
 
 - **They count per worker process, not per deployment.** With multiple workers or replicas, the real ceiling is the limit multiplied by the number of processes.
 - **Max concurrent only takes effect at startup.** It is read when the first delegation runs and is not re-read afterwards, so changing it needs a restart. Max background applies immediately.
-- **`0` is not a way to switch delegation off.** A limit is a positive whole number, or empty for no limit. Use [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) to turn the feature off.
+- **`0` is not a way to switch delegation off.** A limit is a positive whole number, and empty or `0` means no limit. Use [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) to turn the feature off.
 
 ## What a Sub-agent Cannot Do
 

@@ -543,7 +543,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum number of foreground sub-agents running at once. Delegations beyond the limit **wait** for a free slot. Empty or `-1` means no limit. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
+- Description: Maximum number of foreground sub-agents running at once. Delegations beyond the limit **wait** for a free slot. Empty, `0` or `-1` means no limit. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning `SUBAGENTS_MAX_CONCURRENT` needs a restart to change
@@ -556,21 +556,21 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum number of background sub-agents running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty or `-1` means no limit. Also counted per worker process.
+- Description: Maximum number of background sub-agents running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty, `0` or `-1` means no limit. Also counted per worker process.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_ITERATIONS`
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty means no limit even when that one is set. The sub-agent reports that it hit the limit rather than failing silently.
+- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty or `0` means no limit even when that one is set. The sub-agent reports that it hit the limit.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_OUTPUT`
 
 - Type: `int` (characters)
 - Default: `("") empty string` (unlimited)
-- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. Empty means no limit. This caps only what is returned to the parent; the sub-agent's own chat keeps the full text.
+- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. Empty or `0` means no limit. This caps only what is returned to the parent; the sub-agent's own chat keeps the full text.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_SYSTEM_PROMPT`
@@ -1560,8 +1560,8 @@ Several parameters have no effect on background requests wherever you set them: 
 #### `CONTEXT_COMPACTION_MODEL`
 
 - Type: `str`
-- Default: Empty string (follow the task model)
-- Description: The model that writes context compaction summaries. Leave it empty to keep the previous behavior, where compaction uses the same model selection as title and tag generation ([`TASK_MODEL`](#task_model) / [`TASK_MODEL_EXTERNAL`](#task_model_external), falling back to the chat's own model). Set it to give summarization its own model, which is worth doing when your task model is a small one chosen for titles: a summary that will stand in for a large part of the conversation benefits from a more capable model than a five-word title does. A model ID that is not available falls back to the task model selection, and then to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
+- Default: Empty string (use the chat's own model)
+- Description: The model that writes context compaction summaries. Leave it empty to use the chat's own model. Set it to give summarization its own model. A model ID that is not available falls back to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`

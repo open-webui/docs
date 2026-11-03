@@ -199,7 +199,7 @@ curl -s -X DELETE -H "Authorization: Bearer $OWUI_KEY" "$OWUI_URL/api/v1/chats/$
 ```
 
 :::info The `temporary:` alternative
-A `chat_id` of `temporary:<uuid>` also runs the full loop and persists nothing at all. But then there is nowhere to read the result from over HTTP: the output only goes out over the socket. Use it only if your client is a real socket.io client. For plain HTTP, create and delete.
+A `chat_id` of `temporary:<session_id>` also runs the full loop and persists nothing at all. `<session_id>` is the socket.io session id of your own signed-in client, sent as `session_id` too; any other `temporary:` id is refused with `404`. The output only goes out over that socket, so this needs a real socket.io client. For plain HTTP, create and delete.
 :::
 
 ### Blocking variant (no `session_id`)

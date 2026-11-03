@@ -11,7 +11,7 @@ When Open Terminal is connected, the **Files** tab of the **Tabs** side panel ho
 By default the file browser opens automatically when you select a terminal on a screen at least 768 px wide. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
 :::
 
-![Chat interface with the file browser sidebar](/images/open-terminal-file-browser.png)
+![A new chat with the Files tab open in the Tabs side panel](/images/open-terminal-file-browser.png)
 
 ---
 
@@ -78,7 +78,7 @@ Markdown files show a **rendered preview** and a toggle to switch to raw source.
 
 HTML blocks mixed into the Markdown render together with it, so `<details>` sections and wrappers like `<div align="center">` show their Markdown content formatted. In a file you can edit, the checkboxes of a task list (`- [ ]`) can be ticked in the preview, and the change is saved to the file right away. In a read-only file they stay locked.
 
-![Rendered markdown with headings, lists, and formatted text](/images/open-terminal-preview-markdown.png)
+![Rendered markdown with headings, a table and a code block](/images/open-terminal-preview-markdown.png)
 
 ### Comments in documents
 Word, Excel, PowerPoint and PDF previews show the comments stored in the file, with their replies, anchored where they sit in the document. Hover over a marker to read the thread, or tap it on a touch screen. Comments that have no place in the preview are collected behind a counter in the corner. If the comments cannot be read, the preview says **"Could not read comments. Download the original file to review them."**
@@ -192,7 +192,7 @@ You can select up to 16 KiB of text at once. If the file has unsaved edits, you 
 
 You can create new files and folders, or delete things you don't need anymore, directly from the file browser. A folder's menu also has **New File** and **New Folder**.
 
-![File browser action bar with New File, New Folder options](/images/open-terminal-file-browser-home.png)
+![The Files tab with an image previewed](/images/open-terminal-file-browser-home.png)
 
 ---
 
