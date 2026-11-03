@@ -120,7 +120,7 @@ A knowledge base search runs without holding up the worker that issued it, so ev
     *   **Milvus Lite**: for small single-instance deployments whose knowledge base is small and stays roughly the same size, where it uses less disk and less memory than local ChromaDB. Avoid it if you upload documents in bulk or keep adding files over time: the duplicate check Open WebUI runs before every upload scans the whole collection on Milvus Lite, so ingestion gets slower the more you have stored. See [Swap ChromaDB for Milvus Lite](#4-swap-chromadb-for-milvus-lite-small-deployments) for the measurements. A Milvus server remains the right choice for anything larger, and Milvus Lite is embedded, so it carries the same multi-process restriction as local ChromaDB. Point `MILVUS_URI` at a Milvus server before adding replicas.
     *   **PGVector**: Excellent choice if you are already using PostgreSQL. Also fully multi-process safe.
     *   **ChromaDB HTTP mode**: If you want to keep using ChromaDB, run it as a [separate server](/reference/env-configuration#chroma_http_host) so Open WebUI connects via HTTP instead of local SQLite.
--   **Multitenancy**: If using Milvus or Qdrant, multitenancy offers better resource sharing.
+-   **Multitenancy**: Recommended whenever you use Milvus or Qdrant; without it, larger instances quickly hit scaling problems. See [Step 4 of the scaling guide](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database).
     *   `ENABLE_MILVUS_MULTITENANCY_MODE=True` (default `False`)
     *   `ENABLE_QDRANT_MULTITENANCY_MODE=True` (default)
 

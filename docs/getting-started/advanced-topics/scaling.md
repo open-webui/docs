@@ -254,7 +254,7 @@ The core team maintains PGVector and ChromaDB. The other vector stores are contr
 :::tip
 **PGVector** is the simplest choice if you already run PostgreSQL for the main database: no additional infrastructure.
 
-**Milvus** and **Qdrant** support a multitenancy mode that shares resources better at scale. It is on by default for Qdrant ([`ENABLE_QDRANT_MULTITENANCY_MODE`](/reference/env-configuration#enable_qdrant_multitenancy_mode)) and off for Milvus ([`ENABLE_MILVUS_MULTITENANCY_MODE`](/reference/env-configuration#enable_milvus_multitenancy_mode)). Decide before the first start; switching later needs a reindex.
+**Milvus** and **Qdrant** have a multitenancy mode, and we recommend it whenever you use either. Without it, every file, knowledge base, user's memories and web search gets its own collection, which runs into scaling problems quickly on a larger instance. With it, all data shares a few collections. It is on by default for Qdrant ([`ENABLE_QDRANT_MULTITENANCY_MODE`](/reference/env-configuration#enable_qdrant_multitenancy_mode)) and off for Milvus ([`ENABLE_MILVUS_MULTITENANCY_MODE`](/reference/env-configuration#enable_milvus_multitenancy_mode)), so turn it on for Milvus. Decide before the first start; switching later needs a reindex.
 :::
 
 The slim image supports only PGVector, its default `VECTOR_DB`.
