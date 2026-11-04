@@ -4238,7 +4238,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `local`
-- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x, 4.0 or 4.1 and uses the matching interface, so all three work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
+- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x or 4.x and uses the matching interface, so both work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_URL`
@@ -4252,7 +4252,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: Empty string
-- Description: API key for MinerU. Required in `cloud` mode. In `local` mode, Open WebUI sends it as a bearer token to a MinerU 4.x server, which needs it when started with `--api-key`. Open WebUI sends the key only to requests addressed to `MINERU_API_URL`. Leave it empty for a local server without a key.
+- Description: API key for MinerU. Required in `cloud` mode. In `local` mode, Open WebUI sends it as a bearer token to a MinerU 4.x server, which needs it when started with `--api-key`. Leave it empty for a local server without a key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_TIMEOUT`
