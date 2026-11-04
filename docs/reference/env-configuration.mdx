@@ -4419,7 +4419,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `int`
 - Default: `100000`
-- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset`. `view_file` reads knowledge files and files attached to a chat alike, so this bounds both.
+- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset` (or `next_start_line` for a line range). `view_file` reads knowledge files and files attached to a chat alike, so this bounds both.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `VIEW_FILE_DEFAULT_MAX_CHARS`
