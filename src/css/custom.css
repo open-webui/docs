@@ -224,7 +224,7 @@ code {
 }
 
 .shiki-code-block .line {
-	display: block;
+	display: inline;
 	line-height: 1.35;
 }
 

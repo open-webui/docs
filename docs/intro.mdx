@@ -50,26 +50,26 @@ Then open [http://localhost:8080](http://localhost:8080).
   </TabItem>
   <TabItem value="docker" label="Docker">
 
+:::tip Pick the right image
+Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a **lean, memory-efficient, scalable** deployment: **197 MB to download** (88% smaller) and **about 300 MiB of RAM at idle** in our [test](/getting-started/quick-start#slim-memory-usage). You get the same chat experience with **minimal overhead** and a **small footprint**, with external services handling embeddings, document extraction and voice. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
+:::
+
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
 For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
 
-:::tip Pick the right image
-Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a **lean, memory-efficient, scalable** deployment: **197 MB to download** (88% smaller) and **about 300 MiB of RAM at idle** in our [test](/getting-started/quick-start#slim-memory-usage). You get the same chat experience with **minimal overhead** and a **small footprint**, with external services handling embeddings, document extraction and voice. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
-:::
-
 Then open [http://localhost:3000](http://localhost:3000).
 
   </TabItem>
   <TabItem value="desktop" label="Desktop">
 
-Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
-
 :::info
 For production deployments, install via **Docker** or **Python**.
 :::
+
+Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
 
   </TabItem>
 </Tabs>
