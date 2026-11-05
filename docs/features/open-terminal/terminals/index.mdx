@@ -104,9 +104,9 @@ The orchestrator supports three authentication modes:
 
 When deployed via Docker Compose or Helm, the shared API key is configured automatically between Open WebUI and the orchestrator.
 
-JWT mode needs the two sides to agree. The orchestrator checks each request against the identity of the user who made it, so Open WebUI has to send that user's own credentials rather than one shared key. That is what **Auth > Session** on the connection does, and it applies to the model's tools, the file browser and the terminal panel alike. A Session connection also has an **API Key** field. Enter the orchestrator's `TERMINALS_API_KEY` there for the administration calls described below. Leaving the connection on **Auth > Bearer** in JWT mode fails authentication, which shows up as a terminal that closes the moment it opens.
+JWT mode needs the two sides to agree. The orchestrator checks each request against the identity of the user who made it, so Open WebUI has to send that user's own credentials rather than one shared key. That is what **Auth > Session** on the connection does, and it applies to the model's tools, the file browser and the terminal panel alike. Leaving the connection on **Auth > Bearer** in JWT mode fails authentication, which shows up as a terminal that closes the moment it opens.
 
-Administration authenticates separately, by design. The policy, lifecycle, status and refresh APIs are not terminal traffic, so they take the orchestrator's own `TERMINALS_API_KEY` and never a user's token, whichever mode is in use. Keep that key set even in JWT mode, and send it when you call those endpoints yourself. With **Auth** set to **Bearer** or **Session**, Open WebUI attaches the connection's API key to Verify Connection, the policy, lifecycle and refresh calls and the loading of the terminal's tool list. Under **Session**, the model's tools, the file browser and the terminal panel use the signed-in user's own credentials.
+Administration authenticates separately, by design. The policy, lifecycle, status and refresh APIs are not terminal traffic, so they take the orchestrator's own `TERMINALS_API_KEY` and never a user's token, whichever mode is in use. Keep that key set even in JWT mode, and send it when you call those endpoints yourself. Open WebUI attaches it to the policy and lifecycle calls it makes on your behalf when the connection's **Auth** is **Bearer**.
 
 ---
 
@@ -121,7 +121,7 @@ Administration authenticates separately, by design. The policy, lifecycle, statu
 
 ### Authentication failures
 
-- If using **JWT mode**, confirm `TERMINALS_OPEN_WEBUI_URL` points to a reachable Open WebUI instance, that the connection's **Auth** is set to **Session** and that its **API Key** matches `TERMINALS_API_KEY`.
+- If using **JWT mode**, confirm `TERMINALS_OPEN_WEBUI_URL` points to a reachable Open WebUI instance, and that the connection's **Auth** is set to **Session**.
 - If using **API key mode**, confirm the key is set identically on both sides. Check for extra whitespace or newlines.
 - Check the orchestrator logs for `401` or `403` responses.
 
