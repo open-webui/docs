@@ -65,24 +65,20 @@ Then open [http://localhost:3000](http://localhost:3000).
 </p>
 
   </TabItem>
-  <TabItem value="pip" label="pip">
+  <TabItem value="python" label="Python">
 
 ```bash
+# With uv installed (macOS/Linux)
+DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
+
+# Or install and run with pip
 pip install open-webui
 open-webui serve
 ```
 
 Then open [http://localhost:8080](http://localhost:8080).
 
-  </TabItem>
-  <TabItem value="uv" label="uv">
-
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
-```
-
-Then open [http://localhost:8080](http://localhost:8080).
+For uv installation, Windows commands, and pip setup → [Quick Start](/getting-started/quick-start)
 
   </TabItem>
   <TabItem value="desktop" label="Desktop">
