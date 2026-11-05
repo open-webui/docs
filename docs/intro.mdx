@@ -34,7 +34,23 @@ Open WebUI is **a home for AI**, a self-hosted AI platform that's **[extensible]
 ## Quick Start
 
 <Tabs>
-  <TabItem value="docker" label="Docker" default>
+  <TabItem value="python" label="Python" default>
+
+```bash
+# With uv installed (macOS/Linux)
+DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
+
+# Or install and run with pip
+pip install open-webui
+open-webui serve
+```
+
+Then open [http://localhost:8080](http://localhost:8080).
+
+For uv installation, Windows commands, and pip setup → [Quick Start](/getting-started/quick-start)
+
+  </TabItem>
+  <TabItem value="docker" label="Docker">
 
 ```bash
 docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
@@ -47,6 +63,18 @@ Use `:main` for built-in embeddings, document extraction and speech recognition.
 :::
 
 Then open [http://localhost:3000](http://localhost:3000).
+
+  </TabItem>
+  <TabItem value="desktop" label="Desktop">
+
+Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
+
+:::info
+For production deployments, install via **Docker** or **Python**.
+:::
+
+  </TabItem>
+</Tabs>
 
 <video
   autoPlay
@@ -63,34 +91,6 @@ Then open [http://localhost:3000](http://localhost:3000).
 <p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
   Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
 </p>
-
-  </TabItem>
-  <TabItem value="python" label="Python">
-
-```bash
-# With uv installed (macOS/Linux)
-DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
-
-# Or install and run with pip
-pip install open-webui
-open-webui serve
-```
-
-Then open [http://localhost:8080](http://localhost:8080).
-
-For uv installation, Windows commands, and pip setup → [Quick Start](/getting-started/quick-start)
-
-  </TabItem>
-  <TabItem value="desktop" label="Desktop">
-
-Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
-
-:::info
-For production deployments, install via **Docker** or **Python**.
-:::
-
-  </TabItem>
-</Tabs>
 
 :::tip Running? Read this next.
 Installed Open WebUI but not sure where to start? The [**Essentials for Open WebUI**](/getting-started/essentials) guide covers what every new user needs to know: plugins, tool calling, task models, context management, RAG, web search and Open Terminal.
