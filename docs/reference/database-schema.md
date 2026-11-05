@@ -99,6 +99,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 45      | function_history | Saved versions of function source code and metadata          |
 | 46      | skill_history    | Saved versions of skills, including their supporting files   |
 | 47      | app              | Installed [Apps](/features/channels/apps) and their encrypted credentials |
+| 48      | auth_session     | Renewable sign-in sessions for native apps such as [Tether](/ecosystem/tether) |
 
 Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
 
@@ -193,6 +194,26 @@ Things to know about the auth table:
 - One-to-One relationship with the `user` table (shared id)
 - `mfa` and `session_stamp` were added by migration `a7d3e9f2b641`. Rows that existed before it start with both empty, and sessions issued before the upgrade stay valid until the account is first signed out everywhere.
 - Migration `0bd252b206fb` adds a row for every user that has none, with an empty `password` that never matches. The migration changes data only, and its downgrade leaves the added rows in place.
+
+## Auth Session Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                                                                    |
+| --------------- | ------------- | --------------- | ---------------------------------------------------------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique session identifier (UUID)                                                   |
+| user_id         | Text          | nullable        | The signed-in user; empty while a browser sign-in request waits for approval       |
+| refresh_token_id | Text         | nullable        | Identifier of the current refresh token; empty until the sign-in is completed      |
+| data            | JSON          | NOT NULL        | The app's name and the state of a pending sign-in request                          |
+| created_at      | BigInteger    | NOT NULL        | Session creation timestamp                                                         |
+| updated_at      | BigInteger    | NOT NULL        | Session last update timestamp                                                      |
+| expires_at      | BigInteger    | NOT NULL        | Expiration timestamp                                                               |
+
+Things to know about the auth_session table:
+
+- Created by migration `8bc7e5a902d1`. A row is either a session created by a signed-in user or a pending sign-in request that becomes a session once the app completes the sign-in. See [Tether](/ecosystem/tether) for the flow.
+- `user_id` carries no foreign key. The relationship to `user` is one-to-many: a user can hold several sessions, one per signed-in app.
+- Indexed on `user_id` and on `expires_at` (`idx_auth_session_user`, `idx_auth_session_expires`).
+- `expires_at` of a pending request is 10 minutes after its creation. Of a session it is [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) after its creation or last token refresh. Expired rows are deleted whenever a new row is created.
+- Signing out and deleting the session through the API remove the row.
 
 ## Channel Table
 
@@ -1086,6 +1107,7 @@ erDiagram
     user ||--o{ pinned_note : "pins"
     note ||--o{ pinned_note : "pinned_by"
     user ||--o{ oauth_session : "has"
+    user ||--o{ auth_session : "signs_in"
     user ||--o{ api_key : "holds"
 
     %% Content Relationships
@@ -1414,6 +1436,16 @@ erDiagram
         text user_id FK
         text provider
         text token
+        bigint expires_at
+    }
+
+    auth_session {
+        text id PK
+        text user_id
+        text refresh_token_id
+        json data
+        bigint created_at
+        bigint updated_at
         bigint expires_at
     }
 
