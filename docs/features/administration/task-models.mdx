@@ -39,16 +39,16 @@ The main chat experience does not change. The background work just stops draggin
 
 **Task Model Parameters > Configure**, in the same **Tasks** section, opens the advanced parameter controls you already know from a model and applies them to every background request. The equivalent environment variable is [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params), which takes a JSON object such as `{"max_tokens":4000,"temperature":0.3}`.
 
-Leave it empty and background requests behave as they always have: task calls use the task model's own `max_tokens` from its model editor when one is set, and 1000 output tokens when none is, and every other parameter is left out. Context compaction has its own **Context Compaction Model** picker under **Chat** (`CONTEXT_COMPACTION_MODEL`, default Current Model) and does not use the Local or External task model.
+Leave it empty and background requests behave as they always have: task calls use the task model's own `max_tokens` from its model editor when one is set, and 1000 output tokens when none is, and every other parameter is left out. Context compaction has its own **Context Compaction Model** picker under **Chat** (`CONTEXT_COMPACTION_MODEL`, default Current Model) and does not use the Local or External task model. Its summaries have no output limit unless `max_tokens` is set here.
 
 Reach for it when:
 
-- **A title or a compaction summary comes back cut off.** This is the usual symptom of a reasoning task model. Thinking counts against the same 1000 tokens, so the budget can be gone before any answer is written. Raise `max_tokens` or turn `reasoning_effort` down.
+- **A title comes back cut off.** This is the usual symptom of a reasoning task model. Thinking counts against the same 1000 tokens, so the budget can be gone before any answer is written. Raise `max_tokens` or turn `reasoning_effort` down.
 - **Background calls cost more than you expected.** Tag, follow-up, query and autocomplete requests carry no output limit of their own. Setting `max_tokens` puts a ceiling on all of them at once.
 - **Background output is too loose.** Lower `temperature` for steadier titles and tags.
 
 :::warning Setting anything replaces the built-in limit
-As soon as you set a single parameter, the built-in 1000-token limit on titles and compaction summaries is no longer applied. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
+As soon as you set a single parameter, the built-in 1000-token limit on titles is no longer applied. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
 :::
 
 Five of the controls in the panel have no effect on background requests: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Setting them here changes nothing.

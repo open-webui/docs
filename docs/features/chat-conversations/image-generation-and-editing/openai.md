@@ -7,7 +7,7 @@ title: "OpenAI"
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-Open WebUI also supports image generation through the **OpenAI APIs**. This option includes a selector for choosing between DALL·E 2, DALL·E 3, and the GPT-Image models, each supporting different image sizes. `gpt-image-2` is OpenAI's current image model.
+Open WebUI also supports image generation through the **OpenAI APIs**. This option includes a selector for choosing between the GPT-Image models (`gpt-image-1`, `gpt-image-1.5` and `gpt-image-2`). `gpt-image-2` is the default model.
 
 ### Initial Setup
 
@@ -18,16 +18,13 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Default (Open AI)`.
 3. Enter your OpenAI API key.
-4. Choose the model you wish to use. Note that image size options will depend on the selected model:
-   - **DALL·E 2**: Supports `256x256`, `512x512`, or `1024x1024` images.
-   - **DALL·E 3**: Supports `1024x1024`, `1792x1024`, or `1024x1792` images.
-   - **GPT-Image** (`gpt-image-2`, `gpt-image-1`): Supports `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
+4. Choose the model you wish to use. **GPT-Image** models support `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
 
 ![Screenshot of the Open WebUI Images settings page with Open AI selected and the API key, model, and image size fields highlighted.](/images/image-generation-and-editing/openai-settings.png)
 
 ### Azure OpenAI
 
-Image generation with Azure OpenAI (DALL·E or GPT-Image) is supported. Configure the Image Generation as follows:
+Image generation with Azure OpenAI is supported. Configure the Image Generation as follows:
 
 1. In Open WebUI, navigate to the **Settings** > **Admin** > **Images** menu.
 2. Set the `Image Generation Engine` field to `Default (Open AI)` (Azure OpenAI uses the same syntax as OpenAI).

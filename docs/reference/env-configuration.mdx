@@ -1516,7 +1516,7 @@ when using OpenAI-compatible endpoints.
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation and compaction summaries stop at 1000 output tokens and the other tasks send no parameters. Setting anything here drops that built-in limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
+- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation stops at 1000 output tokens and the other tasks send no parameters. Setting anything here drops the title limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Context compaction summaries have no output limit unless `max_tokens` is set here. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
 
 :::info
@@ -6289,7 +6289,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1`, DALL·E) for image generation.
+  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image generation.
   - `comfyui`: Uses ComfyUI engine for image generation.
   - `automatic1111`: Uses AUTOMATIC1111 engine for image generation.
   - `gemini`: Uses Gemini for image generation.
@@ -6301,7 +6301,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: ``
-- Description: Default model to use for image generation (e.g., `gpt-image-2`, `gemini-3.1-flash-image`).
+- Description: Default model to use for image generation (e.g., `gpt-image-2`, `gemini-3.1-flash-image`). With the `openai` engine and no model set, `gpt-image-2` is used.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `IMAGE_SIZE`
@@ -6345,7 +6345,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1`, DALL·E) for image editing.
+  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image editing.
   - `gemini`: Uses Gemini for image editing.
   - `comfyui`: Uses ComfyUI engine for image editing.
 - Default: `openai`
@@ -6383,7 +6383,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+- Description: Sets the OpenAI-compatible base URL to use for OpenAI image generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ##### `IMAGES_OPENAI_API_VERSION`
@@ -6397,15 +6397,15 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `${OPENAI_API_KEY}`
-- Description: Sets the API key to use for DALL-E image generation.
+- Description: Sets the API key to use for OpenAI image generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ##### `IMAGES_OPENAI_API_PARAMS`
 
 - Type: `str` (JSON)
 - Default: `{}`
-- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters for DALL-E models (e.g., `{"quality": "hd"}` for dall-e-3).
-- Example: `{"quality": "hd", "style": "vivid"}`
+- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters (e.g., `{"quality": "high"}` for GPT-Image models).
+- Example: `{"quality": "high"}`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### Image Editing

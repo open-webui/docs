@@ -187,6 +187,7 @@ Watch your provider's usage response for cached-token counts (for example cache-
 
 - **Anthropic**: supports both explicit caching (cache breakpoints) and implicit caching, but caching is **opt-in on every request** (a caching directive must be sent each time) and **cache writes are billed**. You must send that opt-in; a stable prefix then maximises the portion that is cached and reused.
 - **OpenAI / Gemini / DeepSeek / OpenAI-compatible gateways**: automatic (implicit) prefix caching; identical leading tokens are served from cache with no opt-in and no extra flags.
+- **Anthropic models behind OpenAI-compatible gateways (OpenRouter, LiteLLM)**: a cache marker on a tool result reaches the gateway, so the prefix stays cached through tool loops.
 
 In every case the requirement is the same: **don't rewrite the beginning of the request between turns.**
 
