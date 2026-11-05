@@ -1,5 +1,4 @@
 ---
-draft: true
 sidebar_position: 5
 sidebar_label: "Syntegon Technology GmbH"
 title: "Syntegon"
@@ -7,78 +6,150 @@ description: "Syntia (Syntegon Intelligence Assistance) brings multiple AI model
 keywords: ["Syntegon AI", "Open WebUI case study", "enterprise AI", "private AI deployment"]
 ---
 
-# Industrial equipment supplier Syntegon puts 500+ RAG agents to work with Open WebUI
+# Global technology company Syntegon puts 500+ RAG agents to work with Open WebUI
 
 ![Syntegon](/images/enterprise/customers/syntegon/hero.png)
 
 ## Overview
 
 :::info
-**Syntia (Syntegon Intelligence Assistance)** brings multiple AI models and internal knowledge into **one governed platform**, with **2,000 to 2,500 active users** over a reported **14-day period**.
+Syntegon built Syntia (Syntegon Intelligence Assistance) on Open WebUI and hosts it on AWS. It gives employees across engineering, operations, compliance and other functions one SSO-protected, fully auditable platform for 8+ AI models and RAG agents.
 :::
 
 ### At a Glance
 
-- **Industry**: Industrial equipment for pharma, biotech and food.
-- **Company size**: 7,300 employees across 49 locations in more than 20 countries.
-- **Active users**: 2,000 to 2,500 in the last 14 days at the time of reporting.
-- **Deployment**: Amazon EKS on AWS Fargate; EU-only data residency.
-- **Access**: Global employee access, subject to geographic compliance restrictions.
-- **Models**: 8+ models, including OpenAI GPT and Anthropic Claude; GPT-5-mini is the default.
-- **Authentication**: Microsoft Entra ID SSO; provisioning through Syntegon IAM.
+- **Industry**: Global technology company
+- **Company size**: 7,300 employees at 49 locations in more than 20 countries; headquartered in Stuttgart, Germany
+- **Go-live**: December 2025
+- **Active users**: 2,000–2,500 in the last 14 days, at the time of reporting
+- **Access**: Licensed for all Syntegon employees globally, except in regions where compliance requirements and local regulations restrict access
+- **Deployment**: Amazon EKS on AWS Fargate in the EU, with Kubernetes autoscaling; EU-only data residency
+- **Models**: 8+ models across Azure OpenAI and AWS Bedrock, including OpenAI GPT and Anthropic Claude; GPT-5-mini is the default
+- **Integrations**: SharePoint, Confluence, Jira and web search
+- **Key results**: 500+ active RAG agents; Syntia is the only AI platform at Syntegon approved under its data governance and Work Council framework
 
 ## About Syntegon
 
-Syntegon is a leading global technology company and strategic life cycle partner to the pharmaceutical, biotech, and food industries. Headquartered in Stuttgart, Germany, the company employs 7,300 people at 49 locations in more than 20 countries. With over 160 years of industry expertise, Syntegon delivers solutions that make a real difference, helping people live better, stay healthier, and trust the products they rely on every day.
+[Syntegon](https://www.syntegon.com/) is a leading global technology company and strategic life cycle partner to the pharmaceutical, biotech and food industries. Headquartered in Stuttgart, Germany, it employs 7,300 people at 49 locations in more than 20 countries. With over 160 years of industry expertise, Syntegon delivers solutions that help people live better, stay healthier and trust the products they rely on every day.
 
 ## The Challenge: Scaling AI responsibly
 
-Syntegon needed to scale AI across a global engineering organization while controlling models, data sources and governance. Public SaaS tools raised concerns about data residency, intellectual property exposure and vendor lock-in.
+Syntegon needed to scale AI access across a global, multi-site engineering organization while keeping strict data governance, compliance and full control over AI models and data sources. Its leadership set a goal: give every employee enterprise-grade AI capabilities without sacrificing security and compliance.
 
-- Syntegon-controlled EU cloud infrastructure, Entra ID SSO and role-based access through IAM.
-- Multiple model providers through a unified gateway, with secure internal data integration.
-- Work Council and DPO approval pathways, plus required AI literacy training.
+Syntegon found that public SaaS AI tools posed unacceptable risks around data residency and IP exposure. The company also found that commercial SaaS tools offered:
 
-## The Solution: Syntia with Open WebUI on AWS
+- too little control over data residency,
+- no way to integrate proprietary internal data sources securely,
+- limited choice of models, and
+- no enterprise-grade role-based access aligned to Syntegon’s identity management.
 
-Open WebUI enabled Syntegon to deploy Syntia without codebase customization.
+Given how strategically important AI is to the company’s future, vendor lock-in was also a major concern.
 
-- **Compute and orchestration**: Amazon EKS on AWS Fargate with Kubernetes autoscaling.
-- **Storage and database**: Amazon Aurora PostgreSQL with pgvector for RAG embeddings; AWS EFS shared storage and daily database/EFS backups.
-- **Networking**: AWS VPC with public and private subnets across two AZs. Application Load Balancer (ALB) in public subnet for ingress and SSL/TLS termination (AWS ACM). NAT Gateway for outbound-only internet access from private subnets. All application workloads run in private subnets with no direct inbound internet access to pods.
-- **Logging and monitoring**: Full audit trail via OpenTelemetry, Prometheus and Grafana for traces, metrics and alerts; LiteLLM for model usage and costs.
-- **Security controls**: MFA, device compliance, group-based roles, EU data residency, SIEM audit exports and egress restrictions.
-- **Content and privacy**: Azure AI Content Safety and AWS Bedrock Guardrails; admin chat access and exports disabled.
-- **CI/CD**: GitOps-based deployment. Terraform for infrastructure as code (state in AWS S3). Kubernetes manifests managed via Git. Planned updates tested on staging environment before production promotion (documented rollback plans in Confluence GCSS space).
-- **Integrations**: Syntia integrates SharePoint, Confluence, Jira and web search.
-- **RAG**: Azure text-embedding-3-large and pgvector support retrieval from internal knowledge bases.
+Syntegon’s non-negotiable requirements were:
+
+- Deployment in Syntegon-controlled cloud infrastructure (AWS, EU region)
+- SSO with Microsoft Entra ID, plus role-based access through IAM
+- Support for multiple LLM providers (Azure OpenAI and AWS Bedrock) through a unified gateway (LiteLLM)
+- A Work Council and data protection officer (DPO) approval pathway that complies with local regulation
+- A structured AI literacy training program that every employee must complete, covering both the strategic benefits of AI and the responsible boundaries of its use
+
+## The Solution: Syntia on AWS
+
+Open WebUI’s open architecture, permissive licensing and enterprise-ready features let Syntegon rapidly deploy a fully self-hosted, enterprise-hardened AI platform without customizing the codebase. Those features include RAG, Model Context Protocol (MCP), SSO, multi-model support and an extensible plugin framework.
+
+LiteLLM proved decisive. Integrated as a unified, cost-controlled gateway, it routes traffic across Azure OpenAI, AWS Bedrock and future AI models. Open WebUI’s configurability also lets Syntegon’s security teams enforce strict governance policies, including disabling code execution and blocking unauthorized webhooks.
+
+- **Compute and orchestration**: Amazon EKS (managed Kubernetes) on AWS Fargate
+- **Storage and database**: Amazon Aurora (PostgreSQL-compatible) with the pgvector extension for RAG embeddings; AWS EFS for persistent shared storage across pods; daily AWS RDS snapshots
+- **Networking**: All application workloads run in private subnets of an AWS VPC, with no direct inbound internet access to pods
+- **Secrets**: AWS Secrets Manager for all sensitive credentials, and AWS KMS for encryption at rest
+- **CI/CD**: GitOps-based deployment, with Terraform for infrastructure as code and Kubernetes manifests managed in Git. Planned updates are tested in staging before production, with documented rollback plans.
+- **Logging and monitoring**: An OpenTelemetry Collector for traces and metrics, Prometheus for metrics storage, Grafana dashboards for visualization and alerting, AWS SNS for email alerts, and the LiteLLM dashboard for per-model usage and cost
+- **Security controls**: MFA via the identity provider, device compliance, role-based access by group, enforced data residency, moderation and guardrails, audit exports to SIEM, and egress restrictions
+
+### Models and data handling
+
+All model routing runs through a LiteLLM gateway deployed inside Syntegon’s Kubernetes cluster.
+
+- **Azure OpenAI**: GPT-5 for high-quality tasks; GPT-5-mini as the default for cost-effective, high-volume tasks; GPT-4.1 for complex reasoning; GPT-5.4 and GPT-5.1; and GPT 1.5 for image generation
+- **AWS Bedrock**: Claude Sonnet 4.5 and 4.6 for advanced reasoning and long context; Pixtral Large 25.02 for vision and text; and the open-source gpt-oss-120b
+
+GPT-5-mini is every user’s default, and users can choose other models from the full catalogue. Cost-sensitive or high-volume tasks go to GPT-5-mini or gpt-oss-120b. High-sensitivity or complex reasoning tasks can use Claude Sonnet or GPT-5.
+
+RAG uses Azure OpenAI text-embedding-3-large with pgvector on Aurora, which Syntegon prefers for reliability across multiple pods. Sources include:
+
+- internal knowledge bases uploaded to the Syntia Workspace,
+- SharePoint document libraries, through the Microsoft Graph API,
+- Confluence pages, through the Atlassian integration.
+
+Syntia handles PDFs, Office files, CSV, Markdown, HTML, JSON, images and audio. OCR and Azure Document Intelligence extract content from complex documents.
+
+Sensitive data is protected in four ways:
+
+- Azure AI Content Safety filters all Azure model inputs and outputs, and AWS Bedrock Guardrails apply equivalent filtering on AWS models.
+- Admin chat access and admin exports are disabled to protect user privacy.
+- Direct signup is disabled. Users sign in only through Entra ID SSO and are provisioned through the Syntegon Identity Manager.
+- Daily backups are encrypted at rest.
 
 ## Adoption and Enablement
 
-Every Syntegon employee globally can self-service onboard via the Syntegon Identity Manager. Training materials, e-learning modules, and a dedicated AI Hub community ensure sustained adoption and upskilling.
+![Syntia model selector showing GPT, Claude, and other available models.](/images/enterprise/customers/syntegon/open-webui.png)
 
-Required AI literacy training, e-learning, office hours and functional team sessions support adoption, while the AI Innovation Hub and Product Board coordinate feedback and priorities.
+Syntia’s model selector brings GPT, Claude and other models into one interface.
 
-Active use cases span engineering, project management, operations, compliance, sales, and HR:
+Syntia went live in production in December 2025, with access provisioned through an Azure Service Group. It has been updated iteratively since. Employees in eligible regions can onboard themselves through the Syntegon Identity Manager.
 
-- **Enterprise knowledge**: Over 500 active RAG agents provide answers grounded in Syntegon product documentation, SharePoint, and Confluence
-- **Multi-language capability**: supporting Syntegon's global workforce (German, English, and other languages via Azure Speech multilingual neural models)
-- **Content creation**: Service brief drafting and image generation/editing for technical and marketing assets.
+Syntegon supports adoption through:
+
+- **Training and documentation**: dedicated Syntia training materials and e-learning modules, with Confluence and SharePoint as the single source of truth for Syntia documentation, including architecture, configuration, security and rollout guides.
+- **AI Hub & Spoke sessions**: a central hub team owns the shared AI infrastructure, governance, approved tools and reusable components, while departments act as spokes that apply that foundation to their own problems.
+- **Product Board meetings**: used to gather feedback, prioritize features and share updates. An AI Innovation Hub coordinates these meetings, use-case ideation and roadmap governance across departments.
+- **Support and community**: office hours, functional team enablement sessions and a dedicated AI Hub community.
+
+Syntia is used across engineering and R&D, operations and manufacturing, project management, sales, marketing and customer experience, finance and HR, and digital transformation. It supports German, English and other languages through Azure Speech multilingual neural models. LiteLLM virtual API keys let engineering teams build their own AI-powered applications on Syntia’s model infrastructure.
 
 ## Results
 
-![Syntia model selector showing GPT, Claude, and other available models.](/images/enterprise/customers/syntegon/open-webui.png)
+> “We moved from AI experiments to real productivity gains, with more than 1,000 users in the first weeks of go-live — not quarters. Open WebUI let us operationalize use cases at scale while keeping full visibility into cost and compliance.”
+>
+> — Matti Maier, Director of Digital Technology Applications, Syntegon
 
-> “The biggest win with Open WebUI is having every LLM in one place. Our teams switch between models for reasoning, coding, or RAG-based retrieval on the fly—one interface, full flexibility, no juggling separate tools or accounts.” - Syntegon
+Syntegon reports the following results:
 
-- **Adoption**: 2,000 to 2,500 active users over the reported 14-day period.
-- **Knowledge access**: More than 500 active RAG agents provide answers grounded in company documentation.
-- **Productivity**: Syntegon reports faster development cycles, service communications and visual-content turnaround.
-- **Governance**: Syntegon reports Syntia is its only AI platform approved under its data governance and Work Council framework.
+- **Security and compliance**: Syntia is the only AI platform at Syntegon approved under the company’s data governance and Work Council framework. It has two layers of content filtering (Azure AI Content Safety and AWS Bedrock Guardrails), a full audit trail through OpenTelemetry and Grafana, and daily snapshots that meet its backup and recovery SLAs.
+- **Enterprise knowledge**: More than 500 active RAG agents give context-aware answers grounded in Syntegon product documentation, SharePoint and Confluence.
+- **Ecosystem integration**: Syntia is the only enterprise AI platform at Syntegon with native integrations to SharePoint, Confluence, Jira, web search, image generation and document RAG in one interface. That removes the need for multiple siloed tools.
+- **Model breadth and cost efficiency**: 8+ models across Azure and AWS Bedrock in a single interface, with routine tasks going to GPT-5-mini and premium models reserved for complex work.
+- **Platform reliability**: Syntia runs on a production-grade, autoscaling Kubernetes cluster with a 99.9%+ availability target. Planned maintenance has full rollback plans, and no unplanned downtime incidents have been documented.
 
-## Connected Knowledge Sources
+> “The biggest win with Open WebUI is having every LLM in one place. Our teams switch between models for reasoning, coding, or RAG-based retrieval on the fly—one interface, full flexibility, no juggling separate tools or accounts.”
+>
+> — Matti Maier, Director of Digital Technology Applications, Syntegon
 
 ![SharePoint Search and Confluence Search in Syntia’s tools menu.](/images/enterprise/customers/syntegon/search-tools.png)
+
+SharePoint Search and Confluence Search appear in Syntia’s tools menu.
+
+## Top Use Cases
+
+Syntegon highlights these use cases and benefits:
+
+- **Enterprise knowledge at your fingertips**: 500+ RAG agents answer questions from product documentation, SharePoint and Confluence, with no manual searching
+- **Developer productivity**: integrated code assistance and review speed up delivery cycles and improve code quality
+- **Customer and field service**: AI-assisted brief drafting for faster, more consistent service communications
+- **Visual content generation**: on-demand image generation and editing for technical illustrations and marketing assets, reducing external dependency and turnaround time
+- **Agile at scale**: the Confluence integration supports sprint planning, documentation and project tracking
+
+## Why Syntegon Chose Open WebUI
+
+- **Open and self-hosted**: an open architecture and permissive licensing, deployed fully self-hosted without customizing the codebase
+- **Enterprise-ready features**: RAG, MCP, SSO, multi-model support and an extensible plugin framework
+- **Unified model gateway**: the LiteLLM integration, routing across Azure OpenAI, AWS Bedrock and future models, which Syntegon called decisive
+- **Configurable governance**: security teams can enforce strict policies, such as disabling code execution and blocking unauthorized webhooks
+
+## What’s Next
+
+Working with its partner, Syntegon could build an advanced integration that pulls data from Confluence and SharePoint while honoring each user’s access permissions, so users retrieve only the content they’re entitled to see.
 
 ---
 
