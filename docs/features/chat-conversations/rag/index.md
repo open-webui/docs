@@ -75,6 +75,8 @@ Configure these under **Settings > Admin > Integrations > External Knowledge Sou
 
 Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. At chat time, Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
 
+With [Retrieval Query Generation](/reference/env-configuration#enable_retrieval_query_generation) on, all generated queries run at the same time. Their results are merged by rank (the top result of each query, then the second of each, and so on), duplicates are dropped and the list is cut to the result count.
+
 In the sources under an answer, each result is listed by its title. When a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
 
 :::info Embedding model must match

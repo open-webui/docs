@@ -629,6 +629,8 @@ Processing a document holds its chunks and their embeddings in memory while they
 
 A single Redis instance is sufficient for the vast majority of deployments, including those with thousands of users. **You almost certainly do not need Redis Cluster or Redis Sentinel** unless you have specific HA requirements.
 
+Each worker also keeps the parsed model list it reads from Redis for filter lookups, which takes about 3 MB of memory per worker for every 1000 models.
+
 A response being streamed is held in Redis so a browser that reconnects can resume it, and the entry is deleted when the response finishes. Entries left behind by a worker killed mid-stream expire after `REDIS_RESPONSE_STREAM_TTL` seconds (default `3600`). Lower it where Redis memory is tight; `0` keeps them forever. See [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
 
 Common Redis configuration issues that cause unnecessary scaling:
