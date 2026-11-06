@@ -175,7 +175,7 @@ apiKey: YOUR_OPEN_WEBUI_API_KEY
 ### Roles
 
 The roles will allow your model to be used by the extension for certain tasks. For the beginning you can choose `chat` and `edit`.
-You can find more information about roles in the [official roles guide](https://docs.continue.dev/customize/model-roles/intro).
+You can find more information about roles in the [official roles guide](https://docs.continue.dev/customize/model-roles/00-intro).
 
 ```yaml
 roles:
