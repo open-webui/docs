@@ -51,6 +51,7 @@ Saving a connection does not test it. Clicking the **Verify Connection** button 
 | Perplexity | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
 | MiniMax | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes, but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| PopNow | Yes, but also lists image, video and audio models | Add the chat model IDs you want to the allowlist |
 | Vercel AI Gateway | Yes | Auto-detection works; filtering is recommended if you only want specific gateway models |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
@@ -272,6 +273,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
   1. **Use an allowlist**: add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-5`, `google/gemini-3.6-flash`).
   2. **Enable model caching** via `Settings > Admin > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
+  :::
+
+  </TabItem>
+  <TabItem value="popnow" label="PopNow">
+
+  **PopNow** serves Claude, GPT, Gemini, DeepSeek, Kimi and other chat models through one OpenAI-compatible API, billed per token in USD.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.popnow.ai/v1` |
+  | **API Key** | Your API key from the [PopNow API console](https://popnow.ai/api/console/keys) |
+  | **Model IDs** | **Recommended**, add the chat models you want to the allowlist |
+
+  :::tip
+  `/models` also returns image, video and audio models, which won't work in chat. Add only chat model IDs to the allowlist (e.g., `anthropic/claude-sonnet-5.5/chat`, `deepseek/v4-flash/chat`). The [PopNow chat API docs](https://popnow.ai/docs/chat) list every chat model and its price.
   :::
 
   </TabItem>
