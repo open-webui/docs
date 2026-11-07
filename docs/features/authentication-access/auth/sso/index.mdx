@@ -285,7 +285,7 @@ When that login does change the role, Open WebUI ends the account's other live W
 
 ### OAuth Group Management
 
-Any OAuth provider that can be configured to return groups in the ID token or userinfo response can be used to manage user groups in Open WebUI upon user login. On the token exchange endpoint, Open WebUI also reads the groups claim from the presented access token when userinfo lacks one.
+Any OAuth provider that can be configured to return groups in the ID token or userinfo response can be used to manage user groups in Open WebUI upon user login. On the token exchange endpoint, Open WebUI also reads the groups claim from the presented access token when userinfo lacks one. If neither contains the groups claim and the user is already in at least one group, the token exchange is refused with `403`.
 To enable this synchronization, set `ENABLE_OAUTH_GROUP_MANAGEMENT` to `true`.
 
 You can configure the following environment variables:

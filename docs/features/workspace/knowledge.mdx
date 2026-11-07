@@ -71,7 +71,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | 🔍 **Hybrid search** | BM25 keyword search + vector search with cross-encoder reranking |
 | 📑 **8 extraction engines** | Tika, Docling, Azure, Mistral OCR, Datalab Marker, MinerU, PaddleOCR, custom loaders |
 | 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
-| 📄 **Full context mode** | Inject entire documents with no chunking |
+| 📄 **Always Use Full Text** | Inject entire documents with no chunking |
 | 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
 | 👁️ **File browser with preview** | Browse files in a tree, preview each file next to the list and read or edit the indexed text the AI searches |
 | 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
@@ -99,6 +99,8 @@ Injects the complete content of the file into every message. No chunking, no sem
 
 Best for short reference documents, style guides, or context that's always relevant.
 
+Files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full without choosing this mode, and **Always Use Full Text** applies it to every document. Knowledge base attachments are not affected by the threshold.
+
 ---
 
 ## Agentic Knowledge Tools
@@ -121,7 +123,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | `display_file` | ✅ | ✅ | Show a file to the user inline in the chat, optionally at a page or slide |
 | `view_note` | ✅ | ❌ | Read attached notes |
 
-"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, which it uses to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
+"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **Preload files** capability is off. Whatever the source, the model is told what it has: a hidden `list_attached_knowledge` tool result after your message carries an `<attached_knowledge>` list of the items with their IDs, which it uses to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
 
 The key split: `list_knowledge` and `list_knowledge_bases` are mutually exclusive. Attaching a KB scopes the model to only those documents. Leaving it unscoped lets the model discover everything the user has access to.
 
@@ -237,7 +239,7 @@ When native function calling is enabled, attached knowledge is **not automatical
 
 1. **Add system prompt instructions** telling the model to use `list_knowledge` and `query_knowledge_files`.
 2. **Check the model's tool capabilities and retrieval setup** using [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working). Keep Native mode enabled and use a model that can call tools reliably.
-3. **Switch to Full Context mode** for the attachment to bypass RAG entirely.
+3. **Switch the attachment to Using Entire Document** to bypass RAG entirely.
 :::
 
 ---

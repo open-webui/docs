@@ -261,36 +261,36 @@ If you change the embedding model, those standalone chat file embeddings will st
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
 
-## File Context vs Builtin Tools
+## Preload files vs Builtin Tools
 
 Open WebUI provides two separate capabilities that control how files are handled. Understanding the difference is important for configuring models correctly.
 
-### File Context Capability
+### Preload files Capability
 
-The **File Context** capability controls whether Open WebUI performs RAG (Retrieval-Augmented Generation) on attached files:
+The **Preload files** capability controls whether Open WebUI performs RAG (Retrieval-Augmented Generation) on attached files. It is off by default with Native function calling and on with Legacy. The model editor and **Model Defaults** show the effective value. For API requests that do not come from a chat in the web UI, it is on unless the model saves a value for it, so files and knowledge sent in the `files` field reach the model.
 
-| File Context | Behavior |
+| Preload files | Behavior |
 |--------------|----------|
-| ✅ **Enabled** (default) | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
-| ❌ **Disabled** | File content is never extracted or injected. If [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) is also enabled, the model still receives a short listing of which files are attached, their names rather than their content, so it can decide to fetch one with a tool. |
+| ✅ **Enabled** | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
+| ❌ **Disabled** | File content is never extracted or injected. With Native or Default function calling, the model sees a list of the attached files and reads them with the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`). These tools need the **Files** builtin tool category, the model's **File Upload** capability and the user's upload permission. |
 
-**When to disable File Context:**
+**When to disable Preload files:**
 - **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
-- **Using [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling File Context is also what injects the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), which let the model list, search and read the chat's attachments itself.
+- **Using [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling Preload files is also what makes the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) available, which let the model list, search and read the chat's attachments itself.
 - **Debugging/testing**: To isolate whether issues are related to RAG processing.
 
-:::warning File Context Disabled = No Pre-Injected Content
-When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
+:::warning Preload files Disabled = No Pre-Injected Content
+When Preload files is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
 
 To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
 
 :::info
-The File Context toggle only appears when **File Upload** is enabled for the model.
+The Preload files toggle only appears when **File Upload** is enabled for the model.
 :::
 
 ### Builtin Tools Capability
@@ -310,9 +310,9 @@ The **[Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools
 
 These capabilities work independently, giving you fine-grained control, and the rows below describe files and knowledge bases attached **inside the chat** on a model set to Default or Native function calling.
 
-On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so File Context alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
+On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so Preload files alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
 
-| File Context | Builtin Tools | Result |
+| Preload files | Builtin Tools | Result |
 |--------------|---------------|--------|
 | ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
 | ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
@@ -322,10 +322,10 @@ On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-sys
 :::warning Knowledge attached to a model or a folder behaves differently
 The table above covers attachments made in the chat. Knowledge attached to a model in the Workspace, and knowledge attached to a folder, follow the Function Calling mode instead:
 
-- **Legacy**: the knowledge is queued for retrieval and injected upfront, exactly as the table describes, provided File Context is enabled. Turning File Context off removes the retrieval step entirely, so nothing is injected on Legacy either.
-- **Default and Native**: nothing is injected regardless of File Context. The knowledge is offered to the model through the [builtin knowledge tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), and the model decides whether to search it.
+- **Legacy**: the knowledge is queued for retrieval and injected upfront, exactly as the table describes, provided Preload files is enabled. Turning Preload files off removes the retrieval step entirely, so nothing is injected on Legacy either.
+- **Default and Native**: nothing is injected regardless of Preload files. The knowledge is offered to the model through the [builtin knowledge tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), and the model decides whether to search it.
 
-The consequence is a configuration that silently does nothing. With File Context enabled, [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
+The consequence is a configuration that silently does nothing. With Preload files enabled, [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
 
 Any one of these resolves it:
 
@@ -335,9 +335,9 @@ Any one of these resolves it:
 :::
 
 :::tip Choosing the Right Configuration
-- **Most models**: Keep both enabled (defaults) for full functionality.
+- **Most models**: Keep both enabled for full functionality.
 - **Small/local models**: Disable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) if they don't support function calling.
-- **On-demand retrieval only**: Disable File Context, enable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with File Context off nothing would be retrieved at all.
+- **On-demand retrieval only**: Disable Preload files, enable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with Preload files off nothing would be retrieved at all.
 :::
 
 ## Enhanced RAG Pipeline

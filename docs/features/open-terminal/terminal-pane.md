@@ -5,7 +5,7 @@ title: "Terminal Pane"
 
 # The Terminal Pane
 
-Under the [file browser](./file-browser.md) sits a live view of what the AI is running: every command the AI starts gets its own tab. For your own interactive shell, pick **New Terminal** from the **+** menu of the **Tabs** side panel; you can open several side by side.
+Under the [file browser](./file-browser.md) sits a live view of what the AI is running: every command the AI starts gets its own tab. For your own interactive shell, pick **New Terminal** from the **+** menu of the **Tabs**; you can open several side by side.
 
 It appears once the AI has run a command, collapsed as a single strip labelled **Sessions**. When commands are running, the strip carries a count of how many. Click the strip, or the chevron at its right, to open it.
 

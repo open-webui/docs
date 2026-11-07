@@ -133,7 +133,6 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `expandDetails` | Always Expand Details | `false` |
 | `chatHoverPreview` | Chat Hover Previews | `true` |
 | `displayMultiModelResponsesInTabs` | Display Multi-model Responses in Tabs | `false` |
-| `showFilesOnTerminalSelect` | Show Files on Terminal Select | `true` |
 | `terminalFileDisplay` | Terminal File Display | `sidebar` |
 | `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
 | `stylizedPdfExport` | Stylized PDF Export | `true` |

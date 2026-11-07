@@ -948,7 +948,7 @@ Things to know about the skill table:
 
 - Uses UUID for primary key
 - Access control is managed through the `access_grant` table (resource_type `skill`)
-- `description` is injected into the system prompt as part of the manifest; `content` is loaded on-demand via the `view_skill` builtin tool
+- `description` is listed in the hidden `list_available_skills` result; `content` is loaded on-demand via the `view_skill` builtin tool
 - `data` and `version_id` were added in migration `d6a8c3f912ab`, which also seeds one `skill_history` version per existing skill
 
 ## Skill History Table

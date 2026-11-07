@@ -5,13 +5,9 @@ title: "File Browser"
 
 # The File Browser
 
-When Open Terminal is connected, the **Files** tab of the **Tabs** side panel holds a **file browser**. It works like the file explorer on your computer. You can browse folders, open files, upload things and download results. Everything the AI creates shows up here automatically.
+When Open Terminal is connected, the **Files** tab of the [**Tabs**](/features/chat-conversations/chat-features/#tabs-side-panel) holds a **file browser**. It works like the file explorer on your computer. You can browse folders, open files, upload things and download results. Everything the AI creates shows up here automatically.
 
-:::tip Auto-open behavior
-By default the file browser opens automatically when you select a terminal on a screen at least 768 px wide. To stop it from opening on its own, turn off **Show Files on Terminal Select** in **Settings → Interface** (a per-user preference).
-:::
-
-![A new chat with the Files tab open in the Tabs side panel](/images/open-terminal-file-browser.png)
+![A new chat with the Files tab open](/images/open-terminal-file-browser.png)
 
 ---
 
@@ -210,13 +206,14 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Git
 
-When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the **Tabs** side panel. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
+When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
 
 - **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
+  **Discard changes** works for staged, unstaged and new files. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
 - **History**: past commits and their diffs.
 - **Pull requests**, for GitHub repositories when the terminal supports them: list, search, create, edit, comment, approve, request changes, merge, close, reopen, check out and mark ready.
 
-The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. A file with changes gets **Show diff** in the file browser toolbar.
+The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. Staging, pushing, pulling and fetching show their progress. Drag the divider next to the file list to resize it. A file with changes gets **Show diff** in the file browser toolbar.
 
 ---
 

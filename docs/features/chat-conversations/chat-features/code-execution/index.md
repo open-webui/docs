@@ -36,7 +36,7 @@ Pyodide is a **legacy** code-execution engine. It is still the built-in, zero-se
 Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with some constraints:
 
 - **Persistent file storage**: the virtual filesystem at `/mnt/uploads/` is backed by IndexedDB (IDBFS). Files persist across code executions within a session, but **surviving a page reload requires [`ENABLE_PYODIDE_FILE_PERSISTENCE=true`](/reference/env-configuration#enable_pyodide_file_persistence)** (off by default). With it off, Pyodide runs in a sandboxed opaque-origin iframe and the filesystem is not retained across reloads.
-- **Built-in file browser**: when Code Interpreter is enabled, a **Files** tab appears in the chat's [side panel](/features/chat-conversations/chat-features/#tabs-side-panel). You can browse, preview, upload, download and delete files in the Pyodide filesystem, no terminal needed.
+- **Built-in file browser**: when Code Interpreter is enabled, a **Files** tab appears in the chat's [tabs](/features/chat-conversations/chat-features/#tabs-side-panel). You can browse, preview, upload, download and delete files in the Pyodide filesystem, no terminal needed.
 - **User file access**: files attached to messages are automatically placed in `/mnt/uploads/` before code execution, so the model (and your code) can read them directly.
 - **Limited library support**: only a subset of Python packages are available. Libraries that rely on C extensions or system calls may not work.
 - **No shell access**: cannot run shell commands, install packages, or interact with the OS.
@@ -78,7 +78,7 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 - **Full shell access**: models can install packages, run scripts in any language, use system tools like ffmpeg, git, curl, etc.
 - **Container isolation**: runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset**: the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
-- **Built-in file browser**: browse, preview, create, delete, upload and download files directly from the **Files** tab of the side panel.
+- **Built-in file browser**: browse, preview, create, delete, upload and download files directly from the **Files** tab.
 - **Built-in multi-user mode**: a single container can serve multiple users with per-user Linux account isolation (good for small teams, not for large-scale deployments).
 
 For full documentation, see the [Open Terminal integration guide](/features/open-terminal).

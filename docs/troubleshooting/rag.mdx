@@ -30,7 +30,7 @@ Typical for Ollama models on consumer hardware (Qwen 3.5 4B, Gemma 4 12B, Muse G
 | **Chunk Size** | `1000` | Smaller chunks so each retrieval result fits comfortably |
 | **Chunk Overlap** | `100` | Standard overlap |
 | **Top K** | `3` to `5` | Fewer chunks to avoid blowing out your limited context budget |
-| **Full Context Mode** | Off | Cannot afford to send full documents |
+| **Always Use Full Text** | Off | Cannot afford to send full documents |
 
 :::tip Context budget math
 With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. With hybrid search on, **Top K Reranker** sets how many chunks reach the model, so use it for this math. Add your system prompt and conversation history. If your model has an 8K context window, that leaves about 2 to 3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
@@ -47,10 +47,10 @@ Typical for OpenAI (GPT-5.6), Anthropic (Claude), Google (Gemini), DeepSeek, and
 | **Chunk Size** | `2000` | Larger chunks preserve more surrounding context per hit |
 | **Chunk Overlap** | `200` | More overlap prevents sentence splits |
 | **Top K** | `15` to `25` | Cast a wide net, you have the context budget for it |
-| **Full Context Mode** | Consider for small docs | If a document is under ~20K tokens, full context can outperform retrieval |
+| **Always Use Full Text** | Consider for small docs | If a document is under ~20K tokens, full text can outperform retrieval. **Full Text Threshold (Characters)** sets which files are included in full without it |
 
-:::tip When to use Full Context Mode
-If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, Full Context Mode often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Toggle it per-chat in the chat settings.
+:::tip When to use full text
+If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, full text often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Switch an attachment to **Using Entire Document** to do this for one file, or turn on **Always Use Full Text** in **Admin Settings** > **Documents** for all of them.
 :::
 
 ### Mixed environment (local + cloud)
@@ -113,7 +113,7 @@ Open WebUI is designed to work with models that have limited context windows by 
 - Go to **Settings > Admin > Documents**
 - Either:
   - **Enable "Bypass Embedding and Retrieval"**: sends full content directly without applying retrieval filters.
-  - **Toggle on "Full Context Mode"**: injects more comprehensive content into the model prompt.
+  - **Toggle on "Always Use Full Text"**: injects more comprehensive content into the model prompt.
 
 :::warning
 
@@ -208,7 +208,7 @@ Open WebUI implements various limits to ensure system stability and prevent abus
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to `RAG_FILE_MAX_SIZE` and the knowledge base [file limits](/features/workspace/knowledge#file-limits).
-    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used in **Full Context Mode** (accessible in chat settings), which feeds the full document content to the model instead of using vector search retrieval.
+    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used with **Using Entire Document** (click the attachment in a chat), which feeds the full document content to the model instead of using vector search retrieval.
 
 :::info
 By separating these limits, administrators can better manage resource usage across different features. For example, you might want to allow larger uploads in a curated Knowledge Base while restricting the number of files in ad-hoc Folder uploads.
@@ -244,7 +244,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 | Problem | Fix |
 |--------|------|
 | 🤔 Model can't "see" content | Check document extractor settings |
-| 🧹 Only part of content used | Enable Full Context Mode or Bypass Embedding |
+| 🧹 Only part of content used | Enable Always Use Full Text or Bypass Embedding |
 | ⏱ Limited by a small context length | Increase model context length or use large-context LLM |
 | 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
 | ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`); Knowledge Base limits are separate |
@@ -460,7 +460,7 @@ If you want to prevent a model from accessing **any** knowledge base in native m
    - Go to **Settings > Admin > Models** and open **Model Defaults**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
    - Models without an explicit per-model value inherit this setting. Keep the effective value set to `native` and check that the selected model supports tool calling
-   - Also check the **Model Capabilities** section: **File Context** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access
+   - Also check the **Model Capabilities** section: **Preload files** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access
 
 :::info Check the effective model settings
 Per-model settings in **Workspace > Models > Edit > Advanced Params** override the global default when explicitly set. A model without its own `function_calling` value inherits the global setting. Check both places when the model's behavior differs from what you expect.
@@ -479,15 +479,15 @@ Per-model settings in **Workspace > Models > Edit > Advanced Params** override t
    - Confirm the uploaded file finished processing and the current user can access the knowledge base
    - Try a model with reliable native tool calling, then ask about a specific fact you can verify in the document
 
-5. **For a small document, try Full Context mode**:
-   - Click on the attached knowledge base and select **"Use Entire Document"**
+5. **For a small document, try Using Entire Document**:
+   - Click on the attached knowledge base and turn on **Using Entire Document**
    - This sends the full extracted content instead of retrieving selected passages. Ensure the document fits the model's context window
 
 :::info Why the Change?
-Open WebUI uses **agentic RAG**, where the model decides when and how to search knowledge bases and can retry with different queries. This requires a model that can use tools effectively. If the selected model cannot retrieve a known fact reliably, use a model with stronger tool calling or test a small document in Full Context mode.
+Open WebUI uses **agentic RAG**, where the model decides when and how to search knowledge bases and can retry with different queries. This requires a model that can use tools effectively. If the selected model cannot retrieve a known fact reliably, use a model with stronger tool calling or test a small document with Using Entire Document.
 :::
 
-For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
 
 ---
 

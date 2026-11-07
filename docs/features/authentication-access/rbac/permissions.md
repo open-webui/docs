@@ -126,7 +126,7 @@ Controls the features available to the user inside the chat interface.
 | **Allow Call** | Ability to start a [Voice Mode](/features/chat-conversations/chat-features/voice-mode) call, in both Standard and Realtime call mode. |
 | **Allow Multiple Models in Chat** | Ability to use several models at once ([`USER_PERMISSIONS_CHAT_MULTIPLE_MODELS`](/reference/env-configuration#user_permissions_chat_multiple_models)). When disabled, chats use only their first model. |
 | **Allow Temporary Chat** | **(Parent)** Ability to toggle "Temporary Chat" (incognito mode/history off). **Note:** Backend document parsing is disabled in this mode for privacy. |
-| **Allow Side Chat** | *(Requires Allow Temporary Chat)* Ability to open a [side chat](/features/chat-conversations/chat-features/#tabs-side-panel) ([`USER_PERMISSIONS_CHAT_SIDE_CHAT`](/reference/env-configuration#user_permissions_chat_side_chat)). Off by default. Admins always have it. |
+| **Allow Side Chat** | Ability to open a [side chat](/features/chat-conversations/chat-features/#tabs-side-panel) ([`USER_PERMISSIONS_CHAT_SIDE_CHAT`](/reference/env-configuration#user_permissions_chat_side_chat)). Off by default. Admins always have it. The group permissions form shows its switch only while **Allow Temporary Chat** is on. |
 | **Enforce Temporary Chat** | *(Requires Allow Temporary Chat)* **Restricts** the user to *always* use temporary chat (history disabled) ([`USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`](/reference/env-configuration#user_permissions_chat_temporary_enforced)). |
 
 The **Audio** tab in **Settings** needs at least one of **Allow Speech to Text**, **Allow Text to Speech** and **Allow Call**.

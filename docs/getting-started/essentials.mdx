@@ -93,11 +93,11 @@ Set these on the model in **Settings > Admin > Models**, click the pencil (**Edi
 | Setting | Recommended value | Why |
 |---------|-------------------|-----|
 | **System prompt** | Fixed text that does not regenerate per turn | It is the largest block that can stay cached |
-| **File Context** | **Off**, with **File Upload** left on | Stops file content being injected into every message, and this is the switch that hands the model the builtin file tools instead |
-| **Citations** | **Off**, with your citation rules written into the system prompt | Citations re-apply the RAG template and source list after every tool round, rewriting the cached opening |
+| **Preload files** | **Off**, with **File Upload** left on | Stops file content being injected into every message, and this is the switch that hands the model the builtin file tools instead |
+| **Citations** | **Off**, with your citation rules written into the system prompt | Citations add source markers to tool results, which makes the request larger and shows source pills under the reply |
 | **Builtin Tools** | On, with the categories you need enabled | Retrieval stays on demand, so results are appended at the end and the cached opening is untouched |
 | **Function calling** | **Native** | Builtin tools do not exist in Legacy mode |
-| **Memory** | Leave memories unchanged mid-chat, or set `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model fetch them with the memory tools | Memory injection writes into the system message and shifts as the conversation changes topic |
+| **Memory** | Use Native function calling, where recalled memories arrive once per reply after your message, or set `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model fetch them with the memory tools | With Legacy, memories are appended to your message on every turn and shift as the conversation changes topic |
 
 Keep the tool list itself stable as well. Tool definitions sit next to the system prompt in the cached part, so switching categories or turning web search on mid-conversation invalidates the cache from that point. Voice mode needs no attention: its prompt is prepended once and stays constant for the session.
 
@@ -211,9 +211,9 @@ Set these in **Settings > Admin > Documents**:
 |---------|---------|-------------------|-----|
 | **Text Splitter** | `character` | `token` | Token-based splitting produces more consistent chunk sizes across document types |
 | **Markdown Header Splitting** | On | **On** | Respects document structure by splitting at headings, keeping sections coherent |
-| **Chunk Size** | `1000` | `2000` | Larger chunks preserve more surrounding context per retrieval hit |
+| **Chunk Size** | `1024` | `2000` | Larger chunks preserve more surrounding context per retrieval hit |
 | **Chunk Overlap** | `100` | `200` | More overlap means less chance of cutting a key sentence in half |
-| **Top K** | `3` | `15` | Retrieves more candidate chunks, giving the model a wider pool of relevant context. If you are working with local models that have constrained context sizes, lower this to `5` to avoid filling the context window with retrieved chunks |
+| **Top K** | `10` | `15` | Retrieves more candidate chunks, giving the model a wider pool of relevant context. If you are working with local models that have constrained context sizes, lower this to `5` to avoid filling the context window with retrieved chunks |
 | **Embedding Model** | `all-MiniLM-L6-v2` (local CPU) | External (OpenAI or Ollama) | The default works for a single user but consumes ~500 MB RAM per replica. For any multi-user setup, use an external embedding API instead |
 
 :::tip Embedding model

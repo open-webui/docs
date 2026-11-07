@@ -83,7 +83,7 @@ If the AI starts more than one server (say, a frontend on port 3000 and a backen
 
 ## The Browser tab
 
-On terminals that support browser sessions, the **+** menu of the **Tabs** side panel offers **Browser**. Its start page lists the **Ports** the terminal is serving; click one to load it, or type any http or https address.
+On terminals that support browser sessions, the **+** menu of the **Tabs** offers **Browser**. Its start page lists the **Ports** the terminal is serving; click one to load it, or type any http or https address.
 
 The options menu (**...**) picks how pages load. **Proxy** loads them through the terminal. **Chrome** runs Chrome on the terminal, where available, and streams it to the tab as a remote view, with **Mobile view** and a quality setting. The tab remembers the last mode. A live session stops when you or the terminal loses access.
 

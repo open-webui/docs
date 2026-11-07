@@ -101,7 +101,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
   | `/status` | Opens a status panel for the chat showing **Context usage**, **Queued messages**, **Tasks** currently running, and the **Chat ID**. |
   | `/fork` | Copies the conversation up to the current message into a new chat, so you can branch off without disturbing the original. |
   | `/side` | Opens a [side chat](#tabs-side-panel) on the current conversation. `/btw` does the same. Text after the command becomes its first message. |
-  | `/comments` | Opens the chat's [Comments](./comments.mdx) tab in the side panel. Offered in a saved chat when comments are turned on. |
+  | `/comments` | Opens the chat's [Comments](./comments.mdx) tab. Offered in a saved chat when comments are turned on. |
   | `/model` | On its own, reports which model the chat is on, listing all of them in a multi-model chat. Followed by a model id, `/model gpt-5.1` for example, it switches the chat to that model. |
   | `/settings` | Opens the Settings dialog. |
   | `/compare` | Opens **Compare text** for the current prompt, the same as the entry in the **+** menu. See **Compare Text** above. |
@@ -126,12 +126,18 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 ## Tabs Side Panel
 
-The **Tabs** button (split panel icon) in the top bar opens a side panel next to the chat.
+The **Tabs** button (split panel icon) in the top bar opens the tabs. On a large screen the workspace is always full width and the chat is its first tab, which shows the chat title and its actions menu and cannot be closed. On a small screen the tabs open as a panel next to the chat.
 
 The panel holds these tabs when they apply: **Files** for the [Open Terminal](/features/open-terminal) or [Code Interpreter](./code-execution/python.md) files, **Artifacts**, **Preview** for embeds and opened citations, **Voice** for a running [voice call](./voice-mode.mdx) and **Comments** for a saved chat with [comments](./comments.mdx) turned on.
 
-**Side chat** in the **+** menu, or `/side` in the chat input, opens a temporary chat tab that starts from the current conversation, so you can ask something on the side without adding to the chat. Each use opens another numbered tab, so you can keep several open. It needs exactly one selected model and the [Allow Side Chat](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. Its messages disappear when you close the tab.
+**Side chat** in the **+** menu, or `/side` in the chat input, opens a chat tab that starts from the current conversation, so you can ask something on the side without adding to the chat. Each use opens another numbered tab, so you can keep several open. It needs exactly one selected model and the [Allow Side Chat](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. The side chat starts with the model's default tools and features.
+
+A side chat is saved when you send its first message. It is a branch of the parent chat with its own title and tags, listed in the chat list and kept in the parent's folder. The **Temporary Chat** toggle in the side chat, shown to users with [Allow Temporary Chat](/features/authentication-access/rbac/permissions#3-chat-permissions), makes it temporary instead: its messages disappear when you close the tab. Users with [Enforce Temporary Chat](/features/authentication-access/rbac/permissions#3-chat-permissions) always get temporary side chats.
+
+Drag a chat from the sidebar onto the chat area to open it as a side chat tab. This needs the same permission and model selection as **Side chat**.
 
 With a terminal selected, the **+** menu adds **New File**, a file you write and store in the terminal with **Save As**, and **New Terminal**, another shell next to the ones already open. **Browser** and **Desktop** show on terminals that support them, see [The Browser tab](/features/open-terminal/use-cases/web-development#the-browser-tab). A file opened from the file browser gets its own tab, with a dot for unsaved changes. Drag tabs to reorder them, or press Alt+Shift+Left/Right on a selected tab, and close one with its **x**.
 
-On a wide screen, the **Use full-width tabs** button in the tab strip makes the chat itself the first tab, so each tab fills the whole window. The chat tab shows the chat title and its actions menu and cannot be closed. **Use side tabs** switches back, and your browser remembers the choice.
+On a large screen the **Split screen** button splits the workspace into panes, or merges them again. You can also drag a tab or a chat from the sidebar to the edge of a pane to split the view side by side or stacked.
+
+Tabs have [keyboard shortcuts](./keyboard-shortcuts.mdx#tab-shortcuts) for opening, closing and switching them.

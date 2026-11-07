@@ -69,7 +69,7 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 1. Click on any folder in the sidebar to select it.
 2. The chat interface will show that folder is active.
 3. Any new chat you start will automatically be created inside this folder.
-4. New chats will **inherit the folder's settings** (default model, system prompt and knowledge).
+4. New chats will **inherit the folder's settings** (default model, default terminal, working directory, system prompt and knowledge).
 
 A folder's three-dot menu also has **New Chat**, which opens the folder the same way.
 
@@ -107,6 +107,10 @@ Customize the visual appearance of your folder by uploading a background image. 
 
 Pick the model new chats in this folder start with, or leave it on **Use default** to fall back to your usual default. Switching models inside one of the folder's chats leaves the folder's default as it is; change it here.
 
+### Default Terminal and Working Directory
+
+Under **Advanced**, **Default terminal** picks the terminal new chats in this folder start with. Once one is picked, **Working directory** sets the path on that terminal where those chats start, and its folder button browses the terminal's directories. Leave the directory empty to use the terminal's own default. Both apply to new chats only.
+
 ### System Prompt
 
 Assign a dedicated **System Prompt** to the folder that automatically applies to all conversations within it:
@@ -126,9 +130,9 @@ The System Prompt field is only visible if you have permission to set system pro
 Link **knowledge bases and files** to your folder:
 
 - All attached files and knowledge bases are automatically included as **context** for every chat in the folder.
-- With **Native** function calling, the model gets a list of the folder's knowledge and reads it with the **Knowledge Base** [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), whether **File Context** is on or off. With **Legacy** function calling, it is retrieved and injected through RAG (Retrieval Augmented Generation) while **File Context** is on.
+- With **Native** function calling, the model gets a list of the folder's knowledge and reads it with the **Knowledge Base** [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), whether **Preload files** is on or off. With **Legacy** function calling, it is retrieved and injected through RAG (Retrieval Augmented Generation) while **Preload files** is on.
 - Knowledge is optional. Folders work for organization without any attached files.
-- **Attaching a folder to another chat.** Folders are listed in the `#` menu, and you can also drag one from the sidebar into the message input. This attaches the files and knowledge bases linked to the folder, and only while **File Context** is on. With File Context off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder.
+- **Attaching a folder to another chat.** Folders are listed in the `#` menu, and you can also drag one from the sidebar into the message input. This attaches the files and knowledge bases linked to the folder, and only while **Preload files** is on. With Preload files off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder.
 
 **Whose access decides what is attached.** Attaching needs both your access and the **folder owner's**; every chat in the folder then follows the owner's access:
 

@@ -298,7 +298,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | :--- | :--- | :--- |
 | `model_editor.capabilities.vision` | Vision | **Vision** under **Capabilities** in the model editor |
 | `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Capabilities** in the model editor |
-| `model_editor.capabilities.file_context` | File Context | **File Context** under **Capabilities** in the model editor |
+| `model_editor.capabilities.file_context` | Preload files | **Preload files** under **Capabilities** in the model editor |
 | `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Capabilities** in the model editor |
 | `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Capabilities** in the model editor |
 | `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Capabilities** in the model editor |
@@ -563,7 +563,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty or `0` means no limit even when that one is set. The sub-agent reports that it hit the limit.
+- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty or `0` means no limit even when that one is set. At the limit the sub-agent writes a final answer without tools.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_OUTPUT`
@@ -927,7 +927,7 @@ It is recommended to set this to a high single-digit to low double-digit number 
 - Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `1024`. `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` is read when this is unset.
 
 :::info Hitting the limit is visible
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is reported the same way. The same applies to the code interpreter's continuation loop. `1024` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+On reaching the cap, the model gets one more request without tools and writes a final answer. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, shows the provider's error in the chat. The same applies to the code interpreter's continuation loop. `1024` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -1531,8 +1531,50 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Adds a **Tool Permissions** entry to the chat input's ➕ menu, where a user picks **Full access** (run tools without asking, the default) or **Ask for approval** (stop before each tool call until it is allowed or denied). Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Automations and channel replies always run with full access, since nobody is watching the chat to approve anything. Can also be toggled in **Settings > Admin > Interface**.
+- Description: Adds a **Tool Permissions** entry to the chat input's ➕ menu, where a user picks **Full access** (run tools without asking, the default when **Auto** is not offered), **Ask for approval** (stop before each tool call until it is allowed or denied) or, with [`ENABLE_TOOL_PERMISSIONS_AUTO`](#enable_tool_permissions_auto) on, **Auto**. Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Automations and channel replies always run with full access, since nobody is watching the chat to approve anything. Can also be toggled in **Settings > Admin > Interface**.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_TOOL_PERMISSIONS_AUTO`
+
+- Type: `bool`
+- Default: `False`
+- Description: Adds **Auto** next to **Full access** and **Ask for approval** in the **Tool Permissions** entry when [`ENABLE_TOOL_PERMISSIONS`](#enable_tool_permissions) is on. In **Auto**, a review model scores each tool call and the call runs unless the score reaches [`TOOL_PERMISSIONS_DECISIONS_THRESHOLD`](#tool_permissions_decisions_threshold). Users who have not chosen a mode get **Auto**. Not available in channel chats. See [Tool Approval](/features/extensibility/plugin/tools#tool-approval). Can also be toggled in **Settings > Admin > Interface** (**Auto permissions**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.enable`.
+
+#### `TOOL_PERMISSIONS_DECISIONS_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.openai.com/v1`
+- Description: Base URL of the review service for **Auto** tool permissions. Open WebUI sends each review request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.api_base_url`.
+
+#### `TOOL_PERMISSIONS_DECISIONS_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key sent as a Bearer token to the review service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.api_key`.
+
+#### `TOOL_PERMISSIONS_DECISIONS_MODEL`
+
+- Type: `str`
+- Default: `gpt-6-luna`
+- Description: Model name sent to the review service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.model`.
+
+#### `TOOL_PERMISSIONS_DECISIONS_THRESHOLD`
+
+- Type: `float`
+- Default: `0.5`
+- Description: A value from `0` to `1`. A tool call asks for approval when the review model's probability that it needs confirmation is at or above this value. Can also be set in **Settings > Admin > Interface** (**Approval threshold**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.threshold`.
+
+#### `TOOL_PERMISSIONS_DECISIONS_PROMPT`
+
+- Type: `str`
+- Default: Empty string (use the built-in review instructions)
+- Description: Instructions the review model follows when it rates a tool call. The request, tool definition and arguments are added automatically. Can also be set in **Settings > Admin > Interface** (**Prompt**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.prompt`.
 
 #### `ENABLE_CONTEXT_COMPACTION`
 
@@ -1580,8 +1622,50 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request and listed by name in the system prompt, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
+- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.enable`.
+
+#### `TOOL_SEARCH_ENGINE`
+
+- Type: `str` (`bm25`, `embeddings` or `decisions`)
+- Default: `bm25`
+- Description: How [Tool Search](/features/extensibility/plugin/tools#tool-search) matches a search to deferred tools. `bm25` ranks by keywords, `embeddings` uses the Documents embedding model and `decisions` asks a [Decisions API](/features/extensibility/plugin/tools#tool-search) service. Only the selected engine runs. Can also be set in **Settings > Admin > Interface** (**Search engine**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.engine`.
+
+#### `TOOL_SEARCH_DECISIONS_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.openai.com/v1`
+- Description: Base URL of the service used when [`TOOL_SEARCH_ENGINE`](#tool_search_engine) is `decisions`. Open WebUI sends each search request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.api_base_url`.
+
+#### `TOOL_SEARCH_DECISIONS_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key sent as a Bearer token to the Tool Search Decisions service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.api_key`.
+
+#### `TOOL_SEARCH_DECISIONS_MODEL`
+
+- Type: `str`
+- Default: `gpt-6-luna`
+- Description: Model name sent to the Tool Search Decisions service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.model`.
+
+#### `TOOL_SEARCH_DECISIONS_THRESHOLD`
+
+- Type: `float`
+- Default: `0.5`
+- Description: A value from `0` to `1`. Only tools whose relevance probability is at or above this value are returned. Can also be set in **Settings > Admin > Interface** (**Relevance threshold**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.threshold`.
+
+#### `TOOL_SEARCH_DECISIONS_PROMPT`
+
+- Type: `str`
+- Default: Empty string (use the built-in relevance instructions)
+- Description: Instructions the Decisions service follows when it rates a tool's relevance. The search query and tool definition are added automatically. Can also be set in **Settings > Admin > Interface** (**Prompt**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.prompt`.
 
 #### `TOOL_SEARCH_DEFER_THRESHOLD`
 
@@ -2468,6 +2552,8 @@ Set them in **Settings > Admin > Connections** by editing a connection and filli
 }
 ```
 
+To pass the client address to the upstream, use `{"X-Real-IP": "{{USER_IP}}"}`. With the default `FORWARDED_ALLOW_IPS` value `*`, a client that reaches Open WebUI directly can choose this address itself.
+
 Available placeholders, substituted at request time (any placeholder that has no value for the current request becomes an empty string):
 
 | Placeholder | Value |
@@ -2489,6 +2575,8 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{USER_GROUPS}}` | Comma-separated names of the groups the user belongs to, including groups inherited through parent groups |
 | `{{USER_GROUP_IDS}}` | Comma-separated IDs of the same groups |
 | `{{USER_AGENT}}` | User-Agent of the originating browser request |
+| `{{USER_IP}}` | Address of the client that sent the request. For a request that arrives through a proxy listed in [`FORWARDED_ALLOW_IPS`](#forwarded_allow_ips) it is the client address taken from the `X-Forwarded-For` header, otherwise the address of the direct connection. Automations report `127.0.0.1`. Empty when a tool server connection is checked with **Verify Connection** |
+| `{{X_FORWARDED_FOR}}` | Same value as `{{USER_IP}}`, a single address and not the header's full list |
 
 The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
@@ -4363,14 +4451,14 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 #### `RAG_TOP_K`
 
 - Type: `int`
-- Default: `3`
+- Default: `10`
 - Description: Sets the default number of chunks retrieved per search query from each attached knowledge base or file. With hybrid search off, these chunks go to the model. With [hybrid search](#enable_rag_hybrid_search) on, they are the candidates the reranker scores, and [`RAG_TOP_K_RERANKER`](#rag_top_k_reranker) sets how many of them reach the model. Either way, one knowledge base or file passes at most this many chunks to the model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_TOP_K_RERANKER`
 
 - Type: `int`
-- Default: `3`
+- Default: `10`
 - Description: Sets the default number of chunks kept after reranking and given to the model, per search query from each attached knowledge base or file. Only used with [hybrid search](#enable_rag_hybrid_search). One knowledge base or file passes at most [`RAG_TOP_K`](#rag_top_k) chunks to the model, so keep this value lower. Example: `RAG_TOP_K=50` and `RAG_TOP_K_RERANKER=10` let the reranker choose the best 10 of 50 candidates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4507,8 +4595,8 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `CHUNK_SIZE`
 
 - Type: `int`
-- Default: `1000`
-- Description: Sets the document chunk size for embeddings.
+- Default: `1024`
+- Description: Sets the document chunk size for embeddings. Reindex existing documents after changing it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CHUNK_OVERLAP`
@@ -4985,7 +5073,14 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Specifies whether to use the full context for RAG.
+- Description: Always includes the complete text of documents instead of retrieving chunks. Shown as **Always Use Full Text** in **Admin Settings** > **Documents**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_FULL_TEXT_CHAR_THRESHOLD`
+
+- Type: `int`
+- Default: `50000`
+- Description: Sets the number of characters up to which the complete extracted text of an uploaded file or text attachment is included in the prompt. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** in **Admin Settings** > **Documents**. The aliases `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_SYSTEM_CONTEXT`
@@ -7675,7 +7770,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables user permission to open [side chats](/features/chat-conversations/chat-features/#tabs-side-panel). Takes effect only together with [`USER_PERMISSIONS_CHAT_TEMPORARY`](#user_permissions_chat_temporary). Administrators always have it.
+- Description: Enables or disables user permission to open [side chats](/features/chat-conversations/chat-features/#tabs-side-panel). Administrators always have it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
