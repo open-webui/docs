@@ -48,4 +48,5 @@ These community-contributed guides cover specific integration scenarios with ste
 |----------|-------------------|---------|
 | [Notion (MCP)](/tutorials/integrations/mcp-notion) | Connect Notion via Model Context Protocol | 👤 User · ⏱️ 5 min |
 | [OneDrive & SharePoint](/tutorials/integrations/onedrive-sharepoint) | Pull Microsoft 365 documents into Open WebUI | 👤 Admin · ⏱️ 30 min |
+| [Fax for Agents](/tutorials/integrations/fax-for-agents) | Send and read faxes from a chat with a workspace tool | 👤 Admin · ⏱️ 10 min |
 | [LibreTranslate](/tutorials/integrations/libre-translate) | Add self-hosted translation capabilities | 👤 Admin · ⏱️ 15 min |
