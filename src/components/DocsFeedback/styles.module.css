@@ -12,9 +12,3 @@
 .card a {
 	font-weight: 600;
 }
-
-@media (width >= 997px) {
-	.footer-with-sidebar {
-		display: none;
-	}
-}
