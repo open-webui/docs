@@ -29,9 +29,9 @@ In **Temporary Chat** mode, document extraction is performed **exclusively in th
 
 :::info Sending images and video to your extraction engine
 
-An uploaded image or video is normally stored as-is for vision models to look at, rather than being run through the extraction engine. Only the [`external` engine](/features/chat-conversations/rag/document-extraction/external) received media, and only because it was special-cased.
+An uploaded image or video is stored as-is for vision models to look at instead of being run through the extraction engine. The [`external` engine](/features/chat-conversations/rag/document-extraction/external) receives media by default.
 
-[`CONTENT_EXTRACTION_SUPPORTED_MEDIA_MIME_TYPES`](/reference/env-configuration#content_extraction_supported_media_mime_types), or **Supported Media MIME Types** in **Settings > Admin > Documents**, makes that a choice rather than a rule: list the MIME types your engine can actually read, for instance `image/*` for an OCR engine, and matching uploads are extracted whichever engine you run. Leave it unset to keep the previous behavior. Saving the field empty from the admin panel, or setting the variable to an empty string, stores an empty list, which turns media extraction off for every engine, the external one included.
+[`CONTENT_EXTRACTION_SUPPORTED_MEDIA_MIME_TYPES`](/reference/env-configuration#content_extraction_supported_media_mime_types), or **Supported Media MIME Types** in **Settings > Admin > Documents**, lets you choose: list the MIME types your engine can read, for instance `image/*` for an OCR engine, and matching uploads are extracted whichever engine you run. Saving the field empty from the admin panel, or setting the variable to an empty string, stores an empty list, which turns media extraction off for every engine, the external one included.
 
 :::
 

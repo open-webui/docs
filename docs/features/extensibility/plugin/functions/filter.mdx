@@ -225,7 +225,7 @@ The chip being present = the filter is enabled for the next request. The chip be
 
 ### Owning Retrieval With file_handler
 
-By default, when a user attaches a knowledge collection or uploads a file to a chat, Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
+When a user attaches a knowledge collection or uploads a file to a chat and the model's **Preload files** capability is on (the default with Legacy function calling), Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
 
 This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file/collection *references* (IDs, names, types). **The chunk text doesn't exist yet**: retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough. The data you want isn't there yet.
 

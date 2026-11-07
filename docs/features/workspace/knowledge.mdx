@@ -51,7 +51,7 @@ Upload a folder of contracts, technical specs, or research papers. The AI search
 
 ### Two retrieval modes for different needs
 
-Choose **Focused Retrieval** (RAG) to let the AI search large collections efficiently, or **Full Context** to inject an entire document word-for-word when precision matters.
+Choose **Using Focused Retrieval** (RAG) to let the AI search large collections efficiently, or **Using Entire Document** to inject a whole document word-for-word when precision matters.
 
 ### Autonomous exploration with native function calling
 
@@ -81,7 +81,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 
 ## Retrieval Modes
 
-When attaching files or knowledge bases to a model, click on the attached item to toggle between modes:
+When attaching files or knowledge bases to a model, click on the attached item to toggle between **Using Focused Retrieval** and **Using Entire Document**:
 
 ![The knowledge base list](/images/workspace/knowledge-list.png)
 
@@ -95,7 +95,7 @@ Best for large document sets where only specific sections are relevant.
 
 ### 📄 Full Context
 
-Injects the complete content of the file into every message. No chunking, no semantic search. For files and collections attached in the chat it is injected whatever the function calling mode, so the model needs no tool to reach it. A knowledge base attached to the model, though, is only injected in legacy function calling mode: with native function calling the model reaches model-attached knowledge through the knowledge tools, Full Context or not.
+Injects the complete content of the file into every message. No chunking, no semantic search. For files and collections attached in the chat it is injected whatever the function calling mode, as long as the model's **Preload files** capability is on. A knowledge base attached to the model, though, is only injected in legacy function calling mode: with native function calling the model reaches model-attached knowledge through the knowledge tools, Full Context or not.
 
 Best for short reference documents, style guides, or context that's always relevant.
 
@@ -235,7 +235,7 @@ For the full list of built-in agentic tools, see the [Native/Agentic Mode Tools 
 
 :::warning Knowledge is NOT auto-injected with native function calling
 
-When native function calling is enabled, attached knowledge is **not automatically injected**. The model must call the knowledge tools to search and retrieve. If your model isn't using attached knowledge:
+When native function calling is enabled, knowledge attached to a model or a folder is **not automatically injected**. The model must call the knowledge tools to search and retrieve. If your model isn't using attached knowledge:
 
 1. **Add system prompt instructions** telling the model to use `list_knowledge` and `query_knowledge_files`.
 2. **Check the model's tool capabilities and retrieval setup** using [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working). Keep Native mode enabled and use a model that can call tools reliably.
@@ -416,4 +416,4 @@ Files uploaded via API are processed asynchronously. Attempting to use a file be
 
 ### Native function calling changes behavior
 
-Native function calling is now the default, and it changes how knowledge bases work: attached KBs are no longer auto-injected, so the model must call the knowledge tools to retrieve them. See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for details.
+Native function calling is the default. It does not auto-inject attached KBs, so the model must call the knowledge tools to retrieve them. See [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) for details.

@@ -9,7 +9,7 @@ Open WebUI offers powerful code execution capabilities directly within your chat
 
 - **Code Interpreter Capability**: Enable models to autonomously write and execute Python code as part of their responses. In Native (Agentic) Mode, the only supported tool-calling mode, this runs via the `execute_code` tool. The older XML-based mechanism is itself the legacy approach and is unsupported, so new deployments should stay on Native Mode.
 
-- **Python Code Execution**: Run Python in your browser via Pyodide or on a server via Jupyter, with no setup, for self-contained tasks. Both are now **legacy** engines: for real Python workloads (any package, full performance, shell access) use **Open Terminal**.
+- **Python Code Execution**: Run Python in your browser via Pyodide or on a server via Jupyter, with no setup, for self-contained tasks. Both are **legacy** engines: for real Python workloads (any package, full performance, shell access) use **Open Terminal**.
 
 - **MermaidJS Rendering**: Create and visualize flowcharts, diagrams, and other visual representations with MermaidJS syntax that automatically renders in your chat.
 
@@ -24,13 +24,13 @@ These execution capabilities bridge the gap between conversation and implementat
 Open WebUI supports multiple code execution backends, each suited to different use cases. The right choice depends on what you need: lightweight browser-based execution, a full Python environment, or unrestricted shell access.
 
 :::tip Recommended: Open Terminal
-**[Open Terminal](#open-terminal)** is the recommended backend for real code execution: full native Python, any package, any language, and shell access, isolated in a Docker container. **Pyodide** and **Jupyter** are now **legacy** engines, kept for zero-setup, in-chat use, not the path forward for serious workloads.
+**[Open Terminal](#open-terminal)** is the recommended backend for real code execution: full native Python, any package, any language, and shell access, isolated in a Docker container. **Pyodide** and **Jupyter** are **legacy** engines for zero-setup, in-chat use.
 :::
 
 ### Pyodide (Legacy)
 
 :::caution Legacy Engine
-Pyodide is a **legacy** code-execution engine. It is still the built-in, zero-setup default for the in-chat Code Interpreter and remains a safe browser sandbox, but it is no longer the recommended path: for anything beyond basic analysis use **[Open Terminal](#open-terminal)**, which gives full native Python, any package, and shell access. Pyodide may be deprecated in a future release.
+Pyodide is a **legacy** code-execution engine. It is the built-in, zero-setup default for the in-chat Code Interpreter and a safe browser sandbox. For anything beyond basic analysis use **[Open Terminal](#open-terminal)**, which gives full native Python, any package, and shell access. Pyodide may be deprecated in a future release.
 :::
 
 Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with some constraints:

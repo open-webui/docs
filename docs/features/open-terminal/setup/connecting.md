@@ -31,7 +31,7 @@ The settings sidebar lists **Integrations** twice, once under **Personal** in th
 
 ### 3. Find the "Open Terminal" section
 
-Scroll down until you see the **Open Terminal** section. It is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
+Scroll down until you see the **Terminal** section with the **Open Terminal** connections. It is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
 
 ![The Open Terminal section under Integrations](/images/open-terminal-connected.png)
 
@@ -45,7 +45,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | :--- | :--- |
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
-| **Auth Type** | Leave as `Bearer` (the default) |
+| **Auth** | Leave as `Bearer` (the default) |
 | **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
 | **Working Directory Context** | Under **Advanced**, on by default. [Working Directory Context](#working-directory-context) covers when to turn it off |
 | **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
@@ -95,7 +95,7 @@ If the model is set to **Legacy**, Open WebUI falls back to prompt-based tool ca
 :::
 
 :::tip Performance depends on the model
-Not all models are equally capable with tools. Multi-step terminal workflows are the most demanding agentic use case in Open WebUI, so this is one place where a top-tier model genuinely pays off — GPT-5.6 Sol, Claude Opus 5, or Gemini 3.5 Pro. A current mid-tier model (GPT-5.6 Terra, Claude Sonnet 5, Gemini 3.6 Flash, MiniMax M3) is the practical **minimum**. Older or very small models may fail to invoke tools or produce malformed tool calls. If results are poor, try a more capable model.
+Not all models are equally capable with tools. Multi-step terminal workflows are the most demanding agentic use case in Open WebUI, so this is one place where a top-tier model genuinely pays off: GPT-5.6 Sol, Claude Opus 5 or Gemini 3.5 Pro. A current mid-tier model (GPT-5.6 Terra, Claude Sonnet 5, Gemini 3.6 Flash, MiniMax M3) is the practical **minimum**. Older or very small models may fail to invoke tools or produce malformed tool calls. If results are poor, try a more capable model.
 :::
 
 ### 9. Try it out
@@ -139,7 +139,7 @@ A zip archive, an SQLite database, a video file, an export far larger than a con
 
 Four things change with it:
 
-- **The model no longer needs to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
+- **The model does not need to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
 - **The model is told the path only when it can act on it.** Open WebUI passes the paths of attached files to the model alongside the message when the model is using native function calling in a saved conversation. Set the model to [Legacy](#8-enable-native-function-calling) function calling, or turn its **Builtin Tools** capability off, and the file still reaches the terminal while the model is left without its location.
 - **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
@@ -217,12 +217,6 @@ docker exec open-webui curl -s http://open-terminal:8000/health
 
 If it prints `{"status": "ok"}`, the connection works. If it errors, the containers can't see each other.
 :::
-
-### Nothing happens when you save a new connection
-
-Adding a connection works whether you reach Open WebUI over `https://` or over plain `http://`. On older versions the **Add Terminal Connection** dialog stayed open and saved nothing when the interface was reached over plain `http://` at a network address, a LAN IP for example, rather than on `localhost`. Browsers withhold the identifier generator a new connection needs on origins they do not treat as secure, and a new connection gets its identifier automatically when you leave the optional **ID** field blank. Typing an **ID** of your own works around it, because then there is nothing to generate.
-
-Only creating a connection from **Settings > Admin > Integrations** was affected. Editing, enabling, disabling or deleting an existing one, adding one under your own **Settings > Integrations** and connections shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) all worked regardless.
 
 ### Terminal shows up but AI doesn't use it
 

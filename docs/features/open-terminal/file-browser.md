@@ -34,7 +34,7 @@ On a desktop, hovering over a file shows a small preview of it: text files up to
 Click any file to see a full preview. Different file types display differently:
 
 :::info Word and PowerPoint rendering needs a recent terminal
-The terminal lays those files out itself, which needs Open Terminal 0.12.1 or newer running the default image. On anything older, or on the smaller images, the browser draws an approximation instead. See [Updating](./setup/updating.mdx) if your previews look rougher than the ones described here.
+The terminal lays those files out itself, which needs Open Terminal 0.12.1 or newer running the default image. Otherwise the browser draws an approximation instead. See [Updating](./setup/updating.mdx) if your previews look rougher than the ones described here.
 :::
 
 ### Text and code
@@ -125,7 +125,7 @@ Text files open in a read-only compare view: step through the changes with the a
 Documents (PDF, Word, Excel, PowerPoint, OpenDocument and RTF files) are compared by the **text** extracted from them, so a Word file against a PDF, or yesterday's spreadsheet against today's, are all fair game.
 
 :::info Needs a recent Open Terminal
-Comparing documents runs on the terminal server. An older one does not offer it and the browser says **"File comparison is not available on this terminal. Update Open Terminal to use Compare."** See [Updating](./setup/updating.mdx).
+Comparing documents runs on the terminal server. A terminal without it makes the browser say **"File comparison is not available on this terminal. Update Open Terminal to use Compare."** See [Updating](./setup/updating.mdx).
 :::
 
 ## Downloading files
@@ -148,8 +148,6 @@ It works the same way when you do not know which file to look in. Asking which d
 
 ![The AI locating the right document and opening it at the relevant page](/images/open-terminal-display-file-report-page.png)
 
-This replaces the older behaviour where a generated file produced a link in the reply that pointed at a path on the terminal's filesystem rather than at anything the browser could open.
-
 ![A CSV and a generated chart shown as cards inside an assistant message](/images/open-terminal-inline-file-card.png)
 
 A presentation arrives the same way, with its slide rail, page controls and zoom, so a deck can be paged through without leaving the conversation.
@@ -158,7 +156,7 @@ A presentation arrives the same way, with its slide rail, page controls and zoom
 
 The card header is a toggle, so a preview can be folded down to just the filename when it is taking up too much of the reply, and image and document previews carry a zoom control and a resize handle.
 
-By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Terminal File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message. The preference applies to terminals you connect yourself.
+By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Terminal File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message.
 
 ![A Word report opened in the file viewer beside the chat](/images/open-terminal-display-file-report-viewer.png)
 

@@ -119,9 +119,9 @@ If you genuinely must cap memory **with** eviction, the only acceptable policies
 
 ### Persistence
 
-The example command uses `--save 30 1` (an RDB snapshot every 30 minutes, if at least one key changed). On an **unclean** restart, Redis loses every write since the last snapshot, up to 30 minutes of token revocations and session state, so a crash can resurrect signed-out tokens and drop active sessions.
+The example command uses `--save 30 1` (an RDB snapshot after 30 seconds, if at least one key changed). On an **unclean** restart, Redis loses every write since the last snapshot, including token revocations and session state, so a crash can resurrect signed-out tokens and drop active sessions.
 
-For production, also enable the append-only file so durability is measured in seconds, not tens of minutes:
+For production, also enable the append-only file so the loss is bounded to about a second:
 
 ```conf
 appendonly yes
@@ -177,7 +177,7 @@ Notes
 
 The `ports` directive is not included in this configuration, as it is not necessary in most cases. The Redis service will still be accessible from within the Docker network by the Open WebUI service. However, if you need to access the Redis instance from outside the Docker network (e.g., for debugging or monitoring purposes), you can add the `ports` directive to expose the Redis port (e.g., `6379:6379`).
 
-The above configuration sets up a Redis container named `redis` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option writes an RDB snapshot every 30 minutes if at least 1 key has changed, and `--appendonly yes` adds the append-only log for second-level durability.
+The above configuration sets up a Redis container named `redis` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option writes an RDB snapshot 30 seconds after a change if at least 1 key has changed, and `--appendonly yes` adds the append-only log for second-level durability.
 
 **Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion, and `--maxmemory-policy noeviction` stops Redis from silently evicting Open WebUI's session and token-revocation keys. See the [Critical: Redis Server Configuration](#critical-redis-server-configuration), [Memory Eviction Policy](#critical-memory-eviction-policy), and [Persistence](#persistence) sections above for details.
 

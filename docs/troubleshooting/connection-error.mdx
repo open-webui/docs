@@ -47,11 +47,11 @@ WEBUI_AUTH_COOKIE_SECURE=true
 WEBUI_SESSION_COOKIE_SAME_SITE=lax
 WEBUI_AUTH_COOKIE_SAME_SITE=lax
 
-# WebSocket support (if using Redis)
-# If you experience websocket related issues, even after configuring all of the above, you can try turning OFF ENABLE_WEBSOCKET_SUPPORT
-# But this is not recommended for production and also not officially supported!
-# If you experience websocket issues, you should ideally provide websocket support through reverse proxies.
+# Live connection. Set it to false only if your reverse proxy cannot pass WebSocket upgrades:
+# browsers then use HTTP long-polling, which needs sticky sessions when you run several replicas
 ENABLE_WEBSOCKET_SUPPORT=true
+
+# Only with several replicas
 WEBSOCKET_MANAGER=redis
 WEBSOCKET_REDIS_URL=redis://redis:6379/1
 ```
@@ -73,7 +73,7 @@ For reverse proxy and TLS setups, check our [tutorials here](/reference/https).
 
 ### WebSocket Troubleshooting
 
-WebSocket support is required for Open WebUI v0.5.0 and later. If WebSockets aren't working:
+If WebSockets are not working:
 
 1. **Check your reverse proxy configuration**: Ensure `Upgrade` and `Connection` headers are properly set
 2. **Verify CORS settings**: WebSocket connections respect CORS policies
@@ -83,14 +83,7 @@ WebSocket support is required for Open WebUI v0.5.0 and later. If WebSockets are
    - **Fix for HAProxy**: Add `option h2-workaround-bogus-websocket-clients` to your configuration or force the backend connection to use HTTP/1.1.
    - **Fix for Nginx**: Ensure you are using `proxy_http_version 1.1;` in your location block (which is the default in many Open WebUI examples).
 
-For multi-instance deployments, configure Redis for WebSocket management:
-```bash
-ENABLE_WEBSOCKET_SUPPORT=true
-WEBSOCKET_MANAGER=redis
-WEBSOCKET_REDIS_URL=redis://redis:6379/1
-```
-
-For detailed Redis setup instructions, see [Redis WebSocket Support](/tutorials/integrations/redis). For a complete multi-instance scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). If you're seeing WebSocket 403 errors specifically in a multi-replica setup, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures).
+For multi-instance deployments, set `WEBSOCKET_MANAGER=redis` as shown above. For detailed Redis setup instructions, see [Redis WebSocket Support](/tutorials/integrations/redis). For a complete multi-instance scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). If you're seeing WebSocket 403 errors specifically in a multi-replica setup, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures).
 
 ### Testing Your Configuration
 
@@ -192,8 +185,8 @@ In the `delta.tool_calls` entry, look for `"index"`. If it is absent, you have t
 ### Solutions
 
 1. **Put a gateway in front.** LiteLLM, OpenRouter or any proxy that talks the provider's native API and emits schema-correct OpenAI output. This is the only option that keeps native tool calling and the builtin tools working.
-2. **Switch the model to Legacy function calling.** In the model's **Advanced Params**, set **Function Calling** to **Legacy**. Tools are then selected by a separate non-streaming request and never go through the streaming accumulator. Note that **Default** is not the same as Legacy here: an unset value means native. The trade-off is that the builtin tools (Memory and the rest) are unavailable in Legacy mode, since they are injected only for native function calling.
-3. **Turn tools off for that model.** If you only want plain chat, disable the **builtin tools** capability on the model so it never tries to call anything. Chat completions themselves are unaffected by this bug.
+2. **Switch the model to Legacy function calling.** In the model's **Advanced Params**, set **Function Calling** to **Legacy**. Tools are then selected by a separate non-streaming request and never go through the streaming accumulator. An unset value means native. The trade-off is that the builtin tools (Memory and the rest) are unavailable in Legacy mode, since they are injected only for native function calling.
+3. **Turn tools off for that model.** If you only want plain chat, disable the **Builtin Tools** capability on the model so it never tries to call anything. Chat completions themselves are unaffected by this bug.
 4. **Use a pipe.** A [pipe function](/features/extensibility/plugin/functions/pipe) that calls the provider's own API directly bypasses the OpenAI-compatible path entirely.
 
 Open WebUI follows the OpenAI Chat Completions schema and does not add per-provider workarounds for endpoints that diverge from it, which is the same reasoning described under [Protocol-Oriented Design](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#protocol-oriented-design).
@@ -260,11 +253,7 @@ Verify connectivity by accessing the WebUI interface after restarting. For detai
 
 If Open WebUI in Docker cannot connect to Ollama running on the host machine:
 
-1. **Adjust the Network Settings**:
-   Use the `--network=host` flag in your Docker command. This links your container directly to your host’s network.
-
-2. **Change the Port**:
-   Remember that the internal port changes from 3000 to 8080.
+Use the `--network=host` flag in your Docker command. This links your container directly to your host's network.
 
 **Example Docker Command**:
 ```bash

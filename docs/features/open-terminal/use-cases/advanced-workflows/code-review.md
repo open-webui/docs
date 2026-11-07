@@ -38,7 +38,7 @@ description: Reviews code changes for security, performance, correctness, and st
 When asked to review code:
 
 1. **Get the diff**: Use `git diff`, `git log`, or read the specified files to understand what changed
-2. **Read full context**: Don't just look at changed lines — read the entire file to understand the surrounding logic, imports, and how the changes fit in
+2. **Read full context**: Don't just look at changed lines, read the entire file to understand the surrounding logic, imports, and how the changes fit in
 3. **Check for these categories**:
    - **Security**: SQL injection, XSS, hardcoded credentials, missing auth checks, unsafe deserialization, path traversal
    - **Correctness**: Logic errors, off-by-one bugs, unhandled edge cases, race conditions, missing error handling

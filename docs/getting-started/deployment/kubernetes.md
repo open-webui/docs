@@ -38,7 +38,7 @@ helm repo update
 
 **Expected result:** your nodes are ready and the `openwebui` namespace exists. If it already exists, reuse it.
 
-This guide pins **chart 17.5.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-17.5.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
+This guide pins **chart 18.0.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-17.5.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
 
 ## 2. Configure the Application
 
@@ -292,13 +292,13 @@ Both paths start with exactly **one migration-enabled worker** and ingress disab
 
 ```bash
 helm template openwebui open-webui/open-webui \
-  --version 17.5.0 --namespace openwebui \
+  --version 18.0.0 --namespace openwebui \
   -f values-common.yaml -f "$OPENWEBUI_PROFILE" \
   --set replicaCount=1 --set ingress.enabled=false \
   --set-string extraEnvVars.ENABLE_DB_MIGRATIONS=true > rendered.yaml
 
 helm install openwebui open-webui/open-webui \
-  --version 17.5.0 --namespace openwebui \
+  --version 18.0.0 --namespace openwebui \
   -f values-common.yaml -f "$OPENWEBUI_PROFILE" \
   --set replicaCount=1 --set ingress.enabled=false \
   --set-string extraEnvVars.ENABLE_DB_MIGRATIONS=true \
@@ -330,7 +330,7 @@ For the production path, apply the saved profile after the first replica initial
 
 ```bash
 helm upgrade openwebui open-webui/open-webui \
-  --version 17.5.0 --namespace openwebui \
+  --version 18.0.0 --namespace openwebui \
   -f values-common.yaml -f values-production.yaml \
   --wait --timeout 15m
 kubectl -n openwebui rollout status deployment/openwebui --timeout=10m
@@ -433,7 +433,7 @@ kubectl -n openwebui wait --for=delete pod \
 
 ```bash
 helm upgrade openwebui open-webui/open-webui \
-  --version 17.5.0 --namespace openwebui \
+  --version 18.0.0 --namespace openwebui \
   -f values-common.yaml -f "$OPENWEBUI_PROFILE" \
   --set replicaCount=1 --set ingress.enabled=false \
   --set-string extraEnvVars.ENABLE_DB_MIGRATIONS=true \
@@ -450,7 +450,7 @@ When changing the chart version, also review its release notes and update `--ver
 <details>
 <summary>Add an HPA and PodDisruptionBudget after the production deployment works</summary>
 
-Chart 17.5.0 does not create these through dedicated values. Save these separate resources as `scaling.yaml`. The HPA requires a working metrics API and CPU requests; first confirm `kubectl top pods -n openwebui` works.
+Chart 18.0.0 does not create these through dedicated values. Save these separate resources as `scaling.yaml`. The HPA requires a working metrics API and CPU requests; first confirm `kubectl top pods -n openwebui` works.
 
 ```yaml title="scaling.yaml"
 apiVersion: autoscaling/v2

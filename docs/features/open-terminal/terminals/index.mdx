@@ -69,7 +69,7 @@ Terminals is what makes the full agent harness operable for teams. It lets admin
 
 In harness-engineering terms, Terminals owns the workspace lifecycle: provision, route, persist, reap, refresh, and reset.
 
-:::info Admin UI (new in 0.0.4)
+:::info Admin UI
 The orchestrator serves a built-in minimal admin UI at `/` for viewing terminal status, active sessions, and policies. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
 :::
 
@@ -99,14 +99,14 @@ The orchestrator supports three authentication modes:
 | Mode | When to use | How to configure |
 | :--- | :--- | :--- |
 | **Open WebUI JWT** | Production. The orchestrator validates tokens against your Open WebUI instance. | Set `TERMINALS_OPEN_WEBUI_URL` on the orchestrator to your Open WebUI URL, and set the connection's **Auth** to **Session** in Open WebUI. |
-| **Shared API key** | Standard. Open WebUI includes a shared secret in every request. | Set `TERMINALS_API_KEY` to the same value on both Open WebUI and the orchestrator. |
+| **Shared API key** | Standard. Open WebUI includes a shared secret in every request. | Set `TERMINALS_API_KEY` on the orchestrator, and on the connection in Open WebUI set **Auth** to **Bearer** with the same value as **API Key**. |
 | **Open** | Development only. No authentication. Do not use in production. | Leave both `TERMINALS_OPEN_WEBUI_URL` and `TERMINALS_API_KEY` unset. |
 
 When deployed via Docker Compose or Helm, the shared API key is configured automatically between Open WebUI and the orchestrator.
 
-JWT mode needs the two sides to agree. The orchestrator checks each request against the identity of the user who made it, so Open WebUI has to send that user's own credentials rather than one shared key. That is what **Auth > Session** on the connection does, and it applies to the model's tools, the file browser and the terminal panel alike. A Session connection also has an **API Key** field. Enter the orchestrator's `TERMINALS_API_KEY` there for the administration calls described below. Leaving the connection on **Auth > Bearer** in JWT mode fails authentication, which shows up as a terminal that closes the moment it opens.
+JWT mode needs the two sides to agree. The orchestrator checks each request against the identity of the user who made it, so Open WebUI has to send that user's own token instead of one shared key. **Auth > Session** on the connection does this for the model's tools, coding agents, the file browser and the terminal panel. **Auth > Bearer** in JWT mode fails authentication, which shows up as a terminal that closes the moment it opens.
 
-Administration authenticates separately, by design. The policy, lifecycle, status and refresh APIs are not terminal traffic, so they take the orchestrator's own `TERMINALS_API_KEY` and never a user's token, whichever mode is in use. Keep that key set even in JWT mode, and send it when you call those endpoints yourself. With **Auth** set to **Bearer** or **Session**, Open WebUI attaches the connection's API key to Verify Connection, the policy, lifecycle and refresh calls and the loading of the terminal's tool list. Under **Session**, the model's tools, the file browser and the terminal panel use the signed-in user's own credentials.
+The policy, lifecycle, status and refresh APIs take the orchestrator's own `TERMINALS_API_KEY` and never a user's token, whichever mode is in use. Keep that key set even in JWT mode, and send it when you call those endpoints yourself. With **Auth** set to **Bearer** or **Session**, Open WebUI attaches the connection's **API Key** to Verify Connection, the policy, lifecycle and refresh calls and the loading of the terminal's tool list. Enter the orchestrator's `TERMINALS_API_KEY` there.
 
 ---
 

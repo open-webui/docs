@@ -121,7 +121,7 @@ While chatting, click the **Integrations** icon in the input area (the four-diam
 3. Open the **Tools** row and pick the tools you want this model to always have access to by default.
 4. Click **Save**.
 
-For models that support it, **Native tool calling mode** (see [Tool Calling Modes](#tool-calling-modes-default-vs-native) below) lets the model itself decide which of the attached tools to call on each turn. This replaces the older prompt-injection "auto-tool" filter approach and is the recommended way to let the model auto-select tools.
+For models that support it, **Native tool calling mode** (see [Tool Calling Modes](#tool-calling-modes-default-vs-native) below) lets the model itself decide which of the attached tools to call on each turn. It is the recommended way to let the model auto-select tools.
 
 :::caution Attached Tools Still Require User Access
 Attaching a workspace tool to a model does **not** bypass access control. When a user chats with the model, Open WebUI checks whether **that specific user** has read access to each attached tool. Tools the user cannot access are silently skipped, so the model won't be able to call them.
@@ -138,18 +138,18 @@ Attaching a workspace tool to a model does **not** bypass access control. When a
 :::danger Native is the default; "Legacy" is the unsupported opt-out
 **Native (Agentic) Mode is the default.** Every chat and model that has not explicitly chosen a tool-calling mode runs **Native**, which relies on the model's built-in function-calling support. The prompt-injection approach, **Legacy**, is the explicit opt-out and remains **unsupported**: no feature work, no bug fixes, no built-in system tools, and incompatible with modern Open WebUI features (Agentic Research, Interleaved Thinking, the built-in Memory/Notes/Knowledge/Channels tools, and web-search/image-gen/code-interpreter tool injection).
 
-**Breaking change:** if any of your models depended on the old prompt-based behavior, they now run Native unless you switch them back to **Legacy**, [per chat, per model, or globally in your default model parameters](#enable-legacy-for-all-models). If a model struggles with Native, the right fix is a stronger tool-calling model, not falling back to Legacy.
+Models that depend on the prompt-based behavior need **Legacy** set [per chat, per model, or globally in your default model parameters](#enable-legacy-for-all-models). If a model struggles with Native, use a stronger tool-calling model.
 :::
 
-Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode** (formerly **Default**), the prompt-based opt-out kept only for backward compatibility.
+Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode**, the prompt-based opt-out kept only for backward compatibility.
 
-### 🔴 Legacy Mode (Prompt-based, formerly "Default")
+### 🔴 Legacy Mode (Prompt-based)
 
 :::warning Unsupported
-Legacy Mode (the option previously labeled **Default**) is **no longer supported**. It is documented here for reference only. New and existing deployments should use Native Mode. Bug reports, feature requests, and support questions about Legacy Mode behavior will not be actioned.
+Legacy Mode is **unsupported**. It is documented here for reference only. New and existing deployments should use Native Mode. Bug reports, feature requests, and support questions about Legacy Mode behavior will not be actioned.
 :::
 
-In Legacy Mode, Open WebUI manages tool selection by injecting a long prompt template that guides the model to output a tool request in a bespoke format. It was a reasonable approach in 2023; it has been obsolete since mainstream providers and open-weights models gained proper function-calling APIs.
+In Legacy Mode, Open WebUI manages tool selection by injecting a long prompt template that guides the model to output a tool request in a bespoke format. Mainstream providers and open-weights models offer proper function-calling APIs, which makes this approach obsolete.
 
 Why it is legacy:
 - **Breaks KV cache.** The injected prompt changes every turn, preventing LLM engines from reusing cached key-value pairs. Every message pays the full prefill cost again.
@@ -160,12 +160,12 @@ Why it is legacy:
 
 #### How to switch all models to Legacy {#enable-legacy-for-all-models}
 
-Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
+Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** on for models that depend on prompt injection and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
     *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
-    *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
+    *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value runs Legacy. You do **not** need to edit them one by one.
 2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and open the **Advanced Params** row and set **Function Calling** to `Legacy`. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open the **Model controls** menu next to the message input, then **Controls → Advanced Params**, and set **Function Calling** to `Legacy` for that chat only.
 
@@ -183,7 +183,7 @@ DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
-**Agentic tool calling needs a model that is current, not one that is expensive.** Very small or older models often struggle with the multi-step reasoning and strict state management involved, and may produce malformed JSON. A cheap, fast, current model is plenty: **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B**.
+**Agentic tool calling needs a model that is current, not one that is expensive.** Very small or older models often struggle with the multi-step reasoning and strict state management involved, and may produce malformed JSON. A cheap, fast, current model is plenty; see [Model Requirements & Caveats](#model-requirements--caveats).
 :::
 
 #### Why use Native Mode (Agentic Mode)?
@@ -211,35 +211,25 @@ Native Mode is the **default**, so new and existing models use it unless they ar
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
-:::
-
-:::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
-If you configure your instance entirely through env vars, `DEFAULT_MODEL_PARAMS` sets the same global defaults. `function_calling` is a key inside it; there is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable. Because Native is the default, the only value worth setting here is `"legacy"` (to move the whole instance to Legacy, per [above](#enable-legacy-for-all-models)):
-
-```yaml
-DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
-```
-
-Leaving `function_calling` unset (or `"native"`) keeps the default, Native.
+**Model Defaults** in **Settings → Admin → Models** sets any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) once for every model, current and future, unless a specific model overrides it. The environment variable equivalent is `DEFAULT_MODEL_PARAMS` (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 #### Model Requirements & Caveats
 
 :::tip Minimum model tier (not a maintained list)
-Reliable agentic tool calling does not require a frontier model — it requires a *current* one. Any of these is a solid **minimum**, each verified working at the time of writing:
+Reliable agentic tool calling needs a *current* model, not a frontier one. Each of these is a solid **minimum**:
 
-- **GPT-5.6 Luna** (OpenAI) — cheap, fast, and genuinely strong at tool calling
+- **GPT-5.6 Luna** (OpenAI): cheap, fast and strong at tool calling
 - **Gemini 3.5 Flash-Lite** or **Gemini 3.1 Flash-Lite** (Google)
 - **MiniMax M3**
 - **DeepSeek V4 Flash**
 - **Muse Glimmer 30B** or **Qwen 3.6 27B** (local, open-weight)
 
-**This list is not continuously updated** — chasing every model release is impossible and adds no value. Use whatever current model your provider offers; you don't need the latest *and greatest*, just something recent.
+**This list is not continuously updated.** Use whatever current model your provider offers.
 :::
 
 - **Capable Local Models**: Open-weight models built for agentic work (e.g., **Muse Glimmer 30B**, **Qwen 3.6 27B**, **Gemma 4 12B**, **gpt-oss 120B**) work well with Native Mode. Muse Glimmer in particular is Apache 2.0, runs agentic loops reliably on a single 24 GB GPU, and is a good default for local tool calling.
-- **Small Local Models**: Small local models (under ~30B parameters) often produce malformed JSON or fail multi-step tool chains even in Native Mode. **The fix is to use a stronger model for tool-calling workloads**, not to fall back to Legacy Mode (Legacy is unsupported). If your hardware forces you to use a small model, accept that tool calling will be unreliable at this tier, or offload only tool-using conversations to a cloud model.
+- **Small Local Models**: Small local models (under ~30B parameters) often produce malformed JSON or fail multi-step tool chains even in Native Mode. **Use a stronger model for tool-calling workloads.** Legacy Mode is unsupported. If your hardware forces a small model, tool calling stays unreliable at this tier; offload tool-using conversations to a cloud model.
 
 #### Known Model-Specific Issues
 
@@ -266,9 +256,9 @@ Reliable agentic tool calling does not require a frontier model — it requires 
 Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupported and will not be extended to cover this case. This is a DeepSeek model/API issue, not an Open WebUI issue. Open WebUI correctly sends tools in standard OpenAI format; the malformed output originates from DeepSeek's non-standard internal DSML format.
 :::
 
-| Feature | Legacy Mode (formerly Default) | Native Mode (Default, Only Supported) |
+| Feature | Legacy Mode | Native Mode (Default, Only Supported) |
 |:---|:---|:---|
-| **Status** | ❌ Legacy, no longer supported | ✅ Required, all models should use this |
+| **Status** | ❌ Unsupported | ✅ Required, all models should use this |
 | **Latency** | Medium/High | Low |
 | **KV Cache** | ❌ Breaks cache on every turn | ✅ Cache-friendly |
 | **Model Compatibility** | Any text model (obsolete concern) | Every mainstream model since 2024 |
@@ -312,7 +302,7 @@ You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) 
 
 Your choice is saved to your user settings, so it carries over to new chats until you change it back. It is also stored on the chat, so reopening that chat keeps its mode. A denied call is reported back to the model as an error, so the model can react to it, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
 
-Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies. **Auto** cannot be selected in channel chats.
+**Channel** replies always run with full access, and **Auto** cannot be selected in channel chats. **Automations** have no chosen mode, so they run in **Auto** when it is offered and with full access otherwise. Questions from the ask user tool never need approval.
 
 #### Auto
 
@@ -326,7 +316,7 @@ An administrator turns on **Auto permissions** below **Tool Permissions** in **S
 | **Approval threshold** ([`TOOL_PERMISSIONS_DECISIONS_THRESHOLD`](/reference/env-configuration#tool_permissions_decisions_threshold)) | `0.5` |
 | **Prompt** ([`TOOL_PERMISSIONS_DECISIONS_PROMPT`](/reference/env-configuration#tool_permissions_decisions_prompt)) | Empty (built-in instructions) |
 
-For each tool call, Open WebUI sends a `POST` request to `<API Base URL>/decisions` with the **Model**, your latest request and up to your last four messages, the tool's definition and name, the call's arguments, and the tool type and Open Terminal ID. The service answers with the probability that the call needs confirmation. The call asks for approval when that probability is at or above the **Approval threshold**. The call also asks for approval when the review does not answer within 5 seconds, fails, returns an invalid answer or the request would exceed 64 KB. The `search_tools` call of [Tool Search](#tool-search) runs without a review.
+For each tool call, Open WebUI sends a `POST` request to `<API Base URL>/decisions` with the **Model**, your latest request and your last four messages, the tool's definition and name, the call's arguments, and the tool type and Open Terminal ID. The service answers with the probability that the call needs confirmation. The call asks for approval when that probability is at or above the **Approval threshold**. The call also asks for approval when the review does not answer within 5 seconds, fails, returns an invalid answer or the request would exceed 64 KB. The `search_tools` call of [Tool Search](#tool-search) runs without a review.
 
 The review service must implement the same `/decisions` endpoint as the [Tool Search](#tool-search) **Decisions API** engine. If you turn **Auto permissions** off, chats that used **Auto** switch to **Ask for approval**.
 
@@ -392,7 +382,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `view_knowledge_file` | Read a knowledge-base file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered, capped by [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars)); `line_numbers` numbers character pages. |
 | `display_file` | Show a knowledge-base file to the user inline in the chat, optionally opened at a page or slide. |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
-| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **Preload files** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **Preload files** off for this is also the setup that keeps the prompt prefix cacheable, so turn **Citations** off alongside it and put your citation rules in the system prompt instead; see [prompt caching](/features/chat-conversations/prompt-caching).* |
+| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **Preload files** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **Preload files** off also keeps the prompt prefix cacheable; see [prompt caching](/features/chat-conversations/prompt-caching).* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
 | `query_chat_files` | Semantic / RAG search across the attached files, or one file when given its ID. Results are returned as cited chunks. |
 | `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. Capped at 50 matches by default, the same [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches) limit the knowledge greps use. |
@@ -403,7 +393,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
 | **Code Interpreter** | *Requires `ENABLE_CODE_INTERPRETER` enabled (default: on) AND per-chat "Code Interpreter" toggle enabled.* |
 | `execute_code` | Executes code in a sandboxed environment and returns the output. |
-| **Memory** | *Requires Memory feature enabled AND per-model "Memory" category enabled (default: on).* |
+| **Memory** | *Requires Memory feature enabled AND per-model "Memory" capability and "Memory" category enabled (default: on).* |
 | `search_memories` | Searches the user's personal memory/personalization bank. |
 | `list_memory_paths` | Lists the paths memories are filed under. |
 | `read_memory_path` | Reads the memories stored under one path. |
@@ -439,7 +429,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). Selected skills send their instructions with each message. The model gets a summary of every other skill the user can read and loads it on demand. See [Skills](/features/workspace/skills#skill-tools).* |
+| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). The model gets a list of every skill the user can read and loads one on demand. Selected skills load before it answers. See [Skills](/features/workspace/skills#skill-tools).* |
 | `view_skill` | Load a skill's `SKILL.md` and the list of its supporting files by skill id. Resolving a skill follows normal ownership/access-grant checks. |
 | `read_skill_file` | Read one file of a skill by path, paging through long text. |
 | `grep_skill_files` | Search a skill's text files for literal text or a regular expression and return bounded excerpts around the matches. |
@@ -452,7 +442,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
 | **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
-| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
+| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, for direct connections or in temporary chats. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
@@ -504,7 +494,7 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 - knowledge attached to the [folder](/features/chat-conversations/chat-features/conversation-organization) the chat sits in,
 - knowledge bases and notes attached to the chat itself, counted only when the model's **Preload files** capability is off, since with it on the content is already in the conversation.
 
-When the **Knowledge Base** category is enabled and any of these are present, a hidden `list_attached_knowledge` tool result after the user's message holds an `<attached_knowledge>` block listing each item's type, ID, name, and which of the three it came from. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
+When the **Knowledge Base** category is enabled and any of these are present, a hidden `list_attached_knowledge` tool result after the user's message holds an `<attached_knowledge>` block listing each item's type, ID and name, and whether it came from the model or the folder. Chat attachments are not listed, since each user message already names its own. The result is skipped when nothing is attached and when a reply is continued. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
 
 :::info `kb_exec` replaces the matrix when enabled
 When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI replaces the file-oriented tools listed above with `kb_exec`. Still injected alongside it: `query_knowledge_files` and `display_file` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
@@ -715,10 +705,10 @@ All categories are **enabled by default**. Disabling a category prevents those s
 :::info Skills
 While built-in tools are active for the chat and the model's **Skills** category is on:
 
-1. Skills selected for the chat send their instructions with each message. Every new chat pre-selects the model's skills
-2. The model receives a summary (name + description) of **every other active skill the user can read** in a hidden `list_available_skills` tool result via `<available_skills>` tags, including skills that are not attached to the model and skills the user switched off in the chat
+1. Skills selected for the chat load before the model answers, as hidden `view_skill` results, once per chat. Every new chat pre-selects the model's skills
+2. The model receives a summary (name + description) of **every active skill the user can read** in a hidden `list_available_skills` tool result via `<available_skills>` tags, including skills that are not attached to the model and skills the user switched off in the chat
 3. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is listed, so the model can load, read and search instructions and files on demand. `update_skill_files` is injected while at least one workspace skill is listed, to edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
-4. When the user can read no active skill, the `<available_skills>` block is left out
+4. When the user can read no active skill, or when a reply is continued, the `<available_skills>` block is left out
 
 Long `SKILL.md` files are cut at the **Skill Read Limit**, and the model reads on with `read_skill_file`. Without the skill tools, selected skills are injected up to their first 100,000 characters. See [Skills](/features/workspace/skills#model-attached-skills).
 
@@ -788,10 +778,10 @@ See [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-fi
 🧠 When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
 
 :::info Quality Models Required
-Interleaved thinking requires a model that can maintain context across multiple tool calls and choose tools sensibly. Current reasoning-capable models handle this — GPT-5.6, Claude Sonnet 5, Gemini 3.6 Flash, or MiniMax M3 are a reasonable minimum. Older or very small models will not.
+Interleaved thinking requires a model that can maintain context across multiple tool calls and choose tools sensibly. Current reasoning-capable models handle this; GPT-5.6, Claude Sonnet 5, Gemini 3.6 Flash or MiniMax M3 are a reasonable minimum. Older or very small models do not.
 :::
 
-This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
+In an interleaved workflow, the model follows a cycle:
 1.  **Reason**: Analyze the user's intent and identify information gaps.
 2.  **Act**: Call a tool (e.g., `query_knowledge_files` for internal docs or `search_web` and `fetch_url` for web research).
 3.  **Think**: Read the tool's output and update its internal understanding.

@@ -186,10 +186,10 @@ Size `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` per process and check
 - Logs show pip locking errors or several pip processes competing.
 
 **Cause:**
-When a function or tool lists `requirements` in its frontmatter, Open WebUI runs `pip install` at runtime. With `UVICORN_WORKERS` above `1`, every worker runs the installation into the same environment at once. Set `UVICORN_WORKERS=1` and scale with replicas.
+When a function or tool lists `requirements` in its frontmatter, Open WebUI runs `pip install` at runtime. With `UVICORN_WORKERS` above `1`, every worker runs the installation into the same environment at once.
 
 **Solution:**
-Set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and install the packages into the image at build time:
+Keep `UVICORN_WORKERS=1`, set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and install the packages into the image at build time:
 
 ```dockerfile
 FROM ghcr.io/open-webui/open-webui:main

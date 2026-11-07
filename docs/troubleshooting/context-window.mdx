@@ -89,7 +89,7 @@ This is the summarize-and-replace strategy (option 4 below), built in. If you ne
 
   The context usage shown in the chat measures against the same threshold compaction uses.
 
-  Provider vocabularies differ, and all the common ones are read: `prompt_tokens` / `completion_tokens` (OpenAI-style), `input_tokens` / `output_tokens`, `prompt_eval_count` / `eval_count` (Ollama), and `prompt_n` / `predicted_n` plus `cache_n` (llama.cpp). Local backends therefore compact on reported numbers rather than falling back to estimation, which previously made them drift from the threshold. The stored usage travels with the chat history, so the reported count is available on later turns too, not only on the request that produced it.
+  Provider vocabularies differ, and all the common ones are read: `prompt_tokens` / `completion_tokens` (OpenAI-style), `input_tokens` / `output_tokens`, `prompt_eval_count` / `eval_count` (Ollama), and `prompt_n` / `predicted_n` plus `cache_n` (llama.cpp). Local backends therefore compact on reported numbers instead of estimates. The stored usage travels with the chat history, so the reported count is available on later turns too, not only on the request that produced it.
 
 ## The supported way: use a filter Function
 
@@ -176,7 +176,7 @@ With tool calling on, an `assistant` message that invokes tools is paired with o
 :::note Server-side reconciliation, error: `tool_use ids were found without tool_result blocks`
 A second source of the same 400 is **stored** output that is already incomplete: a tool result never got written (the call was interrupted, or a knowledge base changed mid-chat), or a tool call is missing while its result survived. Strict providers (Anthropic, AWS Bedrock Converse) reject this with `400 ... tool_use ids were found without tool_result blocks` (or the mirror case, a `tool_result` with no matching `tool_use`).
 
-Open WebUI reconciles these when it reconstructs a conversation: unpaired `tool_use` / `tool_result` entries are dropped before the request is sent, so resuming a chat with an interrupted tool call no longer hard-fails. Each call is kept only with its own result from the same reply. The saved chat itself stays as it is. Well-formed history is untouched. This is independent of the filter above: the filter still matters because *trimming* can create fresh orphans after reconstruction, which the server-side pass (run earlier, on the stored output) does not see.
+Open WebUI reconciles these when it reconstructs a conversation: unpaired `tool_use` / `tool_result` entries are dropped before the request is sent, so a chat with an interrupted tool call resumes without an error. Each call is kept only with its own result from the same reply. The saved chat itself stays as it is. Well-formed history is untouched. This is independent of the filter above: the filter still matters because *trimming* can create fresh orphans after reconstruction, which the server-side pass (run earlier, on the stored output) does not see.
 :::
 
 ### Slightly more involved: per-model token budget

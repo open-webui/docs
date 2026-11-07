@@ -13,12 +13,12 @@ An orchestrator connection can be scoped per context. For chats and for automati
 Connections to a plain Open Terminal server have no contexts. They stay available everywhere and always resolve to the same workspace.
 
 :::info Requires Terminals 0.2.0 or newer
-Separate workspaces per chat and per automation are provided by the orchestrator. An older orchestrator keeps serving one shared workspace, so **Per chat** and **Per automation** quietly behave like **Shared** until it is upgraded. **Off** and the saved-chat requirement are applied by Open WebUI either way.
+The orchestrator provides the separate workspaces per chat and per automation. On an earlier orchestrator, **Per chat** and **Per automation** behave like **Shared**. Open WebUI applies **Off** and the saved-chat requirement either way.
 :::
 
 ## Configure
 
-1. Open **Settings > Admin > Integrations** and scroll to the **Open Terminal** section.
+1. Open **Settings > Admin > Integrations** and scroll to the **Terminal** section.
 2. Add or edit a connection, then use **Verify Connection** next to the URL so Open WebUI detects the server type. The **Orchestrator** section only appears once the connection is detected as an orchestrator, or when it already carries a **Policy ID**.
 3. Expand **Orchestrator** and set **Terminal Contexts**.
 
@@ -27,7 +27,7 @@ Separate workspaces per chat and per automation are provided by the orchestrator
 | **Chat** | **Shared**, **Per chat**, **Off** |
 | **Automation** | **Shared**, **Per automation**, **Off** |
 
-Both rows default to **Shared**, which is the behavior every earlier release had. Leaving them there changes nothing on an existing connection.
+Both rows default to **Shared**.
 
 ## What Each Mode Does
 
@@ -49,7 +49,7 @@ A terminal that is **Off** for chats is not listed in the chat terminal picker, 
 A per chat workspace belongs to a specific conversation, so the conversation has to exist first. It does once the first message has been sent and the chat appears in the sidebar.
 
 - In a new conversation that has not been sent yet, the terminal panel and file browser for that terminal are not available. They appear once the chat is saved. A file attached to the first message with [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads) set to `Filesystem` waits until you send it, then uploads into the new chat's workspace.
-- In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions), a per chat terminal has nothing to attach to, because a temporary chat is never saved. The picker drops the terminal once the temporary chat exists. Before its first message the picker still lists it, and a message sent with it selected fails with `Terminal unavailable: Terminal server '<name>' requires a saved chat context`.
+- In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions), a per chat terminal has nothing to attach to, because a temporary chat is never saved. The picker drops the terminal once the temporary chat exists. Before its first message the picker still lists it, and a message sent with it selected fails with `Terminal unavailable: Terminal server '<id>' requires a saved chat context`.
 - Nothing in the interface quietly falls back to the shared workspace. Before the chat is saved the terminal is refused, and a model told to use it reports an error naming the terminal.
 - A request that reaches the proxy with no chat id at all, such as a direct API call, is not scoped to any chat and lands in the shared workspace even when the row is **Per chat**. The Open WebUI interface always sends the chat id.
 

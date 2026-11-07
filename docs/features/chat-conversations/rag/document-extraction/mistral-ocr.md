@@ -37,8 +37,8 @@ This documentation provides a step-by-step guide to integrating Mistral OCR with
 - Navigate to the `Admin Panel` settings menu.
 - Click on `Settings`.
 - Click on the `Documents` tab.
-- Change the `Default` content extraction engine dropdown to `Mistral OCR`.
-- Paste the API Key on the field
+- Set **Content Extraction Engine** to **Mistral OCR**.
+- Paste the key into **API Key**.
 - Leave **API Base URL** (`MISTRAL_OCR_API_BASE_URL`, default `https://api.mistral.ai/v1`) as it is unless you route through a proxy or a regional endpoint
 - Save the Admin Panel.
 

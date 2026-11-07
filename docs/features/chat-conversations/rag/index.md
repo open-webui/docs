@@ -27,15 +27,13 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 ## Local and Remote RAG Integration
 
-To use a local document in RAG, upload it from the Documents section in the Workspace area. In a chat, type `#` before your query and select the uploaded document from the suggestion box that appears above the message input. Once selected, a document icon appears above `Send a message`, indicating that the document has been attached for retrieval.
+To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input. Once selected, a document icon appears above `Send a message`, indicating that the document has been attached for retrieval.
 
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
 :::tip Bulk File Management
-Need to clean up multiple uploaded documents or audit your storage? You can now use the centralized **[File Manager](/features/chat-conversations/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
+Need to clean up multiple uploaded documents or audit your storage? Use the centralized **[File Manager](/features/chat-conversations/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
 :::
-
-You can also load documents into the workspace area with their access by starting a prompt with `#`, followed by a URL. This can help incorporate web content directly into your conversations.
 
 ## External Knowledge Sources (External Vector Databases)
 
@@ -103,7 +101,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 Customize the RAG template from the `Settings` > `Admin` > `Documents` menu.
 
-The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
+The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. Without it, retrieved context has nowhere to go.
 
 :::warning Do not include a query placeholder
 Your message (the query) is **always appended automatically** after the rendered template, so the model already sees it once. The template also recognizes `{{QUERY}}` / `[query]` and will substitute the query there, but because the query is still appended afterward, including that placeholder makes the query appear **twice** in the final prompt. Leave `{{QUERY}}` / `[query]` out of your template: it is a wrapper for the retrieved context, not the place to position the query.
@@ -201,13 +199,13 @@ The algorithm is O(n) in the number of chunks: a single pass with no lookahead o
 
 The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute, you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
 
-Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size of 2000) can reduce chunk counts by over 90% while improving retrieval accuracy, because each remaining chunk carries meaningful semantic context rather than being a fragment that confuses both the embedding model and the retrieval ranking. As positive side effects, it also uses less storage space in the vector database and requires fewer embedding operations, which can be a significant cost saving if outsourcing to an embedding service.
+Each remaining chunk carries meaningful semantic context instead of being a fragment that confuses both the embedding model and the retrieval ranking.
 
 </details>
 
 ## RAG Embedding Support
 
-Change the RAG embedding model directly in the `Settings` > `Admin` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
+Change the RAG embedding model in **Admin Settings** > **Documents**. The embedding engine is the built-in SentenceTransformers default, Ollama, OpenAI or Azure OpenAI.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -227,7 +225,7 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model in `Settings` > `Admin` > `Documents`, navigate to `Settings` > `Admin` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+After changing the embedding model, click the **Reindex** button in **Admin Settings** > **Documents** to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
@@ -316,7 +314,7 @@ On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-sys
 |--------------|---------------|--------|
 | ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
 | ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
-| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
+| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
 | ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
 :::warning Knowledge attached to a model or a folder behaves differently

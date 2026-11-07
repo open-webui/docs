@@ -94,7 +94,7 @@ Set these on the model in **Settings > Admin > Models**, click the pencil (**Edi
 |---------|-------------------|-----|
 | **System prompt** | Fixed text that does not regenerate per turn | It is the largest block that can stay cached |
 | **Preload files** | **Off**, with **File Upload** left on | Stops file content being injected into every message, and this is the switch that hands the model the builtin file tools instead |
-| **Citations** | **Off**, with your citation rules written into the system prompt | Citations add source markers to tool results, which makes the request larger and shows source pills under the reply |
+| **Citations** | Optional: **Off**, with your citation rules written into the system prompt | With Native function calling citations keep the cache intact. Off makes the request smaller and removes the source pills under the reply |
 | **Builtin Tools** | On, with the categories you need enabled | Retrieval stays on demand, so results are appended at the end and the cached opening is untouched |
 | **Function calling** | **Native** | Builtin tools do not exist in Legacy mode |
 | **Memory** | Use Native function calling, where recalled memories arrive once per reply after your message, or set `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model fetch them with the memory tools | With Legacy, memories are appended to your message on every turn and shift as the conversation changes topic |
@@ -210,7 +210,7 @@ Set these in **Settings > Admin > Documents**:
 | Setting | Default | Recommended value | Why |
 |---------|---------|-------------------|-----|
 | **Text Splitter** | `character` | `token` | Token-based splitting produces more consistent chunk sizes across document types |
-| **Markdown Header Splitting** | On | **On** | Respects document structure by splitting at headings, keeping sections coherent |
+| **Markdown Header Text Splitter** | On | **On** | Respects document structure by splitting at headings, keeping sections coherent |
 | **Chunk Size** | `1024` | `2000` | Larger chunks preserve more surrounding context per retrieval hit |
 | **Chunk Overlap** | `100` | `200` | More overlap means less chance of cutting a key sentence in half |
 | **Top K** | `10` | `15` | Retrieves more candidate chunks, giving the model a wider pool of relevant context. If you are working with local models that have constrained context sizes, lower this to `5` to avoid filling the context window with retrieved chunks |

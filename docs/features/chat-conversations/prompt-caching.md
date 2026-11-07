@@ -43,9 +43,9 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **Memory** | With Native function calling, adds the recalled memories once per reply as a hidden `recall_memories` tool result after your message. Without it, appends them to your message on every turn | None with Native. High with Legacy: changes whenever memories change |
 | **"Using Entire Document"** | Injects a whole file into every message | Very high: but a **Preload files** sub-mode; only fires while Preload files is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low: constant while voice mode is on |
-| **Attachment metadata block** | Lists attached files / knowledge / collections / chats as metadata (ids and names) in the message | Low: stable as long as the attachments don't change |
+| **Attachment metadata block** | Lists the files, collections, notes and chats attached to a message as metadata (ids and names) in that message | Low: stable as long as the attachments don't change |
 | **Attached knowledge list** | With Native function calling, lists the knowledge attached to the model or folder once per reply as a hidden `list_attached_knowledge` tool result after your message. Skipped when there is nothing to list | None: saved with the reply and replayed unchanged |
-| **Open Terminal `AGENTS.md`** | Reads the terminal's `AGENTS.md` on every turn and adds it as a user message just before the first user message | Invalidates everything from the first user message onward whenever the file changes, for example when the model edits it mid-chat. The system message and tools stay cached |
+| **Open Terminal `AGENTS.md`** | Reads the `AGENTS.md` in the terminal user's home directory on every turn and adds it as a user message just before the first user message | Invalidates everything from the first user message onward whenever the file changes, for example when the model edits it mid-chat. The system message and tools stay cached |
 | **Open Terminal skills** | Adds terminal skills to the skills list, which with Native function calling is a hidden `list_available_skills` tool result once per reply (skipped when there are no skills). With Legacy, only the skills you select are written into the system message | Changes only the tail of the request the turn a skill is added or removed. The tool list changes only when the first skill appears or the last one goes, since the skill tools are offered while at least one skill is listed |
 | **Open Terminal working directory** | Writes the terminal's current working directory into the command tool's instructions on every turn | Changes the tool list whenever the working directory changes. Turn off the connection's [Working Directory Context](/features/open-terminal/setup/connecting#working-directory-context) to keep it stable |
 | **Open Terminal user shell tools** | By default, adds the two tools for your own shell only while that shell is open | Changes the tool list when you open or close the shell. Set the connection's [User Shell Tools](/features/open-terminal/setup/connecting#user-shell-tools) to `Always Include` to keep it stable |
@@ -92,9 +92,9 @@ Configure a fixed system prompt on the model and avoid anything that regenerates
 
 ### 2. Turn Preload files off (this is what switches the file tools on)
 
-Disable the **Preload files** capability on the model (it is off by default with Native function calling), and leave **File Upload** enabled. Attached files, knowledge bases, collections and referenced chats are still **surfaced to the model as stable metadata** in an `<attached_files>` block on the message that carried them, but their **content is no longer auto-retrieved or injected**. See [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
+Disable the **Preload files** capability on the model (it is off by default with Native function calling), and leave **File Upload** enabled. Attached files, collections, notes and referenced chats are still **surfaced to the model as stable metadata** in an `<attached_files>` block on the message that carried them, but their **content is no longer auto-retrieved or injected**. See [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
 
-From v0.11 this is not only a subtraction. **Preload files being off is the condition that injects the builtin Files tools**, which let the model read and search chat attachments itself:
+Turning Preload files off also makes the builtin Files tools available, which let the model read and search chat attachments itself:
 
 | Tool | What the model does with it |
 |---|---|
@@ -103,7 +103,7 @@ From v0.11 this is not only a subtraction. **Preload files being off is the cond
 | `grep_chat_files` | Exact text search, returning matching lines with file ids and line numbers |
 | `view_file` | Read a passage by character offset or line range |
 
-Turning Preload files back on removes these tools again, on the grounds that the content would already be in the conversation. The two are deliberately exclusive, so there is no configuration where you pay for injection and agentic access at once.
+Turning Preload files on removes these tools, since the content is already in the conversation.
 
 Retrieval then becomes **on-demand**: the model decides what to fetch and calls a tool. Tool results are appended at the **end** of the conversation, so they never rewrite the cached prefix.
 
@@ -129,7 +129,7 @@ To get citations in the answer text without the markers, add **static citation i
 Because the instruction lives in the (cached) system prompt, you get citations **without** a per-turn injection.
 
 :::warning Do not ask for numbered citations here
-Numbered `[1]`, `[2]` citations work only while **Citations** is on, because the numbers come from the injected `<source>` block and not from the tools. No builtin tool returns one: the file and knowledge tools return `content`, a `source` filename and a `file_id`, and `search_web` returns `title`, `link` and `snippet`. A system prompt asking for `[1]` style citations with Citations off gives the model nothing to number, and it will invent the numbers.
+Numbered `[1]`, `[2]` citations work only while **Citations** is on, because the numbers come from the `<source>` markers that Open WebUI adds to tool results. No builtin tool returns one: the file and knowledge tools return `content`, a `source` filename and a `file_id`, and `search_web` returns `title`, `link` and `snippet`. A system prompt asking for `[1]` style citations with Citations off gives the model nothing to number, and it will invent the numbers.
 :::
 
 :::info `search_web` returns search results, not page text
@@ -138,14 +138,14 @@ Numbered `[1]`, `[2]` citations work only while **Citations** is on, because the
 
 ### 4. Keep retrieval agentic
 
-Enable **Builtin Tools** on the model and leave the categories you need switched on. As of v0.11 every resource type a chat can carry has a first-class tool, so custom workspace tools are no longer needed to fill gaps:
+Enable **Builtin Tools** on the model and leave the categories you need switched on. Every resource type a chat can carry has a builtin tool:
 
 | Resource | Tools | Category |
 |---|---|---|
 | Files attached to the chat | `list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file` | **Files** |
 | Knowledge bases and collections, including the knowledge of the folder the chat is in | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, `display_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
 | Notes | `search_notes`, `view_note` | **Notes** |
-| Referenced chats | `search_chats`, `view_chat` | **Chat History** |
+| The user's chats | `search_chats`, `view_chat` | **Chat History** |
 
 This requires **Native** function calling. Builtin tools are a native-mode feature and are not injected for models set to Legacy.
 
@@ -157,7 +157,7 @@ The **Files** category has the tightest conditions of the four. All five must ho
 4. The chat actually has at least one attached file.
 5. The user holds the `chat.file_upload` permission (admins always pass).
 
-Each tool re-resolves and access-checks the resource server-side on every call, so nothing enters the context that the model didn't explicitly request, and an attachment the user can no longer open is skipped rather than read. See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
+Each tool re-resolves and access-checks the resource server-side on every call, so no file content enters the context unless the model requests it, and an attachment the user can no longer open is skipped rather than read. See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 
 :::tip Keep the tool list itself stable
 Tool definitions sit in the cached prefix alongside the system prompt, so toggling categories, attaching a skill, or enabling web search mid-conversation invalidates the cache from that point. Decide the tool set per model, not per turn. Note that the Files tools appear the moment the first file is attached to a chat, which is a one-time change within that conversation rather than per-turn churn.
@@ -165,14 +165,13 @@ Tool definitions sit in the cached prefix alongside the system prompt, so toggli
 
 ### 5. Handle Memory deliberately
 
-With Native function calling, recalled memories arrive once per reply as a hidden tool result after your message and are replayed unchanged on later turns, so they do not touch the cached prefix. Without it, memory injection appends to your message on every turn and is **not** governed by Preload files, so it can churn the cache. Options:
+With Native function calling, recalled memories arrive once per reply as a hidden tool result after your message and are replayed unchanged on later turns, so they do not touch the cached prefix. With Legacy, and in API requests without a web UI session, memory injection appends to your message on every turn and is **not** governed by Preload files, so it can churn the cache. Use Native function calling to avoid that.
 
-- Use Native function calling, **or**
-- Disable automatic memory injection with `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and let the model retrieve memories **on demand** via the memory tools (tell it to do so in your static system prompt). See [Memory](/features/chat-conversations/memory).
+`ENABLE_MEMORY_SYSTEM_CONTEXT=false` turns the automatic injection off for every chat. With Native function calling the model then reads memories **on demand** through the memory tools, so tell it to do so in your static system prompt. See [Memory](/features/chat-conversations/memory).
 
 ### 6. Voice mode is usually fine
 
-The dynamic voice-mode prompt is prepended once and stays constant while voice mode is active (a voice session typically starts a fresh chat), so it does not churn the cache. A call started in a chat that already has typed messages, Standard or Realtime, rebuilds the cached prefix once on its first spoken turn. Leave it as-is, or disable `task.voice.prompt.enable` if you want a fully fixed system prompt.
+The dynamic voice-mode prompt is prepended once and stays constant while voice mode is active (a voice session typically starts a fresh chat), so it does not churn the cache. A call started in a chat that already has typed messages, Standard or Realtime, rebuilds the cached prefix once on its first spoken turn. Leave it as-is, or set `ENABLE_VOICE_MODE_PROMPT=false` if you want a fully fixed system prompt.
 
 ## The result: a stable, append-only request
 
@@ -188,8 +187,8 @@ Watch your provider's usage response for cached-token counts (for example cache-
 
 ## Provider notes
 
-- **Anthropic**: supports both explicit caching (cache breakpoints) and implicit caching, but caching is **opt-in on every request** (a caching directive must be sent each time) and **cache writes are billed**. You must send that opt-in; a stable prefix then maximises the portion that is cached and reused.
-- **OpenAI / Gemini / DeepSeek / OpenAI-compatible gateways**: automatic (implicit) prefix caching; identical leading tokens are served from cache with no opt-in and no extra flags.
+- **Anthropic**: caching is opt-in on every request, as described at the top. A stable prefix maximises the cached portion.
+- **OpenAI / Gemini / DeepSeek / OpenAI-compatible gateways**: automatic prefix caching with no opt-in.
 - **Anthropic models behind OpenAI-compatible gateways (OpenRouter, LiteLLM)**: a cache marker on a tool result reaches the gateway, so the prefix stays cached through tool loops.
 
 In every case the requirement is the same: **don't rewrite the beginning of the request between turns.**
@@ -203,5 +202,5 @@ Set on the model, under **Settings > Admin > Models**, click the pencil (**Edit*
 - [ ] Optional: **Citations** off, citation rules moved into the system prompt
 - [ ] **Builtin Tools** on, with the **Files**, **Knowledge Base**, **Notes** and **Chat History** categories left enabled
 - [ ] Function calling set to **Native** (builtin tools do not exist in Legacy mode)
-- [ ] With Legacy, `ENABLE_MEMORY_SYSTEM_CONTEXT=false` and on-demand memory retrieval
+- [ ] Memory: Native function calling keeps recalled memories out of the cached prefix
 - [ ] Keep the tool list stable across turns

@@ -48,7 +48,7 @@ docker exec -it open-webui /bin/sh
 
 ## Table Overview
 
-Here is a complete list of tables in Open-WebUI's SQLite database. The tables are listed alphabetically and numbered for convenience.
+Here is a complete list of tables in Open-WebUI's SQLite database. The tables are numbered for convenience.
 
 | **No.** | **Table Name**   | **Description**                                              |
 | ------- | ---------------- | ------------------------------------------------------------ |
@@ -76,7 +76,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 22      | memory           | Maintains chat history and context memory                    |
 | 23      | message          | Stores individual chat messages and their content            |
 | 24      | message_reaction | Records user reactions (emojis/responses) to messages        |
-| 25      | migrate_history  | Tracks database schema version and migration records         |
+| 25      | migrate_history  | **Legacy.** Migration record of the pre-Alembic migration system, unused by current code |
 | 26      | model            | Manages AI model configurations and settings                 |
 | 27      | note             | Stores user-created notes and annotations                    |
 | 28      | oauth_session    | Manages active OAuth sessions for users                      |
@@ -91,7 +91,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 37      | automation_run   | Stores execution history for automation runs                 |
 | 38      | pinned_note      | Tracks per-user note pins (each row = one user pinning one note) |
 | 39      | chat_message     | Normalized per-message store for chat conversations              |
-| 40      | api_key          | Stores per-user API keys, replacing the former `user.api_key` column |
+| 40      | api_key          | Stores per-user API keys                                     |
 | 41      | knowledge_directory | Nestable folders that organize files within a knowledge base |
 | 42      | channel_webhook  | Stores per-channel incoming webhooks for unauthenticated posting |
 | 43      | model_history    | Saved versions of workspace model configurations             |
@@ -100,11 +100,11 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 46      | skill_history    | Saved versions of skills, including their supporting files   |
 | 47      | app              | Installed [Apps](/features/channels/apps) and their encrypted credentials |
 | 48      | auth_session     | Renewable sign-in sessions for native apps such as [Tether](/ecosystem/tether) |
+| 49      | comment          | Stores comments and replies on workspace items, notes and chats |
+| 50      | comment_reaction | Records emoji reactions to comments                          |
+| 51      | notification     | Stores each user's inbox notifications                       |
 
-Note: there are two additional tables in Open-WebUI's SQLite database that are not related to Open-WebUI's core functionality, that have been excluded:
-
-- Alembic Version table
-- Migrate History table
+Note: the `alembic_version` table, which records the applied migration, is not related to Open-WebUI's core functionality and is excluded from this list.
 
 Note on the `document` table: it is a **legacy** table from before the Knowledge feature. Its rows were migrated into the `knowledge` table (migration `6a39f3d8e55c`) and nothing writes to it anymore, but no migration drops it, so it may still be present (empty) in databases that predate the Knowledge feature. There is no backing model for it in current code.
 
@@ -114,27 +114,24 @@ Now that we have all the tables, let's understand the structure of each table.
 
 | **Column Name** | **Data Type** | **Constraints**         | **Description**                                        |
 | --------------- | ------------- | ----------------------- | ------------------------------------------------------ |
-| id              | Integer       | PRIMARY KEY, AUTOINCREMENT | Unique identifier                                   |
+| id              | Text          | PRIMARY KEY             | Unique identifier                                      |
 | resource_type   | Text          | NOT NULL                | Type of resource (e.g., `model`, `knowledge`, `tool`)  |
 | resource_id     | Text          | NOT NULL                | ID of the specific resource                            |
 | principal_type  | Text          | NOT NULL                | Type of grantee: `user`, `group` or `anyone`           |
 | principal_id    | Text          | NOT NULL                | ID of the user or group (or `*` for public)            |
 | permission      | Text          | NOT NULL                | Permission level: `read` or `write`                    |
-| created_at      | BigInteger    | nullable                | Grant creation timestamp                               |
+| created_at      | BigInteger    | NOT NULL                | Grant creation timestamp                               |
 
 Things to know about the access_grant table:
 
 - Unique constraint on (`resource_type`, `resource_id`, `principal_type`, `principal_id`, `permission`) to prevent duplicate grants
 - Indexed on (`resource_type`, `resource_id`) and (`principal_type`, `principal_id`) for efficient lookups
-- Replaces the former `access_control` JSON column that was previously embedded in each resource table
 - `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
 - `principal_type` of `anyone` is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
 - A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants
 
 ## API Key Table
-
-Added in v0.6.41 (migration `b10670c03dd5`), which also dropped the `api_key` column from the [User Table](#user-table) after copying every existing key into this table.
 
 | **Column Name** | **Data Type** | **Constraints**                        | **Description**                       |
 | --------------- | ------------- | -------------------------------------- | ------------------------------------- |
@@ -342,6 +339,7 @@ Things to know about the channel_file table:
 | last_read_at    | BigInteger    | nullable                | Last read timestamp used for unread indicators |
 | current_message_id | Text       | nullable                | Current (active leaf) message of the chat's history |
 | variables       | JSON          | nullable                | Values filled in for the model's chat variables |
+| timer_at        | BigInteger    | nullable                | Due time in nanoseconds, set only while a timer chat waits to be claimed |
 
 Things to know about the chat table:
 
@@ -548,6 +546,44 @@ Things to know about the chat_file table:
 
 Note on the `chatidtag` table: it is a **legacy** table from before chat tags moved onto the chat record. Its rows were read out into the `chat` table (migration `1af9b942657b`), which wrote each tag into `chat.meta.tags` and turned the `pinned` tag into `chat.pinned`, and nothing writes to it anymore. That migration leaves the rows where they are and no migration drops the table, so an older database may still hold stale rows in it. There is no backing model for it in current code. Chat tags now live in the `tag` table.
 
+## Comment Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                                                          |
+| --------------- | ------------- | --------------- | ------------------------------------------------------------------------ |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)                                                 |
+| user_id         | Text          | nullable        | Author; empty once the comment is deleted                                |
+| resource_type   | Text          | NOT NULL        | Type of the commented item: `model`, `knowledge`, `prompt`, `skill`, `tool`, `note` or `chat` |
+| resource_id     | Text          | NOT NULL        | ID of the commented item                                                 |
+| parent_id       | Text          | nullable        | Top-level comment of the thread; empty on a top-level comment            |
+| reply_to_id     | Text          | nullable        | Comment this reply answers                                               |
+| content         | Text          | NOT NULL        | Comment text                                                             |
+| target_type     | Text          | nullable        | Part of the item the comment points at: `note_page` or `chat_message`    |
+| target_id       | Text          | nullable        | ID of that part                                                          |
+| meta            | JSON          | nullable        | The quoted text range (`anchor`) of a comment on selected text           |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp (nanoseconds)                                         |
+| updated_at      | BigInteger    | NOT NULL        | Last update timestamp (nanoseconds)                                      |
+| deleted_at      | BigInteger    | nullable        | Deletion timestamp (nanoseconds)                                         |
+
+Things to know about the comment table:
+
+- Indexed on (`resource_type`, `resource_id`, `parent_id`, `created_at`, `id`), on (`parent_id`, `created_at`, `id`) and on (`resource_type`, `resource_id`, `target_type`, `target_id`).
+- Deleting a comment keeps its row so threads and quoted replies stay intact: `content` is emptied, `user_id` and `meta` are cleared and `deleted_at` is set.
+- Deleting the commented item deletes its comments and their reactions.
+
+## Comment Reaction Table
+
+| **Column Name** | **Data Type** | **Constraints**              | **Description**              |
+| --------------- | ------------- | ---------------------------- | ---------------------------- |
+| id              | Text          | PRIMARY KEY                  | Unique identifier (UUID)     |
+| user_id         | Text          | NOT NULL                     | User who reacted             |
+| comment_id      | Text          | NOT NULL, INDEX              | Reference to the comment     |
+| name            | Text          | NOT NULL                     | Reaction (emoji) name        |
+| created_at      | BigInteger    | NOT NULL                     | Creation timestamp           |
+
+Things to know about the comment_reaction table:
+
+- Unique constraint on (`comment_id`, `user_id`, `name`): a user can add each reaction to a comment once.
+
 ## Config
 
 The config table is **per-key**: every setting is its own row keyed by a dot-notation path.
@@ -712,7 +748,6 @@ Things to know about the group_member table:
 | user_id         | Text          | -                   | Knowledge base owner       |
 | name            | Text          | -                   | Knowledge base name        |
 | description     | Text          | -                   | Knowledge base description |
-| data            | JSON          | nullable            | Knowledge base content     |
 | meta            | JSON          | nullable            | Additional metadata        |
 | created_at      | BigInteger    | -                   | Creation timestamp         |
 | updated_at      | BigInteger    | -                   | Last update timestamp      |
@@ -880,6 +915,33 @@ Per-user note pins. Each row records that one user has pinned one note for their
 
 A `UNIQUE(user_id, note_id)` constraint prevents duplicate pins for the same user/note pair. The pinned-note list is ordered by `created_at DESC` per user, so the most recently pinned note appears first. Deleting a note cascades through this table; toggling a pin does **not** modify `note.updated_at`.
 
+## Notification Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                                                   |
+| --------------- | ------------- | --------------- | ----------------------------------------------------------------- |
+| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)                                          |
+| user_id         | Text          | NOT NULL        | Recipient                                                         |
+| event_type      | Text          | NOT NULL        | Kind of notification, such as `comment.replied`, `channel.mentioned`, `calendar.alert`, `automation.run_failed` or `system.announcement` |
+| event_key       | Text          | NOT NULL        | Identifier of the occurrence that caused it                       |
+| actor_type      | Text          | NOT NULL        | `user` or `system`                                                |
+| actor_id        | Text          | nullable        | User who caused it; empty for `system`                            |
+| resource_type   | Text          | nullable        | Type of the item it belongs to                                    |
+| resource_id     | Text          | nullable        | ID of that item                                                   |
+| object_type     | Text          | nullable        | Type of the specific object, such as `comment`                    |
+| object_id       | Text          | nullable        | ID of that object                                                 |
+| data            | JSON          | NOT NULL        | Event details shown in the inbox                                  |
+| seen_at         | BigInteger    | nullable        | When the user saw it in the inbox (nanoseconds)                   |
+| read_at         | BigInteger    | nullable        | When the user read it (nanoseconds)                               |
+| created_at      | BigInteger    | NOT NULL        | Creation timestamp (nanoseconds)                                  |
+| updated_at      | BigInteger    | NOT NULL        | Last update timestamp (nanoseconds)                               |
+
+Things to know about the notification table:
+
+- Unique constraint on (`user_id`, `event_key`), so one occurrence notifies a user once.
+- `resource_type` and `resource_id` are both set or both empty, and so are `object_type` and `object_id`.
+- Rows are created only while the notifications setting is on.
+- Indexed on (`user_id`, `created_at`, `id`), on the same columns for unseen rows only, on (`resource_type`, `resource_id`) and on (`object_type`, `object_id`).
+
 ## OAuth Session Table
 
 | **Column Name** | **Data Type** | **Constraints**                            | **Description**                   |
@@ -932,8 +994,8 @@ Things to know about the oauth_session table:
 
 | **Column Name** | **Data Type** | **Constraints** | **Description**                    |
 | --------------- | ------------- | --------------- | ---------------------------------- |
-| id              | Text          | PRIMARY KEY     | Unique identifier (UUID)           |
-| user_id         | Text          | NOT NULL        | Owner/creator of the skill         |
+| id              | String        | PRIMARY KEY     | Unique identifier (UUID)           |
+| user_id         | String        | -               | Owner/creator of the skill         |
 | name            | Text          | NOT NULL        | Display name of the skill          |
 | description     | Text          | nullable        | Short description (used in manifest) |
 | content         | Text          | NOT NULL        | Full skill instructions (Markdown) |
@@ -988,6 +1050,7 @@ Things to know about the tag table:
 | meta            | JSON          | -               | Tool metadata         |
 | valves          | JSON          | -               | Tool control settings |
 | version_id      | Text          | nullable        | Production version (`tool_history.id`) |
+| is_active       | Boolean       | NOT NULL, default=True | Whether the tool is enabled |
 | created_at      | BigInteger    | -               | Creation timestamp    |
 | updated_at      | BigInteger    | -               | Last update timestamp |
 
@@ -1045,8 +1108,7 @@ Things to know about the user table:
 - The `email` column carries no plain `UNIQUE` constraint in the database, which is why the row above shows none. The SQLAlchemy model declares `unique=True` on it, but the schema is built only from the migrations and none of them creates that constraint, so the index above is the whole of the enforcement.
 - `variables` was added by migration `b0018471bbbe`. It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 - `oauth` replaced the single `oauth_sub` text column (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases upgraded across a long gap could have that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
-- The `api_key` column was removed in v0.6.41 (the same migration `b10670c03dd5`). API keys are now rows in the dedicated [API Key Table](#api-key-table). The migration copies each existing key across before dropping the column.
-- `profile_banner_image_url`, `timezone`, `presence_state`, `status_emoji`, `status_message` and `status_expires_at` were all added in v0.6.41 (migration `b10670c03dd5`).
+- API keys are rows in the [API Key Table](#api-key-table).
 - `timezone` holds an IANA zone name (for example `Europe/Vienna`), written by `POST /api/v1/auths/update/timezone`. Calendar recurrence expansion, automation scheduling and the per-user usage statistics read it. An unset or unrecognised value falls back to the server's zone for calendars and automations, and to UTC for usage statistics.
 - `status_emoji`, `status_message` and `status_expires_at` hold the status a user sets for themselves. They are written through `POST /api/v1/users/user/status/update`, which is refused unless the `users.enable_status` config key is on, and they are returned with the signin response and with channel member listings.
 - `presence_state` is returned in channel member listings and in the socket session payload. No code path writes it.
@@ -1109,6 +1171,9 @@ erDiagram
     user ||--o{ oauth_session : "has"
     user ||--o{ auth_session : "signs_in"
     user ||--o{ api_key : "holds"
+    user ||--o{ comment : "writes"
+    comment ||--o{ comment_reaction : "has"
+    user ||--o{ notification : "receives"
 
     %% Content Relationships
     message ||--o{ message_reaction : "has"
@@ -1168,6 +1233,7 @@ erDiagram
         boolean pinned
         json meta
         text folder_id FK
+        bigint timer_at
     }
 
     shared_chat {
@@ -1449,6 +1515,48 @@ erDiagram
         bigint expires_at
     }
 
+    comment {
+        text id PK
+        text user_id FK
+        text resource_type
+        text resource_id
+        text parent_id FK
+        text reply_to_id FK
+        text content
+        text target_type
+        text target_id
+        json meta
+        bigint created_at
+        bigint updated_at
+        bigint deleted_at
+    }
+
+    comment_reaction {
+        text id PK
+        text user_id FK
+        text comment_id FK
+        text name
+        bigint created_at
+    }
+
+    notification {
+        text id PK
+        text user_id FK
+        text event_type
+        text event_key
+        text actor_type
+        text actor_id FK
+        text resource_type
+        text resource_id
+        text object_type
+        text object_id
+        json data
+        bigint seen_at
+        bigint read_at
+        bigint created_at
+        bigint updated_at
+    }
+
     api_key {
         text id PK
         text user_id FK
@@ -1517,6 +1625,7 @@ erDiagram
         json meta
         json valves
         text version_id
+        boolean is_active
     }
 
     tool_history {

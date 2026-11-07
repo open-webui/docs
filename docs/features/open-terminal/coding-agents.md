@@ -15,7 +15,7 @@ Select a terminal in the chat, then open the model picker. Each agent model is n
 
 - **One agent per conversation.** Add only one agent model to a chat. Agents cannot be combined with other models in a multi-model chat.
 - **New messages only.** Continue an agent conversation by sending a new message. Agent chats cannot be regenerated, continued or edited and resent, and you cannot branch from an earlier message; start a new chat instead.
-- **Missing agents.** When the terminal or its agent model is no longer available, the agent is removed from the selection and the default model is used.
+- **Missing agents.** When the terminal or its agent model is unavailable, the agent is removed from the selection and the default model is used.
 - **Saved chats only.** Agent conversations need a saved chat, so they are not available in temporary chats.
 
 ## Options

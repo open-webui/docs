@@ -49,8 +49,8 @@ These configure the orchestrator service itself, prefixed with `TERMINALS_` (or 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
 | `TERMINALS_BACKEND` | `docker` | Backend to use: `docker`, `kubernetes`, or `kubernetes-operator` |
-| `TERMINALS_API_KEY` | *(unset)* | Bearer token for API auth. Unset means no auth (development only) |
-| `TERMINALS_OPEN_WEBUI_URL` | *(unset)* | If set, validate JWTs against this Open WebUI instance |
+| `TERMINALS_API_KEY` | *(unset)* | Bearer token for API auth. Required for the admin APIs when `TERMINALS_OPEN_WEBUI_URL` is set. With neither set there is no auth (development only) |
+| `TERMINALS_OPEN_WEBUI_URL` | *(unset)* | If set, validate user JWTs against this Open WebUI instance |
 | `TERMINALS_HOST` | `0.0.0.0` | Address the orchestrator HTTP server binds to |
 | `TERMINALS_PORT` | `3000` | Port the orchestrator HTTP server listens on |
 | `TERMINALS_ENABLE_UI` | `true` | Serve the built-in minimal admin UI at `/`. Set `false` for API-only deployments |

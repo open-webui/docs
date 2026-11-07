@@ -137,8 +137,8 @@ Link **knowledge bases and files** to your folder:
 **Whose access decides what is attached.** Attaching needs both your access and the **folder owner's**; every chat in the folder then follows the owner's access:
 
 - Attaching a file, collection or note to a folder requires both the person attaching it and the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves, including their own private ones, nor documents they cannot open themselves. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
-- Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being fed into the folder's chats, rather than continuing to serve content through the folder to everyone who can see it.
-- Entries that are not a file, collection or note, or that carry no ID, are ignored rather than passed through, since there is nothing to check them against.
+- Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being used in the folder's chats.
+- Entries that are not a file, collection or note, or that carry no ID, are ignored.
 
 ## Sharing Folders
 

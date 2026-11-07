@@ -22,7 +22,7 @@ The **Tasks** section holds two pickers. Open WebUI picks between them based on 
 | **Local Task Model** | [`TASK_MODEL`](/reference/env-configuration#task_model) | a connection typed **Local** (Ollama and anything else you marked local) |
 | **External Task Model** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | every chat model not typed **Local**, including pipe and function models and models with no connection type |
 
-Both default to **Current Model**, which means background work runs on the chat's own model. If you name a model that is no longer available, background work falls back to the chat's model rather than failing.
+Both default to **Current Model**, which means background work runs on the chat's own model. If you name a model that is unavailable, background work falls back to the chat's model rather than failing.
 
 :::tip What to pick
 Small, fast and **non-reasoning**. A reasoning model spends seconds thinking before producing a three-word title, and you pay for those thinking tokens.
@@ -48,7 +48,7 @@ Reach for it when:
 - **Background output is too loose.** Lower `temperature` for steadier titles and tags.
 
 :::warning Setting anything replaces the built-in limit
-As soon as you set a single parameter, the built-in 1000-token limit on titles is no longer applied. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
+As soon as you set a single parameter, the built-in 1000-token limit on titles is dropped. If you still want a limit, include `max_tokens` in what you set. Emoji generation is the one exception: it always asks for 4 tokens and ignores this setting.
 :::
 
 Five of the controls in the panel have no effect on background requests: **Stream Chat Response**, **Stream Delta Chunk Size**, **Function Calling**, **Reasoning Tags** and **Context Compaction Threshold**. Setting them here changes nothing.

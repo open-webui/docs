@@ -15,7 +15,7 @@ An **Enable Keyboard Shortcuts** toggle at the top of **Settings > Keyboard** sw
 
 Turn it off when Open WebUI's shortcuts collide with ones your browser or operating system already uses, `Cmd+Shift+C` for the browser inspector being a common example. While it is off, the configurable shortcuts below do not fire and the key combinations pass through to the browser or OS untouched, dictation included, and the small hotkey hints stop appearing in the interface.
 
-To stop a single shortcut, unassign it. Its key combination then reaches the browser like any other. That is the usual fix for **Regenerate response**, bound by default to the keys browsers use to reload the page.
+To stop a single shortcut, unassign it. Its key combination then reaches the browser like any other. That is the usual fix for **Regenerate Response**, bound by default to the keys browsers use to reload the page.
 
 Nothing locks you out: the **Settings > Keyboard** tab keeps working while shortcuts are disabled, so you can rebind them or switch them back on at any time. The chat input triggers (`/`, `@`, `#`), `Tab` to accept an autocomplete suggestion, and `Esc` to stop a response or close a dialog are unaffected, since they are not global shortcuts.
 
@@ -27,33 +27,33 @@ These can be rebound. The tab shortcuts are listed in their own table below. Any
 
 | Action | Default |
 |---|---|
-| New chat | `Cmd+Shift+O` |
-| New temporary chat | `Cmd+Shift+'` |
-| Delete chat | `Cmd+Shift+Backspace` |
-| Open model selector | `Cmd+Shift+M` |
-| Toggle dictation | `Cmd+Shift+L` |
-| Navigate to previous chat | *(unassigned)* |
-| Navigate to next chat | *(unassigned)* |
+| New Chat | `Cmd+Shift+O` |
+| New Temporary Chat | `Cmd+Shift+'` |
+| Delete Chat | `Cmd+Shift+Backspace` |
+| Open Model Selector | `Cmd+Shift+M` |
+| Toggle Dictation | `Cmd+Shift+L` |
+| Navigate to Previous Chat | *(unassigned)* |
+| Navigate to Next Chat | *(unassigned)* |
 | Search | `Cmd+K` |
-| Open settings | `Cmd+.` |
-| Show shortcuts | `Cmd+/` |
-| Toggle sidebar | `Cmd+Shift+S` |
+| Open Settings | `Cmd+.` |
+| Show Shortcuts | `Cmd+/` |
+| Toggle Sidebar | `Cmd+Shift+S` |
 | Toggle Controls | *(unassigned)* |
-| Close modal | `Escape` |
-| Focus input | `Shift+Escape` |
+| Close Modal | `Escape` |
+| Focus Chat Input | `Shift+Escape` |
 | Clear Input Selections | `Escape` |
-| Generate message pair | `Cmd+Shift+Enter` |
-| Regenerate response | `Cmd+R` |
-| Allow tool call | `Cmd+Alt+Enter` |
-| Deny tool call | `Cmd+Alt+Backspace` |
-| Copy last code block | `Cmd+Shift+;` |
-| Copy last response | `Cmd+Shift+C` |
+| Generate Message Pair | `Cmd+Shift+Enter` |
+| Regenerate Response | `Cmd+R` |
+| Allow Tool Call | `Cmd+Alt+Enter` |
+| Deny Tool Call | `Cmd+Alt+Backspace` |
+| Copy Last Code Block | `Cmd+Shift+;` |
+| Copy Last Response | `Cmd+Shift+C` |
 
-**Generate message pair** adds the text in the chat input as your message, with a placeholder reply for each selected model that you can then edit by hand.
+**Generate Message Pair** adds the text in the chat input as your message, with a placeholder reply for each selected model that you can then edit by hand.
 
 **Clear Input Selections** resets the chat input's choices: it removes the model override, deselects tools and filters and turns off web search, image generation and code interpreter. It only fires while the chat input has focus.
 
-**Close modal** closes only the dialog on top, so a confirmation opened over **Settings** closes and leaves **Settings** open. `Escape` always closes dialogs, so keys you assign here work alongside `Escape`, not in place of it.
+**Close Modal** closes only the dialog on top, so a confirmation opened over **Settings** closes and leaves **Settings** open. `Escape` always closes dialogs, so keys you assign here work alongside `Escape`, not in place of it.
 
 ### Tab Shortcuts
 
@@ -83,26 +83,20 @@ These eight are built in and cannot be rebound. **Settings > Keyboard** lists th
 
 | Action | Key | Active when |
 |---|---|---|
-| Accept autocomplete generation, jump to prompt variable | `Tab` | The chat input is focused |
-| Prevent file creation | `Cmd+Shift+V` | Pasting in a chat or a channel while **Paste Large Text as File** is on |
-| Attach file from knowledge | `#` | Typed in the chat input |
-| Add custom prompt | `/` | Typed in the chat input |
-| Talk to model | `@` | Typed in the chat input |
-| Stop generating | `Escape` | The chat input is focused and a response is being generated |
-| Edit last message | `ArrowUp` | The chat input is focused |
-| Toggle mute | `M` | Voice mode |
+| Accept Autocomplete Generation, Jump to Prompt Variable | `Tab` | The chat input is focused |
+| Prevent File Creation | `Cmd+Shift+V` | Pasting in a chat or a channel while **Paste Large Text as File** is on |
+| Attach File From Knowledge | `#` | Typed in the chat input |
+| Add Custom Prompt | `/` | Typed in the chat input |
+| Talk to Model | `@` | Typed in the chat input |
+| Stop Generating | `Escape` | The chat input is focused and a response is being generated |
+| Edit Last Message | `ArrowUp` | The chat input is focused |
+| Toggle Mute | `M` | Voice mode |
 
-**Allow tool call** and **Deny tool call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
+**Allow Tool Call** and **Deny Tool Call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
 
-Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to previous / next chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle Controls** opens and closes the [tabs panel](/features/chat-conversations/chat-features/#tabs-side-panel) on a small screen. They are left unbound so they cannot collide with an existing binding on arrival, pick keys that suit you.
+Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to Previous Chat** and **Navigate to Next Chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle Controls** opens and closes the [tabs panel](/features/chat-conversations/chat-features/#tabs-side-panel) on a small screen. They are left unbound so they cannot collide with an existing binding on arrival, pick keys that suit you.
 
-**Delete chat** follows the [Chat Delete permission](/features/authentication-access/rbac/permissions#3-chat-permissions). If an administrator has taken it away, the shortcut stays bound and listed but does nothing, in step with the delete actions being hidden from the sidebar and the menus. Admins are always exempt.
-
-:::info Changes in this release
-Shortcuts used to be a fixed list shown in a modal. They are now rebindable and live in **Settings > Keyboard**; the separate shortcuts modal is gone.
-
-One default changed: **Delete chat** is now `Cmd+Shift+Backspace` only. It previously also responded to `Delete`.
-:::
+**Delete Chat** follows the [Chat Delete permission](/features/authentication-access/rbac/permissions#3-chat-permissions). If an administrator has taken it away, the shortcut is not listed in **Settings > Keyboard** and does nothing, in step with the delete actions being hidden from the sidebar and the menus. **New Temporary Chat** is likewise not listed without the **Allow Temporary Chat** permission. Admins are always exempt.
 
 ## Chat Input Triggers
 

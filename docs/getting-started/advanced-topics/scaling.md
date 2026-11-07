@@ -92,6 +92,7 @@ Open WebUI uses ordinary Redis commands, so a Redis-protocol server such as [**V
 **Key things to know:**
 
 - Single instances work without Redis, but then **signing out does not revoke the session token**: it stays valid until it expires (default: 4 weeks). Password changes and **Sign out all devices** work without Redis. For production or sensitive data, add Redis or shorten `JWT_EXPIRES_IN`. See [Token Revocation](/getting-started/advanced-topics/hardening#token-revocation).
+- [Tether](/ecosystem/tether) connections need Redis when [`UVICORN_WORKERS`](/reference/env-configuration#uvicorn_workers) is above 1. See its [requirements](/ecosystem/tether#requirements).
 - **Redis Sentinel:** set [`REDIS_SENTINEL_HOSTS`](/reference/env-configuration#redis_sentinel_hosts) and [`WEBSOCKET_SENTINEL_HOSTS`](/reference/env-configuration#websocket_sentinel_hosts) (the websocket manager reads only the second). The host part of `REDIS_URL` is the master's service name. Set `REDIS_SOCKET_CONNECT_TIMEOUT=5` so failover does not hang.
 - **Redis Cluster** (for example AWS ElastiCache in cluster mode): set [`REDIS_CLUSTER=true`](/reference/env-configuration#redis_cluster). The websocket manager follows it.
 - Set the Redis server `timeout` (for example `1800`) and a high enough `maxclients` (10000+) to prevent connection exhaustion.
@@ -138,10 +139,10 @@ UVICORN_WS_PER_MESSAGE_DEFLATE=false
 
 Chat responses stream as one small frame per token, so compressing each frame costs CPU for every subscriber and saves almost nothing. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
 
-Two more WebSocket settings matter at size:
+Two more settings matter at size:
 
-- **Heartbeats.** Each open tab sends a heartbeat every 30 seconds. [`WEBSOCKET_HEARTBEAT_INTERVAL=60`](/reference/env-configuration#websocket_heartbeat_interval) halves that traffic. A disconnected user then stays in the active count longer, since presence lasts four times the interval (at least 120 seconds).
-- **Leftover streams.** A response being streamed is kept in Redis so a reconnecting browser can resume it, and is deleted when it finishes. [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl) (default `3600` seconds) expires entries left behind by replicas killed mid-stream. `0` keeps them forever.
+- **Heartbeats.** [`WEBSOCKET_HEARTBEAT_INTERVAL=60`](/reference/env-configuration#websocket_heartbeat_interval) halves the heartbeat traffic of every open tab (default every 30 seconds). See [WebSocket Heartbeats](/troubleshooting/performance#websocket-heartbeats) for the cost.
+- **Leftover streams.** A streamed response is kept in Redis so a reconnecting browser can resume it, and deleted when it finishes. [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl) (default `3600` seconds) expires entries left by replicas killed mid-stream.
 
 #### Pair It with Static Asset Caching at the Proxy
 

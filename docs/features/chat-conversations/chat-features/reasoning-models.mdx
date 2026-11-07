@@ -124,7 +124,9 @@ During a multi-step tool calling turn, Open WebUI:
 
 Open WebUI stores reasoning separately from the answer, whether the model wrote it as `<think>`-style tags or sent it in a separate field. When a message is replayed, within a tool-call loop or on the next turn, the reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Admin → Connections → OpenAI → Advanced → Provider**, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically). The same rules apply within a turn and across turns. See [Provider Compatibility](#provider-compatibility). With **Stream Chat Response** off, `<think>` tags a model writes inside its reply are stored as reply text, so they go back to the model with it.
 
-Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning is left out there. Pipe functions and filters can add it back in a provider-specific shape.
+Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning text is left out there. Pipe functions and filters can add it back in a provider-specific shape.
+
+Reasoning details that a provider returns in a `reasoning_details` field (as OpenRouter does) are sent back unchanged in that field, within a tool-call loop and on later turns. They are dropped when another model continues the chat.
 
 ### Provider Compatibility
 
@@ -144,7 +146,7 @@ Most Chat Completions APIs reject unknown fields on assistant messages, so reaso
 
 In streaming mode (`stream: true`), Open WebUI processes tokens as they arrive and can detect reasoning blocks in real-time. This generally works well without additional configuration.
 
-Providers that send reasoning metadata alongside the answer rather than before it are handled too: reasoning that arrives after the response has started is folded into the thinking block above the answer instead of appearing beneath it, and metadata carrying no actual reasoning text no longer opens an empty thinking block.
+Providers that send reasoning metadata alongside the answer rather than before it are handled too: reasoning that arrives after the response has started is folded into the thinking block above the answer instead of appearing beneath it. Metadata without reasoning text opens no thinking block.
 
 ### Non-Streaming Mode
 

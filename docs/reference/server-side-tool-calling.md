@@ -43,7 +43,7 @@ Send the key in `x-api-key` instead, or rename the header with [`CUSTOM_API_KEY_
 | `params.function_calling: "legacy"` + `tool_ids` | **Open WebUI**, one round, before the model answers | The **HTTP response body**, normal OpenAI shape | ❌ |
 | Neither of the above | **Nobody**. Raw `tool_calls` are handed back to you | The HTTP response body | ❌ |
 
-The reason is structural, not a setting: the native tool-execution loop lives in the same code path that streams events into a chat, so it only runs when the request identifies a chat (`chat_id`) and an assistant message (`id`), and it only runs for `stream: true`. That path writes the result into the chat instead of the HTTP response.
+The native tool-execution loop lives in the code path that streams events into a chat, so it only runs when the request identifies a chat (`chat_id`) and an assistant message (`id`), and only for `stream: true`. That path writes the result into the chat instead of the HTTP response.
 
 So there are two practical integrations, described below:
 
@@ -87,7 +87,7 @@ Terminals backed by the orchestrator (a connection with `server_type: orchestrat
 
 An automation-initiated request is scoped the same way through `contexts.automation`, keyed on `automation_id` instead.
 
-Connections that are not orchestrator-backed have no `contexts` entry and are always usable, which is the behaviour every earlier release had.
+Connections that are not orchestrator-backed have no `contexts` entry and are always usable.
 
 Practically: read `contexts.chat` before choosing a terminal. If it is `false`, pick another. If it is `{"context_id": "chat_id"}`, you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one.
 
@@ -152,7 +152,7 @@ Response:
 {"status": true, "task_ids": ["..."], "chat_id": "..."}
 ```
 
-That is not the answer. It means the work was accepted and is running server-side.
+This response confirms that the work was accepted and is running server-side.
 
 Field by field:
 
@@ -192,7 +192,7 @@ curl -s -H "Authorization: Bearer $OWUI_KEY" "$OWUI_URL/api/v1/chats/$CHAT_ID" \
 
 ### A5. If you did not want the chat saved
 
-Path A needs a real chat to write into, so the honest answer for "API request and response only" is to delete it when you are done:
+Path A writes into a real chat. For "API request and response only", delete the chat when you are done:
 
 ```bash
 curl -s -X DELETE -H "Authorization: Bearer $OWUI_KEY" "$OWUI_URL/api/v1/chats/$CHAT_ID"
@@ -235,7 +235,7 @@ Limits, in exchange for the simplicity:
 - **One round of tool calls.** The model cannot look at a result and decide to call something else.
 - **No built-in tools.** No web search, no code interpreter, no knowledge browsing, no terminal-driven agentic work.
 - **No chat-scoped terminals.** A request in this mode carries no `chat_id`, so an orchestrator terminal configured with `contexts.chat.context_id = "chat_id"` cannot be used. Shared terminals work normally.
-- Legacy mode is **deprecated** and depends on a task model that reliably emits JSON. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+- Legacy mode is **unsupported** and depends on a task model that reliably emits JSON. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 ---
 
@@ -441,7 +441,7 @@ To adapt it:
 | `stream: true` was sent but nothing streamed | The workspace model's **Stream Chat Response** parameter overrides the request | Clear it on the model, or accept the model's setting |
 | Web search, code interpreter, memory or image generation never offered | Missing `session_id`, missing `features` flag, missing user permission, disabled globally, or the model's **Builtin Tools** category is off | All five must line up. Check them in that order |
 | `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Admin > Code Execution**, or drop `code_interpreter` from `features` |
-| File tools (`view_file`, `grep_chat_files`, ...) missing | They need `files` in the request body, the model's **File Upload** capability on, and **Preload files** off | See [Prompt Caching and Context Optimization](/features/chat-conversations/prompt-caching) |
+| File tools (`view_file`, `grep_chat_files`, ...) missing | They need `files` in the request body, a `session_id`, the model's **File Upload** capability on, and **Preload files** off. API requests treat Preload files as on unless the model saves it as off | See [Prompt Caching and Context Optimization](/features/chat-conversations/prompt-caching) |
 | `503 Terminal unavailable` | The terminal server is unreachable, disabled, or your user has no access grant | Confirm the ID appears in `GET /api/v1/terminals/` for that key |
 | `503`, terminal not available for chat | The terminal's `contexts.chat` is `false`, so an administrator has taken it out of chats | Pick a terminal whose `contexts.chat` is not `false` |
 | `503`, terminal requires a saved chat context | The terminal is scoped with `contexts.chat.context_id = "chat_id"` and the request had no saved `chat_id` | Use Path A with a saved chat, or pick a shared terminal |

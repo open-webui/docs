@@ -3,7 +3,7 @@ pip install open-webui
 open-webui serve
 ```
 
-Open WebUI is now on [http://localhost:8080](http://localhost:8080). Set `DATA_DIR` to choose where your data lives, for example `DATA_DIR=~/.open-webui open-webui serve`. Use `--host` and `--port` to change the bind address, for example `open-webui serve --port 3000`.
+Open WebUI runs at [http://localhost:8080](http://localhost:8080). Set `DATA_DIR` to choose where your data lives, for example `DATA_DIR=~/.open-webui open-webui serve`. Use `--host` and `--port` to change the bind address, for example `open-webui serve --port 3000`.
 
 The command signs sessions with a key it writes to `.webui_secret_key` in the directory you start it from. Set `WEBUI_SECRET_KEY` in the environment, or always start from the same directory; a new key signs everyone out.
 

@@ -21,7 +21,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 [Open Terminal](/features/open-terminal) is the action layer that completes Open WebUI's harness. Open WebUI already has the model, chat, prompts, knowledge, tools, MCP connections, memory, users, permissions, automations, and workflow controls. Open Terminal adds the computer substrate: files, shell, package manager, running processes, document and data handling, generated artifacts, and live previews.
 
-It is named after the terminal, but the point is broader than a shell panel. It gives the model a stateful workspace where it can create, run, inspect, repair, and hand back something usable.
+It gives the model a stateful workspace where it can create, run, inspect, repair, and hand back something usable.
 
 Use it when a chat needs more than a text answer: analyze a spreadsheet, write a script, build a small app, render a report, inspect logs, run tests, organize files, or start a server and preview the result. Open WebUI stays the interface; Open Terminal gives the agent a workspace where those results can actually be produced.
 
@@ -59,6 +59,7 @@ If you have heard people talk about agent harnesses, agentic workflows, tool use
 | Work on software projects | [Software development](/features/open-terminal/use-cases/software-development) |
 | Analyze documents and data | [Document and data analysis](/features/open-terminal/use-cases/file-analysis) |
 | Build and preview web apps | [Web development](/features/open-terminal/use-cases/web-development) |
+| Use Claude Code, Codex or Pi as chat models | [Coding agents](/features/open-terminal/coding-agents) |
 | Automate folders and system tasks | [System automation](/features/open-terminal/use-cases/system-automation) |
 | See more complete workflows | [Advanced workflows](/features/open-terminal/use-cases/advanced-workflows) |
 

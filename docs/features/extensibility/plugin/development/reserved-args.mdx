@@ -156,7 +156,7 @@ A `dict` with wide ranging information about the chat, model, files, etc.
     "function_calling": "native",
     "tool_approval_mode": "full"
     # "full" unless tool permissions are enabled and the request chose otherwise.
-    # Always "full" for automations and channel messages.
+    # Always "full" for channel messages. Automations send no choice, so they get "auto" when Auto is offered.
   },
   "tools": "[the same dict as __tools__, present once tools have been loaded]",
   "task": "[the task name for internal task calls, see __task__ below]",
