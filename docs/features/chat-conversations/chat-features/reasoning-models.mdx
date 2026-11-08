@@ -133,7 +133,7 @@ Reasoning details that a provider returns in a `reasoning_details` field (as Ope
 | Provider | Reasoning on replay |
 | :--- | :--- |
 | Ollama | Sent back in the `thinking` field |
-| llama.cpp (*Provider* `llama.cpp`) | Sent back as `reasoning_content` |
+| llama.cpp (*Provider* `llama.cpp`) | Sent back as `reasoning_content`. DeepSeek thinking mode needs this setting, because DeepSeek rejects a tool call turn that has none |
 | OpenAI Responses API | Stored reasoning items sent back. With `ENABLE_RESPONSES_API_STATEFUL` on, `previous_response_id` carries the state |
 | OpenAI / Azure / Vertex AI (Chat Completions, *Provider* `Default`) | Left out (use a pipe or filter to add it back) |
 | Anthropic (extended thinking) | Not supported natively; use a [pipe function](/features/extensibility/plugin/functions/pipe) |

@@ -5,9 +5,9 @@ title: "Coding Agents"
 
 # Coding Agents
 
-When the selected Open Terminal lists coding agents, they show up in the model picker next to your regular models. Pick one and the agent works in the terminal's workspace, using the files and tools of that environment. Claude Code, Codex and Pi are examples.
+When the selected Open Terminal lists coding agents, they show up in the model picker next to your regular models. Pick one and the agent works in the terminal's workspace, using the files and tools of that environment. Open WebUI runs Claude Code, Codex, Cursor, Grok, OpenCode, Cline, Gemini CLI and Pi.
 
-Which agents and models appear depends on the Open Terminal you select. Agents the terminal reports as unavailable are not listed.
+Which agents and models appear depends on the Open Terminal you select. Agents the terminal reports as unavailable are not listed. Agent models are offered in the chat model picker, in a folder's **Default Model** and in the [automation editor](/features/chat-conversations/chat-features/automations#giving-a-run-a-terminal).
 
 ## Picking an Agent
 

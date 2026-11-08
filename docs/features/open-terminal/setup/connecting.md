@@ -77,7 +77,7 @@ In the chat input area, click the **terminal button** (cloud icon). Your admin-c
 
 ![Terminal dropdown showing Open Terminal under System](/images/open-terminal-chat-dropdown.png)
 
-The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it.
+The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another terminal at any time except while a reply is generating.
 
 Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a [Per chat](/features/open-terminal/terminals/orchestration/contexts) terminal the button appears once the chat is saved.
 

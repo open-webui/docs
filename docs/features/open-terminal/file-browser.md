@@ -216,7 +216,7 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Working directory
 
-With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder a new chat starts in. You choose it before the first message; after that the button shows the chat's folder. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in.
+With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in.
 
 **Recently Used** lists your last eight folders on that terminal. They are stored as files on the terminal, under `.open-webui/users/<user id>/folders` in its home folder, so they follow you to other browsers. Anyone who can read that home folder can see them.
 
@@ -248,7 +248,7 @@ When the AI creates or changes files, the file browser refreshes automatically. 
 :::
 
 :::tip Remembers where you were
-The file browser remembers which folder you were in, even when you switch between chats or terminals.
+The file browser remembers which folder you were in when you switch between chats. Picking another terminal moves the Files tab to that terminal's working folder.
 :::
 
 :::tip Live updates
