@@ -17,12 +17,12 @@ When you [connect a provider](/getting-started/quick-start/connect-a-provider/st
 
 When you connect an **agent**, you're connecting to an autonomous system that can:
 
-- 🖥️ **Run terminal commands** on your machine
-- 📁 **Read and write files** in your workspace
-- 🔍 **Search the web** for real-time information
-- 🧠 **Maintain memory** across conversations
-- 🧩 **Use skills and plugins** to extend its capabilities
-- 🔗 **Chain multiple tool calls** to solve complex tasks
+- **Run terminal commands** on your machine
+- **Read and write files** in your workspace
+- **Search the web** for real-time information
+- **Maintain memory** across conversations
+- **Use skills and plugins** to extend its capabilities
+- **Chain multiple tool calls** to solve complex tasks
 
 The agent decides when and how to use these tools based on your message, and Open WebUI displays the results in a familiar chat interface.
 

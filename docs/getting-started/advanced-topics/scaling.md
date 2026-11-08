@@ -97,9 +97,9 @@ Open WebUI uses ordinary Redis commands, so a Redis-protocol server such as [**V
 - Set the Redis server `timeout` (for example `1800`) and a high enough `maxclients` (10000+) to prevent connection exhaustion.
 - For heavy streaming, raise Redis's Pub/Sub output buffer limits; see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
 - All instances must use the same [`WEBSOCKET_REDIS_ROOM_CHANNELS`](/reference/env-configuration#websocket_redis_room_channels) value. See [Per-Room Redis Channels](#per-room-redis-channels).
-- A **single Redis instance** is enough for the vast majority of deployments, even with thousands of users. Before reaching for Redis Cluster, check for fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#%EF%B8%8F-common-anti-patterns)).
+- A **single Redis instance** is enough for the vast majority of deployments, even with thousands of users. Before reaching for Redis Cluster, check for fixable configuration issues (see [Common Anti-Patterns](/troubleshooting/performance#common-anti-patterns)).
 
-For a full Redis setup (Docker Compose, Sentinel, Cluster, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
+For a full Redis setup (Docker Compose, Sentinel, Cluster, verification), see the [Redis WebSocket Support](/tutorials/integrations/redis) tutorial. For WebSocket and CORS issues behind reverse proxies, see [Connection Errors](/troubleshooting/connection-error#https-tls-cors--websocket-issues).
 
 ---
 

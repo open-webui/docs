@@ -60,14 +60,14 @@ The daemon doubles as an [OpenAPI tool server](/ecosystem/knowledge-base-sync/da
 
 | | |
 | :--- | :--- |
-| ⚡ **Incremental sync** | SHA-256 diffing uploads only new and modified files; deletions are removed, unchanged files left untouched |
-| 🌐 **44 connectors** | Local folders, Git, cloud storage, wikis, ticketing, chat, CRM, plus a web crawler |
-| ⏱️ **Scheduled & webhook sync** | Run on an interval, a cron or the moment someone pushes (via the daemon) |
-| 👀 **Watch mode** | Auto-sync a local folder on every save |
-| 🎯 **Selective sync** | Include/exclude globs, size caps and split one source across multiple Knowledge Bases |
-| 🤖 **Model-triggerable** | The daemon is an OpenAPI tool server, so a model can start and check syncs from chat |
-| 🔑 **Uses your access** | Authenticates as your user and never bypasses Knowledge Base access control |
-| 📊 **Production-ready** | Prometheus metrics, structured JSON logs, sync history and failure notifications |
+| **Incremental sync** | SHA-256 diffing uploads only new and modified files; deletions are removed, unchanged files left untouched |
+| **44 connectors** | Local folders, Git, cloud storage, wikis, ticketing, chat, CRM, plus a web crawler |
+| **Scheduled & webhook sync** | Run on an interval, a cron or the moment someone pushes (via the daemon) |
+| **Watch mode** | Auto-sync a local folder on every save |
+| **Selective sync** | Include/exclude globs, size caps and split one source across multiple Knowledge Bases |
+| **Model-triggerable** | The daemon is an OpenAPI tool server, so a model can start and check syncs from chat |
+| **Uses your access** | Authenticates as your user and never bypasses Knowledge Base access control |
+| **Production-ready** | Prometheus metrics, structured JSON logs, sync history and failure notifications |
 
 ---
 

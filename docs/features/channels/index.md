@@ -49,15 +49,15 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 
 | | |
 | :--- | :--- |
-| 🤖 **`@model` tagging** | Summon any AI model into the conversation on demand |
-| 👥 **Shared context** | Every message, human or AI, builds the collective knowledge |
-| 🧵 **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
-| 📎 **File sharing** | Drop images, documents, and code. AI can see and process them |
-| 📝 **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed and go out in order |
-| 🔒 **Access control** | Public, private, group-based, and direct message channels |
-| 🧠 **AI channel awareness** | Models can search and synthesize across channels autonomously |
-| 🧩 **[Apps](/features/channels/apps)** | External services join channels, answer `@mentions` and post messages with buttons |
-| 🔐 **[Encrypted chats](/features/channels/encrypted-chats)** | Temporary end-to-end encrypted conversations in direct messages and private groups, never saved on the server |
+| **`@model` tagging** | Summon any AI model into the conversation on demand |
+| **Shared context** | Every message, human or AI, builds the collective knowledge |
+| **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
+| **File sharing** | Drop images, documents, and code. AI can see and process them |
+| **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed and go out in order |
+| **Access control** | Public, private, group-based, and direct message channels |
+| **AI channel awareness** | Models can search and synthesize across channels autonomously |
+| **[Apps](/features/channels/apps)** | External services join channels, answer `@mentions` and post messages with buttons |
+| **[Encrypted chats](/features/channels/encrypted-chats)** | Temporary end-to-end encrypted conversations in direct messages and private groups, never saved on the server |
 
 ---
 

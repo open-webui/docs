@@ -95,8 +95,8 @@ Simple durations accept `s`, `m`, `h`, `d`. Both styles can be mixed across entr
 | `GET /health` | public | Sync status for every source: last run, duration, file counts, errors. |
 | `GET /health/ready` | public | Liveness probe for Docker/Kubernetes. |
 | `GET /metrics` | public | Prometheus metrics. |
-| `GET /history` | 🔒 | Sync history, filterable by `kb_id` and `errors_only`. |
-| `POST /sync/{name-or-kb-id}` | 🔒 | Trigger an immediate sync. Add `?dry_run=true` to preview only. |
+| `GET /history` | authenticated | Sync history, filterable by `kb_id` and `errors_only`. |
+| `POST /sync/{name-or-kb-id}` | authenticated | Trigger an immediate sync. Add `?dry_run=true` to preview only. |
 | `POST /webhooks/github` · `/gitlab` · `/slack` · `/confluence` | signature | Real-time sync on push (see [Webhooks](#webhooks)). |
 
 A triggered sync runs in the background and returns immediately; poll `/health` for progress. A `dry_run=true` trigger runs synchronously and returns the added/modified/deleted counts.

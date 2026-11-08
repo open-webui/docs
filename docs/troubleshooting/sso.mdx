@@ -27,7 +27,7 @@ This is the **most common cause** of OAuth breakage. A misspelled, omitted, or i
 
 **Common Environment Variable Mistakes:**
 
-#### ❌ Non-Existent Variables People Often Use:
+#### Non-Existent Variables People Often Use:
 - `OIDC_CONFIG` → Use `OPENID_PROVIDER_URL` instead
 - `WEBUI_OIDC_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
 - `WEBUI_ENABLE_SSO` → OAuth is on by default through `ENABLE_OAUTH`. `ENABLE_OAUTH_SIGNUP` is only needed to let SSO create new accounts
@@ -35,7 +35,7 @@ This is the **most common cause** of OAuth breakage. A misspelled, omitted, or i
 - `OPENID_CLIENT_ID` → Use `OAUTH_CLIENT_ID` instead
 - `OPENID_CLIENT_SECRET` → Use `OAUTH_CLIENT_SECRET` instead
 
-#### ✅ Correct OIDC Variables:
+#### Correct OIDC Variables:
 ```bash
 
 # Required for OIDC
@@ -56,13 +56,13 @@ OPENID_REDIRECT_URI=https://your-domain/oauth/oidc/callback
 OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com"}
 ```
 
-#### ✅ Google-specific optional authorize params:
+#### Google-specific optional authorize params:
 ```bash
 # Optional: extra Google /authorize params as JSON
 GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
 ```
 
-#### ✅ Correct Microsoft Variables:
+#### Correct Microsoft Variables:
 ```bash
 
 # Use these for Microsoft Entra ID
@@ -99,11 +99,11 @@ Most OAuth errors (loops, 401s, unresponsiveness) are due to an environment vari
 **Kubernetes/YAML users:** Watch out for **trailing spaces in environment variable names!** In YAML, quoting a key like `'OAUTH_CLIENT_ID '` (with a trailing space inside the quotes) will set a variable named `OAUTH_CLIENT_ID ` (with a space at the end), which Open WebUI will **not** recognize. Always ensure your env var names have no trailing whitespace:
 
 ```yaml
-# ❌ Wrong — trailing space inside quotes:
+# Wrong — trailing space inside quotes:
 - name: 'OAUTH_CLIENT_ID '
   value: your_client_id
 
-# ✅ Correct — no trailing space:
+# Correct — no trailing space:
 - name: OAUTH_CLIENT_ID
   value: your_client_id
 ```
@@ -117,17 +117,17 @@ Most OAuth errors (loops, 401s, unresponsiveness) are due to an environment vari
 #### OPENID_PROVIDER_URL is Mandatory for OIDC
 Many users forget this critical variable. Without it, OIDC authentication cannot work.
 
-✅ **For Microsoft Entra ID:**
+**For Microsoft Entra ID:**
 ```bash
 OPENID_PROVIDER_URL=https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0/.well-known/openid-configuration
 ```
 
-✅ **For Google:**
+**For Google:**
 ```bash
 OPENID_PROVIDER_URL=https://accounts.google.com/.well-known/openid-configuration
 ```
 
-✅ **For Authentik:**
+**For Authentik:**
 ```bash
 OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.well-known/openid-configuration
 ```
@@ -163,7 +163,7 @@ By default, OAuth env vars **will** take priority over database values because `
 
 While it is `false` the OAuth section of the Admin Panel is read-only, so an edit cannot look like it worked and then vanish on the next restart. See [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config).
 
-📌 **Example for Docker Compose:**
+**Example for Docker Compose:**
 ```yaml
 environment:
   - ENABLE_OAUTH_PERSISTENT_CONFIG=false  # Forces reading from env vars (this is the default)
@@ -187,11 +187,11 @@ Sometimes the issue is with the identity provider (e.g., Google, Okta, Auth0, Az
   - Scopes and allowed grant types (e.g., `authorization_code`) are set as required by Open WebUI
 - Check the provider's logs: misconfigured apps will often show clear error messages there
 
-📌 **Redirect URI Format Examples:**
+**Redirect URI Format Examples:**
 ```
-✅ Correct: https://ai.company.com/oauth/oidc/callback
-❌ Wrong: https://ai.company.com/oauth/callback/oidc
-❌ Wrong: https://ai.company.com/callback
+Correct: https://ai.company.com/oauth/oidc/callback
+Wrong: https://ai.company.com/oauth/callback/oidc
+Wrong: https://ai.company.com/callback
 ```
 
 :::tip
@@ -255,11 +255,11 @@ Never cache OAuth or login endpoints. Caching can deliver stale tokens or corrup
 
 # Remove or adjust problematic cookie settings
 
-# ❌ Problematic:
+# Problematic:
 
 # proxy_cookie_path / "/; Secure; HttpOnly; SameSite=None";
 
-# ✅ Better:
+# Better:
 proxy_cookie_flags ~ secure samesite=lax;
 
 # or remove cookie manipulation entirely
@@ -352,7 +352,7 @@ WEBSOCKET_MANAGER=redis
 
 **Problem:** Using generic OIDC variables instead of Microsoft-specific ones.
 
-✅ **Correct Microsoft Setup:**
+**Correct Microsoft Setup:**
 ```bash
 
 # Use Microsoft-specific variables, not generic OIDC
@@ -371,7 +371,7 @@ ENABLE_OAUTH_SIGNUP=true
 
 **Problem:** Incorrect provider URL format.
 
-✅ **Correct Authentik Setup:**
+**Correct Authentik Setup:**
 ```bash
 OAUTH_CLIENT_ID=your_authentik_client_id
 OAUTH_CLIENT_SECRET=your_authentik_client_secret
@@ -477,21 +477,21 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 
 ---
 
-## Summary Checklist ✅
+## Summary Checklist
 
 | Problem | Fix |
 |-------------------------------|------------------------------------------------------------|
-| 🔗 WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
-| 📝 Env var typo or missing    | Double-check against official docs; avoid non-existent vars like `OIDC_CONFIG` |
-| 🚨 Missing OPENID_PROVIDER_URL | Always required for OIDC; set to provider's `.well-known/openid-configuration` |
-| 🔄 Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` for env vars, or `true` to use the admin panel (it is read-only while `false`) |
-| 🏢 Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
-| 🧊 Proxy caching interfering  | Exclude OAuth endpoints from all server-side caches         |
-| 🍪 Cookie configuration issues | Check reverse proxy cookie settings and env vars          |
-| ⏱️ Timeout problems          | Increase `AIOHTTP_CLIENT_TIMEOUT` values                    |
-| 🔐 CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
-| 🔀 Multi-instance problems    | Configure Redis and shared secrets                          |
-| 🧬 SSO accounts locked out right after a long-delayed upgrade | Update Open WebUI; a repair migration fixes the stored identity data on startup |
+| WebUI URL missing or wrong | Set correct WebUI URL in admin panel                        |
+| Env var typo or missing    | Double-check against official docs; avoid non-existent vars like `OIDC_CONFIG` |
+| Missing OPENID_PROVIDER_URL | Always required for OIDC; set to provider's `.well-known/openid-configuration` |
+| Persistent config conflicts | Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` for env vars, or `true` to use the admin panel (it is read-only while `false`) |
+| Provider misconfigured     | Confirm app registration, URIs & client IDs/secrets         |
+| Proxy caching interfering  | Exclude OAuth endpoints from all server-side caches         |
+| Cookie configuration issues | Check reverse proxy cookie settings and env vars          |
+| Timeout problems          | Increase `AIOHTTP_CLIENT_TIMEOUT` values                    |
+| CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
+| Multi-instance problems    | Configure Redis and shared secrets                          |
+| SSO accounts locked out right after a long-delayed upgrade | Update Open WebUI; a repair migration fixes the stored identity data on startup |
 | Still stuck? | Check debug logs, test without proxy, verify provider setup |
 
 ---

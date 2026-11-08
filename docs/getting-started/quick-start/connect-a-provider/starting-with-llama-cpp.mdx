@@ -21,8 +21,8 @@ To run models with Llama.cpp, you first need the Llama.cpp server installed loca
 
 You can either:
 
-- 📦 [Download prebuilt binaries](https://github.com/ggerganov/llama.cpp/releases)
-- 🛠️ Or build it from source by following the [official build instructions](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md)
+- [Download prebuilt binaries](https://github.com/ggerganov/llama.cpp/releases)
+- Or build it from source by following the [official build instructions](https://github.com/ggerganov/llama.cpp/blob/master/docs/build.md)
 
 After installing, make sure `llama-server` is available in your local system path or take note of its location.
 
@@ -59,7 +59,7 @@ DeepSeek-R1-GGUF/
     └── DeepSeek-R1-UD-IQ1_S-00003-of-00003.gguf
 ```
 
-📍 Keep track of the full path to the first GGUF file. You’ll need it in Step 3.
+Keep track of the full path to the first GGUF file. You’ll need it in Step 3.
 
 ---
 
@@ -75,7 +75,7 @@ Start the model server using the llama-server binary. Navigate to your llama.cpp
   --n-gpu-layers 40
 ```
 
-🛠️ Tweak the parameters to suit your machine:
+Tweak the parameters to suit your machine:
 
 - --model: Path to your .gguf model file
 - --port: 10000 (or choose another open port)
@@ -99,15 +99,15 @@ Open WebUI also supports the experimental [Open Responses](/getting-started/quic
 To control and query your locally running model directly from Open WebUI:
 
 1. Open Open WebUI in your browser
-2. Go to ⚙️ **Settings → Admin → Connections → OpenAI**.
-3. Click ➕ **Add Connection**.
+2. Go to **Settings → Admin → Connections → OpenAI**.
+3. Click **Add Connection**.
 4. Set the following:
    - **URL**: `http://127.0.0.1:10000/v1`
      (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker. **Note the `/v1` at the end!**)
    - **Auth**: **None** for a keyless server. With **Bearer** and an empty key, Open WebUI sends an empty bearer token, which some servers reject
    - **Provider**: expand **Advanced** and pick `llama.cpp` from the **Provider** dropdown. This unlocks the loaded-model indicator and the admin **Eject** button in the model selector, plus the admin model management panel described in [Managing Local Models from Open WebUI](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#managing-local-models-from-open-webui). See [Unloading Loaded Models](#unloading-loaded-models) below. Leave at `Default` if you do not need those features.
 
-💡 Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
+Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
 
 :::tip Connection Timeout Configuration
 
@@ -118,7 +118,7 @@ If your Llama.cpp server is slow to initialize or you see timeout errors, you ca
 AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
 ```
 
-If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
 
 :::
 
@@ -154,4 +154,4 @@ Once configured, Open WebUI makes it easy to:
 
 ---
 
-🚀 Have fun experimenting and building!
+Have fun experimenting and building!

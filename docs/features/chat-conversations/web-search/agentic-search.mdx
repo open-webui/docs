@@ -52,7 +52,7 @@ Legacy Mode's RAG-style injection behavior is documented here only for legacy de
 :::
 
 ## How Native Tools Handle Data (Agentic Mode)
-🔗 It is important to understand that Native Mode (Agentic Mode) works fundamentally differently from the global "Web Search" toggle found in standard models.
+It is important to understand that Native Mode (Agentic Mode) works fundamentally differently from the global "Web Search" toggle found in standard models.
 
 ### `search_web` (Snippets only)
 When the model invokes `search_web`:
@@ -80,7 +80,7 @@ If the model determines that a search snippet is insufficient, it will call `fet
 By keeping `search_web` and `fetch_url` separate and RAG-free, the model acts as its own **Information Retrieval** agent, choosing exactly which sources are worth reading in full.
 :::
 
-## Deep Research & Interleaved Thinking 🧠
+## Deep Research & Interleaved Thinking
 
 Because the model can call `search_web` multiple times and decide autonomously when to dive deeper, it can perform genuine "Deep Research" using **Interleaved Thinking**. This creates a powerful research loop where the model acts as its own research assistant.
 
@@ -89,44 +89,44 @@ Because the model can call `search_web` multiple times and decide autonomously w
 Interleaved Thinking is the ability for models to alternate between **reasoning** and **action** in a continuous cycle. Instead of searching once and answering, the model can:
 
 <details>
-<summary>📖 Detailed Research Cycle Example</summary>
+<summary>Detailed Research Cycle Example</summary>
 
 **User asks:** "What are the latest security vulnerabilities in the React ecosystem?"
 
-**Step 1: Initial Analysis 🤔**
+**Step 1: Initial Analysis**
 - Model thinks: "I need current information about React security. Let me start with a broad search."
 
-**Step 2: First Search 🔍**
+**Step 2: First Search**
 ```
 Model calls: search_web("React security vulnerabilities 2026")
 ```
 - Receives snippets based on the admin-configured `WEB_SEARCH_RESULT_COUNT` (or a smaller model-provided `count`)
 - Sees references to npm packages and CVE databases
 
-**Step 3: Gap Analysis 🤔**
+**Step 3: Gap Analysis**
 - Model thinks: "The snippets mention CVEs but don't have enough detail. I should fetch a specific security advisory page."
 
-**Step 4: Targeted Fetch 📄**
+**Step 4: Targeted Fetch**
 ```
 Model calls: fetch_url("https://example.com/react-security-advisory-2026")
 ```
 - Reads the full text of the security advisory
 - Identifies specific vulnerability types (XSS, injection, etc.)
 
-**Step 5: Refinement 🤔**
+**Step 5: Refinement**
 - Model thinks: "I found server-side vulnerabilities. Let me search specifically for client-side issues."
 
-**Step 6: Refined Search 🔍**
+**Step 6: Refined Search**
 ```
 Model calls: search_web("React client-side XSS CVE 2026")
 ```
 - Gets more specific results about cross-site scripting issues
 - Identifies mitigation strategies
 
-**Step 7: Synthesis 🤔**
+**Step 7: Synthesis**
 - Model thinks: "I now have comprehensive information from multiple authoritative sources. Time to synthesize."
 
-**Step 8: Final Answer ✅**
+**Step 8: Final Answer**
 - Provides detailed, grounded response citing multiple sources
 - Includes specific CVE numbers, affected versions, and mitigation steps
 
@@ -136,28 +136,28 @@ Model calls: search_web("React client-side XSS CVE 2026")
 
 The model continuously cycles through these phases until it has sufficient information:
 
-1. **🤔 THINK**: Analyze current knowledge gaps and determine what information is missing
-2. **🔍 ACT**: Search the web or fetch specific URLs to gather relevant content
-3. **📊 EVALUATE**: Assess the quality and completeness of the information retrieved
-4. **❓ DECIDE**: Determine if more research is needed or if enough context has been gathered
-5. **🔄 ITERATE**: If gaps remain, return to step 1 with refined focus and more specific queries
-6. **✅ SYNTHESIZE**: Once sufficient information is gathered, compile and present the final answer
+1. **THINK**: Analyze current knowledge gaps and determine what information is missing
+2. **ACT**: Search the web or fetch specific URLs to gather relevant content
+3. **EVALUATE**: Assess the quality and completeness of the information retrieved
+4. **DECIDE**: Determine if more research is needed or if enough context has been gathered
+5. **ITERATE**: If gaps remain, return to step 1 with refined focus and more specific queries
+6. **SYNTHESIZE**: Once sufficient information is gathered, compile and present the final answer
 
 This cycle repeats autonomously until the model has comprehensive, verified information to answer your question with high confidence.
 
 ### Key Advantages
 
-**🎯 Adaptive Precision**: The model doesn't just search once and accept whatever results appear. Instead, it continuously refines its search strategy based on what it discovers. If initial broad searches return surface-level information, the model automatically pivots to more specific technical terms, product names, version numbers, or specialized terminology. Each iteration becomes progressively more targeted, drilling down from general concepts to specific details, ensuring the final answer is both comprehensive and precise.
+**Adaptive Precision**: The model doesn't just search once and accept whatever results appear. Instead, it continuously refines its search strategy based on what it discovers. If initial broad searches return surface-level information, the model automatically pivots to more specific technical terms, product names, version numbers, or specialized terminology. Each iteration becomes progressively more targeted, drilling down from general concepts to specific details, ensuring the final answer is both comprehensive and precise.
 
-**🔗 Deep Link Following & Discovery**: Unlike traditional RAG systems that only use search result snippets, the model can read full pages when snippets aren't sufficient. Even more powerfully, **when the model uses `fetch_url` to read a page, it can discover and follow new URLs mentioned within that content**. For example, if a fetched page references a technical specification document, an official changelog, or a related research paper, the model can autonomously call `fetch_url` again on those discovered URLs to dive even deeper. This creates a natural "web browsing" behavior where the model follows citation chains, explores linked resources, and builds a comprehensive understanding by reading multiple interconnected sources, just like a human researcher would.
+**Deep Link Following & Discovery**: Unlike traditional RAG systems that only use search result snippets, the model can read full pages when snippets aren't sufficient. Even more powerfully, **when the model uses `fetch_url` to read a page, it can discover and follow new URLs mentioned within that content**. For example, if a fetched page references a technical specification document, an official changelog, or a related research paper, the model can autonomously call `fetch_url` again on those discovered URLs to dive even deeper. This creates a natural "web browsing" behavior where the model follows citation chains, explores linked resources, and builds a comprehensive understanding by reading multiple interconnected sources, just like a human researcher would.
 
-**✅ Fact Verification & Cross-Referencing**: The model can autonomously verify information by cross-referencing multiple independent sources. If one source makes a claim, the model can search for corroborating evidence from authoritative sources, compare version numbers across official documentation, or validate facts against primary sources. This multi-source verification significantly reduces hallucination and increases answer reliability, as the model builds confidence by finding consistent information across diverse, credible sources.
+**Fact Verification & Cross-Referencing**: The model can autonomously verify information by cross-referencing multiple independent sources. If one source makes a claim, the model can search for corroborating evidence from authoritative sources, compare version numbers across official documentation, or validate facts against primary sources. This multi-source verification significantly reduces hallucination and increases answer reliability, as the model builds confidence by finding consistent information across diverse, credible sources.
 
-**🧩 Intelligent Gap Filling**: If initial search results miss key information or only partially address the question, the model identifies these gaps and automatically conducts follow-up searches with different terms, alternative phrasings, or more specific queries. For example, if searching for "React performance issues" doesn't yield information about a specific optimization technique, the model might refine its search to "React useMemo optimization" or "React.memo vs useMemo comparison" to fill the knowledge gap. This ensures comprehensive coverage of complex topics that might require multiple search angles.
+**Intelligent Gap Filling**: If initial search results miss key information or only partially address the question, the model identifies these gaps and automatically conducts follow-up searches with different terms, alternative phrasings, or more specific queries. For example, if searching for "React performance issues" doesn't yield information about a specific optimization technique, the model might refine its search to "React useMemo optimization" or "React.memo vs useMemo comparison" to fill the knowledge gap. This ensures comprehensive coverage of complex topics that might require multiple search angles.
 
-**🌐 Multi-Source Synthesis**: The model doesn't just return information from a single source. It synthesizes insights from multiple web pages, documentation sites, forums, and articles into a coherent, well-rounded answer. This synthesis provides broader context, acknowledges different perspectives, and presents a more complete picture than any single source could provide.
+**Multi-Source Synthesis**: The model doesn't just return information from a single source. It synthesizes insights from multiple web pages, documentation sites, forums, and articles into a coherent, well-rounded answer. This synthesis provides broader context, acknowledges different perspectives, and presents a more complete picture than any single source could provide.
 
-**📚 Context-Aware Source Selection**: The model intelligently decides whether to rely on search snippets (when they contain sufficient information) or to fetch full pages (when deeper detail is needed). It can also determine when to stop researching, avoiding unnecessary tool calls while ensuring thoroughness. This balance between efficiency and comprehensiveness makes agentic search both fast and reliable.
+**Context-Aware Source Selection**: The model intelligently decides whether to rely on search snippets (when they contain sufficient information) or to fetch full pages (when deeper detail is needed). It can also determine when to stop researching, avoiding unnecessary tool calls while ensuring thoroughness. This balance between efficiency and comprehensiveness makes agentic search both fast and reliable.
 
 This iterative loop of **Thought → Action → Thought** continues until the model has sufficient information to answer your request with maximum accuracy.
 

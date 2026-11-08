@@ -55,15 +55,15 @@ Organize events across multiple calendars (e.g., "Personal", "Team Meetings", "O
 
 | | |
 | :--- | :--- |
-| 📅 **Month/Week/Day views** | Full calendar UI with month, week, and day views |
-| 🔁 **Recurring events** | RRULE-based recurrence (daily, weekly, monthly, custom) |
-| 🤖 **Agentic management** | Models can search, create, update, and delete events autonomously |
-| ⚡ **Automation overlay** | Active automations and past runs surface as virtual calendar events |
-| 👥 **Calendar sharing** | Share calendars with users or groups via access grants |
-| 📍 **Location & description** | Attach locations and rich descriptions to events |
-| 🎨 **Color coding** | Per-calendar and per-event color customization |
-| ✅ **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status |
-| 🔔 **Reminders** | Per-event alerts via toast, browser notification, and webhook |
+| **Month/Week/Day views** | Full calendar UI with month, week, and day views |
+| **Recurring events** | RRULE-based recurrence (daily, weekly, monthly, custom) |
+| **Agentic management** | Models can search, create, update, and delete events autonomously |
+| **Automation overlay** | Active automations and past runs surface as virtual calendar events |
+| **Calendar sharing** | Share calendars with users or groups via access grants |
+| **Location & description** | Attach locations and rich descriptions to events |
+| **Color coding** | Per-calendar and per-event color customization |
+| **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status |
+| **Reminders** | Per-event alerts via toast, browser notification, and webhook |
 
 ---
 

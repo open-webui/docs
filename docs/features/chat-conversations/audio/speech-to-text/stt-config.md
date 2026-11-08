@@ -17,12 +17,12 @@ The following speech-to-text providers are supported:
 
 | Service | API Key Required | Guide |
 |---------|------------------|-------|
-| Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/chat-conversations/audio/speech-to-text/env-variables) |
-| OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/chat-conversations/audio/speech-to-text/openai-stt-integration) |
-| Self-hosted (OpenAI-compatible) | ✅ | [Self-Hosted STT Guide](/features/chat-conversations/audio/speech-to-text/self-hosted-stt) (uses an authenticated server) |
-| Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
-| Deepgram | ✅ | N/A |
-| Azure | ✅ | [Azure AI Speech STT Guide](/features/chat-conversations/audio/speech-to-text/azure-stt-integration) |
+| Local Whisper (default) | No | Built-in, see [Environment Variables](/features/chat-conversations/audio/speech-to-text/env-variables) |
+| OpenAI (Whisper API) | Yes | [OpenAI STT Guide](/features/chat-conversations/audio/speech-to-text/openai-stt-integration) |
+| Self-hosted (OpenAI-compatible) | Yes | [Self-Hosted STT Guide](/features/chat-conversations/audio/speech-to-text/self-hosted-stt) (uses an authenticated server) |
+| Mistral (Voxtral) | Yes | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
+| Deepgram | Yes | N/A |
+| Azure | Yes | [Azure AI Speech STT Guide](/features/chat-conversations/audio/speech-to-text/azure-stt-integration) |
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 

@@ -59,7 +59,7 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Import Skills** | *(Requires Skills Access)* Import skills into the Skills workspace (see [Importing skills](/features/workspace/skills#importing-skills) and [Community skills](/features/workspace/skills#community-skills)). |
 | **Export Skills** | *(Requires Skills Access)* Export skills from the Skills workspace (see [Skill Management](/features/workspace/skills#skill-management) and [Community skills](/features/workspace/skills#community-skills)). |
 
-:::danger ⚠️ Tools Access = Root-Equivalent Access
+:::danger Tools Access = Root-Equivalent Access
 **Treat the Tools Access permission as root-equivalent access.** Granting a user access to create or import Tools is equivalent to giving them shell access to your server, because Tools and Functions execute arbitrary Python code. Only grant this permission to users you would trust with direct access to your server. If you enable this permission for untrusted users, you are accepting the risk of arbitrary code execution on your host. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 

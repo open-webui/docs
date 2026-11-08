@@ -11,7 +11,7 @@ This guide explains **what events are**, **how you can trigger them** from your 
 
 ---
 
-## 🌊 What Are Events?
+## What Are Events?
 
 **Events** are real-time notifications or interactive requests sent from your backend code (Tool, or Function) to the web UI. They allow you to update the chat, display notifications, request confirmation, run UI flows, and more.
 
@@ -22,7 +22,7 @@ Think of Events like push notifications and modal dialogs that your plugin can t
 
 ---
 
-## 🏁 Availability
+## Availability
 
 ### Native Python Tools & Functions
 
@@ -43,11 +43,11 @@ Your external tool can use these headers to emit events back to the UI via:
 POST /api/v1/chats/{chat_id}/messages/{message_id}/event
 ```
 
-See [External Tool Events](#-external-tool-events) below for details.
+See [External Tool Events](#external-tool-events) below for details.
 
 ---
 
-## 🧰 Basic Usage
+## Basic Usage
 
 ### Sending an Event
 
@@ -112,7 +112,7 @@ if isinstance(result, dict) and result.get("error"):
 
 ---
 
-## 📜 Event Payload Structure
+## Event Payload Structure
 
 When you emit or call an event, the basic structure is:
 
@@ -127,7 +127,7 @@ Most of the time, you only set `"type"` and `"data"`. Open WebUI fills in the ro
 
 ---
 
-## 🗂 Full List of Event Types
+## Full List of Event Types
 
 Below is a comprehensive table of **all supported `type` values** for events, along with their intended effect and data structure. (This is based on up-to-date analysis of Open WebUI event handling logic.)
 
@@ -151,7 +151,7 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 
 - You can define your own types and handle them at the UI layer (or use upcoming event-extension mechanisms).
 
-### ❗ Details on Specific Event Types
+### Details on Specific Event Types
 
 ### `status`
 
@@ -185,12 +185,12 @@ The backend does not inspect `done` at all. It simply saves the value and forwar
 If you emit status events, always send at least one with `done: True` at the end of your status sequence. Without it, the last status item keeps its shimmer animation indefinitely, making it look like processing never finished, even after the response is complete.
 
 ```python
-# ✅ Correct pattern
+# Correct pattern
 await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
 # ... do work ...
 await __event_emitter__({"type": "status", "data": {"description": "Complete!", "done": True}})
 
-# ⚠️ Broken pattern: shimmer never stops
+# Broken pattern: shimmer never stops
 await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
 # ... do work, return result, but never sent done: True
 ```
@@ -346,7 +346,7 @@ async def pipe(self, body: dict, __event_emitter__):
     await __event_emitter__(
         {
             "type": "embeds",
-            "data": {"embeds": ["<div>✅ Library indexed.</div>"], "replace": True},
+            "data": {"embeds": ["<div>Library indexed.</div>"], "replace": True},
         }
     )
     yield "Indexing complete."
@@ -424,7 +424,7 @@ await __event_emitter__(
 )
 ```
 
-`document` and `metadata` are parallel lists (one entry per cited passage). `source.name` / `source.id` label the citation group, and each `metadata` entry's `source` / `url` is the link shown under the response. External tools (OpenAPI and MCP) emit this same `source` event by POSTing the `{"type": "source", "data": {...}}` body to the [event endpoint](#-external-tool-events); this is how an MCP search tool attaches citations, including in native function calling mode.
+`document` and `metadata` are parallel lists (one entry per cited passage). `source.name` / `source.id` label the citation group, and each `metadata` entry's `source` / `url` is the link shown under the response. External tools (OpenAPI and MCP) emit this same `source` event by POSTing the `{"type": "source", "data": {...}}` body to the [event endpoint](#external-tool-events); this is how an MCP search tool attaches citations, including in native function calling mode.
 
 **For code execution (track execution state):**
 
@@ -711,7 +711,7 @@ Because `execute` runs unsandboxed JavaScript in the user's browser session, it 
 
 ---
 
-## 🏗️ When & Where to Use Events
+## When & Where to Use Events
 
 - **From any Tool, or Function** in Open WebUI.
 - To **stream responses**, show progress, request user data, update the UI, or display supplementary info/files.
@@ -727,19 +727,19 @@ For Pipes, be careful about mixing content delivery methods. If your `pipe()` me
 **Why event-only content delivery is fragile for pipes**: When a pipe completes, the frontend saves the entire chat history (including all message content from its local state) to the database. This full-history save can **overwrite** content that was previously persisted by the backend event emitter. If the pipe returns `None` or an empty string and relies solely on `type: "message"` events for content, the final save may write empty content to the database, erasing what the event emitter had written.
 
 ```python
-# ❌ Fragile: relies only on events for content — can be overwritten on save
+# Fragile: relies only on events for content — can be overwritten on save
 async def pipe(self, body: dict, __event_emitter__=None):
     await __event_emitter__({"type": "message", "data": {"content": "Hello!"}})
     # Returns None — frontend may save empty content, overwriting the emitted content
 
-# ✅ Correct: return content directly, use events for supplementary data
+# Correct: return content directly, use events for supplementary data
 async def pipe(self, body: dict, __event_emitter__=None):
     await __event_emitter__({"type": "status", "data": {"description": "Working...", "done": False}})
     result = "Hello!"
     await __event_emitter__({"type": "status", "data": {"description": "Done", "done": True}})
     return result
 
-# ✅ Also correct: yield for streaming, use events for supplementary data
+# Also correct: yield for streaming, use events for supplementary data
 async def pipe(self, body: dict, __event_emitter__=None):
     await __event_emitter__({"type": "status", "data": {"description": "Streaming...", "done": False}})
     for chunk in ["Hello", ", ", "world", "!"]:
@@ -750,7 +750,7 @@ async def pipe(self, body: dict, __event_emitter__=None):
 
 ---
 
-## 💡 Tips & Advanced Notes
+## Tips & Advanced Notes
 
 - **Multiple types per message:** You can emit several events of different types for one message. For example, show `status` updates, then stream with `chat:message:delta`, then complete with a `chat:message`.
 - **Custom event types:** While the above list is the standard, you may use your own types and detect/handle them in custom UI code.
@@ -758,7 +758,7 @@ async def pipe(self, body: dict, __event_emitter__=None):
 
 ---
 
-## 🧐 FAQ
+## FAQ
 
 ### Q: How do I trigger a notification for the user?
 Use `notification` type:
@@ -800,7 +800,7 @@ Yes, emit `"chat:message:delta"` events in a loop, then finish with `"chat:messa
 
 ---
 
-## 🌐 External Tool Events
+## External Tool Events
 
 External tools (OpenAPI and MCP servers) can emit events to the Open WebUI UI via a REST endpoint. This enables features like status updates, notifications, and streaming content from tools running on external servers.
 
@@ -933,7 +933,7 @@ async function myToolHandler(req) {
 
 ---
 
-## 🔒 Persistence & Browser Disconnection
+## Persistence & Browser Disconnection
 
 A common question is: **what happens if the browser tab is closed while a tool, action, or pipe is still running?**
 
@@ -959,7 +959,7 @@ There is **no timeout** on pipe, tool, or action execution. Your code can run fo
 
 The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**.
 
-#### ✅ Persisted (survive tab close)
+#### Persisted (survive tab close)
 
 Nothing below is written for a temporary chat or a channel message, since neither has a saved chat to write to.
 
@@ -986,7 +986,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 **Bottom line for Pipes**: Use return/yield for message content. Use events for status updates, sources, files, embeds, and notifications.
 :::
 
-#### ❌ Not persisted (lost on tab close)
+#### Not persisted (lost on tab close)
 
 | Type | Why it's lost |
 |------|--------------|
@@ -1006,7 +1006,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
 :::
 
-#### ⚠️ Requires live connection (errors on tab close)
+#### Requires live connection (errors on tab close)
 
 | Type | Why |
 |------|-----|
@@ -1035,10 +1035,10 @@ The return value takes precedence over event-emitted content. If your pipe emits
 
 | Return type | What happens | Persisted? |
 |-------------|-------------|-----------|
-| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
-| `HTMLResponse` (without inline) | Body decoded as plain text tool result | ✅ Yes |
-| `str` / `dict` | Used as tool result text | ✅ Yes |
-| `list` (MCP) | Text items joined, images converted to files | ✅ Yes |
+| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | Yes |
+| `HTMLResponse` (without inline) | Body decoded as plain text tool result | Yes |
+| `str` / `dict` | Used as tool result text | Yes |
+| `list` (MCP) | Text items joined, images converted to files | Yes |
 
 #### Actions
 
@@ -1046,10 +1046,10 @@ Actions are the exception to the rules above. Only an inline `HTMLResponse` is w
 
 | Return type | What happens | Persisted? |
 |-------------|-------------|-----------|
-| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
-| `HTMLResponse` (without inline) | Body decoded to a string, then handled as any other return below | ❌ No |
-| `{"messages": [...]}` | The browser merges each entry into the message with that `id` and saves the chat | ⚠️ Only if the tab is still open |
-| any other `str` / `dict` | Returned to the caller and dropped, the chat is not touched | ❌ No |
+| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | Yes |
+| `HTMLResponse` (without inline) | Body decoded to a string, then handled as any other return below | No |
+| `{"messages": [...]}` | The browser merges each entry into the message with that `id` and saves the chat | Only if the tab is still open |
+| any other `str` / `dict` | Returned to the caller and dropped, the chat is not touched | No |
 
 #### Filters
 
@@ -1059,10 +1059,10 @@ Filters transform `form_data` in the pipeline, so they don't return results to t
 
 | Capability | Tools | Actions | Pipes | Filters |
 |-----------|-------|---------|-------|---------|
-| `__event_emitter__` | ✅ | ✅ | ✅ | ✅ |
-| `__event_call__` | ✅ | ✅ | ✅ | ✅ |
-| Return value → user response | ✅ | ✅ | ✅ | ❌ (modifies `form_data`) |
-| `HTMLResponse` → Rich UI embed | ✅ | ✅ | ❌ | ❌ |
+| `__event_emitter__` | Yes | Yes | Yes | Yes |
+| `__event_call__` | Yes | Yes | Yes | Yes |
+| Return value → user response | Yes | Yes | Yes | No (modifies `form_data`) |
+| `HTMLResponse` → Rich UI embed | Yes | Yes | No | No |
 
 ### Practical Summary
 
@@ -1075,7 +1075,7 @@ If you want your function's output to **survive a closed browser tab**, follow t
 
 ---
 
-## 📝 Conclusion
+## Conclusion
 
 **Events** give you real-time, interactive superpowers inside Open WebUI. They let your code update content, trigger notifications, request user input, stream results, handle code, and much more, seamlessly plugging your backend intelligence into the chat UI.
 
@@ -1086,4 +1086,4 @@ Refer to this document for common event types and structures, and explore Open W
 
 ---
 
-**Happy event-driven coding in Open WebUI! 🚀**
+**Happy event-driven coding in Open WebUI!**

@@ -17,9 +17,9 @@ MCP connects Open WebUI to your tools; it does not improve the model's ability t
 You **MUST** set the `WEBUI_SECRET_KEY` environment variable in your Docker setup. Without it, **OAuth-connected MCP tools (like Notion)** will **break** every time you restart or recreate the container (Error: `Error decrypting tokens`), forcing you to re-authenticate everything.
 :::
 
-## 🚀 Quick start 
+## Quick start
 
-1. Open **⚙️ Settings > Admin > Integrations**.
+1. Open **Settings > Admin > Integrations**.
 2. Under **External Tool Servers**, click **+ Add Connection**. The Integrations page holds several sections, so make sure it is that one.
 3. Set **Type** to **MCP (Streamable HTTP)**.
 4. Enter your **Server URL** and **Auth** details (OAuth 2.1, if required).
@@ -42,7 +42,7 @@ Entering MCP-style configuration (with `mcpServers` in JSON) into an OpenAPI con
 2. Re-add it with the correct **Type** set to **MCP**
 :::
 
-## 🔒 MCP servers are admin-only {#mcp-servers-are-admin-only}
+## MCP servers are admin-only {#mcp-servers-are-admin-only}
 
 MCP servers can only be added by **administrators**, under **Settings > Admin > Integrations**. Regular users cannot register their own, by design.
 
@@ -52,7 +52,7 @@ The difference is capability. A user-supplied OpenAPI server is a stateless HTTP
 
 To give users an MCP-backed capability without server-configuration rights, an admin adds the server once and scopes it with **Access Control** to the right users or groups.
 
-## 🧭 When to use MCP vs OpenAPI
+## When to use MCP vs OpenAPI
 
 :::tip 
 For most deployments, **OpenAPI** remains the **preferred** integration path.
@@ -75,12 +75,12 @@ Choose **MCP (Streamable HTTP)** if you need:
 Browser-based, multi-user deployments increase the surface area (CORS/CSRF, per-user isolation, reconnects). Review your org’s auth, proxy, and rate-limiting policies before exposing MCP externally.
 :::
 
-## ⚙️ Configuration Best Practices
+## Configuration Best Practices
 
 ### Authentication Modes
 
 *   **None**: Use this for **local MCP servers** or internal networks where no token is required.
-    *   **⚠️ Important**: Default to "None" unless your server strictly requires a token. Selecting "Bearer" without providing a key sends an empty Authorization header (`Authorization: Bearer`), which causes many servers to reject the connection immediately.
+    *   **Important**: Default to "None" unless your server strictly requires a token. Selecting "Bearer" without providing a key sends an empty Authorization header (`Authorization: Bearer`), which causes many servers to reject the connection immediately.
 *   **Bearer**: Use this **only** if your MCP server requires a specific API token. You **must** populate the "Key" field.
 *   **Session**: Sends the user's own Open WebUI session token as a bearer token. For servers that authenticate against Open WebUI itself.
 *   **OAuth**: Sends the access token from the user's Open WebUI SSO sign-in as a bearer token. Works only when users sign in to Open WebUI through that same OAuth provider and their token carries the scopes the MCP server needs.
@@ -280,7 +280,7 @@ You likely configured an **MCP server** using the **OpenAPI** connection type, o
 3.  Refresh the page (Ctrl+F5)
 4.  Re-add the connection with the correct **Type** set to **MCP (Streamable HTTP)**
 
-## ❓ FAQ
+## FAQ
 
 **Do you support stdio or SSE transports?**
 

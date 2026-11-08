@@ -51,15 +51,15 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 
 | | |
 | :--- | :--- |
-| ✍️ **Rich editor** | Markdown and Rich Text with a floating formatting toolbar |
-| 🤖 **AI Enhance** | Ask the note's chat to rewrite or improve selected text in place |
-| 💬 **Chat sidebar** | The full chat interface inside the note, with as many conversations per note as you want |
-| 📎 **Context injection** | Attach notes to any chat for full-fidelity context |
-| 📑 **Pages** | Split a note into pages and subpages |
-| 📄 **Attachments** | Files sit as blocks inside the page where you added them |
-| 📌 **Pin to sidebar** | Pin frequently used notes for quick access from the sidebar |
-| 🔍 **Agentic access** | Models can search, read, and update notes autonomously |
-| 📤 **Export** | Download as `.txt`, `.md`, or `.pdf` |
+| **Rich editor** | Markdown and Rich Text with a floating formatting toolbar |
+| **AI Enhance** | Ask the note's chat to rewrite or improve selected text in place |
+| **Chat sidebar** | The full chat interface inside the note, with as many conversations per note as you want |
+| **Context injection** | Attach notes to any chat for full-fidelity context |
+| **Pages** | Split a note into pages and subpages |
+| **Attachments** | Files sit as blocks inside the page where you added them |
+| **Pin to sidebar** | Pin frequently used notes for quick access from the sidebar |
+| **Agentic access** | Models can search, read, and update notes autonomously |
+| **Export** | Download as `.txt`, `.md`, or `.pdf` |
 
 ---
 

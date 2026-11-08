@@ -108,15 +108,15 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 | :--- | :--- | :--- | :--- | :--- |
 | **Runs in** | Browser (WebAssembly) | Server (Python kernel) | Server (Docker container) | Server (orchestrated containers) |
 | **Library support** | Limited subset | Full Python ecosystem | Full OS (any language, any tool) | Full OS (any language, any tool) |
-| **Shell access** | ❌ None | ⚠️ Limited | ✅ Full shell | ✅ Full shell |
-| **File persistence** | ✅ IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | ✅ Shared filesystem | ✅ Container filesystem (until removal) | ✅ Persistent volumes per user |
-| **File browser** | ✅ Built-in sidebar panel | ❌ None | ✅ Built-in sidebar panel | ✅ Built-in sidebar panel |
-| **User file access** | ✅ Attached files placed in `/mnt/uploads/` | ❌ Manual | ✅ Attached files available | ✅ Attached files available |
-| **Isolation** | ✅ Browser sandbox | ❌ Shared environment | ✅ Container-level (when using Docker) | ✅ Full container-per-user isolation |
-| **Multi-user safety** | ✅ Per-user by design | ⚠️ Not isolated | ℹ️ Built-in multi-user mode (small teams) | ✅ Container-per-user with lifecycle management |
-| **File generation** | ✅ Write to `/mnt/uploads/`, download via file browser | ✅ Full support | ✅ Full support with upload/download | ✅ Full support with upload/download |
+| **Shell access** | None | Limited | Full shell | Full shell |
+| **File persistence** | IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | Shared filesystem | Container filesystem (until removal) | Persistent volumes per user |
+| **File browser** | Built-in sidebar panel | None | Built-in sidebar panel | Built-in sidebar panel |
+| **User file access** | Attached files placed in `/mnt/uploads/` | Manual | Attached files available | Attached files available |
+| **Isolation** | Browser sandbox | Shared environment | Container-level (when using Docker) | Full container-per-user isolation |
+| **Multi-user safety** | Per-user by design | Not isolated | Built-in multi-user mode (small teams) | Container-per-user with lifecycle management |
+| **File generation** | Write to `/mnt/uploads/`, download via file browser | Full support | Full support with upload/download | Full support with upload/download |
 | **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations | Separate service + Docker socket or K8s cluster |
-| **Recommended for orgs** | ⚠️ Legacy (safe but limited) | ❌ Not without isolation | ℹ️ Best for small teams | ✅ Designed for multi-tenant orgs |
-| **Enterprise scalability** | ✅ Client-side, no server load | ❌ Single shared instance | ℹ️ Single container, shared resources | ✅ Horizontally scalable (Docker or Kubernetes) |
-| **Idle management** | N/A | N/A | N/A (always running) | ✅ Auto-stop after configurable timeout |
+| **Recommended for orgs** | Legacy (safe but limited) | Not without isolation | Best for small teams | Designed for multi-tenant orgs |
+| **Enterprise scalability** | Client-side, no server load | Single shared instance | Single container, shared resources | Horizontally scalable (Docker or Kubernetes) |
+| **Idle management** | N/A | N/A | N/A (always running) | Auto-stop after configurable timeout |
 | **License** | MIT | MIT | MIT | [Enterprise](/enterprise) |

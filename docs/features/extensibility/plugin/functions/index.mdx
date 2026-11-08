@@ -5,7 +5,7 @@ title: "Functions"
 
 # Functions
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
@@ -174,7 +174,7 @@ Functions are managed from **Admin Panel > Functions**. The page is hidden when 
 |:--------|:-----------|
 | **Active toggle** | Enables or disables the function. Disabled functions are not loaded or executed. |
 | **Global toggle** | When enabled, the function applies to **all models** automatically. Available for Filters and Actions. |
-| **Valves** (⚙️ gear icon) | Opens the admin-configurable settings for this function. |
+| **Valves** (gear icon) | Opens the admin-configurable settings for this function. |
 | **Export / Delete** | Export the function as a file or remove it. |
 
 ### Version history
@@ -213,7 +213,7 @@ Functions support a two-tier configuration system built on [Pydantic](https://do
 
 | Level | Class Name | Who Configures | Where |
 |:------|:-----------|:---------------|:------|
-| **Admin** | `Valves` | Administrators only | Admin Panel > Functions > ⚙️ |
+| **Admin** | `Valves` | Administrators only | Admin Panel > Functions > |
 | **User** | `UserValves` | Any user | Chat interface, per-function |
 
 **Valves** are ideal for API keys, model endpoints, and global behavior settings. **UserValves** let individual users customize behavior (e.g., their preferred language, output format, or personal API key).

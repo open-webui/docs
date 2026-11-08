@@ -147,8 +147,8 @@ Open Terminal comes in three sizes:
 | **Best for** | General use, AI agents | Smaller footprint | Smallest footprint |
 | **Size** | ~4 GB | ~430 MB | ~230 MB |
 | **Includes** | Node.js, Python, compilers, ffmpeg, Docker CLI, data science libs | git, curl, jq | git, curl, jq |
-| **Can install packages** | ✔ (has sudo) | ✘ | ✘ |
-| **Multi-user** | ✔ | ✘ | ✘ |
+| **Can install packages** | Yes (has sudo) | No | No |
+| **Multi-user** | Yes | No | No |
 
 **If you're not sure, use `latest`.** It has everything pre-installed so the AI can work with any tool without waiting for installs.
 

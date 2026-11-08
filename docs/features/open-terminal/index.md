@@ -129,12 +129,12 @@ Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage di
 
 | | |
 | :--- | :--- |
-| 🖥️ **Use a real shell** | Run commands, scripts, CLIs, tests, build tools, and package managers |
-| 📁 **Own a workspace** | Browse, upload, download, edit, create, rename, convert, and organize files |
-| 📄 **Process documents and data** | Handle PDF, Word, Excel, PowerPoint, RTF, EPUB, email, text, code, and data files |
-| 🌐 **Run and preview software** | Start local servers and show live previews inside Open WebUI |
-| 🔁 **Iterate from feedback** | Read output, inspect artifacts, fix errors, retry, and verify the result |
-| 🔒 **Choose the boundary** | Run isolated in Docker, or bare metal when direct host access is intentional |
+| **Use a real shell** | Run commands, scripts, CLIs, tests, build tools, and package managers |
+| **Own a workspace** | Browse, upload, download, edit, create, rename, convert, and organize files |
+| **Process documents and data** | Handle PDF, Word, Excel, PowerPoint, RTF, EPUB, email, text, code, and data files |
+| **Run and preview software** | Start local servers and show live previews inside Open WebUI |
+| **Iterate from feedback** | Read output, inspect artifacts, fix errors, retry, and verify the result |
+| **Choose the boundary** | Run isolated in Docker, or bare metal when direct host access is intentional |
 
 ---
 

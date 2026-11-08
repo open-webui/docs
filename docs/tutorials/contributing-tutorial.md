@@ -39,7 +39,7 @@ We appreciate your interest in contributing tutorials to the Open WebUI document
 
    These variables take effect only after the workflow and config edits in the next section: the upstream `gh-pages.yml` build step sets no `env`, and `docusaurus.config.ts` hard-codes `url` and `baseUrl`.
 
-### 📝 Updating the GitHub Pages Workflow and Config File
+### Updating the GitHub Pages Workflow and Config File
 
 If you need to adjust deployment settings to fit your custom setup, here’s what to do:
 

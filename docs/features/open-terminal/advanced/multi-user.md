@@ -56,13 +56,13 @@ Each user sees only their own files in the file browser.
 
 | | Separate per user | Shared |
 | :--- | :--- | :--- |
-| Home folder and files | ✔ | |
-| Running commands | ✔ | |
-| System packages | | ✔ |
-| CPU and memory | | ✔ |
-| Network access | | ✔ |
-| Process list and command lines | | ✔ |
-| System state and root inside the container | | ✔ |
+| Home folder and files | Yes | |
+| Running commands | Yes | |
+| System packages | | Yes |
+| CPU and memory | | Yes |
+| Network access | | Yes |
+| Process list and command lines | | Yes |
+| System state and root inside the container | | Yes |
 
 :::warning Good for small trusted teams, not production
 This mode gives everyone their own workspace, and they all run inside the same container. Resource pressure (memory, CPU) is shared. The network namespace is shared, so a port one user binds (e.g. `python -m http.server 8080`) is reachable from any other user's shell on that container. The port listing and the port proxy are scoped to the user who owns the port, so the port stays out of other users' file navigators, and reaching it takes a direct request from a shell. The process list is shared, so users can watch each other's running commands. Root inside the container is reachable from any account, because provisioning the accounts needs those privileges in the first place.

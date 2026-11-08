@@ -46,10 +46,10 @@ When asked to review code:
    - **Style & maintainability**: Inconsistent naming, overly complex functions, missing docstrings, dead code, magic numbers
    - **Testing**: Missing test coverage for new code paths, edge cases not tested
 4. **Prioritize findings**:
-   - 🔴 Critical: Must fix before merge (security, data loss, crashes)
-   - 🟡 Warning: Should fix (performance, correctness edge cases)
-   - 🔵 Suggestion: Nice to have (style, refactoring opportunities)
-   - 💬 Nitpick: Optional (naming preferences, formatting)
+   - Critical: Must fix before merge (security, data loss, crashes)
+   - Warning: Should fix (performance, correctness edge cases)
+   - Suggestion: Nice to have (style, refactoring opportunities)
+   - Nitpick: Optional (naming preferences, formatting)
 5. **For each finding**:
    - Cite the exact file and line number
    - Explain WHY it's a problem (not just what's wrong)

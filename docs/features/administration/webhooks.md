@@ -187,7 +187,7 @@ To post a message from an external service, send a `POST` request to the webhook
 ```bash
 curl -X POST "https://your-instance.com/api/v1/channels/webhooks/{webhook_id}/{token}" \
   -H "Content-Type: application/json" \
-  -d '{"content": "Deployment to production completed successfully! 🚀"}'
+  -d '{"content": "Deployment to production completed successfully!"}'
 ```
 
 #### Example: Using Python

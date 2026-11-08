@@ -5,7 +5,7 @@ title: "Connection Errors"
 
 This page covers common connection issues, their causes, and how to resolve them.
 
-## 🔐 HTTPS, TLS, CORS & WebSocket Issues
+## HTTPS, TLS, CORS & WebSocket Issues
 
 If you're experiencing connectivity problems with Open WebUI, especially when using reverse proxies or HTTPS, these issues often stem from improper CORS, TLS, WebSocket, or cookie configuration. Here's how to diagnose and fix them.
 
@@ -14,7 +14,7 @@ If you're experiencing connectivity problems with Open WebUI, especially when us
 You might be experiencing these issues if you see:
 - Empty responses like `"{}"` in the chat
 - Errors like `"Unexpected token 'd', "data: {"id"... is not valid JSON"`
-- Garbled markdown (visible `##`, `**`, broken formatting) during streaming, see [Streaming Response Corruption](#-garbled-markdown--streaming-response-corruption)
+- Garbled markdown (visible `##`, `**`, broken formatting) during streaming, see [Streaming Response Corruption](#garbled-markdown--streaming-response-corruption)
 - WebSocket connection failures in browser console
 - WebSocket connection failures in CLI logs
 - Login problems or session issues
@@ -113,7 +113,7 @@ To verify your setup is working:
 - ✓ Configure Let's Encrypt for automatic certificate renewal
 - ✓ Disable proxy buffering for SSE streaming (see below)
 
-## 📝 Garbled Markdown / Streaming Response Corruption
+## Garbled Markdown / Streaming Response Corruption
 
 If streaming responses show garbled markdown rendering (e.g., visible `##`, `**`, or broken formatting), but disabling streaming fixes the issue, this is typically caused by **nginx proxy buffering**.
 
@@ -163,7 +163,7 @@ Disabling proxy buffering also **significantly improves streaming speed**, as re
 - **Traefik**: Check compression/buffering middleware settings
 - **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
 
-## 📭 Blank Replies When the Model Uses a Tool
+## Blank Replies When the Model Uses a Tool
 
 ### Common Symptoms
 
@@ -198,7 +198,7 @@ In the `delta.tool_calls` entry, look for `"index"`. If it is absent, you have t
 
 Open WebUI follows the OpenAI Chat Completions schema and does not add per-provider workarounds for endpoints that diverge from it, which is the same reasoning described under [Protocol-Oriented Design](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#protocol-oriented-design).
 
-## 🌐 Frontend vs. Backend Connections (localhost Confusion)
+## Frontend vs. Backend Connections (localhost Confusion)
 
 Several Open WebUI features offer **two ways** to configure connections: a **user/direct** method (from the browser) and an **admin/global** method (from the backend). These work at completely different network levels, and the same URL can succeed in one and fail in the other.
 
@@ -272,7 +272,7 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 After running the above, your WebUI should be available at `http://localhost:8080`.
 
-## 🧭 Intermittent Name Lookup Failures (Often Reported as "Model not found")
+## Intermittent Name Lookup Failures (Often Reported as "Model not found")
 
 ### Common Symptoms
 
@@ -300,7 +300,7 @@ AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=true
 
 If you turn it on, exercise your models, web search and any internal services afterwards, and be aware that names your system serves from somewhere other than `/etc/resolv.conf` or the hosts file (`.local` via avahi/mDNS, NIS or LDAP directories, Windows NBNS) may stop resolving. See [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver) for the full picture and [Performance → DNS Resolver](/troubleshooting/performance#dns-resolver) for what it buys you.
 
-## ⏱️ Model List Loading Issues (Slow UI / Unreachable Endpoints)
+## Model List Loading Issues (Slow UI / Unreachable Endpoints)
 
 If your Open WebUI takes a long time to load models, or the model selector spins indefinitely, it may be due to an unreachable or slow API endpoint configured in your connections.
 
@@ -377,7 +377,7 @@ Manual database manipulation should be a last resort. Always back up your databa
 
 See the [Environment Configuration](/reference/env-configuration#aiohttp_client_timeout_model_list) documentation for more details.
 
-## 🐢 Slow Performance or Timeouts on Low-Spec Hardware
+## Slow Performance or Timeouts on Low-Spec Hardware
 
 If you're experiencing slow page loads, API timeouts, or unresponsive UI, especially on resource-constrained systems, this may be related to database session sharing, if you switched it on. It is off by default.
 
@@ -395,7 +395,7 @@ DATABASE_ENABLE_SESSION_SHARING=false
 
 For PostgreSQL on adequate hardware, enabling this setting may improve performance. See the [DATABASE_ENABLE_SESSION_SHARING](/reference/env-configuration#database_enable_session_sharing) documentation for details.
 
-## 🔒 SSL Connection Issue with Hugging Face
+## SSL Connection Issue with Hugging Face
 
 If you encounter an SSL error connecting to Hugging Face:
 
@@ -410,7 +410,7 @@ If you encounter an SSL error connecting to Hugging Face:
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-## 🔐 SSL Certificate Issues with Internal Tools
+## SSL Certificate Issues with Internal Tools
 
 If you are using external tools like Tika, Ollama (for embeddings), or an external reranker with self-signed certificates, you might encounter SSL verification errors.
 
@@ -441,7 +441,7 @@ Disabling SSL verification reduces security. Only do this if you trust the netwo
 
 For Milvus over TLS, point [`MILVUS_SERVER_PEM_PATH`](/reference/env-configuration#milvus_server_pem_path) at the CA or server certificate. Verification stays on.
 
-## 🍏 Podman on MacOS
+## Podman on MacOS
 
 For Podman on MacOS:
 
@@ -454,7 +454,7 @@ podman run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11
 ```
 
 
-## 🔐 SSL/TLS Errors with Web Search
+## SSL/TLS Errors with Web Search
 
 If you are encountering SSL errors while using the Web Search feature, they usually fall into two categories: Proxy configuration issues or Certificate verification issues.
 

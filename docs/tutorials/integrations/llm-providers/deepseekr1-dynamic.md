@@ -63,7 +63,7 @@ DeepSeek-R1-GGUF/
 
 :::info
 
-🛠️ Update paths in the later steps to **match your specific directory structure**. For example, if your script was in `/Users/tim/Downloads`, the full path to the GGUF file would be:
+Update paths in the later steps to **match your specific directory structure**. For example, if your script was in `/Users/tim/Downloads`, the full path to the GGUF file would be:
 `/Users/tim/Downloads/DeepSeek-R1-GGUF/DeepSeek-R1-UD-IQ1_S/DeepSeek-R1-UD-IQ1_S-00001-of-00003.gguf`.
 
 :::
@@ -104,7 +104,7 @@ Here’s the command to start the server:
 
 :::tip
 
-🔑 **Parameters to Customize Based on Your Machine:**
+**Parameters to Customize Based on Your Machine:**
 
 - **`--model`:** Replace `/[your-directory]/` with the path where the GGUF files were downloaded in Step 2.
 - **`--port`:** The server default is `8080`, but feel free to change it based on your port availability.
@@ -131,7 +131,7 @@ http://127.0.0.1:10000
 
 :::info
 
-🖥️ **Llama.cpp Server Running**
+**Llama.cpp Server Running**
 
 ![Server Screenshot](/images/tutorials/deepseek/serve.png)
 
@@ -151,7 +151,7 @@ Be sure to **keep this terminal session running**, as it serves the model for al
 
 :::info
 
-🖥️ **Adding Connection in Open WebUI**
+**Adding Connection in Open WebUI**
 
 ![Connection Screenshot](/images/tutorials/deepseek/connection.png)
 
@@ -159,7 +159,7 @@ After running the command, you should see a message confirming the server is act
 
 :::
 
-Once the connection is saved, you can start querying **DeepSeek-R1** directly from Open WebUI! 🎉
+Once the connection is saved, you can start querying **DeepSeek-R1** directly from Open WebUI!
 
 ---
 
@@ -183,6 +183,6 @@ You can now use Open WebUI’s chat interface to interact with the **DeepSeek-R1
 
 Thanks to **UnslothAI** and **Llama.cpp**, running one of the largest open-source reasoning models, **DeepSeek-R1** (1.58-bit version), is finally accessible to individuals. While it’s challenging to run such models on consumer hardware, the ability to do so without massive computational infrastructure is a significant technological milestone.
 
-⭐ Big thanks to the community for pushing the boundaries of open AI research.
+Big thanks to the community for pushing the boundaries of open AI research.
 
-Happy experimenting! 🚀
+Happy experimenting!

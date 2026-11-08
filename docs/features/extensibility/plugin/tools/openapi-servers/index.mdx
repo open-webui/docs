@@ -18,7 +18,7 @@ Connecting an external tool makes it available to the model; the model still has
 The [oikb](/ecosystem/knowledge-base-sync) sync daemon is a ready-made OpenAPI tool server. Run it, add its URL under **Settings → Integrations**, and a model can trigger Knowledge Base syncs and check their status from chat. See [Let the model trigger syncs](/ecosystem/knowledge-base-sync/daemon#let-the-model-trigger-syncs).
 :::
 
-## ☝️ Why OpenAPI?
+## Why OpenAPI?
 
 - **Established Standard**: OpenAPI is a widely used, production-proven API standard backed by thousands of tools, companies, and communities.
 
@@ -30,16 +30,16 @@ The [oikb](/ecosystem/knowledge-base-sync) sync daemon is a ready-made OpenAPI t
 
 - **Future-Friendly & Stable**: OpenAPI benefits from broad adoption, long-term community support, and a well-defined evolution process.
 
-## ⚠️ Limitations
+## Limitations
 
 While OpenAPI tools are powerful for extending Open WebUI with external services, they have some constraints compared to native Python tools:
 
-- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/extensibility/plugin/development/events#-external-tool-events) via the REST endpoint. Open WebUI passes the `X-OpenWebUI-Chat-Id` and `X-OpenWebUI-Message-Id` headers to enable this, but only when [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) is turned on, which it is not by default. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
+- **One-way events only**: OpenAPI tools can emit status updates, notifications, and other [one-way events](/features/extensibility/plugin/development/events#external-tool-events) via the REST endpoint. Open WebUI passes the `X-OpenWebUI-Chat-Id` and `X-OpenWebUI-Message-Id` headers to enable this, but only when [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) is turned on, which it is not by default. However, interactive events (user input prompts, confirmations) are only available for native Python tools.
 - **No streaming output**: Tool responses are returned as complete results, not streamed token-by-token.
 
 If you need interactive UI feedback (confirmations, user input prompts), consider implementing your tool as a [native Python Tool](/features/extensibility/plugin/tools/development) instead.
 
-## ✅ Supported Spec Shapes
+## Supported Spec Shapes
 
 Open WebUI parses tool-server specs against the OpenAPI 3.x path-item model. The parser:
 
@@ -51,7 +51,7 @@ Open WebUI parses tool-server specs against the OpenAPI 3.x path-item model. The
 
 Specs that put `parameters` at the path level, expose extension keys, or rely on path-item metadata fields work without changes.
 
-## 🚀 Quickstart
+## Quickstart
 
 Get started quickly with our reference FastAPI-based implementations provided in the `servers/` directory. (You can adapt these examples into your preferred stack as needed, such as using [FastAPI](https://fastapi.tiangolo.com/), [FastOpenAPI](https://github.com/mr-fatalyst/fastopenapi) or any other OpenAPI-compatible library):
 
@@ -90,7 +90,7 @@ The services will be reachable from:
 
 Now, simply point your OpenAPI-compatible clients or AI agents to your local or publicly deployed URL: no configuration headaches, no complicated transports.
 
-## 🌱 Open WebUI Community
+## Open WebUI Community
 
 - For general discussions, technical exchange, and announcements, visit our [Community Discussions](https://github.com/open-webui/openapi-servers/discussions) page.
 - Have ideas or feedback? Please open an issue!

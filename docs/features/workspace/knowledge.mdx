@@ -67,15 +67,15 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 
 | | |
 | :--- | :--- |
-| 📄 **13 vector databases** | ChromaDB and PGVector (officially maintained), plus non-core integrations: Qdrant, Milvus, OpenSearch, Elasticsearch, and more |
-| 🔍 **Hybrid search** | BM25 keyword search + vector search with cross-encoder reranking |
-| 📑 **8 extraction engines** | Tika, Docling, Azure, Mistral OCR, Datalab Marker, MinerU, PaddleOCR, custom loaders |
-| 🤖 **Agentic retrieval** | Models browse, search, and read your documents autonomously |
-| 📄 **Full context mode** | Inject entire documents with no chunking |
-| 🗂️ **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
-| 👁️ **File browser with preview** | Browse files in a tree, preview each file next to the list and read or edit the indexed text the AI searches |
-| 🔄 **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
-| 📦 **Export and API** | Back up knowledge bases as zip files, manage via REST API |
+| **13 vector databases** | ChromaDB and PGVector (officially maintained), plus non-core integrations: Qdrant, Milvus, OpenSearch, Elasticsearch, and more |
+| **Hybrid search** | BM25 keyword search + vector search with cross-encoder reranking |
+| **8 extraction engines** | Tika, Docling, Azure, Mistral OCR, Datalab Marker, MinerU, PaddleOCR, custom loaders |
+| **Agentic retrieval** | Models browse, search, and read your documents autonomously |
+| **Full context mode** | Inject entire documents with no chunking |
+| **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
+| **File browser with preview** | Browse files in a tree, preview each file next to the list and read or edit the indexed text the AI searches |
+| **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
+| **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
 ---
 
@@ -87,13 +87,13 @@ When attaching files or knowledge bases to a model, click on the attached item t
 
 In the preview that opens, the knowledge base's name opens it in the workspace, and a file or link name opens the file or page. Both open in a new tab.
 
-### 🔍 Focused Retrieval (default)
+### Focused Retrieval (default)
 
 Uses RAG to find and inject the most relevant chunks based on the user's query. When hybrid search is enabled (`ENABLE_RAG_HYBRID_SEARCH`), retrieval combines BM25 keyword search with vector search, plus reranking for accuracy.
 
 Best for large document sets where only specific sections are relevant.
 
-### 📄 Full Context
+### Full Context
 
 Injects the complete content of the file into every message. No chunking, no semantic search. For files and collections attached in the chat it is injected whatever the function calling mode, so the model needs no tool to reach it. A knowledge base attached to the model, though, is only injected in legacy function calling mode: with native function calling the model reaches model-attached knowledge through the knowledge tools, Full Context or not.
 
@@ -109,17 +109,17 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 
 | Tool | Attached KB | No KB attached | Description |
 |------|:-----------:|:--------------:|-------------|
-| `list_knowledge` | ✅ | ❌ | List attached KBs (with file counts), standalone files, and notes; pass `knowledge_id` (with `skip`/`count`, max 200) to page one KB's files |
-| `list_knowledge_bases` | ❌ | ✅ | Browse available knowledge bases with file counts |
-| `search_knowledge_bases` | ❌ | ✅ | Find knowledge bases by name or description |
-| `query_knowledge_bases` | ❌ | ✅ | Search KB names/descriptions by semantic similarity |
-| `search_knowledge_files` | ✅ (scoped) | ✅ (all) | Search files by filename |
-| `query_knowledge_files` | ✅ (scoped) | ✅ | Search file contents using the RAG pipeline |
-| `grep_knowledge_files` | ✅ (scoped) | ✅ | Exact text / regex search across knowledge files (returns matching lines with line numbers; auto-detects regex like `error|warn`) |
-| `view_file` | ✅ | ❌ | Read file content with pagination (`offset`/`max_chars`) or by line range (`start_line`/`end_line`, optional `line_numbers`) |
-| `view_knowledge_file` | ✅ | ✅ | Read file content from any accessible KB |
-| `display_file` | ✅ | ✅ | Show a file to the user inline in the chat, optionally at a page or slide |
-| `view_note` | ✅ | ❌ | Read attached notes |
+| `list_knowledge` | Yes | No | List attached KBs (with file counts), standalone files, and notes; pass `knowledge_id` (with `skip`/`count`, max 200) to page one KB's files |
+| `list_knowledge_bases` | No | Yes | Browse available knowledge bases with file counts |
+| `search_knowledge_bases` | No | Yes | Find knowledge bases by name or description |
+| `query_knowledge_bases` | No | Yes | Search KB names/descriptions by semantic similarity |
+| `search_knowledge_files` | Yes (scoped) | Yes (all) | Search files by filename |
+| `query_knowledge_files` | Yes (scoped) | Yes | Search file contents using the RAG pipeline |
+| `grep_knowledge_files` | Yes (scoped) | Yes | Exact text / regex search across knowledge files (returns matching lines with line numbers; auto-detects regex like `error|warn`) |
+| `view_file` | Yes | No | Read file content with pagination (`offset`/`max_chars`) or by line range (`start_line`/`end_line`, optional `line_numbers`) |
+| `view_knowledge_file` | Yes | Yes | Read file content from any accessible KB |
+| `display_file` | Yes | Yes | Show a file to the user inline in the chat, optionally at a page or slide |
+| `view_note` | Yes | No | Read attached notes |
 
 "Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **File Context** capability is off. Whatever the source, the model is told what it has: its system prompt carries an `<attached_knowledge>` list of the items with their IDs, which it uses to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
 
@@ -382,7 +382,7 @@ Knowledge bases can be managed programmatically:
 - After acting on the diff (create `mkdir` paths, upload `added` + `modified` files with their hashes via `POST /api/v1/files/`), call:
 - `POST /api/v1/knowledge/{id}/sync/cleanup`: Body: `{file_ids: [...], dir_ids: [...]}`. Removes the stale files (from the KB, vector store and per-file collections) and the now-empty directories returned by `sync/diff`. Run this last so deletions don't outrun uploads.
 
-File processing happens asynchronously. You must poll the status endpoint until processing completes before adding files to a knowledge base, or you'll get an "empty content" error. See [API Endpoints](/reference/api-endpoints#-retrieval-augmented-generation-rag) for workflow examples.
+File processing happens asynchronously. You must poll the status endpoint until processing completes before adding files to a knowledge base, or you'll get an "empty content" error. See [API Endpoints](/reference/api-endpoints#retrieval-augmented-generation-rag) for workflow examples.
 
 ---
 

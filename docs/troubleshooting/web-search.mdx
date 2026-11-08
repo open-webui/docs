@@ -19,7 +19,7 @@ If you're running Open WebUI behind an HTTP proxy, you might notice that web sea
 
 This happens because the web content fetcher doesn't use your `http_proxy`/`https_proxy` environment variables by default.
 
-✅ **Solution:**
+**Solution:**
 
 1. Navigate to: **Settings > Admin > Web Search**
 2. Enable **Trust Proxy Environment**
@@ -45,7 +45,7 @@ This setting tells Open WebUI's web content loader to respect the proxy settings
 
 If you're using SearXNG and seeing `403 Client Error: Forbidden` in your logs, the JSON format is not enabled.
 
-✅ **Solution:**
+**Solution:**
 
 Edit your SearXNG `settings.yml` and add `json` to the formats list:
 
@@ -64,7 +64,7 @@ Restart SearXNG after making this change.
 
 If web search returns empty content or poor quality results, the issue is often related to context window size or content extraction.
 
-✅ **Solutions:**
+**Solutions:**
 
 - **Increase context length**: Web pages often contain 4,000-8,000+ tokens. If your model runs at Ollama's 4096-token default for GPUs under 24 GiB, you're missing most of the content. Increase to 16384+ tokens in **Settings > Admin > Models > Edit** the model **> Advanced Params** (anything below will be subpar for web content).
 
@@ -88,7 +88,7 @@ If the web search engine is configured (for example DDGS with DuckDuckGo as the 
 
 In Native/Agentic mode, Open WebUI exposes web search as the `search_web` tool. The model must decide to call that tool and return a valid structured tool call. Older, smaller, or weaker local models can miss the tool, ignore it, or produce malformed tool calls even when every Open WebUI setting is correct.
 
-✅ **Solutions:**
+**Solutions:**
 
 - **Use a modern, high-quality tool-calling model** for web-search workflows. Frontier models or large recent open-weight models are much more reliable than older/smaller models for deciding when to search and formatting tool calls correctly. See [Tool Calling Modes: Native vs. Legacy](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for model requirements and recommendations.
 - **Confirm Native Function Calling is active** in **Settings > Admin > Models > Edit** the model **> Advanced Params > Function Calling**. Built-in web search tools are Native-mode tools.
@@ -101,7 +101,7 @@ In Native/Agentic mode, Open WebUI exposes web search as the `search_web` tool. 
 
 If web searches are timing out:
 
-✅ **Solutions:**
+**Solutions:**
 
 - **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (required for Brave free tier).
 

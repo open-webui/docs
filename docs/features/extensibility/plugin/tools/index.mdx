@@ -5,11 +5,11 @@ title: "Tools"
 
 # What are Tools?
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Workspace Tools and Functions execute arbitrary Python code on your server.** Only install from trusted sources, review code before importing, and restrict Workspace access to trusted administrators only. Granting a user the ability to create or import Tools is equivalent to giving them shell access to the server. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
-⚙️ Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things like search the web, scrape data, generate images, talk back using AI voices, and more.
+Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things like search the web, scrape data, generate images, talk back using AI voices, and more.
 
 Because there are several ways to integrate "Tools" in Open WebUI, it's important to understand which type you are using.
 
@@ -17,7 +17,7 @@ Because there are several ways to integrate "Tools" in Open WebUI, it's importan
 
 ## Tooling Taxonomy: Which "Tool" are you using?
 
-🧩 Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
+Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
 
 ![Installed tools in the workspace](/images/workspace/tools-list.png)
 
@@ -46,11 +46,11 @@ These are **Python scripts** that run directly within the Open WebUI environment
 - **Capability**: Can do anything Python can do (web scraping, complex math, API calls), and hold secrets (API keys) entirely server-side so neither the user nor the model can read them.
 - **Access**: Managed via the `Workspace` menu. 
 - **Safety**: Always review code before importing, as these run on your server.
-- **⚠️ Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
+- **Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
 
 ### 3. MCP (Model Context Protocol)
 
-🔌 MCP is an open standard that allows LLMs to interact with external data and tools.
+MCP is an open standard that allows LLMs to interact with external data and tools.
 - **Native HTTP MCP**: Open WebUI can connect directly to any MCP server that exposes an HTTP/SSE endpoint.
 - **MCPO (Proxy)**: Most community MCP servers use `stdio` (local command line). To use these in Open WebUI, you use the [**MCPO Proxy**](../../plugin/tools/openapi-servers/mcp.mdx) to bridge the connection.
 
@@ -65,7 +65,7 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 
 ## How to Install & Manage Workspace Tools
 
-📦 Workspace Tools are the most common way to extend your instance with community features. They need [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), which is on by default.
+Workspace Tools are the most common way to extend your instance with community features. They need [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), which is on by default.
 
 1. Go to [Community Tool Library](https://openwebui.com/search)
 2. Choose a Tool, then click the **Get** button.
@@ -110,14 +110,14 @@ The globe selector in the tool editor stores a name, a description and valve lab
 
 ## How to Use Tools in Chat
 
-🔧 Once installed or connected, here’s how to enable them for your conversations:
+Once installed or connected, here’s how to enable them for your conversations:
 
 ### Option 1: Enable on-the-fly (Specific Chat)
-While chatting, click the **Integrations** icon in the input area (the four-diamond icon next to the ➕ button), then select **Tools**. You’ll see a list of available Tools, and you can toggle them on specifically for that session.
+While chatting, click the **Integrations** icon in the input area (the four-diamond icon next to the plus button), then select **Tools**. You’ll see a list of available Tools, and you can toggle them on specifically for that session.
 
 ### Option 2: Enable by Default (Global/Model Level)
-1. Go to **Workspace ➡️ Models**.
-2. Choose the model you’re using and click the ✏️ edit icon.
+1. Go to **Workspace → Models**.
+2. Choose the model you’re using and click the edit icon.
 3. Open the **Tools** row and pick the tools you want this model to always have access to by default.
 4. Click **Save**.
 
@@ -143,7 +143,7 @@ Attaching a workspace tool to a model does **not** bypass access control. When a
 
 Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode** (formerly **Default**), the prompt-based opt-out kept only for backward compatibility.
 
-### 🔴 Legacy Mode (Prompt-based, formerly "Default")
+### Legacy Mode (Prompt-based, formerly "Default")
 
 :::warning Unsupported
 Legacy Mode (the option previously labeled **Default**) is **no longer supported**. It is documented here for reference only. New and existing deployments should use Native Mode. Bug reports, feature requests, and support questions about Legacy Mode behavior will not be actioned.
@@ -179,7 +179,7 @@ DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 `function_calling` is a key inside `DEFAULT_MODEL_PARAMS`; there is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable. The only value that changes behavior is `"legacy"`; leaving it unset (or `"native"`) keeps the default, Native.
 :::
 
-### 🟢 Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
+### Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
 Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
@@ -268,21 +268,21 @@ Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupport
 
 | Feature | Legacy Mode (formerly Default) | Native Mode (Default, Only Supported) |
 |:---|:---|:---|
-| **Status** | ❌ Legacy, no longer supported | ✅ Required, all models should use this |
+| **Status** | Legacy, no longer supported | Required, all models should use this |
 | **Latency** | Medium/High | Low |
-| **KV Cache** | ❌ Breaks cache on every turn | ✅ Cache-friendly |
+| **KV Cache** | Breaks cache on every turn | Cache-friendly |
 | **Model Compatibility** | Any text model (obsolete concern) | Every mainstream model since 2024 |
 | **Logic** | Prompt-injection parsed by Open WebUI | Structured tool calls via provider API |
-| **System Tools** | ❌ Not available | ✅ Full access (Memory, Notes, Knowledge, Channels, Web Search, Image Gen, Code Interpreter) |
-| **Agentic Research / Interleaved Thinking** | ❌ Unsupported | ✅ Supported |
-| **Complex Chaining** | ⚠️ Unreliable | ✅ Excellent |
-| **Future development** | ❌ None | ✅ All new features target this mode |
+| **System Tools** | Not available | Full access (Memory, Notes, Knowledge, Channels, Web Search, Image Gen, Code Interpreter) |
+| **Agentic Research / Interleaved Thinking** | Unsupported | Supported |
+| **Complex Chaining** | Unreliable | Excellent |
+| **Future development** | None | All new features target this mode |
 
 ### Tool Approval
 
 By default a model runs its tool calls as soon as it makes them. An administrator can offer a second mode by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
 
-Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with two choices:
+Once it is on, the chat input's plus menu gains a **Tool Permissions** entry with two choices:
 
 | Mode | Behaviour |
 | :--- | :--- |
@@ -327,7 +327,7 @@ Write Always Loaded patterns against the [tool names the model sees](/features/e
 
 ### Built-in System Tools (Native/Agentic Mode)
 
-🛠️ These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
+These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
 
 | Tool | Purpose |
 |------|---------|
@@ -438,17 +438,17 @@ Use this quick matrix instead of memorizing per-row caveats.
 
 | Tool | Model has attached knowledge | Model has no attached knowledge |
 |------|------------------------------|---------------------------------|
-| `list_knowledge` | ✅ | ❌ |
-| `list_knowledge_bases` | ❌ | ✅ |
-| `search_knowledge_bases` | ❌ | ✅ |
-| `query_knowledge_bases` | ❌ | ✅ |
-| `search_knowledge_files` | ✅ (auto-scoped) | ✅ (all accessible KBs) |
-| `query_knowledge_files` | ✅ (auto-scoped) | ✅ |
-| `grep_knowledge_files` | ✅ (auto-scoped) | ✅ |
-| `view_file` | ✅ (when attached items include files/collections) | ❌ |
-| `view_knowledge_file` | ✅ (when attached items include files/collections) | ✅ |
-| `display_file` | ✅ (when attached items include files/collections) | ✅ |
-| `view_note` | ✅ (when attached items include notes) | ❌ |
+| `list_knowledge` | Yes | No |
+| `list_knowledge_bases` | No | Yes |
+| `search_knowledge_bases` | No | Yes |
+| `query_knowledge_bases` | No | Yes |
+| `search_knowledge_files` | Yes (auto-scoped) | Yes (all accessible KBs) |
+| `query_knowledge_files` | Yes (auto-scoped) | Yes |
+| `grep_knowledge_files` | Yes (auto-scoped) | Yes |
+| `view_file` | Yes (when attached items include files/collections) | No |
+| `view_knowledge_file` | Yes (when attached items include files/collections) | Yes |
+| `display_file` | Yes (when attached items include files/collections) | Yes |
+| `view_note` | Yes (when attached items include notes) | No |
 
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
@@ -740,7 +740,7 @@ See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-contex
 
 ### Interleaved Thinking {#interleaved-thinking}
 
-🧠 When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
+When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
 
 :::info Quality Models Required
 Interleaved thinking requires a model that can maintain context across multiple tool calls and choose tools sensibly. Current reasoning-capable models handle this — GPT-5.6, Claude Sonnet 5, Gemini 3.6 Flash, or MiniMax M3 are a reasonable minimum. Older or very small models will not.
@@ -761,7 +761,7 @@ For long-running workflows, combine interleaved tool use with `create_tasks` (to
 
 ---
 
-## 🚀 Summary & Next Steps
+## Summary & Next Steps
 
 Tools bring your AI to life by giving it hands to interact with the world.
 - **Browse Tools**: [openwebui.com/search](https://openwebui.com/search)

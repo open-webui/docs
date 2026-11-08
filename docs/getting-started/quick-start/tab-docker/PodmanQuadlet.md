@@ -2,7 +2,7 @@
 
 Podman Quadlets allow you to manage containers as native systemd services. This is the recommended way to run production containers on Linux distributions that use systemd (like Fedora, RHEL, Ubuntu, etc.).
 
-## 🛠️ Setup
+## Setup
 
 1. **Create the configuration directory:**
    For a rootless user deployment:
@@ -48,7 +48,7 @@ Podman Quadlets allow you to manage containers as native systemd services. This 
    systemctl --user enable open-webui
    ```
 
-## 📊 Management
+## Management
 
 - **Check status:**
   ```bash

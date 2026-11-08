@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-## 🪶 Apache Tika Extraction
+## Apache Tika Extraction
 
 This documentation provides a step-by-step guide to integrating Apache Tika with Open WebUI. Apache Tika is a content analysis toolkit that can be used to detect and extract metadata and text content from over a thousand different file types. All of these file types can be parsed through a single interface, making Tika useful for search engine indexing, content analysis, translation, and much more.
 

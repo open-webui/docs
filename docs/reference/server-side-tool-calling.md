@@ -39,9 +39,9 @@ Send the key in `x-api-key` instead, or rename the header with [`CUSTOM_API_KEY_
 
 | What you send | Who runs the tools | Where the answer comes back | Built-in tools |
 | :--- | :--- | :--- | :--- |
-| `chat_id` + `id` + `stream: true` (+ `session_id`) | **Open WebUI**, full multi-round native loop | The **chat record** (and the socket). The HTTP body is empty. | ✅ with `session_id` |
-| `params.function_calling: "legacy"` + `tool_ids` | **Open WebUI**, one round, before the model answers | The **HTTP response body**, normal OpenAI shape | ❌ |
-| Neither of the above | **Nobody**. Raw `tool_calls` are handed back to you | The HTTP response body | ❌ |
+| `chat_id` + `id` + `stream: true` (+ `session_id`) | **Open WebUI**, full multi-round native loop | The **chat record** (and the socket). The HTTP body is empty. | Yes with `session_id` |
+| `params.function_calling: "legacy"` + `tool_ids` | **Open WebUI**, one round, before the model answers | The **HTTP response body**, normal OpenAI shape | No |
+| Neither of the above | **Nobody**. Raw `tool_calls` are handed back to you | The HTTP response body | No |
 
 The reason is structural, not a setting: the native tool-execution loop lives in the same code path that streams events into a chat, so it only runs when the request identifies a chat (`chat_id`) and an assistant message (`id`), and it only runs for `stream: true`. That path writes the result into the chat instead of the HTTP response.
 

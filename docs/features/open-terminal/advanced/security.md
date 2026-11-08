@@ -252,18 +252,16 @@ When users need to be protected from each other, give each one their own contain
 
 ## Security checklist
 
-| ✅ | Recommendation |
-| :--- | :--- |
-| ☐ | Use Docker, not bare metal |
-| ☐ | Set a strong API key |
-| ☐ | Use admin-configured connections |
-| ☐ | Set memory and CPU limits |
-| ☐ | Use network isolation (internal Docker network) |
-| ☐ | Enable egress filtering if internet access isn't needed |
-| ☐ | Don't mount the Docker socket unless necessary |
-| ☐ | Use `slim` or `alpine` images if you don't need runtime package installs |
-| ☐ | Leave **Terminal Preview Allow Same Origin** off unless a preview genuinely needs it |
-| ☐ | Give each user their own container when users must be protected from each other |
+- [ ] Use Docker, not bare metal
+- [ ] Set a strong API key
+- [ ] Use admin-configured connections
+- [ ] Set memory and CPU limits
+- [ ] Use network isolation (internal Docker network)
+- [ ] Enable egress filtering if internet access isn't needed
+- [ ] Don't mount the Docker socket unless necessary
+- [ ] Use `slim` or `alpine` images if you don't need runtime package installs
+- [ ] Leave **Terminal Preview Allow Same Origin** off unless a preview genuinely needs it
+- [ ] Give each user their own container when users must be protected from each other
 
 ## Related
 

@@ -50,7 +50,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 - For GPU support: NVIDIA GPU with CUDA 12.3
 - For CPU-only: No special requirements
 
-## ⚡️ Quick start
+## Quick start
 
 ### You can choose between GPU or CPU versions
 

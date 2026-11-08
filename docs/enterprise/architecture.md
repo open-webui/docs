@@ -42,9 +42,9 @@ When properly configured, Open WebUI is designed to support high availability su
 
 Open WebUI isn't theoretically scalable, it's **deployed at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
 
-* 🎓 **Universities** managing institution-wide AI access.
-* 🏢 **Multinational Enterprises** deploying across regions and business units.
-* 🏛️ **Major Organizations** requiring consistent performance under heavy load.
+* **Universities** managing institution-wide AI access.
+* **Multinational Enterprises** deploying across regions and business units.
+* **Major Organizations** requiring consistent performance under heavy load.
 
 With the right infrastructure configuration, Open WebUI scales from pilot projects to mission-critical worldwide rollouts.
 

@@ -243,21 +243,21 @@ If your initial response is fast but follow-up questions become increasingly slo
 
 | Problem | Fix |
 |--------|------|
-| 🤔 Model can't "see" content | Check document extractor settings |
-| 🧹 Only part of content used | Enable Full Context Mode or Bypass Embedding |
-| ⏱ Limited by a small context length | Increase model context length or use large-context LLM |
-| 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
-| ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`); Knowledge Base limits are separate |
-| 🧩 Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
-| 🐌 Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
-| 📄 API returns "empty content" | Wait for file processing to complete before adding to knowledge base |
-| 💥 CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
-| 📷 PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
-| 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
-| 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
-| 🧠 Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or disable native function calling |
-| 🗂 Single attached file returns nothing | Re-index to rebuild the per-file indexes |
-| 📑 Docling citations show the wrong page | [Re-upload the file](/features/chat-conversations/rag/document-extraction/docling#citations-point-to-the-wrong-page) |
+| Model can't "see" content | Check document extractor settings |
+| Only part of content used | Enable Full Context Mode or Bypass Embedding |
+| Limited by a small context length | Increase model context length or use large-context LLM |
+| Inaccurate retrieval | Switch to a better embedding model, then reindex |
+| Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`); Knowledge Base limits are separate |
+| Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
+| Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
+| API returns "empty content" | Wait for file processing to complete before adding to knowledge base |
+| CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
+| PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
+| Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
+| Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
+| Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or disable native function calling |
+| Single attached file returns nothing | Re-index to rebuild the per-file indexes |
+| Docling citations show the wrong page | [Re-upload the file](/features/chat-conversations/rag/document-extraction/docling#citations-point-to-the-wrong-page) |
 
 ---
 
@@ -271,7 +271,7 @@ When uploading files via the API and immediately adding them to a knowledge base
 
 **The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously: the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
 
-✅ **Solution: Wait for Processing to Complete**
+**Solution: Wait for Processing to Complete**
 
 Before adding a file to a knowledge base, poll the status endpoint until processing is done:
 
@@ -325,7 +325,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 - PyTorch memory fragmentation from repeated small allocations
 - Large documents creating memory spikes during embedding
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Isolate Embedding to a Different GPU** (if available):
    Set `CUDA_VISIBLE_DEVICES` to pin embedding to a specific GPU separate from your chat model.
@@ -360,7 +360,7 @@ Error generating embeddings: 429 Rate limit reached
 
 **The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits, especially on free-tier or lower-tier plans.
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Limit Concurrent Embedding Requests**:
    Set [`RAG_EMBEDDING_CONCURRENT_REQUESTS`](/reference/env-configuration#rag_embedding_concurrent_requests) to cap the number of simultaneous embedding API calls. For example, set it to `5` or `10` depending on your provider's rate limits:
@@ -383,7 +383,7 @@ If PDFs containing images with text are returning empty content:
 
 **The Problem**: The default "pypdf" content extractor may struggle with certain PDF formats, especially those containing primarily image-based content.
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
    - Navigate to **Settings > Admin > Documents**
@@ -454,7 +454,7 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 
 ![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
 
-✅ **Solutions (check in order):**
+**Solutions (check in order):**
 
 1. **Check Global Model Settings first**:
    - Go to **Settings > Admin > Models** and open **Model Defaults**
@@ -505,7 +505,7 @@ Attaching one file with `#` retrieves nothing, while attaching the knowledge bas
 
 **The Problem**: a file belonging to a knowledge base is indexed twice, once with the knowledge base and once on its own. Attaching it by itself searches only its own index, which can go missing after a vector database migration, a partial reset or a deletion made directly in the vector database.
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Re-index** at **Settings > Admin > Documents > Reindex Knowledge and Memory Vectors**. This rebuilds each knowledge base, the per-file index of every file inside it and every user's memories. It re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
 2. **Re-upload the file** if it is not in any knowledge base, since re-indexing only covers knowledge bases.

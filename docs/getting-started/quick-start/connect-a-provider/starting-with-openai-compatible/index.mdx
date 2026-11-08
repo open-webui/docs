@@ -67,7 +67,7 @@ Saving a connection does not test it. Clicking the **Verify Connection** button 
 
 1. Open Open WebUI in your browser.
 2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
-3. Click ➕ **Add Connection**.
+3. Click **Add Connection**.
 4. Fill in the **URL** and **API Key** for your provider (see tabs below). The URL field will **suggest common provider endpoints** as you type.
 5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs** allowlist. After a successful **Verify Connection**, the **Model IDs** field suggests the provider's model IDs as you type.
 6. Click **Save**.
@@ -121,7 +121,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   - Turn the **builtin tools** capability off for the model if you only want plain chat.
   - For working native tool calling, put a gateway in front that translates to Google's own API, such as LiteLLM or OpenRouter, or use a pipe that calls `generateContent` directly.
 
-  This is a deviation on Google's side, so Open WebUI will not work around it. [Blank Replies When the Model Uses a Tool](/troubleshooting/connection-error#-blank-replies-when-the-model-uses-a-tool) covers the symptom in full, including how to test any other provider for it. Reported in [#28492](https://github.com/open-webui/open-webui/issues/28492).
+  This is a deviation on Google's side, so Open WebUI will not work around it. [Blank Replies When the Model Uses a Tool](/troubleshooting/connection-error#blank-replies-when-the-model-uses-a-tool) covers the symptom in full, including how to test any other provider for it. Reported in [#28492](https://github.com/open-webui/open-webui/issues/28492).
   :::
 
   </TabItem>
@@ -290,15 +290,15 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   | Capability                   | Bedrock Access Gateway (BAG) | stdapi.ai | LiteLLM (Bedrock provider) | AWS Bedrock Mantle |
   |------------------------------| --- | --- | --- | --- |
-  | Automatic models discovery   | ✅ | ✅ | ❌ | ✅ |
-  | Chat completion              | ✅ | ✅ | ✅ | ✅ |
-  | Embeddings                   | ✅ | ✅ | ✅ | ❌ |
-  | Text to speech               | ❌ | ✅ | ❌ | ❌ |
-  | Speech to text               | ❌ | ✅ | ❌ | ❌ |
-  | Image generation             | ❌ | ✅ | ✅ | ❌ |
-  | Image editing                | ❌ | ✅ | ❌ | ❌ |
-  | Models from multiple regions | ❌ | ✅ | ✅ | ❌ |
-  | No installation required     | ❌ | ❌ | ❌ | ✅ |
+  | Automatic models discovery   | Yes | Yes | No | Yes |
+  | Chat completion              | Yes | Yes | Yes | Yes |
+  | Embeddings                   | Yes | Yes | Yes | No |
+  | Text to speech               | No | Yes | No | No |
+  | Speech to text               | No | Yes | No | No |
+  | Image generation             | No | Yes | Yes | No |
+  | Image editing                | No | Yes | No | No |
+  | Models from multiple regions | No | Yes | Yes | No |
+  | No installation required     | No | No | No | Yes |
   | License                      | MIT | AGPL or Commercial | MIT or Commercial | AWS Service |
 
   #### Solution 1: Bedrock Access Gateway (BAG)
@@ -562,7 +562,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **Model IDs** | Auto-detected from your LiteLLM configuration |
   | **Provider** | `LiteLLM` (optional, see below) |
 
-  Setting **Provider** to `LiteLLM` under **Advanced** only matters when something calls Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#-anthropic-messages-api), for example an Anthropic SDK or a coding agent pointed at Open WebUI. With it set, such a request is handed to LiteLLM untouched instead of being translated into Chat Completions and back, so Anthropic-only fields survive the trip. The trade is that the request goes straight to LiteLLM and skips the Open WebUI chat pipeline, so filters, tools and knowledge do not run on it. Normal chatting in the Open WebUI interface is unaffected either way.
+  Setting **Provider** to `LiteLLM` under **Advanced** only matters when something calls Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api), for example an Anthropic SDK or a coding agent pointed at Open WebUI. With it set, such a request is handed to LiteLLM untouched instead of being translated into Chat Completions and back, so Anthropic-only fields survive the trip. The trade is that the request goes straight to LiteLLM and skips the Open WebUI chat pipeline, so filters, tools and knowledge do not run on it. Normal chatting in the Open WebUI interface is unaffected either way.
 
   **Quick setup:**
 
@@ -688,7 +688,7 @@ If your server is slow to start or you're connecting over a high-latency network
 AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
 ```
 
-If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for recovery options.
 
 :::
 
@@ -722,7 +722,7 @@ Leaving it at **Default** is always safe. Chatting works the same with every opt
 | **Azure OpenAI** | Requests are rewritten into Azure's deployment-based URL form with an `api-version` parameter, so the connection needs an **API Version** and the deployment names listed under **Model IDs**. Also switched on automatically for Azure-looking URLs, see the Azure OpenAI tab under [Cloud Providers](#cloud-providers). |
 | **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
 | **LM Studio** | Unlocks the same [model management panel](#managing-local-models-from-open-webui), loaded markers and model details, minus deleting models and minus the **Eject** button. |
-| **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#-anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
+| **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
 
 :::info Where the dropdown is not shown
 The **Provider** dropdown belongs to OpenAI connections only. Ollama connections are recognised on their own, and the personal **Direct Connections** users add in their own settings do not offer it.
@@ -786,4 +786,4 @@ That's it! Whether you choose a cloud provider or a local server, you can manage
 
 ---
 
-🚀 Enjoy building your perfect AI setup!
+Enjoy building your perfect AI setup!
