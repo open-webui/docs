@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Channels
 
 <ThemedImage
-  alt="Channels: a shared #product-launch channel where people and AI models talk in one timeline, summoned with @model mentions"
+  alt="Channels: three lanes with one block travelling along the middle lane"
   sources={{
     light: useBaseUrl('/images/banners/channels-light.svg'),
     dark: useBaseUrl('/images/banners/channels-dark.svg'),

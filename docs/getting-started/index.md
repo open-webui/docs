@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Getting Started with Open WebUI
 
 <ThemedImage
-  alt="Getting Started with Open WebUI: install, connect a provider, start chatting, then expand into app install, agents, sharing, and updates"
+  alt="Getting Started: a row of rising steps, the first one marked"
   sources={{
     light: useBaseUrl('/images/banners/getting-started-light.svg'),
     dark: useBaseUrl('/images/banners/getting-started-dark.svg'),

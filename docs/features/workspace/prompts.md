@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Prompts
 
 <ThemedImage
-  alt="Workspace map with the Prompts cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  alt="Workspace Prompts: a template block above a row of identical copies"
   sources={{
     light: useBaseUrl('/images/banners/workspace-prompts-light.svg'),
     dark: useBaseUrl('/images/banners/workspace-prompts-dark.svg'),

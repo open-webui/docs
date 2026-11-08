@@ -10,7 +10,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Models
 
 <ThemedImage
-  alt="Workspace map with the Models cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  alt="Workspace Models: a row of blocks, one raised"
   sources={{
     light: useBaseUrl('/images/banners/workspace-models-light.svg'),
     dark: useBaseUrl('/images/banners/workspace-models-dark.svg'),

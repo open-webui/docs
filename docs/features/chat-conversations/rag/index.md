@@ -7,7 +7,7 @@ import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 <ThemedImage
-  alt="Chat & Conversations map with the Documents (RAG) cell highlighted"
+  alt="Documents: a stack of sheets with one slid out"
   sources={{
     light: useBaseUrl('/images/banners/chat-conversations-documents-light.svg'),
     dark: useBaseUrl('/images/banners/chat-conversations-documents-dark.svg'),

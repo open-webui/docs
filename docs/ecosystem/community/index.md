@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Open WebUI Community
 
 <ThemedImage
-  alt="Open WebUI Community: posts discovered on openwebui.com, imported into an Open WebUI instance, and shared back"
+  alt="Open WebUI Community: a board of posts with one lifted off toward your instance"
   sources={{
     light: useBaseUrl('/images/banners/community-platform-light.svg'),
     dark: useBaseUrl('/images/banners/community-platform-dark.svg'),

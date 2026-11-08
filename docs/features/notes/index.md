@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Notes
 
 <ThemedImage
-  alt="Notes: a two-pane note editor with an AI chat sidebar, selecting text in the note and asking the AI to edit it in place"
+  alt="Notes: a notepad with its top sheet lifted"
   sources={{
     light: useBaseUrl('/images/banners/notes-light.svg'),
     dark: useBaseUrl('/images/banners/notes-dark.svg'),

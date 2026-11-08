@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Open Terminal
 
 <ThemedImage
-  alt="Open Terminal: the Open WebUI core driving a real terminal session in a loop, running commands and reading the output"
+  alt="Terminal: a screen block with a cursor"
   sources={{
     light: useBaseUrl('/images/banners/terminal-light.svg'),
     dark: useBaseUrl('/images/banners/terminal-dark.svg'),

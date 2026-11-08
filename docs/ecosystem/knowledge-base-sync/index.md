@@ -10,7 +10,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Knowledge Base Sync (oikb)
 
 <ThemedImage
-  alt="Knowledge Base Sync: many different source connectors flowing through the oikb sync hub into Open WebUI Knowledge Bases"
+  alt="Knowledge Sync: two towers with a block in transit between them"
   sources={{
     light: useBaseUrl('/images/banners/kbsync-light.svg'),
     dark: useBaseUrl('/images/banners/kbsync-dark.svg'),

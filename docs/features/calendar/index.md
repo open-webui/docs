@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Calendar
 
 <ThemedImage
-  alt="Calendar: a month grid with color-coded events and a recurring weekday standup, with AI creating events from a natural-language request"
+  alt="Calendar: a month of day tiles with one day lifted out"
   sources={{
     light: useBaseUrl('/images/banners/calendar-light.svg'),
     dark: useBaseUrl('/images/banners/calendar-dark.svg'),

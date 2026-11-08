@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Reference
 
 <ThemedImage
-  alt="Open WebUI Reference: canonical technical map for environment variables, API endpoints, HTTPS, monitoring, and network diagrams"
+  alt="Reference: four stacked drawers, one pulled out"
   sources={{
     light: useBaseUrl('/images/banners/reference-light.svg'),
     dark: useBaseUrl('/images/banners/reference-dark.svg'),
