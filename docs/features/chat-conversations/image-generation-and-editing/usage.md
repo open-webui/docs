@@ -78,7 +78,7 @@ You can edit an image by providing the image and a text prompt directly in the c
 2. **Enter a prompt** describing the change you want to make (e.g., "Change the background to a sunset" or "Add a hat").
 3. The model will generate a new version of the image based on your prompt.
 
-With an [Open Terminal](/features/open-terminal) that an administrator added, or a [Tether](/ecosystem/tether) terminal, selected in the chat, the model can also edit images stored in that terminal, such as files attached with [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads) set to `Filesystem`. It passes their absolute paths to `edit_image`, and Open WebUI reads them from that terminal with your access to it, in the same workspace the chat uses. Each image must be a PNG, JPEG, WebP or GIF of at most 25 megapixels and 50 MB.
+With an [Open Terminal](/features/open-terminal) that an administrator added, or a [Tether](/ecosystem/tether) terminal, selected in the chat, the model can also edit any image stored in that terminal, whatever [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads) is set to. It passes their absolute paths to `edit_image`, and Open WebUI reads them from that terminal with your access to it, in the same workspace the chat uses. Each image must be a PNG, JPEG, WebP or GIF of at most 25 megapixels and 50 MB.
 
 ## Image Compositing (Multi-Image Fusion)
 
