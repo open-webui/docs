@@ -144,6 +144,8 @@ JWT_EXPIRES_IN=24h
 
 Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will log a warning if this is set.
 
+Native apps such as [Tether](/ecosystem/tether) use renewable sessions instead, which end after [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) without use (default `90d`). Signing out of the app, deleting the session through the [Session API](/ecosystem/tether#session-api) and every account-wide sign-out below revoke such a session at once, with or without Redis.
+
 ### Token revocation
 
 Signing an account out of every device is stored in the database and works with or without Redis. It happens when:
@@ -527,7 +529,7 @@ AUDIT_INCLUDED_PATHS=auths,users,configs
 AUDIT_EXCLUDED_PATHS=/chats,/chat,/folders
 ```
 
-Authentication endpoints (signin, signout, signup and the MFA endpoints) are always audited regardless of path exclusions. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, in any letter case, is masked in both request and response bodies.
+Authentication endpoints (signin, signout, signup and the MFA endpoints) are always audited regardless of path exclusions. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, `secret`, `token`, `key` or `authorization` (or the plural, such as `tokens`), in any letter case, is masked in both request and response bodies. This includes lists of values and values cut off by the body size limit.
 
 Each entry has a `model_id` field with the model the client asked for. It is filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](/reference/env-configuration#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is, so `METADATA` is enough to see who used which model. The default exclusions skip `/api/chat/completions`, the endpoint the chat interface uses. To record those requests, drop `/chat` from the list:
 
@@ -537,7 +539,7 @@ AUDIT_EXCLUDED_PATHS=/chats,/folders
 
 With chat requests recorded, every model reply to a `/api/chat/completions` request writes its own audit entry next to the entry for the request. When a reply calls tools, each round of the model's answer between tool calls gets one. Such an entry has the model that answered in `model_id` and the token counts the provider reported in `usage` (`input_tokens`, `output_tokens` and `total_tokens`). Its `extra.request_id` holds the `id` of the request's entry, which links the two. A reply whose provider reports no token counts writes none. Background tasks, such as title and tag generation, write none either.
 
-Within these filters, the audit log covers HTTP requests that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
+Within these filters, the audit log covers `POST`, `PUT`, `PATCH` and `DELETE` requests (add `GET` with [`ENABLE_AUDIT_GET_REQUESTS`](/reference/env-configuration#enable_audit_get_requests)) that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
 
 ---
 

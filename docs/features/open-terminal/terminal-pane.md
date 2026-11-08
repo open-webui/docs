@@ -5,7 +5,7 @@ title: "Terminal Pane"
 
 # The Terminal Pane
 
-Under the [file browser](./file-browser.md) sits a live view of what the AI is running: every command the AI starts gets its own tab. For your own interactive shell, pick **New Terminal** from the **+** menu of the **Tabs** side panel; you can open several side by side.
+Under the [file browser](./file-browser.md) sits a live view of what the AI is running: every command the AI starts gets its own tab. For your own interactive shell, pick **New Terminal** from the **+** menu of the **Tabs**; you can open several side by side.
 
 It appears once the AI has run a command, collapsed as a single strip labelled **Sessions**. When commands are running, the strip carries a count of how many. Click the strip, or the chevron at its right, to open it.
 
@@ -47,6 +47,6 @@ The pane follows the terminal selected in the chat, the same as the file browser
 
 ## For self-hosted terminal servers
 
-Open WebUI proxies the interactive terminal over a websocket, and that connection carries `X-User-Id` and `X-Session-Id` headers naming the signed-in user and the chat the terminal belongs to. The HTTP proxy has always sent them; the websocket now does too, so a terminal server that scopes sessions per user sees the same identity on both.
+Open WebUI proxies the interactive terminal over a websocket, and that connection carries `X-User-Id` and `X-Session-Id` headers naming the signed-in user and the chat the terminal belongs to, the same as the HTTP proxy. A terminal server that scopes sessions per user sees the same identity on both.
 
-Both values are set by Open WebUI from the authenticated session, so a browser cannot choose them.
+Open WebUI sets `X-User-Id` from the authenticated session, so a browser cannot choose it. `X-Session-Id` is the chat ID the browser reports.

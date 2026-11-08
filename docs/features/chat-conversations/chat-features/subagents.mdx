@@ -33,7 +33,7 @@ Typical uses are researching several questions at once, working through a task t
 
 **Foreground** is the default. The parent chat waits for the sub-agent and receives its answer as the tool result, the same as any other tool call.
 
-**Background** must be enabled separately with [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled). The model gets an immediate handle instead of an answer and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible "Background sub-agent finished" row. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
+**Background** must be enabled separately with [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) or **Enable background sub-agents** in **Settings > Admin > Sub-agents**. The model gets an immediate handle instead of an answer and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible "Background sub-agent finished" row. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
 
 While background is disabled, the `background` option is stripped from the tool definition entirely, so the model cannot ask for it.
 
@@ -41,7 +41,7 @@ While background is disabled, the `background` option is stripped from the tool 
 
 A sub-agent starts with no attachments. Nothing the parent chat has uploaded travels with the task on its own, so delegating does not quietly drag every file in a long conversation into a second model call.
 
-To pass a file, the model names it in the `file_ids` argument of `delegate_task`. Those files are attached to the sub-agent's opening message the way you would attach them yourself: an image is handed to the model as an image, so a vision model can actually look at it, and a document is available to the sub-agent exactly as it is in a normal chat, retrieved through file context or read with the **Files** builtin tools when file context is off.
+To pass a file, the model names it in the `file_ids` argument of `delegate_task`. Those files are attached to the sub-agent's opening message the way you would attach them yourself: an image is handed to the model as an image, so a vision model can actually look at it, and a document is available to the sub-agent exactly as it is in a normal chat, injected when **Preload files** is on or read with the **Files** builtin tools when it is off.
 
 Only files already attached in the parent chat can be passed, and every ID is checked before anything runs. If one of them is unknown or no longer available, the call comes back as `Error: file_ids not attached or unavailable: <ids>` and no sub-agent is started.
 
@@ -53,7 +53,7 @@ Sub-agents need three things to line up:
 
 1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > Sub-agents**.
 2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Workspace > Models > Edit**, on by default once the feature is on.
-3. **Native function calling in the UI**: builtin tools are only injected for chats started in the interface, and only in Native mode. Legacy function calling and direct API callers never receive `delegate_task`.
+3. **Native function calling in a saved chat**: `delegate_task` is a builtin tool, so it needs Native mode and a request that carries a `session_id`, as every chat started in the interface does. It is not offered in legacy function calling or in temporary chats.
 
 There is no per-user permission for sub-agents. Once enabled for a model, anyone who can use that model can trigger delegation through it.
 
@@ -65,7 +65,7 @@ Configure these in **Settings > Admin > Sub-agents**, or with the matching envir
 |---|---|---|---|
 | Max concurrent | [`SUBAGENTS_MAX_CONCURRENT`](/reference/env-configuration#subagents_max_concurrent) | Empty (unlimited) | Foreground sub-agents at once. Extra ones wait for a slot. |
 | Max background | [`SUBAGENTS_MAX_ASYNC`](/reference/env-configuration#subagents_max_async) | Empty (unlimited) | Background sub-agents at once. Extra ones are refused immediately. |
-| Max iterations | [`SUBAGENTS_MAX_ITERATIONS`](/reference/env-configuration#subagents_max_iterations) | Empty (unlimited) | Tool-call loops one sub-agent may run before it is stopped. The parent then gets the error plus what the sub-agent wrote so far. |
+| Max iterations | [`SUBAGENTS_MAX_ITERATIONS`](/reference/env-configuration#subagents_max_iterations) | Empty (unlimited) | Tool-call rounds one sub-agent may run. At the limit it writes a final answer without tools, and that answer goes back to the parent. |
 | Max output | [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output) | Empty (unlimited) | Characters returned to the parent. Longer results are truncated. |
 | System prompt | [`SUBAGENTS_SYSTEM_PROMPT`](/reference/env-configuration#subagents_system_prompt) | Built-in | Added on top of the model's own system prompt. |
 
@@ -73,11 +73,11 @@ Three limits are worth understanding before changing them:
 
 - **They count per worker process, not per deployment.** With multiple workers or replicas, the real ceiling is the limit multiplied by the number of processes.
 - **Max concurrent only takes effect at startup.** It is read when the first delegation runs and is not re-read afterwards, so changing it needs a restart. Max background applies immediately.
-- **`0` is not a way to switch delegation off.** A limit is a positive whole number, and empty or `0` means no limit. Use [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) to turn the feature off.
+- **A limit is a positive whole number.** Empty or `0` means no limit. Use [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) to turn the feature off.
 
 ## What a Sub-agent Cannot Do
 
-Sub-agents are deliberately narrower than the chat that starts them:
+Sub-agents are narrower than the chat that starts them:
 
 - **No recursion.** A sub-agent cannot delegate again, so delegation cannot fan out without bound.
 - **No memory writes.** It can read memories but cannot add, change or delete them, keeping delegated work from quietly rewriting your personalization.
@@ -104,12 +104,6 @@ What delegation costs shows up in [Analytics](/features/administration/analytics
 | `delegate_task` | Delegate a task to a parallel sub-agent and return its result. |
 
 `delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), optional `file_ids` naming attachments the sub-agent has to open (see [Handing Over Files](#handing-over-files)), `model_id` to pick one of the model's sub-agent models, and `background` when background sub-agents are enabled.
-
-### Requirements
-
-- [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled.
-- The **Sub-agents** builtin tools category enabled on the model.
-- Native function calling, in a chat started from the interface.
 
 :::info The Sub-agents category also controls timers
 The `timer` tool is injected by the same category and the same [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) toggle. Turning sub-agents off also removes timers.

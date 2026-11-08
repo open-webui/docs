@@ -9,7 +9,7 @@ title: "Image Generation"
 
 - **Image Not Generating** (asking for an image produces no image, or an error appears in the chat):
     - Check the **Images** settings in **Settings** > **Admin** > **Images**. Ensure "Image Generation" is toggled **ON**.
-    - Ensure the **Image** toggle is on in the **Integrations** menu of the message input. Nothing image-related happens without it, in any function calling mode.
+    - Ensure the **Image** toggle is on in the **+** menu of the message input. Nothing image-related happens without it, in any function calling mode.
     - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).

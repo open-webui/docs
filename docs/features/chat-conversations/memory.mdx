@@ -21,8 +21,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 How well memories are stored and recalled depends heavily on the model. Frontier models manage memory well; small local models may store or retrieve information inconsistently.
 :::
 
-Open WebUI includes a sophisticated memory system that allows models to remember facts, preferences, and context across different conversations.
-With the introduction of **Native Tool Calling**, this system has been upgraded from a passive injection mechanism to an active, model-managed "long-term memory."
+Open WebUI includes a memory system that lets models remember facts, preferences, and context across conversations.
+With **Native Tool Calling**, the model manages this memory itself as an active "long-term memory."
 
 ## How it Works
 
@@ -37,10 +37,8 @@ Users can manually add, edit, or delete memories by navigating to:
 
 When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
-:::tip Minimum model tier (not a maintained list)
-Autonomous memory management needs a model that can decide what facts are worth saving and when to recall them. That does **not** require a frontier model — **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B** all do this well and are the **minimum**, each verified working at the time of writing. Only very small models struggle with appropriate memory selection.
-
-**This list is not continuously updated** — chasing every model release is impossible and adds no value. Use whatever current model your provider offers; you don't need the latest *and greatest*, just something recent.
+:::tip Minimum model tier
+Autonomous memory management needs a model that can decide which facts are worth saving and when to recall them. A frontier model is not required: **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B** are the minimum. Only very small models struggle with memory selection. The list is not updated with every model release; any recent model with solid tool calling works.
 :::
 
 Each memory carries a **type** and an optional **path** (see [Memory Types & Paths](#memory-types--paths) below). The model manages memory through these tools:
@@ -63,7 +61,7 @@ Each memory has a **type** and an optional **path**:
 
 These are set automatically by the memory tools; you do not need to assign them manually.
 
-## Benefits of the New Memory System
+## Benefits of the Memory System
 
 -   **Proactive Learning**: Instead of you manually typing preferences, a model can say: *"I'll remember that you prefer dark mode for your UI projects"* and call `add_memory` behind the scenes.
 -   **Contextual Retrieval**: If a conversation drifts into a topic mentioned months ago, the model can "search its brain" using `search_memories` to find those past details.
@@ -76,8 +74,7 @@ These are set automatically by the memory tools; you do not need to assign them 
 
 1.  **Administrative Enablement**: Ensure the Memory feature is [enabled globally](#administrative-controls) by an administrator and that you have the required permissions.
 2.  **Native Mode (Agentic Mode)**: Enable **Native Function Calling** in the model's advanced parameters (**Settings > Admin > Models > Edit** the model **> Advanced Params**).
-3.  **Minimum Model Tier**: Use a current model with solid tool calling, at minimum GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally. Very small models may not manage memories reliably.
-4.  **Per-Model Category Toggle**: Ensure the **Memory** category is enabled for the model in **Workspace > Models > Edit > Builtin Tools** (enabled by default).
+3.  **Per-Model Toggles**: Ensure the **Memory** capability and the **Memory** category under **Builtin Tools** are enabled for the model in **Workspace > Models > Edit** (both are on by default). The model also needs **Builtin Tools** on.
 
 [Automations](/features/chat-conversations/chat-features/automations) get the memory tools under the same conditions, whenever memory is on for the user who owns them. That follows the user's **Memory** switch in **Settings > Personalization**. If the user never set it, the default interface settings decide, and without those the instance-wide **Memories** setting.
 
@@ -94,7 +91,7 @@ For complete details on all built-in agentic tools (including memory, web search
 Administrators have full control over the Memory feature, including the ability to disable it globally or restrict it to specific user groups.
 
 ### Global Toggle
-The Memory feature can be toggled on or off for the entire instance. When disabled, the "Personalization" tab is hidden from all users, the memory-related API endpoints are blocked, stored memories are no longer injected into the system context and the model is no longer given the memory tools.
+The Memory feature can be toggled on or off for the entire instance. When disabled, the "Personalization" tab is hidden from all users, the memory-related API endpoints are blocked, stored memories are no longer added to the model's context and the model is no longer given the memory tools.
 - **Admin UI**: Settings > Admin > General > Features > **Memories**
 - **Environment Variable**: [`ENABLE_MEMORIES`](/reference/env-configuration#enable_memories) (Default: `True`)
 
@@ -103,7 +100,7 @@ Administrators can also control Memory access on a per-role or per-group basis f
 - **Admin UI**: Admin Panel > Users > Permissions > Features > **Memories**
 - **Environment Variable**: [`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories) (Default: `True`)
 
-Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab, the memory API endpoints answer them with `403`, the model is no longer handed the memory tools and their stored memories are no longer injected into the system context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
+Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab, the memory API endpoints answer them with `403`, the model is no longer handed the memory tools and their stored memories are no longer added to the model's context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
 
 ### Background Review & Limits
 
@@ -111,8 +108,8 @@ Taking the permission away closes every route memories take to a model. The affe
 - **Injection budgets**: [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
 
 ### Memory System Context
-By default Open WebUI injects the user's stored memories into the model's system context so the model is aware of them on every turn. This injection can be turned off independently of the memory tools: when disabled, the model can still add, update and delete memories on request, but remembered information is no longer added to the prompt automatically.
-- **Admin UI**: Settings > Admin > General > **Memory System Context** (shown when Memories is enabled)
+By default Open WebUI adds the user's stored memories to the model's context so the model is aware of them. With Native function calling they arrive once per reply as a hidden `recall_memories` tool result after the user's message, otherwise they are appended to the user's message. Recall also needs the model's **Memory** capability. This injection can be turned off independently of the memory tools: when disabled, the model can still add, update and delete memories on request, but remembered information is no longer added to the prompt automatically.
+- **Admin UI**: Settings > Admin > General > Features > **Memory System Context** (shown when Memories is enabled)
 - **Environment Variable**: [`ENABLE_MEMORY_SYSTEM_CONTEXT`](/reference/env-configuration#enable_memory_system_context) (Default: `True`)
 
 ## Privacy & Security

@@ -85,7 +85,7 @@ When using `UVICORN_WORKERS` greater than 1 with the default `LocalOrchestrator`
 
 1. Log in to your Open WebUI instance
 2. Navigate to **Settings** → **Admin** → **Documents**
-3. Change the **Default** content extraction engine dropdown to **Docling**
+3. Set **Content Extraction Engine** to **Docling**
 4. Set **Docling Server URL** to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native). The default is `http://docling:5001`.
 5. Optionally set **API Key** (`DOCLING_API_KEY`), which is sent to docling-serve as the `X-Api-Key` header
 6. Save the changes
@@ -231,7 +231,7 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via e
 
 ### Citations point to the wrong page
 
-**Cause**: Docling marks only page changes in its Markdown output, so a blank page leaves no page break. Older extractions counted pages from those breaks, so every citation after a blank page shows an earlier page number. Open WebUI takes the page numbers from the JSON output Docling returns alongside the Markdown.
+**Cause**: Docling marks only page changes in its Markdown output, so a blank page leaves no page break. Page numbers counted from those breaks make every citation after a blank page show an earlier page number. Open WebUI takes the page numbers from the JSON output Docling returns alongside the Markdown.
 
 **Solution**: Upload the affected files again, for example by removing a file from its knowledge base and adding it back. Page numbers are set when Docling extracts a file, and **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents** reuses the text already extracted, so it keeps the old page numbers.
 

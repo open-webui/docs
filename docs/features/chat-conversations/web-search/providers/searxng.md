@@ -366,9 +366,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 ## 5. Using Web Search in a Chat
 
-To access Web Search, Click the Integrations button next to the + icon.
-
-Here you can toggle Web Search On/Off.
+To use Web Search, open the **+** menu and turn on **Web Search**.
 
 ![Web Search UI Toggle](/images/web_search_toggle.png)
 

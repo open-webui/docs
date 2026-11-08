@@ -23,9 +23,9 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 An agent harness is the system around a model that lets it do real work: instructions, context, tools, state, permissions, feedback loops, observability, and an execution environment. Open WebUI already gives you the control side of that harness: models, chats, knowledge, prompts, tools, MCP connections, memory, users, permissions, automations, and shared workflow controls. Open Terminal completes it with the part most chat products are still missing: a real computer substrate where actions run and evidence comes back.
 
-That means the agent can do real work. Not just answer questions about a task, and not just emit code you run somewhere else. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
+That means the agent does the work itself. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
 
-Despite the name, Open Terminal is not just a terminal panel. It is the computer-like workspace that makes Open WebUI's agent loop capable of acting on files, code, packages, servers, documents, and generated artifacts. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
+Open Terminal is the computer-like workspace that makes Open WebUI's agent loop capable of acting on files, code, packages, servers, documents, and generated artifacts. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
 
 ![Open WebUI with Open Terminal selected and the Files tab open beside a new chat](/images/open-terminal-file-browser.png)
 
@@ -115,7 +115,7 @@ Describe a site or app. The agent can create the files, install dependencies, st
 
 ### Software development
 
-Clone repos, inspect architecture, run test suites, debug failures, refactor code, and work with Git. The key capability is not just writing code; it is running and verifying it.
+Clone repos, inspect architecture, run test suites, debug failures, refactor code, and work with Git. The agent runs and verifies the code it writes.
 
 ### File and system automation
 
@@ -156,6 +156,7 @@ Open Terminal needs a model that performs tool calling at agentic quality, not j
 - **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites in the Browser tab
 - **[System automation](/features/open-terminal/use-cases/system-automation)**: file management, backups, batch operations
 - **[Advanced workflows](/features/open-terminal/use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
+- **[Coding agents](/features/open-terminal/coding-agents)**: Claude Code, Codex and Pi in the model picker
 - **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files, Git
 
 ---

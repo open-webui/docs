@@ -111,7 +111,7 @@ Something added in `inlet` reaches the first call and can be dropped from later 
 
 **Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `tool_ids`, `terminal_id`, `files`, `folder_id` and `skill_ids`. A filter that needs any of these has to be an `inlet`. `variables`, `regeneration_prompt` and `params` are popped even earlier, before `inlet` runs, and `variables` stays readable as `__metadata__["variables"]`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
 
-**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the chat's own system message and the folder system prompt (the workspace model's own System Prompt is added by the provider router after `request` returns), and memory or web-search context. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
+**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the chat's own system message and the folder system prompt (the workspace model's own System Prompt is added by the provider router after `request` returns), and web-search context, plus memory context on Legacy function calling. With Native function calling, recalled memories, the skills list and the attached knowledge list are added as hidden tool results after `inlet` and the first `request` call, so `inlet` never sees them and `request` sees them as tool messages from the second call of a reply on. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
 
 Provider-shape normalization happens after `request` returns, so you still see Open WebUI's internal message shapes, not the provider's.
 
@@ -156,7 +156,7 @@ What a raised exception does depends on the hook. From `inlet`, or from the firs
 
 By default a filter that's **active and in scope** (global, or attached to the model) runs on every request. The user has no say in it. That's often what you want (PII scrubbing, logging, mandatory guardrails). Sometimes you want the opposite: let the user decide whether the filter runs for a given conversation.
 
-Set `self.toggle = True` to make the filter **user-controllable**. The filter then shows up in the chat UI with a clickable chip + an entry in the Integrations menu, and only runs on requests where the user has it selected.
+Set `self.toggle = True` to make the filter **user-controllable**. The filter then shows up as a switch in the chat input's **+** menu, and only runs on requests where the user has it selected.
 
 ```python
 from pydantic import BaseModel, Field
@@ -191,24 +191,22 @@ class Filter:
 
 It is a **visibility / gating flag**, read once at request-dispatch time, **not** a runtime state the UI flips on your Python object. Specifically:
 
-- **Visibility:** the filter only appears in the chat UI (inline chip + Integrations menu entry) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
+- **Visibility:** the filter only appears in the chat UI (the **+** menu entry and its chip) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
 - **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `request()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
 - **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__`, which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
 
 :::warning Upgrading from pre-0.9.0 filters
-Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally. The user controls whether `inlet()` runs by selecting/deselecting the chip. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; clicking the chip opens the user's valves modal automatically.
+Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally. The user controls whether `inlet()` runs by switching the filter on or off. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; the user opens it from the filter's **Valves** button.
 :::
 
 #### How users interact with a toggleable filter
 
-When a toggleable filter is in scope for the current chat, two UI surfaces show up:
+When a toggleable filter is in scope for the current chat, it shows up in two places:
 
-- **Inline chip in the chat input bar.** Shows the filter's `self.icon` + name. Clicking it:
-  - **opens the user-valves modal** if the filter defines a `UserValves` class (so the user can tune per-chat settings), **otherwise**
-  - **removes the filter from the current selection** for this chat session (the chip disappears from the inline row).
-- **Integrations menu (gear icon).** Lists every toggleable filter in scope, each with a proper on/off **Switch**. This is where users re-enable a filter they removed from the chip row, or switch one off that was selected by default.
+- **The + menu in the chat input.** Lists every toggleable filter in scope with its `self.icon`, name and an on/off **Switch**. A filter that defines a `UserValves` class also gets a **Valves** button there.
+- **A chip beside the + button**, only while the user has **Show Input Selections** on in **Settings > Interface** (off by default). It shows for each selected filter. Clicking it opens the user-valves modal if the filter defines `UserValves`, otherwise it removes the filter from the selection; the **x** on hover always removes it.
 
-The chip being present = the filter is enabled for the next request. The chip being absent (but the filter is in the Integrations menu) = the user has turned it off.
+A filter whose switch is on runs on the next request.
 
 #### Where the selection lives
 
@@ -219,13 +217,13 @@ The chip being present = the filter is enabled for the next request. The chip be
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
 
-`self.icon` continues to work as before: pass a URL (strongly preferred) or a base64 data URI, and it renders in both the inline chip and the Integrations menu entry. See the [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example-specifying-action-frontmatter) for why hosted URLs are recommended over base64.
+`self.icon` takes a URL (strongly preferred) or a base64 data URI and renders in both the **+** menu entry and the chip. See the [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example-specifying-action-frontmatter) for why hosted URLs are recommended over base64.
 
 ---
 
 ### Owning Retrieval With file_handler
 
-By default, when a user attaches a knowledge collection or uploads a file to a chat, Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
+When a user attaches a knowledge collection or uploads a file to a chat and the model's **Preload files** capability is on (the default with Legacy function calling), Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
 
 This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file/collection *references* (IDs, names, types). **The chunk text doesn't exist yet**: retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough. The data you want isn't there yet.
 
@@ -429,7 +427,7 @@ Understanding the difference between these two types is key to using the filter 
 - Run automatically whenever the filter is active for a model
 - **No user control** in the chat interface
 - Have no **Start enabled in new chats** switch in the model's **Filters** row
-- Do **not** show up in the chat integrations menu (gear icon)
+- Do **not** show up in the chat input's **+** menu
 
 **Use Cases:**
 - **Content moderation**: Filter profanity, hate speech, or inappropriate content
@@ -459,7 +457,7 @@ class ContentModerationFilter:
 #### Toggleable Filters (`toggle=True`)
 
 **Characteristics:**
-- Appear in the **chat input bar as a clickable chip** and in the **Integrations menu (gear icon) as a Switch**.
+- Appear in the chat input's **+** menu as a **Switch**, and as a chip beside the **+** button while **Show Input Selections** is on.
 - Users can add or remove them from the active selection on a per-chat, per-session basis. Selection is stored in browser sessionStorage, not persisted to the chat record on the server.
 - Get a **Start enabled in new chats** switch in the model's **Filters** row.
 - `defaultFilterIds` on the model controls the **initial selection** (which toggleable filters start on when a new chat begins with that model).
@@ -471,7 +469,7 @@ class ContentModerationFilter:
 - **Verbose/detailed mode**: User toggles between concise and detailed responses
 - **Translation filters**: User enables translation to/from specific languages
 - **Code formatting**: User chooses when to apply syntax highlighting or linting
-- **Thinking/reasoning toggle**: User switches the underlying model's thinking mode on/off by enabling the filter (do the work unconditionally in `inlet()`; the user disables it by removing the chip)
+- **Thinking/reasoning toggle**: User switches the underlying model's thinking mode on/off by enabling the filter (do the work unconditionally in `inlet()`; the user disables it with its switch)
 - **Markdown rendering**: Toggle between raw text and formatted output
 - **Anonymization mode**: User enables when discussing sensitive topics
 - **Expert mode**: Inject domain-specific context (legal, medical, technical)
@@ -499,13 +497,12 @@ class WebSearchFilter:
 
 1.  **Model Settings → Filters → Start enabled in new chats**
     - Admin switches on the toggleable filters that start in the selection on new chats with that model.
-2.  **Chat input bar → Inline chip**
-    - Shown for every toggleable filter currently in the user's selection for this chat.
-    - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection** (it moves back to the Integrations menu where the user can re-enable it).
+2.  **Chat input → + menu**
+    - Lists every toggleable filter in scope for the current model, each with an on/off **Switch**, and a **Valves** button when the filter defines `UserValves`.
+3.  **Chat input → chip beside the + button**
+    - Shown for every toggleable filter in the user's selection, only while **Show Input Selections** is on in **Settings > Interface**.
+    - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection**.
     - `self.icon` renders as the chip's image.
-3.  **Chat UI → Integrations Menu (gear icon)**
-    - Lists every toggleable filter in scope for the current model, each with a proper on/off **Switch**.
-    - Used to re-enable a filter removed from the chip row, or to turn off a filter selected by default.
 
 ---
 
@@ -525,8 +522,8 @@ Here's the complete flow from admin configuration to filter execution:
 - **Start enabled in new chats** switch: Set default enabled state (only for toggleable filters)
 
 **3. CHAT UI (User Interaction, Toggleable Filters Only)**
-- Chat input bar → Inline chip (add/remove via click; click opens UserValves modal if defined)
-- Chat → Integrations Menu → Switch per toggleable filter
+- Chat input → **+** menu → Switch per toggleable filter
+- Chat input → chip per selected filter, with **Show Input Selections** on (click opens UserValves modal if defined, otherwise removes the filter)
 - Frontend tracks `selectedFilterIds` in sessionStorage (per chat, per session)
 - Initial selection seeded from the model's `defaultFilterIds`
 - Always-on filters (no `self.toggle`) run automatically with no UI control
@@ -912,13 +909,13 @@ Only parameters you declare in your function signature are injected. Open WebUI 
 
 Each selected or global toggleable filter shows a **Start enabled in new chats** switch below its entry.
 
-#### In Chat UI (Integrations Menu)
+#### In the Chat Input's + Menu
 
 | Element | Description |
 |---------|-------------|
 | Filter name | Shows the filter's display name |
 | Custom icon | SVG icon from `self.icon` (if provided) |
-| Toggle switch | Enable/disable the filter for this chat, and the only indicator of its state |
+| Toggle switch | Enable/disable the filter for this chat |
 
 ---
 

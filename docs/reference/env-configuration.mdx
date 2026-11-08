@@ -298,7 +298,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | :--- | :--- | :--- |
 | `model_editor.capabilities.vision` | Vision | **Vision** under **Capabilities** in the model editor |
 | `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Capabilities** in the model editor |
-| `model_editor.capabilities.file_context` | File Context | **File Context** under **Capabilities** in the model editor |
+| `model_editor.capabilities.file_context` | Preload files | **Preload files** under **Capabilities** in the model editor |
 | `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Capabilities** in the model editor |
 | `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Capabilities** in the model editor |
 | `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Capabilities** in the model editor |
@@ -368,6 +368,8 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `settings.iframe_sandbox_allow_same_origin` | iframe Sandbox Allow Same Origin | **iframe Sandbox Allow Same Origin** in **Settings > Interface** |
 | `settings.iframe_sandbox_allow_forms` | iframe Sandbox Allow Forms | **iframe Sandbox Allow Forms** in **Settings > Interface** |
 | `settings.iframe_sandbox_allow_downloads` | iframe Sandbox Allow Downloads | **iframe Sandbox Allow Downloads** in **Settings > Interface** |
+
+The `chat.selected_*` indicators show only while the user has **Show Input Selections** on in **Settings > Interface**.
 
 #### `DEFAULT_USER_ROLE`
 
@@ -486,6 +488,13 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 - Description: How many characters of a skill's instructions the model gets when the `SKILL.md` is longer than `SKILL_CONTENT_MAX_CHARS`. Capped at `SKILL_CONTENT_MAX_CHARS`. Must be a positive integer, or Open WebUI stops at startup.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Preview Length**. Leave the field empty to use the default.
 
+#### `VIEW_CHAT_MAX_CHARS`
+
+- Type: `int`
+- Default: empty, which means no limit
+- Description: The most characters of message text the `view_chat` tool returns when a model reads a previous chat. The newest messages are kept, and the result tells the model it was cut and how many messages it holds. Must be a positive integer, or Open WebUI stops at startup. See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > Admin > General > Chat Read Limit**. Leave the field empty for no limit.
+
 #### `ENABLE_AUTOMATIONS`
 
 - Type: `bool`
@@ -563,7 +572,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum tool-call loops a single sub-agent may run before it is stopped. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty or `0` means no limit even when that one is set. The sub-agent reports that it hit the limit.
+- Description: Maximum tool-call rounds a single sub-agent may run. This overrides the global [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](#chat_response_max_tool_call_iterations) for sub-agents, so empty or `0` means no limit even when that one is set. At the limit the sub-agent writes a final answer without tools.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_OUTPUT`
@@ -734,15 +743,12 @@ Whether a deployment has to mark or disclose AI-generated content, and in what f
 
 - Type: `int`
 - Default: unset (the AnyIO limit of `40` and Python's default executor size apply)
-- Description: Sets the maximum number of **concurrent** blocking operations that may run in worker threads at once. Open WebUI offloads synchronous/blocking work (file I/O, sync route handlers, some library calls) to threads; a positive value sets both the AnyIO thread limit and the size of the event loop's default thread pool. The value is a **concurrency ceiling (a token limit), not a fixed pool of pre-spawned OS threads and not a CPU-core/thread count**: worker threads are created lazily only when needed and reused, so a high value does **not** by itself create that many threads, consume CPU, or cause CPU contention while idle. It only raises how many blocking operations can be in flight simultaneously before the rest must queue.
+- Description: Sets the maximum number of **concurrent** blocking operations (file I/O, sync route handlers, some library calls) that may run in worker threads at once. A positive value sets both the AnyIO thread limit and the size of the event loop's default thread pool. It is a concurrency ceiling, not a count of pre-spawned threads: threads are created lazily and reused, so a high value costs nothing while idle.
 
-:::warning Set this high on any real server (2000+); never lower it
-The AnyIO default of `40` is far too low for production. When more than `THREAD_POOL_SIZE` blocking operations are needed at once (many users acting at the same time, or a few users each triggering several blocking calls), every further request **waits** for a free slot. The symptom is the whole app appearing to **hang / freeze / stop responding** under load, even though CPU and memory look fine. It is pool starvation, not resource exhaustion.
+:::warning Set this to 2000 or higher on any real server; never lower it
+The default of `40` is far too low for production. When more than `THREAD_POOL_SIZE` blocking operations are needed at once, every further request waits for a free slot and the whole app appears to hang while CPU and memory look fine. `2000` is a lower bound for large multi-user instances; going higher is fine.
 
-- **Normal servers / production:** `2000` or higher. `2000` is a *lower* bound for very large multi-user instances; going higher is fine and is **not** a CPU or contention risk (it is a ceiling, not a preallocation).
-- **Never decrease below the default.** An idle high ceiling costs effectively nothing; a low ceiling causes freezes.
-- **Exception, weak hardware (Raspberry Pi, tiny VPS, containers capped at ~250m CPU / very low RAM):** do **not** set `2000` here. Each *genuinely concurrent* blocking op still uses a real OS thread (stack memory), so on a tiny device an enormous ceiling lets a traffic burst spawn enough threads to exhaust RAM. Leave it at the default, or set a modest value (e.g. a few hundred) matched to what the device can actually absorb. This caveat applies only to constrained single-board / micro deployments; any normal server should use `2000+`.
-
+On weak hardware (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or very little RAM) keep the default or set a few hundred. Each concurrent blocking operation uses a real OS thread with its own stack, so a huge ceiling lets a traffic burst exhaust RAM on a small device.
 :::
 
 #### `THREAD_POOL_THREAD_NAME_PREFIX`
@@ -924,10 +930,10 @@ It is recommended to set this to a high single-digit to low double-digit number 
 
 - Type: `int`
 - Default: `1024`
-- Description: Caps how many sequential tool-calling turns the agentic loop will run within a **single** assistant response when Native Function Calling is enabled. Each turn where the model emits one or more tool calls counts as **one** toward this limit (multiple tool calls grouped in the same turn still count as one); the counter resets for every new message and does not carry across turns of a conversation. It is **not** a retry budget for failed tool calls: a successful call and a failed call each consume one, exactly the same. Set to `-1` for **unlimited** (no cap). Read once at startup; it is **not** a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `1024`. `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` is read when this is unset.
+- Description: Caps how many sequential tool-calling turns the agentic loop runs within a **single** assistant response when Native Function Calling is enabled. A turn is one model reply that requests tools: several calls in the same turn count as one, and failed calls count like successful ones. The counter resets for every new message. At the cap the model gets one more request without tools and writes a final answer. Set to `-1` for **unlimited** (no cap). Read once at startup; it is not a `ConfigVar` and cannot be changed from the Admin UI. An empty or invalid value falls back to `1024`. `CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES` is read when this is unset.
 
-:::info Hitting the limit is visible
-On reaching the cap, Open WebUI emits a **`Tool-call limit reached (N iterations).`** error in the chat. A continuation request that fails outright, the provider erroring while the loop is fetching the model's next turn, is reported the same way. The same applies to the code interpreter's continuation loop. `1024` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
+:::info Continuation errors
+A continuation request that fails outright (the provider errors while the loop fetches the model's next turn) shows the provider's error in the chat. `1024` is high enough for normal runs; raise it or set `-1` only for unbounded agents, accepting that a looping model then runs many more turns before stopping.
 :::
 
 #### `ENABLE_RESPONSES_API_STATEFUL`
@@ -1125,7 +1131,7 @@ whole number falls back to `300`.
 
 :::info
 
-Leave it unset to keep the previous behavior, where a provider that stops sending data mid-stream holds the connection until the total timeout expires. Set it to something a little above your slowest expected gap between tokens (for example `60`) to fail fast on a stalled upstream. Non-numeric values and anything zero or below are treated as unset.
+Unset, a provider that stops sending data mid-stream holds the connection until the total timeout expires. Set it to something a little above your slowest expected gap between tokens (for example `60`) to fail fast on a stalled upstream. Non-numeric values and anything zero or below are treated as unset.
 
 :::
 
@@ -1516,7 +1522,7 @@ when using OpenAI-compatible endpoints.
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation and compaction summaries stop at 1000 output tokens and the other tasks send no parameters. Setting anything here drops that built-in limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
+- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation stops at 1000 output tokens and the other tasks send no parameters. Setting anything here drops the title limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Context compaction summaries have no output limit unless `max_tokens` is set here. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
 
 :::info
@@ -1527,12 +1533,68 @@ Several parameters have no effect on background requests wherever you set them: 
 
 :::
 
+#### `ENABLE_TOOL_CALL_LABELS`
+
+- Type: `bool`
+- Default: `False`
+- Description: In Native function calling mode, asks the model to write a short running and completed label for each tool call in the user's language, which the chat shows in place of the default tool call text. Each tool gets an extra required `__labels__` argument that Open WebUI removes before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object are skipped. See [Tool call labels](/features/extensibility/plugin/tools#tool-call-labels). Can also be toggled in **Settings > Admin > Interface > Tool Call Labels**.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_call_labels.enable`.
+
 #### `ENABLE_TOOL_PERMISSIONS`
 
 - Type: `bool`
 - Default: `False`
-- Description: Adds a **Tool Permissions** entry to the chat input's plus menu, where a user picks **Full access** (run tools without asking, the default) or **Ask for approval** (stop before each tool call until it is allowed or denied). Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Automations and channel replies always run with full access, since nobody is watching the chat to approve anything. Can also be toggled in **Settings > Admin > Interface**.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Description: Adds a **Tool Permissions** entry to the chat input's **+** menu, where a user picks **Full access** (run tools without asking, the default when **Auto** is not offered), **Ask for approval** (stop before each tool call until it is allowed or denied) or, with [`ENABLE_TOOL_PERMISSIONS_AUTO`](#enable_tool_permissions_auto) on, **Auto**. Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Channel replies always run with full access. Automations have no chosen mode, so they run in **Auto** when it is offered and with full access otherwise. Can also be toggled in **Settings > Admin > Interface**.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.enable`.
+
+#### `ENABLE_TOOL_PERMISSIONS_AUTO`
+
+- Type: `bool`
+- Default: `False`
+- Description: Adds **Auto** next to **Full access** and **Ask for approval** in the **Tool Permissions** entry when [`ENABLE_TOOL_PERMISSIONS`](#enable_tool_permissions) is on. In **Auto**, the engine set by [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) decides for each tool call whether it runs or waits for approval. Users who have not chosen a mode get **Auto**. Not available in channel chats. See [Tool Approval](/features/extensibility/plugin/tools#tool-approval). Can also be toggled in **Settings > Admin > Interface** (**Auto permissions**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.enable`.
+
+#### `TOOL_PERMISSIONS_AUTO_ENGINE`
+
+- Type: `str` (empty or `decisions`)
+- Default: Empty string
+- Description: What decides which tool calls need approval in **Auto**. Empty lets the chat model decide: Open WebUI adds the approval policy to the system prompt and a required `__approval__` argument to each tool. `decisions` sends each tool call to a review service at [`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](#tool_permissions_auto_decisions_api_base_url). Any other value makes every call in **Auto** ask for approval. See [Auto](/features/extensibility/plugin/tools#auto). Can also be set in **Settings > Admin > Interface** (**Engine**: **Default** or **Decisions API**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.engine`.
+
+#### `TOOL_PERMISSIONS_AUTO_PROMPT`
+
+- Type: `str`
+- Default: Empty string (use the built-in approval policy)
+- Description: Approval policy that describes which tool calls need approval. Used by both engines. Can also be set in **Settings > Admin > Interface** (**Approval policy**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.prompt`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.openai.com/v1`
+- Description: Base URL of the review service used when [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) is `decisions`. Open WebUI sends each review request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.api_base_url`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key sent as a Bearer token to the review service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.api_key`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_MODEL`
+
+- Type: `str`
+- Default: `gpt-6-luna`
+- Description: Model name sent to the review service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.model`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_THRESHOLD`
+
+- Type: `float`
+- Default: `0.5`
+- Description: A value from `0` to `1`. A tool call asks for approval when the review service's probability that it needs approval is at or above this value. A value outside that range makes every call ask for approval. Can also be set in **Settings > Admin > Interface** (**Approval threshold**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.threshold`.
 
 #### `ENABLE_CONTEXT_COMPACTION`
 
@@ -1580,8 +1642,50 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request and listed by name in the system prompt, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
+- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.enable`.
+
+#### `TOOL_SEARCH_ENGINE`
+
+- Type: `str` (`bm25`, `embeddings` or `decisions`)
+- Default: `bm25`
+- Description: How [Tool Search](/features/extensibility/plugin/tools#tool-search) matches a search to deferred tools. `bm25` ranks by keywords, `embeddings` uses the Documents embedding model and `decisions` asks a [Decisions API](/features/extensibility/plugin/tools#search-engines) service. Only the selected engine runs. Can also be set in **Settings > Admin > Interface** (**Search engine**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.engine`.
+
+#### `TOOL_SEARCH_DECISIONS_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.openai.com/v1`
+- Description: Base URL of the service used when [`TOOL_SEARCH_ENGINE`](#tool_search_engine) is `decisions`. Open WebUI sends each search request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.api_base_url`.
+
+#### `TOOL_SEARCH_DECISIONS_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key sent as a Bearer token to the Tool Search Decisions service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.api_key`.
+
+#### `TOOL_SEARCH_DECISIONS_MODEL`
+
+- Type: `str`
+- Default: `gpt-6-luna`
+- Description: Model name sent to the Tool Search Decisions service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.model`.
+
+#### `TOOL_SEARCH_DECISIONS_THRESHOLD`
+
+- Type: `float`
+- Default: `0.5`
+- Description: A value from `0` to `1`. Only tools whose relevance probability is at or above this value are returned. Can also be set in **Settings > Admin > Interface** (**Relevance threshold**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.threshold`.
+
+#### `TOOL_SEARCH_DECISIONS_PROMPT`
+
+- Type: `str`
+- Default: Empty string (use the built-in relevance instructions)
+- Description: Instructions the Decisions service follows when it rates a tool's relevance. The search query and tool definition are added automatically. Can also be set in **Settings > Admin > Interface** (**Prompt**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.prompt`.
 
 #### `TOOL_SEARCH_DEFER_THRESHOLD`
 
@@ -1739,28 +1843,28 @@ Code execution and both of its engines are **legacy**. `pyodide` (browser/WebAss
 #### `CODE_EXECUTION_JUPYTER_URL`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string
 - Description: Specifies the Jupyter URL to use for code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_EXECUTION_JUPYTER_AUTH`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string
 - Description: Specifies the Jupyter authentication method to use for code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_EXECUTION_JUPYTER_AUTH_TOKEN`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string
 - Description: Specifies the Jupyter authentication token to use for code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CODE_EXECUTION_JUPYTER_AUTH_PASSWORD`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string
 - Description: Specifies the Jupyter authentication password to use for code execution.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1808,7 +1912,7 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 #### `CODE_INTERPRETER_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string (the built-in prompt is used)
 - Description: Specifies the prompt template to use for code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -2249,7 +2353,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints in memory. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > Connections > "Cache Base Model List".
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > Connections > "Cache Base Model List".
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 **How the cache works:**
@@ -2258,7 +2362,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 - **Storage**: The cache is kept in each process's memory and, when Redis is configured, shared through Redis so all workers and replicas use one list.
 - **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
 - **Cache Refresh**: The cache is refreshed when:
-  - The application restarts
+  - The application restarts (without Redis; a list stored in Redis survives restarts)
   - The connection settings are saved in the **Settings > Admin > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
   - An admin downloads, deletes, loads or unloads a model on a connection
 - **No TTL**: There is no automatic time-based expiration.
@@ -2289,7 +2393,7 @@ Open WebUI has **two model caching mechanisms** that work independently:
 
 | Setting | Type | Default | Refresh Trigger |
 |---------|------|---------|-----------------|
-| `ENABLE_BASE_MODELS_CACHE` | In-memory | `False` | App restart OR Admin Save |
+| `ENABLE_BASE_MODELS_CACHE` | Memory, or Redis when configured | `False` | Admin Save, or app restart without Redis |
 | `MODELS_CACHE_TTL` | TTL-based | `1` second | Automatic after TTL expires |
 
 For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODELS_CACHE_TTL=300`.
@@ -2314,6 +2418,13 @@ Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens v
 If you have already deployed with `JWT_EXPIRES_IN=-1`, you can rotate or change your `WEBUI_SECRET_KEY` to immediately invalidate all existing tokens.
 
 :::
+
+#### `SESSION_EXPIRES_IN`
+
+- Type: `str`
+- Default: `90d`
+- Description: Sets how long a renewable session of a native app such as [Tether](/ecosystem/tether) stays valid without use, as a number followed by a unit: `ms`, `s`, `m`, `h`, `d` or `w`, for example `90d` or `12h`. The value must be at least 1 second. Each renewal extends the session by this period.
+- Persistence: This environment variable is a `ConfigVar` variable. It has no toggle in the interface, so on an instance that has already started once the environment variable is ignored and the stored value wins. Change it by posting the new value to `/api/v1/configs/import` with an admin token, or set [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) to `False` to have environment variables win on every start.
 
 ### Memory
 
@@ -2461,6 +2572,8 @@ Set them in **Settings > Admin > Connections** by editing a connection and filli
 }
 ```
 
+To pass the client address to the upstream, use `{"X-Real-IP": "{{USER_IP}}"}`. With the default `FORWARDED_ALLOW_IPS` value `*`, a client that reaches Open WebUI directly can choose this address itself.
+
 Available placeholders, substituted at request time (any placeholder that has no value for the current request becomes an empty string):
 
 | Placeholder | Value |
@@ -2482,6 +2595,8 @@ Available placeholders, substituted at request time (any placeholder that has no
 | `{{USER_GROUPS}}` | Comma-separated names of the groups the user belongs to, including groups inherited through parent groups |
 | `{{USER_GROUP_IDS}}` | Comma-separated IDs of the same groups |
 | `{{USER_AGENT}}` | User-Agent of the originating browser request |
+| `{{USER_IP}}` | Address of the client that sent the request. For a request that arrives through a proxy listed in [`FORWARDED_ALLOW_IPS`](#forwarded_allow_ips) it is the client address taken from the `X-Forwarded-For` header, otherwise the address of the direct connection. Empty for requests no client sends (automations, timers, sub-agents and the model list fetch at startup) and when a tool server connection is checked with **Verify Connection** |
+| `{{X_FORWARDED_FOR}}` | Same value as `{{USER_IP}}`, a single address and not the header's full list |
 
 The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
@@ -3984,7 +4099,7 @@ In a custom Docker image, change the version in the line that installs it and re
 
 - Type: `str` (comma-separated MIME types, wildcards allowed)
 - Default: unset
-- Description: Which uploaded **images and videos** are handed to the content extraction engine instead of being stored without text extraction. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. Leaving it unset keeps the old behavior: media goes to the extraction engine only when the engine is `external`, and every other engine stores images as-is and rejects unsupported types. Setting it to an empty list disables media extraction for every engine, `external` included. Video types count too, so `video/*` sends video uploads to the engine if yours can handle them; anything not matched is stored as-is, and an unmatched type that is neither image nor video is rejected as before. Audio is unaffected, since it follows the speech-to-text settings instead. Can also be set in **Settings > Admin > Documents** (**Supported Media MIME Types**).
+- Description: Which uploaded **images and videos** are handed to the content extraction engine. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. It takes effect only with a content extraction engine selected. When unset, media goes to the extraction engine only when the engine is `external`. Media that is not handed over is stored without text extraction: an image then fails processing and a video is kept for vision models. An empty list disables media extraction for every engine, `external` included. `video/*` sends video uploads to the engine if yours can handle them. Audio follows the speech-to-text settings instead. Also set in **Settings > Admin > Documents** (**Supported Media MIME Types**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MISTRAL_OCR_API_KEY`
@@ -4238,7 +4353,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `local`
-- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x or 4.x and uses the matching interface, so both work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
+- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x, 4.0 or 4.1 and uses the matching interface, so all three work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_URL`
@@ -4252,7 +4367,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: Empty string
-- Description: API key for MinerU. Required in `cloud` mode. In `local` mode, Open WebUI sends it as a bearer token to a MinerU 4.x server, which needs it when started with `--api-key`. Leave it empty for a local server without a key.
+- Description: API key for MinerU. Required in `cloud` mode. In `local` mode, Open WebUI sends it as a bearer token to a MinerU 4.x server, which needs it when started with `--api-key`. Open WebUI sends the key only to requests addressed to `MINERU_API_URL`. Leave it empty for a local server without a key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_TIMEOUT`
@@ -4266,7 +4381,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str` (comma-separated)
 - Default: `pdf`
-- Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. MinerU was previously hardcoded to PDF only, so only add extensions your MinerU deployment actually supports.
+- Description: File extensions routed to the **MinerU** engine when `CONTENT_EXTRACTION_ENGINE=mineru`. Comma-separated, lower-case, no leading dots (e.g. `pdf,png,jpg`). A file whose extension is not on this list skips MinerU and falls back to the default loader. Only add extensions your MinerU deployment actually supports.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_METADATA_MAX_VALUE_CHARS`
@@ -4282,7 +4397,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Caps the size, in bytes, of the Markdown file Open WebUI reads from a result of the MinerU cloud service. A larger file is rejected and the document fails with `Markdown file in results ZIP is too large`, which guards against a single huge document flooding memory. The cap applies to the cloud service only; results from a self-hosted MinerU server are read in full. Leave unset for no limit.
+- Description: Caps the size, in bytes, of the Markdown file Open WebUI reads from a MinerU results ZIP, which the MinerU cloud service and a self-hosted MinerU 4.1 server return. A larger file is rejected and the document fails with `Markdown file in results ZIP is too large`, which guards against a single huge document flooding memory. Results from a self-hosted MinerU 3.x or 4.0 server are read in full. Leave unset for no limit.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MINERU_PARAMS`
@@ -4356,14 +4471,14 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 #### `RAG_TOP_K`
 
 - Type: `int`
-- Default: `3`
+- Default: `10`
 - Description: Sets the default number of chunks retrieved per search query from each attached knowledge base or file. With hybrid search off, these chunks go to the model. With [hybrid search](#enable_rag_hybrid_search) on, they are the candidates the reranker scores, and [`RAG_TOP_K_RERANKER`](#rag_top_k_reranker) sets how many of them reach the model. Either way, one knowledge base or file passes at most this many chunks to the model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_TOP_K_RERANKER`
 
 - Type: `int`
-- Default: `3`
+- Default: `10`
 - Description: Sets the default number of chunks kept after reranking and given to the model, per search query from each attached knowledge base or file. Only used with [hybrid search](#enable_rag_hybrid_search). One knowledge base or file passes at most [`RAG_TOP_K`](#rag_top_k) chunks to the model, so keep this value lower. Example: `RAG_TOP_K=50` and `RAG_TOP_K_RERANKER=10` let the reranker choose the best 10 of 50 candidates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4419,7 +4534,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `int`
 - Default: `100000`
-- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset`. `view_file` reads knowledge files and files attached to a chat alike, so this bounds both.
+- Description: The hard ceiling, in characters, on what one `view_file` or `view_knowledge_file` call returns. A model asking for more than this is silently held to the ceiling; the response still carries pagination metadata, so it can continue from `next_offset` (or `next_start_line` for a line range). `view_file` reads knowledge files and files attached to a chat alike, so this bounds both.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `VIEW_FILE_DEFAULT_MAX_CHARS`
@@ -4500,8 +4615,8 @@ Provide a clear and direct response to the user's query, including inline citati
 #### `CHUNK_SIZE`
 
 - Type: `int`
-- Default: `1000`
-- Description: Sets the document chunk size for embeddings.
+- Default: `1024`
+- Description: Sets the document chunk size for embeddings. Reindex existing documents after changing it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CHUNK_OVERLAP`
@@ -4598,12 +4713,14 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 #### `RAG_FILE_MAX_SIZE`
 
 - Type: `int`
+- Default: unset (no limit)
 - Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. Office and EPUB documents are checked a second time against their contents, since those formats are archives: a file whose contents unpack to far more than the file itself is refused rather than extracted, which stops a small upload from consuming the whole machine's memory. This value doubles as the default ceiling on extracted metadata, so leaving it unset removes that protection as well; see [`RAG_METADATA_MAX_VALUE_CHARS`](#rag_metadata_max_value_chars).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_MAX_COUNT`
 
 - Type: `int`
+- Default: unset (no limit)
 - Description: Sets the maximum number of files that can be uploaded at once in a chat. Knowledge base uploads use [`KNOWLEDGE_MAX_UPLOAD_COUNT`](#knowledge_max_upload_count).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4657,13 +4774,9 @@ These values are exposed through app config and consumed by the frontend chat up
 
 #### `RAG_ALLOWED_FILE_EXTENSIONS`
 
-- Type: `list` of `str`
-- Default: `[]` (which means all supported file types are allowed)
-- Description: Specifies which file extensions are permitted for upload.
-
-```json
-["pdf,docx,txt"]
-```
+- Type: `str` (comma-separated)
+- Default: Empty (all supported file types are allowed)
+- Description: Specifies which file extensions are permitted for upload. Use lower-case extensions without a leading dot, for example `pdf,docx,txt`. Also set in **Admin Settings** > **Documents** > **Allowed File Extensions**.
 
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4978,7 +5091,14 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Specifies whether to use the full context for RAG.
+- Description: Always includes the complete text of documents instead of retrieving chunks. Shown as **Always Use Full Text** in **Admin Settings** > **Documents**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_FULL_TEXT_CHAR_THRESHOLD`
+
+- Type: `int`
+- Default: `50000`
+- Description: Sets the number of characters up to which the complete extracted text of an uploaded file or text attachment is included in the prompt. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** in **Admin Settings** > **Documents**. The aliases `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_SYSTEM_CONTEXT`
@@ -6254,7 +6374,7 @@ When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `voxtral-mini-tts-2603` when `A
 #### `IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: `None`
+- Default: Empty string (the built-in prompt below is used)
 - Description: Specifies the template to use for generating image prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -6289,7 +6409,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1`, DALL·E) for image generation.
+  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image generation.
   - `comfyui`: Uses ComfyUI engine for image generation.
   - `automatic1111`: Uses AUTOMATIC1111 engine for image generation.
   - `gemini`: Uses Gemini for image generation.
@@ -6301,7 +6421,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: ``
-- Description: Default model to use for image generation (e.g., `gpt-image-2`, `gemini-3.1-flash-image`).
+- Description: Default model to use for image generation (e.g., `gpt-image-2`, `gemini-3.1-flash-image`). With no model set, the `openai` engine uses `gpt-image-2` and the `gemini` engine uses `imagen-3.0-generate-002`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `IMAGE_SIZE`
@@ -6345,7 +6465,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1`, DALL·E) for image editing.
+  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image editing.
   - `gemini`: Uses Gemini for image editing.
   - `comfyui`: Uses ComfyUI engine for image editing.
 - Default: `openai`
@@ -6383,7 +6503,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for DALL-E image generation.
+- Description: Sets the OpenAI-compatible base URL to use for OpenAI image generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ##### `IMAGES_OPENAI_API_VERSION`
@@ -6397,15 +6517,15 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `${OPENAI_API_KEY}`
-- Description: Sets the API key to use for DALL-E image generation.
+- Description: Sets the API key to use for OpenAI image generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ##### `IMAGES_OPENAI_API_PARAMS`
 
 - Type: `str` (JSON)
 - Default: `{}`
-- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters for DALL-E models (e.g., `{"quality": "hd"}` for dall-e-3).
-- Example: `{"quality": "hd", "style": "vivid"}`
+- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters (e.g., `{"quality": "high"}` for GPT-Image models).
+- Example: `{"quality": "high"}`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### Image Editing
@@ -7668,7 +7788,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables user permission to open [side chats](/features/chat-conversations/chat-features/#tabs-side-panel). Takes effect only together with [`USER_PERMISSIONS_CHAT_TEMPORARY`](#user_permissions_chat_temporary). Administrators always have it.
+- Description: Enables or disables user permission to open [side chats](/features/chat-conversations/chat-features/#tabs-side-panel). Administrators always have it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED`
@@ -8449,13 +8569,11 @@ When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct 
 - Description: Minimum interval, in seconds, between writes of a user's `last_active_at` timestamp to the database (this timestamp drives online/"active" presence, evaluated over a ~3-minute window). The write is throttled **per user**: within the interval, repeat activity does not hit the database. Set it to `0` to disable throttling and write on every request.
 
 :::warning Raise this at scale, and never set it to zero there
-Throttling is on by default at 60 seconds, which already collapses thousands of writes into at most one per user per interval. **Setting it to `0` disables throttling, so essentially every authenticated request issues its own `UPDATE users SET last_active_at = ... ` plus a `COMMIT`.** On a busy instance that is a continuous flood of tiny write transactions which amplifies database load and consumes connection-pool capacity for no functional benefit. Presence only needs about minute granularity.
+With `0`, essentially every authenticated request issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`. On a busy instance that flood of tiny write transactions loads the database and consumes connection-pool capacity for no benefit, since presence only needs about minute granularity.
 
-**Keep it below 180 seconds.** Active presence counts users whose timestamp falls in the last 180 seconds, and that window is fixed in the code. An interval at or above it means a user's timestamp can age past the window before the next write is allowed, so they drop out of the count and reappear on the next write, which shows up as a sawtooth in the active-user metric rather than a steady figure.
-
-- **Recommended:** `120`. That halves the presence writes again while leaving a full minute of headroom inside the 180 second window, so a user who is still active is always counted. The default of `60` is also fine and needs no change.
-- Above `180` the count stops being reliable. Only go there if you do not use the active-user figure or the metric that reports it.
-- Applies regardless of database backend, and applies on weak hardware too (it only *reduces* writes, there is no downside to setting it on a Raspberry Pi).
+- **Recommended:** `120`, which halves the presence writes again. The default of `60` also works.
+- **Keep it below 180 seconds.** Active presence counts users whose timestamp falls in the last 180 seconds, a window fixed in the code. With an interval at or above it, users drop out of the count between writes and the active-user metric oscillates.
+- It applies on every database backend, on weak hardware too, since it only reduces writes.
 - Read once at startup; not a `ConfigVar` and not changeable from the Admin UI.
 :::
 
@@ -8635,7 +8753,7 @@ Like the page cache above, the mmap window is established **per connection**. It
 #### `REDIS_URL`
 
 - Type: `str`
-- Description: Specifies the URL of the Redis instance or cluster host for storing application state. A Redis-protocol server such as [Valkey](/tutorials/integrations/valkey) or Dragonfly should work in its place, on the same `redis://` and `rediss://` schemes, though neither is officially supported yet; use a recent release of whichever you pick.
+- Description: Specifies the URL of the Redis instance or cluster host for storing application state. A Redis-protocol server such as [Valkey](/tutorials/integrations/valkey) or Dragonfly should work in its place, on the same `redis://` and `rediss://` schemes, though neither is officially supported; use a recent release of whichever you pick.
 - Examples:
   - `redis://localhost:6379/0`
   - `rediss://:password@localhost:6379/0` *(with password and TLS)*
@@ -8645,14 +8763,11 @@ Like the page cache above, the mmap window is established **per connection**. It
 
 **Required for Multi-Replica Deployments**
 
-When running several replicas behind a load balancer (Docker Compose, Docker Swarm, Kubernetes), you **must** set the `REDIS_URL` value. Without it, the following issues will occur:
+When running several replicas behind a load balancer (Docker Compose, Docker Swarm, Kubernetes), you **must** set `REDIS_URL` and [`WEBSOCKET_MANAGER=redis`](#websocket_manager). Without `REDIS_URL`:
 
-- Session management will fail across replicas
-- Application state will be inconsistent between instances
-- Websocket connections will not function properly in distributed setups
-- Users may experience intermittent authentication failures
-
-Redis serves as the central state store that allows multiple Open WebUI instances to coordinate and share critical application data.
+- Stopping or resuming a response that runs on another replica does not work.
+- Sign-in rate limits and OAuth token refresh locks apply per replica instead of across all of them.
+- Signing out does not revoke the session token (see below).
 
 :::
 
@@ -8759,7 +8874,7 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 - Type: `str`
 - Default: `open-webui`
-- Description: Customizes the Redis key prefix used for storing configuration values. This allows multiple Open WebUI instances to share the same Redis instance without key conflicts. When operating in Redis cluster mode, the prefix is formatted as `{prefix}:` (e.g., `{open-webui}:config:*`) to enable multi-key operations on configuration keys within the same hash slot.
+- Description: Sets the prefix of the Redis keys Open WebUI writes, for example `open-webui:tasks:...`.
 
 #### `REDIS_RESPONSE_STREAM_TTL`
 
@@ -8774,7 +8889,7 @@ Redis Cluster mode is fully compatible with OpenTelemetry instrumentation. When 
 
 - Type: `int` (seconds)
 - Default: `300`
-- Description: How long a background task's Redis entry survives without a heartbeat from the worker that owns it. Each worker refreshes its own tasks at a quarter of this interval, so a task is cleaned up only when its worker has gone silent past the full timeout, a crash among them; this stops tasks from a dead worker blocking a stop request forever on multi-worker deployments. The listing of active tasks keeps entries whose key has already expired. Set `0` to keep task entries indefinitely as before, which also skips the heartbeat. Values below `60` fall back to the default. Applies only when Redis is in use.
+- Description: How long a background task's Redis entry survives without a heartbeat from the worker that owns it. Each worker refreshes its own tasks at a quarter of this interval, so a task is cleaned up only when its worker has gone silent past the full timeout, for example after a crash. This stops tasks from a dead worker blocking a stop request forever. The listing of active tasks keeps entries whose key has already expired. Set `0` to keep task entries indefinitely, which also skips the heartbeat. Values below `60` fall back to the default. Applies only when Redis is in use.
 - Persistence: No
 
 #### `REDIS_SOCKET_CONNECT_TIMEOUT`
@@ -8896,12 +9011,7 @@ Without this setting, if your Redis server has a `timeout` configured (recommend
 
 **Required for Multi-Replica Deployments**
 
-When running several replicas behind a load balancer (Docker Compose, Docker Swarm, Kubernetes), you **must** set this variable. Without it, the following issues will occur:
-
-- Session management will fail across replicas
-- Application state will be inconsistent between instances
-- Websocket connections will not function properly in distributed setups
-- Users may experience intermittent authentication failures
+When running several replicas behind a load balancer (Docker Compose, Docker Swarm, Kubernetes), you **must** set this variable together with [`REDIS_URL`](#redis_url). Without it, live updates (streamed tokens, channel messages, note edits) reach only users connected to the replica that produced them, and the model list, active users and presence are not shared between replicas.
 
 :::
 
@@ -9059,14 +9169,14 @@ Each worker is a full Open WebUI process that holds its own copy of any local mo
 
 :::
 
-### Cache Settings
-
 #### `UVICORN_WS_PER_MESSAGE_DEFLATE`
 
 - Type: `bool`
 - Default: `True`
-- Description: Whether the websocket server negotiates per-message compression with the browser. Chat responses arrive as a stream of very small frames, one per token, and compressing each of them costs processor time on the server for every subscriber while saving almost nothing, since there is little to compress in a fragment that size. Setting this to `false` declines the compression extension, so frames go out uncompressed. The large frames that did benefit, a finished message or a set of sources, are only a few hundred kilobytes even for a very long reply, which any network carries without a noticeable delay. Worth turning off on instances under heavy streaming load, where it shows up as measurable processor use. The default preserves the previous behaviour.
+- Description: Whether the websocket server negotiates per-message compression with the browser. Chat responses arrive as one very small frame per token, and compressing each of them costs CPU for every subscriber while saving almost nothing. Setting this to `false` declines the compression extension, so frames go out uncompressed. The large frames that did benefit, a finished message or a set of sources, are only a few hundred kilobytes even for a very long reply, which any network carries without a noticeable delay. Worth turning off on instances under heavy streaming load.
 - Persistence: No
+
+### Cache Settings
 
 #### `CACHE_CONTROL`
 

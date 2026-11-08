@@ -44,6 +44,6 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 #### Note
 
-You have to enable `Web Search` in the prompt field. Click the Integrations button next to the `+` icon.
+To search the web in a chat, open the **+** menu in the message input and turn on **Web Search**.
 
 ![enable Web search](/images/tutorial_google_pse2.png)

@@ -12,13 +12,13 @@ Image generation is only available in a chat when all of the following are true:
 - **Image Generation** is enabled in **Settings** > **Admin** > **Images**.
 - Your role has the **Image Generation** feature permission. Admins always pass this check.
 - The model has the **Image Generation** capability checked in **Workspace** > **Models** > **Edit**. Outside Legacy mode its **Builtin Tools** capability and the **Image Generation** builtin tool category must stay enabled too. All of these are on by default.
-- The **Image** toggle is on for that chat, in the **Integrations** menu of the message input. Tick **Image Generation** under **Default Features** in the model editor to have it active in every new chat.
+- The **Image** toggle is on for that chat, in the **+** menu of the message input. Tick **Image Generation** under **Default Features** in the model editor to have it active in every new chat.
 
-If **Image** is missing from the **Integrations** menu entirely, then either image generation is off globally, the **Image Generation** capability is off on one of the selected models, or your role lacks the permission. The engine's own URL and key are a separate matter. Get those wrong and the toggle still appears, generation just fails once it runs.
+If **Image** is missing from the **+** menu entirely, then either image generation is off globally, the **Image Generation** capability is off on one of the selected models or your role lacks the permission. The engine's own URL and key are a separate matter. Get those wrong and the toggle still appears, generation just fails once it runs.
 
 ## Using Image Generation
 
-1. Switch **Image** on in the **Integrations** menu of the message input.
+1. Switch **Image** on in the **+** menu of the message input.
 2. Enter your image generation prompt.
 3. Click `Send`.
 
@@ -77,6 +77,8 @@ You can edit an image by providing the image and a text prompt directly in the c
 1. **Upload an image** to the chat.
 2. **Enter a prompt** describing the change you want to make (e.g., "Change the background to a sunset" or "Add a hat").
 3. The model will generate a new version of the image based on your prompt.
+
+With an [Open Terminal](/features/open-terminal) that an administrator added, or a [Tether](/ecosystem/tether) terminal, selected in the chat, the model can also edit any image stored in that terminal, whatever [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads) is set to. It passes their absolute paths to `edit_image`, and Open WebUI reads them from that terminal with your access to it, in the same workspace the chat uses. Each image must be a PNG, JPEG, WebP or GIF of at most 25 megapixels and 50 MB.
 
 ## Image Compositing (Multi-Image Fusion)
 

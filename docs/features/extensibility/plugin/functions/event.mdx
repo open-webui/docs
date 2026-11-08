@@ -102,7 +102,7 @@ Open WebUI emits **170+ events** spanning every subsystem. Each name is namespac
 | **Auth** | `auth.signup`, `auth.login`, `auth.logout`, `auth.password_changed`, `auth.api_key.created`, `auth.sessions_revoked`, `auth.mfa.enrolled`, `auth.mfa.failed` |
 | **Users & groups** | `user.created`, `user.deleted`, `user.role_updated`, `user.permissions_updated`, `group.member_added` |
 | **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `chat.finished`, `chat.failed`, `message.created`, `message.reaction_added` |
-| **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `prompt.created` |
+| **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `model.available`, `model.unavailable`, `prompt.created` |
 | **Knowledge & files** | `knowledge.created`, `knowledge.file.added`, `knowledge.reindexed`, `file.uploaded`, `file.deleted` |
 | **Plugins** | `tool.created`, `function.enabled`, `function.enable_started`, `function.disable_started`, `function.valves_updated`, `tool.valves_updated`, `skill.created` |
 | **Config** | `config.updated`, `config.models.updated`, `config.connections.updated`, `config.webhook.updated` |
@@ -177,6 +177,7 @@ How often your `event()` runs depends on the event:
 
 - **Request-scoped events** (`auth.signup`, `chat.deleted`, `model.created`, …) fire on the **single** instance that handled that request. One signup, one handler call.
 - **Lifecycle events** (`system.startup.completed`, `system.shutdown.started`) fire on **every replica**, because every replica boots and shuts down independently. In a 4-replica deployment your startup handler runs **4 times**.
+- **Model list events** (`model.available`, `model.unavailable`) fire when a model appears in or disappears from the fetched model list. Each replica compares against its own previous fetch, so every replica that fetches the list reports the change. The first fetch after startup reports nothing.
 
 So the classic footgun: an Event function that logs signups, sends a "server is up" alert, or provisions a resource on startup will do it **once per replica**, not once globally, the moment you scale past a single instance.
 

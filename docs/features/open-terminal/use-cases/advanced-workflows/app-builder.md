@@ -41,7 +41,7 @@ When building a web app:
 2. **Design the database first**: Use SQLite with proper schema
 3. **Build the API** with Flask or FastAPI: CRUD, search, filtering, error handling
 4. **Build a polished frontend**:
-   - Modern CSS (not a skeleton — make it look demo-ready)
+   - Modern CSS (not a skeleton, make it look demo-ready)
    - Dashboard with key metrics and charts (Chart.js)
    - Responsive tables with search
    - Forms for data entry

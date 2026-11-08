@@ -210,7 +210,7 @@ The same panel opens from the **⋯** menu of a note in the Notes list.
 
 Saving a note never changes who it is shared with.
 
-People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
+People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. Each user can have up to 20 note pages open for live editing at once, counted across all their browser tabs and devices. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
 
 Administrators can control sharing via environment variables or the Admin Panel:
 

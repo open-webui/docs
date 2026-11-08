@@ -17,8 +17,6 @@ One of the most impressive things Open Terminal can do: the AI builds a website,
 4. You open it from the **Ports** list of a [Browser tab](#the-browser-tab)
 5. You ask for changes → the AI edits the files → you reload the page
 
-This needs a terminal that supports browser sessions.
-
 ![AI checking that the status page on port 8080 responds and summarising it](/images/open-terminal-ai-web-dev.png)
 
 ---
@@ -83,9 +81,9 @@ If the AI starts more than one server (say, a frontend on port 3000 and a backen
 
 ## The Browser tab
 
-On terminals that support browser sessions, the **+** menu of the **Tabs** side panel offers **Browser**. Its start page lists the **Ports** the terminal is serving; click one to load it, or type any http or https address.
+On terminals that support browser sessions, the **+** menu of the **Tabs** offers **Browser**. Its start page lists the **Ports** the terminal is serving; click one to load it, or type any http or https address.
 
-The options menu (**...**) picks how pages load. **Proxy** loads them through the terminal. **Chrome** runs Chrome on the terminal, where available, and streams it to the tab as a remote view, with **Mobile view** and a quality setting. The tab remembers the last mode. A live session stops when you or the terminal loses access.
+The options menu (**...**) picks how pages load. **Chrome** runs Chrome on the terminal and streams it to the tab as a remote view, with **Mobile view** and a quality setting. **Proxy** loads pages through the terminal. A new Browser tab starts in Chrome when the terminal offers it, and in Proxy otherwise. If Chrome fails, the tab switches to Proxy and shows **Chrome failed. Switched to Proxy.** A live session stops when you or the terminal loses access.
 
 ## The Desktop tab
 

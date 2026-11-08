@@ -52,7 +52,7 @@ If you are using **OpenRouter** or any provider with hundreds/thousands of model
 
 - **Admin Panel**: `Settings > Admin > Connections > Cache Base Model List`
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
-  *   *Note*: Caches the base model list, in Redis when Redis is configured (shared by all replicas), otherwise in each replica's memory. It refreshes on restart, when you click **Save** in Connections settings, or with the refresh button next to the toggle.
+  *   *Note*: Caches the base model list, in Redis when Redis is configured (shared by all replicas), otherwise in each replica's memory. It refreshes when you click **Save** in Connections settings or use the refresh button next to the toggle. Without Redis it also refreshes on restart.
 
 - **Env Var**: `MODELS_CACHE_TTL=300`
   *   *Note*: Caches the model list responses from each OpenAI and Ollama connection for 5 minutes. The default is `1` second.
@@ -77,11 +77,11 @@ For any multi-user or high-concurrency setup, **PostgreSQL is mandatory**. SQLit
 
 ### User Active-Status Write Throttling (set this on every deployment)
 
-Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. Unthrottled, that means essentially *every authenticated request* issues its own `UPDATE users SET last_active_at = ...` plus a `COMMIT`, a continuous flood of tiny write transactions that amplifies database load and consumes connection-pool capacity for zero functional benefit, since presence only needs about minute granularity.
+Open WebUI tracks online/"active" presence by writing each user's `last_active_at` timestamp to the database. Unthrottled, essentially every authenticated request issues its own `UPDATE` plus `COMMIT`, a flood of tiny write transactions that loads the database and the connection pool for no benefit, since presence only needs about minute granularity.
 
 -   **Env Var**: `DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`
--   **Default**: `60` seconds, so the throttling is already in place
--   **Recommendation**: `120`. It halves the presence writes again and still leaves a full minute of headroom inside the window, so an active user is never missed. The default of `60` is fine too if you would rather not set anything. **Keep it below `180`**: active presence counts users whose timestamp falls in the last 180 seconds, so an interval at or above that lets a user age out of the count between writes and the active-user figure oscillates instead of holding steady. Setting it to `0` disables throttling entirely and restores the per-request write. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
+-   **Default**: `60` seconds
+-   **Recommendation**: `120`, which halves the presence writes again. Keep it below `180`: active presence counts users whose timestamp falls in the last 180 seconds, so a longer interval makes the active-user figure oscillate. `0` disables throttling. See [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval).
 
 ### Database Session Sharing
 
@@ -208,7 +208,7 @@ Open WebUI rebuilds a response's text on every chunk that arrives, copying every
 - **Env Var**: `ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND=true`
 
 *   *Recommendation*: turn it on wherever long answers are normal (agent transcripts, large code dumps, long tool output) and several of them stream at once. An ordinary chat answer is sub-millisecond either way, so a small instance will not notice.
-*   *What you give up*: if an append fails because memory is exhausted, that one message is left empty instead of holding the text collected so far. Getting there needs an allocation to be refused rather than the process being killed, which a container memory limit does not do, and the default path needs more memory at that point anyway.
+*   *What you give up*: if memory runs out during an append, that one message is left empty instead of keeping the text collected so far. A container memory limit kills the process instead, so this needs an allocation to be refused, which is rare.
 
 See [`ENABLE_CHAT_RESPONSE_STREAM_INPLACE_APPEND`](/reference/env-configuration#enable_chat_response_stream_inplace_append) for the full description.
 
@@ -234,12 +234,11 @@ See [`WEBSOCKET_HEARTBEAT_INTERVAL`](/reference/env-configuration#websocket_hear
 
 #### JSON Encoder
 
-Open WebUI encodes and decodes JSON constantly: every request body, every API response, every chat saved and opened again, every request sent on to a provider, every chunk of a streamed completion arriving back and every Socket.IO event, including the ones published over Redis when you run multiple replicas. All of that goes through [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard-library `json` module.
+Open WebUI encodes and decodes JSON for every request body, API response, saved chat, provider request and streamed chunk, and for every Socket.IO event, including those published over Redis with multiple replicas. All of it goes through [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster than Python's standard-library `json` module.
 
-*   **Where the win is**: the Socket.IO encoding path. In clustered deployments, encoding live updates was the single largest cost measured on the workers handling them. Streaming responses benefit too, since every arriving chunk is parsed individually.
-*   **Where else it shows up**: saving and opening chats, so the cost follows the length of the chat.
-*   **Where it is not**: a single-user instance with ordinary-sized chats.
-*   **Fallback**: anything orjson cannot encode falls back to the standard library automatically, so nothing breaks. One change to know about: `NaN` and `Infinity` floats serialize as `null`; the standard library raises an error.
+*   **Where it matters most**: Socket.IO encoding in clustered deployments, parsing of streamed chunks, and saving and opening long chats.
+*   **Where it does not**: a single-user instance with ordinary-sized chats.
+*   **Fallback**: anything orjson cannot encode falls back to the standard library. One difference: `NaN` and `Infinity` floats serialize as `null`; the standard library raises an error.
 
 - **Env Var**: `ENABLE_ORJSON=True`
   *   *Recommendation*: leave it on.
@@ -256,16 +255,15 @@ Messages the level filters out are never built, so raising it saves CPU as well 
 See [What the Log Level Costs](../getting-started/advanced-topics/logging.md#what-the-log-level-costs) for the full explanation.
 
 #### Thread Pool Size
-Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers and other work offloaded to a thread) may run at once. The value sets both the AnyIO thread limiter and the event loop's default thread executor. It is a concurrency **ceiling**: threads are created lazily and reused, so a high value costs nothing while idle.
-*   **Default**: unset, so the AnyIO limit of 40 applies (far too low for production)
-*   **Normal servers / production**: **2000+**. `2000` is a *lower* bound for very large instances; going higher is fine.
-*   **Symptom if too low**: when more than `THREAD_POOL_SIZE` blocking ops are needed at once (many users at the same time, or a few users each triggering several blocking calls), further requests queue and the **whole app appears to hang/freeze** while CPU and RAM look fine. This is pool starvation.
-*   **Warning**: **NEVER decrease below the default.**
-*   **Exception, weak hardware** (Raspberry Pi, tiny VPS, containers capped at ~250m CPU / very low RAM): keep the default or a modest few-hundred value matched to the device. Each genuinely concurrent blocking op uses a real OS thread with its own stack memory, so on a tiny device a huge ceiling lets a traffic burst exhaust RAM.
+Caps how many **concurrent** blocking operations (sync DB calls, file I/O, sync route handlers and other work offloaded to a thread) may run at once. It is a ceiling, not a pre-spawned pool: threads are created lazily and reused, so a high value costs nothing while idle.
+*   **Default**: unset, so the AnyIO limit of 40 applies. That is far too low for production.
+*   **Servers**: `2000` or higher. Never go below the default.
+*   **Symptom if too low**: further requests queue and the **whole app appears to hang** while CPU and RAM look fine.
+*   **Weak hardware** (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or very little RAM): keep the default or a few hundred. Each concurrent blocking operation uses a real OS thread with its own stack, so a huge ceiling lets a traffic burst exhaust RAM.
 
 - **Env Var**: `THREAD_POOL_SIZE=2000`
 
-See [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size) for the full explanation.
+See [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size).
 
 #### AIOHTTP Client Timeouts
 Requests to model providers have no total timeout by default, so a long completion is never cut off. Model list requests time out after 10 seconds.
@@ -414,8 +412,7 @@ A bigger pool only moves the breaking point: more connections mean more concurre
    ```bash
    DATABASE_URL=postgresql://user:password@host:5432/webui
    ```
-   PostgreSQL removes the fsync-per-connection pathology entirely because the database process owns its own storage, and it is the only supported option for multi-user workloads.
-2. **Acceptable, move `webui.db` onto directly-attached local SSD/NVMe.** Only appropriate for single-user or very small deployments. Bind-mount a directory on the host's **local** SSD/NVMe into `/app/backend/data`. Do **not** use NFS, SMB, Azure Files, or any network-backed storage class, not even "high-performance" network block storage. SQLite was not designed for network filesystems and will always be slow on them.
+2. **Acceptable, move `webui.db` onto directly-attached local SSD/NVMe.** Only appropriate for single-user or very small deployments. Bind-mount a directory on the host's **local** SSD/NVMe into `/app/backend/data`. Never use NFS, SMB, Azure Files or any other network-backed storage class for it.
 3. **Temporary workaround only, keep SQLite on NFS with reduced concurrency.** If you cannot immediately move storage or switch databases, set:
    ```bash
    DATABASE_POOL_SIZE=1
@@ -629,6 +626,8 @@ Processing a document holds its chunks and their embeddings in memory while they
 
 A single Redis instance is sufficient for the vast majority of deployments, including those with thousands of users. **You almost certainly do not need Redis Cluster or Redis Sentinel** unless you have specific HA requirements.
 
+Each worker also keeps the parsed model list it reads from Redis for filter lookups, which takes about 3 MB of memory per worker for every 1000 models.
+
 A response being streamed is held in Redis so a browser that reconnects can resume it, and the entry is deleted when the response finishes. Entries left behind by a worker killed mid-stream expire after `REDIS_RESPONSE_STREAM_TTL` seconds (default `3600`). Lower it where Redis memory is tight; `0` keeps them forever. See [`REDIS_RESPONSE_STREAM_TTL`](/reference/env-configuration#redis_response_stream_ttl).
 
 Common Redis configuration issues that cause unnecessary scaling:
@@ -640,21 +639,7 @@ Common Redis configuration issues that cause unnecessary scaling:
 | **No connection limits** | Open WebUI pods may accumulate connections that never close | Combine `timeout` with connection pool limits in your Redis client config |
 | **Low Pub/Sub output buffer limits** | WebSocket streams stall, `Cannot publish to redis... giving up`, or Redis logs client output buffer disconnections when large Socket.IO events are published | Increase the Redis `client-output-buffer-limit ... pubsub ...` setting, sized for your websocket payloads and available Redis memory |
 
-For Redis-backed websockets, Open WebUI uses Socket.IO over Redis Pub/Sub. Large streaming responses and tool events can create multi-MB `PUBLISH socketio ...` payloads. If Redis disconnects slow Pub/Sub clients, inspect:
-
-```bash
-redis-cli INFO stats | grep client_output_buffer_limit_disconnections
-redis-cli SLOWLOG GET 50
-redis-cli CONFIG GET client-output-buffer-limit
-```
-
-Example Redis configuration for deployments that need to tolerate large websocket bursts:
-
-```conf
-client-output-buffer-limit normal 0 0 0 replica 268435456 67108864 60 pubsub 1073741824 268435456 180
-```
-
-This keeps normal client limits disabled and raises Pub/Sub clients to a 1 GB hard limit and 256 MB soft limit for 180 seconds. Tune downward or upward based on Redis memory headroom and observed payload sizes.
+For the Pub/Sub output buffer limit, including the commands to inspect it and an example configuration, see [WebSocket Pub/Sub Buffer Limits](/tutorials/integrations/redis#websocket-pubsub-buffer-limits).
 
 ---
 
@@ -668,7 +653,7 @@ These are real-world mistakes that cause organizations to massively over-provisi
 | **Running SentenceTransformers at scale** | Each worker loads PyTorch and its own copy of the embedding model → RAM usage explodes → you add more machines | Use external embeddings (`RAG_EMBEDDING_ENGINE=openai`, `azure_openai` or `ollama`), or the [slim image](#the-slim-image) |
 | **Redis Cluster when single Redis suffices** | Too many replicas → too many connections → Redis can't handle them → you deploy Redis Cluster to compensate | Fix the root cause (fewer replicas, `timeout 1800`, `maxclients 10000`) |
 | **Scaling replicas to mask memory leaks** | Leaky processes → OOM kills → auto-scaler adds more pods → more Redis connections → Redis overwhelmed | Fix the leaks first (content extraction, embedding engine), then right-size |
-| **Using Default (prompt-based) tool calling** | Legacy / no longer supported; injected prompts break KV cache → higher latency → more resources needed per request; cannot access built-in system tools | Switch every model to Native Mode |
+| **Using Legacy (prompt-based) tool calling** | Legacy mode is unsupported; injected prompts break KV cache → higher latency → more resources needed per request; cannot access built-in system tools | Switch every model to Native Mode |
 | **Not configuring Redis stale connection timeout** | Connections accumulate forever → Redis OOM → you deploy Redis Cluster | Add `timeout 1800` to redis.conf |
 | **Using base64-encoded icons in Actions/Filters** | Icon data is embedded in `/api/models` responses sent to the frontend on every page load for every model. A 500 KB base64 icon on 3 actions across 20 models = **30 MB of payload bloat** per request → slow frontend loads, high bandwidth usage, unnecessary backend memory pressure | Host icons as static files and reference them by URL in `icon_url` / `self.icon`. See [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example-specifying-action-frontmatter) |
 | **Running SQLite with the default pool on a tiny container** | Unset `DATABASE_POOL_SIZE` falls back to a pool of 512 connections plus 10 overflow; each connection grows its own ~64 MB page cache plus a 256 MB mmap window, so a connection-fanning workflow (editing model/KB permissions, reloading a long model list) OOM-kills a 1 GB container | Cap `DATABASE_POOL_SIZE` (e.g. `8`), set `DATABASE_SQLITE_PRAGMA_CACHE_SIZE=-2000` and `DATABASE_SQLITE_PRAGMA_MMAP_SIZE=0`, give the container ≥ 2 GB. See [SQLite Memory Footprint](#5-sqlite-memory-footprint-on-constrained-containers) |

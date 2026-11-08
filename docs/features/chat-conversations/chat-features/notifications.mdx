@@ -9,7 +9,7 @@ Notifications send a webhook to somewhere you actually watch, such as Slack, Dis
 
 Webhook notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
 
-The [inbox](#inbox) in the sidebar needs no setup. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser.
+The [inbox](#inbox) in the sidebar needs no setup. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser. With **Notification Sound** on, **Notification sound style** picks the sound (**Chime**, the default, **Soft**, **Bell** or **Tap**), and the play button next to it previews it. Clicking a browser notification focuses Open WebUI and opens the chat, channel or calendar.
 
 :::note "Always Play Notification Sound" has no toggle
 If **Always Play Notification Sound** was switched on for your account, sounds play even while you are active, and the interface has no control to switch it off.
@@ -74,15 +74,6 @@ A notification the model sends goes to an enabled target whether or not that tar
 :::
 
 Pairing this with [Timers](/features/chat-conversations/chat-features/timers) is the usual way to be told about something later: the timer fires a prompt back into the chat, and the model calls `notify` when it has an answer.
-
-## Upgrading From the Old Notification Webhook
-
-Earlier versions had a single **Notification Webhook** URL under **Settings > Account** that fired on chat responses. That field is replaced by targets, and an existing URL is **migrated automatically** into a target subscribed to all events, so notifications keep arriving without any action.
-
-Two changes are worth knowing about:
-
-- Channel and calendar notifications are no longer sent straight from those features. They now flow through the notification system, so a target's event subscriptions and delivery mode decide whether they reach you.
-- Notification settings now live in **Settings > Notifications**. They used to sit under **Settings > Account**.
 
 ## Managing Notifications from Chat
 

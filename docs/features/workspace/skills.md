@@ -36,7 +36,7 @@ Write guidelines in Markdown. No Python, no API calls, no deployment. If you can
 
 ### On-demand context loading
 
-Selected skills send their instructions with each message. Every other skill you can read is listed by name and description, and the model loads it when needed.
+With the [skill tools](#skill-tools), every skill you can read is listed by name and description, and the model loads one when it needs it. Selected skills load before the model answers.
 
 ### Reusable across models
 
@@ -56,7 +56,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | **Supporting files** | Ship scripts, references, templates and assets next to `SKILL.md` |
 | **Version history** | Every save is a version you can compare, export or set back as the current one |
 | **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
-| **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
+| **Per-chat toggle** | Switch skills on for one chat from the **+** menu, no model edit needed |
 | **Model binding** | Attach skills to models so new chats start with them selected |
 | **Lazy loading** | Skills you did not select are listed in a manifest and load on demand |
 | **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
@@ -70,39 +70,39 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 ### User-selected skills ($ mention)
 
-Type `$` in the chat input, or use the `/` menu, and pick a skill. Its instructions go into the system prompt with every message. A message that is only a `$` mention is sent with the skill names as its text.
+Type `$` in the chat input, or use the `/` menu, and pick a skill. With the [skill tools](#skill-tools), the skill loads before the model answers, once per chat. Without them its instructions go into the system prompt with every message. A message that is only a `$` mention is sent with the skill names as its text.
 
-### Per-chat skills (Integrations menu)
+### Per-chat skills
 
-The **+** menu > **Skills** turns skills on for the current chat. A badge shows how many are on. Selected skills send their instructions with every message.
+The **+** menu > **Skills** turns skills on for the current chat. A badge shows how many are on. Selected skills load like skills mentioned with `$`.
 
 ### Model-attached skills
 
 A new chat with a single model starts with the model's skills selected.
 
-Skills that are not selected use lazy loading. With the [skill tools](#skill-tools), every other active skill you can read is listed in a manifest by name and description. The model loads one with `view_skill` when it needs it, so many skills cost little context. A skill you switch off in the chat stays in the manifest.
+With the [skill tools](#skill-tools), every active skill you can read is listed by name and description in a hidden `list_available_skills` result after your message. The model loads one with `view_skill` when it needs it, so many skills cost little context. Selected skills are loaded the same way, as a hidden `view_skill` result, once per chat. A skill you switch off in the chat stays in the list.
 
-Without the skill tools there is no manifest. Selected, mentioned and model skills are injected up to the first 100,000 characters of `SKILL.md`, and model skills are injected even when switched off in the chat.
+Without the skill tools there is no list. Selected, mentioned and model skills are injected into the system prompt on every message, up to the first 100,000 characters of `SKILL.md`, and model skills are injected even when switched off in the chat.
 
 A `SKILL.md` longer than the [read limit](#read-limits) arrives as a preview, and the model reads on with `read_skill_file`.
 
 ### Loading selected skills on demand
 
-**Load selected skills on demand** in **Admin Settings > General** ([`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading), off by default) lists selected and model skills in the manifest too, so they load only when needed. A skill mentioned with `$` in the chat is still sent with every message. The setting needs the skill tools.
+**Load selected skills on demand** in **Admin Settings > General** ([`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading), off by default) stops selected and model skills from loading before the model answers, so they load when the model asks for them. A skill mentioned with `$` in the chat still loads with the message. The setting needs the skill tools.
 
 ### Skill tools
 
-With native function calling, the **Builtin Tools** capability and the model's **Skills** category on, the model gets these tools. `/skills:create` needs them too.
+With native function calling, the **Builtin Tools** capability and the model's **Skills** category on, the model gets these tools. The first three are offered while at least one skill is listed and `update_skill_files` while a workspace skill is listed. `/skills:create` needs them too.
 
 | Tool | What it does |
 | :--- | :--- |
 | `view_skill` | Loads a skill's `SKILL.md` and the list of its files, up to the read limit. |
 | `read_skill_file` | Reads one file of a skill from a given offset, up to the read limit per call. For a binary file it returns the size and a link to the skill editor. |
-| `grep_skill_files` | Searches a skill's text files for a word, phrase or regular expression and returns up to 10 excerpts. |
+| `grep_skill_files` | Searches a skill's text files for a word, phrase or regular expression and returns excerpts, 10 by default and up to 30. |
 | `update_skill_files` | Saves file changes as a new version of a skill the user can edit. Refused with a conflict when someone saved the skill in the meantime. |
 | `create_skill` | Creates a new private skill in the workspace from the `SKILL.md` text and optional text files. Offered to admins and to users with the **Skills Access** permission. |
 
-All five follow the skill's access grants. A user with write access to an inactive skill can still have the model load and read it.
+The tools that read a skill check the user's access to it. A user with write access to an inactive skill can still have the model load and read it.
 
 ### Read limits
 
@@ -291,7 +291,7 @@ Every save that changes a skill's name, description, translations or files store
 
 The version menu at the top of the editor's file panel lists **Current** and every earlier version, newest first and 20 per page, each with its author and the note from **Describe this change** (or a short version ID when there is none). Picking an earlier version opens it read-only with two actions:
 
-- **Compare to current** shows what differs between that version and the current one: name, description and translations, plus every added, deleted or modified file with a line-by-line diff for text files.
+- **Compare to current** shows what differs between that version and the current one: name, description and translations, plus every added, deleted or modified file with a line-by-line diff for text files. A file longer than 5000 lines in either version gets no line diff (`Diff is limited to 5000 lines per version`).
 - **Set as Production** makes that version the current one again. It needs write access. If someone saved the skill after you opened the version, the switch is refused and the editor offers to reload the latest state.
 
 The **...** beside each earlier version holds **Delete**, for users with write access. Versions that were based on a deleted one are linked to its parent, so the chain stays intact. With the **Export Skills** permission, the file panel's **...** menu also exports the version you are viewing as `.skill`, JSON or ZIP.
@@ -381,7 +381,7 @@ Open WebUI stores a skill's scripts for the model to read. Running one takes a t
 
 ### Context window with $ mention
 
-Selected skills go into the system prompt with every message. A very long skill on a model with a small context window can crowd out the conversation.
+Without the skill tools, selected skills go into the system prompt with every message. A very long skill on a model with a small context window can crowd out the conversation.
 
 ### Lazy loading requires function calling
 

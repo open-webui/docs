@@ -9,7 +9,7 @@ Open WebUI offers powerful code execution capabilities directly within your chat
 
 - **Code Interpreter Capability**: Enable models to autonomously write and execute Python code as part of their responses. In Native (Agentic) Mode, the only supported tool-calling mode, this runs via the `execute_code` tool. The older XML-based mechanism is itself the legacy approach and is unsupported, so new deployments should stay on Native Mode.
 
-- **Python Code Execution**: Run Python in your browser via Pyodide or on a server via Jupyter, with no setup, for self-contained tasks. Both are now **legacy** engines: for real Python workloads (any package, full performance, shell access) use **Open Terminal**.
+- **Python Code Execution**: Run Python in your browser via Pyodide or on a server via Jupyter, with no setup, for self-contained tasks. Both are **legacy** engines: for real Python workloads (any package, full performance, shell access) use **Open Terminal**.
 
 - **MermaidJS Rendering**: Create and visualize flowcharts, diagrams, and other visual representations with MermaidJS syntax that automatically renders in your chat.
 
@@ -24,19 +24,19 @@ These execution capabilities bridge the gap between conversation and implementat
 Open WebUI supports multiple code execution backends, each suited to different use cases. The right choice depends on what you need: lightweight browser-based execution, a full Python environment, or unrestricted shell access.
 
 :::tip Recommended: Open Terminal
-**[Open Terminal](#open-terminal)** is the recommended backend for real code execution: full native Python, any package, any language, and shell access, isolated in a Docker container. **Pyodide** and **Jupyter** are now **legacy** engines, kept for zero-setup, in-chat use, not the path forward for serious workloads.
+**[Open Terminal](#open-terminal)** is the recommended backend for real code execution: full native Python, any package, any language, and shell access, isolated in a Docker container. **Pyodide** and **Jupyter** are **legacy** engines for zero-setup, in-chat use.
 :::
 
 ### Pyodide (Legacy)
 
 :::caution Legacy Engine
-Pyodide is a **legacy** code-execution engine. It is still the built-in, zero-setup default for the in-chat Code Interpreter and remains a safe browser sandbox, but it is no longer the recommended path: for anything beyond basic analysis use **[Open Terminal](#open-terminal)**, which gives full native Python, any package, and shell access. Pyodide may be deprecated in a future release.
+Pyodide is a **legacy** code-execution engine. It is the built-in, zero-setup default for the in-chat Code Interpreter and a safe browser sandbox. For anything beyond basic analysis use **[Open Terminal](#open-terminal)**, which gives full native Python, any package, and shell access. Pyodide may be deprecated in a future release.
 :::
 
 Pyodide runs Python in the browser via WebAssembly. It is sandboxed and safe for multi-user environments, but comes with some constraints:
 
 - **Persistent file storage**: the virtual filesystem at `/mnt/uploads/` is backed by IndexedDB (IDBFS). Files persist across code executions within a session, but **surviving a page reload requires [`ENABLE_PYODIDE_FILE_PERSISTENCE=true`](/reference/env-configuration#enable_pyodide_file_persistence)** (off by default). With it off, Pyodide runs in a sandboxed opaque-origin iframe and the filesystem is not retained across reloads.
-- **Built-in file browser**: when Code Interpreter is enabled, a **Files** tab appears in the chat's [side panel](/features/chat-conversations/chat-features/#tabs-side-panel). You can browse, preview, upload, download and delete files in the Pyodide filesystem, no terminal needed.
+- **Built-in file browser**: when Code Interpreter is enabled, a **Files** tab appears in the chat's [tabs](/features/chat-conversations/chat-features/#tabs-side-panel). You can browse, preview, upload, download and delete files in the Pyodide filesystem, no terminal needed.
 - **User file access**: files attached to messages are automatically placed in `/mnt/uploads/` before code execution, so the model (and your code) can read them directly.
 - **Limited library support**: only a subset of Python packages are available. Libraries that rely on C extensions or system calls may not work.
 - **No shell access**: cannot run shell commands, install packages, or interact with the OS.
@@ -78,7 +78,7 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 - **Full shell access**: models can install packages, run scripts in any language, use system tools like ffmpeg, git, curl, etc.
 - **Container isolation**: runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset**: the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
-- **Built-in file browser**: browse, preview, create, delete, upload and download files directly from the **Files** tab of the side panel.
+- **Built-in file browser**: browse, preview, create, delete, upload and download files directly from the **Files** tab.
 - **Built-in multi-user mode**: a single container can serve multiple users with per-user Linux account isolation (good for small teams, not for large-scale deployments).
 
 For full documentation, see the [Open Terminal integration guide](/features/open-terminal).
