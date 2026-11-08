@@ -216,7 +216,7 @@ Native Mode is the **default**, so new and existing models use it unless they ar
 
 #### Tool call labels
 
-A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Admin > Interface** ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required argument for these labels to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
+A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Admin > Interface** ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required `__labels__` argument to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
 
 #### Model Requirements & Caveats
 
@@ -300,7 +300,7 @@ Once it is on, the chat input's **+** menu gains a **Tool Permissions** entry wi
 | :--- | :--- |
 | **Full access** (default when **Auto** is not offered) | Tool calls run immediately, as they always have. |
 | **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. While it waits, the chat's sidebar entry shows a yellow dot labelled **Waiting for approval**. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
-| **Auto** | A review model rates each tool call. A call runs unless the review rates it at or above the approval threshold, and then it waits for **Allow** or **Deny** like under **Ask for approval**. Users who have not chosen a mode get **Auto**. |
+| **Auto** | Each tool call is checked against an approval policy. A call that needs approval waits for **Allow** or **Deny** like under **Ask for approval**; the others run immediately. Users who have not chosen a mode get **Auto**. |
 
 You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
 
@@ -310,19 +310,24 @@ Your choice is saved to your user settings, so it carries over to new chats unti
 
 #### Auto
 
-An administrator turns on **Auto permissions** below **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto)) and sets the review service:
+An administrator turns on **Auto permissions** below **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto)) and picks the **Engine** that decides which calls need approval:
 
 | Setting | Default |
 | :--- | :--- |
-| **API Base URL** ([`TOOL_PERMISSIONS_DECISIONS_API_BASE_URL`](/reference/env-configuration#tool_permissions_decisions_api_base_url)) | `https://api.openai.com/v1` |
-| **API Key** ([`TOOL_PERMISSIONS_DECISIONS_API_KEY`](/reference/env-configuration#tool_permissions_decisions_api_key)) | Empty |
-| **Model** ([`TOOL_PERMISSIONS_DECISIONS_MODEL`](/reference/env-configuration#tool_permissions_decisions_model)) | `gpt-6-luna` |
-| **Approval threshold** ([`TOOL_PERMISSIONS_DECISIONS_THRESHOLD`](/reference/env-configuration#tool_permissions_decisions_threshold)) | `0.5` |
-| **Prompt** ([`TOOL_PERMISSIONS_DECISIONS_PROMPT`](/reference/env-configuration#tool_permissions_decisions_prompt)) | Empty (built-in instructions) |
+| **Engine** ([`TOOL_PERMISSIONS_AUTO_ENGINE`](/reference/env-configuration#tool_permissions_auto_engine)) | **Default** |
+| **Approval policy** ([`TOOL_PERMISSIONS_AUTO_PROMPT`](/reference/env-configuration#tool_permissions_auto_prompt)) | Empty (built-in policy) |
+| **API Base URL** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](/reference/env-configuration#tool_permissions_auto_decisions_api_base_url)) | `https://api.openai.com/v1` |
+| **API Key** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_API_KEY`](/reference/env-configuration#tool_permissions_auto_decisions_api_key)) | Empty |
+| **Model** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_MODEL`](/reference/env-configuration#tool_permissions_auto_decisions_model)) | `gpt-6-luna` |
+| **Approval threshold** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_THRESHOLD`](/reference/env-configuration#tool_permissions_auto_decisions_threshold)) | `0.5` |
 
-For each tool call, Open WebUI sends a `POST` request to `<API Base URL>/decisions` with the **Model**, your latest request and your last four messages, the tool's definition and name, the call's arguments, and the tool type and Open Terminal ID. The service answers with the probability that the call needs confirmation. The call asks for approval when that probability is at or above the **Approval threshold**. The call also asks for approval when the review does not answer within 5 seconds, fails, returns an invalid answer or the request would exceed 64 KB. The `search_tools` call of [Tool Search](#tool-search) runs without a review.
+Both engines use the **Approval policy**. The last four settings apply to the **Decisions API** engine only.
 
-The review service must implement the same `/decisions` endpoint as the [Tool Search](#tool-search) **Decisions API** engine. If you turn **Auto permissions** off, chats that used **Auto** switch to **Ask for approval**.
+With the **Default** engine, the chat model decides. Open WebUI adds the approval policy to the system prompt and a required `__approval__` argument to each tool, and removes that argument before the tool runs. A call runs without approval only when the model sends exactly `{"required": false}` in that argument; anything else, including leaving it out, asks for approval. Tools whose parameters are not a plain JSON object or that define their own `__approval__` parameter get no `__approval__` argument, so their calls always ask for approval. In [Legacy Mode](#legacy-mode-prompt-based) no tool gets the argument, so every call asks for approval. The decision arrives with the call, so this engine needs no extra service. The chat model judges its own calls, so content that steers the model, such as instructions in a tool result, can also steer its decision.
+
+With the **Decisions API** engine, Open WebUI sends a `POST` request to `<API Base URL>/decisions` for each tool call with the **Model**, the approval policy, your latest request and your last four messages, the tool's definition and name, the call's arguments and the tool type and Open Terminal ID. The service answers with the probability that the call needs approval. The call asks for approval when that probability is at or above the **Approval threshold**. The call also asks for approval when the review does not answer within 5 seconds, fails or returns an invalid answer, when the **Approval threshold** is not a number from 0 to 1 and when the request data apart from the model and approval policy would exceed 64 KB. The review service must implement the same `/decisions` endpoint as the [Tool Search](#tool-search) **Decisions API** engine.
+
+The `search_tools` call of [Tool Search](#tool-search) runs without a review. If you turn **Auto permissions** off, chats that used **Auto** switch to **Ask for approval**.
 
 :::info Saved and temporary chats
 In a saved chat the pending call is stored on the assistant message, so approval prompts survive a page reload. In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) each call opens a live **Tool Permissions** dialog showing the tool name and its arguments, with **Allow** and **Deny**. The call is denied at once when that chat is not the one open in the tab. It is also denied when the browser tab is gone or nobody answers within 120 seconds, or within [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is set lower.

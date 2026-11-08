@@ -1537,7 +1537,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: In Native function calling mode, asks the model to write a short running and completed label for each tool call in the user's language, which the chat shows in place of the default tool call text. Each tool gets an extra required `__display__` argument that Open WebUI removes before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object are skipped. See [Tool call labels](/features/extensibility/plugin/tools#tool-call-labels). Can also be toggled in **Settings > Admin > Interface > Tool Call Labels**.
+- Description: In Native function calling mode, asks the model to write a short running and completed label for each tool call in the user's language, which the chat shows in place of the default tool call text. Each tool gets an extra required `__labels__` argument that Open WebUI removes before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object are skipped. See [Tool call labels](/features/extensibility/plugin/tools#tool-call-labels). Can also be toggled in **Settings > Admin > Interface > Tool Call Labels**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_call_labels.enable`.
 
 #### `ENABLE_TOOL_PERMISSIONS`
@@ -1551,42 +1551,84 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Adds **Auto** next to **Full access** and **Ask for approval** in the **Tool Permissions** entry when [`ENABLE_TOOL_PERMISSIONS`](#enable_tool_permissions) is on. In **Auto**, a review model scores each tool call and the call runs unless the score reaches [`TOOL_PERMISSIONS_DECISIONS_THRESHOLD`](#tool_permissions_decisions_threshold). Users who have not chosen a mode get **Auto**. Not available in channel chats. See [Tool Approval](/features/extensibility/plugin/tools#tool-approval). Can also be toggled in **Settings > Admin > Interface** (**Auto permissions**).
+- Description: Adds **Auto** next to **Full access** and **Ask for approval** in the **Tool Permissions** entry when [`ENABLE_TOOL_PERMISSIONS`](#enable_tool_permissions) is on. In **Auto**, the engine set by [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) decides for each tool call whether it runs or waits for approval. Users who have not chosen a mode get **Auto**. Not available in channel chats. See [Tool Approval](/features/extensibility/plugin/tools#tool-approval). Can also be toggled in **Settings > Admin > Interface** (**Auto permissions**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.enable`.
+
+#### `TOOL_PERMISSIONS_AUTO_ENGINE`
+
+- Type: `str` (empty or `decisions`)
+- Default: Empty string
+- Description: What decides which tool calls need approval in **Auto**. Empty lets the chat model decide: Open WebUI adds the approval policy to the system prompt and a required `__approval__` argument to each tool. `decisions` sends each tool call to a review service at [`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](#tool_permissions_auto_decisions_api_base_url). Any other value makes every call in **Auto** ask for approval. See [Auto](/features/extensibility/plugin/tools#auto). Can also be set in **Settings > Admin > Interface** (**Engine**: **Default** or **Decisions API**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.engine`.
+
+#### `TOOL_PERMISSIONS_AUTO_PROMPT`
+
+- Type: `str`
+- Default: Empty string (use the built-in approval policy)
+- Description: Approval policy that describes which tool calls need approval. Used by both engines. Can also be set in **Settings > Admin > Interface** (**Approval policy**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.prompt`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`
+
+- Type: `str`
+- Default: `https://api.openai.com/v1`
+- Description: Base URL of the review service used when [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) is `decisions`. Open WebUI sends each review request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.api_base_url`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_KEY`
+
+- Type: `str`
+- Default: Empty string
+- Description: API key sent as a Bearer token to the review service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.api_key`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_MODEL`
+
+- Type: `str`
+- Default: `gpt-6-luna`
+- Description: Model name sent to the review service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.model`.
+
+#### `TOOL_PERMISSIONS_AUTO_DECISIONS_THRESHOLD`
+
+- Type: `float`
+- Default: `0.5`
+- Description: A value from `0` to `1`. A tool call asks for approval when the review service's probability that it needs approval is at or above this value. A value outside that range makes every call ask for approval. Can also be set in **Settings > Admin > Interface** (**Approval threshold**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.threshold`.
 
 #### `TOOL_PERMISSIONS_DECISIONS_API_BASE_URL`
 
 - Type: `str`
 - Default: `https://api.openai.com/v1`
-- Description: Base URL of the review service for **Auto** tool permissions. Open WebUI sends each review request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Description: Read in place of [`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](#tool_permissions_auto_decisions_api_base_url) when that is not set.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.api_base_url`.
 
 #### `TOOL_PERMISSIONS_DECISIONS_API_KEY`
 
 - Type: `str`
 - Default: Empty string
-- Description: API key sent as a Bearer token to the review service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Description: Read in place of [`TOOL_PERMISSIONS_AUTO_DECISIONS_API_KEY`](#tool_permissions_auto_decisions_api_key) when that is not set.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.api_key`.
 
 #### `TOOL_PERMISSIONS_DECISIONS_MODEL`
 
 - Type: `str`
 - Default: `gpt-6-luna`
-- Description: Model name sent to the review service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Description: Read in place of [`TOOL_PERMISSIONS_AUTO_DECISIONS_MODEL`](#tool_permissions_auto_decisions_model) when that is not set.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.model`.
 
 #### `TOOL_PERMISSIONS_DECISIONS_THRESHOLD`
 
 - Type: `float`
 - Default: `0.5`
-- Description: A value from `0` to `1`. A tool call asks for approval when the review model's probability that it needs confirmation is at or above this value. Can also be set in **Settings > Admin > Interface** (**Approval threshold**).
+- Description: Read in place of [`TOOL_PERMISSIONS_AUTO_DECISIONS_THRESHOLD`](#tool_permissions_auto_decisions_threshold) when that is not set.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.threshold`.
 
 #### `TOOL_PERMISSIONS_DECISIONS_PROMPT`
 
 - Type: `str`
-- Default: Empty string (use the built-in review instructions)
-- Description: Instructions the review model follows when it rates a tool call. The request, tool definition and arguments are added automatically. Can also be set in **Settings > Admin > Interface** (**Prompt**).
+- Default: Empty string
+- Description: Read in place of [`TOOL_PERMISSIONS_AUTO_PROMPT`](#tool_permissions_auto_prompt) when that is not set.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.decisions.prompt`.
 
 #### `ENABLE_CONTEXT_COMPACTION`
