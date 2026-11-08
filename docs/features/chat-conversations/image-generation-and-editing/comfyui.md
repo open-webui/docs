@@ -115,7 +115,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 ![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
 
 :::info
-There is no "Generate Image" button underneath messages any more. Generation happens from the chat itself: switch **Image** on in the **Integrations** menu of the message input, then ask for the image. See [Usage](/features/chat-conversations/image-generation-and-editing/usage) for the conditions that have to be met and for the community action that brings the old button back.
+Messages have no "Generate Image" button. Generation happens from the chat itself: switch **Image** on in the **+** menu of the message input, then ask for the image. See [Usage](/features/chat-conversations/image-generation-and-editing/usage) for the conditions that have to be met and for a community action that adds such a button.
 :::
 
 ## Edit Image

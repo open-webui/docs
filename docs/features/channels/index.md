@@ -117,6 +117,8 @@ Point at someone's profile picture next to their messages or in the channel's me
 
 Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation. A thread opens beside the channel on screens at least 768 px wide, and over it on narrower ones.
 
+The **Search** button in the channel header searches the messages of that channel. The channel shows as a filter under the search box; remove it to search more widely.
+
 You can delete your own messages, and an admin can delete anyone's. Deleting a message that started a thread also deletes every reply in that thread, including replies other people wrote.
 
 If you can only read a channel, messages show no hover actions and the reactions under them cannot be clicked. The message box reads **You do not have permission to send messages in this channel.**

@@ -73,7 +73,7 @@ In the search window, a query of several words finds every item that contains al
 
 The **Reference Chats** picker in the chat input's **+** menu and the model's `search_chats` tool search your own chats with different rules. A query of several words finds every chat that contains all of them, in any order, without needing them next to each other. Each word can come from the chat's title or from any of its messages, and different words can come from different messages, so `docker healthcheck` also finds a chat titled "Docker setup" whose reply mentions a healthcheck. Chats that contain your query as an exact phrase are listed first, then the rest, each group ordered by most recently updated.
 
-Matching ignores case and works on substrings, so `log` also matches "login" and "backlog". Words are cut out of your query on English letters and digits, so `v0.9.1` searches for `v0`, `9` and `1` separately. A query written entirely in another script, Chinese or Russian for example, is searched as one exact phrase.
+Matching ignores case and works on substrings, so `log` also matches "login" and "backlog". Words are cut out of your query on English letters and digits, so `v0.9.1` searches for `v0`, `9` and `1` separately. Only the first twelve distinct words count. A query written entirely in another script, Chinese or Russian for example, is searched as one exact phrase.
 
 ### Filter prefixes
 
@@ -101,7 +101,7 @@ When using a model with **Native Function Calling** enabled (see the [**Central 
 
 ### Available History Tools:
 - **`search_chats`**: Text search across chat titles and message content, using the same matching as the **Reference Chats** picker and skipping the chat the model is currently in. Returns matching chat IDs and snippets.
-- **`view_chat`**: Reads and returns the full message history of a specific chat by ID.
+- **`view_chat`**: Reads and returns the message history of a specific chat by ID, cut to the newest messages when [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) is set.
 
 ### Why use native tool calling for Search?
 This allows the model to leverage its own previous work. You can ask: *"What was the feedback I got on my last email draft?"* or *"Find the Python script I wrote about image processing two weeks ago."*

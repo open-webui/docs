@@ -127,7 +127,7 @@ With **OAuth 2.1 (Static)**, the check runs against the **OAuth Server URL** whe
 
 ### Connecting an account
 
-An admin registers the MCP server once. Each user then connects their own account to it: the first time someone enables an OAuth 2.1 tool from the **Integrations** menu in a chat, Open WebUI sends them to the provider, and the access they grant is stored against their account alone. Nobody else inherits it.
+An admin registers the MCP server once. Each user then connects their own account to it: the first time someone enables an OAuth 2.1 tool from the **+** menu in a chat, Open WebUI sends them to the provider, and the access they grant is stored against their account alone. Nobody else inherits it.
 
 The authorization is bound to the account that started it and to the browser session it started in, so it has to be finished in that same browser, signed in as that same person, at the address in [`WEBUI_URL`](/reference/env-configuration#webui_url). Signing out cancels one still in progress. Anything else leaves the browser back on Open WebUI with a notification saying why; enable the tool again to retry.
 
@@ -152,7 +152,7 @@ Use this when you already have a client ID/client secret from your identity prov
 After saving:
 
 1. Open a chat.
-2. Click **+ > Integrations > Tools**.
+2. Click **+ > Tools**.
 3. Enable your MCP tool.
 4. Complete the OAuth consent/authorization flow in the browser redirect.
 
@@ -181,7 +181,7 @@ No configuration is needed on the Open WebUI side: the resource indicator is dis
 
 If an OAuth 2.1 tool is set as a default and the user hasn't previously authenticated (or their refresh token has expired), the tool call will fail with **"Failed to connect to MCP server"** because the backend cannot initiate the browser-based auth flow mid-request.
 
-**Workaround:** Users should manually enable OAuth 2.1 tools per-chat via the **Integrations** menu in the chat input area. This triggers the auth flow before the tool is ever invoked. Token refresh works automatically once the initial authentication is complete. A temporary provider error during refresh (rate limit, server error or unreachable provider) keeps the stored sign-in, and the next call tries again. A refresh the provider rejects removes the stored sign-in, and you sign in again.
+**Workaround:** Users should manually enable OAuth 2.1 tools per-chat via the **+** menu in the chat input area. This triggers the auth flow before the tool is ever invoked. Token refresh works automatically once the initial authentication is complete. A temporary provider error during refresh (rate limit, server error or unreachable provider) keeps the stored sign-in, and the next call tries again. A refresh the provider rejects removes the stored sign-in, and you sign in again.
 :::
 
 ### Connection URLs
@@ -228,7 +228,7 @@ An MCP server can ask you for input in the middle of a tool call (MCP elicitatio
 
 An MCP tool can come with an interactive app ([MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview)). When the tool's `_meta.ui.resourceUri` points to a `ui://` resource of type `text/html;profile=mcp-app` (up to 5 MB), Open WebUI shows that app inline in the chat after the tool runs.
 
-The app runs in a sandboxed iframe that may run scripts, download files and open popups, with no access to Open WebUI's origin. Its Content-Security-Policy comes from the resource's `csp` metadata (`resourceDomains`, `connectDomains`, `frameDomains`, `baseUriDomains`), and [`IFRAME_CSP`](/reference/env-configuration#iframe_csp) applies on top. The app can read and list the server's resources, open `http` and `https` links in a new tab and call the server's tools. Each tool call from the app asks you to confirm it first.
+The app runs in a sandboxed iframe that may run scripts, download files and open popups, with no access to Open WebUI's origin. Its Content-Security-Policy comes from the resource's `csp` metadata (`resourceDomains`, `connectDomains`, `frameDomains`, `baseUriDomains`), and [`IFRAME_CSP`](/reference/env-configuration#iframe_csp) applies on top. The app can read and list the server's resources, open `http` and `https` links in a new tab, call the server's tools and send messages to the chat. Each tool call from the app asks you to confirm it first in a **Tool call** dialog. A message from the app shows its text in a **Confirm Prompt from Embed** dialog and is sent as your next chat message once you confirm. Apps can send text only, so images and files in a message are left out.
 
 A tool's `_meta.ui.visibility` decides who can use it: a tool without `model` is hidden from the model, and a tool without `app` cannot be called by apps. MCP Apps need a stable [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key).
 

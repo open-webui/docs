@@ -89,7 +89,7 @@ The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that
 Every save that changes a tool's name, description, translations or code is kept as a version, together with the text typed into **Describe this change** beside **Save**. The version picker next to **Back** at the top of the tool editor starts on **Production**, the version chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). Anyone who can edit the tool can use it.
 
 - **Open a version** by picking it. The editor shows its name, description, translations and code read-only.
-- **Compare to current** shows what differs between that version and Production: changed fields side by side, then the code as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**.
+- **Compare to current** shows what differs between that version and Production: changed fields side by side, then the code as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**. Code longer than 5000 lines in either version cannot be compared (`Diff is limited to 5000 lines per version`).
 - **Set as Production** makes the opened version the one chats use. Its code is loaded and checked the same way as a save. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
 - **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
 
@@ -113,7 +113,7 @@ The globe selector in the tool editor stores a name, a description and valve lab
 Once installed or connected, here’s how to enable them for your conversations:
 
 ### Option 1: Enable on-the-fly (Specific Chat)
-While chatting, click the **Integrations** icon in the input area (the four-diamond icon next to the plus button), then select **Tools**. You’ll see a list of available Tools, and you can toggle them on specifically for that session.
+While chatting, open the **+** menu in the input area, then select **Tools**. You’ll see a list of available Tools, and you can toggle them on specifically for that session.
 
 ### Option 2: Enable by Default (Global/Model Level)
 1. Go to **Workspace → Models**.
@@ -214,6 +214,10 @@ Native Mode is the **default**, so new and existing models use it unless they ar
 **Model Defaults** in **Settings → Admin → Models** sets any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) once for every model, current and future, unless a specific model overrides it. The environment variable equivalent is `DEFAULT_MODEL_PARAMS` (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
+#### Tool call labels
+
+A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Admin > Interface** ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required argument for these labels to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
+
 #### Model Requirements & Caveats
 
 :::tip Minimum model tier (not a maintained list)
@@ -290,7 +294,7 @@ Earlier tool calls in the chat history whose arguments cannot be read are sent t
 
 By default a model runs its tool calls as soon as it makes them. An administrator can offer more modes by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
 
-Once it is on, the chat input's menu gains a **Tool Permissions** entry with two choices, or three when **Auto permissions** is on:
+Once it is on, the chat input's **+** menu gains a **Tool Permissions** entry with two choices, or three when **Auto permissions** is on:
 
 | Mode | Behaviour |
 | :--- | :--- |
@@ -344,9 +348,9 @@ How it works:
 
 - **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.
 - **What the model sees.** A short `<available_tools>` instruction at the end of the system prompt tells the model to look tools up with `search_tools`. It does not list the deferred tools. Two built-in tools are added to the tool list: `search_tools` and `call_tool`.
-- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by the selected search engine. To run a tool it found, the model calls `call_tool` with `tool_name` set to the tool's exact name and `params` set to the tool's arguments as a JSON-encoded object string, for example `call_tool(tool_name="get_weather", params='{"city":"Dubai"}')`. Open WebUI runs the named tool as if the model had called it directly, so approvals, citations and the tool's behaviour are the same.
+- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by the selected search engine. To run tools it found, the model calls `call_tool` with a `calls` array. Each entry holds `tool_name`, the tool's exact name, and `params`, the tool's arguments as a JSON-encoded object string, for example `call_tool(calls=[{"tool_name": "get_weather", "params": "{\"city\":\"Dubai\"}"}])`. One `call_tool` call can run several independent tools. Open WebUI runs each entry as if the model had called that tool directly, so approvals, results, citations and the chat display are per tool.
 - **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
-- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself. Under **Auto**, `search_tools` runs without a review. The approval for a `call_tool` call names the tool it runs.
+- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself. Under **Auto**, `search_tools` runs without a review. Each tool a `call_tool` call runs is approved on its own, under that tool's name.
 - **Backend support.** Every call the model makes goes to a tool in the list sent to the provider, so Tool Search also works on backends that only accept calls to listed tools, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server.
 
 #### Search engines
@@ -409,7 +413,7 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | `replace_note_content` | Update one page of an existing note, replacing its whole content or editing part of it by exact text or by character range. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
-| `view_chat` | Reads and returns the full message history of a specific chat by ID. |
+| `view_chat` | Reads and returns the message history of a specific chat by ID. With [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) set, it keeps the newest messages up to that many characters and says the result was cut. |
 | **Channels** | *Requires `ENABLE_CHANNELS` AND per-model "Channels" category enabled (default: on).* |
 | `search_channels` | Find public or accessible channels by name/description. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
@@ -451,7 +455,7 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | `play_animation` | Play one of the avatar's named gestures on the call screen. In a Realtime call the voice model plays the gestures, so this tool returns `unavailable` to the chat model. |
 | **Tool Search** | *Requires [Tool Search](#tool-search) turned on AND at least one tool deferred in the request. Added even when the model's **Builtin Tools** capability is off. No per-model category of its own.* |
 | `search_tools` | Find deferred tools by keywords or exact name and return their full definitions. |
-| `call_tool` | Run a tool found with `search_tools`, given its `tool_name` and its arguments as a JSON-encoded object string in `params`. |
+| `call_tool` | Run one or more tools found with `search_tools` in one call, each given by its `tool_name` and its arguments as a JSON-encoded object string in `params`. |
 
 #### Attached Chat Files
 
@@ -521,7 +525,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
 | `generate_image` | `prompt` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed. With a terminal selected, each image also carries `terminal_path` |
-| `edit_image` | `prompt` (required), `image_urls` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed. With a terminal selected, each image also carries `terminal_path` |
+| `edit_image` | `prompt` (required), `image_urls` (required; image URLs or [absolute file paths in the selected terminal](/features/chat-conversations/image-generation-and-editing/usage#image-editing-inpainting)), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed. With a terminal selected, each image also carries `terminal_path` |
 | **Code Interpreter** | | |
 | `execute_code` | `code` (required) | `{status, stdout, stderr, result}` |
 | **Memory** | | |
@@ -540,7 +544,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `replace_note_content` | `note_id` (required), `page_id` (required on notes with several pages), `content` (optional; the new markdown for the whole page. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; each `{"action": "replace", "content": ...}`, `{"action": "replace_text", "find", "content", "occurrence", "replace_all"}` or `{"action": "replace_text", "start", "end", "content", "expected"}`. `find` is literal and case sensitive. With several matches, `occurrence` picks one (0-indexed) and `replace_all: true` replaces all of them; with neither set, nothing changes and the error lists every match. `replace_range` is a deprecated alias of the `start`/`end` form), `title` (optional) | `{status: "success", id, page_id, title, updated_at, applied_operation_count, applied_ranges}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `read_required` (the page was not read with `view_note` earlier in the same reply), `page_conflict` (no `page_id` on a note with several pages, the page is gone or it changed since it was read), `text_not_found`, `ambiguous_match`, `invalid_find`, `invalid_occurrence`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …). An `ambiguous_match` error carries `matches`, each with `start`, `end` and `context` (the match with up to 50 characters on either side) |
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
-| `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
+| `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}], updated_at, created_at}`. A result cut by [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) adds `truncated: true`, `total_messages` and `returned_messages` |
 | **Channels** | | |
 | `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
 | `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{channel_id, channel_name, message_id, content_snippet, is_thread_reply, parent_id, created_at}` |
@@ -580,7 +584,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
 | **Tool Search** | | |
 | `search_tools` | `query` (required; keywords or an exact tool name), `count` (default: `5`, at most `20`) | `{"tools": [...]}` with the full definitions, `{"tools": [], "message": ...}` when nothing matches, or `{"error": ...}` when the search engine fails |
-| `call_tool` | `tool_name` (required; exact name), `params` (required; the tool's arguments as a JSON-encoded object string, `"{}"` for none) | The named tool's own result, or an `Error: ...` string when the call is malformed or the tool is not available |
+| `call_tool` | `calls` (required; an array of `{tool_name, params}`, with `tool_name` the exact name and `params` the tool's arguments as a JSON-encoded object string, `"{}"` for none) | `{"results": [{tool_name, status, output}]}` with each tool's own result in order, or an `Error: ...` string when the call is malformed. A tool that is not available gets an `Error: ...` in its entry |
 
 In `view_file` and `view_knowledge_file` line mode, `end_line` without `start_line` reads from line 1, and `start_line` without `end_line` returns 100 lines. A line range stops at the last whole line that fits [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars), counting the line-number prefixes. The response then has `truncated: true` and `next_start_line` to continue from. Character paging with `line_numbers` on returns every character exactly once: following `next_offset` page after page reads the whole file with no gaps.
 

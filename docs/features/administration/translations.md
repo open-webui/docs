@@ -52,7 +52,7 @@ Open WebUI picks by the language the user has the interface set to, in this orde
 
 A field you leave blank is dropped when you save, so an empty translation is the same as no translation and the original shows through. Translate what matters and leave the rest.
 
-Translated text follows the resource everywhere it is named: model and tool pickers, the new chat screen, the `@`, `$` and `/` menus, the Integrations menu, the model controls panel, the action buttons under a reply, the sidebar and the Workspace lists. Workspace search matches both the translated name and the original, so searching for either finds the thing.
+Translated text follows the resource everywhere it is named: model and tool pickers, the new chat screen, the `@`, `$` and `/` menus, the **+** menu, the model controls panel, the action buttons under a reply, the sidebar and the Workspace lists. Workspace search matches both the translated name and the original, so searching for either finds the thing.
 
 ---
 

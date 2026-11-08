@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # Tether
 
-Tether is the desktop companion for Open WebUI. It signs in to your instance and connects your own computer to it, so chats can use that computer as a terminal and the app can show desktop notifications. The project lives at [github.com/open-webui/tether](https://github.com/open-webui/tether). It is free for personal non-commercial use. Commercial or organizational production use needs an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise).
+Tether is the desktop companion app for Open WebUI, available for macOS, Windows and Linux. It signs in to your instance and connects your own computer to it, so chats can use that computer as a terminal and the app can show desktop notifications. The project lives at [github.com/open-webui/tether](https://github.com/open-webui/tether). It is free for personal non-commercial use. Commercial or organizational production use needs an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise).
 
 ## Connecting
 

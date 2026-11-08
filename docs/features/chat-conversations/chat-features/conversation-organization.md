@@ -109,7 +109,7 @@ Pick the model new chats in this folder start with, or leave it on **Use default
 
 ### Default Terminal and Working Directory
 
-Under **Advanced**, **Default terminal** picks the terminal new chats in this folder start with. Once one is picked, **Working directory** sets the path on that terminal where those chats start, and its folder button browses the terminal's directories. Leave the directory empty to use the terminal's own default. Both apply to new chats only.
+Under **Advanced**, **Default terminal** picks the terminal new chats in this folder start with. Once one is picked, **Working directory** sets the path on that terminal where those chats start; leave it empty to use the terminal's own default. Its folder button browses the terminal's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default terminal picked, **Default Model** also offers that terminal's [coding agents](/features/open-terminal/coding-agents). These settings apply to new chats only.
 
 ### System Prompt
 

@@ -144,9 +144,7 @@ Turn it on only for a server you control that authenticates the person behind th
 
 ## Step 3: Confirm Your Tool Server Is Connected
 
-Once your tool server is successfully connected, Open WebUI will display a tool server indicator directly in the message input area:
-
-You'll now see this icon below the input box:
+While tools are selected for the chat and **Show Input Selections** is on in **Settings > Interface**, a tool indicator shows beside the **+** button in the message input:
 
 ![Tool Server Indicator](/images/openapi-servers/open-webui/message-input.png)
 
@@ -156,7 +154,7 @@ Clicking this icon opens a popup where you can:
 - Expand an MCP server to load its tool names and descriptions live
 - Check whether each server is connected or shows **Auth required**, and use **Reconnect** to sign in again
 
-To disconnect OAuth for an MCP server, use the **Integrations** menu in the message input.
+To disconnect OAuth for an MCP server, use **Disconnect OAuth** next to the tool under **+ > Tools** in the message input.
 
 Here's what the tool information modal looks like:
 
@@ -169,7 +167,7 @@ If you've connected a Global Tool Server (i.e., one that's admin-configured), it
 Instead:
 
 - Global tools are hidden by default and must be explicitly activated per user.
-- To enable them, you'll need to click on the **Integrations** button in the message input area (bottom left of the chat box, next to the plus button), select **Tools**, and manually toggle on the specific global tool(s) you want to use.
+- To enable them, you'll need to open the **+** menu in the message input area, select **Tools**, and manually toggle on the specific global tool(s) you want to use.
 
 Here's what that looks like:
 
@@ -177,7 +175,7 @@ Here's what that looks like:
 
 Important Notes for Global Tool Servers:
 
-- They will not show up in the tool indicator popup until enabled from the **Integrations** menu.
+- They will not show up in the tool indicator popup until enabled from the **+** menu.
 - Each global tool must be individually toggled on to become active inside your current chat.
 - Once toggled on, they function the same way as user tools.
 - Admins can control access to global tools via role-based permissions.

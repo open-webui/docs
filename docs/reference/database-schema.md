@@ -103,6 +103,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 49      | comment          | Stores comments and replies on workspace items, notes and chats |
 | 50      | comment_reaction | Records emoji reactions to comments                          |
 | 51      | notification     | Stores each user's inbox notifications                       |
+| 52      | chat_view_state  | Stores each user's saved tab layout for a chat               |
 
 Note: the `alembic_version` table, which records the applied migration, is not related to Open-WebUI's core functionality and is excluded from this list.
 
@@ -402,6 +403,22 @@ Things to know about the chat_message table:
 - `context_summary` was added by migration `4c5ce3d2f27f` to store a summary of the message's context.
 - `meta` was added by migration `856c5b02fb54`. It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
 - [Chat search](/features/chat-conversations/chat-features/history-search) reads a different set of stores per backend. On PostgreSQL it matches `chat_message.content` as well as the `history.messages` map and the older flat `messages` array inside the `chat.chat` blob. On SQLite it matches those two JSON locations only.
+
+## Chat View State Table
+
+| **Column Name** | **Data Type** | **Constraints** | **Description**                                              |
+| --------------- | ------------- | --------------- | ------------------------------------------------------------ |
+| user_id         | Text          | PRIMARY KEY     | User the view belongs to                                     |
+| chat_id         | Text          | PRIMARY KEY, indexed | Chat the view belongs to                                |
+| state           | JSON          | NOT NULL        | Open tabs, split layout and selected terminal                |
+| updated_at      | BigInteger    | NOT NULL        | Last update timestamp (seconds)                              |
+
+Things to know about the chat_view_state table:
+
+- Created by migration `6a23bd107e54`. The primary key is (`user_id`, `chat_id`), with an index on `chat_id` (`ix_chat_view_state_chat_id`).
+- It holds the tabs a user had open in a chat, so they are restored when the chat is reopened, on any device. `GET` and `POST /api/v1/chats/{id}/view` read and save it for any user who can read the chat.
+- Each row is private to its user, even for shared chats: the endpoints only read and write the signed-in user's own row. A saved view is limited to 1 MiB.
+- Deleting a chat deletes its rows, and deleting a user deletes that user's rows.
 
 ## Automation Table
 
@@ -835,6 +852,7 @@ Things to know about the memory table:
 Things to know about the message table:
 
 - `parent_id` was added in migration `3781e22d8b01` and `reply_to_id` in migration `a5c220713937`. `is_pinned`, `pinned_at` and `pinned_by` were added in migration `2f1211949ecc`.
+- Indexed on (`channel_id`, `parent_id`, `created_at`) and on `parent_id` (`ix_message_channel_parent_created`, `ix_message_parent_id`, migration `9f6c2a8d1b43`) for loading channel message lists and threads.
 - `parent_id` and `reply_to_id` do different jobs. `parent_id` is the thread root: a channel's message list selects rows with a null `parent_id`, and a thread is read by selecting rows whose `parent_id` is the root message. `reply_to_id` points at a single message that the reply quotes, and the quoted message is fetched and attached when a message is served. It has no effect on which list a message appears in.
 - `is_pinned`, `pinned_at` and `pinned_by` are written together by `POST /api/v1/channels/{id}/messages/{message_id}/pin`. Unpinning clears `pinned_at` and `pinned_by` back to null. `GET /api/v1/channels/{id}/messages/pinned` reads them.
 - `app_id` was added in migration `c92da83b017f`. Messages posted by an app carry its `app_id` and a null `user_id`, and keep their buttons and cards in `data` under `app` (`actions` and `embeds`).
@@ -853,6 +871,7 @@ Things to know about the message table:
 Things to know about the message_reaction table:
 
 - `user_id`, `message_id` and `name` are NOT NULL in the database (migration `3781e22d8b01`) while the SQLAlchemy model declares them without the flag. The database constraint is the one that applies.
+- Indexed on `message_id` (`ix_message_reaction_message_id`, migration `9f6c2a8d1b43`).
 
 ## Model Table
 
@@ -1180,6 +1199,8 @@ erDiagram
     chat ||--o{ tag : "tagged_with"
     chat ||--o{ chat_message : "contains"
     chat ||--o{ shared_chat : "shared_via"
+    chat ||--o{ chat_view_state : "viewed_as"
+    user ||--o{ chat_view_state : "saves"
     chat }|--|| folder : "organized_in"
     calendar ||--o{ calendar_event : "contains"
     calendar_event ||--o{ calendar_event_attendee : "has"
@@ -1260,6 +1281,13 @@ erDiagram
         boolean done
         json usage
         text context_summary
+    }
+
+    chat_view_state {
+        text user_id PK
+        text chat_id PK
+        json state
+        bigint updated_at
     }
 
     calendar {

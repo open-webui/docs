@@ -56,7 +56,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 | **Supporting files** | Ship scripts, references, templates and assets next to `SKILL.md` |
 | **Version history** | Every save is a version you can compare, export or set back as the current one |
 | **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
-| **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
+| **Per-chat toggle** | Switch skills on for one chat from the **+** menu, no model edit needed |
 | **Model binding** | Attach skills to models so new chats start with them selected |
 | **Lazy loading** | Skills you did not select are listed in a manifest and load on demand |
 | **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
@@ -72,7 +72,7 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 Type `$` in the chat input, or use the `/` menu, and pick a skill. With the [skill tools](#skill-tools), the skill loads before the model answers, once per chat. Without them its instructions go into the system prompt with every message. A message that is only a `$` mention is sent with the skill names as its text.
 
-### Per-chat skills (Integrations menu)
+### Per-chat skills
 
 The **+** menu > **Skills** turns skills on for the current chat. A badge shows how many are on. Selected skills load like skills mentioned with `$`.
 
@@ -291,7 +291,7 @@ Every save that changes a skill's name, description, translations or files store
 
 The version menu at the top of the editor's file panel lists **Current** and every earlier version, newest first and 20 per page, each with its author and the note from **Describe this change** (or a short version ID when there is none). Picking an earlier version opens it read-only with two actions:
 
-- **Compare to current** shows what differs between that version and the current one: name, description and translations, plus every added, deleted or modified file with a line-by-line diff for text files.
+- **Compare to current** shows what differs between that version and the current one: name, description and translations, plus every added, deleted or modified file with a line-by-line diff for text files. A file longer than 5000 lines in either version gets no line diff (`Diff is limited to 5000 lines per version`).
 - **Set as Production** makes that version the current one again. It needs write access. If someone saved the skill after you opened the version, the switch is refused and the editor offers to reload the latest state.
 
 The **...** beside each earlier version holds **Delete**, for users with write access. Versions that were based on a deleted one are linked to its parent, so the chain stays intact. With the **Export Skills** permission, the file panel's **...** menu also exports the version you are viewing as `.skill`, JSON or ZIP.

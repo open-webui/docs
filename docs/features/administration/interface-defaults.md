@@ -201,7 +201,7 @@ If a set of accounts should stay exactly on your values, remove the **Interface 
 
 ## Hiding controls
 
-**Visible controls** in **Settings > Admin > Interface** hides single controls from everyone except admins. Hiding only removes the control from view: its value and the feature behind it stay in effect, so use a [permission](/features/authentication-access/rbac/permissions) to stop people using a feature. Hiding **Archive** also hides unarchiving and **Archive All Chats**. The same list can be set with [`UI_VISIBILITY`](/reference/env-configuration#ui_visibility).
+**Visible controls** in **Settings > Admin > Interface** hides single controls from everyone except admins. Hiding only removes the control from view: its value and the feature behind it stay in effect, so use a [permission](/features/authentication-access/rbac/permissions) to stop people using a feature. Hiding **Archive** also hides unarchiving and **Archive All Chats**. A section or menu entry whose controls are all hidden disappears with them, such as **Add Context** in the chat input menu or the **Capabilities** section of the model editor. The same list can be set with [`UI_VISIBILITY`](/reference/env-configuration#ui_visibility).
 
 ---
 
