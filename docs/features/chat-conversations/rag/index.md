@@ -7,7 +7,7 @@ import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 <ThemedImage
-  alt="Chat & Conversations map with the Documents (RAG) cell highlighted"
+  alt="Documents: a stack of sheets with one slid out"
   sources={{
     light: useBaseUrl('/images/banners/chat-conversations-documents-light.svg'),
     dark: useBaseUrl('/images/banners/chat-conversations-documents-dark.svg'),
@@ -252,8 +252,8 @@ If you change the embedding model, those standalone chat file embeddings will st
 
 | Change | New Documents | Knowledge Base Documents (no re-index) | Knowledge Base Documents (after re-index) | Standalone Chat Files |
 |---|---|---|---|---|
-| **Chunk Size / Overlap** | ✅ Uses new settings | ⚠️ Old chunks still work, but quality may vary | ✅ Re-chunked with new settings | ⚠️ Old chunks, re-upload to update |
-| **Embedding Model** | ✅ Uses new model | ❌ Old embeddings, incompatible vector space | ✅ Re-embedded with new model | ❌ Old embeddings, re-upload to update |
+| **Chunk Size / Overlap** | Uses new settings | Old chunks still work, but quality may vary | Re-chunked with new settings | Old chunks, re-upload to update |
+| **Embedding Model** | Uses new model | Old embeddings, incompatible vector space | Re-embedded with new model | Old embeddings, re-upload to update |
 
 ## Citations in RAG Feature
 
@@ -269,8 +269,8 @@ The **Preload files** capability controls whether Open WebUI performs RAG (Retri
 
 | Preload files | Behavior |
 |--------------|----------|
-| ✅ **Enabled** | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
-| ❌ **Disabled** | File content is never extracted or injected. With Native or Default function calling, the model sees a list of the attached files and reads them with the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`). These tools need the **Files** builtin tool category, the model's **File Upload** capability and the user's upload permission. |
+| **Enabled** | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
+| **Disabled** | File content is never extracted or injected. With Native or Default function calling, the model sees a list of the attached files and reads them with the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`). These tools need the **Files** builtin tool category, the model's **File Upload** capability and the user's upload permission. |
 
 **When to disable Preload files:**
 - **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
@@ -297,8 +297,8 @@ The **[Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools
 
 | Builtin Tools | Behavior |
 |---------------|----------|
-| ✅ **Enabled** (default) | Unless the model is set to Legacy, it receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats` and others. |
-| ❌ **Disabled** | No [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) are injected. The model works only with pre-injected context. |
+| **Enabled** (default) | Unless the model is set to Legacy, it receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats` and others. |
+| **Disabled** | No [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) are injected. The model works only with pre-injected context. |
 
 **When to disable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode):**
 - **Model doesn't support function calling**: Smaller or older models may not handle the `tools` parameter.
@@ -312,10 +312,10 @@ On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-sys
 
 | Preload files | Builtin Tools | Result |
 |--------------|---------------|--------|
-| ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
-| ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
-| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
-| ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
+| Enabled | Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
+| Enabled | Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
+| Disabled | Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
+| Disabled | Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
 :::warning Knowledge attached to a model or a folder behaves differently
 The table above covers attachments made in the chat. Knowledge attached to a model in the Workspace, and knowledge attached to a folder, follow the Function Calling mode instead:

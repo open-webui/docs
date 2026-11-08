@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Getting Started with Open WebUI
 
 <ThemedImage
-  alt="Getting Started with Open WebUI: install, connect a provider, start chatting, then expand into app install, agents, sharing, and updates"
+  alt="Getting Started: a row of rising steps, the first one marked"
   sources={{
     light: useBaseUrl('/images/banners/getting-started-light.svg'),
     dark: useBaseUrl('/images/banners/getting-started-dark.svg'),
@@ -23,7 +23,7 @@ Open WebUI runs anywhere (Docker, Kubernetes, pip, bare metal) and connects to O
 
 ---
 
-## ⏱️ Quick Start
+## Quick Start
 
 **Install Open WebUI, connect a model, and start chatting.**
 
@@ -31,18 +31,18 @@ Everything you need for a working setup. Choose Docker for the fastest path, Pyt
 
 | | |
 | :--- | :--- |
-| 🐳 **Docker** | One-command deploy, the officially recommended path |
-| 📦 **Python (pip / uv)** | Lightweight install for low-resource or manual setups |
-| ☸️ **Kubernetes (Helm)** | Production-ready orchestration with scaling |
-| 🖥️ **Desktop app** | Native app, no Docker required |
-| 🔌 **Connect a provider** | Ollama, OpenAI, Anthropic, llama.cpp, vLLM, and more |
-| ⚙️ **Understanding settings** | Learn how Admin Settings and User Settings work together |
+| **Docker** | One-command deploy, the officially recommended path |
+| **Python (pip / uv)** | Lightweight install for low-resource or manual setups |
+| **Kubernetes (Helm)** | Production-ready orchestration with scaling |
+| **Desktop app** | Native app, no Docker required |
+| **Connect a provider** | Ollama, OpenAI, Anthropic, llama.cpp, vLLM, and more |
+| **Understanding settings** | Learn how Admin Settings and User Settings work together |
 
 [**Start installing →**](/getting-started/quick-start)
 
 ---
 
-## 📱 Open WebUI as an App
+## Open WebUI as an App
 
 **Already running Open WebUI? Install it as an app on any device.**
 
@@ -50,9 +50,9 @@ Open WebUI is a Progressive Web App (PWA). Add it to your phone's home screen, y
 
 | | |
 | :--- | :--- |
-| 📱 **iPhone / iPad** | Share → Add to Home Screen |
-| 🤖 **Android** | Menu → Install app |
-| 🖥️ **Chrome / Edge** | Address bar install icon |
+| **iPhone / iPad** | Share → Add to Home Screen |
+| **Android** | Menu → Install app |
+| **Chrome / Edge** | Address bar install icon |
 
 [**Install as an app →**](/getting-started/open-webui-as-app)
 
@@ -66,19 +66,19 @@ Short sections that cover the things every new user eventually wishes they'd kno
 
 | | |
 | :--- | :--- |
-| 🧩 **Plugins** | Tools, Pipes, Filters, Actions: the extensibility story |
-| 🧠 **Context management** | Why long chats hit a wall and how to handle it |
-| 🤖 **Task models** | Keep titles, tags, and autocomplete off your main model |
-| 📚 **Basic RAG** | Chatting with your own documents |
-| 🔧 **Tool calling** | Native mode + first Tools to install |
-| 🌐 **Web search** | Pick a provider and the model searches when it needs to |
-| 🖥️ **Open Terminal** | A sandboxed shell the model can build and run things in |
+| **Plugins** | Tools, Pipes, Filters, Actions: the extensibility story |
+| **Context management** | Why long chats hit a wall and how to handle it |
+| **Task models** | Keep titles, tags, and autocomplete off your main model |
+| **Basic RAG** | Chatting with your own documents |
+| **Tool calling** | Native mode + first Tools to install |
+| **Web search** | Pick a provider and the model searches when it needs to |
+| **Open Terminal** | A sandboxed shell the model can build and run things in |
 
 [**Read the essentials →**](/getting-started/essentials)
 
 ---
 
-## 🤖 Connect an Agent
+## Connect an Agent
 
 **Go beyond simple model providers. Connect an autonomous AI agent.**
 
@@ -86,8 +86,8 @@ AI agents like Hermes Agent and OpenClaw bring their own tools (terminal, file o
 
 | | |
 | :--- | :--- |
-| 🧠 **Hermes Agent** | Nous Research's agent with terminal, file ops, web search, and skills |
-| 🐾 **OpenClaw** | Self-hosted agent framework with shell access, web browsing, and channel bots |
+| **Hermes Agent** | Nous Research's agent with terminal, file ops, web search, and skills |
+| **OpenClaw** | Self-hosted agent framework with shell access, web browsing, and channel bots |
 
 [**Connect an agent →**](/getting-started/quick-start/connect-an-agent)
 
@@ -110,7 +110,7 @@ Open WebUI isn't just a local interface for AI. It is designed to be a centraliz
 
 ---
 
-## 🛠️ Advanced Topics
+## Advanced Topics
 
 **Scale, observe, and customize your deployment.**
 
@@ -118,15 +118,15 @@ Go beyond the basics. Configure environment variables, connect external database
 
 | | |
 | :--- | :--- |
-| ⚖️ **Scaling** | Multiple replicas, multi-node, Redis-backed sessions |
-| 📊 **Logging & observability** | OpenTelemetry traces, metrics, and structured logs |
-| 🧪 **Development setup** | Run from source for local development and testing |
+| **Scaling** | Multiple replicas, multi-node, Redis-backed sessions |
+| **Logging & observability** | OpenTelemetry traces, metrics, and structured logs |
+| **Development setup** | Run from source for local development and testing |
 
 [**Explore advanced topics →**](/getting-started/advanced-topics)
 
 ---
 
-## 🔄 Updating
+## Updating
 
 **Stay current with the latest features and security patches.**
 
@@ -134,9 +134,9 @@ Update manually with a single Docker or pip command, or automate with Watchtower
 
 | | |
 | :--- | :--- |
-| 🔄 **Manual update** | Docker pull + recreate, or pip upgrade |
-| 🤖 **Automated updates** | Watchtower, WUD, or Diun |
-| 📌 **Version pinning** | Lock to a specific release for stability |
-| 💾 **Backup & restore** | One-command volume backup and recovery |
+| **Manual update** | Docker pull + recreate, or pip upgrade |
+| **Automated updates** | Watchtower, WUD, or Diun |
+| **Version pinning** | Lock to a specific release for stability |
+| **Backup & restore** | One-command volume backup and recovery |
 
 [**Update guide →**](/getting-started/updating)

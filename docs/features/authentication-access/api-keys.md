@@ -33,10 +33,10 @@ A key can be replaced or removed outright. Creating a new key overwrites the old
 
 | | |
 | :--- | :--- |
-| 🔐 **Bearer token auth** | Standard `Authorization: Bearer` header, works with any HTTP client or SDK |
-| 🛡️ **Scoped to user** | Key inherits the creating user's role and group permissions |
-| 🚫 **Endpoint restrictions** | Optionally limit which API routes API keys can access |
-| 👥 **Permission-gated** | Requires a global admin toggle plus a per-group feature permission for non-admins |
+| **Bearer token auth** | Standard `Authorization: Bearer` header, works with any HTTP client or SDK |
+| **Scoped to user** | Key inherits the creating user's role and group permissions |
+| **Endpoint restrictions** | Optionally limit which API routes API keys can access |
+| **Permission-gated** | Requires a global admin toggle plus a per-group feature permission for non-admins |
 
 ---
 

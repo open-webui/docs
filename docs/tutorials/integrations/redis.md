@@ -240,7 +240,7 @@ WEBSOCKET_MANAGER="redis"
 WebSockets are on by default ([`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support)). The websocket layer uses `REDIS_URL` and follows `REDIS_CLUSTER`. Set [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) (and `WEBSOCKET_REDIS_CLUSTER`) only to put websocket traffic on a different Redis server or database, for example `redis://redis:6379/1`.
 
 :::warning CORS and websockets
-If you set [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin), include every origin users open Open WebUI from, for example `https://chat.example.com`, separated by semicolons. Websocket connections from any other origin are refused. See [Connection Errors](/troubleshooting/connection-error#-https-tls-cors--websocket-issues).
+If you set [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin), include every origin users open Open WebUI from, for example `https://chat.example.com`, separated by semicolons. Websocket connections from any other origin are refused. See [Connection Errors](/troubleshooting/connection-error#https-tls-cors--websocket-issues).
 :::
 
 ### Optional Configuration

@@ -9,20 +9,20 @@ This guide covers breaking changes and required updates for Tools, Functions, Pi
 
 ---
 
-## 🧐 What Has Changed and Why?
+## What Has Changed and Why?
 
 Open WebUI 0.9.0 ships a large internal refactor: the backend data layer has moved from **synchronous** to **asynchronous** from top to bottom. Almost every database-backed method on every model class (Users, Chats, Files, Models, Functions, Tools, Knowledge, Memories, Groups, Folders, Messages, Feedback, …) is now an `async def` and must be awaited.
 
 At the storage layer, SQLAlchemy is now used in its async mode: sessions are `AsyncSession` instances, and queries are issued via `await db.execute(select(...))` instead of the legacy `db.query(...).first()` style. A sync engine still exists internally, but it is reserved for startup-only tasks (config loading, Alembic/peewee migrations, health checks): **all runtime code, including plugins, must use the async engine**.
 
-📌 **Why did we make this change?**
+**Why did we make this change?**
 - **Concurrency**: blocking DB calls on the event loop were the biggest bottleneck under load. Making the data layer async lets FastAPI handle many more concurrent chats without thread-pool saturation.
 - **Consistency**: request handlers were already async; the data layer being sync forced awkward `run_in_threadpool` wrappers throughout the codebase.
 - **Forward-looking**: SQLAlchemy 2.0's async API is the supported path going forward.
 
 ---
 
-## ⚠️ Breaking Changes
+## Breaking Changes
 
 If your plugin touches the Open WebUI database or models (**or calls any helper that eventually touches them**) you will need to update it. Because almost every utility in `open_webui.utils.*` and every router function ultimately reads or writes through a model, "async reach" extends well beyond obvious `Users.`/`Chats.` calls. Specifically:
 
@@ -35,9 +35,9 @@ Plugin entrypoints themselves (the `pipe`, `inlet`, `outlet`, `stream`, `action`
 
 ---
 
-## ✅ Step-by-Step Migration
+## Step-by-Step Migration
 
-### 🔄 1. Await every model method
+### 1. Await every model method
 
 The most common change. Anywhere your plugin reads or writes through a model class, add `await`.
 
@@ -67,7 +67,7 @@ Note that the helper itself became `async def`. Its callers must now `await` it 
 
 ---
 
-### 🗄️ 2. Replace `get_db_context` with `get_async_db_context`
+### 2. Replace `get_db_context` with `get_async_db_context`
 
 If your plugin opens its own database session (rare, but some Tools do for custom queries), the sync helper is gone. Switch to the async variant.
 
@@ -108,7 +108,7 @@ If you rely on type hints, the session type is now `sqlalchemy.ext.asyncio.Async
 
 ---
 
-### 🧩 3. Pipes, Filters, and Actions
+### 3. Pipes, Filters, and Actions
 
 Plugin entrypoints were already async since 0.5, so their signatures are unchanged. What changes is how you interact with models inside them.
 
@@ -156,7 +156,7 @@ A one-line diff in the simplest case, but every model call inside `inlet`, `outl
 
 ---
 
-### 🛠️ 4. Tools
+### 4. Tools
 
 Tool methods can be declared `async def` (and should be, if they touch the DB). For Tools that only call external APIs and never query Open WebUI's database, no change is required.
 
@@ -182,7 +182,7 @@ class Tools:
 
 ---
 
-### 🧵 5. FastAPI dependencies and session types
+### 5. FastAPI dependencies and session types
 
 If your plugin exposes its own FastAPI routes (advanced Tools sometimes do this via router imports) and declares a database session dependency, switch both the dependency and the type annotation.
 
@@ -212,7 +212,7 @@ async def my_endpoint(db: AsyncSession = Depends(get_async_session)):
 
 ---
 
-### 📣 6. Event emitters are still called the same way
+### 6. Event emitters are still called the same way
 
 The internal constructors `get_event_emitter` / `get_event_call` were made `async` in this release, but **plugin authors do not see this**. You still receive the already-constructed callables as `__event_emitter__` and `__event_call__` in your function signature, and you still `await` them exactly as before:
 
@@ -225,7 +225,7 @@ No plugin changes are required here.
 
 ---
 
-### 🔁 7. Third-party libraries that don't yet support async
+### 7. Third-party libraries that don't yet support async
 
 If you depend on a library that only exposes a sync API (for example a legacy HTTP client or a library that does its own blocking I/O), do not block the event loop. Wrap the sync call in a thread:
 
@@ -239,7 +239,7 @@ This keeps Open WebUI's event loop free while your sync call runs on a worker th
 
 ---
 
-## 🌟 Recap
+## Recap
 
 - Add `await` to **every** model method call. They all return coroutines now.
 - Do the same for every `open_webui.*` helper that sits on top of the DB (most of `utils`, retrieval, access control, router helpers). If it used to be sync and touched data, it is async now.
@@ -255,5 +255,5 @@ A mechanical sweep (`await` before every `Users.`/`Chats.`/`Files.`/`Models.`/`F
 
 ---
 
-💬 **Questions or Feedback?**
+**Questions or Feedback?**
 If you run into any issues or have suggestions, feel free to open a [GitHub issue](https://github.com/open-webui/open-webui) or ask in the community forums!

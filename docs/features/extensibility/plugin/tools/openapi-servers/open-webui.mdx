@@ -5,9 +5,9 @@ title: "Open WebUI Integration"
 
 ## Overview
 
-Open WebUI v0.6+ supports seamless integration with external tools via the OpenAPI servers, meaning you can easily extend your LLM workflows using custom or community-powered tool servers 🧰.
+Open WebUI v0.6+ supports seamless integration with external tools via the OpenAPI servers, meaning you can easily extend your LLM workflows using custom or community-powered tool servers.
 
-In this guide, you'll learn how to launch an OpenAPI-compatible tool server and connect it to Open WebUI through the intuitive user interface. Let's get started! 🚀
+In this guide, you'll learn how to launch an OpenAPI-compatible tool server and connect it to Open WebUI through the intuitive user interface. Let's get started!
 
 :::tip Choose a model that can use tools reliably
 External tools depend on the model to select a tool, generate valid arguments, and interpret its response. Supporting tool calling does not guarantee doing it well. If a connected and enabled tool is ignored or used incorrectly, **try a stronger model with reliable native tool calling** before assuming the problem is in Open WebUI. This applies to OpenAPI tools, native MCP connections, and MCP tools exposed through `mcpo`.
@@ -19,7 +19,7 @@ External tools depend on the model to select a tool, generate valid arguments, a
 
 To begin, you'll need to start one of the reference tool servers available in the [openapi-servers repo](https://github.com/open-webui/openapi-servers). For quick testing, we'll use the time tool server as an example.
 
-🛠️ Example: Starting the `time` server locally
+Example: Starting the `time` server locally
 
 ```bash
 git clone https://github.com/open-webui/openapi-servers
@@ -46,14 +46,14 @@ Once running, this will host a local OpenAPI server at http://localhost:8000, wh
 Next, connect your running tool server to Open WebUI:
 
 1. Open WebUI in your browser.
-2. Open ⚙️ **Settings → Integrations**.
-3. Click ➕ in the **Tools** section to add a new tool server.
+2. Open **Settings → Integrations**.
+3. Click the plus button in the **Tools** section to add a new tool server.
 4. Enter the URL where your OpenAPI tool server is running (e.g., http://localhost:8000).
 5. Click "Save".
 
 ![Settings Page](/images/openapi-servers/open-webui/settings.png)
 
-### 🧑‍💻 User Tool Servers vs. 🛠️ Global Tool Servers
+### User Tool Servers vs. Global Tool Servers
 
 There are two ways to register tool servers in Open WebUI:
 
@@ -69,7 +69,7 @@ There are two ways to register tool servers in Open WebUI:
 
 Admins can manage shared tool servers available to all or selected users across the entire deployment:
 
-- Go to 🛠️ **Settings → Admin → Integrations**, **Tools** section.
+- Go to **Settings → Admin → Integrations**, **Tools** section.
 - Add the tool server URL just as you would in user settings.
 - These tools are treated similarly to Open WebUI's built-in tools.
 
@@ -101,11 +101,11 @@ User Tool Servers are best for personal or experimental tools, especially those 
 
 :::
 
-### 👉 Optional: Using a Config File with mcpo
+### Optional: Using a Config File with mcpo
 
 If you're running multiple tools through mcpo using a config file, take note:
 
-🧩 Each tool is mounted under its own unique path!
+Each tool is mounted under its own unique path!
 
 For example, if you're using memory and time tools simultaneously through mcpo, they'll each be available at a distinct route:
 
@@ -119,12 +119,12 @@ This means:
 
 ![MCPO Config Tools Setting](/images/openapi-servers/open-webui/mcpo-config-tools.png)
 
-✅ Good:
+Good:
 
 http://localhost:8000/time
 http://localhost:8000/memory
 
-🚫 Not valid:
+Not valid:
 
 http://localhost:8000
 
@@ -142,11 +142,11 @@ Turn it on only for a server you control that authenticates the person behind th
 
 :::
 
-## Step 3: Confirm Your Tool Server Is Connected ✅
+## Step 3: Confirm Your Tool Server Is Connected
 
-Once your tool server is successfully connected, Open WebUI will display a 👇 tool server indicator directly in the message input area:
+Once your tool server is successfully connected, Open WebUI will display a tool server indicator directly in the message input area:
 
-📍 You'll now see this icon below the input box:
+You'll now see this icon below the input box:
 
 ![Tool Server Indicator](/images/openapi-servers/open-webui/message-input.png)
 
@@ -158,24 +158,24 @@ Clicking this icon opens a popup where you can:
 
 To disconnect OAuth for an MCP server, use the **Integrations** menu in the message input.
 
-🔍 Here's what the tool information modal looks like:
+Here's what the tool information modal looks like:
 
 ![Tool Info Modal Expanded](/images/openapi-servers/open-webui/info-modal.png)
 
-### 🛠️ Global Tool Servers Look Different, And Are Hidden by Default!
+### Global Tool Servers Look Different, And Are Hidden by Default!
 
 If you've connected a Global Tool Server (i.e., one that's admin-configured), it will not appear automatically in the input area like user tool servers do.
 
 Instead:
 
 - Global tools are hidden by default and must be explicitly activated per user.
-- To enable them, you'll need to click on the **Integrations** button in the message input area (bottom left of the chat box, next to the ➕ button), select **Tools**, and manually toggle on the specific global tool(s) you want to use.
+- To enable them, you'll need to click on the **Integrations** button in the message input area (bottom left of the chat box, next to the plus button), select **Tools**, and manually toggle on the specific global tool(s) you want to use.
 
 Here's what that looks like:
 
 ![Global Tool Server Message Input](/images/openapi-servers/open-webui/global-message-input.png)
 
-⚠️ Important Notes for Global Tool Servers:
+Important Notes for Global Tool Servers:
 
 - They will not show up in the tool indicator popup until enabled from the **Integrations** menu.
 - Each global tool must be individually toggled on to become active inside your current chat.
@@ -186,13 +186,13 @@ This is ideal for team setups or shared environments, where commonly-used tools 
 
 ---
 
-## (Optional) Step 4: Choosing the Function Calling Mode 🧠
+## (Optional) Step 4: Choosing the Function Calling Mode
 
 Native function calling is the default, so there is nothing to switch on for it. The model uses its own built-in tool calling, which needs a model that genuinely supports it. Some local models claim support and produce poor results, so prefer a model with solid native tool calling if you have the choice.
 
 `Legacy` is the alternative: Open WebUI injects the tool definitions into the prompt and calls tools once before generating. It works with a much wider range of models, at the cost of being limited to that single tool-calling round, where Native keeps calling tools until the model is done.
 
-✳️ How to switch modes:
+How to switch modes:
 
 1. Open the chat window.
 2. Open **Model controls > Controls > Advanced Params** next to the message input.
@@ -202,21 +202,21 @@ Native function calling is the default, so there is nothing to switch on for it.
 
 ---
 
-## Need More Tools? Explore & Expand! 🧱
+## Need More Tools? Explore & Expand!
 
 The [openapi-servers repo](https://github.com/open-webui/openapi-servers) includes a variety of useful reference servers:
 
-- 📂 Filesystem access
-- 🧠 Memory & knowledge graphs
-- 🗃️ Git repo browsing
-- 🌎 Web search (WIP)
-- 🛢️ Database querying (WIP)
+- Filesystem access
+- Memory & knowledge graphs
+- Git repo browsing
+- Web search (WIP)
+- Database querying (WIP)
 
 You can run any of these in the same way and connect them to Open WebUI by repeating the steps above.
 
 ---
 
-## Troubleshooting & Tips 🧩
+## Troubleshooting & Tips
 
 ### Tools are enabled but the model does not use them correctly
 
@@ -257,8 +257,8 @@ If you see CORS errors, your tool server needs to allow requests from the Open W
 
 ### General tips
 
-- 🔒 If you're using remote servers, check firewalls and HTTPS configs.
-- 📝 To make servers persist across reboots, consider deploying them in Docker or with system services.
-- 🔍 When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) directly in the same browser you use for Open WebUI. If it loads, the browser can reach it.
+- If you're using remote servers, check firewalls and HTTPS configs.
+- To make servers persist across reboots, consider deploying them in Docker or with system services.
+- When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) directly in the same browser you use for Open WebUI. If it loads, the browser can reach it.
 
-Need help? Visit the 👉 [Discussions page](https://github.com/open-webui/openapi-servers/discussions) or [open an issue](https://github.com/open-webui/openapi-servers/issues).
+Need help? Visit the [Discussions page](https://github.com/open-webui/openapi-servers/discussions) or [open an issue](https://github.com/open-webui/openapi-servers/issues).

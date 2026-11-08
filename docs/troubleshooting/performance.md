@@ -21,7 +21,7 @@ This guide provides a comprehensive overview of strategies to optimize Open WebU
 
 ---
 
-## ⚡ Performance Tuning (Speed & Responsiveness)
+## Performance Tuning (Speed & Responsiveness)
 
 If Open WebUI feels slow or unresponsive, especially during chat generation or high concurrency, specialized optimizations can significantly improve the user experience.
 
@@ -65,7 +65,7 @@ Reuses the LLM-generated Web-Search search queries for RAG search within the sam
 
 ---
 
-## 📦 Database Optimization
+## Database Optimization
 
 For high-scale deployments, your database configuration is the single most critical factor for stability.
 
@@ -163,7 +163,7 @@ The way your documents are chunked directly impacts both storage efficiency and 
 
 ---
 
-## 📈 Scaling Infrastructure (Multi-Tenancy & Kubernetes)
+## Scaling Infrastructure (Multi-Tenancy & Kubernetes)
 
 For **enterprise scale** (hundreds of users), run several replicas behind a load balancer with Docker Compose, Docker Swarm or Kubernetes, one worker each.
 
@@ -173,11 +173,11 @@ For a step-by-step walkthrough of the entire scaling journey (PostgreSQL, Redis,
 *   **Redis (Mandatory)**: When running multiple replicas, **Redis is required** to handle WebSocket connections and session syncing. See **[Redis Integration](/tutorials/integrations/redis)**.
 *   **Load Balancing**: Plain round-robin works. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions) for when sticky sessions help.
 *   **Reverse Proxy Caching**: Configure your reverse proxy (e.g., Nginx, Caddy, Cloudflare) to **cache static assets** (JS, CSS, Images). This significantly reduces load on the application server. See **[Nginx Config](/reference/https/nginx)** or **[Caddy Config](/reference/https/caddy)**.
-*   **Disable Proxy Buffering (Critical for Streaming)**: If using Nginx, you **must** disable `proxy_buffering` for Open WebUI. Proxy buffering re-chunks SSE streams, causing garbled markdown and slow streaming. Add `proxy_buffering off;` and `proxy_cache off;` to your location block. See **[Streaming Troubleshooting](/troubleshooting/connection-error#-garbled-markdown--streaming-response-corruption)**.
+*   **Disable Proxy Buffering (Critical for Streaming)**: If using Nginx, you **must** disable `proxy_buffering` for Open WebUI. Proxy buffering re-chunks SSE streams, causing garbled markdown and slow streaming. Add `proxy_buffering off;` and `proxy_cache off;` to your location block. See **[Streaming Troubleshooting](/troubleshooting/connection-error#garbled-markdown--streaming-response-corruption)**.
 
 ---
 
-## ⚡ High-Concurrency & Network Optimization
+## High-Concurrency & Network Optimization
 
 For setups with many simultaneous users, these settings are crucial to prevent bottlenecks.
 
@@ -279,7 +279,7 @@ By default Open WebUI asks the operating system to resolve hostnames, and those 
 - **Env Var**: `AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=True`
   *   *Recommendation*: try it, then exercise your models, web search and any internal services and switch it back off if lookups start failing. Requires a restart.
 
-c-ares reads fewer name sources than the operating system does, so read [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](../reference/env-configuration.mdx#aiohttp_client_async_dns_resolver) before leaving it on. See [Intermittent Name Lookup Failures](./connection-error.mdx#-intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
+c-ares reads fewer name sources than the operating system does, so read [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](../reference/env-configuration.mdx#aiohttp_client_async_dns_resolver) before leaving it on. See [Intermittent Name Lookup Failures](./connection-error.mdx#intermittent-name-lookup-failures-often-reported-as-model-not-found) if you are debugging lookups that fail on and off.
 
 #### Container Resource Limits
 For Docker deployments, ensure adequate resource allocation:
@@ -316,7 +316,7 @@ docker exec openwebui ls -la /proc/1/fd | wc -l
 ---
 
 
-## ☁️ Cloud Infrastructure Latency
+## Cloud Infrastructure Latency
 
 When deploying Open WebUI in cloud Kubernetes environments (AKS, EKS, GKE), you may notice significant performance degradation compared to local Kubernetes (Rancher Desktop, kind, Minikube) or bare-metal deployments, even with identical resource allocations. This is almost always caused by **latency** in the underlying infrastructure.
 
@@ -433,7 +433,7 @@ A bigger pool only moves the breaking point: more connections mean more concurre
 
 ---
 
-## 📉 Resource Efficiency (Reducing RAM)
+## Resource Efficiency (Reducing RAM)
 
 If deploying on memory-constrained devices (Raspberry Pi, small VPS), use these strategies to prevent the application from crashing due to OOM (Out of Memory) errors.
 
@@ -583,7 +583,7 @@ Processing a document holds its chunks and their embeddings in memory while they
 
 ---
 
-## 🚀 Recommended Configuration Profiles
+## Recommended Configuration Profiles
 
 ### Profile 1: Maximum Privacy (Weak Hardware/RPi)
 *Target: 100% Local, Raspberry Pi / &lt;4GB RAM.*
@@ -643,7 +643,7 @@ For the Pub/Sub output buffer limit, including the commands to inspect it and an
 
 ---
 
-## ⚠️ Common Anti-Patterns
+## Common Anti-Patterns
 
 These are real-world mistakes that cause organizations to massively over-provision infrastructure:
 
@@ -661,7 +661,7 @@ These are real-world mistakes that cause organizations to massively over-provisi
 
 ---
 
-## 🔗 Environment Variable References
+## Environment Variable References
 
 For detailed information on all available variables, see the [Environment Configuration](/reference/env-configuration) guide.
 

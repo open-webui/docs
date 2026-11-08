@@ -59,7 +59,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
     - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
     - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
     - In the **Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
-    - Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
+    - Click the **refresh icon** next to the URL field to verify the connection. A success message should appear.
     - If your ComfyUI instance requires an API key, enter it in the **API Key** field.
 
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
@@ -279,13 +279,13 @@ This section provides a supplementary guide on setting up the Qwen models for bo
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── qwen_image_fp8_e4m3fn.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── qwen_image_vae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
 ```
 
@@ -307,13 +307,13 @@ This section provides a supplementary guide on setting up the Qwen models for bo
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── qwen_image_edit_fp8_e4m3fn.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── qwen_image_vae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
 ```
 
@@ -341,13 +341,13 @@ This section provides a supplementary guide on setting up the FLUX.1 models for 
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── flux1-dev.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── ae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       ├── clip_l.safetensors
 │       └── t5xxl_fp16.safetensors
 ```
@@ -364,13 +364,13 @@ This section provides a supplementary guide on setting up the FLUX.1 models for 
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── flux1-schnell.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── ae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       ├── clip_l.safetensors
 │       └── t5xxl_fp8_e4m3fn.safetensors
 ```

@@ -73,7 +73,7 @@ The same section carries a **Policy** block that takes environment variables for
 
 ### 7. Select a terminal in chat
 
-In the chat input area, click the **terminal button** (cloud icon ☁). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
+In the chat input area, click the **terminal button** (cloud icon). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
 
 ![Terminal dropdown showing Open Terminal under System](/images/open-terminal-chat-dropdown.png)
 

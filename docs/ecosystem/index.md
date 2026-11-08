@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Ecosystem
 
 <ThemedImage
-  alt="Open WebUI Ecosystem: an expanding set of Open WebUI-made projects, connectors, agents, and tools around the core platform"
+  alt="Ecosystem: a central block with spokes to four blocks around it"
   sources={{
     light: useBaseUrl('/images/banners/ecosystem-light.svg'),
     dark: useBaseUrl('/images/banners/ecosystem-dark.svg'),

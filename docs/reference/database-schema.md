@@ -19,17 +19,17 @@ For Open-WebUI, the SQLite database serves as the backbone for user management, 
 You can find the SQLite database at `root` -> `data` -> `webui.db`
 
 ```txt
-📁 Root (/)
-├── 📁 data
-│   ├── 📁 cache
-│   ├── 📁 uploads
-│   ├── 📁 vector_db
-│   └── 📄 webui.db
-├── 📄 dev.sh
-├── 📁 open_webui
-├── 📄 requirements.txt
-├── 📄 start.sh
-└── 📄 start_windows.bat
+Root (/)
+├── data
+│   ├── cache
+│   ├── uploads
+│   ├── vector_db
+│   └── webui.db
+├── dev.sh
+├── open_webui
+├── requirements.txt
+├── start.sh
+└── start_windows.bat
 ```
 
 ## Copy Database Locally

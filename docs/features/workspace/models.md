@@ -10,7 +10,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Models
 
 <ThemedImage
-  alt="Workspace map with the Models cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  alt="Workspace Models: a row of blocks, one raised"
   sources={{
     light: useBaseUrl('/images/banners/workspace-models-light.svg'),
     dark: useBaseUrl('/images/banners/workspace-models-dark.svg'),
@@ -50,17 +50,17 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 
 | | |
 | :--- | :--- |
-| 🧩 **Model presets** | System prompt, tools, knowledge, skills, and parameters in one package |
-| 🏷️ **Dynamic variables** | `{{USER_NAME}}`, `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}` injected automatically |
-| 🔧 **Bound tools** | Force-enable specific tools per model |
-| 📚 **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
-| 🎭 **Skills** | Bind markdown instruction sets that every new chat starts with selected |
-| 👥 **Access control** | Restrict to specific users or groups |
-| 📊 **Global defaults** | Set baseline capabilities and parameters for all models at once |
-| 🎚️ **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
-| 🔊 **Per-model TTS voice** | Give each persona its own voice |
-| 🌐 **Translations** | Per-language name, description and prompt suggestions |
-| 🕑 **Version history** | Every saved configuration is kept, and any of them can be set live again |
+| **Model presets** | System prompt, tools, knowledge, skills, and parameters in one package |
+| **Dynamic variables** | `{{USER_NAME}}`, `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}` injected automatically |
+| **Bound tools** | Force-enable specific tools per model |
+| **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
+| **Skills** | Bind markdown instruction sets that every new chat starts with selected |
+| **Access control** | Restrict to specific users or groups |
+| **Global defaults** | Set baseline capabilities and parameters for all models at once |
+| **Model controls** | Let people pick from approved parameter presets, such as thinking effort, right in the chat |
+| **Per-model TTS voice** | Give each persona its own voice |
+| **Translations** | Per-language name, description and prompt suggestions |
+| **Version history** | Every saved configuration is kept, and any of them can be set live again |
 
 ---
 
@@ -229,7 +229,7 @@ The icon is there whenever a selected model has controls, and for anyone allowed
 - **A removed option blocks the model until a new pick.** If an editor removes an option someone picked, that person's messages to the model fail with `Model control <key>: the selected option is no longer available.` until they pick another option or **Default**. A pick for a removed control is skipped.
 - **Automations use the defaults.** A chat started by an [automation](/features/chat-conversations/chat-features/automations) always sends each control's default option.
 
-API callers get the same controls. See [Chat Completions](/reference/api-endpoints#-chat-completions) for how a request picks an option.
+API callers get the same controls. See [Chat Completions](/reference/api-endpoints#chat-completions) for how a request picks an option.
 
 ### Prompt suggestions
 
@@ -335,7 +335,7 @@ Custom parameters are the ones added with **Add Custom Parameter**, stored under
 **Default Features** and **Builtin Tools** work as a whole row. Once a model saves its own choice in either row, that choice replaces the global row. A model can switch off any default feature that **Model Defaults** turns on, and a built-in tool that **Model Defaults** turns off stays on for a model that turns it on.
 
 :::info A request that sets a parameter keeps its own value
-Both layers only fill in what the request left out. A parameter sent in the body of a [chat completions](/reference/api-endpoints#-chat-completions) request survives, so an integration that sends its own `temperature` or `max_tokens` gets the value it asked for rather than the model's saved one. The exception is **Stream Chat Response**, which still decides whether the reply streams no matter what the request asked for.
+Both layers only fill in what the request left out. A parameter sent in the body of a [chat completions](/reference/api-endpoints#chat-completions) request survives, so an integration that sends its own `temperature` or `max_tokens` gets the value it asked for rather than the model's saved one. The exception is **Stream Chat Response**, which still decides whether the reply streams no matter what the request asked for.
 :::
 
 :::warning Knowledge base + function calling interaction

@@ -40,7 +40,7 @@ Open your iTerm2 terminal and navigate to **Settings** (⌘,) from the **iTerm2*
 
 ### Verify the installed plugin
 
-Once the iTerm2 AI plugin is installed, verify that the **Plugin** section shows `Plugin installed and working ✅`.
+Once the iTerm2 AI plugin is installed, verify that the **Plugin** section shows `Plugin installed and working`.
 
 ---
 

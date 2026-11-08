@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Open WebUI Computer
 
 <ThemedImage
-  alt="Open WebUI Computer showing a real workspace from a desktop and phone"
+  alt="Computer: a monitor on a stand"
   sources={{
     light: useBaseUrl('/images/banners/computer-light.svg'),
     dark: useBaseUrl('/images/banners/computer-dark.svg'),

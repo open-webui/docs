@@ -40,9 +40,9 @@ Chatterbox can use a good deal of memory and has hardware requirements that migh
 
 :::
 
-## ⚡️ Quick start
+## Quick start
 
-### 🐍 Using Python
+### Using Python
 
 #### Option A: Using uv (Recommended, Faster & Better Dependencies)
 
@@ -68,7 +68,7 @@ uv run uvicorn app.main:app --host 0.0.0.0 --port 4123
 uv run main.py
 ```
 
-> 💡 **Why uv?** Users report better compatibility with `chatterbox-tts`, 25-40% faster installs, and superior dependency resolution. [See migration guide →](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/UV_MIGRATION.md)
+> **Why uv?** Users report better compatibility with `chatterbox-tts`, 25-40% faster installs, and superior dependency resolution. [See migration guide →](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/UV_MIGRATION.md)
 
 #### Option B: Using pip (Traditional)
 
@@ -101,7 +101,7 @@ python main.py
 
 > Ran into issues? Check the [troubleshooting section](https://github.com/travisvn/chatterbox-tts-api?tab=readme-ov-file#common-issues)
 
-### 🐳 Docker (Recommended)
+### Docker (Recommended)
 
 ```bash
 
@@ -141,7 +141,7 @@ curl -X POST http://localhost:4123/v1/audio/speech \
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
 <!-- markdownlint-disable-next-line MD033 -->
-<summary>**🚀 Running with the Frontend Interface**</summary>
+<summary>**Running with the Frontend Interface**</summary>
 
 This project includes an optional React-based web UI. Use Docker Compose profiles to easily opt in or out of the frontend:
 
@@ -224,7 +224,7 @@ The default API key is the string `none` (no API key required)
 
 ![Screenshot of Open WebUI Admin Settings for Audio adding the correct endpoints for this project](https://lm17s1uz51.ufs.sh/f/EsgO8cDHBTOUjUe3QjHytHQ0xqn2CishmXgGfeJ4o983TUMO)
 
-## Please ⭐️ star the [repo on GitHub](https://github.com/travisvn/chatterbox-tts-api) to support development
+## Please star the [repo on GitHub](https://github.com/travisvn/chatterbox-tts-api) to support development
 
 ## Need help?
 
@@ -232,8 +232,8 @@ Chatterbox can be challenging to get running the first time, and you may want to
 
 For more information on `chatterbox-tts-api`, you can visit the [GitHub repo](https://github.com/travisvn/chatterbox-tts-api)
 
-- 📖 **Documentation**: See [API Documentation](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/API_README.md) and [Docker Guide](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/DOCKER_README.md)
-- 💬 **Discord**: [Join the Discord for this project](http://chatterboxtts.com/discord)
+- **Documentation**: See [API Documentation](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/API_README.md) and [Docker Guide](https://github.com/travisvn/chatterbox-tts-api/blob/main/docs/DOCKER_README.md)
+- **Discord**: [Join the Discord for this project](http://chatterboxtts.com/discord)
 
 ## Troubleshooting
 

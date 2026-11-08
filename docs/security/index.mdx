@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Security
 
 <ThemedImage
-  alt="Open WebUI Security: policy, privacy controls, vendor dispositions, and accepted risks mapped as a trust boundary"
+  alt="Security: a walled vault with a block inside"
   sources={{
     light: useBaseUrl('/images/banners/security-light.svg'),
     dark: useBaseUrl('/images/banners/security-dark.svg'),
@@ -23,7 +23,7 @@ Open WebUI takes the security and confidentiality of user data seriously. Our te
 
 ---
 
-## 📋 Security Policy
+## Security Policy
 
 **Rules of engagement for vulnerability reporting, disclosure, and resolution.**
 
@@ -31,17 +31,17 @@ Everything you need to know before submitting a security report: supported versi
 
 | | |
 | :--- | :--- |
-| 📝 **Reporting guidelines** | What qualifies, what doesn't, and how to submit |
-| ⏱️ **Response timeframe** | What to expect after submitting a report |
-| 🔒 **Confidential disclosure** | Rules around public disclosure timing |
-| 🔌 **Plugin security** | Security implications of Tools, Functions, and Pipelines |
-| 🏗️ **Production hardening** | Key considerations for production deployments |
+| **Reporting guidelines** | What qualifies, what doesn't, and how to submit |
+| **Response timeframe** | What to expect after submitting a report |
+| **Confidential disclosure** | Rules around public disclosure timing |
+| **Plugin security** | Security implications of Tools, Functions, and Pipelines |
+| **Production hardening** | Key considerations for production deployments |
 
 [**Read the Security Policy →**](/security/security-policy)
 
 ---
 
-## 📦 Supply Chain and Security Scanners
+## Supply Chain and Security Scanners
 
 **Our position on automated supply-chain scanner flags (socket.dev and similar tools).**
 
@@ -49,9 +49,9 @@ Automated scanners flag Open WebUI's packages with behavioral risk indicators an
 
 | | |
 | :--- | :--- |
-| 🔎 **Heuristics, not findings** | Why capability flags are not vulnerabilities |
-| 🧪 **Unconfirmed classifications** | The "potential malware" banner, explained |
-| 🧰 **Sandboxed by default** | Pyodide WASM default; server-side execution is opt-in |
+| **Heuristics, not findings** | Why capability flags are not vulnerabilities |
+| **Unconfirmed classifications** | The "potential malware" banner, explained |
+| **Sandboxed by default** | Pyodide WASM default; server-side execution is opt-in |
 
 [**Read Supply Chain and Security Scanners →**](/security/supply-chain-security)
 
@@ -63,7 +63,7 @@ Several vulnerability databases and endpoint-security products do not reprocess 
 
 ---
 
-## 🔐 Chat Data Privacy & Encryption
+## Chat Data Privacy & Encryption
 
 **How Open WebUI stores chat data and which controls reduce exposure.**
 
@@ -71,16 +71,16 @@ This guide lists concrete controls for reducing chat-data exposure, including da
 
 | | |
 | :--- | :--- |
-| 🔒 **Encryption status** | What is protected in transit and at rest |
-| 👤 **Admin visibility** | What product toggles reduce and where infrastructure trust begins |
-| 🧭 **Enterprise guidance** | Recommended settings for sensitive internal deployments |
-| 🛠️ **Practical controls** | Concrete configuration measures to reduce access and retention |
+| **Encryption status** | What is protected in transit and at rest |
+| **Admin visibility** | What product toggles reduce and where infrastructure trust begins |
+| **Enterprise guidance** | Recommended settings for sensitive internal deployments |
+| **Practical controls** | Concrete configuration measures to reduce access and retention |
 
 [**Read Chat Data Privacy & Encryption →**](/security/chat-data-privacy-and-encryption)
 
 ---
 
-## 📄 Vendor Dispositions
+## Vendor Dispositions
 
 **Our formal assessments of externally reported CVEs and security claims.**
 
@@ -88,15 +88,15 @@ When a CVE is filed against Open WebUI that we believe is inaccurate, mischaract
 
 | | |
 | :--- | :--- |
-| 🔍 **Formal assessments** | Detailed analysis of each disputed report |
-| 📐 **Threat model context** | How claims map to Open WebUI's architecture |
-| ✅ **Resolution status** | Whether a report was accepted, disputed, or rejected |
+| **Formal assessments** | Detailed analysis of each disputed report |
+| **Threat model context** | How claims map to Open WebUI's architecture |
+| **Resolution status** | Whether a report was accepted, disputed, or rejected |
 
 [**View Vendor Dispositions →**](/security/vendor-dispositions)
 
 ---
 
-## ⚖️ Known &amp; Accepted Risks
+## Known &amp; Accepted Risks
 
 **Residual risks we have mitigated as far as is technically possible, then formally accepted.**
 
@@ -104,8 +104,8 @@ Some weaknesses cannot be fully eliminated in application code, because they are
 
 | | |
 | :--- | :--- |
-| 🛠️ **Mitigated as far as possible** | What we changed to reduce each risk |
-| 🚧 **Why the residual stays** | The language, OS, CPU or network limits that prevent a full fix |
-| 📐 **Threat-model context** | Why the residual is accepted rather than treated as a defect |
+| **Mitigated as far as possible** | What we changed to reduce each risk |
+| **Why the residual stays** | The language, OS, CPU or network limits that prevent a full fix |
+| **Threat-model context** | Why the residual is accepted rather than treated as a defect |
 
 [**View Accepted Risks →**](/security/accepted-risks)

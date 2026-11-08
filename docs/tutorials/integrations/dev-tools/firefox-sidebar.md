@@ -3,7 +3,7 @@ sidebar_position: 40
 title: "Firefox Sidebar"
 ---
 
-## 🦊 Firefox AI Chatbot Sidebar
+## Firefox AI Chatbot Sidebar
 
 # Integrating Open WebUI as a Local AI Chatbot Browser Assistant in Mozilla Firefox
 

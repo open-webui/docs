@@ -24,7 +24,7 @@ Once installed, you can access the application via the `continue` tab in the sid
 
 ## Setup
 
-Click on the assistant selector to the right of the main chat input. Then hover over `Local Assistant` and click on the settings icon (⚙️).
+Click on the assistant selector to the right of the main chat input. Then hover over `Local Assistant` and click on the settings icon.
 This will open the `config.yaml` file in your editor. Here you can change the settings of your `Local Assistant`.
 
 ![continue.dev chat input](/images/tutorials/continue-dev/continue_dev_extension_input_field.png)

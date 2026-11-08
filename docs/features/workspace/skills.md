@@ -10,7 +10,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Skills
 
 <ThemedImage
-  alt="Workspace map with the Skills cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  alt="Workspace Skills: four blocks with a fifth set on top"
   sources={{
     light: useBaseUrl('/images/banners/workspace-skills-light.svg'),
     dark: useBaseUrl('/images/banners/workspace-skills-dark.svg'),
@@ -52,17 +52,17 @@ Pair a skill with [Open Terminal](/features/open-terminal) or any tool server. T
 
 | | |
 | :--- | :--- |
-| 📝 **Markdown content** | Write instructions in plain Markdown |
-| 📁 **Supporting files** | Ship scripts, references, templates and assets next to `SKILL.md` |
-| 🕘 **Version history** | Every save is a version you can compare, export or set back as the current one |
-| ⚡ **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
-| 🧩 **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
-| 🤖 **Model binding** | Attach skills to models so new chats start with them selected |
-| 📦 **Lazy loading** | Skills you did not select are listed in a manifest and load on demand |
-| 📥 **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
-| 🌍 **Community** | Find skills on openwebui.com and share your own |
-| 🔒 **Access control** | Private by default, shareable with users or groups |
-| 🔀 **Active/Inactive toggle** | Deactivate skills without deleting them |
+| **Markdown content** | Write instructions in plain Markdown |
+| **Supporting files** | Ship scripts, references, templates and assets next to `SKILL.md` |
+| **Version history** | Every save is a version you can compare, export or set back as the current one |
+| **$ mention in chat** | Type `$` to inject a skill's instructions into the current message |
+| **Per-chat toggle** | Switch skills on for one chat from the **+** Integrations menu, no model edit needed |
+| **Model binding** | Attach skills to models so new chats start with them selected |
+| **Lazy loading** | Skills you did not select are listed in a manifest and load on demand |
+| **Import/Export** | Import ZIP archives, `.skill` files, skill folders, JSON or single `.md` files, or load them from a URL; export as `.skill`, ZIP or JSON |
+| **Community** | Find skills on openwebui.com and share your own |
+| **Access control** | Private by default, shareable with users or groups |
+| **Active/Inactive toggle** | Deactivate skills without deleting them |
 
 ---
 

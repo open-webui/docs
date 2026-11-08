@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Prompts
 
 <ThemedImage
-  alt="Workspace map with the Prompts cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  alt="Workspace Prompts: a template block above a row of identical copies"
   sources={{
     light: useBaseUrl('/images/banners/workspace-prompts-light.svg'),
     dark: useBaseUrl('/images/banners/workspace-prompts-dark.svg'),
@@ -51,13 +51,13 @@ Share prompts with specific users or groups. Public prompts appear in everyone's
 
 | | |
 | :--- | :--- |
-| ⚡ **Slash commands** | Type `/command` to insert the full prompt |
-| 📋 **Input variable forms** | Typed fields (text, dropdown, date, number, checkbox, and more) generate a popup form |
-| 🕑 **Version history** | Full change tracking with commit messages, rollback, and production pinning |
-| 🔄 **System variables** | `{{CURRENT_DATE}}`, `{{USER_NAME}}`, `{{CLIPBOARD}}` auto-replaced at runtime |
-| 🔒 **Access control** | Share with specific users, groups, or make public |
-| 🔀 **Enable/Disable toggle** | Deactivate prompts without deleting them |
-| 🏷️ **Tags** | Organize and filter your prompt library |
+| **Slash commands** | Type `/command` to insert the full prompt |
+| **Input variable forms** | Typed fields (text, dropdown, date, number, checkbox, and more) generate a popup form |
+| **Version history** | Full change tracking with commit messages, rollback, and production pinning |
+| **System variables** | `{{CURRENT_DATE}}`, `{{USER_NAME}}`, `{{CLIPBOARD}}` auto-replaced at runtime |
+| **Access control** | Share with specific users, groups, or make public |
+| **Enable/Disable toggle** | Deactivate prompts without deleting them |
+| **Tags** | Organize and filter your prompt library |
 
 ---
 

@@ -3,7 +3,7 @@ sidebar_position: 100
 title: "Image Generation"
 ---
 
-## 🎨 Image Generation Troubleshooting
+## Image Generation Troubleshooting
 
 ### General Issues
 

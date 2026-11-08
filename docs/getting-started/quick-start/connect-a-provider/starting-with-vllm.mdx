@@ -29,7 +29,7 @@ For remote servers, use the appropriate hostname or IP address.
 
 1. Go to **Settings > Admin > Connections**.
 2. Find the **Manage OpenAI API Connections** list.
-3. Click ➕ **Add Connection**.
+3. Click **Add Connection**.
 5. Fill in the following:
    - **URL**: `http://localhost:8000/v1` (or your vLLM server URL)
      *   **Docker Users**: Use `http://host.docker.internal:8000/v1` if Open WebUI is in a container.
@@ -51,6 +51,6 @@ If your vLLM server is slow to respond (especially during model loading), you ca
 AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
 ```
 
-If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#️-model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
+If you've saved an unreachable URL and the UI becomes unresponsive, see the [Model List Loading Issues](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide.
 
 :::

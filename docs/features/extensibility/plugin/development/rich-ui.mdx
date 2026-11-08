@@ -211,8 +211,8 @@ Two more flags can be toggled by the user in **Settings → Interface**:
 
 | Setting | Default | Description |
 |---|---|---|
-| iframe Sandbox Allow Same Origin | ❌ Off | Allows the iframe to access parent page context |
-| iframe Sandbox Allow Forms | ❌ Off | Allows form submissions within embedded content |
+| iframe Sandbox Allow Same Origin | Off | Allows the iframe to access parent page context |
+| iframe Sandbox Allow Forms | Off | Allows form submissions within embedded content |
 
 Two caveats on those toggles. Embeds attached to an assistant message always allow forms regardless of the setting, and embeds opened from a citation ignore both toggles entirely, so their sandbox is only `allow-scripts allow-downloads`.
 
@@ -230,7 +230,7 @@ This is the most important flag to be aware of. It is **off by default** for sec
 - The iframe can interact with the parent page's context
 - Auto-resizing works without any script in your HTML
 - Chart.js and Alpine.js dependencies are automatically injected if detected
-- ⚠️ **Use with caution**: only enable this when you trust the embedded content
+- **Use with caution**: only enable this when you trust the embedded content
 
 Users can toggle this setting in **Settings → Interface → iframe Sandbox Allow Same Origin**.
 
@@ -292,9 +292,9 @@ The parent responds with `{ type: 'payload', requestId: ..., payload: ... }`.
 :::info Where the payload comes from
 There is no separate "set the payload" call. The payload is whatever the parent component had configured when it instantiated the iframe, and today only one path actually configures one:
 
-- ✅ **Citation-opened embeds in the Preview tab**: when the user clicks a citation badge whose source has an embed URL, the Preview tab opens and exposes **the full citation/source object** (the same dict you sent in your `source` / `citation` event via `__event_emitter__`) as the payload. To set it, emit a [`source` event](./events.mdx#source-or-citation-and-code-execution) whose `data` includes whatever you want the iframe to be able to fetch. The iframe then asks for it via the postMessage above and receives the citation object back.
-- ❌ **Inline tool-call embeds** (from a tool method returning `HTMLResponse` or `(HTMLResponse, context)`): the parent does not configure a payload on this path, so a payload request returns `{ type: 'payload', requestId: ..., payload: null }`. Use [Tool Args Injection](#tool-args-injection-tools-only) (subject to `allowSameOrigin`) to pass data into a tool-call embed instead.
-- ❌ **`__event_emitter__({"type": "embeds", ...})` and Action embeds**: also configured without a payload; the response is `null`.
+- **Citation-opened embeds in the Preview tab**: when the user clicks a citation badge whose source has an embed URL, the Preview tab opens and exposes **the full citation/source object** (the same dict you sent in your `source` / `citation` event via `__event_emitter__`) as the payload. To set it, emit a [`source` event](./events.mdx#source-or-citation-and-code-execution) whose `data` includes whatever you want the iframe to be able to fetch. The iframe then asks for it via the postMessage above and receives the citation object back.
+- **Inline tool-call embeds** (from a tool method returning `HTMLResponse` or `(HTMLResponse, context)`): the parent does not configure a payload on this path, so a payload request returns `{ type: 'payload', requestId: ..., payload: null }`. Use [Tool Args Injection](#tool-args-injection-tools-only) (subject to `allowSameOrigin`) to pass data into a tool-call embed instead.
+- **`__event_emitter__({"type": "embeds", ...})` and Action embeds**: also configured without a payload; the response is `null`.
 
 In short: payload-request is the side-panel-citation channel, not a generic iframe-data channel. Pick the right rendering path for the data flow you need.
 :::
@@ -322,11 +322,11 @@ The args are injected from the parent page via `iframe.contentWindow.args = ...`
 :::
 
 :::note Where `window.args` is set, and where it is not
-- ✅ **Tool method returning `HTMLResponse` or `(HTMLResponse, context)` tuple**: rendered inline at the "View Result from..." tool call indicator. `window.args` is injected (subject to the `allowSameOrigin` requirement above).
-- ❌ **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`**: rendered above the message, which does not wire `args` at all. `window.args` will always be undefined here, regardless of sandbox settings. This is by design: the embeds-event path has no tool call attached, so there are no args to inject.
-- ❌ **Action embeds**: triggered by the user, not the model, so there are no model-supplied args to inject.
+- **Tool method returning `HTMLResponse` or `(HTMLResponse, context)` tuple**: rendered inline at the "View Result from..." tool call indicator. `window.args` is injected (subject to the `allowSameOrigin` requirement above).
+- **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`**: rendered above the message, which does not wire `args` at all. `window.args` will always be undefined here, regardless of sandbox settings. This is by design: the embeds-event path has no tool call attached, so there are no args to inject.
+- **Action embeds**: triggered by the user, not the model, so there are no model-supplied args to inject.
 
-If you need to pass dynamic data into an embed rendered via either of the ❌ paths, use the [Payload Requests](#payload-requests) pattern above instead.
+If you need to pass dynamic data into an embed rendered via either of the unsupported paths, use the [Payload Requests](#payload-requests) pattern above instead.
 :::
 
 ### Auto-Injected Libraries

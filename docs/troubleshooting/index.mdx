@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Troubleshooting
 
 <ThemedImage
-  alt="Open WebUI Troubleshooting: symptoms route to the right guide and fix"
+  alt="Troubleshooting: a row of blocks with one out of line"
   sources={{
     light: useBaseUrl('/images/banners/troubleshooting-light.svg'),
     dark: useBaseUrl('/images/banners/troubleshooting-dark.svg'),
@@ -23,13 +23,13 @@ Use this page to find the right guide for your issue. If you're unsure where to 
 
 | What you're seeing | Go to |
 | :--- | :--- |
-| Empty `"{}"` responses, garbled markdown, CORS errors in console | [Connection Errors → HTTPS/CORS/WebSocket](/troubleshooting/connection-error#-https-tls-cors--websocket-issues) |
+| Empty `"{}"` responses, garbled markdown, CORS errors in console | [Connection Errors → HTTPS/CORS/WebSocket](/troubleshooting/connection-error#https-tls-cors--websocket-issues) |
 | `WebSocket connection failed: 403` or chat hangs | [Connection Errors → WebSocket](/troubleshooting/connection-error#websocket-troubleshooting) |
-| Assistant replies are randomly blank, worse with tools enabled | [Connection Errors → Blank Replies on Tool Calls](/troubleshooting/connection-error#-blank-replies-when-the-model-uses-a-tool) |
+| Assistant replies are randomly blank, worse with tools enabled | [Connection Errors → Blank Replies on Tool Calls](/troubleshooting/connection-error#blank-replies-when-the-model-uses-a-tool) |
 | Can't connect to Ollama from Open WebUI | [Connection Errors → Ollama](/troubleshooting/connection-error#connection-to-ollama-server) |
-| Model list takes forever to load / `500` on `/api/models` | [Connection Errors → Model List Loading](/troubleshooting/connection-error#%EF%B8%8F-model-list-loading-issues-slow-ui--unreachable-endpoints) |
-| Intermittent "Model not found", model list emptying itself, `ClientConnectorDNSError` | [Connection Errors → Intermittent Name Lookup Failures](/troubleshooting/connection-error#-intermittent-name-lookup-failures-often-reported-as-model-not-found) |
-| `[SSL: CERTIFICATE_VERIFY_FAILED]` | [Connection Errors → SSL](/troubleshooting/connection-error#-ssl-certificate-issues-with-internal-tools) |
+| Model list takes forever to load / `500` on `/api/models` | [Connection Errors → Model List Loading](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) |
+| Intermittent "Model not found", model list emptying itself, `ClientConnectorDNSError` | [Connection Errors → Intermittent Name Lookup Failures](/troubleshooting/connection-error#intermittent-name-lookup-failures-often-reported-as-model-not-found) |
+| `[SSL: CERTIFICATE_VERIFY_FAILED]` | [Connection Errors → SSL](/troubleshooting/connection-error#ssl-certificate-issues-with-internal-tools) |
 | Login loops, 401 Unauthorized, token errors across replicas | [Scaling & HA → Login Loops](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors) |
 | `database is locked`, data disappearing across instances | [Scaling & HA → Database](/troubleshooting/multi-replica#4-database-corruption--locked-errors) |
 | Live updates stop with `Redis denied publishing` or `Redis denied subscribing` in the log | [Scaling → Per-Room Redis Channels](/getting-started/advanced-topics/scaling#per-room-redis-channels) |

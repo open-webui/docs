@@ -31,10 +31,10 @@ The deepest check sends a real prompt and validates the response. If that passes
 
 | | |
 | :--- | :--- |
-| ✅ **Health endpoint** | Unauthenticated `/health` check, returns `200` when the service is up |
-| 🔗 **Model connectivity** | Authenticated `/api/models` check verifies provider connections |
-| 🤖 **Deep health check** | Send a real chat completion and validate the response |
-| 🐻 **Uptime Kuma recipes** | Ready-to-use configurations for each monitoring level |
+| **Health endpoint** | Unauthenticated `/health` check, returns `200` when the service is up |
+| **Model connectivity** | Authenticated `/api/models` check verifies provider connections |
+| **Deep health check** | Send a real chat completion and validate the response |
+| **Uptime Kuma recipes** | Ready-to-use configurations for each monitoring level |
 
 ---
 

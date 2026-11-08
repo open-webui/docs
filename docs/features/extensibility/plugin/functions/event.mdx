@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Event Function: React to System Events
 
 <ThemedImage
-  alt="Event functions react to system events: auth.signup, chat.deleted, system.startup and config.updated flow into an Open WebUI Event function"
+  alt="Event Functions: a row of dominoes, the first one marked"
   sources={{
     light: useBaseUrl('/images/banners/event-function-light.svg'),
     dark: useBaseUrl('/images/banners/event-function-dark.svg'),
@@ -21,7 +21,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 Event functions are a new plugin primitive introduced in Open WebUI **0.10.0**.
 :::
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Functions execute arbitrary Python code on your server**, and Event functions run automatically in response to system activity, not just when a user acts. Function creation is restricted to administrators. Only install from trusted sources and review code before importing. See the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
@@ -228,7 +228,7 @@ Registering routes and calling admin endpoints from a function is powerful and e
 
 ## Configuration with Valves
 
-Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel > Functions > ⚙️**, not hard-coded.
+Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel > Functions >**, not hard-coded.
 
 The `function.valves_updated` event also fires when an admin saves new Valve values, so a function can **react to its own configuration changing** and apply it live.
 
