@@ -25,10 +25,10 @@ The layout is remembered per workspace, across devices. Arrange a terminal besid
 
 | I want to | Page |
 | --- | --- |
-| Add a project folder or switch between projects | [Add and switch workspaces](./workspaces) |
-| Browse, edit, and preview files | [Files and editor](./files-and-editor) |
-| Run commands and long-lived processes | [Terminals](./terminals) |
-| Stage, diff, commit, branch | [Git](./git) |
-| Check a dev server or open a website in a tab | [Preview local apps and browse](./previews-and-browser) |
-| Find a file, chat, or message | [Search and chats](./search-and-chats) |
-| Take notes, record memos, share from my phone | [Notes, memos, and sharing in](./notes-and-sharing) |
+| Add a project folder or switch between projects | [Add and switch workspaces](/ecosystem/computer/workspace/workspaces) |
+| Browse, edit, and preview files | [Files and editor](/ecosystem/computer/workspace/files-and-editor) |
+| Run commands and long-lived processes | [Terminals](/ecosystem/computer/workspace/terminals) |
+| Stage, diff, commit, branch | [Git](/ecosystem/computer/workspace/git) |
+| Check a dev server or open a website in a tab | [Preview local apps and browse](/ecosystem/computer/workspace/previews-and-browser) |
+| Find a file, chat, or message | [Search and chats](/ecosystem/computer/workspace/search-and-chats) |
+| Take notes, record memos, share from my phone | [Notes, memos, and sharing in](/ecosystem/computer/workspace/notes-and-sharing) |

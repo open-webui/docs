@@ -6,153 +6,83 @@ title: "Docker Swarm"
 
 # Docker Swarm
 
-This installation method requires knowledge on Docker Swarms, as it utilizes a stack file to deploy 3 seperate containers as services in a Docker Swarm.
+This stack deploys Open WebUI, ChromaDB and Ollama as three services in a Docker Swarm. It assumes you already run a Swarm.
 
-It includes isolated containers of ChromaDB, Ollama, and OpenWebUI.
-Additionally, there are pre-filled [Environment Variables](https://docs.openwebui.com/reference/env-configuration) to further illustrate the setup.
+ChromaDB runs as its own HTTP server, which Open WebUI reaches through [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host). The default local ChromaDB cannot be shared by several workers or replicas. Before scaling the `openWebUI` service past one replica, also move to PostgreSQL, Redis and shared file storage; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling).
 
-:::info Why ChromaDB Runs as a Separate Container
+The `chromadb/chroma` image is pinned to the version of the `chromadb` client inside the Open WebUI image, because a 1.x client only speaks the v2 API. Keep the two versions matched when you update either. The 1.x server stores its data under `/data`. Open WebUI's **Reset Vector Storage/Knowledge** and **Reset Upload Directory** actions call Chroma's reset endpoint, which the 1.x server refuses unless `allow_reset: true` is set in a config file mounted at `/config.yaml` (see [Chroma's Docker guide](https://docs.trychroma.com/guides/deploy/docker)).
 
-This stack correctly deploys ChromaDB as a **separate HTTP server** container, with Open WebUI connecting to it via `CHROMA_HTTP_HOST` and `CHROMA_HTTP_PORT`. This is **required** for any multi-worker or multi-replica deployment.
+Embeddings run in Ollama, so the Open WebUI container loads no local embedding model. Pull the model once the stack is up with `docker exec <ollama-container> ollama pull nomic-embed-text`.
 
-The default ChromaDB mode (without `CHROMA_HTTP_HOST`) uses a local SQLite-backed `PersistentClient` that is **not fork-safe**: concurrent writes from multiple worker processes will crash workers instantly. Running ChromaDB as a separate server avoids this by using HTTP connections instead of direct SQLite access.
+Create the data directories next to `docker-stack.yaml`:
 
-If you plan to scale the `openWebUI` service to multiple replicas, you should also switch to PostgreSQL for the main database and set up Redis. See the [Scaling & HA guide](https://docs.openwebui.com/troubleshooting/multi-replica) for full requirements.
-
-:::
-
-Choose the appropriate command based on your hardware setup:
-
-- **Before Starting**:
-
-  Directories for your volumes need to be created on the host, or you can specify a custom location or volume.
-
-  The current example utilizes an isolated dir `data`, which is within the same dir as the `docker-stack.yaml`.
-
-      - **For example**:
-
-        ```bash
-        mkdir -p data/open-webui data/chromadb data/ollama
-        ```
-
-- **With GPU Support**:
+```bash
+mkdir -p data/open-webui data/chromadb data/ollama
+```
 
 #### Docker-stack.yaml
 
-    ```yaml
-    services:
-      openWebUI:
-        image: ghcr.io/open-webui/open-webui:main
-        depends_on:
-            - chromadb
-            - ollama
-        volumes:
-          - ./data/open-webui:/app/backend/data
-        environment:
-          DATA_DIR: /app/backend/data
-          WEBUI_SECRET_KEY: your-secret-key
-          OLLAMA_BASE_URLS: http://ollama:11434
-          CHROMA_HTTP_PORT: 8000
-          CHROMA_HTTP_HOST: chromadb
-          CHROMA_TENANT: default_tenant
-          VECTOR_DB: chroma
-          WEBUI_NAME: Awesome ChatBot
-          CORS_ALLOW_ORIGIN: "*" # This is the current Default, will need to change before going live
-          RAG_EMBEDDING_ENGINE: ollama
-          RAG_EMBEDDING_MODEL: nomic-embed-text-v1.5
-          RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE: "True"
-        ports:
-          - target: 8080
-            published: 8080
-            mode: overlay
-        deploy:
-          replicas: 1
-          restart_policy:
-            condition: any
-            delay: 5s
-            max_attempts: 3
+```yaml title="docker-stack.yaml"
+services:
+  openWebUI:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - ./data/open-webui:/app/backend/data
+    environment:
+      WEBUI_SECRET_KEY: your-secret-key
+      OLLAMA_BASE_URL: http://ollama:11434
+      VECTOR_DB: chroma
+      CHROMA_HTTP_HOST: chromadb
+      CHROMA_HTTP_PORT: 8000
+      RAG_EMBEDDING_ENGINE: ollama
+      RAG_EMBEDDING_MODEL: nomic-embed-text
+    ports:
+      - target: 8080
+        published: 8080
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
 
-      chromadb:
-        hostname: chromadb
-        image: chromadb/chroma:0.5.15
-        volumes:
-          - ./data/chromadb:/chroma/chroma
-        environment:
-          - IS_PERSISTENT=TRUE
-          - ALLOW_RESET=TRUE
-          - PERSIST_DIRECTORY=/chroma/chroma
-        ports:
-          - target: 8000
-            published: 8000
-            mode: overlay
-        deploy:
-          replicas: 1
-          restart_policy:
-            condition: any
-            delay: 5s
-            max_attempts: 3
-        healthcheck:
-          test: ["CMD-SHELL", "curl localhost:8000/api/v1/heartbeat || exit 1"]
-          interval: 10s
-          retries: 2
-          start_period: 5s
-          timeout: 10s
+  chromadb:
+    image: chromadb/chroma:1.5.9
+    volumes:
+      - ./data/chromadb:/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
 
-      ollama:
-        image: ollama/ollama:latest
-        hostname: ollama
-        ports:
-          - target: 11434
-            published: 11434
-            mode: overlay
-        deploy:
-          resources:
-            reservations:
-              generic_resources:
-                - discrete_resource_spec:
-                    kind: "NVIDIA-GPU"
-                    value: 0
-          replicas: 1
-          restart_policy:
-            condition: any
-            delay: 5s
-            max_attempts: 3
-        volumes:
-          - ./data/ollama:/root/.ollama
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ./data/ollama:/root/.ollama
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+      resources:
+        reservations:
+          generic_resources:
+            - discrete_resource_spec:
+                kind: "NVIDIA-GPU"
+                value: 0
+```
 
-    ```
+Replace `your-secret-key` with the output of `openssl rand -hex 32`. Services reach each other by service name on the stack's network, so only Open WebUI publishes a port. Bind mounts like `./data/...` exist only on the node where the task runs, so pin the services to one node with a placement constraint, or use volumes every node can reach.
 
-- **Additional Requirements**:
+**GPU:** the `generic_resources` block is for GPU nodes. It needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) and GPU resource advertising on every GPU node: uncomment `swarm-resource = "DOCKER_RESOURCE_GPU"` in `/etc/nvidia-container-runtime/config.toml` and restart the Docker daemon. See [configuring Docker Swarm for GPUs](https://gist.github.com/tomlankhorst/33da3c4b9edbde5c83fc1244f010815c#configuring-docker-to-work-with-your-gpus).
 
-      1. Ensure CUDA is Enabled, follow your OS and GPU instructions for that.
-      2. Enable Docker GPU support, see [Nvidia Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html " on Nvidia's site.")
-      3. Follow the [Guide here on configuring Docker Swarm to with with your GPU](https://gist.github.com/tomlankhorst/33da3c4b9edbde5c83fc1244f010815c#configuring-docker-to-work-with-your-gpus)
-  - Ensure *GPU Resource* is enabled in `/etc/nvidia-container-runtime/config.toml` and enable GPU resource advertising by uncommenting the `swarm-resource = "DOCKER_RESOURCE_GPU"`. The docker daemon must be restarted after updating these files on each node.
+**CPU only:** delete the `resources:` block from the `ollama` service.
 
-- **With CPU Support**:
+Deploy the stack:
 
-    Modify the Ollama Service within `docker-stack.yaml` and remove the lines for `generic_resources:`
-
-    ```yaml
-        ollama:
-      image: ollama/ollama:latest
-      hostname: ollama
-      ports:
-        - target: 11434
-          published: 11434
-          mode: overlay
-      deploy:
-        replicas: 1
-        restart_policy:
-          condition: any
-          delay: 5s
-          max_attempts: 3
-      volumes:
-        - ./data/ollama:/root/.ollama
-    ```
-
-- **Deploy Docker Stack**:
-
-  ```bash
-  docker stack deploy -c docker-stack.yaml -d super-awesome-ai
-  ```
+```bash
+docker stack deploy -c docker-stack.yaml -d open-webui
+```

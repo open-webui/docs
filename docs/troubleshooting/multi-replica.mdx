@@ -5,22 +5,22 @@ title: "Scaling & HA"
 
 # Multi-Replica, High Availability & Concurrency Troubleshooting
 
-This guide addresses common issues encountered when deploying Open WebUI in **multi-replica** environments (e.g., Kubernetes, Docker Swarm) or when using **multiple workers** (`UVICORN_WORKERS > 1`) for increased concurrency.
+This guide covers common issues in **multi-replica** deployments (Docker Compose, Docker Swarm, Kubernetes). Scale with replicas of one worker each; `UVICORN_WORKERS` above `1` is not recommended and hits the same issues.
 
-If you are setting up a scaled deployment for the first time, start with the [Scaling Open WebUI](/getting-started/advanced-topics/scaling) guide for a step-by-step walkthrough.
+To set up a scaled deployment, follow [Scaling Open WebUI](/getting-started/advanced-topics/scaling). For single-instance tuning, see [Optimization, Performance & RAM Usage](/troubleshooting/performance).
 
 ## Core Requirements Checklist
 
-Before troubleshooting specific errors, ensure your deployment meets these **absolute requirements** for a multi-replica setup. Missing any of these will cause instability, login loops, or data loss.
+Before troubleshooting specific errors, make sure your deployment meets these requirements. Missing any of them causes instability, login loops or data loss.
 
-1.  **Shared Secret Key:** [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) **MUST** be identical on all replicas.
-2.  **External Database:** You **MUST** use an external PostgreSQL database (see [`DATABASE_URL`](/reference/env-configuration#database_url)). SQLite is **NOT** supported for multiple instances.
-3.  **Redis for WebSockets:** [`ENABLE_WEBSOCKET_SUPPORT=True`](/reference/env-configuration#enable_websocket_support) and [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager) with a valid [`WEBSOCKET_REDIS_URL`](/reference/env-configuration#websocket_redis_url) are required.
-4.  **Shared Storage:** A persistent volume (RWX / ReadWriteMany if possible, or ensuring all replicas map to the same underlying storage for `data/`) is critical for RAG (uploads/vectors) and generated images.
-5.  **External Vector Database (Required):** The default ChromaDB uses a local SQLite-backed `PersistentClient` that is **not safe for multi-worker or multi-replica deployments**. SQLite connections are not fork-safe, and concurrent writes from multiple processes will crash workers instantly. You **must** use a dedicated external Vector DB (e.g., [PGVector](/reference/env-configuration#pgvector_db_url), [MariaDB Vector](/reference/env-configuration#mariadb_vector_db_url), Milvus, Qdrant) via [`VECTOR_DB`](/reference/env-configuration#vector_db), or run ChromaDB as a [separate HTTP server](/reference/env-configuration#chroma_http_host).
-6.  **Database Session Sharing (Optional):** For PostgreSQL deployments with adequate resources, consider enabling [`DATABASE_ENABLE_SESSION_SHARING=True`](/reference/env-configuration#database_enable_session_sharing) to improve performance under high concurrency.
-7.  **Thread Pool Ceiling:** Set [`THREAD_POOL_SIZE=2000`](/reference/env-configuration#thread_pool_size) (or higher). The default concurrency ceiling for blocking operations is only **40**; at multi-user scale this is exhausted quickly and the app appears to **freeze** while CPU/RAM look fine. It is a ceiling, not a thread/CPU count: a high value is not a contention risk. Never lower it.
-8.  **Presence Writes:** [`DATABASE_USER_ACTIVE_STATUS_UPDATE_INTERVAL`](/reference/env-configuration#database_user_active_status_update_interval) already throttles each user's `last_active_at` write to once per 60 seconds, so the flood of tiny `UPDATE`/`COMMIT` transactions is avoided by default. Set `120` if you want fewer writes still, which keeps a full minute of headroom inside the 180 second active-presence window. Anything at or above 180 drops users out of the count between writes, and `0` disables throttling and writes on essentially every request.
+1.  **Shared secret key:** [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) is identical on all replicas.
+2.  **PostgreSQL:** [`DATABASE_URL`](/reference/env-configuration#database_url) points to PostgreSQL. SQLite is **not** supported for multiple instances. See [Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql).
+3.  **Redis:** [`REDIS_URL`](/reference/env-configuration#redis_url) and [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager) are set on every replica. See [Step 2](/getting-started/advanced-topics/scaling#step-2-add-redis).
+4.  **External vector database:** [`VECTOR_DB`](/reference/env-configuration#vector_db) points to a client-server database, or ChromaDB runs as a [separate HTTP server](/reference/env-configuration#chroma_http_host). The embedded ChromaDB crashes under multi-process writes. See [Step 4](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database).
+5.  **Shared file storage:** every replica reaches the same uploaded files through object storage or a shared filesystem. See [Step 5](/getting-started/advanced-topics/scaling#step-5-share-file-storage-across-instances).
+6.  **One migrating process:** only one process runs database migrations on upgrade. See [Updates and Migrations](#updates-and-migrations).
+
+For recommended tuning on top of these, see [Minimum Environment Variables for Scaled Deployments](/getting-started/advanced-topics/scaling#minimum-environment-variables-for-scaled-deployments).
 
 ---
 
@@ -30,14 +30,14 @@ Before troubleshooting specific errors, ensure your deployment meets these **abs
 
 **Symptoms:**
 - You log in successfully, but the next click logs you out.
-- You see "Unauthorized" or "401" errors in the browser console immediately after login.
+- The browser console shows "Unauthorized" or "401" errors right after login.
 - "Error decrypting tokens" appears in logs.
 
 **Cause:**
-Each replica is using a different `WEBUI_SECRET_KEY`. When Replica A issues a session token (JWT), Replica B rejects it because it cannot verify the signature with its own different key.
+The replicas use different `WEBUI_SECRET_KEY` values. Replica B rejects a token signed by Replica A. Without `WEBUI_SECRET_KEY`, each container generates its own key on first start.
 
 **Solution:**
-Set the `WEBUI_SECRET_KEY` environment variable to the **same** strong, random string on all backend replicas.
+Set `WEBUI_SECRET_KEY` to the **same** strong, random string on all replicas. If you set `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY` separately, it must match everywhere too.
 
 ```yaml
 # Example in Kubernetes/Compose
@@ -50,205 +50,146 @@ env:
 
 **Symptoms:**
 - Chat stops responding or hangs.
-- Browser console shows `WebSocket connection failed: 403 Forbidden` or `Connection closed`.
-- Logs show `engineio.server: https://your-domain.com is not an accepted origin`.
+- The browser console shows `WebSocket connection failed: 403 Forbidden` or `Connection closed`.
+- Logs show `https://your-domain.com is not an accepted origin`.
 
 **Cause:**
-- **CORS:** The load balancer or ingress origin does not match the allowed origins.
-- **Missing Redis:** WebSockets are defaulting to in-memory, so events on Replica A (e.g., LLM generation finish) are not broadcast to the user connected to Replica B.
+- **CORS:** the origin users reach Open WebUI through is missing from the allowed origins.
+- **Missing Redis:** without `WEBSOCKET_MANAGER=redis`, live updates stay on the replica that produced them, so a user connected to another replica never sees the response.
 
 **Solution:**
-1.  **Configure CORS:** Ensure [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin) includes your public domain *and* http/https variations.
-    
-    If you see logs like `engineio.base_server:_log_error_once:354 - https://yourdomain.com is not an accepted origin`, you must update this variable. It accepts a **semicolon-separated list** of allowed origins.
-    
-    **Example:**
+1.  **Configure CORS:** add every public origin to [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin), a **semicolon-separated list**:
+
     ```bash
     CORS_ALLOW_ORIGIN="https://chat.yourdomain.com;http://chat.yourdomain.com;https://yourhostname;http://localhost:3000"
     ```
-    *Add all valid IPs, Domains, and Hostnames that users might use to access your Open WebUI.*
-2.  **Enable Redis for WebSockets:**
-    Ensure these variables are set on **all** replicas:
+
+    Include every domain, hostname and IP users might use.
+2.  **Enable Redis for WebSockets** on **all** replicas:
+
     ```bash
-    ENABLE_WEBSOCKET_SUPPORT=True
+    REDIS_URL=redis://your-redis-host:6379/0
     WEBSOCKET_MANAGER=redis
-    WEBSOCKET_REDIS_URL=redis://your-redis-host:6379/0
     ```
 
 ### 3. "Model Not Found" or Configuration Mismatch
 
 **Symptoms:**
-- You enable a model or change a setting in the Admin UI, but other users (or you, after a refresh) don't see the change.
+- A model enabled in the Admin UI shows up for some requests and not others.
 - Chats fail with "Model not found" intermittently.
 
 **Cause:**
-- **Configuration Sync:** Replicas are not synced. Open WebUI uses Redis Pub/Sub to broadcast configuration changes (like toggling a model) to all other instances.
-- **Missing Redis:** If `REDIS_URL` is not set, configuration changes stay local to the instance where the change was made.
+Settings live in the shared database, and every replica reads them from there, so settings changes reach all replicas without Redis. The model list is held per replica unless `WEBSOCKET_MANAGER=redis` shares it. Without it, each replica only knows the models it has loaded itself.
 
 **Solution:**
-Set `REDIS_URL` to point to your shared Redis instance. This enables the Pub/Sub mechanism for real-time config syncing.
+Set `REDIS_URL` and `WEBSOCKET_MANAGER=redis` on every replica (see [Step 2](/getting-started/advanced-topics/scaling#step-2-add-redis)).
 
-```bash
-REDIS_URL=redis://your-redis-host:6379/0
-```
-
-For Ollama specifically, a chat sent to a model the replica has not seen no longer fails outright: the replica clears its model cache, re-reads the model list from the Ollama servers, and only reports the model as unknown if it is still missing. A model pulled or added while a replica was holding a stale list therefore becomes usable on the next request instead of after the cache expires.
+For Ollama, a chat sent to a model the replica does not know makes it re-read the model list from the Ollama servers first. A model pulled while a replica held a stale list is usable on the next request.
 
 ### 4. Database Corruption / "Locked" Errors
 
 **Symptoms:**
 - Logs show `database is locked` or severe SQL errors.
 - Data saved on one instance disappears on another.
-- `sqlalchemy.exc.TimeoutError: QueuePool limit of size N overflow M reached, connection timed out, timeout 30.00` on **every** request after a short warm-up, not just at peak load.
-- `/api/config`, `/api/v1/chats/?page=1`, OIDC callbacks all stall for 10 s to multiple minutes.
-- `PRAGMA journal_mode=WAL` logged as starting but never completing.
-- Problems appeared suddenly after the 0.8.x → 0.9.x upgrade without any other change in the deployment.
+- `sqlalchemy.exc.TimeoutError: QueuePool limit of size N overflow M reached, connection timed out, timeout 30.00` on nearly every request after a short warm-up, not just at peak load.
+- `/api/config`, chat list and OIDC callbacks stall for 10 seconds to several minutes.
+- `PRAGMA journal_mode=WAL` is logged as starting but never completes.
 
 **Cause:**
-Using **SQLite** with multiple replicas, or with a single replica whose `webui.db` lives on a network filesystem. SQLite is a file-based database; its file locking [does not work reliably over NFS / CIFS / CephFS / Azure Files / any network PVC](https://www.sqlite.org/faq.html#q5) (this is SQLite upstream's own position, not an Open WebUI policy). With the async backend introduced in 0.9.0, this turns from "slow and occasionally locked" into a hard failure mode because slow network `fsync`s hold each pool connection hostage long enough to saturate the connection pool on every request.
+**SQLite** with multiple replicas, or with a single replica whose `webui.db` lives on a network filesystem (NFS, CIFS, CephFS, Azure Files, a network PVC). SQLite's file locking is [unreliable over network filesystems](https://www.sqlite.org/faq.html#q5), and slow network `fsync`s hold each pool connection long enough to exhaust the pool. For the mechanism, see [Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage).
 
-For the full mechanism (fsync latency + async concurrency + pool saturation + WAL-on-mmap-on-NFS), see [Performance → Disk I/O Latency](/troubleshooting/performance#disk-io-latency-sqlite--storage).
+**Solution, in order of preference:**
 
-**Solution, in order of correctness:**
-
-1. **Migrate to PostgreSQL (strongly recommended, required for multi-replica):**
-   ```bash
-   DATABASE_URL=postgresql+asyncpg://user:password@postgres-host:5432/openwebui
-   ```
-   For Kubernetes / Docker Swarm this is effectively mandatory. Postgres manages its own I/O against its own local storage, so the network-`fsync` pathology disappears entirely. See [Scaling → Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql) for the full migration steps.
-
-2. **If you're on a single instance and can move the DB:** put `webui.db` on a locally-attached SSD/NVMe (host bind mount, node-local volume, ephemeral disk), not on the same NFS/Ceph/EFS mount you use for uploads and RAG files. Your shared storage for `/app/backend/data` is fine; SQLite specifically is the problem.
-
-3. **Do NOT just increase `DATABASE_POOL_SIZE`.** A bigger pool doesn't fix slow `fsync`; it just schedules more concurrent slow `fsync`s against the same slow storage and moves the breaking point by a few seconds. This is a symptom-whack, not a fix.
-
-4. **Temporary damage-control only** (for a deployment you're about to migrate):
+1. **Migrate to PostgreSQL** (required for multiple replicas). See [Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql).
+2. **Single instance:** move `webui.db` to a locally attached SSD/NVMe (host bind mount, node-local volume). Uploads and RAG files can stay on the shared storage.
+3. **Stopgap** while you migrate: fewer connections and a longer lock wait reduce lock contention.
    ```bash
    DATABASE_POOL_SIZE=1
    DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
    ```
-   Serializes to a single async connection, trading concurrency for stability. **Not supported long-term.** Also consider `ENABLE_AUTOMATIONS=false` if the background scheduler's periodic poll is the specific thing tipping you over the edge.
+
+A larger `DATABASE_POOL_SIZE` makes this worse: it runs more slow `fsync`s against the same storage at once.
 
 ### 5. Uploaded Files or RAG Knowledge Inaccessible
 
 **Symptoms:**
-- You upload a file (for RAG) on one instance, but the model cannot find it later.
-- Images in a chat show an **Image unavailable** placeholder instead of the picture, intermittently, depending on which replica served the request.
+- You upload a file on one instance, but the model cannot find it later.
+- Images in a chat intermittently show an **Image unavailable** placeholder, depending on which replica served the request.
 
 **Cause:**
-The `/app/backend/data` directory is not shared or is not consistent across replicas. If User A uploads a file to Replica 1, and the next request hits Replica 2, Replica 2 won't have the file physically on disk.
+Uploaded files are not shared across replicas. A file uploaded to Replica 1 is missing on Replica 2.
 
 **Solution:**
-- **Kubernetes:** Use a `PersistentVolumeClaim` with `ReadWriteMany` (RWX) access mode if your storage provider supports it (e.g., NFS, CephFS, AWS EFS).
-- **Docker Swarm/Compose:** Mount a shared volume (e.g., NFS mount) to `/app/backend/data` on all containers.
+Use object storage or a shared filesystem on every replica, as described in [Step 5](/getting-started/advanced-topics/scaling#step-5-share-file-storage-across-instances). On Kubernetes, a shared volume needs `ReadWriteMany` (RWX) access.
 
 ### 6. Worker Crashes During Document Upload (ChromaDB + Multi-Worker)
 
 **Symptoms:**
-- Logs show the following sequence, all within the same second:
+- Logs show this sequence within the same second:
   ```
   save_docs_to_vector_db:1619 - adding to collection file-id
   INFO:     Waiting for child process [pid]
   INFO:     Child process [pid] died
   ```
-- Workers die immediately during RAG document ingestion.
-- The crash is instant (not a timeout).
+- Workers die instantly during RAG document ingestion (not a timeout).
 
 **Cause:**
-The default ChromaDB configuration uses a local `PersistentClient` backed by **SQLite**. When uvicorn forks multiple workers (`UVICORN_WORKERS > 1`), each worker process inherits a copy of the same SQLite database connection, all pointing at the same file on disk (`data/vector_db/`).
-
-When two workers attempt to write to the collection simultaneously (e.g., during document upload), SQLite's file-level locking fails across forked processes. The result is either a database lock error or a segfault from corrupted internal state inherited across the `fork()` call, which kills the worker process instantly.
-
-This is a [well-known SQLite limitation](https://www.sqlite.org/howtocorrupt.html#_carrying_an_open_database_connection_across_a_fork_): open database connections must not be carried across a `fork()`.
+The default ChromaDB runs embedded in each Open WebUI process and stores its data in local SQLite files (`data/vector_db/`). Only one process may write to them. With several replicas or workers, concurrent writes during uploads kill the process.
 
 **Solution:**
-You **must** stop using the default local ChromaDB with multiple workers. Pick one of these options:
 
 | Option | Change | Tradeoff |
 |--------|--------|----------|
-| **Keep 1 worker** | Set `UVICORN_WORKERS=1` (the default) | Simplest, but limits concurrency |
-| **Use ChromaDB HTTP mode** | Set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) to point to a separate Chroma server | Each worker connects via HTTP instead of SQLite, fully fork-safe |
-| **Switch vector DB** | Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `mariadb-vector`, `milvus`, `qdrant`, etc. | These are client-server databases, inherently multi-process safe |
+| **Keep 1 worker** | `UVICORN_WORKERS=1` (the default) and scale with replicas | Still needs one of the options below once there is more than one replica |
+| **Use ChromaDB HTTP mode** | Point [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) to a separate Chroma server | Every process connects over HTTP to one server |
+| **Switch vector DB** | Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `mariadb-vector`, `milvus`, `qdrant` or another client-server database | Built for many clients |
 
-**Recommended fix**: run ChromaDB as a separate server:
+To keep ChromaDB, run it as its own server:
 
 ```bash
-# Run chroma server separately
+# Run the Chroma server separately
 chroma run --host 0.0.0.0 --port 8000 --path /data/vector_db
 
-# Then set these env vars for Open WebUI
+# Then point Open WebUI at it
 CHROMA_HTTP_HOST=localhost
 CHROMA_HTTP_PORT=8000
-UVICORN_WORKERS=4
 ```
 
 ### 7. Slow Performance in Cloud vs. Local Kubernetes
 
 **Symptoms:**
-- Open WebUI performs well locally but experiences significant degradation or timeouts when deployed to cloud providers (AKS, EKS, GKE).
-- Performance drops sharply under concurrent load despite adequate resource allocation.
+- Open WebUI performs well locally but degrades or times out on AKS, EKS or GKE.
+- Performance drops sharply under concurrent load despite adequate resources.
 
 **Cause:**
-This is typically caused by infrastructure latency (Network Latency to the database or Disk I/O latency for SQLite) that is inherently higher in cloud environments compared to local NVMe/SSD storage and local networks.
+Usually network latency to the database or disk I/O latency for SQLite, both higher in the cloud than on local NVMe and local networks.
 
 **Solution:**
-Refer to the **[Cloud Infrastructure Latency](/troubleshooting/performance#%EF%B8%8F-cloud-infrastructure-latency)** section in the Performance Guide for a detailed breakdown of diagnosis and mitigation strategies.
-
-If you need more tips for performance improvements, check out the full [Optimization & Performance Guide](/troubleshooting/performance).
+See [Cloud Infrastructure Latency](/troubleshooting/performance#cloud-infrastructure-latency).
 
 ### 8. Optimizing Database Performance
 
-For PostgreSQL deployments with adequate resources, consider these optimizations:
+**Symptoms:**
+- `QueuePool limit of size N overflow M reached` errors on PostgreSQL under load.
+- PostgreSQL rejects connections with `too many clients already`.
 
-#### Database Session Sharing
+**Cause:**
+The pool of one process is too small for its load, or the pools of all processes together exceed PostgreSQL's `max_connections`. Each replica has its own pool.
 
-Enabling session sharing can improve performance under high concurrency:
-
-```bash
-DATABASE_ENABLE_SESSION_SHARING=true
-```
-
-See [DATABASE_ENABLE_SESSION_SHARING](/reference/env-configuration#database_enable_session_sharing) for details.
-
-#### Connection Pool Sizing
-
-If you experience `QueuePool limit reached` errors or connection timeouts under high concurrency, increase the pool size:
-
-```bash
-DATABASE_POOL_SIZE=15 (or higher)
-DATABASE_POOL_MAX_OVERFLOW=20 (or higher)
-```
-
-**Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keep the combined total under 50-80 per Open WebUI instance to leave room for other clients and maintenance operations.
-
-:::warning Pool Size Multiplies with Concurrency
-
-**Each Open WebUI process maintains its own independent connection pool.** This applies to multiple replicas (Kubernetes pods, Docker Swarm replicas) *and* multiple Uvicorn workers within each replica.
-
-The actual maximum number of database connections is:
-
-```
-Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Total processes
-```
-
-Where `Total processes = Number of replicas × UVICORN_WORKERS per replica`.
-
-For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, 3 replicas, and 2 workers each, you could open up to **210 connections** (35 × 6 processes).
-
-:::
-
-See [DATABASE_POOL_SIZE](/reference/env-configuration#database_pool_size) for details. For comprehensive database optimization including caching, session sharing, and content extraction tuning, see the [Performance & RAM](./performance.md) guide.
+**Solution:**
+Size `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW` per process and check the total against `max_connections`, as described in [Step 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql). If blocking work queues instead (the app freezes while CPU and RAM look fine), raise [`THREAD_POOL_SIZE`](/troubleshooting/performance#thread-pool-size).
 
 ### 9. Function/Tool Dependency Installation Crashes
 
 **Symptoms:**
-- Workers crash with `AssertionError` on startup or when a function/tool is first loaded.
-- Logs show pip locking errors or multiple pip processes competing.
+- Workers crash with `AssertionError` on startup or when a function or tool first loads.
+- Logs show pip locking errors or several pip processes competing.
 
 **Cause:**
-When a function or tool specifies `requirements` in its frontmatter, Open WebUI runs `pip install` at runtime. With multiple workers or replicas, each process attempts the installation independently, causing pip's internal lock to detect the conflict and crash.
+When a function or tool lists `requirements` in its frontmatter, Open WebUI runs `pip install` at runtime. With `UVICORN_WORKERS` above `1`, every worker runs the installation into the same environment at once.
 
 **Solution:**
-**Set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)** to disable runtime pip installs entirely. Then pre-install all required packages at image build time:
+Keep `UVICORN_WORKERS=1`, set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and install the packages into the image at build time:
 
 ```dockerfile
 FROM ghcr.io/open-webui/open-webui:main
@@ -256,9 +197,7 @@ FROM ghcr.io/open-webui/open-webui:main
 RUN pip install --no-cache-dir python-docx requests beautifulsoup4
 ```
 
-Runtime `requirements` installation is only appropriate for single-worker development or homelab environments.
-
-For more details, see the [External Packages](/features/extensibility/plugin/tools/development#external-packages) section of the Tools documentation.
+Runtime installation suits only development or homelab setups. See [External Packages](/features/extensibility/plugin/tools/development#external-packages).
 
 ---
 
@@ -267,49 +206,41 @@ For more details, see the [External Packages](/features/extensibility/plugin/too
 ### Updates and Migrations
 
 :::danger Critical: Avoid Concurrent Migrations
-**Always ensure only one process is running database migrations when upgrading Open WebUI versions.**
+**Only one process may run database migrations when upgrading Open WebUI.**
 :::
 
 :::danger Critical: Never Run Two Versions Against One Database
-**Old and new Open WebUI instances must never serve traffic against the same database at the same time.** Rolling updates, canary rollouts and any "update one replica, scale the rest once it is healthy" strategy are unsupported across a release that changes the schema.
+**Old and new Open WebUI instances must never serve traffic against the same database at the same time.** Rolling updates, canary rollouts and "update one replica, scale the rest once it is healthy" strategies are unsupported across a release that changes the schema.
 :::
 
-Database migrations run automatically on startup. If multiple replicas (or multiple workers within a single container) start simultaneously with a new version, they may try to run migrations concurrently, potentially leading to race conditions or database schema corruption.
+Migrations run automatically on startup. If several replicas start a new version at once, they run migrations concurrently and can corrupt the schema.
 
-Stop all replicas and workers, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage, and there is no general zero-downtime path across a schema change.
+Stop all replicas, let one instance migrate, then bring the fleet back up on the new version. That costs a short full outage; there is no general zero-downtime path across a schema change.
 
-Back up the database before you start. Putting the old image back does not undo a migration: the schema stays where the migration left it, and rows a migration rewrote stay rewritten. Restoring a backup taken before the upgrade is the way back. See [Backup & Restore](/getting-started/updating#backup--restore).
+Back up the database first. Putting the old image back does not undo a migration: the schema and any rewritten rows stay as the migration left them. Restoring a backup taken before the upgrade is the way back. See [Backup & Restore](/getting-started/updating#backup--restore).
 
 **Safe Update Procedure:**
 
-There are two ways to safely handle migrations in a multi-replica environment:
-
 #### Option 1: Designate a Master Migration Pod (Recommended)
-1.  Identify one pod/replica as the "master" for migrations.
-2.  Set `ENABLE_DB_MIGRATIONS=True` (default) on the master pod.
+1.  Pick one pod as the migration "master".
+2.  Keep `ENABLE_DB_MIGRATIONS=True` (default) on that pod.
 3.  Set `ENABLE_DB_MIGRATIONS=False` on all other pods.
-4.  When updating, the master pod will handle the database schema update while other pods skip the migration step.
+4.  On update, the master pod migrates the schema while the others skip it.
 
-`ENABLE_DB_MIGRATIONS` only decides **which** instance migrates. It does not make version skew safe. Roll the new image out to every pod at once, not one at a time. If your platform cannot replace all pods simultaneously, use Option 2 instead.
+`ENABLE_DB_MIGRATIONS` only decides **which** instance migrates. Roll the new image out to every pod at once. If your platform cannot replace all pods simultaneously, use Option 2.
 
 #### Option 2: Scale Down During Update
-1.  **Scale Down:** Set replicas to `1` (and ensure `UVICORN_WORKERS=1`).
-2.  **Update Image:** Update the image or version.
-3.  **Wait for Health Check:** Wait for the single instance to start fully and complete migrations.
-4.  **Scale Up:** Increase replicas back to your desired count.
-
+1.  **Scale down:** set replicas to `1`.
+2.  **Update** the image or version.
+3.  **Wait** until the single instance has started and finished migrating.
+4.  **Scale up** to your desired count.
 
 ### Session Affinity (Sticky Sessions)
-While Open WebUI is designed to be stateless with proper Redis configuration, enabling **Session Affinity** (Sticky Sessions) at your Load Balancer / Ingress level can improve performance and reduce occasional jitter in WebSocket connections.
+
+With Redis configured and WebSockets on (the default), any replica can serve any request, so sticky sessions are not needed. On an unstable network, a blip or reconnect can still disturb how streamed responses or tool calls reach the browser; if you see that, turning them on is worth a try. They are required when `ENABLE_WEBSOCKET_SUPPORT=false`, because long-polling needs every request of a connection to reach the same replica.
 
 - **Nginx Ingress:** `nginx.ingress.kubernetes.io/affinity: "cookie"`
-- **AWS ALB:** Enable Target Group Stickiness.
-
-### Compress at the Load Balancer, Not in the App
-
-By default each Open WebUI worker compresses its own HTTP responses, which profiling shows costs roughly 3–4% CPU per worker, multiplied across all replicas. In multi-replica deployments there is always a load balancer or ingress in front, so enable compression there and disable it in the app with `ENABLE_COMPRESSION_MIDDLEWARE=false`. WebSocket and SSE streaming traffic is never compressed by this middleware, so chat streaming is unaffected. Pair this with proxy-side caching of the content-hashed static bundles under `/_app/immutable/` so they are served from the proxy cache instead of the workers. See [`ENABLE_COMPRESSION_MIDDLEWARE`](/reference/env-configuration#enable_compression_middleware) and [Scaling → Offload HTTP Compression](/getting-started/advanced-topics/scaling#offload-http-compression-to-the-load-balancer).
-
-WebSocket frames are compressed by the WebSocket server rather than that middleware, and under streaming load that is worth switching off with `UVICORN_WS_PER_MESSAGE_DEFLATE=false`. Every replica pays it, since chat responses arrive as one small frame per token and each is compressed separately for every subscriber. See [`UVICORN_WS_PER_MESSAGE_DEFLATE`](/reference/env-configuration#uvicorn_ws_per_message_deflate).
+- **AWS ALB:** enable Target Group Stickiness.
 
 ### Use the Faster JSON Encoder
 
@@ -317,41 +248,21 @@ WebSocket frames are compressed by the WebSocket server rather than that middlew
 ENABLE_ORJSON=True
 ```
 
-Every Socket.IO event in a multi-replica deployment is published through Redis, and each one is encoded on the way out and decoded on the way in. In clustered deployments that encoding was the single largest cost measured on the workers handling live updates, which is why this setting exists. It switches the whole application from Python's standard-library `json` to [orjson](https://pypi.org/project/orjson/), a Rust implementation several times faster. orjson already ships as a pinned dependency, so there is nothing to install. Available from v0.11.0.
+In a multi-replica deployment every Socket.IO event is published through Redis, encoded on the way out and decoded on the way in, which makes JSON encoding one of the largest costs on the replicas handling live updates. [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) (default `True`) uses [orjson](https://pypi.org/project/orjson/), a much faster Rust implementation, across the whole app. It ships with Open WebUI, so there is nothing to install. On a small single instance the difference is mostly felt when saving and opening very long chats.
 
-**What it covers:**
+Payloads orjson rejects (non-string dictionary keys, integers beyond 64 bits) fall back to the standard library automatically, so a working payload never turns into an error. Two differences remain:
 
-| Path | Why it matters at scale |
-|---|---|
-| Socket.IO payloads, including the ones published over Redis, plus Redis-backed session and collaborative-document state | The reason to turn this on. Every live update crossing replicas is encoded and decoded here |
-| Saving and opening chats, and the rest of what is stored as JSON (user settings, configuration, folders, notes) | A whole conversation is encoded on every save and decoded again on every open, so the cost follows the length of the chat rather than the number of requests |
-| Upstream provider responses (OpenAI-compatible and Ollama), including per-chunk parsing of streamed completions | Runs once per arriving token batch, so it scales with streaming volume rather than request count |
-| The requests sent out to model providers (OpenAI-compatible, Ollama and Anthropic) | Each one carries the whole conversation or a whole embedding batch, so it is the largest single encode on a chat request |
-| Incoming HTTP request bodies and outgoing `JSONResponse` bodies | The broadest surface, but individually the cheapest |
-| The stored chunk details on the Valkey and Oracle 23ai vector stores | Read back once per result, so the cost follows how many chunks each knowledge base search returns |
-| Results returned by built-in tools, and working out a user's permissions when they sign in, sign up or reload the page | Small payloads, but on paths every user hits over and over |
-| The output a Jupyter server returns for code run in chat | Only when the code execution or code interpreter engine is set to Jupyter. The cost follows how much a run prints and how many images it produces, so the difference shows on chart-heavy or output-heavy runs |
-
-**Why it is opt-in.** orjson is stricter than the standard library, so the default keeps behaviour byte-for-byte identical to earlier releases. In practice the strictness is handled for you: dictionary keys that are not strings, integers beyond 64 bits, and `NaN` or `Infinity` literals are all rejected by orjson and fall back to the standard-library path automatically. Enabling this cannot turn a payload that worked into an error.
-
-Two differences do survive the fallback, neither of which affects a normal deployment:
-
-- **`NaN` and `Infinity` floats in a response body serialize as `null`** instead of raising. Starlette's own encoder is configured with `allow_nan=False`, so a response carrying those values previously failed outright and now goes out with nulls. If you have a custom tool or pipe that can emit them, this is a behaviour change to be aware of rather than a regression.
-- **Encoded output carries raw UTF-8 rather than `\uXXXX` escapes.** Both parse identically, so this matters only to something downstream that checksums encoded JSON. Three line separator characters stay escaped, since leaving them raw would split a streamed reply. Stored text is held raw too, and neither turning the setting on nor off needs a migration.
-
-**When not to bother.** On a single-worker, single-user instance the saving is real but invisible next to model latency. The setting earns its keep once Socket.IO traffic is crossing Redis between workers or replicas. The one thing that can be felt on a small instance is very long chats, which are encoded in full every time they are saved and decoded again every time they are opened.
-
-See [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson) for the variable itself and [Scaling → Switch the JSON Encoder to orjson](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it fits in a scaled rollout.
+- **`NaN` and `Infinity` floats in a response body become `null`.** With the standard library, such a response fails. Relevant only to custom tools or pipes that emit these values.
+- **Encoded output carries raw UTF-8 instead of `\uXXXX` escapes.** Both parse identically; this matters only to something that checksums encoded JSON. Line separator characters stay escaped so streamed replies are not split. Switching the setting on or off needs no migration.
 
 ---
 
 ## Related Documentation
 
-- [Scaling Open WebUI](/getting-started/advanced-topics/scaling): Step-by-step guide to scaling from single instance to production
+- [Scaling Open WebUI](/getting-started/advanced-topics/scaling): step-by-step guide from a single instance to production
 - [Environment Variable Configuration](/reference/env-configuration)
 - [Optimization, Performance & RAM Usage](/troubleshooting/performance)
-- [Redis WebSocket Support](/tutorials/integrations/redis): Detailed Redis setup tutorial
+- [Redis WebSocket Support](/tutorials/integrations/redis): detailed Redis setup tutorial
 - [Troubleshooting Connection Errors](/troubleshooting/connection-error)
-- [RAG Troubleshooting](/troubleshooting/rag): Document upload and embedding issues
+- [RAG Troubleshooting](/troubleshooting/rag): document upload and embedding issues
 - [Logging Open WebUI](/getting-started/advanced-topics/logging)
-

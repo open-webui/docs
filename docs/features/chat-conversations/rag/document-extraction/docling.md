@@ -9,7 +9,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 :::
 
-## 🐤 Docling Document Extraction
+## Docling Document Extraction
 
 This documentation provides a step-by-step guide to integrating Docling with Open WebUI. Docling is a document processing library designed to transform a wide range of file formats (including PDFs, Word documents, spreadsheets, HTML, and images) into structured data such as JSON or Markdown. With built-in support for layout detection, table parsing, and language-aware processing, Docling streamlines document preparation for AI applications like search, summarization, and retrieval-augmented generation, all through a unified and extensible interface.
 
@@ -84,14 +84,15 @@ When using `UVICORN_WORKERS` greater than 1 with the default `LocalOrchestrator`
 ### Step 2: Configure Open WebUI
 
 1. Log in to your Open WebUI instance
-2. Navigate to **Settings** → **Admin** → **Tools** → **Documents**
-3. Change the **Default** content extraction engine dropdown to **Docling**
-4. Set the extraction engine URL to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native)
-5. Save the changes
+2. Navigate to **Settings** → **Admin** → **Documents**
+3. Set **Content Extraction Engine** to **Docling**
+4. Set **Docling Server URL** to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native). The default is `http://docling:5001`.
+5. Optionally set **API Key** (`DOCLING_API_KEY`), which is sent to docling-serve as the `X-Api-Key` header
+6. Save the changes
 
 ### Step 3: Configure Picture Description (Optional)
 
-To enable AI-powered image description within documents, add the picture description options to the **Docling Parameters** JSON field in the **Documents** tab. Two modes are available:
+To enable AI-powered image description within documents, add the picture description options to the **Parameters** JSON field under the Docling settings in the **Documents** tab. Two modes are available:
 
 - **local**: Vision model runs within the Docling container itself, configured via `picture_description_local`
 - **API**: Docling calls an external service (e.g., Ollama, OpenAI-compatible endpoint), configured via `picture_description_api`
@@ -227,6 +228,12 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via e
 **Solution**: 
 - Tesseract uses 3-letter codes: `["eng", "deu"]`
 - EasyOCR uses 2-letter codes: `["en", "de"]`
+
+### Citations point to the wrong page
+
+**Cause**: Docling marks only page changes in its Markdown output, so a blank page leaves no page break. Page numbers counted from those breaks make every citation after a blank page show an earlier page number. Open WebUI takes the page numbers from the JSON output Docling returns alongside the Markdown.
+
+**Solution**: Upload the affected files again, for example by removing a file from its knowledge base and adding it back. Page numbers are set when Docling extracts a file, and **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents** reuses the text already extracted, so it keeps the old page numbers.
 
 ### "Error calling Docling" with no specific details
 

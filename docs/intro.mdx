@@ -17,7 +17,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 Open WebUI is **a home for AI**, a self-hosted AI platform that's **[extensible](https://docs.openwebui.com/features/extensibility/plugin/)**, **[feature-rich](https://docs.openwebui.com/features/)**, user-friendly, and built to run **[entirely offline](https://openwebui.com/sovereign-ai)**. With support for **Ollama** and **OpenAI-compatible APIs**, it gives you a powerful, provider-agnostic interface for both local and cloud-based models.
 
 <ThemedImage
-  alt="Open WebUI: a self-hosted AI platform connecting local and cloud models with tools and knowledge"
+  alt="Open WebUI: a cube of blocks with one corner block lifted out"
   sources={{
     light: useBaseUrl('/images/banners/home-light.svg'),
     dark: useBaseUrl('/images/banners/home-dark.svg'),
@@ -34,30 +34,13 @@ Open WebUI is **a home for AI**, a self-hosted AI platform that's **[extensible]
 ## Quick Start
 
 <Tabs>
-  <TabItem value="docker" label="Docker" default>
+  <TabItem value="python" label="Python" default>
 
 ```bash
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-```
+# With uv installed (macOS/Linux)
+DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
 
-Then open [http://localhost:3000](http://localhost:3000).
-
-<img
-  alt="Open WebUI running a live analysis: Claude Opus 5 reads a spreadsheet through Open Terminal and renders an interactive revenue dashboard inline in the chat"
-  src={useBaseUrl('/images/landing/hero.png')}
-  style={{ width: '100%', borderRadius: 12, margin: '0.75rem 0 0.5rem' }}
-/>
-
-<p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
-  Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
-</p>
-
-For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
-
-  </TabItem>
-  <TabItem value="pip" label="pip">
-
-```bash
+# Or install and run with pip
 pip install open-webui
 open-webui serve
 ```
@@ -65,26 +48,47 @@ open-webui serve
 Then open [http://localhost:8080](http://localhost:8080).
 
   </TabItem>
-  <TabItem value="uv" label="uv">
+  <TabItem value="docker" label="Docker">
+
+:::tip Pick the right image
+Use `:main` for built-in embeddings, document extraction and speech recognition. Choose `:slim` for a **lean, memory-efficient, scalable** deployment: **197 MB to download** (88% smaller) and **about 300 MiB of RAM at idle** in our [test](/getting-started/quick-start#slim-memory-usage). You get the same chat experience with **minimal overhead** and a **small footprint**, with external services handling embeddings, document extraction and voice. [Why choose slim?](/getting-started/quick-start#what-slim-leaves-out)
+:::
 
 ```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-DATA_DIR=~/.open-webui uvx --python 3.11 open-webui@latest serve
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-Then open [http://localhost:8080](http://localhost:8080).
+For GPU support, Docker Compose, and more → [Quick Start](/getting-started/quick-start) and [Docker images and tags](/getting-started/quick-start#image-variants)
+
+Then open [http://localhost:3000](http://localhost:3000).
 
   </TabItem>
   <TabItem value="desktop" label="Desktop">
-
-Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
 
 :::info
 For production deployments, install via **Docker** or **Python**.
 :::
 
+Download the desktop app from [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop). It runs Open WebUI natively on your system without Docker or manual setup.
+
   </TabItem>
 </Tabs>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  poster={useBaseUrl('/images/landing/hero.png')}
+  aria-label="Open WebUI running a live analysis: a local model reads a spreadsheet through Open Terminal, totals it with Python and builds a revenue dashboard in the integrated browser"
+  style={{ display: 'block', width: '100%', borderRadius: 12, margin: '0.75rem 0 0.5rem' }}
+>
+  <source src={useBaseUrl('/images/landing/hero.mp4')} type="video/mp4" />
+</video>
+
+<p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
+  Powered by <a href="/features/open-terminal">Open Terminal</a> and some of our <a href="/features/extensibility/community">amazing community built plugins</a>.
+</p>
 
 :::tip Running? Read this next.
 Installed Open WebUI but not sure where to start? The [**Essentials for Open WebUI**](/getting-started/essentials) guide covers what every new user needs to know: plugins, tool calling, task models, context management, RAG, web search and Open Terminal.
@@ -114,24 +118,11 @@ Installed Open WebUI but not sure where to start? The [**Essentials for Open Web
 
 ---
 
-## Open WebUI Computer
+## Agentic Execution with Open Terminal
 
-[**Open WebUI Computer**](/ecosystem/computer) is the cutting-edge agent harness and runtime for your real machine. You install one app, add AI (an API key, a local model, or a coding-agent subscription you already have like Claude Code or Codex), and it works on the actual files, branches, services, and tools already on that computer, with approvals and plan mode. The file the agent edits is the file on your disk; the terminal it uses is the terminal on your machine.
+[**Open Terminal**](/features/open-terminal) gives an agent a real terminal and filesystem, so it can carry out multi-step work instead of only describing it: analyze data, run scripts, fix its own errors, and hand you the files it produced, all inside the chat. A [file browser](/features/open-terminal/file-browser) beside the conversation shows everything it creates.
 
-Run Computer with uv:
-
-```bash
-uvx cptr@latest run
-```
-
-Then create an account and open a folder.
-
-Because it's your whole machine, you get the rest for free: files, editor, terminal, git, previews, and agent chats in any browser, from your desk or your phone; an assistant you can message from Telegram or WhatsApp; scheduled agents that report back to you. Everything runs locally on hardware you own, nothing hosted elsewhere.
-
-Computer and Open WebUI are one ecosystem moving at two speeds, on purpose. **Open WebUI** is the stable platform: enterprise-ready, multi-user, what teams and organizations deploy and rely on. **Computer** moves faster: new real-machine agent capabilities are built and shipped there first, hardened in daily use, and graduated into Open WebUI where they fit. If you want the bleeding edge of what we're building, it lands in Computer first.
-
-- New to it? [What is Computer?](/ecosystem/computer/what-is-computer) · [Quickstart](/ecosystem/computer/quickstart) · [Use cases](/ecosystem/computer/use-cases/)
-- Already run Open WebUI? [Use a Computer workspace as a model in Open WebUI](/ecosystem/computer/automate/open-webui)
+For teams, [**Terminals**](/features/open-terminal/terminals) is the enterprise layer on top, giving every user an isolated environment with resource limits and automatic lifecycle management.
 
 ---
 

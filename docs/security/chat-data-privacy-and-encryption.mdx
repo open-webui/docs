@@ -15,12 +15,13 @@ Open WebUI's standard experience is designed for self-hosted control, auditabili
 
 | Concern | Best available measure |
 | :--- | :--- |
-| Reduce admin product access to employee chats | Set `ENABLE_ADMIN_CHAT_ACCESS=false` |
+| Hide user chats from admins in the interface | Set `ENABLE_ADMIN_CHAT_ACCESS=false` |
 | Control admin product exports | Set `ENABLE_ADMIN_EXPORT=false` |
 | Scope admin workspace list/selector visibility | Set `BYPASS_ADMIN_ACCESS_CONTROL=false` |
 | Production database storage exposure | Use PostgreSQL with encrypted volumes, provider encryption, TDE where available, TLS, and encrypted backups |
-| SQLite-only deployments | Use SQLCipher with `DATABASE_TYPE=sqlite+sqlcipher` |
+| SQLite-only deployments | Put the data directory on an encrypted filesystem (LUKS, BitLocker, FileVault) |
 | Employees asking sensitive or personal questions | Use Temporary Chat, or force Temporary Chat for all users with `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` |
+| Users messaging each other about sensitive topics | Use [encrypted chats](/features/channels/encrypted-chats) in direct messages and private groups: end-to-end encrypted in the browser and never stored on the server |
 | Keep prompts inside your infrastructure | Use local or private model endpoints and restrict approved models by group |
 | Sensitive documents being uploaded or indexed | Keep file upload and knowledge permissions off by default; grant only by group |
 | Control server-side code execution | Keep Tools and Functions restricted to trusted admins |
@@ -40,12 +41,7 @@ DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
 Database encryption protects data at rest. The running Open WebUI application uses the database key to serve authenticated users and normal product workflows.
 
-For SQLite-only deployments, SQLCipher can encrypt the local SQLite database file:
-
-```bash
-DATABASE_TYPE=sqlite+sqlcipher
-DATABASE_PASSWORD=your-secure-password
-```
+For SQLite-only deployments, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). SQLCipher is not supported.
 
 ### Limit Admin Chat and Export Surfaces
 
@@ -55,7 +51,7 @@ ENABLE_ADMIN_EXPORT=false
 BYPASS_ADMIN_ACCESS_CONTROL=false
 ```
 
-These reduce what admins can access through Open WebUI. Direct database, host, backup, and application-secret access should be limited to operators inside your approved trust boundary.
+These hide other users' chats and exports from admins in the interface. They do not keep an admin away from the data; see [Admin Users](#admin-users).
 
 ### Use SSO and Restrict Accounts
 
@@ -66,7 +62,7 @@ ENABLE_PASSWORD_CHANGE_FORM=false
 DEFAULT_USER_ROLE=pending
 ```
 
-Use your identity provider for MFA, conditional access, device posture, group membership, and user lifecycle. Use SCIM where possible.
+Use your identity provider for MFA, conditional access, device posture, group membership and user lifecycle. Use SCIM where possible. Where accounts still sign in to Open WebUI directly, turn on the built-in [two-factor sign-in](/features/authentication-access/mfa).
 
 ### Use Temporary Chat Where History Is Not Needed
 
@@ -88,6 +84,8 @@ Relevant permissions:
 
 - **Chat > Temporary Chat**
 - **Chat > Enforced Temporary**
+
+For users with both permissions, the server refuses to save a chat on every route, including direct API calls, chat import, clone and fork. Chats they already have still open, and administrators are exempt.
 
 Temporary Chat is a data-minimization control for saved history. The active prompt is still processed by Open WebUI and the configured model endpoint. Tools you leave enabled still run in a temporary chat and can store data of their own, so disable them on the model where that matters.
 
@@ -126,7 +124,7 @@ Regular users can read their own chats and chats explicitly shared with them. Ac
 
 ### Admin Users
 
-Admins have broad control by design. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` prevent casual access through Open WebUI product surfaces. Infrastructure-level access should be handled through operator trust, access review, and separation of duties.
+Admins control the instance, so treat every admin as able to read every chat. `ENABLE_ADMIN_CHAT_ACCESS=false` and `ENABLE_ADMIN_EXPORT=false` only hide other users' chats and exports in the interface. An admin can still reach the data in other ways, for example by installing a function or tool that runs code on the server, and through internal chats such as sub-agent chats, which stay readable by id. Limit the admin role, and database, host and backup access, to people you trust with the data.
 
 ### Database, Host, and Backup Operators
 
@@ -185,7 +183,6 @@ For personal or highly sensitive employee questions:
 
 - [Hardening Open WebUI](/getting-started/advanced-topics/hardening)
 - [HTTPS Reference](/reference/https)
-- [Database Encryption with SQLCipher](/reference/database-schema#database-encryption-with-sqlcipher)
 - [Authentication & Access](/features/authentication-access)
 - [RBAC Permissions](/features/authentication-access/rbac/permissions)
 - [Temporary Chat URL Parameter](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions)

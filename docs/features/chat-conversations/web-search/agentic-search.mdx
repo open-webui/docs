@@ -24,7 +24,7 @@ For comprehensive information about all built-in agentic tools (including web se
 | **Search Decision** | Open WebUI decides based on prompt analysis. | The **Model** decides if and when it needs to search. |
 | **Data Processing** | Fetches ALL results, chunks them, and performs **RAG**. | Returns **Snippets** directly; no chunking or Vector DB. |
 | **Link Following** | Snippets from top results are injected. | Model uses `fetch_url` to read a **Full Page** directly. |
-| **Model Context** | Only gets relevant fragments (Top-K chunks). | Gets the **whole text** (up to ~50k chars) via `fetch_url`. |
+| **Model Context** | Only gets relevant fragments (Top-K chunks). | Gets the **whole text** via `fetch_url`, up to the limit you set. |
 | **Reasoning** | Model processes data *after* system injection. | Model can search, read, check, and search again. |
 
 ## How to Enable Agentic Behavior
@@ -35,7 +35,7 @@ To unlock these features, your model needs native tool calling and reasonable mu
 2.  **Enable Model Capability**: In **Settings → Admin → Models**, select your model and enable the **Web Search** capability.
 3.  **Enable Default Feature**: In the same model settings, under **Default Features**, check **Web Search**. This controls whether the `search_web` and `fetch_url` tools are available by default in new chat sessions.
 4.  **Confirm Native Mode (Agentic Mode)**:
-    *   Native is the default tool-calling mode as of v0.10.0, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).
+    *   Native is the default tool-calling mode, so this is already active unless the model was switched to Legacy. In the same model settings, under **Advanced Parameters**, make sure **Function Calling** is set to `Native` (not `Legacy`).
 5.  **Use a Quality Search Engine**: Choose a provider that returns relevant, current results. Hosted providers built for LLM workflows usually return stronger results, while self-hosted engines like SearXNG depend heavily on upstream engines and instance configuration.
 6.  **Use a Quality Tool-Calling Model**: Use a recent model with reliable native function calling and enough context for tool schemas and search results.
 
@@ -52,7 +52,7 @@ Legacy Mode's RAG-style injection behavior is documented here only for legacy de
 :::
 
 ## How Native Tools Handle Data (Agentic Mode)
-🔗 It is important to understand that Native Mode (Agentic Mode) works fundamentally differently from the global "Web Search" toggle found in standard models.
+It is important to understand that Native Mode (Agentic Mode) works fundamentally differently from the global "Web Search" toggle found in standard models.
 
 ### `search_web` (Snippets only)
 When the model invokes `search_web`:
@@ -60,18 +60,27 @@ When the model invokes `search_web`:
 *   **Result Count Behavior**: If the model omits `count`, Open WebUI uses the admin-configured `WEB_SEARCH_RESULT_COUNT`. If the model provides `count`, the value is capped at the same admin maximum.
 *   **No RAG**: Unlike traditional search, **no data is stored in a Vector DB**. No chunking or embedding occurs.
 *   **Result**: The model sees exactly what a human sees on a search results page. If the snippet contains the answer, the model responds. If not, the model must decide to "deep dive" into a link.
+*   **Not a source**: search hits are not listed in the citations panel and the model is not told to cite them. Nothing has opened those pages, so there is nothing to cite. The results still reach the model as tool output and it can name a link in its answer like any other text.
+
+:::info Changes in this release
+Search results used to be emitted as citation sources, one empty entry per hit, all named `search_web`. Models regularly attached a result id to text taken from a different result, and the panel resolved that id to a title that looked right, so a wrong attribution was indistinguishable from a correct one. Search results are no longer offered as citations. To get a citation, the model has to open the page with `fetch_url`.
+
+This applies to the Native tool-calling path. Legacy mode still runs the old RAG-style web search and still cites what it retrieves.
+:::
 
 ### `fetch_url` (Full Page Context)
 If the model determines that a search snippet is insufficient, it will call `fetch_url`:
 *   **Direct Access**: The tool visits the specific URL and extracts the main text using your configured **Web Loader**.
-*   **Raw Context**: The extracted text is injected **directly into the model's context window** (hard-coded truncation at exactly 50,000 characters to prevent context overflow).
+*   **Raw Context**: The extracted text is injected **directly into the model's context window** By default the whole page goes in. To cap it, set **Fetch URL Content Length Limit** in **Settings > Admin > Web Search** or [`WEB_FETCH_MAX_CONTENT_LENGTH`](/reference/env-configuration#web_fetch_max_content_length); a longer page is cut at that many characters and ends with `[Content truncated...]`.
+*   **Files**: before reading, Open WebUI checks whether the URL is a web page or a file. That check sends the same request as the web loader, with the same [`USER_AGENT`](/reference/env-configuration#user_agent), browser headers and **Verify SSL Certificate** setting, so sites that block unknown clients (Wikimedia, for example) answer it the same way. A PDF or other document then goes to document extraction and the model gets its text. When the file name has no known extension, as in `arxiv.org/pdf/1706.03762`, the file type the server reports decides how the file is read.
+*   **Citable**: a fetched page appears in the citations panel as a source named by its URL. This is the only way a web page becomes a citation in Native mode, and it is a page the model has actually read.
 *   **Agentic Advantage**: Because it doesn't use RAG, the model has the "full picture" of the page rather than isolated fragments. This allows it to follow complex instructions on specific pages (e.g., "Summarize the technical specifications table from this documentation link").
 
 :::tip
 By keeping `search_web` and `fetch_url` separate and RAG-free, the model acts as its own **Information Retrieval** agent, choosing exactly which sources are worth reading in full.
 :::
 
-## Deep Research & Interleaved Thinking 🧠
+## Deep Research & Interleaved Thinking
 
 Because the model can call `search_web` multiple times and decide autonomously when to dive deeper, it can perform genuine "Deep Research" using **Interleaved Thinking**. This creates a powerful research loop where the model acts as its own research assistant.
 
@@ -80,44 +89,44 @@ Because the model can call `search_web` multiple times and decide autonomously w
 Interleaved Thinking is the ability for models to alternate between **reasoning** and **action** in a continuous cycle. Instead of searching once and answering, the model can:
 
 <details>
-<summary>📖 Detailed Research Cycle Example</summary>
+<summary>Detailed Research Cycle Example</summary>
 
 **User asks:** "What are the latest security vulnerabilities in the React ecosystem?"
 
-**Step 1: Initial Analysis 🤔**
+**Step 1: Initial Analysis**
 - Model thinks: "I need current information about React security. Let me start with a broad search."
 
-**Step 2: First Search 🔍**
+**Step 2: First Search**
 ```
 Model calls: search_web("React security vulnerabilities 2026")
 ```
 - Receives snippets based on the admin-configured `WEB_SEARCH_RESULT_COUNT` (or a smaller model-provided `count`)
 - Sees references to npm packages and CVE databases
 
-**Step 3: Gap Analysis 🤔**
+**Step 3: Gap Analysis**
 - Model thinks: "The snippets mention CVEs but don't have enough detail. I should fetch a specific security advisory page."
 
-**Step 4: Targeted Fetch 📄**
+**Step 4: Targeted Fetch**
 ```
 Model calls: fetch_url("https://example.com/react-security-advisory-2026")
 ```
-- Reads full 50k characters of detailed security documentation
+- Reads the full text of the security advisory
 - Identifies specific vulnerability types (XSS, injection, etc.)
 
-**Step 5: Refinement 🤔**
+**Step 5: Refinement**
 - Model thinks: "I found server-side vulnerabilities. Let me search specifically for client-side issues."
 
-**Step 6: Refined Search 🔍**
+**Step 6: Refined Search**
 ```
 Model calls: search_web("React client-side XSS CVE 2026")
 ```
 - Gets more specific results about cross-site scripting issues
 - Identifies mitigation strategies
 
-**Step 7: Synthesis 🤔**
+**Step 7: Synthesis**
 - Model thinks: "I now have comprehensive information from multiple authoritative sources. Time to synthesize."
 
-**Step 8: Final Answer ✅**
+**Step 8: Final Answer**
 - Provides detailed, grounded response citing multiple sources
 - Includes specific CVE numbers, affected versions, and mitigation steps
 
@@ -127,28 +136,28 @@ Model calls: search_web("React client-side XSS CVE 2026")
 
 The model continuously cycles through these phases until it has sufficient information:
 
-1. **🤔 THINK**: Analyze current knowledge gaps and determine what information is missing
-2. **🔍 ACT**: Search the web or fetch specific URLs to gather relevant content
-3. **📊 EVALUATE**: Assess the quality and completeness of the information retrieved
-4. **❓ DECIDE**: Determine if more research is needed or if enough context has been gathered
-5. **🔄 ITERATE**: If gaps remain, return to step 1 with refined focus and more specific queries
-6. **✅ SYNTHESIZE**: Once sufficient information is gathered, compile and present the final answer
+1. **THINK**: Analyze current knowledge gaps and determine what information is missing
+2. **ACT**: Search the web or fetch specific URLs to gather relevant content
+3. **EVALUATE**: Assess the quality and completeness of the information retrieved
+4. **DECIDE**: Determine if more research is needed or if enough context has been gathered
+5. **ITERATE**: If gaps remain, return to step 1 with refined focus and more specific queries
+6. **SYNTHESIZE**: Once sufficient information is gathered, compile and present the final answer
 
 This cycle repeats autonomously until the model has comprehensive, verified information to answer your question with high confidence.
 
 ### Key Advantages
 
-**🎯 Adaptive Precision**: The model doesn't just search once and accept whatever results appear. Instead, it continuously refines its search strategy based on what it discovers. If initial broad searches return surface-level information, the model automatically pivots to more specific technical terms, product names, version numbers, or specialized terminology. Each iteration becomes progressively more targeted, drilling down from general concepts to specific details, ensuring the final answer is both comprehensive and precise.
+**Adaptive Precision**: The model doesn't just search once and accept whatever results appear. Instead, it continuously refines its search strategy based on what it discovers. If initial broad searches return surface-level information, the model automatically pivots to more specific technical terms, product names, version numbers, or specialized terminology. Each iteration becomes progressively more targeted, drilling down from general concepts to specific details, ensuring the final answer is both comprehensive and precise.
 
-**🔗 Deep Link Following & Discovery**: Unlike traditional RAG systems that only use search result snippets, the model can read full pages when snippets aren't sufficient. Even more powerfully, **when the model uses `fetch_url` to read a page, it can discover and follow new URLs mentioned within that content**. For example, if a fetched page references a technical specification document, an official changelog, or a related research paper, the model can autonomously call `fetch_url` again on those discovered URLs to dive even deeper. This creates a natural "web browsing" behavior where the model follows citation chains, explores linked resources, and builds a comprehensive understanding by reading multiple interconnected sources, just like a human researcher would.
+**Deep Link Following & Discovery**: Unlike traditional RAG systems that only use search result snippets, the model can read full pages when snippets aren't sufficient. Even more powerfully, **when the model uses `fetch_url` to read a page, it can discover and follow new URLs mentioned within that content**. For example, if a fetched page references a technical specification document, an official changelog, or a related research paper, the model can autonomously call `fetch_url` again on those discovered URLs to dive even deeper. This creates a natural "web browsing" behavior where the model follows citation chains, explores linked resources, and builds a comprehensive understanding by reading multiple interconnected sources, just like a human researcher would.
 
-**✅ Fact Verification & Cross-Referencing**: The model can autonomously verify information by cross-referencing multiple independent sources. If one source makes a claim, the model can search for corroborating evidence from authoritative sources, compare version numbers across official documentation, or validate facts against primary sources. This multi-source verification significantly reduces hallucination and increases answer reliability, as the model builds confidence by finding consistent information across diverse, credible sources.
+**Fact Verification & Cross-Referencing**: The model can autonomously verify information by cross-referencing multiple independent sources. If one source makes a claim, the model can search for corroborating evidence from authoritative sources, compare version numbers across official documentation, or validate facts against primary sources. This multi-source verification significantly reduces hallucination and increases answer reliability, as the model builds confidence by finding consistent information across diverse, credible sources.
 
-**🧩 Intelligent Gap Filling**: If initial search results miss key information or only partially address the question, the model identifies these gaps and automatically conducts follow-up searches with different terms, alternative phrasings, or more specific queries. For example, if searching for "React performance issues" doesn't yield information about a specific optimization technique, the model might refine its search to "React useMemo optimization" or "React.memo vs useMemo comparison" to fill the knowledge gap. This ensures comprehensive coverage of complex topics that might require multiple search angles.
+**Intelligent Gap Filling**: If initial search results miss key information or only partially address the question, the model identifies these gaps and automatically conducts follow-up searches with different terms, alternative phrasings, or more specific queries. For example, if searching for "React performance issues" doesn't yield information about a specific optimization technique, the model might refine its search to "React useMemo optimization" or "React.memo vs useMemo comparison" to fill the knowledge gap. This ensures comprehensive coverage of complex topics that might require multiple search angles.
 
-**🌐 Multi-Source Synthesis**: The model doesn't just return information from a single source. It synthesizes insights from multiple web pages, documentation sites, forums, and articles into a coherent, well-rounded answer. This synthesis provides broader context, acknowledges different perspectives, and presents a more complete picture than any single source could provide.
+**Multi-Source Synthesis**: The model doesn't just return information from a single source. It synthesizes insights from multiple web pages, documentation sites, forums, and articles into a coherent, well-rounded answer. This synthesis provides broader context, acknowledges different perspectives, and presents a more complete picture than any single source could provide.
 
-**📚 Context-Aware Source Selection**: The model intelligently decides whether to rely on search snippets (when they contain sufficient information) or to fetch full pages (when deeper detail is needed). It can also determine when to stop researching, avoiding unnecessary tool calls while ensuring thoroughness. This balance between efficiency and comprehensiveness makes agentic search both fast and reliable.
+**Context-Aware Source Selection**: The model intelligently decides whether to rely on search snippets (when they contain sufficient information) or to fetch full pages (when deeper detail is needed). It can also determine when to stop researching, avoiding unnecessary tool calls while ensuring thoroughness. This balance between efficiency and comprehensiveness makes agentic search both fast and reliable.
 
 This iterative loop of **Thought → Action → Thought** continues until the model has sufficient information to answer your request with maximum accuracy.
 

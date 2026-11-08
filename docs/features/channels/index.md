@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Channels
 
 <ThemedImage
-  alt="Channels: a shared #product-launch channel where people and AI models talk in one timeline, summoned with @model mentions"
+  alt="Channels: three lanes with one block travelling along the middle lane"
   sources={{
     light: useBaseUrl('/images/banners/channels-light.svg'),
     dark: useBaseUrl('/images/banners/channels-dark.svg'),
@@ -49,12 +49,15 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 
 | | |
 | :--- | :--- |
-| 🤖 **`@model` tagging** | Summon any AI model into the conversation on demand |
-| 👥 **Shared context** | Every message, human or AI, builds the collective knowledge |
-| 🧵 **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
-| 📎 **File sharing** | Drop images, documents, and code. AI can see and process them |
-| 🔒 **Access control** | Public, private, group-based, and direct message channels |
-| 🧠 **AI channel awareness** | Models can search and synthesize across channels autonomously |
+| **`@model` tagging** | Summon any AI model into the conversation on demand |
+| **Shared context** | Every message, human or AI, builds the collective knowledge |
+| **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
+| **File sharing** | Drop images, documents, and code. AI can see and process them |
+| **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed and go out in order |
+| **Access control** | Public, private, group-based, and direct message channels |
+| **AI channel awareness** | Models can search and synthesize across channels autonomously |
+| **[Apps](/features/channels/apps)** | External services join channels, answer `@mentions` and post messages with buttons |
+| **[Encrypted chats](/features/channels/encrypted-chats)** | Temporary end-to-end encrypted conversations in direct messages and private groups, never saved on the server |
 
 ---
 
@@ -102,23 +105,41 @@ Mentioning a model in a channel runs through the same chat-completion pipeline a
 
 In other words, a channel-summoned model is a fully-equipped agent, not a one-shot completion.
 
-:::note Document attachments in channels (v0.9.6+)
-Before v0.9.6, tagging a model in a channel only forwarded **images** from the thread. Uploaded PDFs, DOCX, and other non-image documents were ignored, so summarization and document-comparison prompts silently had nothing to work with. As of v0.9.6 these files are forwarded the same way they are in a direct chat, so document workflows behave identically in channels.
-:::
-
 ### Tagging people and linking channels
 
-Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. Use `#channel-name` to create clickable cross-references between conversations.
+Use `@username` to notify teammates. The suggestion list puts the channel's own members first, then anyone else on the instance whose name matches what you typed, so you can still tag someone who is not in the channel. A tag notifies only people who can read the channel. Use `#channel-name` to create clickable cross-references between conversations.
+
+You can also type a mention out in full without picking from the list. When you paste or send, `@name` becomes a real mention if it matches the name of exactly one person, model or app, or a model's ID such as `@gpt-5.6`. `#name` becomes a channel link if it matches exactly one channel. Two matches with the same name need a pick from the list. Mentions pasted from another message keep pointing at the same person.
+
+Point at someone's profile picture next to their messages or in the channel's member list, or at an `@mention` of them, to open their profile card. It shows their name, online state, status, bio, groups, local time and when they were last active. Local time follows the time zone of the browser they last used Open WebUI in. Every signed-in user can open any other user's card, and the same details, plus email address and role, are available to them through the API.
 
 ### Message interactions
 
-Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation.
+Hover any message to react with emoji, pin it for reference, reply inline, or start a threaded side conversation. A thread opens beside the channel on screens at least 768 px wide, and over it on narrower ones.
+
+The **Search** button in the channel header searches the messages of that channel. The channel shows as a filter under the search box; remove it to search more widely.
+
+You can delete your own messages, and an admin can delete anyone's. Deleting a message that started a thread also deletes every reply in that thread, including replies other people wrote.
+
+If you can only read a channel, messages show no hover actions and the reactions under them cannot be clicked. The message box reads **You do not have permission to send messages in this channel.**
+
+### Muting a channel
+
+The **...** menu of a channel or direct message, in the sidebar or in the channel header, has a **Notifications** setting. **Mentions only** mutes it for you: the channel is dimmed in the sidebar and shows no unread count. Only a message that @mentions you still sends a pop-up, browser notification or [notification webhook](/features/chat-conversations/chat-features/notifications); the unread count stays hidden for it too. **All messages** turns it back on. The setting is per member, so muting a channel changes nothing for anyone else. See also your [inbox](/features/chat-conversations/chat-features/notifications#inbox).
+
+### Apps
+
+External services can also join a channel as [Apps](/features/channels/apps). An admin installs them in **Settings > Admin > Apps**; the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.
 
 ### Direct messages
 
 A direct message is a conversation between you and the people you pick, and there is one of them per set of participants. Start one from the **Message** button on someone's profile card in a channel, or from **(+)** in the sidebar's **Channels** section with **Channel Type** set to **Direct Message**. Messaging someone you have messaged before reopens the conversation you already have with them, with its history, instead of adding a second one beside it. A name is optional on a direct message; without one it is listed under the names of the other participants.
 
 Membership is measured against the accounts that still exist. When someone's account is deleted, they stop counting towards the conversation: they are gone from the member list and from the member count next to the people icon in the header, and the participants who remain still land back in that same conversation when they message each other again. Group channels count their members the same way. Nothing merges two conversations that already exist for the same set of people, so where a duplicate was created it stays in the sidebar alongside the original, with the messages that were sent in it.
+
+### Encrypted chats
+
+In a direct message or a private group channel, members with the **Encrypted Channels** permission can start a temporary [encrypted chat](/features/channels/encrypted-chats) from the conversation's **...** menu with **Encrypted Chat**. Messages are end-to-end encrypted in the browser and never stored on the server. An administrator turns this on in **Settings > Admin > General** (**Encrypted channels**) and grants the permission, which is off by default.
 
 ---
 
@@ -153,6 +174,8 @@ Channels must be enabled by an administrator before use.
 3. Channels appear in the sidebar. Click **(+)** to create your first one
 
 Creating a standard channel is restricted to administrators. Someone with the **Channels** permission ([`USER_PERMISSIONS_FEATURES_CHANNELS`](/reference/env-configuration#user_permissions_features_channels)) can create group channels and direct messages. Channels support granular permissions including read-only access, write access, and feature-level toggles via environment variables or group permissions.
+
+A standard channel's **Access** sets who can read or write in it: specific users, groups or every user of the instance. Only the channel's creator or an admin can change it, and only admins can open it to every user. Sharing with users or groups follows the [sharing permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions). Group channels and direct messages have no **Access** setting; their members decide who can read them.
 
 ---
 

@@ -35,7 +35,6 @@ Ensure you have:
 - **Tavily Account**: An account with an API key from [Tavily](https://app.tavily.com/sign-in).
 - **Admin Access**: Administrative access to your Open WebUI instance.
 - **Internet Connection**: Required for Tavily API requests.
-- **WEBUI_URL Environment Variable**: Configured to point to your Open WebUI instance. Refer to [Environment Variable Configuration](https://docs.openwebui.com/environment).
 
 ## Step-by-Step Configuration
 
@@ -50,8 +49,8 @@ Ensure you have:
 ### 2. Configure Open WebUI
 
 1. Log in to Open WebUI with an admin account.
-2. Click the **user icon** (bottom left) and select **Settings**.
-3. Go to the **Web Search** tab.
+2. Open the **Admin Panel** and go to **Settings**.
+3. Go to the **Web Search** tab under **Tools**.
 4. Enable **Web Search** by toggling it **On**.
 5. Select **tavily** from the **Web Search Engine** dropdown.
 6. Paste your Tavily API key into the **Tavily API Key** field.
@@ -70,14 +69,15 @@ Ensure you have:
 
 ## Optional Configurations
 
-- **Search Parameters**: Explore advanced options (e.g., domain filtering) in the [Tavily API Documentation](https://docs.tavily.com/docs/introduction).
+- **Search Parameters**: Open WebUI sends `query`, `max_results` and `search_depth` to Tavily. Set the depth under **Tavily Search Depth** (`ultra-fast`, `fast`, `basic` or `advanced`, default `basic`) or with [`TAVILY_SEARCH_DEPTH`](/reference/env-configuration#tavily_search_depth). Domain filtering is applied by Open WebUI's own **Domain Filter List** after the results return.
+- **Endpoint**: Requests go to `TAVILY_API_BASE_URL` plus `/search`, default `https://api.tavily.com`. The variable is read from the environment only and has no admin field.
 - **Environment Variables**: Set the `TAVILY_API_KEY` in your `.env` file or Docker command:
 
   ```bash
   -e TAVILY_API_KEY="your_tavily_api_key"
   ```
 
-  See [Environment Variable Configuration](https://docs.openwebui.com/environment).
+  See [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration).
 - **RAG Integration**: Combine Tavily results with local data using Retrieval Augmented Generation. Refer to [RAG Documentation](https://docs.openwebui.com/features/chat-conversations/rag).
 
 ## Troubleshooting
@@ -91,7 +91,7 @@ For further help, visit the [Open WebUI Community](https://openwebui.com/search)
 
 ## Additional Resources
 
-- [Tavily API Documentation](https://docs.tavily.com/docs/introduction): API reference and advanced options.
+- [Tavily API Documentation](https://docs.tavily.com/welcome): API reference and advanced options.
 - [Open WebUI Features](https://docs.openwebui.com/features): Details on RAG and web search.
 - [Contributing to Open WebUI](https://docs.openwebui.com/contributing): Share improvements or report issues.
 

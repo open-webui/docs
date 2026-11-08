@@ -7,13 +7,19 @@ title: "Notifications"
 
 Notifications send a webhook to somewhere you actually watch, such as Slack, Discord or your own endpoint, when something happens in Open WebUI that you care about. Each user sets up their own **targets** and chooses which events reach them, so a long answer, a channel message or a calendar alert can find you after you have moved on.
 
-Notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
+Webhook notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
 
-This is **outbound webhooks only**. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated, and handled by your browser.
+The [inbox](#inbox) in the sidebar needs no setup. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser. With **Notification Sound** on, **Notification sound style** picks the sound (**Chime**, the default, **Soft**, **Bell** or **Tap**), and the play button next to it previews it. Clicking a browser notification focuses Open WebUI and opens the chat, channel or calendar.
 
-:::note "Always Play Notification Sound" no longer has a toggle
-A separate **Always Play Notification Sound** setting used to sit under **Settings > Interface**. Its control is gone, but the setting is still honoured: if you had it switched on, sounds keep playing always rather than only when you are away, and there is currently no way to switch it back off from the interface.
+:::note "Always Play Notification Sound" has no toggle
+If **Always Play Notification Sound** was switched on for your account, sounds play even while you are active, and the interface has no control to switch it off.
 :::
+
+## Inbox
+
+The bell button at the top of the sidebar opens your inbox and shows a badge with the number of entries that arrived since you last opened it. It lists comments on your items, replies to your comments and mentions in comments; mentions and replies in channels; failed runs of your automations, which open the run; and your calendar alerts. From a muted channel only mentions arrive. An entry only shows while you can still open the item it points to.
+
+The inbox is on for all users by default. Admins switch it off in **Admin Settings > General > Notifications** or with [`ENABLE_NOTIFICATIONS`](/reference/env-configuration#enable_notifications).
 
 ## Enabling Notifications
 
@@ -22,7 +28,7 @@ A separate **Always Play Notification Sound** setting used to sit under **Settin
 | [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) | **Settings > Admin > General**, the **User Webhooks** toggle |
 | The `features.webhooks` permission ([`USER_PERMISSIONS_FEATURES_USER_WEBHOOKS`](/reference/env-configuration#user_permissions_features_user_webhooks), default: off) | **Admin Panel > Users > Groups > Permissions** |
 
-Admins always hold the permission. While the feature is off, the endpoints report the feature as absent rather than forbidden, so it stays hidden rather than looking blocked.
+Admins always hold the permission. While the feature is off, the notification endpoints answer `404 Not Found`, so the feature looks absent.
 
 ## Targets
 
@@ -34,26 +40,28 @@ Each target has:
 - **Events** it subscribes to.
 - **Enabled**, to pause a target without deleting it.
 - **Automatic Delivery**, either `away` or `always`.
+- **Target ID for notify**, the name the `notify` tool uses to pick this target. Left empty, it becomes the webhook's host name. It is saved in lowercase. Each run of characters other than letters, digits, `_` and `-` becomes a single `-`, so `Work/Slack` is saved as `work-slack`.
 
 Use **Send Test** to fire a test notification and confirm the endpoint works.
 
 ### Events
 
-Four events can be subscribed to:
+Five events can be subscribed to:
 
 | Event | Fires when |
 |---|---|
 | `chat.finished` | A chat response finishes generating. |
-| `chat.failed` | A chat response fails. |
-| `channel.message` | A message arrives in a channel you receive notifications for. |
+| `chat.failed` | A chat response ends in an error, including when the model provider returns an error status or cannot be reached. The notification carries the error text and a link to the chat. |
+| `channel.message` | A person or a bot account posts a message in a channel you belong to, group channels and direct messages included. You belong to a standard channel once you have opened or posted in it. |
 | `calendar.alert` | A calendar event alert triggers. |
+| `automation.run_failed` | One of your [automations](/features/chat-conversations/chat-features/automations) fails, on a schedule or when run by hand. The notification carries the automation name and the error. |
 
 ### Delivery: away or always
 
 - **`away`** (the default) only sends when you are **not currently active**, so you are not pinged about things you are already watching. You count as active if you have used Open WebUI in roughly the last three minutes.
 - **`always`** sends regardless.
 
-`channel.message` is the exception: it does not check activity and is delivered either way, since a message from someone else is worth having even while you are online.
+`channel.message` is the exception: it ignores the delivery mode and is sent only while you have no Open WebUI tab open. In a channel set to [**Mentions only**](/features/channels#muting-a-channel), only messages that @mention you are sent.
 
 ## The `notify` Tool
 
@@ -66,15 +74,6 @@ A notification the model sends goes to an enabled target whether or not that tar
 :::
 
 Pairing this with [Timers](/features/chat-conversations/chat-features/timers) is the usual way to be told about something later: the timer fires a prompt back into the chat, and the model calls `notify` when it has an answer.
-
-## Upgrading From the Old Notification Webhook
-
-Earlier versions had a single **Notification Webhook** URL under **Settings > Account** that fired on chat responses. That field is replaced by targets, and an existing URL is **migrated automatically** into a target subscribed to all four events, so notifications keep arriving without any action.
-
-Two changes are worth knowing about:
-
-- Channel and calendar notifications are no longer sent straight from those features. They now flow through the notification system, so a target's event subscriptions and delivery mode decide whether they reach you.
-- Notification settings now live in **Settings > Notifications** rather than **Settings > Account**.
 
 ## Managing Notifications from Chat
 

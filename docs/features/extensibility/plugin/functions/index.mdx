@@ -5,7 +5,7 @@ title: "Functions"
 
 # Functions
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
@@ -39,7 +39,7 @@ A Pipe registers itself as a new "model" in Open WebUI. When a user selects it a
 
 A single Pipe can also expose **multiple models** (called a "manifold") by defining a `pipes()` method that returns a list of `{"id": ..., "name": ...}` dictionaries, one per model.
 
-→ **[Pipe Function Guide](./pipe)**
+→ **[Pipe Function Guide](/features/extensibility/plugin/functions/pipe)**
 
 ### Filter Functions
 
@@ -53,7 +53,7 @@ Filters enable powerful cross-cutting concerns like real-time translation, conte
 
 Filters can be applied globally (to all models) or attached to specific models. Toggleable filters let users enable/disable them per-chat.
 
-→ **[Filter Function Guide](./filter)**
+→ **[Filter Function Guide](/features/extensibility/plugin/functions/filter)**
 
 ### Action Functions
 
@@ -61,7 +61,7 @@ An Action adds a custom button to the chat message toolbar. When a user clicks i
 
 Actions can do anything Python can do: summarize or translate a message, copy formatted output, pin important messages, export conversations to external systems, trigger a CI/CD pipeline, send a Slack notification, generate a PDF report, run a code snippet, or kick off an external workflow.
 
-→ **[Action Function Guide](./action)**
+→ **[Action Function Guide](/features/extensibility/plugin/functions/action)**
 
 ### Event Functions
 
@@ -69,7 +69,7 @@ Actions can do anything Python can do: summarize or translate a message, copy fo
 
 An Event function runs custom Python in response to **system events** (a user signs up, a chat is deleted, the server starts, configuration changes). Its `event()` method is called for every event and filters on the event name. Event functions can register their own API endpoints and call internal services, which suits them to lifecycle automation, audit logging, signup gating, provisioning, and self-installing plugins.
 
-→ **[Event Function Guide](./event)**
+→ **[Event Function Guide](/features/extensibility/plugin/functions/event)**
 
 ---
 
@@ -93,16 +93,14 @@ class Filter:
 
 ### Module Loading & Caching
 
-The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Four legacy prefixes are rewritten on the way in, `from utils`, `from apps`, `from main` and `from config`, each gaining an `open_webui.` prefix. The rewrite is a plain text replacement over the whole file, so those strings are also changed inside docstrings and prompt text, and the rewritten source is saved back to the database.
+The Python source code is loaded via `exec()` into a temporary module namespace. Once loaded, the module is cached in memory (`request.app.state.FUNCTIONS`) and only reloaded when the source code changes. Four legacy prefixes are rewritten on the way in, `from utils`, `from apps`, `from main` and `from config`, each gaining an `open_webui.` prefix. The rewrite is a plain text replacement over the whole file, so those strings are also changed inside docstrings and prompt text. Creating or saving a function stores the rewritten source. Loading a function applies the rewrite to the code it runs and leaves the stored source as it is.
 
 ### When a Function Fails to Load
 
-If the code raises while it is being executed, Open WebUI switches the function to **inactive** rather than leaving it to fail on every request. That covers a syntax error, an `import` that fails, an exception raised while the class is constructed and a file with no `Pipe`, `Filter`, `Action` or `Event` class in it. A failed `requirements` install is separate: it rejects the save and leaves the function's state alone.
+A function fails to load when its code raises while it is being executed: a syntax error, an `import` that fails, an exception raised while the class is constructed or a file with no `Pipe`, `Filter`, `Action` or `Event` class in it.
 
-- **Saving over an existing function** executes the code before storing it. The save is rejected and your new source is never written, so what ends up deactivated is the version already in the database. The browser only shows a generic error, the Python error goes to the server log as `Error loading module: <function id>: <the error>`.
-- **Outside the editor**, the same execution happens every time the module is loaded again, so a function can turn itself off with nobody touching it in the admin panel. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart.
-
-Fix the code, then switch the function back on in **Admin Panel > Functions**.
+- **Saving in the editor** executes the new code before storing it. Code that fails to load is refused: the Python error shows in the editor, the new source is not written and the version already saved stays active and keeps running. Fix the code and save again. A failed `requirements` install is refused the same way.
+- **Outside the editor**, the code is executed again every time the module is loaded, for example after a restart. When that fails, Open WebUI switches the function to **inactive** to keep it from failing on every request, and logs `Error loading module: <function id>: <the error>`. A package that was installed into the container by hand and never added to `requirements` is the usual cause, since it is gone after a restart. Fix the code, then switch the function back on in **Admin Panel > Functions**.
 
 ### Frontmatter
 
@@ -152,7 +150,7 @@ Always review the source code before importing. Community functions are user-con
 ### From a URL
 
 1. Go to **Admin Panel > Functions**.
-2. Click **Import From Link** and paste a link to the Python file.
+2. Click **Import from URL** and paste a link to the Python file.
    - GitHub URLs are automatically converted to raw file URLs.
 3. Review and save.
 
@@ -170,14 +168,28 @@ Always review the source code before importing. Community functions are user-con
 
 ### Admin Controls
 
-Functions are managed from **Admin Panel > Functions**. Each function has the following controls:
+Functions are managed from **Admin Panel > Functions**. The page is hidden when [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) is set to `False`. Each function has the following controls:
 
 | Control | Description |
 |:--------|:-----------|
 | **Active toggle** | Enables or disables the function. Disabled functions are not loaded or executed. |
 | **Global toggle** | When enabled, the function applies to **all models** automatically. Available for Filters and Actions. |
-| **Valves** (⚙️ gear icon) | Opens the admin-configurable settings for this function. |
+| **Valves** (gear icon) | Opens the admin-configurable settings for this function. |
 | **Export / Delete** | Export the function as a file or remove it. |
+
+### Version history
+
+Functions keep a version history that works like the one for tools: the version picker next to **Back**, **Compare to current**, **Set as Production** and **Delete**. See [Version history](/features/extensibility/plugin/tools#version-history) for the details. For functions:
+
+- Only admins can open and change versions.
+- **Production** is the version that is running.
+- Valves and the **Active** and **Global** switches belong to the function itself and keep their current values when you change versions. When the current Valves do not fit an older version's code, setting it as Production is refused with **Current Valves are incompatible with this code** and the running version stays in place.
+
+The same actions are available over the API, admin only: `GET /api/v1/functions/id/{id}/history` (paged with `?page=`), `GET /api/v1/functions/id/{id}/history/{history_id}`, `GET /api/v1/functions/id/{id}/history/diff?from_id=...&to_id=...`, `DELETE /api/v1/functions/id/{id}/history/{history_id}` and `POST /api/v1/functions/id/{id}/update/version` with `{"version_id": "..."}`. A save through `POST /api/v1/functions/id/{id}/update` accepts an optional `commit_message`.
+
+### Translating a function
+
+The globe selector in the function editor stores a name, a description, valve labels and per-action labels for each language, so an action button under a reply can read in the user's own language. See [Translations](/features/administration/translations).
 
 ### Assigning Functions to Specific Models
 
@@ -201,7 +213,7 @@ Functions support a two-tier configuration system built on [Pydantic](https://do
 
 | Level | Class Name | Who Configures | Where |
 |:------|:-----------|:---------------|:------|
-| **Admin** | `Valves` | Administrators only | Admin Panel > Functions > ⚙️ |
+| **Admin** | `Valves` | Administrators only | Admin Panel > Functions > |
 | **User** | `UserValves` | Any user | Chat interface, per-function |
 
 **Valves** are ideal for API keys, model endpoints, and global behavior settings. **UserValves** let individual users customize behavior (e.g., their preferred language, output format, or personal API key).
@@ -232,10 +244,10 @@ Both are defined as nested Pydantic `BaseModel` classes inside your `Pipe`, `Fil
 
 | Guide | Description |
 |:------|:-----------|
-| [Pipe Function Guide](./pipe) | Build custom models, agents, and non-LLM interfaces |
-| [Filter Function Guide](./filter) | Intercept, translate, moderate, and log messages |
-| [Action Function Guide](./action) | Add buttons for export, workflows, and interactive tasks |
-| [Event Function Guide](./event) | Run custom logic in response to system events |
+| [Pipe Function Guide](/features/extensibility/plugin/functions/pipe) | Build custom models, agents, and non-LLM interfaces |
+| [Filter Function Guide](/features/extensibility/plugin/functions/filter) | Intercept, translate, moderate, and log messages |
+| [Action Function Guide](/features/extensibility/plugin/functions/action) | Add buttons for export, workflows, and interactive tasks |
+| [Event Function Guide](/features/extensibility/plugin/functions/event) | Run custom logic in response to system events |
 | [Valves](/features/extensibility/plugin/development/valves) | Configure functions with admin and user settings |
 | [Events](/features/extensibility/plugin/development/events) | Send real-time updates to the UI |
 | [Reserved Arguments](/features/extensibility/plugin/development/reserved-args) | `__user__`, `__event_emitter__`, `__metadata__`, and more |

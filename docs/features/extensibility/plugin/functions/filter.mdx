@@ -5,13 +5,13 @@ title: "Filter Function"
 
 # Filter Function: Modify Inputs and Outputs
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Filter Functions execute arbitrary Python code on your server.** Function creation is restricted to administrators only. Only install from trusted sources and review code before importing. A malicious Function could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
 Welcome to the comprehensive guide on Filter Functions in Open WebUI! Filters are a flexible and powerful **plugin system** for modifying data *before it's sent to the Large Language Model (LLM)* (input) or *after it’s returned from the LLM* (output). Whether you’re transforming inputs for better context or cleaning up outputs for improved readability, **Filter Functions** let you do it all.
 
-This guide will break down **what Filters are**, how they work, their structure, and everything you need to know to build powerful and user-friendly filters of your own. Let’s dig in, and don’t worry, I’ll use metaphors, examples, and tips to make everything crystal clear! 🌟
+This guide will break down **what Filters are**, how they work, their structure, and everything you need to know to build powerful and user-friendly filters of your own. Let’s dig in, and don’t worry, I’ll use metaphors, examples, and tips to make everything crystal clear!
 
 ---
 
@@ -27,7 +27,7 @@ Filters sit in the middle of the flow (like checkpoints) where you decide what n
 Here’s a quick summary of what Filters do:
 
 1. **Modify User Inputs (Inlet Function)**: Tweak the input data before it reaches the AI model. This is where you enhance clarity, add context, sanitize text, or reformat messages to match specific requirements.
-2. **Modify Every Outgoing Call (Request Function)**: Adjust the payload immediately before it is handed to the model provider, every single time one is sent. Added in v0.11.2, and covered in [The `request` step](#the-request-step) below.
+2. **Modify Every Outgoing Call (Request Function)**: Adjust the payload immediately before it is handed to the model provider, every single time one is sent. Covered in [The `request` step](#the-request-step) below.
 3. **Intercept Model Outputs (Stream Function)**: Capture and adjust the AI’s responses **as they’re generated** by the model. This is useful for real-time modifications, like filtering out sensitive information or formatting the output for better readability.
 4. **Modify Model Outputs (Outlet Function)**: Adjust the AI's response **after it’s processed**, before showing it to the user. This can help refine, log, or adapt the data for a cleaner user experience.
 
@@ -81,7 +81,7 @@ class Filter:
 
 ### The `request` step
 
-`request` was added in **v0.11.2**. It receives the payload that is about to be sent to the model provider, and whatever it returns is what gets sent.
+`request` receives the payload that is about to be sent to the model provider, and whatever it returns is what gets sent.
 
 ```python
     async def request(self, body: dict, __user__: Optional[dict] = None) -> dict:
@@ -93,7 +93,7 @@ class Filter:
 
 `inlet` runs **once per user turn**. `request` runs **once per call to the model**, and those are not the same number.
 
-A turn that uses tools makes several calls: one to decide which tool to use, then another after each set of tool results comes back, until the model produces a final answer. `inlet` saw only the first of those. `request` runs before every one of them, including the call made after a tool run the user had to approve.
+A turn that uses tools makes several calls: one to decide which tool to use, then another after each set of tool results comes back, until the model produces a final answer. `inlet` saw only the first of those. `request` runs before every one of them, including the call made after a tool run the user had to approve. After an approval, `request` filters run before the approved tool executes, so a filter can still reject the request before the tool has any effect.
 
 That difference decides which one you want:
 
@@ -109,9 +109,9 @@ Something added in `inlet` reaches the first call and can be dropped from later 
 
 `inlet` runs near the start of the turn; `request` runs at the end, on the payload as it is about to leave. Everything the pipeline does happens between them, and that changes what is in the `body` you receive.
 
-**Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `variables`, `tool_ids`, `terminal_id`, `files`, `folder_id`, `skill_ids` and `regeneration_prompt`. A filter that needs any of these has to be an `inlet`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
+**Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `tool_ids`, `terminal_id`, `files`, `folder_id` and `skill_ids`. A filter that needs any of these has to be an `inlet`. `variables`, `regeneration_prompt` and `params` are popped even earlier, before `inlet` runs, and `variables` stays readable as `__metadata__["variables"]`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
 
-**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the applied system prompt, and memory or web-search context. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
+**Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the chat's own system message and the folder system prompt (the workspace model's own System Prompt is added by the provider router after `request` returns), and web-search context, plus memory context on Legacy function calling. With Native function calling, recalled memories, the skills list and the attached knowledge list are added as hidden tool results after `inlet` and the first `request` call, so `inlet` never sees them and `request` sees them as tool messages from the second call of a reply on. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
 
 Provider-shape normalization happens after `request` returns, so you still see Open WebUI's internal message shapes, not the provider's.
 
@@ -128,10 +128,15 @@ async def request(self, body: dict) -> dict:
 # RIGHT: converges to the same body no matter how many times it runs.
 async def request(self, body: dict) -> dict:
     marker = "Be concise."
-    if not any(m.get("content") == marker for m in body["messages"]):
+    if not any(
+        m.get("role") == "system" and marker in str(m.get("content", ""))
+        for m in body["messages"]
+    ):
         body["messages"].insert(0, {"role": "system", "content": marker})
     return body
 ```
+
+Check whether a system message **contains** your text, not whether one equals it. Before each call to the model, Open WebUI merges all system messages into one, so on the next hop your line is part of a longer message whenever the chat has another system message, such as the chat's own system prompt or a folder's, or one added by another filter. An equality check misses it there and adds the line again on every hop.
 
 Transformations that are naturally idempotent (clamping a value, downscaling an image that is already under the limit, redacting a pattern that no longer matches) need no guard. Anything that appends, prepends, increments or accumulates does. If a once-per-turn guarantee is what you actually want, that is what `inlet` is for.
 
@@ -139,7 +144,7 @@ Transformations that are naturally idempotent (clamping a value, downscaling an 
 
 `request` runs on every provider call, so anything expensive in it is paid for repeatedly inside a single answer. Because each call re-scans the full history, cost grows with both conversation length and tool-call count. Cache on a content hash if the work is heavy.
 
-Raising from `request` aborts the whole completion, exactly as it does from `outlet` and `stream`. Only `inlet` failures are logged at debug level and otherwise treated gently; every other filter type re-raises and the call site turns it into a failed turn. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
+What a raised exception does depends on the hook. From `inlet`, or from the first `request` call of a turn, it aborts the turn. From `request` on a later tool-loop hop it ends the loop with an error while what was already streamed stays. From `stream` it drops that one event in the WebUI path, but ends the whole stream for a direct API streaming caller. From `outlet` it is logged at debug level and otherwise ignored, except through `/api/chat/completed`, where it becomes an HTTP 400. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
 
 `file_handler` has no effect on a `request` filter; see [the note below](#owning-retrieval-with-file_handler).
 
@@ -151,7 +156,7 @@ Raising from `request` aborts the whole completion, exactly as it does from `out
 
 By default a filter that's **active and in scope** (global, or attached to the model) runs on every request. The user has no say in it. That's often what you want (PII scrubbing, logging, mandatory guardrails). Sometimes you want the opposite: let the user decide whether the filter runs for a given conversation.
 
-Set `self.toggle = True` to make the filter **user-controllable**. The filter then shows up in the chat UI with a clickable chip + an entry in the Integrations menu, and only runs on requests where the user has it selected.
+Set `self.toggle = True` to make the filter **user-controllable**. The filter then shows up as a switch in the chat input's **+** menu, and only runs on requests where the user has it selected.
 
 ```python
 from pydantic import BaseModel, Field
@@ -186,52 +191,47 @@ class Filter:
 
 It is a **visibility / gating flag**, read once at request-dispatch time, **not** a runtime state the UI flips on your Python object. Specifically:
 
-- **Visibility:** the filter only appears in the chat UI (inline chip + Integrations menu entry) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
+- **Visibility:** the filter only appears in the chat UI (the **+** menu entry and its chip) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
 - **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `request()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
 - **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__`, which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
 
 :::warning Upgrading from pre-0.9.0 filters
-Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally. The user controls whether `inlet()` runs by selecting/deselecting the chip. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; clicking the chip opens the user's valves modal automatically.
+Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally. The user controls whether `inlet()` runs by switching the filter on or off. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; the user opens it from the filter's **Valves** button.
 :::
 
 #### How users interact with a toggleable filter
 
-When a toggleable filter is in scope for the current chat, two UI surfaces show up:
+When a toggleable filter is in scope for the current chat, it shows up in two places:
 
-- **Inline chip in the chat input bar.** Shows the filter's `self.icon` + name. Clicking it:
-  - **opens the user-valves modal** if the filter defines a `UserValves` class (so the user can tune per-chat settings), **otherwise**
-  - **removes the filter from the current selection** for this chat session (the chip disappears from the inline row).
-- **Integrations menu (⚙️ icon).** Lists every toggleable filter in scope, each with a proper on/off **Switch**. This is where users re-enable a filter they removed from the chip row, or switch one off that was selected by default.
+- **The + menu in the chat input.** Lists every toggleable filter in scope with its `self.icon`, name and an on/off **Switch**. A filter that defines a `UserValves` class also gets a **Valves** button there.
+- **A chip beside the + button**, only while the user has **Show Input Selections** on in **Settings > Interface** (off by default). It shows for each selected filter. Clicking it opens the user-valves modal if the filter defines `UserValves`, otherwise it removes the filter from the selection; the **x** on hover always removes it.
 
-The chip being present = the filter is enabled for the next request. The chip being absent (but the filter is in the Integrations menu) = the user has turned it off.
+A filter whose switch is on runs on the next request.
 
 #### Where the selection lives
 
 - Stored in the browser as **sessionStorage draft state**, keyed per chat.
 - Survives page reloads in the same browser session but is **not persisted to the chat record on the server**.
-- Initial state comes from the model's `defaultFilterIds` (Settings > Admin > Models → Edit the model → Default Filters). Admins decide which toggleable filters start **on** vs **off** per model.
-- Resets when the user switches to a different model.
+- Initial state comes from the model's `defaultFilterIds` (Settings > Admin > Models → Edit the model → **Filters** → **Start enabled in new chats**). Admins decide which toggleable filters start **on** vs **off** per model.
+- Switching models applies the new model's default filters and keeps the ones the user turned on or off.
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
 
-`self.icon` continues to work as before: pass a URL (strongly preferred) or a base64 data URI, and it renders in both the inline chip and the Integrations menu entry. See the [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example-specifying-action-frontmatter) for why hosted URLs are recommended over base64.
+`self.icon` takes a URL (strongly preferred) or a base64 data URI and renders in both the **+** menu entry and the chip. See the [Action Function icon_url warning](/features/extensibility/plugin/functions/action#example-specifying-action-frontmatter) for why hosted URLs are recommended over base64.
 
 ---
 
 ### Owning Retrieval With file_handler
 
-By default, when a user attaches a knowledge collection or uploads a file to a chat, Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
+When a user attaches a knowledge collection or uploads a file to a chat and the model's **Preload files** capability is on (the default with Legacy function calling), Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
 
 This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file/collection *references* (IDs, names, types). **The chunk text doesn't exist yet**: retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough. The data you want isn't there yet.
 
-**`file_handler = True`** is the opt-in escape hatch for exactly this case. Declared as a **module-level attribute** at the top of your filter file, it tells Open WebUI "I am handling retrieval and chunk injection myself, skip the built-in RAG step." When set, the backend strips `body["metadata"]["files"]` and `body["files"]` after your `inlet()` returns, so the chat-completion handler finds no files to retrieve over and goes straight to the LLM with whatever you injected.
+**`file_handler = True`** is the opt-in escape hatch for exactly this case. Declared on the `Filter` instance, as `self.file_handler = True` in `__init__` or as a class attribute, it tells Open WebUI "I am handling retrieval and chunk injection myself, skip the built-in RAG step." When set, the backend strips `body["metadata"]["files"]` and `body["files"]` after your `inlet()` returns, so the chat-completion handler finds no files to retrieve over and goes straight to the LLM with whatever you injected.
 
 ```python
 from pydantic import BaseModel
 from typing import Optional
-
-# Module-level attribute, sits OUTSIDE the Filter class, alongside imports.
-file_handler = True
 
 class Filter:
     class Valves(BaseModel):
@@ -239,6 +239,8 @@ class Filter:
 
     def __init__(self):
         self.valves = self.Valves()
+        # Read from the instance before each inlet() call.
+        self.file_handler = True
 
     async def inlet(
         self,
@@ -253,8 +255,8 @@ class Filter:
         return body
 ```
 
-:::warning Module attribute, not `self.file_handler`
-Open WebUI reads `file_handler` from the **module object** (the file your filter lives in), not from the `Filter` instance. Setting `self.file_handler = True` inside `__init__` is silently ignored. Put the assignment at the top of the file, alongside your imports, exactly as shown above.
+:::warning Instance attribute, not a module-level variable
+Open WebUI reads `file_handler` from the `Filter` instance, the same way it reads `toggle` and `icon`. A bare `file_handler = True` at the top of the file is silently ignored. Set `self.file_handler = True` in `__init__`, or declare it as a class attribute, exactly as shown above.
 :::
 
 :::note `file_handler` applies to `inlet` only
@@ -289,7 +291,7 @@ The flag is read exclusively on the `inlet` pass, and the file references are st
 
 #### Caveat: it's static, all-or-nothing per filter
 
-`file_handler` is read **once per filter, at the module level**. It is not a per-request signal and cannot be flipped based on the model, user, or chat from inside `inlet()`. When set, the built-in RAG is **always** skipped for any request where this filter is invoked, regardless of whether your `inlet()` actually called any retrieval logic on that particular request.
+`file_handler` is read from the cached `Filter` instance before each `inlet()` call. It is not a per-request signal: a value changed inside `inlet()` applies from the next request, not the one being processed, and it cannot be flipped based on the model, user, or chat of the current request. When set, the built-in RAG is **always** skipped for any request where this filter is invoked, regardless of whether your `inlet()` actually called any retrieval logic on that particular request.
 
 In practice this means: if you use `file_handler = True`, your filter must handle retrieval for **every** scenario where files would normally be retrieved by the built-in path, including the cases where you'd have been happy with the default behavior. The retrieval call itself is identical in both cases; only any conditional *transformation* (e.g. "only redact for remote models") branches on context.
 
@@ -313,10 +315,10 @@ Filters can exist in one of four states, controlled by two boolean flags in the 
 
 | State | `is_active` | `is_global` | Effect |
 |-------|------------|------------|--------|
-| **Globally Enabled** | ✅ `True` | ✅ `True` | Applied to **ALL** models automatically, cannot be disabled per-model |
-| **Globally Disabled** | ❌ `False` | `True` | Not applied anywhere; even though the filter is globally enabled, the filter itself is disabled |
-| **Model-Specific** | ✅ `True` | ❌ `False` | Only applied to models where the admin explicitly enables it |
-| **Inactive** | ❌ `False` | `False` | Not applied anywhere, even if filter is enabled for a model by the admin; the filter itself is turned off |
+| **Globally Enabled** | `True` | `True` | Applied to **ALL** models automatically, cannot be disabled per-model |
+| **Globally Disabled** | `False` | `True` | Not applied anywhere; even though the filter is globally enabled, the filter itself is disabled |
+| **Model-Specific** | `True` | `False` | Only applied to models where the admin explicitly enables it |
+| **Inactive** | `False` | `False` | Not applied anywhere, even if filter is enabled for a model by the admin; the filter itself is turned off |
 
 :::tip Global Filter Behavior
 When a filter is set as **Global** (`is_global=True`) and **Active** (`is_active=True`), it becomes **force-enabled** for all models:
@@ -327,14 +329,14 @@ When a filter is set as **Global** (`is_global=True`) and **Active** (`is_active
 
 #### Admin Panel: Making a Filter Global
 
-**Location:** Admin Panel > Functions > Filter Management
+**Location:** Admin Panel > Functions
 
 To make a filter global:
 1. Navigate to the Admin Panel
 2. Click on **Functions** in the sidebar
 3. Find your filter in the list
 4. Click the **three-dot menu (⋮)** next to the filter
-5. Click the **🌐 Globe icon** to toggle `is_global`
+5. Flip the **Global** switch in that menu
 6. Ensure the filter is also **Active** (green toggle switch)
 
 **API Endpoint:**
@@ -343,8 +345,8 @@ POST /api/v1/functions/id/{filter_id}/toggle/global
 ```
 
 **Visual Indicators:**
-- 🟢 Green toggle = `is_active=True` (filter is active)
-- 🌐 Highlighted globe icon = `is_global=True` (applies to all models)
+- Green toggle = `is_active=True` (filter is active)
+- The list itself does not show whether a filter is global. Open the ⋮ menu to read the **Global** switch.
 
 ---
 
@@ -354,14 +356,14 @@ Open WebUI uses a sophisticated two-tier system for managing filters on a per-mo
 
 #### Tier 1: FiltersSelector (Which filters are available?)
 
-**Location:** Model Settings → Filters → "Filters" Section
+**Location:** Model Settings → **Filters** row
 
 This controls which filters are **available** for a specific model.
 
 **Behavior:**
-- Shows **all** filters (both global and model-specific)
-- **Global filters** appear as checked and disabled (can't be unchecked)
-- **Regular filters** can be toggled on/off
+- Opens a searchable picker with **all** filters (both global and model-specific)
+- **Global filters** are marked **Global** and cannot be clicked
+- **Regular filters** are added or removed with a click
 - Saves to: `model.meta.filterIds` in the database
 
 **Example:**
@@ -375,9 +377,9 @@ This controls which filters are **available** for a specific model.
 
 #### Tier 2: DefaultFiltersSelector (Which toggleable filters start enabled?)
 
-**Location:** Model Settings → Filters → "Default Filters" Section
+**Location:** Model Settings → **Filters** row → **Start enabled in new chats** switch
 
-This section **only appears** when at least one toggleable filter is selected (or is global).
+The switch appears below each toggleable filter that is selected or global.
 
 **Purpose:** Controls which toggleable filters are **enabled by default** for new chats.
 
@@ -424,8 +426,8 @@ Understanding the difference between these two types is key to using the filter 
 **Characteristics:**
 - Run automatically whenever the filter is active for a model
 - **No user control** in the chat interface
-- Do **not** appear in the "Default Filters" section
-- Do **not** show up in the chat integrations menu (⚙️ icon)
+- Have no **Start enabled in new chats** switch in the model's **Filters** row
+- Do **not** show up in the chat input's **+** menu
 
 **Use Cases:**
 - **Content moderation**: Filter profanity, hate speech, or inappropriate content
@@ -455,9 +457,9 @@ class ContentModerationFilter:
 #### Toggleable Filters (`toggle=True`)
 
 **Characteristics:**
-- Appear in the **chat input bar as a clickable chip** and in the **Integrations menu (⚙️ icon) as a Switch**.
+- Appear in the chat input's **+** menu as a **Switch**, and as a chip beside the **+** button while **Show Input Selections** is on.
 - Users can add or remove them from the active selection on a per-chat, per-session basis. Selection is stored in browser sessionStorage, not persisted to the chat record on the server.
-- **Do** appear in the model's "Default Filters" configuration.
+- Get a **Start enabled in new chats** switch in the model's **Filters** row.
 - `defaultFilterIds` on the model controls the **initial selection** (which toggleable filters start on when a new chat begins with that model).
 - `self.toggle` itself is **never mutated at runtime**: it's a visibility/gating flag read once at request dispatch. `inlet()` only runs when the filter is currently selected; there is no "else" branch to write inside the filter. See [the detailed note above](#what-selftoggle--true-actually-does).
 
@@ -467,7 +469,7 @@ class ContentModerationFilter:
 - **Verbose/detailed mode**: User toggles between concise and detailed responses
 - **Translation filters**: User enables translation to/from specific languages
 - **Code formatting**: User chooses when to apply syntax highlighting or linting
-- **Thinking/reasoning toggle**: User switches the underlying model's thinking mode on/off by enabling the filter (do the work unconditionally in `inlet()`; the user disables it by removing the chip)
+- **Thinking/reasoning toggle**: User switches the underlying model's thinking mode on/off by enabling the filter (do the work unconditionally in `inlet()`; the user disables it with its switch)
 - **Markdown rendering**: Toggle between raw text and formatted output
 - **Anonymization mode**: User enables when discussing sensitive topics
 - **Expert mode**: Inject domain-specific context (legal, medical, technical)
@@ -493,15 +495,14 @@ class WebSearchFilter:
 
 **Where Toggleable Filters Appear:**
 
-1.  **Model Settings → Default Filters**
-    - Admin picks which toggleable filters start in the selection on new chats with that model.
-2.  **Chat input bar → Inline chip**
-    - Shown for every toggleable filter currently in the user's selection for this chat.
-    - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection** (it moves back to the Integrations menu where the user can re-enable it).
+1.  **Model Settings → Filters → Start enabled in new chats**
+    - Admin switches on the toggleable filters that start in the selection on new chats with that model.
+2.  **Chat input → + menu**
+    - Lists every toggleable filter in scope for the current model, each with an on/off **Switch**, and a **Valves** button when the filter defines `UserValves`.
+3.  **Chat input → chip beside the + button**
+    - Shown for every toggleable filter in the user's selection, only while **Show Input Selections** is on in **Settings > Interface**.
+    - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection**.
     - `self.icon` renders as the chip's image.
-3.  **Chat UI → Integrations Menu (⚙️ icon)**
-    - Lists every toggleable filter in scope for the current model, each with a proper on/off **Switch**.
-    - Used to re-enable a filter removed from the chip row, or to turn off a filter selected by default.
 
 ---
 
@@ -516,13 +517,13 @@ Here's the complete flow from admin configuration to filter execution:
 - Toggle is_global (apply to all models)
 
 **2. MODEL CONFIGURATION (Per-Model Filter Selection)**
-- Model Settings → Filters Section
-- FiltersSelector: Select which filters for this model
-- DefaultFiltersSelector: Set default enabled state (only for toggleable filters)
+- Model Settings → **Filters** row
+- Filters picker: Select which filters for this model
+- **Start enabled in new chats** switch: Set default enabled state (only for toggleable filters)
 
 **3. CHAT UI (User Interaction, Toggleable Filters Only)**
-- Chat input bar → Inline chip (add/remove via click; click opens UserValves modal if defined)
-- Chat → Integrations Menu (⚙️) → Switch per toggleable filter
+- Chat input → **+** menu → Switch per toggleable filter
+- Chat input → chip per selected filter, with **Show Input Selections** on (click opens UserValves modal if defined, otherwise removes the filter)
 - Frontend tracks `selectedFilterIds` in sessionStorage (per chat, per session)
 - Initial selection seeded from the model's `defaultFilterIds`
 - Always-on filters (no `self.toggle`) run automatically with no UI control
@@ -551,27 +552,23 @@ When using Open WebUI's API endpoints directly (e.g., via `curl` or external app
 
 #### Key Behavioral Differences
 
-| Function | WebUI Request | Direct API, stable (`main`) | Direct API, pre-release (`dev`) |
-|----------|--------------|------------------------------|-----------------------------------|
-| `inlet()` | ✅ Always called | ✅ Always called | ✅ Always called |
-| `request()` | ✅ Called before every provider call | ✅ Called before every provider call | ✅ Called before every provider call |
-| `stream()` | ✅ Called during streaming | ✅ Called during streaming | ✅ Called during streaming |
-| `outlet()` | ✅ Called after response | ❌ Not called by `/api/chat/completions`, only by `/api/chat/completed` | ✅ Runs by default for API callers, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
-| `__event_emitter__` | ✅ Shows UI feedback | ⚠️ Inert for pure API callers | ⚠️ Inert for pure API callers |
+| Function | WebUI Request | Direct API |
+|----------|--------------|------------|
+| `inlet()` | Always called | Always called |
+| `request()` | Called before every provider call | Called before every provider call |
+| `stream()` | Called during streaming | Called during streaming |
+| `outlet()` | Called after response | Runs by default, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
+| `__event_emitter__` | Shows UI feedback | A real but invisible callable in `inlet()` and the first `request()`, and `None` in `stream()` and `outlet()` |
 
 :::info outlet() on Direct API Calls
-This behavior **changed on `dev`** (shipping in an upcoming release). The two cases differ:
+`outlet()` runs for direct `/api/chat/completions` callers **by default**, on **both** the non-streaming and streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). On the streaming path the server accumulates the full response and runs `outlet()` once the stream completes. Set `ENABLE_API_OUTLET_FILTERS=False` to skip outlet filters on direct API traffic.
 
-**On `dev` / upcoming release:** `outlet()` runs for direct `/api/chat/completions` callers **by default**, on **both** the non-streaming and streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). On the streaming path the server accumulates the full response and runs `outlet()` once the stream completes. Set `ENABLE_API_OUTLET_FILTERS=False` to skip outlet filters on direct API traffic.
-
-**On tagged releases / `main`:** `outlet()` is **not** invoked by `/api/chat/completions`; it runs only when the caller performs the second POST to `/api/chat/completed`. API integrations that need `outlet()` on these releases must make both calls.
-
-**Response visibility (both cases):** `outlet()`'s side effects run (DB update, `__event_emitter__`, external calls like logging/tracing), but it does **not** rewrite the HTTP response body, and a streaming client has already received the stream before `outlet()` fires. To observe `outlet()`'s output, read the chat record back, subscribe to the `chat:outlet` WebSocket event, or use `/api/chat/completed`. `__event_emitter__` remains inert for pure API callers (no UI to receive it).
+**Response visibility:** `outlet()`'s side effects run (DB update, `__event_emitter__`, external calls like logging/tracing), but it does **not** rewrite the HTTP response body, and a streaming client has already received the stream before `outlet()` fires. To observe `outlet()`'s output, read the chat record back, subscribe to the `chat:outlet` WebSocket event, or use `/api/chat/completed`. `__event_emitter__` is `None` in `outlet()` for pure API callers.
 :::
 
 #### Inlet ↔ Outlet Correlation via `__metadata__`
 
-`__metadata__` is a live dict passed through the request lifecycle, so anything your filter stashes in `inlet()` is visible in `outlet()` on the *same request*. This is useful for things like start-time tracking, correlation IDs, or per-call valves, *when `outlet()` actually runs*. That covers WebUI requests, the `/api/chat/completed` handler, and, on `dev`/upcoming releases with `ENABLE_API_OUTLET_FILTERS` enabled, direct `/api/chat/completions` API calls.
+`__metadata__` is a live dict passed through the request lifecycle, so anything your filter stashes in `inlet()` is visible in `outlet()` on the *same request*. This is useful for things like start-time tracking, correlation IDs, or per-call valves, *when `outlet()` actually runs*. That covers WebUI requests and the inline outlet for direct `/api/chat/completions` calls, where the same dict object flows from `inlet()` to `outlet()`. It does not cover `/api/chat/completed`, which builds a fresh metadata dict holding only `chat_id`, `message_id`, `filter_ids`, `session_id` and `user_id`.
 
 ```python
 import time
@@ -597,12 +594,12 @@ class Filter:
 ```
 
 :::warning Synthesizing `chat_id` / `message_id` in `inlet()` Is Not a Reliable Workaround
-Older versions of this page suggested synthesizing a temporary-chat `chat_id` (`temporary:<uuid>`, or `local:<uuid>` in older releases) and a random `message_id` inside `inlet()` to force `outlet()` to run for pure API callers. Do not rely on that pattern. In current backend code the chat ownership check runs before the filter pipeline, and the inline outlet handler does not rewrite the HTTP response body even when it does run. If you need `outlet()` output over HTTP for an API caller, use `/api/chat/completed` instead.
+Setting a made-up `chat_id` and `message_id` inside `inlet()` does not return `outlet()` output to pure API callers. The chat ownership check runs before the filter pipeline, and the inline outlet handler does not rewrite the HTTP response body. If you need `outlet()` output over HTTP for an API caller, use `/api/chat/completed` instead.
 :::
 
 #### Running outlet() for API Callers: `/api/chat/completed`
 
-The reliable, supported way to run `outlet()` for a direct API integration is to follow up `/api/chat/completions` with `POST /api/chat/completed`, passing the full conversation (including the assistant response) in `messages`. The endpoint runs pipeline outlet filters and Function `outlet()` handlers unconditionally and returns the filtered payload.
+The reliable, supported way to run `outlet()` for a direct API integration is to follow up `/api/chat/completions` with `POST /api/chat/completed`, passing the full conversation (including the assistant response) in `messages`. The body must also carry `id`, the assistant message id, and the `chat_id` and `session_id` keys (their values may be empty, but a non-empty `chat_id` must be a chat you own). The endpoint runs pipeline outlet filters and Function `outlet()` handlers unconditionally and returns the filtered payload. Errors come back as HTTP 400.
 
 ```bash
 # Step 2: run outlet() after /api/chat/completions returned a response.
@@ -615,13 +612,14 @@ curl -X POST http://localhost:3000/api/chat/completed \
       {"role": "user", "content": "Hello"},
       {"role": "assistant", "content": "Hi there! How can I help you?"}
     ],
-    "chat_id": "optional-chat-id",
-    "session_id": "optional-session-id"
+    "id": "the-assistant-message-id",
+    "chat_id": "a-chat-id-you-own",
+    "session_id": ""
   }'
 ```
 
 :::info
-On `dev` this endpoint is labeled deprecated in favor of inline execution, but because inline execution does not return the filtered payload over HTTP to pure API callers, `/api/chat/completed` is still the correct choice for most API integrations today.
+This endpoint is labeled deprecated in favor of inline execution, but because inline execution does not return the filtered payload over HTTP to pure API callers, `/api/chat/completed` is still the correct choice for most API integrations today.
 :::
 
 #### Detecting API vs WebUI Requests
@@ -712,7 +710,7 @@ class Filter:
 ```
 
 :::note Event Emitter Behavior
-Filters that use `__event_emitter__` will still execute for API requests, but since there's no WebUI to display the events, the status messages won't be visible. The filter logic still runs; only the visual feedback is missing.
+Filters that use `__event_emitter__` will still execute for API requests, but since there's no WebUI to display the events, the status messages won't be visible. In `inlet()` and the first `request()` the emitter is a real callable, so awaiting it is harmless. In `stream()` and `outlet()` it is `None` for pure API callers, so guard with `if __event_emitter__:` before awaiting it.
 :::
 
 ---
@@ -783,7 +781,7 @@ async def inlet(self, body: dict, __event_emitter__) -> dict:
 
 ---
 
-### 🔌 Injecting Extra API Body Parameters
+### Injecting Extra API Body Parameters
 
 Inlet filters can inject **extra fields into the request body** that get forwarded to the external LLM API. This is useful for API-specific parameters that Open WebUI doesn't expose in the UI.
 
@@ -874,15 +872,20 @@ Filters can declare any of these parameters in their function signature to recei
 | Parameter | What it provides |
 |-----------|-----------------|
 | `__model__` | Full model dict (including `info.base_model_id` for workspace models) |
-| `__user__` | User data (`id`, `email`, `name`, `role`) |
+| `__user__` | The full user record (`UserModel.model_dump()`), with `valves` added when the filter defines `UserValves` |
 | `__metadata__` | Request metadata (`chat_id`, `session_id`, `user_id`, `files`, `features`, `params`, etc.) |
 | `__event_emitter__` | Function to send status updates, embeds, etc. to the client |
-| `__chat_id__` | Chat session ID |
+| `__event_call__` | Function that sends an event and waits for the browser's answer |
+| `__chat_id__` | Chat session ID. Not passed to `outlet()`, which reads it from `body["chat_id"]` |
+| `__message_id__` | Id of the assistant message being produced. Not passed to `outlet()` |
+| `__oauth_token__` | The user's OAuth token data, or `None`. Not passed to `outlet()` |
+| `__id__` | The filter's own function id |
+| `__body__` | `stream()` only: the request body being answered, since `stream()` receives the chunk as `event` |
 | `__request__` | The raw FastAPI `Request` object |
 
 Only parameters you declare in your function signature are injected. Open WebUI inspects the signature at runtime to determine what to pass.
 
-`request()` is handed the **same set** as `inlet()`, so `__model__` resolves workspace models there exactly as shown above. The one extra is `__features__`, which carries the `features` dict after the pipeline has popped it off the body.
+`request()` is handed the same set as `inlet()` on the first call of a turn, so `__model__` resolves workspace models there exactly as shown above, plus `__features__`, which carries the `features` dict after the pipeline has popped it off the body. On the later tool-loop hops `__features__` is absent, so give it a default.
 
 ---
 
@@ -892,27 +895,27 @@ Only parameters you declare in your function signature are injected. Open WebUI 
 
 | Indicator | Meaning |
 |-----------|---------|
-| 🟢 Green toggle | Filter is active (`is_active=True`) |
-| ⚪ Grey toggle | Filter is inactive (`is_active=False`) |
-| 🌐 Highlighted globe | Filter is global (`is_global=True`) |
-| 🌐 Unhighlighted globe | Filter is not global (`is_global=False`) |
+| Green toggle | Filter is active (`is_active=True`) |
+| Grey toggle | Filter is inactive (`is_active=False`) |
+| **Global** switch in the ⋮ menu | Filter is global (`is_global=True`) when on |
 
 #### In Model Settings (FiltersSelector)
 
-| State | Checkbox | Description |
-|-------|----------|-------------|
-| Global Filter | ✅ Checked & Disabled (greyed) | "This filter is globally enabled" |
-| Selected Filter | ✅ Checked & Enabled | "This filter is selected for this model" |
-| Unselected Filter | ☐ Unchecked & Enabled | "Click to include this filter" |
+| State | Picker entry | Description |
+|-------|--------------|-------------|
+| Global Filter | ✓ Marked **Global**, not clickable | "This filter is globally enabled" |
+| Selected Filter | ✓ Checkmark, clickable | "This filter is selected for this model" |
+| Unselected Filter | No checkmark, clickable | "Click to include this filter" |
 
-#### In Chat UI (Integrations Menu)
+Each selected or global toggleable filter shows a **Start enabled in new chats** switch below its entry.
+
+#### In the Chat Input's + Menu
 
 | Element | Description |
 |---------|-------------|
 | Filter name | Shows the filter's display name |
 | Custom icon | SVG icon from `self.icon` (if provided) |
 | Toggle switch | Enable/disable the filter for this chat |
-| Status badge | Shows if filter is currently active |
 
 ---
 
@@ -920,26 +923,26 @@ Only parameters you declare in your function signature are injected. Open WebUI 
 
 #### 1. When to Use Global Filters
 
-✅ **Use global filters for:**
+**Use global filters for:**
 - Security and compliance (PII scrubbing, content moderation)
 - System-wide formatting (standardize all outputs)
 - Logging and analytics (track all requests)
 - Organization-wide policies (enforce company guidelines)
 
-❌ **Don't use global filters for:**
+**Don't use global filters for:**
 - Optional features (use toggleable filters instead)
 - Model-specific behavior (use model-specific filters)
 - User-preference features (let users control via toggles)
 
 #### 2. When to Use Toggleable Filters
 
-✅ **Make a filter toggleable (`toggle=True`) when:**
+**Make a filter toggleable (`toggle=True`) when:**
 - Users should control when it's active (web search, translation)
 - It's an optional enhancement (citation mode, verbose output)
 - It adds functionality users may not always want (code formatting)
 - It has a performance cost that should be optional
 
-❌ **Don't make a filter toggleable when:**
+**Don't make a filter toggleable when:**
 - It's required for security/compliance (always-on is better)
 - Users shouldn't be able to disable it (use always-on)
 - It's a system-level transformation (global is better)
@@ -1075,10 +1078,10 @@ The `inlet` function is like **prepping food before cooking**. Imagine you’re 
 
 In the world of Open WebUI, the `inlet` function does this important prep work on the **user input** before it’s sent to the model. It ensures the input is as clean, contextual, and helpful as possible for the AI to handle.
 
-📥 **Input**:
+**Input**:
 - **`body`**: The raw input from Open WebUI to the model. It is in the format of a chat-completion request (usually a dictionary that includes fields like the conversation's messages, model settings, and other metadata). Think of this as your recipe ingredients.
 
-🚀 **Your Task**:
+**Your Task**:
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
 :::info Want to transform RAG chunks? `inlet()` runs **before** retrieval
@@ -1109,9 +1112,9 @@ At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only 
 
 10. **A/B Testing**: Route users to different model configurations based on user ID or random selection.
 
-##### 💡 Example Use Cases: Build on Food Prep
+##### Example Use Cases: Build on Food Prep
 
-###### 🥗 Example 1: Adding System Context
+###### Example 1: Adding System Context
 Let’s say the LLM is a chef preparing a dish for Italian cuisine, but the user hasn’t mentioned "This is for Italian cooking." You can ensure the message is clear by appending this context before sending the data to the model.
 
 ```python
@@ -1126,7 +1129,7 @@ async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     return body
 ```
 
-📖 **What Happens?**
+**What Happens?**
 - Any user input like "What are some good dinner ideas?" now carries the Italian theme because we’ve set the system context! Cheesecake might not show up as an answer, but pasta sure will.
 
 ###### Example 2: Cleaning Input (Remove Odd Characters)
@@ -1140,8 +1143,8 @@ async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     return body
 ```
 
-📖 **What Happens?**
-- Before: `"How can I debug this issue!!!"` ➡️ Sent to the model as `"How can I debug this issue"`
+**What Happens?**
+- Before: `"How can I debug this issue!!!"` → Sent to the model as `"How can I debug this issue"`
 
 :::note
 
@@ -1154,7 +1157,7 @@ Note: The user feels the same, but the model processes a cleaner and easier-to-u
 - Makes the AI **more efficient** by removing unnecessary noise like emojis, HTML tags, or extra punctuation.
 - Ensures **consistency** by formatting user input to match the model’s expected patterns or schemas (like, say, JSON for a specific use case).
 
-💭 **Think of `inlet` as the sous-chef in your kitchen**, ensuring everything that goes into the model (your AI "recipe") has been prepped, cleaned, and seasoned to perfection. The better the input, the better the output!
+**Think of `inlet` as the sous-chef in your kitchen**, ensuring everything that goes into the model (your AI "recipe") has been prepped, cleaned, and seasoned to perfection. The better the input, the better the output!
 
 ---
 
@@ -1165,7 +1168,7 @@ The **`stream` function** is a new feature introduced in Open WebUI **0.5.17** t
 
 Unlike `outlet`, which processes an entire completed response, `stream` operates on **individual chunks** as they are received from the model.
 
-##### 🛠️ When to Use the Stream Hook?
+##### When to Use the Stream Hook?
 - **Real-time content filtering**: Censor profanity or sensitive content as it streams
 - **Live word replacement**: Replace brand names, competitor mentions, or outdated terms
 - **Streaming analytics**: Count tokens and track response length in real-time
@@ -1186,23 +1189,23 @@ async def stream(self, event: dict) -> dict:
 ```jsonl
 {"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": "Hi"}}]}
 {"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": "!"}}]}
-{"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": " 😊"}}]}
+{"id": "chatcmpl-B4l99MMaP3QLGU5uV7BaBM0eDS0jb","choices": [{"delta": {"content": " [redacted]"}}]}
 ```
-📖 **What Happens?**
+**What Happens?**
 - Each line represents a **small fragment** of the model's streamed response.
 - The **`delta.content` field** contains the progressively generated text.
 
-##### Example: Filtering Out Emojis from Streamed Data
+##### Example: Filtering Out Markers from Streamed Data
 ```python
 async def stream(self, event: dict) -> dict:
     for choice in event.get("choices", []):
         delta = choice.get("delta", {})
         if "content" in delta:
-            delta["content"] = delta["content"].replace("😊", "")  # Strip emojis
+            delta["content"] = delta["content"].replace(" [redacted]", "")  # Strip the marker
     return event
 ```
-📖 **Before:** `"Hi 😊"`
-📖 **After:** `"Hi"`
+**Before:** `"Hi [redacted]"`
+**After:** `"Hi"`
 
 ##### Streamed Events on Responses API Connections
 
@@ -1210,11 +1213,11 @@ The events above are **Chat Completions** chunks, which is what you get from eve
 
 ```jsonl
 {"type": "response.output_text.delta", "delta": "Hi"}
-{"type": "response.output_text.delta", "delta": " 😊"}
-{"type": "response.output_text.done", "text": "Hi 😊"}
-{"type": "response.content_part.done", "part": {"type": "output_text", "text": "Hi 😊"}}
-{"type": "response.output_item.done", "item": {"type": "message", "content": [{"type": "output_text", "text": "Hi 😊"}]}}
-{"type": "response.completed", "response": {"output": [{"type": "message", "content": [{"type": "output_text", "text": "Hi 😊"}]}], "usage": {"input_tokens": 9, "output_tokens": 3}}}
+{"type": "response.output_text.delta", "delta": " [redacted]"}
+{"type": "response.output_text.done", "text": "Hi [redacted]"}
+{"type": "response.content_part.done", "part": {"type": "output_text", "text": "Hi [redacted]"}}
+{"type": "response.output_item.done", "item": {"type": "message", "content": [{"type": "output_text", "text": "Hi [redacted]"}]}}
+{"type": "response.completed", "response": {"output": [{"type": "message", "content": [{"type": "output_text", "text": "Hi [redacted]"}]}], "usage": {"input_tokens": 9, "output_tokens": 3}}}
 ```
 
 :::warning Rewriting the deltas alone is not enough
@@ -1223,13 +1226,13 @@ The deltas are what the user watches arrive, but the later events repeat the **f
 The example below covers the assistant message text. Reasoning is a separate output item type with text of its own, and refusals sit in a `refusal` field rather than a `text` one, so neither is touched by it.
 :::
 
-##### Example: Filtering Out Emojis on Responses API Connections
+##### Example: Filtering Out Markers on Responses API Connections
 
 ```python
 async def stream(self, event: dict) -> dict:
     def clean(value):
         # Non-string values turn up, and raising here would drop the whole event
-        return value.replace("😊", "") if isinstance(value, str) else value
+        return value.replace(" [redacted]", "") if isinstance(value, str) else value
 
     def clean_message(item):
         if (item or {}).get("type") != "message":
@@ -1277,12 +1280,16 @@ If `stream()` raises, Open WebUI drops that whole event, and losing `response.co
 
 The `outlet` function is like a **proofreader**: tidy up the AI's response (or make final changes) *after it’s processed by the LLM.*
 
-📤 **Input**:
+**Input**:
 - **`body`**: This contains **all current messages** in the chat (user history + LLM replies).
 
-🚀 **Your Task**: Modify this `body`. You can clean, append, or log changes, but be mindful of how each adjustment impacts the user experience.
+Each message carries its `id`, `role`, `content`, `info` and `timestamp`, plus `output`, `usage` and `sources` when it has them. Only the reply that just finished carries **`finish_reason`**: the reason the provider gave for ending the reply, such as `stop`, `length` (the reply hit the token limit) or `tool_calls`. When the reply involved tool calls, it is the value from the last model call of the turn.
 
-💡 **Best Practices**:
+`finish_reason` is set for OpenAI-compatible and Ollama models, streamed or not. Ollama reports `length` when a reply is cut off by the token limit. Connections that use the OpenAI Responses API set it on non-streamed replies only, as `stop` or `tool_calls`.
+
+**Your Task**: Modify this `body`. You can clean, append, or log changes, but be mindful of how each adjustment impacts the user experience.
+
+**Best Practices**:
 - Prefer logging over direct edits in the outlet (e.g., for debugging or analytics).
 - If heavy modifications are needed (like formatting outputs), consider using the **pipe function** instead.
 
@@ -1296,14 +1303,21 @@ The `outlet` function is like a **proofreader**: tidy up the AI's response (or m
 - **Quality scoring**: Run automated quality checks on model outputs
 
 :::info Outlet and API Requests
-On tagged releases `outlet()` is never invoked by `/api/chat/completions`, so a direct API integration has to follow it with `POST /api/chat/completed`. On `dev` it runs by default for direct callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
+`outlet()` runs by default for direct `/api/chat/completions` callers on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters). With it switched off, a direct API integration has to follow the request with `POST /api/chat/completed`. Either way the filtered content is not written back into the HTTP response. See [Filter Behavior with API Requests](#filter-behavior-with-api-requests) for the full picture.
 :::
 
-💡 **Example Use Case**: Strip out sensitive API responses you don't want the user to see:
+An outlet that changes the reply edits both its `content` and the text in its `output`, because the chat shows the reply from `output`.
+
+**Example Use Case**: Strip out sensitive API responses you don't want the user to see:
 ```python
 async def outlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
     for message in body["messages"]:
         message["content"] = message["content"].replace("<API_KEY>", "[REDACTED]")
+        for item in message.get("output") or []:
+            if item.get("type") == "message":
+                for part in item.get("content") or []:
+                    if part.get("type") == "output_text":
+                        part["text"] = part["text"].replace("<API_KEY>", "[REDACTED]")
     return body
 ```
 
@@ -1341,6 +1355,11 @@ class Filter:
         for message in body["messages"]:
             if message["role"] == "assistant":  # Target model response
                 message["content"] = f"**{message['content']}**"  # Highlight with Markdown
+                for item in message.get("output") or []:  # The text the chat shows
+                    if item.get("type") == "message":
+                        for part in item.get("content") or []:
+                            if part.get("type") == "output_text":
+                                part["text"] = f"**{part['text']}**"
         return body
 ```
 
@@ -1354,9 +1373,9 @@ This section describes **behavior and caveats**, not a full drop-in program. Fil
 
 #### What such a Filter would observe
 
-Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`**, **`usage`** (often on the terminal chunk only), or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values). Exact shapes vary by connector and protocol.
+Streaming passes your Filter a sequence of **`event`** objects (chunks from the upstream provider/Open WebUI stack). Typical fields include **`choices[].delta`** (incremental assistant text), optional **`choices[].finish_reason`** (also handed to `outlet` on the finished reply, see [`outlet`](#outlet-function-output-post-processing)), **`usage`** (often on the terminal chunk only) or synthetic terminal markers (a **`done` flag**, **`type`** sentinel values). Exact shapes vary by connector and protocol.
 
-Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python): record when you first see a stream fragment for an assistant reply, bump counters when deltas contain printable model text (including reasoning / audio transcript fields some APIs expose), and compare timestamps when you decide the stream **ended**.
+Timing is simplest with a **monotonic clock** (`time.perf_counter()` in Python): record when you first see a stream fragment for an assistant reply, bump counters when deltas contain printable model text (including reasoning / audio transcript fields some APIs expose) and compare timestamps when you decide the stream **ended**.
 
 #### Correlating one stream (“which message is this?”)
 
@@ -1408,7 +1427,7 @@ You can, but **it’s not the best practice.**:
 
 ---
 
-## 🎉 Recap: Why Build Filter Functions?
+## Recap: Why Build Filter Functions?
 
 By now, you’ve learned:
 1. **Inlet** manipulates **user inputs** (pre-processing), once per turn.
@@ -1420,6 +1439,6 @@ By now, you’ve learned:
 
 ---
 
-🚀 **Your Turn**: Start experimenting! What small tweak or context addition could elevate your Open WebUI experience? Filters are fun to build, flexible to use, and can take your models to the next level!
+**Your Turn**: Start experimenting! What small tweak or context addition could elevate your Open WebUI experience? Filters are fun to build, flexible to use, and can take your models to the next level!
 
-Happy coding! ✨
+Happy coding!

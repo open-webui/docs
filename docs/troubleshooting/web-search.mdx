@@ -1,9 +1,11 @@
 ---
 sidebar_position: 4
-title: "Web Search"
+title: "Troubleshoot Web Search"
+sidebar_label: "Web Search"
+description: "Fix web search connection failures, empty page content, proxy errors, and missing search tool calls in Open WebUI."
 ---
 
-Web Search in Open WebUI allows language models to access real-time information from the internet. When things don't work as expected, this guide will help you diagnose and fix common issues.
+If web search fails, first distinguish a failed search request from a failure to read the returned pages. This guide covers proxy settings, provider errors, empty content, timeouts, and models that do not call the search tool.
 
 ## Common Web Search Issues
 
@@ -13,11 +15,11 @@ If you're running Open WebUI behind an HTTP proxy, you might notice that web sea
 
 - `[Errno -3] Temporary failure in name resolution`
 - `Connection timeout to host`
-- `The content provided is empty`
+- `None of the web search results could be loaded`
 
 This happens because the web content fetcher doesn't use your `http_proxy`/`https_proxy` environment variables by default.
 
-✅ **Solution:**
+**Solution:**
 
 1. Navigate to: **Settings > Admin > Web Search**
 2. Enable **Trust Proxy Environment**
@@ -43,7 +45,7 @@ This setting tells Open WebUI's web content loader to respect the proxy settings
 
 If you're using SearXNG and seeing `403 Client Error: Forbidden` in your logs, the JSON format is not enabled.
 
-✅ **Solution:**
+**Solution:**
 
 Edit your SearXNG `settings.yml` and add `json` to the formats list:
 
@@ -62,9 +64,9 @@ Restart SearXNG after making this change.
 
 If web search returns empty content or poor quality results, the issue is often related to context window size or content extraction.
 
-✅ **Solutions:**
+**Solutions:**
 
-- **Increase context length**: Web pages often contain 4,000-8,000+ tokens. If your model has a 2048-token limit, you're missing most of the content. Increase to 16384+ tokens in **Settings > Admin > Models > Edit** the model **> Advanced Params** (anything below will be subpar for web content).
+- **Increase context length**: Web pages often contain 4,000-8,000+ tokens. If your model runs at Ollama's 4096-token default for GPUs under 24 GiB, you're missing most of the content. Increase to 16384+ tokens in **Settings > Admin > Models > Edit** the model **> Advanced Params** (anything below will be subpar for web content).
 
 - **Check result count**: Adjust `WEB_SEARCH_RESULT_COUNT` to control how many results are fetched.
 
@@ -72,7 +74,9 @@ If web search returns empty content or poor quality results, the issue is often 
 
 - **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use `playwright` for JavaScript-heavy sites or `firecrawl`/`tavily` for better extraction.
 
-- **Set a real User-Agent**: If results from Wikipedia, Cloudflare-protected sites, or other large publishers come back empty (or as 403s in logs), the default Python `requests`/`aiohttp` UA is being filtered by bot detection. Set [`USER_AGENT`](/reference/env-configuration#user_agent) to a real browser-like string (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`). This affects both web search result fetching and the `fetch_url` tool.
+- **Set a real User-Agent**: If results from Wikipedia, Cloudflare-protected sites, or other large publishers come back empty (or as 403s in logs), the default Python `requests`/`aiohttp` UA is being filtered by bot detection. Set [`USER_AGENT`](/reference/env-configuration#user_agent) to a real browser-like string (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`). This affects web search result fetching, the `fetch_url` tool and web pages attached with `#`, including the check whether a link points to a file such as a PDF.
+
+- **Compressed responses are refused**: Open WebUI asks for uncompressed pages and files and refuses a compressed answer with `The server answered with a compressed response, which is not accepted.` A host that always sends a file compressed, such as an S3 or MinIO object uploaded with a `Content-Encoding` header, cannot be read. Upload the file again without that header.
 
 For more details on context window issues, see the [RAG Troubleshooting Guide](./rag.mdx).
 
@@ -84,7 +88,7 @@ If the web search engine is configured (for example DDGS with DuckDuckGo as the 
 
 In Native/Agentic mode, Open WebUI exposes web search as the `search_web` tool. The model must decide to call that tool and return a valid structured tool call. Older, smaller, or weaker local models can miss the tool, ignore it, or produce malformed tool calls even when every Open WebUI setting is correct.
 
-✅ **Solutions:**
+**Solutions:**
 
 - **Use a modern, high-quality tool-calling model** for web-search workflows. Frontier models or large recent open-weight models are much more reliable than older/smaller models for deciding when to search and formatting tool calls correctly. See [Tool Calling Modes: Native vs. Legacy](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for model requirements and recommendations.
 - **Confirm Native Function Calling is active** in **Settings > Admin > Models > Edit** the model **> Advanced Params > Function Calling**. Built-in web search tools are Native-mode tools.
@@ -97,7 +101,7 @@ In Native/Agentic mode, Open WebUI exposes web search as the `search_web` tool. 
 
 If web searches are timing out:
 
-✅ **Solutions:**
+**Solutions:**
 
 - **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (required for Brave free tier).
 
@@ -122,5 +126,9 @@ Key variables:
 | `WEB_LOADER_ENGINE` | Content extraction engine |
 
 All of these are persisted settings, so **Settings > Admin > Web Search** is the live source of truth for them. The page fetcher reads proxy trust, loader concurrency and SSL verification from that saved configuration on each search, so a change you save there applies to the next search without a restart, and matches what the same settings do elsewhere. If a change you made in the admin panel appears not to have taken effect, re-check it there rather than assuming the environment variable is still in charge: the variable seeds the initial value, and the saved setting wins afterwards.
+
+**Web Search Engine** is required only while **Web Search** is on, so the **Loader** settings save without one.
+
+While **Web Search** is off, the page hides the settings that only apply to search. Their saved values are kept.
 
 ---

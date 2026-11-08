@@ -20,33 +20,91 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 |-----|----------|
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
-| `:main-slim` | Smaller image without the pre-downloaded models, see [What slim leaves out](#what-slim-leaves-out) |
+| `:slim`, `:main-slim` | About **197 MB instead of 1.62 GB** to download, **88% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
 | `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
 
-Channel and variant combine: `:dev-slim`, `:dev-cuda`, `:dev-cuda126` and `:dev-ollama` all exist. Slim is a variant of its own, so there is no `cuda-slim` or `ollama-slim`. The bare variant names `:slim`, `:cuda`, `:cuda126` and `:ollama` are aliases of the `main` build.
+Each variant also has a development build: `:dev-slim`, `:dev-cuda`, `:dev-cuda126` and `:dev-ollama`. The short tags `:slim`, `:cuda`, `:cuda126` and `:ollama` follow `main`. Choose one variant; slim does not combine with CUDA or bundled Ollama.
 
-### What slim leaves out
+### Why choose slim? {#what-slim-leaves-out}
 
-The slim image is the standard image without the pre-downloaded model files. The Python packages, ffmpeg and pandoc are identical, and on the amd64 build the download shrinks from roughly 1.8 GB to 1.5 GB.
+**197 MB instead of 1.62 GB. Same chat experience.** The `:slim` image is **88% smaller** than `:main`, saving about **1.42 GB on a fresh pull**. That means less time downloading Open WebUI when you set up a machine or deploy a new instance. Use it with a hosted API, your own model server, or a separate Ollama instance, even one on the same machine.
 
-| Left out | Downloaded when |
-|---|---|
-| RAG embedding model `sentence-transformers/all-MiniLM-L6-v2` | **First start** (it is loaded at boot), from Hugging Face |
-| Speech-to-text model `faster-whisper` `base` | First local speech-to-text request, from Hugging Face |
-| Auxiliary embedding model `TaylorAI/bge-micro-v2` | First leaderboard search, from Hugging Face |
-| `tiktoken` `cl100k_base` encoding | When the token text splitter is selected, from OpenAI |
+These are compressed download sizes for Linux/amd64, checked on October 16, 2026. Sizes vary by build and architecture. `:slim` and `:main-slim` are two tags for the same image.
 
-So slim reaches out to the internet on first start and again on first use of local speech-to-text. Offline, air-gapped, behind a proxy that blocks Hugging Face, or with `OFFLINE_MODE=true`, it still works, as long as the default local embedding engine is not in use: set `RAG_EMBEDDING_ENGINE` to `ollama`, `openai` or `azure_openai` before the first start, or supply the model files yourself.
+<!-- Verified from GHCR manifest layer sizes on October 16, 2026. main linux/amd64: sha256:d90e4762f94cae56e74d329a176f0dc76c6460ee7cb01ad6e4b91a503aa70d66 = 1,620,712,040 bytes; slim linux/amd64: sha256:c5645947013018ed78b0740ccdb29a01a673dbfd815ac168c641d9a80427ca9f = 197,296,335 bytes. -->
 
-Otherwise the container starts, but the first document upload or RAG query fails with `ValueError: No embedding model is loaded` (0.9.6 aborted startup instead, fixed in 0.10.0); switch `RAG_EMBEDDING_ENGINE` or supply the model files, see [Startup & Docker Failures](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install).
+The saving comes from leaving out the bundled machine-learning stack, including PyTorch, local embedding and speech runtimes, plus document-processing tools and optional database and storage clients. If you use Open WebUI to chat with models through an API, those dependencies would otherwise sit unused in your container.
 
-### When slim saves anything
+**To get started, change `:main` to `:slim` in the Docker command above.** The default SQLite database and local file storage work as usual. Connect your model provider and start chatting; no extra services are needed for a basic chat setup.
 
-The slim image is always about 0.3 GB smaller on disk. The bandwidth saving only holds if the models never get downloaded: with default settings slim pulls the embedding model into your volume at first start, and the first local speech-to-text request pulls Whisper, so the total transfer ends up about the same as `:main`. To keep the downloads at zero, start the container with `OFFLINE_MODE=true`. It blocks every Hugging Face download (the embedding models and Whisper) and the version check, and the container boots normally; document upload and RAG just fail until you open your avatar > **Settings > Admin > Documents** and set **Embedding Model Engine** to Ollama, OpenAI or Azure OpenAI. The change takes effect immediately, persists, and nothing is ever downloaded. Speech-to-text works the same way: pick an external engine in the admin settings, or leave it unused. Two things to leave alone: the `token` text splitter pulls the tiktoken encoding, which `OFFLINE_MODE` does not block, and leaderboard searches fail offline because they need the auxiliary embedding model.
+For knowledge search, document extraction or voice, slim connects to services that do that work. It is a good fit if you already use those services or only need chat. Choose the standard image if you want Open WebUI to handle embeddings, speech recognition and document extraction inside its own container. The table below covers the setup for each feature.
 
-If your data volume already holds the models from an earlier `:main` run, slim costs you nothing either.
+#### RAM usage {#slim-memory-usage}
+
+Slim used **about 300 MiB of RAM at idle** in our October 16, 2026 test of Open WebUI 0.12.3 on Linux/arm64 in Docker Desktop. This is the Open WebUI container alone; your browser, Docker's VM and any model server or external services need their own memory. Allow extra memory for startup and active workloads: this idle measurement is not a minimum RAM requirement or a container memory limit.
+
+<details>
+<summary>How we measured</summary>
+
+We ran three fresh containers with the default SQLite database and one Uvicorn worker, with no configured provider, users, chats, uploads or plugins. Each run used a new data directory and no memory limit. Docker's Linux VM had 16 CPUs and 7.65 GiB RAM available; other containers remained running.
+
+After `/health` returned HTTP 200, we waited 30 seconds, then took 12 readings with five seconds between calls:
+
+```bash
+docker stats --no-stream --format '{{.MemUsage}}' <container-name>
+```
+
+Across all 36 samples, memory usage ranged from **291.8 to 292.6 MiB**, with a median of **292.2 MiB**.
+
+On Linux, [Docker's reported memory usage](https://docs.docker.com/reference/cli/docker/container/stats/) excludes inactive file cache. These samples cover an idle instance, not model inference or concurrent chat traffic. Results vary with version, architecture, configuration and workload.
+
+The pinned image was `ghcr.io/open-webui/open-webui@sha256:abd02d41e522d41be389d28d1a73752cd2afc4aa46f980b60d490ecc9379c16b` (Linux/arm64, commit `91ea4e3421d1d8069f13d4a463fcb5986d94ea60`).
+
+</details>
+
+#### Moving an existing deployment to slim
+
+Check your database and file storage before switching:
+
+- **Database:** SQLite and PostgreSQL work on slim, the two databases Open WebUI supports. AWS RDS IAM authentication for PostgreSQL requires the standard image.
+- **File storage:** Local files and S3 (`STORAGE_PROVIDER=s3`) are supported. Azure Blob and Google Cloud Storage require the standard image.
+
+Slim checks these settings at startup and reports an error for unsupported configurations. Default installs already use SQLite and local files.
+
+#### What each feature needs
+
+| If you want | Point slim at | Otherwise |
+|---|---|---|
+| **Documents, knowledge or RAG** | An embedding provider: `RAG_EMBEDDING_ENGINE` set to `ollama`, `openai` or `azure_openai` | Embedding calls fail with 503, and the admin panel refuses to save the local engine |
+| | PostgreSQL with pgvector, slim's default and only vector store. It uses `DATABASE_URL` when that points at PostgreSQL; otherwise set `PGVECTOR_DB_URL` | 503 the first time retrieval runs. Nothing else is affected, the store is only opened when it is used |
+| **PDFs and Office files** | Tika, Docling, an external extractor or a cloud engine | Uploading one returns 503. Plain text formats are still read by slim itself |
+| **Voice input** | Any external speech-to-text engine: OpenAI, Deepgram, Azure, Mistral and so on | Local Whisper is not offered, and the admin panel refuses to select it |
+| **Spoken replies** | Any external text-to-speech engine | The local Transformers voice is not offered, and requesting speech returns 503 |
+| **Web search** | Any provider other than DDGS | DDGS is greyed out in the admin panel and refused on save |
+| **Reranking** | An external reranker | Selecting a local reranking model is refused |
+| **Code interpreter** | Nothing, but the browser fetches the Python packages from `cdn.jsdelivr.net` rather than from your instance | Running code fails where the browser cannot reach that CDN |
+
+Also unavailable: the **Playwright** web loader, so pages are fetched over plain HTTP or by an external web loader, and the **Transformers** text splitter, so use the character or the tiktoken token splitter. Slim carries no `git` either, so a tool or function whose requirements install straight from a repository needs the standard image.
+
+If you use Open WebUI as a chat front end for hosted models, none of the above applies and slim is simply the smaller image.
+
+#### What still works without a service
+
+- **Plain text extraction.** `csv`, `html`, `txt`, `md`, `markdown`, `rst`, `xml` and anything else detected as text are read by slim itself.
+- **Reranking, in a fashion.** Leave the reranking model empty and results are scored by cosine similarity against the embeddings you already have, which needs no model runtime.
+- **Audio passthrough.** Speech from an external provider is served in the format that provider returned, since slim cannot transcode. A provider that answers with something a browser cannot play is rejected rather than stored.
+
+#### Building it yourself
+
+`USE_SLIM=true` cannot be combined with `USE_CUDA=true` or `USE_OLLAMA=true`. The build stops with an error rather than producing an image whose GPU support or bundled model server has nothing to run.
+
+#### Offline and air-gapped
+
+Slim never downloads a model, because it cannot run one, and an air-gapped deployment otherwise only has to reach whichever services it uses on your own network. `OFFLINE_MODE=true` still blocks the Hugging Face traffic and the version check.
+
+Two features reach the internet on first use. The **token text splitter** downloads its tiktoken encoding, so offline instances should use the character splitter. The **code interpreter** has the browser pull its Python packages from `cdn.jsdelivr.net`, because slim ships only the Pyodide runtime while the standard image bundles them. Air-gapped instances should leave the code interpreter off, or use the standard image.
 
 ### How the tags update
 
@@ -74,6 +132,7 @@ For production environments, pin a specific version instead of using floating ta
 
 ```bash
 docker pull ghcr.io/open-webui/open-webui:vX.Y.Z
+docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-slim
 docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
 docker pull ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
 ```
@@ -169,4 +228,3 @@ If Docker is not your preference, follow the [Developing Open WebUI](/getting-st
     ```bash
     docker volume rm open-webui
     ```
-

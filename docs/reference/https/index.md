@@ -19,21 +19,21 @@ Modern browsers block microphone access on non-HTTPS origins. **Voice Calls will
 
 | Method | Best for | TLS management |
 | :--- | :--- | :--- |
-| [**Cloudflare Tunnel**](./cloudflare-tunnel) | Production without open ports | Automatic (Cloudflare edge) |
-| [**ngrok**](./ngrok) | Development and testing | Automatic (ngrok edge) |
-| [**Tailscale**](./tailscale) | Private access across devices | Automatic (tailscale serve) |
-| [**Nginx**](./nginx) | Self-hosted production with full control | Manual or Let's Encrypt |
-| [**Caddy**](./caddy) | Self-hosted production, minimal config | Automatic (Let's Encrypt) |
-| [**HAProxy**](./haproxy) | High-availability / load balancing | Manual or Let's Encrypt |
+| [**Cloudflare Tunnel**](/reference/https/cloudflare-tunnel) | Production without open ports | Automatic (Cloudflare edge) |
+| [**ngrok**](/reference/https/ngrok) | Development and testing | Automatic (ngrok edge) |
+| [**Tailscale**](/reference/https/tailscale) | Private access across devices | Automatic (tailscale serve) |
+| [**Nginx**](/reference/https/nginx) | Self-hosted production with full control | Manual or Let's Encrypt |
+| [**Caddy**](/reference/https/caddy) | Self-hosted production, minimal config | Automatic (Let's Encrypt) |
+| [**HAProxy**](/reference/https/haproxy) | High-availability / load balancing | Manual or Let's Encrypt |
 | **Cloud load balancers** | AWS ALB, GCP LB, Azure App Gateway | Managed by cloud provider |
 
 ---
 
 ## Quick recommendations
 
-- **Just want HTTPS fast?** Use [Cloudflare Tunnel](./cloudflare-tunnel) (production) or [ngrok](./ngrok) (development). No certificates to manage, no ports to open.
-- **Running a reverse proxy already?** Add [Caddy](./caddy) for automatic certs or [Nginx](./nginx) for maximum control.
-- **Need load balancing?** Use [HAProxy](./haproxy) or your cloud provider's load balancer.
+- **Just want HTTPS fast?** Use [Cloudflare Tunnel](/reference/https/cloudflare-tunnel) (production) or [ngrok](/reference/https/ngrok) (development). No certificates to manage, no ports to open.
+- **Running a reverse proxy already?** Add [Caddy](/reference/https/caddy) for automatic certs or [Nginx](/reference/https/nginx) for maximum control.
+- **Need load balancing?** Use [HAProxy](/reference/https/haproxy) or your cloud provider's load balancer.
 
 ---
 

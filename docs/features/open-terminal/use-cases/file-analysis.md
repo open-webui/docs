@@ -1,6 +1,7 @@
 ---
 sidebar_position: 2
 title: "Analyze Documents & Data"
+description: "Use Open Terminal to read documents, analyze spreadsheets, extract information from files, and return results in Open WebUI."
 ---
 
 # Analyze Your Documents and Data
@@ -16,7 +17,7 @@ Got a pile of spreadsheets, PDFs, Word documents, or emails you need to make sen
 | **Presentations** | PowerPoint (.pptx), OpenDocument (.odp) |
 | **Other** | Email (.eml), E-books (.epub), plain text, HTML, Markdown, JSON, XML |
 
-The AI can read all of these directly. It doesn't need to upload them to any external service. File content stays on your server and is processed locally.
+Open Terminal reads and processes files in its execution environment. Content returned to the AI is sent to the model endpoint configured for the conversation. Use local models and local processing services when that content must remain within your infrastructure. See [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption).
 
 ---
 

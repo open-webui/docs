@@ -36,8 +36,8 @@ Settings are applied in this order (later ones override earlier ones):
 | **System Prompt** | Generated | `OPEN_TERMINAL_SYSTEM_PROMPT` | Replace the generated prompt with a custom template |
 | **Environment Info** | None | `OPEN_TERMINAL_INFO` | Append operator-provided environment context to the generated prompt |
 | **File Browser Root** | `home` | `OPEN_TERMINAL_FILE_BROWSER_ROOT` | Use `home`, an explicit path such as `/workspace`, or `filesystem` to opt out |
-| **Multi-User** | `false` | `OPEN_TERMINAL_MULTI_USER` | Enable [per-user isolation](./multi-user.md) |
-| **CORS Origins** | `*` | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains. The default `*` allows all origins (permissive); a startup warning is printed when it is left unset (since ~0.11.30) |
+| **Multi-User** | `false` | `OPEN_TERMINAL_MULTI_USER` | Give each user their own account and home folder in one shared container ([multi-user setup](./multi-user.md)) |
+| **CORS Origins** | `*` | `OPEN_TERMINAL_CORS_ALLOWED_ORIGINS` | Allowed cross-origin domains. The default `*` allows all origins (permissive); a startup warning is printed when it is left unset |
 | **Allowed Domains** | None | `OPEN_TERMINAL_ALLOWED_DOMAINS` | [Egress firewall](./security.md#egress-filtering): only allow outbound connections to these domains |
 | **Session CWD TTL** | `604800` (7 days) | `OPEN_TERMINAL_SESSION_CWD_TTL` | How long a session's saved working directory is remembered |
 | **Max Log Size** | `50000000` (50 MB) | `OPEN_TERMINAL_MAX_LOG_SIZE` | Max size of a session log before rotation |
@@ -147,8 +147,8 @@ Open Terminal comes in three sizes:
 | **Best for** | General use, AI agents | Smaller footprint | Smallest footprint |
 | **Size** | ~4 GB | ~430 MB | ~230 MB |
 | **Includes** | Node.js, Python, compilers, ffmpeg, Docker CLI, data science libs | git, curl, jq | git, curl, jq |
-| **Can install packages** | ✔ (has sudo) | ✘ | ✘ |
-| **Multi-user** | ✔ | ✘ | ✘ |
+| **Can install packages** | Yes (has sudo) | No | No |
+| **Multi-user** | Yes | No | No |
 
 **If you're not sure, use `latest`.** It has everything pre-installed so the AI can work with any tool without waiting for installs.
 

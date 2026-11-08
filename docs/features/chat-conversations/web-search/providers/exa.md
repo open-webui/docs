@@ -55,7 +55,7 @@ Next, you need to configure the Exa AI integration in the Open WebUI admin setti
 1.  **Log in as an Administrator:** Access your Open WebUI instance and log in with an administrator account.
 2.  **Navigate to Web Search Settings:** Go to **Settings > Admin > Web Search**.
 3.  **Select Exa as the Search Engine:** In the "Web Search Engine" dropdown menu, select **Exa**.
-4.  **Enter Your API Key:** In the **Exa API Key** input field that appears, paste the API key you copied from the Exa AI dashboard.
+4.  **Enter Your API Key:** In the **Exa API Key** input field that appears, paste the API key you copied from the Exa AI dashboard. An optional **Max Content Length** field (`EXA_MAX_CONTENT_LENGTH`, unset by default) caps the characters returned per result.
 5.  **Save Changes:** Scroll down and click the **Save** button to apply the changes.
 
 ### 3. (Optional) Environment Variable Configuration
@@ -64,7 +64,7 @@ Alternatively, you can configure the Exa AI integration using an environment var
 
 Set the following environment variable for your Open WebUI instance:
 
-- `EXA_API_KEY`: Your Exa AI API key.
+- [`EXA_API_KEY`](/reference/env-configuration#exa_api_key): Your Exa AI API key.
 
 When this environment variable is set, the "Exa API Key" field in the admin settings will be automatically populated.
 
@@ -77,6 +77,16 @@ docker run -d \\
   --name open-webui \\
   ghcr.io/open-webui/open-webui:main
 ```
+
+### 4. (Optional) Use Exa to Read Pages
+
+Exa can also act as the [web loader](/features/chat-conversations/web-search#search-engine-vs-web-loader), the part that reads the pages behind search results and links you share in chat. Exa fetches each page and returns its text and title.
+
+1.  In **Settings > Admin > Web Search**, set **Web Loader Engine** to `exa`, or set `WEB_LOADER_ENGINE=exa`.
+2.  If Exa is also your search engine, the loader uses the API key you entered above. With another search engine selected, an **Exa API Key** field appears under the web loader settings; it sets the same `EXA_API_KEY`.
+3.  The **Timeout** field ([`WEB_LOADER_TIMEOUT`](/reference/env-configuration#web_loader_timeout)) sets how many seconds each request to Exa may take. When it is empty, the limit is 60 seconds.
+
+The loader returns the full page text. **Max Content Length** applies to search results only; to cap the pages the `fetch_url` tool reads, set [`WEB_FETCH_MAX_CONTENT_LENGTH`](/reference/env-configuration#web_fetch_max_content_length).
 
 ## Verify the Integration
 

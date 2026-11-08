@@ -11,7 +11,7 @@ This guide explains **what events are**, **how you can trigger them** from your 
 
 ---
 
-## 🌊 What Are Events?
+## What Are Events?
 
 **Events** are real-time notifications or interactive requests sent from your backend code (Tool, or Function) to the web UI. They allow you to update the chat, display notifications, request confirmation, run UI flows, and more.
 
@@ -22,7 +22,7 @@ Think of Events like push notifications and modal dialogs that your plugin can t
 
 ---
 
-## 🏁 Availability
+## Availability
 
 ### Native Python Tools & Functions
 
@@ -43,11 +43,11 @@ Your external tool can use these headers to emit events back to the UI via:
 POST /api/v1/chats/{chat_id}/messages/{message_id}/event
 ```
 
-See [External Tool Events](#-external-tool-events) below for details.
+See [External Tool Events](#external-tool-events) below for details.
 
 ---
 
-## 🧰 Basic Usage
+## Basic Usage
 
 ### Sending an Event
 
@@ -112,7 +112,7 @@ if isinstance(result, dict) and result.get("error"):
 
 ---
 
-## 📜 Event Payload Structure
+## Event Payload Structure
 
 When you emit or call an event, the basic structure is:
 
@@ -127,7 +127,7 @@ Most of the time, you only set `"type"` and `"data"`. Open WebUI fills in the ro
 
 ---
 
-## 🗂 Full List of Event Types
+## Full List of Event Types
 
 Below is a comprehensive table of **all supported `type` values** for events, along with their intended effect and data structure. (This is based on up-to-date analysis of Open WebUI event handling logic.)
 
@@ -138,8 +138,8 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 | `chat:message:delta`,<br/>`message`          | Append content to the current message                | `{content: "text to append"}`                                                                        |
 | `chat:message`,<br/>`replace`                | Replace current message content completely           | `{content: "replacement text"}`                                                                      |
 | `chat:message:files`,<br/>`files`            | Set or overwrite message files (for uploads, output) | `{files: [...]}`                                                                                     |
-| `chat:title`                                 | Set (or update) the chat conversation title          | Topic string OR `{title: ...}`                                                                       |
-| `chat:tags`                                  | Update the set of tags for a chat                    | Tag array or object                                                                                  |
+| `chat:title`                                 | Set (or update) the chat conversation title          | The title string itself                                                                              |
+| `chat:tags`                                  | Tell the browser to reload the chat's tags           | Ignored. Write the tags to the database first, then emit                                             |
 | `source`,<br/>`citation`                     | Add a source/citation, or code execution result      | For code: See [below.](/features/extensibility/plugin/development/events#source-or-citation-and-code-execution) |
 | `notification`                               | Show a notification ("toast") in the UI              | `{type: "info" or "success" or "error" or "warning", content: "..."}`                                |
 | `confirmation` <br/>(needs `__event_call__`) | Ask for confirmation (OK/Cancel dialog)              | `{title: "...", message: "..."}`                                                                     |
@@ -151,7 +151,7 @@ Below is a comprehensive table of **all supported `type` values** for events, al
 
 - You can define your own types and handle them at the UI layer (or use upcoming event-extension mechanisms).
 
-### ❗ Details on Specific Event Types
+### Details on Specific Event Types
 
 ### `status`
 
@@ -185,12 +185,12 @@ The backend does not inspect `done` at all. It simply saves the value and forwar
 If you emit status events, always send at least one with `done: True` at the end of your status sequence. Without it, the last status item keeps its shimmer animation indefinitely, making it look like processing never finished, even after the response is complete.
 
 ```python
-# ✅ Correct pattern
+# Correct pattern
 await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
 # ... do work ...
 await __event_emitter__({"type": "status", "data": {"description": "Complete!", "done": True}})
 
-# ⚠️ Broken pattern: shimmer never stops
+# Broken pattern: shimmer never stops
 await __event_emitter__({"type": "status", "data": {"description": "Fetching data...", "done": False}})
 # ... do work, return result, but never sent done: True
 ```
@@ -200,7 +200,11 @@ await __event_emitter__({"type": "status", "data": {"description": "Fetching dat
 
 When `hidden` is `true`, the status is saved to `statusHistory` but **not shown** in the current status display. This is useful for internal status tracking that shouldn't be visible to the user.
 
-Additionally, when the message has no content yet and the last status has `hidden: true` (or no status exists at all), the frontend shows a blinking typing cursor instead of the status bar, so hidden statuses don't replace the indicator that something is still running. A visible status suppresses that cursor while the message is still empty; once the first content arrives the cursor trails the text until the message is marked done, whether a status is on screen or not.
+Additionally, when the message has no content yet and the last status has `hidden: true` (or no status exists at all), the frontend shows a pulsing typing cursor in place of the status bar, so hidden statuses don't replace the indicator that something is still running. A visible status suppresses that cursor while the message is still empty; once the first content arrives the cursor trails the text until the message is marked done, whether a status is on screen or not.
+
+#### Long Status Text
+
+The status line above a reply is cut to one line. Users click it to read the full text. When a message has several statuses, the click opens the status history, which shows every entry in full. Longer summaries, such as token usage reports, stay readable this way, also when several models answer side by side.
 
 ---
 
@@ -342,7 +346,7 @@ async def pipe(self, body: dict, __event_emitter__):
     await __event_emitter__(
         {
             "type": "embeds",
-            "data": {"embeds": ["<div>✅ Library indexed.</div>"], "replace": True},
+            "data": {"embeds": ["<div>Library indexed.</div>"], "replace": True},
         }
     )
     yield "Indexing complete."
@@ -371,15 +375,13 @@ await __event_emitter__(
 
 ### `chat:title`
 
-**Update the chat's title:**
+**Update the chat's title.** `data` is the title string itself, which is also how Open WebUI emits it after title generation. An object here would set the title to that object.
 
 ```python
 await __event_emitter__(
     {
         "type": "chat:title",
-        "data": {
-            "title": "Market Analysis Bot Session"
-        },
+        "data": "Market Analysis Bot Session",
     }
 )
 ```
@@ -388,17 +390,13 @@ await __event_emitter__(
 
 ### `chat:tags`
 
-**Update the chat's tags:**
+**Refresh the chat's tags.** The browser ignores `data` on this event and reloads the chat and the tag list from the server, which is also how Open WebUI uses it after tag generation. Write the tags to the database first, then emit the event as the refresh signal:
 
 ```python
-await __event_emitter__(
-    {
-        "type": "chat:tags",
-        "data": {
-            "tags": ["finance", "AI", "daily-report"]
-        },
-    }
-)
+from open_webui.models.chats import Chats
+
+await Chats.update_chat_tags_by_id(chat_id, ["finance", "AI", "daily-report"], user)
+await __event_emitter__({"type": "chat:tags", "data": {}})
 ```
 
 ---
@@ -426,7 +424,7 @@ await __event_emitter__(
 )
 ```
 
-`document` and `metadata` are parallel lists (one entry per cited passage). `source.name` / `source.id` label the citation group, and each `metadata` entry's `source` / `url` is the link shown under the response. External tools (OpenAPI and MCP) emit this same `source` event by POSTing the `{"type": "source", "data": {...}}` body to the [event endpoint](#-external-tool-events); this is how an MCP search tool attaches citations, including in native function calling mode.
+`document` and `metadata` are parallel lists (one entry per cited passage). `source.name` / `source.id` label the citation group, and each `metadata` entry's `source` / `url` is the link shown under the response. External tools (OpenAPI and MCP) emit this same `source` event by POSTing the `{"type": "source", "data": {...}}` body to the [event endpoint](#external-tool-events); this is how an MCP search tool attaches citations, including in native function calling mode.
 
 **For code execution (track execution state):**
 
@@ -444,6 +442,8 @@ await __event_emitter__(
 ---
 
 ### `notification`
+
+Notifications are dropped for internal requests, so an automation or a background task never shows a toast.
 
 **Show a toast notification:**
 
@@ -568,6 +568,10 @@ This uses the same `SensitiveInput` component used for user valve password field
 :::
 
 ---
+
+#### Select Input
+
+To offer a fixed set of choices instead of free text, pass `"input": {"type": "select", "options": ["a", "b"]}` in the data payload. Cancelling the dialog returns `false` rather than a string, so check for it before using the value.
 
 ### `execute` (works with both `__event_call__` and `__event_emitter__`)
 
@@ -700,12 +704,14 @@ The `execute` event and [Rich UI Embeds](/features/extensibility/plugin/developm
 Use `execute` for transient interactions (confirmations, custom dialogs, triggering downloads, reading page state) and Rich UI embeds for persistent visual content you want to stay in the conversation.
 
 :::warning
+If the JavaScript throws, the browser logs the error and never sends a reply, so an `__event_call__` waits until `WEBSOCKET_EVENT_CALLER_TIMEOUT` expires, which by default is forever. Wrap the code in `try` and `catch` and `return` an error value from the `catch` branch.
+
 Because `execute` runs unsandboxed JavaScript in the user's browser session, it has full access to the Open WebUI page context. Only use this in trusted functions. Never execute untrusted or user-provided code through this event.
 :::
 
 ---
 
-## 🏗️ When & Where to Use Events
+## When & Where to Use Events
 
 - **From any Tool, or Function** in Open WebUI.
 - To **stream responses**, show progress, request user data, update the UI, or display supplementary info/files.
@@ -721,19 +727,19 @@ For Pipes, be careful about mixing content delivery methods. If your `pipe()` me
 **Why event-only content delivery is fragile for pipes**: When a pipe completes, the frontend saves the entire chat history (including all message content from its local state) to the database. This full-history save can **overwrite** content that was previously persisted by the backend event emitter. If the pipe returns `None` or an empty string and relies solely on `type: "message"` events for content, the final save may write empty content to the database, erasing what the event emitter had written.
 
 ```python
-# ❌ Fragile: relies only on events for content — can be overwritten on save
+# Fragile: relies only on events for content — can be overwritten on save
 async def pipe(self, body: dict, __event_emitter__=None):
     await __event_emitter__({"type": "message", "data": {"content": "Hello!"}})
     # Returns None — frontend may save empty content, overwriting the emitted content
 
-# ✅ Correct: return content directly, use events for supplementary data
+# Correct: return content directly, use events for supplementary data
 async def pipe(self, body: dict, __event_emitter__=None):
     await __event_emitter__({"type": "status", "data": {"description": "Working...", "done": False}})
     result = "Hello!"
     await __event_emitter__({"type": "status", "data": {"description": "Done", "done": True}})
     return result
 
-# ✅ Also correct: yield for streaming, use events for supplementary data
+# Also correct: yield for streaming, use events for supplementary data
 async def pipe(self, body: dict, __event_emitter__=None):
     await __event_emitter__({"type": "status", "data": {"description": "Streaming...", "done": False}})
     for chunk in ["Hello", ", ", "world", "!"]:
@@ -744,7 +750,7 @@ async def pipe(self, body: dict, __event_emitter__=None):
 
 ---
 
-## 💡 Tips & Advanced Notes
+## Tips & Advanced Notes
 
 - **Multiple types per message:** You can emit several events of different types for one message. For example, show `status` updates, then stream with `chat:message:delta`, then complete with a `chat:message`.
 - **Custom event types:** While the above list is the standard, you may use your own types and detect/handle them in custom UI code.
@@ -752,7 +758,7 @@ async def pipe(self, body: dict, __event_emitter__=None):
 
 ---
 
-## 🧐 FAQ
+## FAQ
 
 ### Q: How do I trigger a notification for the user?
 Use `notification` type:
@@ -787,14 +793,14 @@ response = await __event_call__({
 Yes, use the `"files"` or `"chat:message:files"` event type with a `{files: [...]}` payload.
 
 ### Q: Can I update the conversation title or tags?
-Absolutely: use `"chat:title"` or `"chat:tags"` accordingly.
+The title, yes: emit `"chat:title"` with the new title string as `data`. Tags are different. `"chat:tags"` only makes the browser reload the tags from the server, so write them to the chat first and then emit it.
 
 ### Q: Can I stream responses (partial tokens) to the user?
 Yes, emit `"chat:message:delta"` events in a loop, then finish with `"chat:message"`.
 
 ---
 
-## 🌐 External Tool Events
+## External Tool Events
 
 External tools (OpenAPI and MCP servers) can emit events to the Open WebUI UI via a REST endpoint. This enables features like status updates, notifications, and streaming content from tools running on external servers.
 
@@ -927,7 +933,7 @@ async function myToolHandler(req) {
 
 ---
 
-## 🔒 Persistence & Browser Disconnection
+## Persistence & Browser Disconnection
 
 A common question is: **what happens if the browser tab is closed while a tool, action, or pipe is still running?**
 
@@ -951,9 +957,11 @@ There is **no timeout** on pipe, tool, or action execution. Your code can run fo
 
 ### Which Event Types Are Persisted to the Database?
 
-The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**. These writes are independent of the `ENABLE_REALTIME_CHAT_SAVE` setting.
+The event emitter writes certain event types directly to the database **regardless of whether a browser is connected**.
 
-#### ✅ Persisted (survive tab close)
+#### Persisted (survive tab close)
+
+Nothing below is written for a temporary chat or a channel message, since neither has a saved chat to write to.
 
 | Type | What's saved |
 |------|-------------|
@@ -964,7 +972,7 @@ The event emitter writes certain event types directly to the database **regardle
 | `files` | Merged into the message's `files` array, newest first |
 | `source` / `citation` | Appended to the message's `sources` array, but only when the payload has no `type` field of its own. A typed source such as `code_execution` is not written by the event emitter; it reaches the browser, which stores it on the message when it saves the chat. |
 
-These 6 types write to the database inside the event emitter function itself, completely independent of `ENABLE_REALTIME_CHAT_SAVE`.
+These 6 types write to the database inside the event emitter function itself.
 
 :::warning Use Short Names for Persistence
 The backend event emitter only recognizes the short names above for DB writes. If you emit `"chat:message:embeds"` instead of `"embeds"`, the frontend handles it identically, but the **backend won't persist it**. Always use the short names (`"status"`, `"message"`, `"replace"`, `"embeds"`, `"files"`, `"source"`) if you need persistence.
@@ -978,7 +986,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 **Bottom line for Pipes**: Use return/yield for message content. Use events for status updates, sources, files, embeds, and notifications.
 :::
 
-#### ❌ Not persisted (lost on tab close)
+#### Not persisted (lost on tab close)
 
 | Type | Why it's lost |
 |------|--------------|
@@ -998,7 +1006,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
 :::
 
-#### ⚠️ Requires live connection (errors on tab close)
+#### Requires live connection (errors on tab close)
 
 | Type | Why |
 |------|-----|
@@ -1007,7 +1015,7 @@ If your pipe or tool needs to call an LLM and have the result persist even when 
 | `execute` via `__event_call__` | Uses `sio.call()`, waits for a client response and returns an error dictionary if the timeout elapses |
 | `execute` via `__event_emitter__` | Fires and forgets, **will not error**, but JS may not run if no browser is connected |
 
-`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed the session is gone, so the call returns `{"error": "Client session disconnected."}` straight away. If the tab is merely inactive the call waits for [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout). That is unset by default, so it waits indefinitely; set it to a number of seconds and once it elapses the call returns `{"error": "Event call timed out. The browser tab may be inactive or closed."}`. Neither case raises, so test the return value instead of relying on `try`/`except`, and note that a timeout leaves the browser session connected: a user who was slow to answer can still be prompted again.
+`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed the session is gone, so the call returns `{"error": "Client session disconnected."}` straight away. In a saved chat, if the connection drops while the dialog is open, the call waits up to 60 seconds for the user to reopen that chat and then shows the dialog again. If the tab is merely inactive the call waits for [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout). That is unset by default, so it waits indefinitely; set it to a number of seconds and once it elapses the call returns `{"error": "Event call timed out. The browser tab may be inactive or closed."}`. Neither case raises, so test the return value instead of relying on `try`/`except`, and note that a timeout leaves the browser session connected: a user who was slow to answer can still be prompted again.
 
 `execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value, particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 
@@ -1017,11 +1025,7 @@ The final return value of your function is **always saved to the database** when
 
 #### Pipes
 
-When a pipe's `pipe()` method returns (or its generator finishes yielding), the streaming handler saves the final result at completion:
-- If `ENABLE_REALTIME_CHAT_SAVE` is **on**: intermediate chunks are saved during streaming
-- If `ENABLE_REALTIME_CHAT_SAVE` is **off**: the full final content is saved in one write at completion
-
-Either way, the final assistant message is always persisted. When you reopen the chat, it will be there.
+When a pipe's `pipe()` method returns (or its generator finishes yielding), the streaming handler saves the full final content in one write. The final assistant message is always persisted. When you reopen the chat, it will be there.
 
 :::caution
 The return value takes precedence over event-emitted content. If your pipe emits `"message"` events but returns `None`, the saved content will be empty, since the frontend's final save overwrites whatever the event emitter wrote to the database. Always return or yield your content directly from the `pipe()` method.
@@ -1031,10 +1035,10 @@ The return value takes precedence over event-emitted content. If your pipe emits
 
 | Return type | What happens | Persisted? |
 |-------------|-------------|-----------|
-| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
-| `HTMLResponse` (without inline) | Body decoded as plain text tool result | ✅ Yes |
-| `str` / `dict` | Used as tool result text | ✅ Yes |
-| `list` (MCP) | Text items joined, images converted to files | ✅ Yes |
+| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | Yes |
+| `HTMLResponse` (without inline) | Body decoded as plain text tool result | Yes |
+| `str` / `dict` | Used as tool result text | Yes |
+| `list` (MCP) | Text items joined, images converted to files | Yes |
 
 #### Actions
 
@@ -1042,10 +1046,10 @@ Actions are the exception to the rules above. Only an inline `HTMLResponse` is w
 
 | Return type | What happens | Persisted? |
 |-------------|-------------|-----------|
-| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | ✅ Yes |
-| `HTMLResponse` (without inline) | Body decoded to a string, then handled as any other return below | ❌ No |
-| `{"messages": [...]}` | The browser merges each entry into the message with that `id` and saves the chat | ⚠️ Only if the tab is still open |
-| any other `str` / `dict` | Returned to the caller and dropped, the chat is not touched | ❌ No |
+| `HTMLResponse` (with `Content-Disposition: inline`) | HTML body extracted → added to `embeds` → emitted as `"embeds"` event | Yes |
+| `HTMLResponse` (without inline) | Body decoded to a string, then handled as any other return below | No |
+| `{"messages": [...]}` | The browser merges each entry into the message with that `id` and saves the chat | Only if the tab is still open |
+| any other `str` / `dict` | Returned to the caller and dropped, the chat is not touched | No |
 
 #### Filters
 
@@ -1055,10 +1059,10 @@ Filters transform `form_data` in the pipeline, so they don't return results to t
 
 | Capability | Tools | Actions | Pipes | Filters |
 |-----------|-------|---------|-------|---------|
-| `__event_emitter__` | ✅ | ✅ | ✅ | ✅ |
-| `__event_call__` | ✅ | ✅ | ✅ | ✅ |
-| Return value → user response | ✅ | ✅ | ✅ | ❌ (modifies `form_data`) |
-| `HTMLResponse` → Rich UI embed | ✅ | ✅ | ❌ | ❌ |
+| `__event_emitter__` | Yes | Yes | Yes | Yes |
+| `__event_call__` | Yes | Yes | Yes | Yes |
+| Return value → user response | Yes | Yes | Yes | No (modifies `form_data`) |
+| `HTMLResponse` → Rich UI embed | Yes | Yes | No | No |
 
 ### Practical Summary
 
@@ -1071,7 +1075,7 @@ If you want your function's output to **survive a closed browser tab**, follow t
 
 ---
 
-## 📝 Conclusion
+## Conclusion
 
 **Events** give you real-time, interactive superpowers inside Open WebUI. They let your code update content, trigger notifications, request user input, stream results, handle code, and much more, seamlessly plugging your backend intelligence into the chat UI.
 
@@ -1082,4 +1086,4 @@ Refer to this document for common event types and structures, and explore Open W
 
 ---
 
-**Happy event-driven coding in Open WebUI! 🚀**
+**Happy event-driven coding in Open WebUI!**

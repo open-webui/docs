@@ -25,7 +25,6 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 
 [Linkup](https://www.linkup.so/) is a search API built for AI applications. Integrating it with Open WebUI lets your language model perform real-time web searches and ground responses in current sources. This tutorial guides you through configuring Linkup as a web search provider.
 
-Linkup support was added in Open WebUI v0.9.6.
 
 ## Prerequisites
 
@@ -51,7 +50,7 @@ Ensure you have:
 3. Enable **Web Search** by toggling it **On**.
 4. Select **linkup** from the **Web Search Engine** dropdown.
 5. Paste your Linkup API key into the **Linkup API Key** field.
-6. (Optional) Set the **Search Depth** and **Output Type** (see below).
+6. (Optional) Set search depth and output type in the **Parameters** field as a JSON object, for example `{"depth": "standard", "outputType": "sourcedAnswer"}` (see below).
 7. Save your settings.
 
 ### 3. Test the Integration
@@ -77,7 +76,7 @@ These map to the [`LINKUP_SEARCH_PARAMS`](/reference/env-configuration#linkup_se
 -e LINKUP_SEARCH_PARAMS='{"depth": "deep", "outputType": "searchResults"}'
 ```
 
-The same fields are exposed in the Admin UI when the `linkup` engine is selected, so you do not need environment variables unless you prefer to manage configuration that way. See [Environment Variable Configuration](https://docs.openwebui.com/environment) for details and the [`ENABLE_PERSISTENT_CONFIG`](/reference/env-configuration#enable_persistent_config) behavior.
+The same JSON object is exposed as the single **Parameters** field in the Admin UI when the `linkup` engine is selected, so you do not need environment variables unless you prefer to manage configuration that way. See [Environment Variable Configuration](https://docs.openwebui.com/reference/env-configuration) for details and the [`ENABLE_PERSISTENT_CONFIG`](/reference/env-configuration#enable_persistent_config) behavior.
 
 ## Troubleshooting
 

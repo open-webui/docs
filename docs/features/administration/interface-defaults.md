@@ -16,6 +16,10 @@ You can configure them in two ways:
 
 ---
 
+:::tip Renaming what the interface says
+These settings decide the starting values of the options users see. To change the wording of the interface itself, a label or a button, use **UI Translations** on the same admin page. See [Translations](/features/administration/translations#interface-text).
+:::
+
 ## How a value is decided
 
 1. If the person has set that option themselves, their value is used.
@@ -24,7 +28,7 @@ You can configure them in two ways:
 
 An on/off option someone has never touched shows a small **Default** label beside its switch in **Settings > Interface**. The options that are not switches carry no label, but they inherit the same way.
 
-Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option.
+Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option. Saving the **Interface** page keeps them inherited, **Font Family** and the **Image Compression** size included.
 
 :::info Matching the default releases the option
 Moving a control to whatever your default currently is releases the override: the **Default** label comes back and the option follows your defaults again. That is how someone undoes a choice they made earlier.
@@ -95,7 +99,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `showUpdateToast` | Toast Notifications for New Updates | `true` |
 | `showChangelog` | Show "What's New" Modal on Login | `true` |
 
-`textScale` is the **UI Scale** slider and `highContrastMode` is **Accessibility Mode**, which was called **High Contrast Mode** before v0.11.2. The key kept its old name, so existing defaults keep working untouched.
+`textScale` is the **UI Scale** slider and `highContrastMode` is **Accessibility Mode**. With Accessibility Mode on, phones allow pinch zoom up to 5x; with it off, zoom stays locked so phones do not zoom into small text fields on their own.
 
 `fontFamily` names a font that has to be installed on each person's own machine. Nothing is downloaded, so a default naming a font your users do not have simply falls back to the standard one, and everybody sees the usual interface. Set it only where you know what is installed, such as a managed fleet with a corporate typeface.
 
@@ -129,8 +133,8 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `expandDetails` | Always Expand Details | `false` |
 | `chatHoverPreview` | Chat Hover Previews | `true` |
 | `displayMultiModelResponsesInTabs` | Display Multi-model Responses in Tabs | `false` |
-| `showFilesOnTerminalSelect` | Show Files on Terminal Select | `true` |
 | `terminalFileDisplay` | Terminal File Display | `sidebar` |
+| `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
 | `stylizedPdfExport` | Stylized PDF Export | `true` |
 | `showFloatingActionButtons` | Floating Quick Actions | `true` |
 | `floatingActionButtons` | Floating Quick Actions > **Manage** | `null` |
@@ -142,7 +146,7 @@ Every option on the **Settings > Interface** page, in the order it appears there
 
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
-| `ctrlEnterToSend` | Enter Key Behavior | `false` (**Enter to Send**); `true` is **Ctrl+Enter to Send** |
+| `ctrlEnterToSend` | Enter Key Behavior | `false` (**Enter to Send**); `true` is **Ctrl+Enter to Send**, in chats, channel messages and thread replies |
 | `richTextInput` | Rich Text Input for Chat | `true` |
 | `promptAutocomplete` | Prompt Autocompletion | `false` |
 | `showFormattingToolbar` | Show Formatting Toolbar | `false` |
@@ -156,7 +160,6 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `detectArtifacts` | Detect Artifacts Automatically | `true` |
 | `iframeSandboxAllowScripts` | iframe Sandbox Allow Scripts | `true` |
 | `iframeSandboxAllowSameOrigin` | iframe Sandbox Allow Same Origin | `false` |
-| `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
 | `iframeSandboxAllowForms` | iframe Sandbox Allow Forms | `true` |
 | `iframeSandboxAllowDownloads` | iframe Sandbox Allow Downloads | `true` |
 
@@ -177,14 +180,14 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `imageCompressionInChannels` | Compress Images in Channels | `true` |
 
 :::note Rows that are not always on screen
-A few controls only appear under a condition: **Toast Notifications for New Updates** and **Show "What's New" Modal on Login** are shown to admins only, **Display the Username Instead of You in the Chat** appears when **Chat Bubble UI** is off, **Temporary Chat by Default** needs the temporary-chat permission, **Prompt Autocompletion** needs autocomplete generation enabled on the instance, **Show Formatting Toolbar** and **Insert Prompt as Rich Text** appear when **Rich Text Input for Chat** is on, and **Compress Images in Channels** appears when **Image Compression** is on. Setting a default for any of them still works; it simply takes effect for the people who can see the control.
+A few controls only appear when they can apply, for example the terminal settings once the user can reach a terminal, or **Web Search in Chat** while web search is on and allowed. Setting a default for them still works; it takes effect for the people who see the control.
 :::
 
 ---
 
 ## What this does not do
 
-- **It does not restrict anyone.** Everyone keeps full control of every option in **Settings > Interface**. To actually hold people to your values, take **Interface Settings Access** away from them, see [Locking the defaults](#locking-the-defaults).
+- **It does not restrict anyone.** Everyone keeps full control of every option in **Settings > Interface**. To actually hold people to your values, take **Interface Settings Access** away from them (see [Locking the defaults](#locking-the-defaults)) or hide single options with [Visible controls](#hiding-controls).
 - **It does not wipe anyone's existing choices.** Whatever someone already set for themselves keeps its value. What changes is the options they never set: those move from the built-in value to yours.
 - **It does not cover Theme or Language.** Both are stored in the browser rather than on the account, so they are not part of this. Use [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale) to choose the starting language.
 
@@ -193,6 +196,12 @@ A few controls only appear under a condition: **Toast Notifications for New Upda
 ## Locking the defaults
 
 If a set of accounts should stay exactly on your values, remove the **Interface Settings Access** permission from them (see [Permissions](/features/authentication-access/rbac/permissions)). Doing so hides the **Interface** page and refuses any attempt to save personal settings, so those accounts keep whatever you have configured. Admins are exempt from the permission and can always change their own settings.
+
+---
+
+## Hiding controls
+
+**Visible controls** in **Settings > Admin > Interface** hides single controls from everyone except admins. Hiding only removes the control from view: its value and the feature behind it stay in effect, so use a [permission](/features/authentication-access/rbac/permissions) to stop people using a feature. Hiding **Archive** also hides unarchiving and **Archive All Chats**. A section or menu entry whose controls are all hidden disappears with them, such as **Add Context** in the chat input menu or the **Capabilities** section of the model editor. The same list can be set with [`UI_VISIBILITY`](/reference/env-configuration#ui_visibility).
 
 ---
 

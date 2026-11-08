@@ -35,5 +35,5 @@ Bing Search APIs will be retired on 11th August 2025. New deployments are not su
 2. On the key management page, locate Key1 or Key2 and copy your desired key.
 3. Open **Settings > Admin > Web Search**.
 4. Enable the Web search option and set the Web Search Engine to bing.
-5. Fill `SearchApi API Key` with the `API key` that you copied in step 2 from [AzurePortal](https://portal.azure.com/#create/Microsoft.BingSearch) dashboard.
+5. Fill **Bing Search V7 Subscription Key** (`BING_SEARCH_V7_SUBSCRIPTION_KEY`) with the key that you copied in step 2 from the [Azure Portal](https://portal.azure.com/#create/Microsoft.BingSearch) dashboard. **Bing Search V7 Endpoint** (`BING_SEARCH_V7_ENDPOINT`) defaults to `https://api.bing.microsoft.com/v7.0/search` and only needs changing for a custom endpoint. Open WebUI does not check that the key is set, so an empty key fails at Bing rather than in Open WebUI.
 6. Click `Save`.

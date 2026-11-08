@@ -31,7 +31,7 @@ The settings sidebar lists **Integrations** twice, once under **Personal** in th
 
 ### 3. Find the "Open Terminal" section
 
-Scroll down until you see the **Open Terminal** section.
+Scroll down until you see the **Terminal** section with the **Open Terminal** connections. It is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
 
 ![The Open Terminal section under Integrations](/images/open-terminal-connected.png)
 
@@ -45,10 +45,13 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | :--- | :--- |
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
-| **Auth Type** | Leave as `Bearer` (the default) |
+| **Auth** | Leave as `Bearer` (the default) |
 | **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
+| **Working Directory Context** | Under **Advanced**, on by default. [Working Directory Context](#working-directory-context) covers when to turn it off |
+| **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
+| **Forward cookies** | Under **Advanced**, off by default. Only turn it on for a terminal server that authenticates by cookie, since every cookie the browser holds for your Open WebUI domain travels with the request |
 
-![Connection form filled in with URL and API key](/images/open-terminal-connection-form.png)
+![Add Terminal Connection form with the Name, URL, Chat Uploads and Auth fields still empty](/images/open-terminal-connection-form.png)
 
 ### 5. Save
 
@@ -70,15 +73,17 @@ The same section carries a **Policy** block that takes environment variables for
 
 ### 7. Select a terminal in chat
 
-In the chat input area, click the **terminal button** (cloud icon ☁). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
+In the chat input area, click the **terminal button** (cloud icon). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
 
-![Terminal dropdown showing Docs Terminal under System](/images/open-terminal-chat-dropdown.png)
+![Terminal dropdown showing Open Terminal under System](/images/open-terminal-chat-dropdown.png)
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it.
 
+Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a [Per chat](/features/open-terminal/terminals/orchestration/contexts) terminal the button appears once the chat is saved.
+
 ### 8. Enable native function calling
 
-Native function calling is the default tool-calling mode as of v0.10.0, so it is already active for new models. The only thing to check is that the model was not switched to **Legacy**:
+Native function calling is the default tool-calling mode, so it is already active for new models. The only thing to check is that the model was not switched to **Legacy**:
 
 1. Go to **Workspace → Models**
 2. Click the edit button on the model you're using
@@ -92,7 +97,7 @@ If the model is set to **Legacy**, Open WebUI falls back to prompt-based tool ca
 :::
 
 :::tip Performance depends on the model
-Not all models are equally capable with tools. Multi-step terminal workflows are the most demanding agentic use case in Open WebUI, so this is one place where a top-tier model genuinely pays off — GPT-5.6 Sol, Claude Opus 5, or Gemini 3.5 Pro. A current mid-tier model (GPT-5.6 Terra, Claude Sonnet 5, Gemini 3.6 Flash, MiniMax M3) is the practical **minimum**. Older or very small models may fail to invoke tools or produce malformed tool calls. If results are poor, try a more capable model.
+Not all models are equally capable with tools. Multi-step terminal workflows are the most demanding agentic use case in Open WebUI, so this is one place where a top-tier model genuinely pays off: GPT-5.6 Sol, Claude Opus 5 or Gemini 3.5 Pro. A current mid-tier model (GPT-5.6 Terra, Claude Sonnet 5, Gemini 3.6 Flash, MiniMax M3) is the practical **minimum**. Older or very small models may fail to invoke tools or produce malformed tool calls. If results are poor, try a more capable model.
 :::
 
 ### 9. Try it out
@@ -120,6 +125,8 @@ Adding a terminal connection via personal Settings sends the API key to your bro
 
 If you need to test a connection without admin access, you can add one from the **Personal** part of settings, under *Services*, at **Integrations → Open Terminal**. The same URL and API key fields apply, and the connection is yours alone rather than the instance's.
 
+The personal **Integrations** tab shows only while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)). While it is off, connections saved there are not used in chats.
+
 ---
 
 ## Chat Uploads
@@ -128,20 +135,45 @@ If you need to test a connection without admin access, you can add one from the 
 
 `Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what a connection nobody has touched does, and what happens with no terminal selected at all.
 
-`Filesystem` writes the file into the terminal. It lands in the terminal's current working directory, the same place the [file browser](../file-browser.md) is showing, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
+`Filesystem` writes the file into the terminal. It lands in the folder the [file browser](../file-browser.md) has open, or in the terminal's current working directory when the browser has not opened a folder on that terminal, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
 
 A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
 
 Four things change with it:
 
-- **The model no longer needs to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
+- **The model does not need to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
 - **The model is told the path only when it can act on it.** Open WebUI passes the paths of attached files to the model alongside the message when the model is using native function calling in a saved conversation. Set the model to [Legacy](#8-enable-native-function-calling) function calling, or turn its **Builtin Tools** capability off, and the file still reaches the terminal while the model is left without its location.
 - **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
 
+On a [**Per chat**](/features/open-terminal/terminals/orchestration/contexts) terminal, a file attached to a new chat's first message uploads into that chat's terminal when you send it.
+
 The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
 
 ![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)
+
+---
+
+## Working Directory Context
+
+**Working Directory Context** is under **Advanced** on connections an administrator adds. It is on by default. While it is on, Open WebUI asks the terminal for its current working directory on every message and writes it into the instructions of the command tool, so the model knows where its commands run.
+
+Tool instructions are part of the cached prefix of every request, so each change of directory starts the provider's [prompt cache](/features/chat-conversations/prompt-caching) over. Turn the switch off to keep the instructions identical from message to message.
+
+## User Shell Tools
+
+A **New Terminal** tab, from the **+** menu of the **Tabs**, is your own shell. Two tools let the model read that shell's recent output and send input to it. **User Shell Tools**, under **Advanced**, decides when the model gets them:
+
+- `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks your browser whether it is.
+- `Always Include`: on every message, open shell or not. The tool list stays the same from message to message, which keeps the [prompt cache](/features/chat-conversations/prompt-caching) intact when you open and close the shell.
+
+Automations and sub-agents never get the two tools. The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
+
+## AGENTS.md
+
+When a terminal is selected in the chat, Open WebUI reads `AGENTS.md` from the home folder of the terminal's user on every message. Its content is added to the conversation as a user message just before the first user message, so the model gets your standing instructions for that workspace. Edits to the file apply from the next message. Windows home folders work too.
+
+A file larger than 32 KiB is skipped, and so is a read that takes longer than 5 seconds. A terminal an admin configured is read by the Open WebUI server. A terminal a user added in their own settings is read through that user's browser, so the chat tab has to stay open.
 
 ---
 
@@ -187,12 +219,6 @@ docker exec open-webui curl -s http://open-terminal:8000/health
 
 If it prints `{"status": "ok"}`, the connection works. If it errors, the containers can't see each other.
 :::
-
-### Nothing happens when you save a new connection
-
-Adding a connection works whether you reach Open WebUI over `https://` or over plain `http://`. On older versions the **Add Terminal Connection** dialog stayed open and saved nothing when the interface was reached over plain `http://` at a network address, a LAN IP for example, rather than on `localhost`. Browsers withhold the identifier generator a new connection needs on origins they do not treat as secure, and a new connection gets its identifier automatically when you leave the optional **ID** field blank. Typing an **ID** of your own works around it, because then there is nothing to generate.
-
-Only creating a connection from **Settings > Admin > Integrations** was affected. Editing, enabling, disabling or deleting an existing one, adding one under your own **Settings > Integrations** and connections shipped in [`TERMINAL_SERVER_CONNECTIONS`](/reference/env-configuration#terminal_server_connections) all worked regardless.
 
 ### Terminal shows up but AI doesn't use it
 

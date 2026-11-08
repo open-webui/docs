@@ -7,6 +7,8 @@ title: "Automations"
 
 Automations let you schedule prompts to run automatically at recurring times. Each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
 
+Runs use [memory](/features/chat-conversations/memory) the same way your chats do. When memory is on for you, a run gets the memory tools and, with **Memory System Context** on, your stored memories in its context, under the same model, permission and admin settings as a chat. Whether memory is on follows your **Memory** switch in **Settings > Personalization**; if you never set it, the [default interface settings](/features/administration/interface-defaults) decide, and without those, whether Memories is enabled for the instance.
+
 Automations can be enabled or disabled globally by an administrator via the [`ENABLE_AUTOMATIONS`](/reference/env-configuration#enable_automations) environment variable or the **Settings > Admin > General** toggle. When disabled, the automation worker stops processing, API endpoints return `403`, and the sidebar entry is hidden.
 
 ## What You Can Automate
@@ -91,6 +93,10 @@ On the editor page, you can:
 
 Execution logs are paginated with infinite scroll in the editor, so large run histories load incrementally.
 
+### Quick delete
+
+Hold **Shift** while the Automations list is open and each automation's menu button and on/off switch turn into a delete button. Clicking it deletes that automation straight away, without asking. Release **Shift** and the menu and switch come back. Deleting from the menu still asks you to confirm.
+
 ## Export and Import
 
 The Automations list header has a split **Create** button. Its dropdown holds **Import JSON** and **Export JSON**, which move automations between instances or accounts.
@@ -128,6 +134,8 @@ Supported schedule modes:
 - **Monthly**
 - **Custom** (`RRULE`)
 
+**Daily**, **Weekly** and **Monthly** run at the exact minute you pick, in your own timezone.
+
 Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
 
 A few rules about how a custom rule is read:
@@ -141,7 +149,8 @@ A few rules about how a custom rule is read:
 ## Notes
 
 - Automations run in the background worker loop on a polling interval.
-- Every run records a status (`success` or `error`) and optional error details.
+- Every run records a status (`success` or `error`) and optional error details. A run that replies in a chat is recorded as `success` once the reply has finished. A reply that fails or is cancelled is recorded as `error`, and the run keeps its **View chat** link so you can open the chat.
+- To be told when a run fails, subscribe a [notification target](/features/chat-conversations/chat-features/notifications#events) to `automation.run_failed`.
 - Deleting an automation also removes its run history.
 
 ## Managing Automations from Chat

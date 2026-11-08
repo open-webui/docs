@@ -15,10 +15,10 @@ title: "FAQ"
 4. **Be kind.** Respectful, well-prepared questions help contributors and core team members respond effectively. Please review our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)** before participating.
 
 **Where to ask:**
-- 🤖 **Quick Answers**: [Discord #questions channel](https://discord.gg/5rJgQTnV4s). Try the bot first, it can answer most Open WebUI questions
-- 🐛 **Bugs**: [GitHub Issues](https://github.com/open-webui/open-webui/issues). Please use the issue template and include all requested information (Open WebUI version, browser, deployment method, expected vs. actual behavior, and logs). Clear steps to reproduce the issue along with relevant settings are essential, and reproducibility is key to getting bugs resolved quickly. Reports missing key details may be closed or converted to discussions.
-- 💬 **Questions & Help**: [Discord](https://discord.gg/5rJgQTnV4s) (most active community), [Reddit](https://www.reddit.com/r/OpenWebUI/), or [GitHub Discussions](https://github.com/open-webui/open-webui/discussions)
-- 💡 **Feature Requests**: [GitHub Discussions](https://github.com/open-webui/open-webui/discussions/new/choose)
+- **Quick Answers**: [Discord #questions channel](https://discord.gg/5rJgQTnV4s). Try the bot first, it can answer most Open WebUI questions
+- **Bugs**: [GitHub Issues](https://github.com/open-webui/open-webui/issues). Please use the issue template and include all requested information (Open WebUI version, browser, deployment method, expected vs. actual behavior, and logs). Clear steps to reproduce the issue along with relevant settings are essential, and reproducibility is key to getting bugs resolved quickly. Reports missing key details may be closed or converted to discussions.
+- **Questions & Help**: [Discord](https://discord.gg/5rJgQTnV4s) (most active community), [Reddit](https://www.reddit.com/r/OpenWebUI/), or [GitHub Discussions](https://github.com/open-webui/open-webui/discussions)
+- **Feature Requests**: [GitHub Discussions](https://github.com/open-webui/open-webui/discussions/new/choose)
 
 :::important
 All community participants are expected to follow our **[Code of Conduct](https://github.com/open-webui/open-webui/blob/main/CODE_OF_CONDUCT.md)**. Hostile or disruptive behavior will result in immediate action.
@@ -40,7 +40,7 @@ For more details on enterprise solutions and branding customizations, [click her
 
 ### Q: How can I manage or delete files I've uploaded?
 
-**A:** You can access the **File Manager** by going to **Settings > Data Controls > Manage Files > Manage**. This dashboard allows you to search through all your uploaded documents, view their details, and delete them. Deleting a file here also automatically cleans up any associated Knowledge Base entries and vector embeddings.
+**A:** You can access the **File Manager** by going to **Settings > Data Controls > Manage Files > Manage**. This dashboard allows you to search through all your uploaded documents, view their details, download them and delete them. Deleting a file here also automatically cleans up any associated Knowledge Base entries and vector embeddings.
 
 ### Q: I get "The prompt is too long" / "context length exceeded" after a while in a chat. How do I fix it?
 
@@ -169,7 +169,7 @@ docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host
 
 ### Q: RAG with Open WebUI is very bad or not working at all. Why?
 
-**A:** If you're using **Ollama**, be aware that Ollama sets the context length to **2048 tokens by default**. This means that none of the retrieved data might be used because it doesn't fit within the available context window.
+**A:** If you're using **Ollama**, be aware that Ollama picks a model's default context length from your GPU's VRAM, and on GPUs with less than 24 GiB that is **4096 tokens** (see [Ollama's context length documentation](https://docs.ollama.com/context-length)). This means that none of the retrieved data might be used because it doesn't fit within the available context window.
 
 To improve the performance of Retrieval-Augmented Generation (**RAG**) with Open WebUI, you should **increase the context length** to a much larger value (**8192+ tokens**) to ensure that retrieved documents can effectively contribute to the model’s responses.
 
@@ -253,7 +253,7 @@ For more optimization tips, see the **[Performance Tips Guide](troubleshooting/p
 
 ### Q: Is MCP (Model Context Protocol) supported in Open WebUI?
 
-**A:** Yes, Open WebUI includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at 👉 [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
+**A:** Yes, Open WebUI includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
 
 ### Q: Why doesn't Open WebUI natively support [Provider X]'s proprietary API?
 
@@ -335,7 +335,7 @@ With the right infrastructure configuration, Open WebUI is designed to scale fro
 
 If you’re planning a high-availability, enterprise-grade deployment, we recommend reviewing this excellent community resource:
 
-👉 [The SRE's Guide to High Availability Open WebUI Deployment Architecture](http://taylorwilsdon.medium.com/the-sres-guide-to-high-availability-open-webui-deployment-architecture-2ee42654eced)
+[The SRE's Guide to High Availability Open WebUI Deployment Architecture](http://taylorwilsdon.medium.com/the-sres-guide-to-high-availability-open-webui-deployment-architecture-2ee42654eced)
 *(This provides a strong technical overview and best practices for large-scale Open WebUI architecture.)*
 
 Open WebUI is designed from day one to not just handle, but thrive at scale, serving large organizations, universities, and enterprises worldwide.
@@ -350,7 +350,7 @@ To stay informed, you can follow release notes and announcements on our [GitHub 
 
 If you encounter an Open WebUI deployment that appears to violate the Open WebUI license (such as removed branding where it is not permitted, misleading white-labeling, commercial misuse, or any form of unauthorized redistribution) you can confidentially report it to our compliance team.
 
-📩 **Email:** **[reports@openwebui.com](mailto:reports@openwebui.com)**
+**Email:** **[reports@openwebui.com](mailto:reports@openwebui.com)**
 Please include any relevant details (screenshots, URLs, description of usage, etc.) so we can investigate appropriately.
 
 We review every report in good faith and handle all submissions discreetly. Protecting the health, clarity, and integrity of the Open WebUI ecosystem helps us keep the project sustainable, fair, and openly accessible for everyone.

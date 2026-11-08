@@ -3,17 +3,24 @@ sidebar_position: 100
 title: "Image Generation"
 ---
 
-## 🎨 Image Generation Troubleshooting
+## Image Generation Troubleshooting
 
 ### General Issues
 
 - **Image Not Generating** (asking for an image produces no image, or an error appears in the chat):
     - Check the **Images** settings in **Settings** > **Admin** > **Images**. Ensure "Image Generation" is toggled **ON**.
-    - Ensure the **Image** toggle is on in the **Integrations** menu of the message input. Nothing image-related happens without it, in any function calling mode.
+    - Ensure the **Image** toggle is on in the **+** menu of the message input. Nothing image-related happens without it, in any function calling mode.
     - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
+
+- **Images settings refuse to save** (saving **Settings** > **Admin** > **Images** shows an error such as `OpenAI API Key is required.`):
+    - Keys and URLs are only required while their feature is on. Fill in the field, or switch the feature off, and save again.
+    - Invalid JSON in **Additional Parameters** is refused with `Invalid JSON format for Parameters`. Fix or clear it and save again.
+
+- **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
+    - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Their saved values are kept while hidden.
 
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
     - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
@@ -31,14 +38,16 @@ title: "Image Generation"
         3. Click "Save (API Format)" in the menu.
     - **Do not** use the standard "Save" button or standard JSON export.
 
+- **Generation or editing shows an error** (the workflow failed inside ComfyUI):
+    - The Open WebUI server log names the failed node and its error as `ComfyUI <node type> failed: <message>`. Fix that node in the workflow.
+
 - **Image Editing / Image Variation Fails** (generating from text works, but editing or image-to-image fails silently):
     - If you are using Image Editing or Image+Image generation, your custom workflow **must** have nodes configured to accept an input image (usually a `LoadImage` node replaced/linked effectively).
     - Check the default "Image Editing" workflow in the Open WebUI settings for the required node structure to ensure compatibility.
 
 - **Generation/editing fails when ComfyUI is on a private/internal address** (e.g. `10.x`, `192.168.x`, `172.16–31.x`, or `localhost`), often only after the workflow runs:
-    - Open WebUI applies SSRF protection to outbound fetches, which previously blocked retrieving the rendered image back from a ComfyUI instance on a private network.
-    - **Fixed in v0.9.6**: image URLs are now trusted when they are same-origin with the admin-configured `COMFYUI_BASE_URL` (a strict scheme + host + port match, not a string prefix), so a private-network ComfyUI works without weakening SSRF protection globally.
-    - Ensure `COMFYUI_BASE_URL` is set to the **exact** origin ComfyUI serves images from (matching scheme, host, and port). If ComfyUI returns image URLs on a different host/port than `COMFYUI_BASE_URL`, those fetches are still SSRF-validated and may be blocked. On older versions, upgrade rather than disabling SSRF protection.
+    - Open WebUI applies SSRF protection to outbound fetches and trusts image URLs only when they are same-origin with the admin-configured `COMFYUI_BASE_URL` (a strict scheme + host + port match).
+    - Ensure `COMFYUI_BASE_URL` (and, for image editing, `IMAGES_EDIT_COMFYUI_BASE_URL`, which is empty by default and is the only origin the edit path trusts) is set to the **exact** origin ComfyUI serves images from (matching scheme, host, and port). If ComfyUI returns image URLs on a different host/port than `COMFYUI_BASE_URL`, those fetches are still SSRF-validated and may be blocked. On older versions, upgrade rather than disabling SSRF protection.
 
 ### Automatic1111 Issues
 

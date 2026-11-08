@@ -16,7 +16,7 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 ### 1. **Per-chat basis:**
 
 - **Description**: The per-chat basis setting refers to the system prompt and advanced parameters configured for a specific chat instance. These settings are only applicable to the current conversation and do not affect future chats.
-- **How to set**: Users can modify the system prompt and advanced parameters for a specific chat instance within the right-hand sidebar's **Chat Controls** section in Open WebUI.
+- **How to set**: Open the **Model controls** menu (the knobs icon next to the message input) and expand **Controls**. It holds the chat's files, valves, system prompt and advanced parameters, and shows for admins and for users with the **Allow Chat Controls** [permission](/features/authentication-access/rbac/permissions#3-chat-permissions).
 - **Override capabilities**: Users are restricted from overriding the **System Prompt** already set by an administrator on a per-model basis (**#3**). This ensures consistency and adherence to model-specific settings. An **Advanced Parameter** set here is the value sent for that chat, even when the model carries one of its own.
 
 <!-- markdownlint-disable-next-line MD033 -->
@@ -27,7 +27,7 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 :::tip
 
 **Per-chat basis**:
-Suppose a user wants to set a custom system prompt for a specific conversation. They can do so by accessing the **Chat Controls** section and modifying the **System Prompt** field. These changes will only apply to the current chat session.
+Suppose a user wants to set a custom system prompt for a specific conversation. They can do so by opening **Model controls > Controls** and modifying the **System Prompt** field. These changes will only apply to the current chat session.
 
 :::
 </details>
@@ -36,7 +36,7 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 
 - **Description**: The per-account basis setting refers to the default system prompt and advanced parameters configured for a specific user account. Any user-specific changes can serve as a fallback in situations where lower-level settings aren't defined.
 - **How to set**: Users can set their own system prompt and advanced parameters for their account within the **General** section of the **Settings** menu in Open WebUI.
-- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that it can still be overridden if an administrator has already set the **System Prompt** on a per-model basis for the particular model being used. An **Advanced Parameter** set here is sent in place of the model's, and is itself replaced by anything the chat sets in **Chat Controls**.
+- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that it can still be overridden if an administrator has already set the **System Prompt** on a per-model basis for the particular model being used. An **Advanced Parameter** set here is sent in place of the model's, and is itself replaced by anything the chat sets in its **Controls**.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -56,8 +56,9 @@ Suppose a user wants to set their own system prompt for their account. They can 
 - **Description**: The per-model basis setting refers to the default system prompt and advanced parameters configured for a specific model. These settings are applicable to all chat instances using that model.
 - **How to set**: Administrators can set the default system prompt and advanced parameters for a specific model within the **Models** section of the **Workspace** in Open WebUI.
 - **Override capabilities**: **User** accounts are restricted from modifying the **System Prompt** or specific **Advanced Parameters** on a per-model basis (**#3**). This restriction prevents users from inappropriately altering default settings.
-- **System prompt preservation:** When a model's **System Prompt** is set manually in the **Workspace** section by an Admin, it cannot be overridden or adjusted on a per-account basis within the **General** settings or **Chat Controls** section by a **User** account. This ensures consistency and adherence to model-specific settings.
-- **Parameter precedence:** An **Advanced Parameter** an Admin sets on the model applies to every chat that does not set that same parameter itself. A **User** account that sets it in the **General** settings or in **Chat Controls** sends its own value instead, and the per-chat value wins over the per-account one. A parameter nobody has set at any of those levels falls through to the instance-wide values under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin). This includes the context length: a `num_ctx` set in **Chat Controls** is the one sent, even for a model that carries its own.
+- **System prompt preservation:** When a model's **System Prompt** is set manually in the **Workspace** section by an Admin, it cannot be overridden or adjusted on a per-account basis within the **General** settings or a chat's **Controls** by a **User** account. This ensures consistency and adherence to model-specific settings.
+- **Parameter precedence:** An **Advanced Parameter** an Admin sets on the model applies to every chat that does not set that same parameter itself. A **User** account that sets it in the **General** settings or in a chat's **Controls** sends its own value, and the per-chat value wins over the per-account one. A parameter nobody has set at any of those levels falls through to the instance-wide values under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin). This includes the context length: a `num_ctx` set in a chat's **Controls** is the one sent, even for a model that carries its own. **Stream Chat Response** is the exception: a value set on the model wins, then the chat's, then the account's.
+- **Model controls:** When the model has [Model controls](/features/workspace/models#model-controls), the option picked there (or the control's default option) sits above every level: its parameters replace the same ones set in a chat's **Controls**, the **General** settings, the model or the Global Model Defaults. The choice is saved per model on the account, so it carries across all chats with that model.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -87,9 +88,9 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 - Assign your primary System Prompt (**i.e., to give an LLM a defining character**) you want to use in your **General** settings **System Prompt** field. This sets it on a per-account level and allows it to work as the system prompt across all your LLMs without requiring adjustments within a model from the **Workspace** section.
 
-- For your secondary System Prompt (**i.e, to give an LLM a task to perform**), choose whether to place it in the **System Prompt** field within the **Chat Controls** sidebar (on a per-chat basis) or the **Models** section of the **Workspace** section (on a per-model basis) for Admins, allowing you to set them directly. This allows your account-level system prompt to work in conjunction with either the per-chat level system prompt provided by **Chat Controls**, or the per-model level system prompt provided by **Models**.
+- For your secondary System Prompt (**i.e, to give an LLM a task to perform**), choose whether to place it in the **System Prompt** field under **Model controls > Controls** (on a per-chat basis) or the **Models** section of the **Workspace** section (on a per-model basis) for Admins, allowing you to set them directly. This allows your account-level system prompt to work in conjunction with either the per-chat level system prompt provided by **Controls**, or the per-model level system prompt provided by **Models**.
 
-- As an administrator, you should assign your LLM parameters on a per-model basis using **Models** section for optimal flexibility. For both of these secondary System Prompts, ensure to set them in a manner that maximizes flexibility and minimizes required adjustments across different per-account or per-chat instances. It is essential for both your Admin account as well as all User accounts to understand the priority order by which system prompts within **Chat Controls** and the **Models** section will be applied to the **LLM**.
+- As an administrator, you should assign your LLM parameters on a per-model basis using **Models** section for optimal flexibility. For both of these secondary System Prompts, ensure to set them in a manner that maximizes flexibility and minimizes required adjustments across different per-account or per-chat instances. It is essential for both your Admin account as well as all User accounts to understand the priority order by which system prompts within **Controls** and the **Models** section will be applied to the **LLM**.
 
 :::
 
@@ -143,7 +144,7 @@ So: mark a field `required` when the answer has to come from the user, and give 
 
 :::
 
-Values are stored on the chat, so reopening it keeps them, and forking or cloning a chat carries them over. In temporary chats they are sent with the request instead of being stored, so they last only as long as the chat does.
+Values are stored on the chat, so reopening it keeps them, and forking or cloning your own chat carries them over. A copy of someone else's chat starts with empty chat variables. In temporary chats they travel with each request and last only as long as the chat does.
 
 A single value can be up to 20,000 characters, and all of a chat's variables together up to 100,000 characters.
 

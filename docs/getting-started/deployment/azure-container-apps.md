@@ -9,13 +9,13 @@ description: "Deploy Open WebUI on Azure Container Apps with PostgreSQL, Redis, 
 
 Azure Container Apps runs the application without requiring you to operate Kubernetes. This guide uses the Azure portal to configure an app and a separate manual migration job. For AKS, use [Kubernetes Deployment](./kubernetes).
 
-See the existing [Container Service guide](/enterprise/deployment/container-service) for the shared architecture. The application settings below target **Open WebUI v0.11.3**.
+See the existing [Container Service guide](/enterprise/deployment/container-service) for the shared architecture. The application settings below target **Open WebUI v0.13.0**.
 
 ## 1. Prepare the Azure Services
 
 | Component | Prepare before creating the app |
 | :--- | :--- |
-| Image | Mirror the versioned image into Azure Container Registry and retain an immutable digest. |
+| Image | Mirror the versioned standard image (`ghcr.io/open-webui/open-webui:v0.13.0`) into Azure Container Registry and retain an immutable digest. The slim image has no Azure Blob client. |
 | Container Apps environment | An environment with the VNet connectivity, DNS, egress, and private endpoint access your backing services require. |
 | Database | Azure Database for PostgreSQL Flexible Server, an application database/role, and the `vector` extension enabled by an administrator. |
 | Redis | A compatible Redis endpoint, such as [Azure Managed Redis](https://learn.microsoft.com/en-us/azure/redis/overview). Verify its clustering mode, authentication, and TLS settings. |
@@ -24,7 +24,7 @@ See the existing [Container Service guide](/enterprise/deployment/container-serv
 | Models and extraction | Reachable chat/embedding APIs and a private Tika service. |
 | Browser access | An approved HTTPS hostname and access path to the app. |
 
-If the chosen endpoint uses Redis Cluster, set both `REDIS_CLUSTER=true` and `WEBSOCKET_REDIS_CLUSTER=true`; a standalone endpoint does not need these flags. Follow [Redis configuration](/reference/env-configuration#redis_url) for your chosen endpoint. Container Apps' local filesystem is temporary; do not use it for SQLite or durable file storage.
+If the chosen endpoint uses Redis Cluster, set `REDIS_CLUSTER=true` (WebSockets follow it unless `WEBSOCKET_REDIS_CLUSTER` is set). Follow [Redis configuration](/reference/env-configuration#redis_url) for your chosen endpoint. Container Apps' local filesystem is temporary; do not use it for SQLite or durable file storage.
 
 ## 2. Configure Credentials and Environment Values
 
@@ -33,10 +33,10 @@ In Key Vault, store the credentials below. Use Container Apps secret references 
 | Environment variable | Secret value |
 | :--- | :--- |
 | `WEBUI_SECRET_KEY` | A stable random signing key, identical on every instance. Generate once with `openssl rand -hex 32`. |
-| `DATABASE_URL` and `PGVECTOR_DB_URL` | The same PostgreSQL connection URL for this reference deployment, with your provider's required TLS parameters. |
-| `REDIS_URL` and `WEBSOCKET_REDIS_URL` | The same Redis connection URL, including authentication and TLS where configured. |
+| `DATABASE_URL` | The PostgreSQL connection URL, with your provider's required TLS parameters. PGVector uses it too unless you set `PGVECTOR_DB_URL`. |
+| `REDIS_URL` | The Redis connection URL, including authentication and TLS where configured. WebSockets use it too unless you set `WEBSOCKET_REDIS_URL`. |
 | `OPENAI_API_KEY` | Chat provider API key. |
-| `RAG_OPENAI_API_KEY` | Embedding provider API key. |
+| `RAG_OPENAI_API_KEY` | Embedding provider API key. Defaults to `OPENAI_API_KEY` when unset. |
 | `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` | Initial administrator credentials for an empty database. Keep the password in the secret store. |
 | `LICENSE_KEY` | Optional issued Enterprise license key. |
 
@@ -45,13 +45,10 @@ Also store `AZURE_STORAGE_KEY` as a secret. This example uses an account key for
 Map each secret to its environment variable in the app configuration. Replace the non-secret values below:
 
 ```ini
-HOST=0.0.0.0
-PORT=8080
 WEBUI_URL=https://ai.example.com
 UVICORN_WORKERS=1
 ENABLE_DB_MIGRATIONS=false
 ENABLE_OLLAMA_API=false
-ENABLE_WEBSOCKET_SUPPORT=true
 WEBSOCKET_MANAGER=redis
 VECTOR_DB=pgvector
 PGVECTOR_CREATE_EXTENSION=false
@@ -88,7 +85,7 @@ Use the same pinned application image as the service. Set `ENABLE_DB_MIGRATIONS=
 | Executable / entry point | `python` |
 | Arguments, as two separate values | `-c` and `import open_webui.config` |
 
-For **v0.11.3**, importing this module runs schema migrations when that flag is true and raises an error if they fail. This is a version-specific command based on the [application's migration implementation](https://github.com/open-webui/open-webui/blob/v0.11.3/backend/open_webui/config.py), not a stable public migration CLI. Recheck it when changing versions. It initializes the schema; normal application startup subsequently initializes runtime settings and the administrator account.
+Importing this module runs the schema migrations when that flag is true and exits with an error if they fail. It is an internal entry point, not a stable migration CLI, so recheck it against the [migration code](https://github.com/open-webui/open-webui/blob/v0.13.0/backend/open_webui/config.py) when you change versions. It initializes the schema; normal application startup subsequently initializes runtime settings and the administrator account.
 
 The migration container needs the same database connection, signing key, network access, and image-pull permissions. Run exactly one execution at a time, with automatic retries disabled, while all application instances using that database are stopped. Continue only when it exits successfully and the logs show no migration error.
 
@@ -105,12 +102,12 @@ Create `openwebui` in the same environment, using the pinned image and the envir
 | Scale | Minimum `1`, maximum `1` until verification passes. |
 | Ingress | HTTP, target port `8080`, transport `auto`, HTTPS only. Choose exposure consistent with the environment's access policy. |
 | Startup probe | HTTP `/health` on `8080`; allow for measured startup time. |
-| Readiness probe | HTTP `/health/db` on `8080`. |
+| Readiness probe | HTTP `/ready` on `8080`. It answers once startup has finished and the database and Redis respond. |
 | Liveness probe | HTTP `/health` on `8080`. |
 
 Configure probes explicitly rather than relying on generic defaults. A starting startup-probe budget is 60 failures at 10-second intervals; use a 5-second probe timeout. Tune it after measuring startup and external-service latency.
 
-Container Apps ingress supports WebSockets, while ordinary HTTP requests have a 240-second timeout. Test long streams and document processing through the actual ingress. See [ingress behavior](https://learn.microsoft.com/en-us/azure/container-apps/ingress-overview). For HTTP affinity, enable sticky sessions in single-revision mode; see [session affinity requirements](https://learn.microsoft.com/en-us/azure/container-apps/sticky-sessions).
+Container Apps ingress supports WebSockets, while ordinary HTTP requests have a 240-second timeout. Test long streams and document processing through the actual ingress. See [ingress behavior](https://learn.microsoft.com/en-us/azure/container-apps/ingress-overview). Sticky sessions are needed only when WebSockets are turned off (`ENABLE_WEBSOCKET_SUPPORT=false`); see [session affinity requirements](https://learn.microsoft.com/en-us/azure/container-apps/sticky-sessions).
 
 Verify the app and follow logs with:
 

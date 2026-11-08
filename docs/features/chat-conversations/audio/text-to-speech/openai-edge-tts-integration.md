@@ -37,7 +37,7 @@ Similar to [openedai-speech](https://github.com/matatonic/openedai-speech), [ope
 - Docker installed on your system
 - Open WebUI running
 
-## ⚡️ Quick start
+## Quick start
 
 The simplest way to get started without having to configure anything is to run the command below
 
@@ -63,14 +63,14 @@ The default API key is the string `your_api_key_here`. You do not have to change
 
 **And that's it! You can end here**
 
-## Please ⭐️ star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
+## Please star the repo on GitHub if you find [OpenAI Edge TTS](https://github.com/travisvn/openai-edge-tts) useful
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
   <!-- markdownlint-disable-next-line MD033 -->
 <summary>Running with Python</summary>
 
-### 🐍 Running with Python
+### Running with Python
 
 If you prefer to run this project directly with Python, follow these steps to set up a virtual environment, install dependencies, and start the server.
 
@@ -226,7 +226,7 @@ These can be disabled by setting the environment variable `EXPAND_API=False`.
 
 </details>
 
-## 🐳 Quick Config for Docker
+## Quick Config for Docker
 
 You can configure the environment variables in the command used to run the project
 
@@ -258,7 +258,7 @@ For more information on `openai-edge-tts`, you can visit the [GitHub repo](https
 
 For direct support, you can visit the [Voice AI & TTS Discord](https://tts.travisvn.com/discord)
 
-## 🎙️ Voice Samples
+## Voice Samples
 
 [Play voice samples and see all available Edge TTS voices](https://tts.travisvn.com/)
 

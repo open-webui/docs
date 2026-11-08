@@ -20,11 +20,14 @@ Admins can configure server-wide audio defaults:
 4. Select the **Audio** tab
 
 Here you can configure:
-- **Speech-to-Text Engine**: Choose between local Whisper, OpenAI, Azure, Deepgram, or Mistral
+- **Voice calls**: **Call mode** (**Standard** or **Realtime**). See [Realtime Calls](/features/chat-conversations/chat-features/voice-mode#realtime-calls) and [Realtime call error messages](/features/chat-conversations/chat-features/voice-mode#troubleshooting)
+- **Speech-to-Text Engine**: Choose between local Whisper, OpenAI, Azure, Deepgram or Mistral
 - **Whisper Model**: Select model size for local STT (tiny, base, small, medium, large)
-- **Text-to-Speech Engine**: Choose between OpenAI-compatible, Mistral, ElevenLabs, Azure, local Transformers, or disable backend TTS (browser-only)
+- **Text-to-Speech Engine**: Choose between OpenAI-compatible, OpenAI Realtime, Mistral, ElevenLabs, Azure or local Transformers, or disable backend TTS (browser-only)
 - **TTS Voice**: Select the default voice
 - **API Keys and Base URLs**: Configure external service connections
+
+The **Voice mode** button in the message input shows only when a call can work. That is when **Call mode** is **Realtime**, when a call is already running or when the admin **Speech-to-Text Engine** is not **Web API** and the user has the **Allow Speech to Text** permission. Users also need **Allow Call**. Admins always pass the permission checks. A `?call=true` link or the desktop app's call shortcut follows the same checks. If the button is missing, check these settings first.
 
 ### User Settings (Per-User)
 
@@ -34,10 +37,12 @@ Individual users can customize their audio experience:
 2. Select **Settings**
 3. Click the **Audio** tab
 
+The **Audio** tab shows only to users allowed at least one of **Allow Speech to Text**, **Allow Text to Speech** or **Allow Call**. Admins always see it. If the tab is missing, ask your admin about these [chat permissions](/features/authentication-access/rbac/permissions).
+
 User-level options include:
 - **STT Engine Override**: Use "Web API" for browser-based speech recognition
 - **STT Language**: Set preferred language for transcription
-- **TTS Engine**: Choose "Browser Kokoro" for local in-browser TTS
+- **TTS Engine**: Choose **Kokoro.js (Browser)** for local in-browser TTS
 - **TTS Voice**: Select from available voices
 - **Auto-playback**: Automatically play AI responses
 - **Playback Speed**: Adjust audio speed
@@ -76,8 +81,8 @@ environment:
 If you prefer Mistral's audio stack:
 
 **In Settings → Admin → Audio:**
-- **STT Engine:** `MistralAI` | **Model:** `voxtral-mini-2602`
-- **TTS Engine:** `MistralAI` | **Model:** `voxtral-tts-26-03` | **Voice:** choose from list
+- **STT Engine:** `MistralAI` | **Model:** leave empty for `voxtral-mini-latest`, or name another Voxtral model (any id is passed through unchanged)
+- **TTS Engine:** `MistralAI` | **Model:** `voxtral-mini-tts-2603` | **Voice:** choose from list
 - Enter your Mistral API key in both sections
 
 Or via environment variables:
@@ -87,7 +92,7 @@ environment:
   - AUDIO_STT_MISTRAL_API_KEY=...
   - AUDIO_TTS_ENGINE=mistral
   - AUDIO_TTS_MISTRAL_API_KEY=...
-  - AUDIO_TTS_MODEL=voxtral-tts-26-03
+  - AUDIO_TTS_MODEL=voxtral-mini-tts-2603
 ```
 
 → See guides: [Mistral Voxtral STT](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) | [Mistral TTS](/features/chat-conversations/audio/text-to-speech/mistral-tts-integration)
@@ -125,7 +130,7 @@ For basic functionality without any server-side audio processing:
 
 **In User Settings → Audio:**
 - **STT Engine:** `Web API` (uses the browser's built-in speech recognition; **does not call the backend STT endpoint**)
-- **TTS Engine:** `Web API` or `Browser Kokoro` (uses browser's built-in text-to-speech or client-side Kokoro; **does not call the backend TTS endpoint**)
+- **TTS Engine:** `Web API` or `Kokoro.js (Browser)` (uses browser's built-in text-to-speech or client-side Kokoro; **does not call the backend TTS endpoint**)
 
 :::note
 When the admin leaves `AUDIO_TTS_ENGINE` as an empty string (the default), no backend TTS service is available. All TTS is handled client-side. Similarly, if users select "Web API" for STT in their user settings, the backend's local Whisper is not used.
@@ -137,7 +142,7 @@ When the admin leaves `AUDIO_TTS_ENGINE` as an empty string (the default), no ba
 
 For security reasons, accessing the microphone is restricted to pages served over HTTPS or locally from `localhost`. This requirement is meant to safeguard your data by ensuring it is transmitted over secure channels.
 
-### Common Permission Issues 🚫
+### Common Permission Issues
 
 Browsers like Chrome, Brave, Microsoft Edge, Opera, and Vivaldi, as well as Firefox, restrict microphone access on non-HTTPS URLs. This typically becomes an issue when accessing a site from another device within the same network (e.g., using a mobile phone to access a desktop server).
 
@@ -200,7 +205,9 @@ docker exec open-webui bash -lc "pip install datasets==3.6.0" && docker restart 
 Add this to your `docker-compose.yml`:
 ```yaml
 environment:
-  - EXTRA_PIP_PACKAGES=datasets==3.6.0
+  - # Open WebUI has no EXTRA_PIP_PACKAGES hook. Build a derived image instead:
+# FROM ghcr.io/open-webui/open-webui:main
+# RUN pip install datasets==3.6.0
 ```
 
 **Verify the installed version:**
@@ -271,7 +278,7 @@ If Open WebUI can't reach your TTS service:
 **Solutions:**
 
 #### 1. Upgrade to the Latest Version (Recommended)
-The most reliable fix is to upgrade to the latest version of Open WebUI. Recent updates ensure that `WHISPER_COMPUTE_TYPE` is correctly respected and provides optimized defaults for CUDA environments.
+The most reliable fix is to upgrade to the latest version of Open WebUI. `WHISPER_COMPUTE_TYPE` defaults to `int8` on every image, the `:cuda` image included. There is no CUDA-specific default, so on a GPU set `WHISPER_COMPUTE_TYPE=float16` (or `int8_float16`) yourself.
 
 #### 2. Manually Set Compute Type
 If you are on an affected version or still experiencing issues on GPU, explicitly set the compute type to `float16`:
@@ -316,7 +323,7 @@ environment:
 
 :::info Default Behavior
 - **CPU mode:** Defaults to `int8` for best performance
-- **CUDA mode:** The `:cuda` image may default to `int8`, which can cause errors on older GPUs. Set `float16` explicitly for GPUs.
+- **CUDA mode:** The `:cuda` image defaults to `int8` like every other image, which can cause errors on older GPUs. Set `float16` explicitly for GPUs.
 :::
 
 ### STT Not Recognizing Speech Correctly
@@ -347,7 +354,7 @@ environment:
 If your STT or TTS engine is hosted behind a self-signed certificate or an internal CA and requests fail with TLS verification errors (e.g. `SSLCertVerificationError`, `certificate verify failed`):
 
 - Set [`AIOHTTP_CLIENT_SESSION_SSL=False`](/reference/env-configuration#aiohttp_client_session_ssl) to disable certificate verification for these upstream calls.
-- As of v0.9.6 the audio endpoints honor this setting (previously STT/TTS ignored it and always verified, so this configuration had no effect on audio engines). If it still appears ignored, confirm you are on v0.9.6 or later.
+- Text-to-speech and speech-to-text both honor this setting.
 - Prefer installing the internal CA into the container's trust store where possible; disabling verification removes protection against man-in-the-middle interception on that connection.
 
 ---
@@ -429,7 +436,7 @@ curl http://your-tts-service:port/health
 
 | Variable | Description |
 |----------|-------------|
-| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS, uses browser), `openai`, `mistral`, `elevenlabs`, `azure`, `transformers` |
+| `AUDIO_TTS_ENGINE` | TTS engine: `""` (empty, disables backend TTS, uses browser), `openai`, `openai-realtime`, `mistral`, `elevenlabs`, `azure`, `transformers`. For `openai-realtime` see [Realtime Voice Calls](/reference/env-configuration#realtime-voice-calls) |
 | `AUDIO_TTS_MODEL` | TTS model to use (default: `tts-1`) |
 | `AUDIO_TTS_VOICE` | Default voice for TTS (default: `alloy`) |
 | `AUDIO_TTS_API_KEY` | API key for ElevenLabs or Azure TTS |
@@ -450,7 +457,7 @@ curl http://your-tts-service:port/health
 | `AUDIO_STT_OPENAI_API_BASE_URL` | Base URL for OpenAI-compatible STT |
 | `AUDIO_STT_OPENAI_API_KEY` | API key for OpenAI-compatible STT |
 | `DEEPGRAM_API_KEY` | Deepgram API key |
-| `AIOHTTP_CLIENT_SESSION_SSL` | TLS verification for outbound STT/TTS API calls (default: `True`; set `False` for self-signed certs; honored by audio engines since v0.9.6) |
+| `AIOHTTP_CLIENT_SESSION_SSL` | TLS verification for outbound STT/TTS API calls (default: `True`; set `False` for self-signed certs) |
 
 For a complete list of audio environment variables, see [Environment Variable Configuration](/reference/env-configuration#audio).
 

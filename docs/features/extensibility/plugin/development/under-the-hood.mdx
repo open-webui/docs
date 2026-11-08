@@ -5,7 +5,7 @@ title: "Under the Hood"
 
 # Under the Hood: What the Plugin Loader Actually Does
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Tools, Functions, Pipes, Filters, and Actions execute arbitrary Python code on your server.** Function creation is restricted to administrators only, and Workspace Tool creation is gated by the `workspace.tools` permission. Granting that permission is equivalent to giving the user shell access to the server. Only install from trusted sources, review code before importing, and restrict creation to trusted administrators. A malicious plugin could access your file system, exfiltrate data, or compromise your entire system. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
@@ -20,12 +20,23 @@ This page documents what the loader really does and what that opens up, so you c
 A single loader in [`backend/open_webui/utils/plugin.py`](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/plugin.py) handles every plugin type:
 
 1. The plugin's Python source is read from the database.
-2. A fresh `types.ModuleType` is created and registered in `sys.modules` as `function_{id}` (or `tool_{id}`).
+2. A fresh `types.ModuleType` is created and registered in `sys.modules` while it loads, under a unique name for this source version, `function_{id}_<32 hex characters>` (or `tool_{id}_<32 hex characters>`). That unique name is the plugin's `__name__`, so `logging.getLogger(__name__)` uses it too.
 3. The source is fed to `exec(content, module.__dict__)`. Anything at module top level runs at this point.
 4. The loader looks for **one** entry-point class: `Tools`, `Pipe`, `Filter`, `Action` or `Event`. That class becomes the handle Open WebUI calls into.
-5. The module stays in `sys.modules` for the life of the process. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
+5. After a successful load the module is published in `sys.modules` under its unique name plus the stable alias `function_{id}` (or `tool_{id}`), and the previous version's entries are removed. A load that fails publishes nothing. The published module stays until a newer version replaces it or the process restarts. Any side effect of step 3 (imports, monkey-patches, background tasks, route registrations) is now installed in the live application.
 
 The entry-point class is the only thing the rest of Open WebUI cares about. Everything else in the file is yours.
+
+:::tip Reading your plugin's own id
+`__name__` returns the id with 32 hex characters attached, so a plugin cannot take its own id from it. Inside a handler, read the [`__id__`](./reserved-args.mdx#__id__) argument instead (Pipes do not receive it). Code that runs at module load, before any handler is called, can strip the prefix and suffix, which works on both the old and the new names:
+
+```python
+import re
+
+PLUGIN_ID = re.sub(r"^(?:function|tool)_|_[0-9a-f]{32}$", "", __name__)
+```
+
+:::
 
 ### When the module is re-executed
 
@@ -54,7 +65,7 @@ From any hook (and from module top level):
 - The reserved dunder args documented in [Reserved Arguments](./reserved-args.mdx): `__user__`, `__metadata__`, `__model__`, `__request__`, `__event_emitter__`, `__event_call__`, `__features__`, `__body__`, `__id__`, `__oauth_token__`, plus stream-only and per-hook extras.
 - Events documented in [Events](./events.mdx): emit anything to the frontend, or solicit a response from the user with `event_call`.
 - Any pip package via `requirements:` frontmatter, installed at load time (gated by [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)).
-- The Python stdlib, plus everything pip-installed in the container.
+- The Python stdlib, plus everything pip-installed in the container. Only what you declare under `requirements:` is yours to rely on. Packages Open WebUI happens to install come and go between releases, so a plugin that imports one without declaring it can stop loading after an update.
 
 There is no sandbox, no allowlist, no capability system. The execution model is **"this is Python, you are inside the server process"**.
 
@@ -100,7 +111,7 @@ Runs at module load (once per source version). The patch persists in `sys.module
 Use sparingly. Cross-plugin interference is a real risk: if two plugins patch the same function the result depends on load order, which is not deterministic.
 
 :::tip Check whether the `request` filter hook covers you first
-The most common reason people patched `generate_chat_completion` or `process_chat_payload` was to reach the payload on **every** provider call, not just the first one, because `inlet` runs once per user turn and never sees a tool-loop continuation. Since **v0.11.2** the [`request` filter hook](/features/extensibility/plugin/functions/filter#the-request-step) does exactly that as a supported hook, with no patching, no load-order hazard and no restart needed to roll back.
+The most common reason people patched `generate_chat_completion` or `process_chat_payload` was to reach the payload on **every** provider call, not just the first one, because `inlet` runs once per user turn and never sees a tool-loop continuation. The [`request` filter hook](/features/extensibility/plugin/functions/filter#the-request-step) does exactly that as a supported hook, with no patching, no load-order hazard and no restart needed to roll back.
 
 If you are on 0.11.2+ and your patch exists to intercept outgoing payloads, migrate it to `request` and delete the patch. Note that a patch installed by an earlier version of your plugin stays live in every worker process that loaded it, so a fleet-wide restart is still required to actually drop it.
 :::
@@ -256,7 +267,6 @@ For work that takes longer than a single atomic claim, Open WebUI ships a renewa
 - **No concurrency control, no exactly-once.** Open WebUI does not serialize your handlers and does not deduplicate work across replicas. Async hooks interleave within a process, and in a multi-replica deployment the same handler can run on every worker at once, a side effect that must fire once globally fires once *per replica* unless you coordinate it yourself. See [Concurrency and multiple instances](#concurrency-and-multiple-instances).
 - **`requirements:` runs `pip install` on every replica at load.** In multi-replica deployments set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) and pre-install dependencies in your image; runtime installs race across workers and crash. See [Scaling → Function/Tool Dependency Installation Crashes](/troubleshooting/multi-replica#9-functiontool-dependency-installation-crashes).
 - **Internal APIs are not a stable public surface.** `open_webui.utils.*`, the internal model classes, middleware helpers, and pretty much everything outside the documented dunder args and event types can rename, move, or change signatures between releases. If your monkey-patch breaks after an upgrade, that is on you to repair.
-- **The Pipelines server is out of scope here.** This page is about in-process plugins (Tools / Functions). The separate [Pipelines](/features/extensibility/pipelines/) server runs out-of-process and does not share `sys.modules` with Open WebUI: it cannot monkey-patch the main app, but it also is not constrained by it.
 
 ---
 

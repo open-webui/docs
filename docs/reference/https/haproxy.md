@@ -6,7 +6,7 @@ title: "HTTPS using HAProxy"
 
 # HAProxy Configuration for Open WebUI
 
-HAProxy (High Availability Proxy) is specialized load-balancing and reverse proxy solution that is highly configurable and designed to handle large amounts of connections with a relatively low resource footprint. for more information, please see: https://www.haproxy.org/
+HAProxy (High Availability Proxy) is a specialized load-balancing and reverse proxy solution that is highly configurable and designed to handle large amounts of connections with a relatively low resource footprint. For more information, please see: https://www.haproxy.org/
 
 ## Install HAProxy and Let's Encrypt
 
@@ -140,7 +140,7 @@ You will need to expose port 80 and 443 to your HAProxy server. These ports are 
 
 ## Issuing SSL Certificates with Let's Encrypt
 
-Before starting HAProxy, you will want to generate a self signed certificate to use as a placeholder until Let's Encrypt issues a proper one. Here's how to generate a self-signed certificate:
+Before starting HAProxy, you will want to generate a self-signed certificate to use as a placeholder until Let's Encrypt issues a proper one. Here's how to generate a self-signed certificate:
 
 ```shell
 openssl req -x509 -newkey rsa:2048 -keyout /tmp/haproxy.key -out /tmp/haproxy.crt -days 3650 -nodes -subj "/CN=localhost"

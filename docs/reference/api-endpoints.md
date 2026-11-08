@@ -7,7 +7,7 @@ This guide provides essential information on how to interact with the API endpoi
 
 ## Authentication
 
-To ensure secure access to the API, authentication is required 🛡️. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication. For full instructions on enabling and generating API keys (including the admin toggle and group permissions required for non-admin users) see [API Keys](/features/authentication-access/api-keys).
+To ensure secure access to the API, authentication is required. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication. For full instructions on enabling and generating API keys (including the admin toggle and group permissions required for non-admin users) see [API Keys](/features/authentication-access/api-keys).
 
 :::tip Alternate credential header for proxy-heavy setups
 When Open WebUI is behind a reverse proxy that already uses the `Authorization` header for its own auth, you can deliver the API key via a custom header instead (`x-api-key` by default). Admins can rename the header via the [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header) environment variable to avoid collisions. See [Behind a reverse proxy that consumes `Authorization`?](/features/authentication-access/api-keys#behind-a-reverse-proxy-that-consumes-authorization) for the full pattern.
@@ -29,7 +29,7 @@ Access detailed API documentation for different services provided by Open WebUI:
 
 ## Notable API Endpoints
 
-### 📜 Retrieve All Models
+### Retrieve All Models
 
 - **Endpoint**: `GET /api/models`
 - **Description**: Fetches all models created or added via Open WebUI.
@@ -39,13 +39,14 @@ Access detailed API documentation for different services provided by Open WebUI:
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
 
-### 🛠️ Programmatic Model Management (Export / Import / Sync)
+### Programmatic Model Management (Export / Import / Sync)
 
 Custom models are plain JSON, so you can manage them declaratively (in git, via scripts or from an AI agent) without the UI. These endpoints live under `/api/v1/models`:
 
 | Endpoint | Description |
 | :--- | :--- |
-| `GET /api/v1/models/export` | Export **all** custom models as a JSON array. |
+| `GET /api/v1/models/all` | **(Admin)** Every saved model record in one unpaginated list, including models no connection is currently offering. Backs the admin models page. |
+| `GET /api/v1/models/export` | Export **all** custom models as a JSON array, or the ones you name with a repeated `ids` query parameter (`?ids=a&ids=b`). Asking for a model you cannot write is refused with `403`, rather than being quietly left out. |
 | `POST /api/v1/models/import` | Bulk **upsert**: create new models and update existing ones (matched by `id`). Additive, never deletes. |
 | `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
 | `POST /api/v1/models/create` | Create a single model. |
@@ -53,6 +54,10 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 | `POST /api/v1/models/model/delete` | Delete a single model. |
 
 **Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+
+**Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
+
+**Voice avatars travel as references.** A [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) and its animations stay files on the source instance, and the export only carries their file IDs. Importing or syncing a model whose avatar or animation files are missing or not accessible on the target instance fails with `403` (`Avatar or animation file is not accessible. Upload it again.`). Upload the avatar on the target instance first.
 
 **Version-controlled, code-driven workflow:**
 
@@ -71,25 +76,34 @@ curl -X POST -H "Authorization: Bearer YOUR_API_KEY" \
 
 This gives reproducible, version-controlled model definitions. Use `/import` instead of `/sync` for additive updates that never delete existing models. Run the sync step on deploy, in CI or at container startup to load your models automatically.
 
-### 💬 Chat Completions
+### Chat Completions
 
 - **Endpoint**: `POST /api/chat/completions`
-- **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models.
+- **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models. A model on a Responses API connection also answers in Chat Completions format, streamed or not, with `finish_reason` set to `length` or `content_filter` when the reply was cut off.
 
 :::warning Reading `usage` from a reply that used tools
 
-A reply can involve several model calls, one per round of tool use, and the `usage` block distinguishes the two things you might want from that:
-
-- `prompt_tokens` and `completion_tokens` report the **most recent model call** only.
-- `input_tokens`, `output_tokens` and `total_tokens` report the **whole reply**, every call added up.
-
-Earlier releases put the running total in `prompt_tokens` / `completion_tokens` as well. If you bill or meter on those two fields, read `input_tokens` / `output_tokens` instead, or a tool-using reply will now be undercounted. The split exists because a context-window gauge needs the size of the latest request, while billing needs the sum, and one pair of fields cannot be both.
+A reply can involve several model calls, one per round of tool use. `input_tokens`, `output_tokens`, `total_tokens` and `cost` add up all calls. `prompt_tokens` and `completion_tokens` hold the latest call only, which is what context compaction reads.
 
 :::
 
-**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#-anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
+**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
+
+**Model controls.** A model with [Model controls](/features/workspace/models#model-controls) applies each control's default option to API requests as well, and those parameters also only fill in what your request left out. To pick another option, send the control and option IDs under `params.model_controls`, keyed by model ID. `GET /api/models` lists a model's controls under `info.params.model_controls`, with each control's ID, label, default and the IDs and labels of its options:
+
+```json
+{
+  "model": "gpt-5",
+  "messages": [{ "role": "user", "content": "Plan a three-day trip to Lisbon." }],
+  "params": { "model_controls": { "gpt-5": { "thinking": "high" } } }
+}
+```
+
+Any caller with access to the model can pick an option, whatever their **Allow Chat Controls** and **Allow Chat Params** [permissions](/features/authentication-access/rbac/permissions#3-chat-permissions) say. A pick for a control the model no longer has is ignored, and picking an option the control no longer has returns a `400`.
 
 **Getting a `usage` block at all.** Most OpenAI-compatible providers leave usage out of a streamed reply unless asked. Open WebUI adds `stream_options: {"include_usage": true}` itself when the model has the **Usage** capability enabled, so you do not have to send it. A non-streaming request is left untouched, and a `stream_options` you send keeps its other keys but has `include_usage` forced to `true`, so usage cannot be switched off per request while the capability is on.
+
+**Provider errors.** When the model provider rejects a request, the endpoint returns the provider's own status code and error, for example a `429` when you hit its rate limit, and passes its `Retry-After` and `retry-after-ms` headers through so your client can back off. The OpenAI, Ollama and Anthropic proxy routes forward those retry headers too.
 
 #### Using Open WebUI tools, including MCP, from the API
 
@@ -115,6 +129,8 @@ curl -X POST http://localhost:3000/api/chat/completions \
 Open WebUI checks the caller's access to each selected tool server before resolving the tools. For OAuth-protected MCP servers, the user associated with the API key must have already completed the OAuth authorization flow in the web UI; otherwise the tool connection can fail during the API request.
 
 If your external client sends its own OpenAI-style `tools` array, Open WebUI forwards those caller-provided tool definitions to the model instead of resolving `tool_ids` server-side.
+
+To see which tools an MCP connection offers, call `GET /api/v1/tools/id/{id}/specs` with a `server:mcp:<server-id>` ID. It connects to the server and returns `{"specs": [{"name": ..., "description": ...}]}`. Any other ID, or a server you cannot access, returns `404`. An OAuth server you have not signed in to returns `401`, a server that does not answer within 15 seconds returns `504` and any other failure returns `502`.
 
 :::tip Want the model to actually run those tools, in a loop, with the built-in tools too?
 Which fields you send decides whether Open WebUI executes tool calls for you or hands them back for your client to run, and whether the answer arrives in the HTTP body or in the chat record. [Server-Side Tool Calling (API)](/reference/server-side-tool-calling) walks through every call for both approaches, streaming and non-streaming, with and without saving the chat, and ends in a reusable script.
@@ -161,7 +177,7 @@ Which fields you send decides whether Open WebUI executes tool calls for you or 
       return response.json()
   ```
 
-### 🔮 Anthropic Messages API
+### Anthropic Messages API
 
 Open WebUI provides an Anthropic Messages API compatible endpoint. This allows tools, SDKs, and applications built for the Anthropic API to work directly against Open WebUI, routing requests through all configured models, filters, and pipelines.
 
@@ -308,7 +324,17 @@ The count is obtained from the upstream provider behind the resolved connection,
 The Messages API previously always reported `input_tokens: 0` in the streaming `message_start` block. Input tokens are now counted up front and reported in both streaming and non-streaming responses. If counting fails the request still succeeds, so clients should treat the value as best-effort rather than guaranteed.
 :::
 
-### 🔧 Filter and Function Behavior with API Requests
+### `POST /api/v1/users/user/settings/update` patches, it does not replace
+
+The `ui` object in this request is applied field by field. A field you leave out keeps its current value, and a field sent as `null` is cleared, which drops the user back to the instance default for it. Sending a partial object is therefore the normal way to change one setting.
+
+A script that reads the settings, edits one key and posts the whole object back still works. One that posts a hand-written object expecting everything else to be wiped does not, since nothing it omits is removed any more.
+
+### Removed: `POST /api/v1/utils/pdf`
+
+The endpoint that rendered a chat to PDF server-side is gone, along with the fonts and the PDF library behind it. Nothing changes for people using Open WebUI: **Chat > Download > PDF** still works and always renders in the browser. Only a script calling that endpoint directly is affected, and there is no replacement endpoint for it.
+
+### Filter and Function Behavior with API Requests
 
 When using the API endpoints directly, filters (Functions) behave differently than when requests come from the web interface.
 
@@ -318,11 +344,11 @@ Open WebUI accepts both **API keys** (prefixed with `sk-`) and **JWT tokens** fo
 
 #### Filter Execution
 
-| Filter Function | WebUI Request | Direct API, stable (`main`) | Direct API, pre-release (`dev`) |
-|----------------|--------------|------------------------------|-----------------------------------|
-| `inlet()` | ✅ Runs | ✅ Runs | ✅ Runs |
-| `stream()` | ✅ Runs | ✅ Runs | ✅ Runs |
-| `outlet()` | ✅ Runs | ❌ Not called by `/api/chat/completions`, use `/api/chat/completed` | ✅ Runs inline by default, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
+| Filter Function | WebUI Request | Direct API |
+|----------------|--------------|------------|
+| `inlet()` | Runs | Runs |
+| `stream()` | Runs | Runs |
+| `outlet()` | Runs | Runs inline by default, gated by `ENABLE_API_OUTLET_FILTERS` (see below) |
 
 The `inlet()` function always executes, making it ideal for:
 - **Rate limiting**: Track and limit requests per user
@@ -330,20 +356,18 @@ The `inlet()` function always executes, making it ideal for:
 - **Input validation**: Reject invalid requests before they reach the model
 
 :::danger Outlet Behavior for Direct API Calls, Read Carefully
-**On tagged releases / `main`:** `outlet()` is **not** invoked inline by `/api/chat/completions` at all. It only runs if the caller performs the second POST to `/api/chat/completed`. For now, if your integration needs `outlet()`, you must still do that second call.
-
-**On `dev` / pre-release builds:** `outlet()` runs inline after `/api/chat/completions` **by default**, on **both** the streaming and non-streaming paths, gated by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). A `chat_id` and a message `id` are **not** required: when neither is in the request body, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Set `ENABLE_API_OUTLET_FILTERS=False` to turn inline execution off for direct API traffic.
+`outlet()` runs inline after `/api/chat/completions` **by default**, on **both** the streaming and non-streaming paths, gated by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). A `chat_id` and a message `id` are **not** required: when neither is in the request body, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Set `ENABLE_API_OUTLET_FILTERS=False` to turn inline execution off for direct API traffic.
 
 What `chat_id` and `id` decide is where the response goes. Send both and the request takes the path built for the WebUI: the server consumes the upstream stream itself and routes the content to the user's WebSocket, so the HTTP response to a streaming caller is effectively empty. Omit them and the upstream stream is relayed to you over HTTP as usual, with `outlet()` running once it has finished.
 
 In every case, **`outlet()` does not rewrite the HTTP response body**. It updates the persisted chat message and emits a `chat:outlet` WebSocket event, but the JSON your client receives is the pre-outlet content. If you need the outlet-filtered text, read it back from the chat record, subscribe to the WebSocket, or keep using `/api/chat/completed`.
 
-**Practical guidance:** if you are a pure API consumer (Continue.dev, Claude Code, custom scripts, Langfuse pipelines, etc.) and you need `outlet()`'s output back over HTTP, follow the completion with `/api/chat/completed`. Inline execution still runs your outlet filters and their side effects; it just does not hand you the filtered payload.
+**Practical guidance:** if you are a pure API consumer (Continue.dev, Claude Code, custom scripts, etc.) and you need `outlet()`'s output back over HTTP, follow the completion with `/api/chat/completed`. Inline execution still runs your outlet filters and their side effects; it just does not hand you the filtered payload.
 :::
 
 #### Legacy / Supported-for-API Endpoint: `/api/chat/completed`
 
-`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. On `dev` it is marked deprecated in favor of inline execution, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
+`POST /api/chat/completed` is the endpoint that reliably runs `outlet()` for direct API integrations. It is marked deprecated, but as described above, inline execution does not currently return the filtered payload to pure API callers, so in practice `/api/chat/completed` remains the right call for most API integrations today.
 
 - **Endpoint**: `POST /api/chat/completed`
 - **Description**: Runs `outlet()` filters (and pipeline outlet filters) unconditionally over a completed chat payload. Returns the filtered payload.
@@ -372,11 +396,10 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
 
   def complete_chat_with_outlet(token, model, messages, chat_id=None):
       """
-      Second-step call that actually runs outlet() for direct API callers.
-      On tagged releases /api/chat/completions does not run outlet inline at all.
-      On dev it runs inline by default but does not rewrite the HTTP response
-      body, so this endpoint is still the right call for most API integrations
-      that want outlet's output over HTTP.
+      Second-step call that returns outlet()'s output to direct API callers.
+      /api/chat/completions runs outlet inline by default but does not rewrite
+      the HTTP response body, so this endpoint is still the right call for API
+      integrations that want outlet's output over HTTP.
       """
       url = 'http://localhost:3000/api/chat/completed'
       headers = {
@@ -398,14 +421,14 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
 If you need `outlet()` output over HTTP today, call `/api/chat/completions` followed by `/api/chat/completed`. Inline execution on `dev` runs your outlet filters, and their side effects (persisted message, `chat:outlet` WebSocket event, logging or tracing calls) all take place, but the filtered text is not returned in the HTTP response. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#filter-behavior-with-api-requests).
 :::
 
-### 🦙 Ollama API Proxy Support
+### Ollama API Proxy Support
 
 If you want to interact directly with Ollama models (including for embedding generation or raw prompt streaming) Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
 
 - **Base URL**: `/ollama/<api>`
 - **Reference**: [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)
 
-#### 🔁 Generate Completion (Streaming)
+#### Generate Completion (Streaming)
 
 ```bash
 curl http://localhost:3000/ollama/api/generate \
@@ -417,14 +440,14 @@ curl http://localhost:3000/ollama/api/generate \
 }'
 ```
 
-#### 📦 List Available Models
+#### List Available Models
 
 ```bash
 curl http://localhost:3000/ollama/api/tags \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-#### 🧠 Generate Embeddings
+#### Generate Embeddings
 
 ```bash
 curl -X POST http://localhost:3000/ollama/api/embed \
@@ -440,7 +463,7 @@ curl -X POST http://localhost:3000/ollama/api/embed \
 When using the Ollama Proxy endpoints, you **must** include the `Content-Type: application/json` header for POST requests, or the API may fail to parse the body. Authorization headers are also required if your instance is secured.
 :::
 
-#### 🔮 Responses API (OpenAI-Compatible)
+#### Responses API (OpenAI-Compatible)
 
 Ollama supports the OpenAI Responses API format. Open WebUI proxies this through the Ollama router with the same model resolution, access control, and prefix handling used by chat completions.
 
@@ -458,7 +481,7 @@ This allows API consumers (Codex, Claude Code, etc.) to use the Responses API di
 
 This is ideal for building search indexes, retrieval systems, or custom pipelines using Ollama models behind the Open WebUI.
 
-#### 🔤 Embeddings (OpenAI-Compatible)
+#### Embeddings (OpenAI-Compatible)
 
 Alongside the native `/ollama/api/embed` route above, Open WebUI proxies an OpenAI-compatible embeddings endpoint, so clients that already speak the OpenAI embeddings format can use Ollama-hosted embedding models without configuring a separate connection. It applies the same model resolution, access control, and prefix handling as the other proxied routes.
 
@@ -474,7 +497,7 @@ curl -X POST http://localhost:3000/ollama/v1/embeddings \
 
 A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The endpoint returns `503` if the Ollama integration is disabled.
 
-### 🧩 Retrieval Augmented Generation (RAG)
+### Retrieval Augmented Generation (RAG)
 
 The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
 
@@ -637,6 +660,8 @@ After uploading, you can group files into a knowledge collection or reference th
       return response.json()
   ```
 
+A file whose extracted text is already in the knowledge base is rejected with `400`, and the error detail reads `400: Duplicate content detected. Please provide unique content to proceed.` The same check runs on `POST /api/v1/knowledge/{id}/files/batch/add`, which takes a list of `{"file_id": ...}` objects: there a duplicate is reported as a failed file in the response warnings, and the other files of the batch are still added. Both calls are subject to the knowledge base [file limits](/features/workspace/knowledge#file-limits).
+
 
 #### Processing Web URLs into Knowledge Collections
 
@@ -649,6 +674,7 @@ Use this endpoint to fetch a webpage, extract content, and store the resulting c
 - **Request Body**:
   - `url` (string, required): Web URL to fetch and parse
   - `collection_name` (string, optional): Target collection name. If omitted, Open WebUI generates one from the URL
+- **Errors**: A link that cannot be fetched or yields no content, such as a host refusing the connection, returns `400` with the detail `[ERROR: Could not read content from <url>]`, also when `process=false`.
 
 **`overwrite` behavior:**
 | Value | Result |
@@ -868,4 +894,4 @@ Open WebUI offers a myriad of benefits, making it an essential tool for develope
 - **Unified Interface**: Simplify your interactions with different LLMs through a single, integrated platform.
 - **Ease of Implementation**: Quick start integration with comprehensive documentation and community support.
 
-By following these guidelines, you can swiftly integrate and begin utilizing the Open WebUI API. Should you encounter any issues or have questions, feel free to reach out through our Discord Community or consult the FAQs. Happy coding! 🌟
+By following these guidelines, you can swiftly integrate and begin utilizing the Open WebUI API. Should you encounter any issues or have questions, feel free to reach out through our Discord Community or consult the FAQs. Happy coding!

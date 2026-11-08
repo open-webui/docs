@@ -50,7 +50,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
 ## Create Image (Image Generation)
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Experience** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Images**.
 
 2. **Enable and Configure ComfyUI:**
     - Ensure the **Image Generation** toggle at the top of the page is enabled.
@@ -59,7 +59,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
     - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
     - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
     - In the **Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
-    - Click the **refresh icon** (🔄) next to the URL field to verify the connection. A success message should appear.
+    - Click the **refresh icon** next to the URL field to verify the connection. A success message should appear.
     - If your ComfyUI instance requires an API key, enter it in the **API Key** field.
 
     ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
@@ -71,7 +71,7 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
     - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Export (API)"** button found in the **File** sub-menu after clicking on the ComfyUI logo. This will prompt you to name the file. Name it something memorable and download it.
 
-    ![Screenshot of the "Save (API Format)" button in the ComfyUI interface.](/images/image-generation-and-editing/comfyui-save-api-format.png)
+    ![Screenshot of the "Export (API)" entry in the ComfyUI File menu.](/images/image-generation-and-editing/comfyui-save-api-format.png)
     - Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
 
     ![Screenshot of the ComfyUI Workflow section in Open WebUI, showing the upload button.](/images/image-generation-and-editing/comfyui-workflow-upload.png)
@@ -97,6 +97,8 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 
     You can find the node ID by clicking on a node in ComfyUI and viewing its details.
 
+    Open WebUI returns the images from the workflow's **Save Image**, **Save Image (Advanced)**, **Save Animated WEBP**, **Save Animated PNG** and **Preview Image** nodes. Animated images stay animated in the chat.
+
     ![Screenshot of the ComfyUI Workflow Nodes section in Open WebUI, showing the mapping fields.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
     :::info
@@ -113,14 +115,14 @@ To customize the prompt template used for generation, go to **Settings > Admin >
 ![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
 
 :::info
-There is no "Generate Image" button underneath messages any more. Generation happens from the chat itself: switch **Image** on in the **Integrations** menu of the message input, then ask for the image. See [Usage](/features/chat-conversations/image-generation-and-editing/usage) for the conditions that have to be met and for the community action that brings the old button back.
+Messages have no "Generate Image" button. Generation happens from the chat itself: switch **Image** on in the **+** menu of the message input, then ask for the image. See [Usage](/features/chat-conversations/image-generation-and-editing/usage) for the conditions that have to be met and for a community action that adds such a button.
 :::
 
 ## Edit Image
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Experience** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Images**.
 
 2. **Configure Image Editing:**
     - Under the **Edit Image** section, switch **Image Edit** on. It is off by default, and without it the edit engine is never used.
@@ -162,7 +164,7 @@ Open WebUI's **ComfyUI Workflow Nodes** section lets you map generic controls to
 
 Before configuring Open WebUI, you must examine your exported workflow JSON files directly in a text editor. The Node ID is the unique number ComfyUI uses to identify the node in the JSON structure. The top-level keys in the JSON object are the node IDs.
 
-![Screenshot of the ComfyUI interface with a node selected, highlighting the node ID in the properties panel.](/images/image-generation-and-editing/comfyui-node-mapping.png)
+![Screenshot of the ComfyUI Workflow Nodes list in Open WebUI, pairing each input key such as text, unet_name, width, height, steps and seed with its node ID.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
 **Identify the Input Key (The Parameter Name)**
 
@@ -205,7 +207,7 @@ The Key is the exact parameter name within that node's JSON structure that you n
 },
 ```
 
-![Screenshot of the ComfyUI interface with the KSampler node selected, highlighting the node ID and the 'seed' and 'steps' input fields.](/images/image-generation-and-editing/comfyui-unet-name-node.png)
+![Screenshot of the Images page in Open WebUI's admin settings with ComfyUI as the engine, showing the base URL, API key, workflow upload and the Workflow Nodes mapping.](/images/image-generation-and-editing/comfyui-unet-name-node.png)
 
 #### Default Key Values by Task Type
 
@@ -277,13 +279,13 @@ This section provides a supplementary guide on setting up the Qwen models for bo
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── qwen_image_fp8_e4m3fn.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── qwen_image_vae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
 ```
 
@@ -305,13 +307,13 @@ This section provides a supplementary guide on setting up the Qwen models for bo
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── qwen_image_edit_fp8_e4m3fn.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── qwen_image_vae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
 ```
 
@@ -339,13 +341,13 @@ This section provides a supplementary guide on setting up the FLUX.1 models for 
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── flux1-dev.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── ae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       ├── clip_l.safetensors
 │       └── t5xxl_fp16.safetensors
 ```
@@ -362,13 +364,13 @@ This section provides a supplementary guide on setting up the FLUX.1 models for 
 #### Model Storage Location
 
 ```
-📂 ComfyUI/
-├── 📂 models/
-│   ├── 📂 diffusion_models/
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
 │   │   └── flux1-schnell.safetensors
-│   ├── 📂 vae/
+│   ├── vae/
 │   │   └── ae.safetensors
-│   └── 📂 text_encoders/
+│   └── text_encoders/
 │       ├── clip_l.safetensors
 │       └── t5xxl_fp8_e4m3fn.safetensors
 ```

@@ -41,7 +41,7 @@ The `WEBUI_SECRET_KEY` is used to sign JWTs (login tokens) and derive encryption
 
 If you run multiple Open WebUI instances behind a load balancer, every instance must share the same key. Otherwise, a token signed by one instance will be rejected by another, causing login failures. Generate a key with `openssl rand -base64 32` and pass it as an environment variable to all replicas.
 
-**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again.
+**Rotation:** Changing the key invalidates all existing sessions. Users will need to sign in again. If [two-factor sign-in](#two-factor-sign-in) is on, users' authenticator secrets are encrypted with a key derived from `WEBUI_SECRET_KEY`, and once users have enrolled, Open WebUI refuses to start after a rotation. Set [`MFA_ENCRYPTION_KEY`](/reference/env-configuration#mfa_encryption_key) before users enroll to rotate `WEBUI_SECRET_KEY` freely. Installed [apps](/features/channels/apps) stop connecting after a rotation; uninstall each app, connect it again with its API key and add it back to its channels (see [Apps stop connecting after WEBUI_SECRET_KEY changed](/features/channels/apps#apps-stop-connecting-after-webui_secret_key-changed)).
 
 ---
 
@@ -90,7 +90,7 @@ If all authentication is handled by an OAuth/OIDC provider, you can hide the loc
 ENABLE_LOGIN_FORM=false
 ```
 
-This removes the email/password form from the UI, steering all users through your SSO flow. You can also disable local password authentication at the backend level:
+This removes the email/password form from the UI and refuses local sign-ups, steering all users through your SSO flow. The same switch is **Login Form** in **Settings > Admin > Authentication**, so it can be turned off without a restart once SSO works. You can also disable local password authentication at the backend level:
 
 ```bash
 ENABLE_PASSWORD_AUTH=false
@@ -103,6 +103,16 @@ ENABLE_PASSWORD_CHANGE_FORM=false
 ```
 
 This is useful for SSO-focused deployments where local password changes should not be presented to users.
+
+### Two-factor sign-in
+
+Open WebUI can require a code from an authenticator app after every sign-in, for all users:
+
+```bash
+ENABLE_MFA=true
+```
+
+The same switch is **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Admin > Authentication**. OAuth and trusted-header sign-ins can be exempted when your identity provider or proxy already enforces a second factor (`MFA_ALLOW_OAUTH_BYPASS`, `MFA_ALLOW_TRUSTED_HEADER_BYPASS`). Changing any of these settings signs every user out. While MFA is on, sign-in attempts are also limited per account and per client address. See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa) for enrollment, recovery and the limits.
 
 ---
 
@@ -134,18 +144,31 @@ JWT_EXPIRES_IN=24h
 
 Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will log a warning if this is set.
 
+Native apps such as [Tether](/ecosystem/tether) use renewable sessions instead, which end after [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) without use (default `90d`). Signing out of the app, deleting the session through the [Session API](/ecosystem/tether#session-api) and every account-wide sign-out below revoke such a session at once, with or without Redis.
+
 ### Token revocation
 
-:::warning Token Revocation Requires Redis
+Signing an account out of every device is stored in the database and works with or without Redis. It happens when:
 
-Without Redis, **signing out does not invalidate a user's token**. The token remains valid and usable until it expires naturally (default: 4 weeks). This means:
+- The user changes their password, or an administrator sets a new one for them.
+- An administrator clicks **Sign out all devices** in the user's edit dialog (see [Signing a User Out of Every Device](/features/authentication-access/rbac/roles#signing-a-user-out-of-every-device)).
+- The user sets up or replaces their authenticator or generates new recovery codes, or an operator resets their MFA.
+- An administrator changes the [two-factor sign-in](#two-factor-sign-in) settings, which signs out every account.
 
-- A stolen or leaked token cannot be revoked by signing out
-- Changing a user's password does not invalidate their existing sessions
-- Deactivating an account does not revoke the token already issued to it, although the account's role is rechecked on every request
+From then on, every token issued to the account before that moment is refused. The account's live connections are closed, and automation and sub-agent runs in progress for that user lose access. Every open live connection is also rechecked every 30 seconds and closed once its session has been revoked or has expired. API keys stay valid; delete or regenerate the key to cut it off. The check reads the database on every request, and requests are refused while the database cannot be reached.
+
+Deactivating an account keeps the tokens already issued to it, with the account's role rechecked on every request. Use **Sign out all devices** as well to end its sessions.
+
+:::warning Signing Out of a Single Session Requires Redis
+
+Without Redis, **signing out does not invalidate that session's token**. The token remains valid and usable until it expires naturally (default: 4 weeks). This means:
+
+- A stolen or leaked token cannot be revoked by signing out; **Sign out all devices** or a password change ends it
 - OIDC back-channel logout cannot revoke tokens
 
-With Redis configured, Open WebUI supports per-token revocation. When a user signs out, changes their password, or is deactivated by an admin, their token is added to a revocation list that auto-expires. This is the intended production behavior.
+With Redis configured, signing out adds the token to a revocation list that auto-expires, and OIDC back-channel logout signs the affected users out of every device. This is the intended production behavior.
+
+**Revocation checks fail open.** A revocation check that cannot reach Redis accepts the token and logs `Revocation check failed; accepting token` at most once a minute per worker process. A Redis outage therefore puts the instance back into the no-Redis behavior listed above for as long as it lasts, with sign-outs taking no effect, so treat Redis availability as part of your auth surface and alert on that log line.
 
 **If you cannot deploy Redis**, shorten `JWT_EXPIRES_IN` (e.g., `1h` or `4h`) to limit the window of exposure. See the [Redis tutorial](/tutorials/integrations/redis) for setup instructions.
 
@@ -187,7 +210,7 @@ CORS_ALLOW_CUSTOM_SCHEME=app
 
 ## Security Headers
 
-Open WebUI includes a `SecurityHeadersMiddleware` that injects HTTP security headers into responses. None are set by default, so you opt in to each one via environment variables.
+Open WebUI includes a `SecurityHeadersMiddleware` that injects HTTP security headers into responses. None are set by default, so you opt in to each one via environment variables. The accepted values and fallbacks for each are listed under [Security Headers](/reference/env-configuration#security-headers) in the environment variable reference.
 
 The following is a recommended starting configuration for production deployments:
 
@@ -249,7 +272,7 @@ HSTS=max-age=31536000;includeSubDomains
 
 ### Trusted proxy IPs
 
-Open WebUI uses `--forwarded-allow-ips` to determine which proxies are trusted to send `X-Forwarded-For` headers. By default, this is set to `*` (trust all), which is appropriate when Open WebUI is on an isolated network behind a single reverse proxy. If your network topology is more complex, restrict it to your proxy's IP:
+[`FORWARDED_ALLOW_IPS`](/reference/env-configuration#forwarded_allow_ips) determines which proxies are trusted to send `X-Forwarded-For` headers. The Docker image, `open-webui serve` and `open-webui dev` all read it. By default, this is set to `*` (trust all), which is appropriate only when a reverse proxy that overwrites these headers sits in front and nothing else can reach the backend. Otherwise any client can claim any address, which defeats the per-address sign-in limit and falsifies the address in audit logs. Restrict it to your proxy's IP:
 
 ```bash
 FORWARDED_ALLOW_IPS=192.168.1.100
@@ -267,7 +290,7 @@ If you use an OAuth/OIDC provider for authentication, several options help you c
 # Only allow users with email addresses from specific domains
 OAUTH_ALLOWED_DOMAINS=yourcompany.com
 
-# Block specific IdP groups
+# Keep specific IdP groups out of group sync: never created, joined or left
 OAUTH_BLOCKED_GROUPS='["contractors-external", "temp-accounts"]'
 ```
 
@@ -348,11 +371,7 @@ See the [Scaling Guide](/getting-started/advanced-topics/scaling#step-1-switch-t
 
 ### SQLCipher
 
-For SQLite deployments that need encryption at rest, Open WebUI supports SQLCipher:
-
-```bash
-DATABASE_TYPE=sqlite+sqlcipher
-```
+SQLCipher is not supported, and Open WebUI refuses to start with `DATABASE_TYPE=sqlite+sqlcipher`. For SQLite deployments that need encryption at rest, put the data directory on an encrypted filesystem (LUKS on Linux, BitLocker on Windows, FileVault on macOS). To keep the data of an existing SQLCipher database, decrypt it first as described in [Upgrading an Existing SQLCipher Database](/reference/database-schema#upgrading-an-existing-sqlcipher-database).
 
 ### Connection pool tuning
 
@@ -440,7 +459,7 @@ The OpenAI router includes a catch-all proxy endpoint (`/{path:path}`) that forw
 Several features control how data can be shared or exported:
 
 ```bash
-# Allow users to share chats with other authenticated users (default: true)
+# Show the Open WebUI Community share and discover options (default: true)
 ENABLE_COMMUNITY_SHARING=true
 
 # Allow admins to bulk export all user chats from the database (default: true)
@@ -451,7 +470,7 @@ ENABLE_ADMIN_EXPORT=true
 ENABLE_DIRECT_CONNECTIONS=false
 ```
 
-`ENABLE_COMMUNITY_SHARING` lets users generate share links for their chats. Any authenticated user with the link can view the chat. If your deployment contains sensitive conversations, consider setting this to `false`.
+`ENABLE_COMMUNITY_SHARING` shows the options that send chats, models, prompts, tools, functions, skills and usage statistics to the Open WebUI Community, and the links to discover community content. Set it to `false` to keep everything on your instance. Chat share links are a separate feature: a new link stays private until its owner picks who can view it, see [Chat Sharing](/features/chat-conversations/chat-features/chatshare).
 
 `ENABLE_DIRECT_CONNECTIONS`, when enabled, allows users to configure their own API keys and model endpoints in the browser. These connections are made from the backend, so the user's API key is sent to the Open WebUI server. This is off by default.
 
@@ -481,7 +500,7 @@ AUDIT_LOG_LEVEL=METADATA
 | Level | What is logged |
 |---|---|
 | `NONE` | Nothing (default) |
-| `METADATA` | User, IP, user agent, method, URL, timestamp |
+| `METADATA` | User, IP, user agent, method, URL, timestamp, requested model |
 | `REQUEST` | Metadata plus request body |
 | `REQUEST_RESPONSE` | Metadata plus request and response bodies |
 
@@ -510,7 +529,17 @@ AUDIT_INCLUDED_PATHS=auths,users,configs
 AUDIT_EXCLUDED_PATHS=/chats,/chat,/folders
 ```
 
-Authentication endpoints (signin, signout, signup) are always audited regardless of path exclusions. Passwords in request bodies are automatically redacted.
+Authentication endpoints (signin, signout, signup and the MFA endpoints) are always audited regardless of path exclusions. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, `secret`, `token`, `key` or `authorization` (or the plural, such as `tokens`), in any letter case, is masked in both request and response bodies. This includes lists of values and values cut off by the body size limit.
+
+Each entry has a `model_id` field with the model the client asked for. It is filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](/reference/env-configuration#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is, so `METADATA` is enough to see who used which model. The default exclusions skip `/api/chat/completions`, the endpoint the chat interface uses. To record those requests, drop `/chat` from the list:
+
+```bash
+AUDIT_EXCLUDED_PATHS=/chats,/folders
+```
+
+With chat requests recorded, every model reply to a `/api/chat/completions` request writes its own audit entry next to the entry for the request. When a reply calls tools, each round of the model's answer between tool calls gets one. Such an entry has the model that answered in `model_id` and the token counts the provider reported in `usage` (`input_tokens`, `output_tokens` and `total_tokens`). Its `extra.request_id` holds the `id` of the request's entry, which links the two. A reply whose provider reports no token counts writes none. Background tasks, such as title and tag generation, write none either.
+
+Within these filters, the audit log covers `POST`, `PUT`, `PATCH` and `DELETE` requests (add `GET` with [`ENABLE_AUDIT_GET_REQUESTS`](/reference/env-configuration#enable_audit_get_requests)) that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
 
 ---
 
@@ -565,9 +594,7 @@ Outbound HTTP requests also do not follow `3xx` redirects by default. Without th
 AIOHTTP_CLIENT_ALLOW_REDIRECTS=false
 ```
 
-:::note Playwright loader (v0.9.6+)
-Earlier versions applied URL validation and the redirect gate only to the default web loader; the Playwright-based loader (`WEB_LOADER_ENGINE=playwright` / the `playwright` Docker variant) could navigate and follow redirects to internal or blocklisted URLs unchecked. As of v0.9.6 the Playwright path enforces the same `validate_url()` and redirect rules as the default loader, so the SSRF controls above apply regardless of which web loader engine you run. If you use Playwright, ensure you are on v0.9.6 or later.
-:::
+[Apps](/features/channels/apps) have their own gate: an app URL must use HTTPS and resolve to public addresses. Open WebUI refuses redirects from an app and always verifies its certificate. [`APP_ALLOWED_PRIVATE_ORIGINS`](/reference/env-configuration#app_allowed_private_origins) lists the app origins allowed on private addresses or plain HTTP.
 
 ### Profile image URL forwarding
 
@@ -627,11 +654,16 @@ Because Tools and Functions execute server-side code, any user with permission t
 If your deployment does not use Tools or Functions at all, remove the surface completely:
 
 ```bash
-# Set to false to disable the built-in Tools and Functions execution surface
+# Master switch: Tools, Functions, tool servers and Open Terminal
 ENABLE_PLUGINS=false
+
+# Or switch off one part only
+ENABLE_TOOLS=false
+ENABLE_FUNCTIONS=false
+ENABLE_TOOL_SERVERS=false
 ```
 
-This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages, makes their listing endpoints return empty, and stops those plugins loading and running, so filters, actions and pipe functions are skipped and user-authored tools are never offered to a model.
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers, Open Terminal connections and users' direct tool servers from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
 
 ### Code execution
 
@@ -688,7 +720,7 @@ All default to `false`, meaning only administrators can manage Tools and Functio
 
 ### Base image
 
-The default Dockerfile uses `python:3.11-slim-bookworm`. If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
+The default Dockerfile uses `python:3.12-slim-trixie` (Python 3.12 on Debian 13). If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
 
 ### Non-root execution
 
@@ -708,7 +740,7 @@ docker build --build-arg USE_PERMISSION_HARDENING=true .
 
 ### Data directory
 
-The data directory (`/app/backend/data`) contains the database, uploaded files, cached plugins, and the auto-generated secret key. Protect this directory with appropriate filesystem permissions and include it in your backup strategy.
+The data directory (`/app/backend/data`) contains the database, uploaded files and cached plugins. The auto-generated secret key is written to `/app/backend/.webui_secret_key`, outside this directory, so set [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) or point [`WEBUI_SECRET_KEY_FILE`](/reference/env-configuration#webui_secret_key_file) into the data directory to keep it across container recreation. Protect this directory with appropriate filesystem permissions and include it in your backup strategy.
 
 ### Development features
 
@@ -731,6 +763,8 @@ JSON logging is designed for log aggregators like ELK, Datadog, or Splunk.
 
 ```bash
 ENABLE_OTEL=true
+ENABLE_OTEL_TRACES=true
+ENABLE_OTEL_METRICS=true
 OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
 OTEL_SERVICE_NAME=open-webui
 ```
@@ -763,7 +797,7 @@ For Docker deployments, pull the latest image and recreate the container:
 docker pull ghcr.io/open-webui/open-webui:main
 ```
 
-For multi-replica deployments, follow the [rolling update procedure](/troubleshooting/multi-replica#updates-and-migrations) to avoid downtime.
+For multi-replica deployments, update every instance at the same time: stop all replicas, let one instance run the migrations, then bring the rest back on the new version. See [Updates and migrations](/troubleshooting/multi-replica#updates-and-migrations).
 
 ---
 
@@ -779,7 +813,8 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Review signup policy](#registration) | Disabled after first user | Keep disabled or use `pending` role |
 | [Enable password validation](#password-validation) | Disabled | `ENABLE_PASSWORD_VALIDATION=true` |
 | [Secure cookies](#cookie-settings) | `Secure=false`, `SameSite=lax` | `Secure=true`, `SameSite=strict` |
-| [Enable token revocation](#token-revocation) | No revocation (no Redis) | Configure Redis or shorten `JWT_EXPIRES_IN` |
+| [Require two-factor sign-in](#two-factor-sign-in) | Disabled | `ENABLE_MFA=true` |
+| [Enable token revocation](#token-revocation) | Sign-out of a single session needs Redis | Configure Redis or shorten `JWT_EXPIRES_IN` |
 | [Restrict CORS](#cors) | `*` | Your specific domain(s) |
 | [Set security headers](#security-headers) | None | HSTS, X-Frame-Options, CSP, Cross-Origin policies |
 | [Restrict OAuth domains](#domain-and-group-restrictions) | All allowed | `OAUTH_ALLOWED_DOMAINS=yourdomain.com` |
@@ -804,7 +839,7 @@ For organizations where security is a priority, the following practices define t
 
 ### Network and Transport
 
-1. **Place Open WebUI behind a VPN, reverse proxy, or zero-trust access layer with rate limiting and IP allowlisting.** Open WebUI is built for private, trusted networks. Do not expose it directly to the public internet without an additional access control layer in front of it. Configure your proxy to throttle connection rates, limit repeated authentication attempts, restrict access to known IP ranges, and use tools like fail2ban to block abusive sources. Restrict `--forwarded-allow-ips` to your proxy's IP to prevent header spoofing. [Details](#network-placement)
+1. **Place Open WebUI behind a VPN, reverse proxy, or zero-trust access layer with rate limiting and IP allowlisting.** Open WebUI is built for private, trusted networks. Do not expose it directly to the public internet without an additional access control layer in front of it. Configure your proxy to throttle connection rates, limit repeated authentication attempts, restrict access to known IP ranges, and use tools like fail2ban to block abusive sources. Restrict `FORWARDED_ALLOW_IPS` to your proxy's IP to prevent header spoofing. [Details](#network-placement)
 
 2. **Serve all traffic over HTTPS and enable all security headers.** Use a reverse proxy that terminates TLS. Configure session cookies with `Secure=true` and `SameSite=strict`. Never serve Open WebUI over plain HTTP in production. Enable HSTS, Content Security Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy. Do not leave CORS set to `*`; restrict it to only the exact domains that need access. [Details](#https-and-tls)
 
@@ -814,7 +849,7 @@ For organizations where security is a priority, the following practices define t
 
 4. **Use SSO with your identity provider and disable local authentication.** Integrate with your organization's OAuth/OIDC or LDAP provider. Restrict access to specific email domains and IdP groups, map IdP roles to Open WebUI roles, and disable the local login form and password authentication entirely. Limit concurrent sessions per user, enable backchannel logout with Redis so sessions are revoked immediately when users are deprovisioned, and do not enable OAuth account merging unless your provider guarantees email verification. [Details](#oauth-and-sso)
 
-5. **Enforce password complexity and shorten session lifetime.** If local accounts are used, enable password validation. Reduce the default JWT expiration from 4 weeks to a shorter duration appropriate for your environment (e.g., 8 to 24 hours). Do not disable token expiration in production. [Details](#password-validation)
+5. **Enforce password complexity and shorten session lifetime.** If local accounts are used, enable password validation and two-factor sign-in. Reduce the default JWT expiration from 4 weeks to a shorter duration appropriate for your environment (e.g., 8 to 24 hours). Do not disable token expiration in production. [Details](#password-validation)
 
 6. **Review user accounts and permissions periodically.** Remove inactive accounts, audit group memberships, and verify that workspace permissions remain appropriate. Use SCIM provisioning to automate account lifecycle management through your identity provider. [Details](#access-control)
 
@@ -828,7 +863,7 @@ For organizations where security is a priority, the following practices define t
 
 9. **Restrict data sharing, file uploads, and API key access.** Set maximum file sizes, file count limits, and restrict allowed file extensions. Disable community sharing (`ENABLE_COMMUNITY_SHARING=false`) and admin bulk export (`ENABLE_ADMIN_EXPORT=false`) if not operationally needed. Keep API key creation restricted to administrators and enable endpoint restrictions to limit which routes each key can access. [Details](#data-sharing-and-export)
 
-10. **Encrypt data at rest and maintain regular backups.** For SQLite, use SQLCipher. For PostgreSQL, use disk-level or Transparent Data Encryption. Maintain regular backups, store them in a separate security domain, and periodically test your restore procedure. [Details](#sqlcipher)
+10. **Encrypt data at rest and maintain regular backups.** For SQLite, use an encrypted filesystem. For PostgreSQL, use disk-level or Transparent Data Encryption. Maintain regular backups, store them in a separate security domain, and periodically test your restore procedure. [Details](#sqlcipher)
 
 ### Outbound Network Controls
 
@@ -850,4 +885,4 @@ For organizations where security is a priority, the following practices define t
 
 16. **Monitor for anomalies.** Track CPU, memory, network, and disk usage. Integrate with your alerting infrastructure to detect unexpected compute usage, outbound network activity, or storage consumption early. [Details](#observability)
 
-17. **Maintain an incident response plan.** Define procedures for compromised accounts, unauthorized access, and unexpected resource consumption. Know how to disable user accounts, revoke sessions (requires Redis), rotate the secret key, and review audit logs.
+17. **Maintain an incident response plan.** Define procedures for compromised accounts, unauthorized access, and unexpected resource consumption. Know how to disable user accounts, sign users out of all devices, reset a user's two-factor sign-in, rotate the secret key and review audit logs.

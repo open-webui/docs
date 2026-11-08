@@ -10,14 +10,14 @@ description: "Deploy Open WebUI on Google Cloud Run with Cloud SQL, Redis, Cloud
 Cloud Run is the Google Cloud managed-container option for this guide. Use shared external state and a separate migration job. For GKE, use [Kubernetes Deployment](./kubernetes); for the general architecture, see the existing [Container Service guide](/enterprise/deployment/container-service).
 
 :::info Check the workload fit
-Cloud Run supports WebSockets, but connections remain subject to its request timeout, up to 60 minutes. Clients must reconnect, and session affinity is best effort. Redis remains necessary across instances. Test long conversations and background work before adopting this platform. See [Cloud Run WebSockets](https://docs.cloud.google.com/run/docs/triggering/websockets).
+Cloud Run supports WebSockets, but connections remain subject to its request timeout, up to 60 minutes. Clients must reconnect, and Redis remains necessary across instances. Test long conversations and background work before adopting this platform. See [Cloud Run WebSockets](https://docs.cloud.google.com/run/docs/triggering/websockets).
 :::
 
 ## 1. Prepare the Google Cloud Services
 
 | Component | Prepare before creating the service |
 | :--- | :--- |
-| Image | Mirror `ghcr.io/open-webui/open-webui:v0.11.3` into Artifact Registry and retain its immutable digest. |
+| Image | Mirror `ghcr.io/open-webui/open-webui:v0.13.0` into Artifact Registry and retain its immutable digest. Use the standard image: the slim image has no Cloud Storage client. |
 | Database | Cloud SQL for PostgreSQL, an application database/role, and the `vector` extension enabled by an administrator. This guide uses a private-IP database connection. |
 | Redis | A compatible Memorystore or other Redis endpoint. Match authentication, TLS, and cluster settings to the chosen service. |
 | Files | A private Cloud Storage bucket. |
@@ -37,22 +37,20 @@ Create and map these secret environment variables. Pin secret versions so a depl
 | Environment variable | Secret value |
 | :--- | :--- |
 | `WEBUI_SECRET_KEY` | A stable random signing key, identical on every instance. Generate once with `openssl rand -hex 32`. |
-| `DATABASE_URL` and `PGVECTOR_DB_URL` | The same PostgreSQL connection URL for this reference deployment, with your provider's required TLS parameters. |
-| `REDIS_URL` and `WEBSOCKET_REDIS_URL` | The same Redis connection URL, including authentication and TLS where configured. |
+| `DATABASE_URL` | The PostgreSQL connection URL, with your provider's required TLS parameters. PGVector uses it too unless you set `PGVECTOR_DB_URL`. |
+| `REDIS_URL` | The Redis connection URL, including authentication and TLS where configured. WebSockets use it too unless you set `WEBSOCKET_REDIS_URL`. |
 | `OPENAI_API_KEY` | Chat provider API key. |
-| `RAG_OPENAI_API_KEY` | Embedding provider API key. |
+| `RAG_OPENAI_API_KEY` | Embedding provider API key. Defaults to `OPENAI_API_KEY` when unset. |
 | `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` | Initial administrator credentials for an empty database. Keep the password in the secret store. |
 | `LICENSE_KEY` | Optional issued Enterprise license key. |
 
 Configure these non-secret values, replacing the example endpoints and bucket:
 
 ```ini
-HOST=0.0.0.0
 WEBUI_URL=https://ai.example.com
 UVICORN_WORKERS=1
 ENABLE_DB_MIGRATIONS=false
 ENABLE_OLLAMA_API=false
-ENABLE_WEBSOCKET_SUPPORT=true
 WEBSOCKET_MANAGER=redis
 VECTOR_DB=pgvector
 PGVECTOR_CREATE_EXTENSION=false
@@ -81,7 +79,7 @@ Use the same pinned application image as the service. Set `ENABLE_DB_MIGRATIONS=
 | Executable / entry point | `python` |
 | Arguments, as two separate values | `-c` and `import open_webui.config` |
 
-For **v0.11.3**, importing this module runs schema migrations when that flag is true and raises an error if they fail. This is a version-specific command based on the [application's migration implementation](https://github.com/open-webui/open-webui/blob/v0.11.3/backend/open_webui/config.py), not a stable public migration CLI. Recheck it when changing versions. It initializes the schema; normal application startup subsequently initializes runtime settings and the administrator account.
+Importing this module runs the schema migrations when that flag is true and exits with an error if they fail. It is an internal entry point, not a stable migration CLI, so recheck it against the [migration code](https://github.com/open-webui/open-webui/blob/v0.13.0/backend/open_webui/config.py) when you change versions. It initializes the schema; normal application startup subsequently initializes runtime settings and the administrator account.
 
 The migration container needs the same database connection, signing key, network access, and image-pull permissions. Run exactly one execution at a time, with automatic retries disabled, while all application instances using that database are stopped. Continue only when it exits successfully and the logs show no migration error.
 
@@ -105,8 +103,8 @@ In the Cloud Run console, deploy `openwebui` with the same image, identity, VPC 
 | Instances | Minimum `1`, maximum `1` until verification passes. |
 | Concurrency | Start at `20` and tune with realistic chat/ingestion traffic. |
 | Request timeout | `3600` seconds; clients still need to reconnect. |
-| Session affinity | Enabled. |
-| Startup probe | HTTP `/health/db`, port `8080`, 10-second period, 5-second timeout, failure threshold `24`. |
+| Session affinity | Optional; required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). |
+| Startup probe | HTTP `/ready`, port `8080`, 10-second period, 5-second timeout, failure threshold `24`. |
 | Liveness probe | HTTP `/health`, port `8080`, with a suitable interval and failure threshold. |
 
 Keep startup within Cloud Run's [supported probe budget](https://docs.cloud.google.com/run/docs/configuring/healthchecks). Offloaded embeddings and a separate migration job reduce startup work. A successful probe does not validate the model provider or bucket permissions.
@@ -170,7 +168,7 @@ Do not route to an incompatible old image after migration. Restore compatible da
 | Startup fails | Port, startup budget, database private-IP routing/TLS, secret permissions, and logs. |
 | Redis cannot connect | VPC egress, firewall/DNS, authentication/TLS, and Redis cluster mode. |
 | Files disappear or uploads fail | `STORAGE_PROVIDER=gcs`, bucket name, service-account permissions, and external vector storage. |
-| WebSocket disconnects after a long session | Request timeout and client reconnection; affinity is best effort. |
+| WebSocket disconnects after a long session | Request timeout and client reconnection. |
 | Background work pauses or disappears | CPU allocation, minimum instances, and process termination; use durable job infrastructure for work that must survive an instance. |
 
 Deleting the Cloud Run service or job does not delete separately provisioned Cloud SQL, Redis, Cloud Storage, or Secret Manager resources. Remove those only according to your backup and retention policy.

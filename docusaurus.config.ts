@@ -18,9 +18,6 @@ const shikiPlugin: [typeof rehypeShiki, RehypeShikiOptions] = [
 	},
 ];
 
-const shouldEnableGtag =
-	process.env.NODE_ENV === "production" && !process.argv.includes("start");
-
 const config: Config = {
 	title: "Open WebUI",
 	titleDelimiter: "/",
@@ -39,6 +36,8 @@ const config: Config = {
 	projectName: "docs", // Usually your repo name.
 
 	onBrokenLinks: "throw",
+	onBrokenAnchors: "throw",
+	onDuplicateRoutes: "throw",
 
 	// Even if you don't use internationalization, you can use this field to set
 	// useful metadata like html lang. For example, if your site is Chinese, you
@@ -55,7 +54,7 @@ const config: Config = {
 			onBrokenMarkdownLinks: "throw",
 		},
 	},
-	clientModules: ["./src/clientModules/ensure-gtag.js"],
+	clientModules: ["./src/clientModules/analytics.js"],
 	themes: [
 		"@docusaurus/theme-mermaid",
 		[
@@ -74,14 +73,6 @@ const config: Config = {
 		[
 			"classic",
 			{
-				...(shouldEnableGtag
-					? {
-							gtag: {
-								trackingID: "G-522JSJVWTB",
-								anonymizeIP: false,
-							},
-						}
-					: {}),
 				docs: {
 					sidebarPath: "./sidebars.ts",
 					routeBasePath: "/",

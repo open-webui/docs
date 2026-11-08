@@ -40,11 +40,7 @@ See the companion guide: [Using Mistral Voxtral for Speech-to-Text](/features/ch
 | `voxtral-tts-26-03` | Voxtral TTS — current Mistral text-to-speech model, with zero-shot voice cloning |
 
 :::info
-If `AUDIO_TTS_MODEL` is empty, Open WebUI falls back to `mistral-tts-latest`.
-:::
-
-:::caution Set the model explicitly
-Mistral no longer publishes `-latest` alias names, so the built-in `mistral-tts-latest` fallback may be rejected. Set **TTS Model** to a current ID such as `voxtral-tts-26-03` rather than leaving the field empty. See the [Mistral models overview](https://docs.mistral.ai/getting-started/models/models_overview/) for the current list.
+If `AUDIO_TTS_MODEL` is empty, Open WebUI falls back to `voxtral-mini-tts-2603`. Choosing **MistralAI** as the engine fills in that model.
 :::
 
 ## Environment Variables Setup
@@ -71,7 +67,7 @@ services:
 | `AUDIO_TTS_ENGINE` | Set to `mistral` | empty (uses browser-only TTS) |
 | `AUDIO_TTS_MISTRAL_API_KEY` | Your Mistral API key | empty |
 | `AUDIO_TTS_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
-| `AUDIO_TTS_MODEL` | TTS model | `mistral-tts-latest` (built-in fallback; set `voxtral-tts-26-03` explicitly) |
+| `AUDIO_TTS_MODEL` | TTS model | `voxtral-mini-tts-2603` (built-in fallback) |
 | `AUDIO_TTS_VOICE` | Voice ID | empty |
 
 ## Choosing Voices

@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Calendar
 
 <ThemedImage
-  alt="Calendar: a month grid with color-coded events and a recurring weekday standup, with AI creating events from a natural-language request"
+  alt="Calendar: a month of day tiles with one day lifted out"
   sources={{
     light: useBaseUrl('/images/banners/calendar-light.svg'),
     dark: useBaseUrl('/images/banners/calendar-dark.svg'),
@@ -55,15 +55,15 @@ Organize events across multiple calendars (e.g., "Personal", "Team Meetings", "O
 
 | | |
 | :--- | :--- |
-| 📅 **Month/Week/Day views** | Full calendar UI with month, week, and day views |
-| 🔁 **Recurring events** | RRULE-based recurrence (daily, weekly, monthly, custom) |
-| 🤖 **Agentic management** | Models can search, create, update, and delete events autonomously |
-| ⚡ **Automation overlay** | Active automations and past runs surface as virtual calendar events |
-| 👥 **Calendar sharing** | Share calendars with users or groups via access grants |
-| 📍 **Location & description** | Attach locations and rich descriptions to events |
-| 🎨 **Color coding** | Per-calendar and per-event color customization |
-| ✅ **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status |
-| 🔔 **Reminders** | Per-event alerts via toast, browser notification, and webhook |
+| **Month/Week/Day views** | Full calendar UI with month, week, and day views |
+| **Recurring events** | RRULE-based recurrence (daily, weekly, monthly, custom) |
+| **Agentic management** | Models can search, create, update, and delete events autonomously |
+| **Automation overlay** | Active automations and past runs surface as virtual calendar events |
+| **Calendar sharing** | Share calendars with users or groups via access grants |
+| **Location & description** | Attach locations and rich descriptions to events |
+| **Color coding** | Per-calendar and per-event color customization |
+| **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status |
+| **Reminders** | Per-event alerts via toast, browser notification, and webhook |
 
 ---
 
@@ -73,6 +73,8 @@ Calendar is permission-gated for non-admin users.
 
 - **Admins**: always have access to Calendar
 - **Users**: require the **Features > Calendar** permission
+
+Without access, opening `/calendar` goes to the home page.
 
 See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
 
@@ -121,6 +123,8 @@ Click the small **+** button next to the **Calendars** heading in the calendar s
 
 Click any event on the calendar to open the event editor. From there you can update details or delete the event. Automation-generated virtual events cannot be edited directly; clicking them navigates to the automation or the run's chat.
 
+Clicking one occurrence of a repeating event opens the whole series, dated from its first occurrence. **Save** changes every occurrence, and **Delete** removes the series.
+
 ---
 
 ## Calendar Views
@@ -147,7 +151,7 @@ Your time zone comes from your browser and is stored on your account, so there i
 
 ### Daily is as often as an event can repeat
 
-From v0.11.2, an event cannot repeat more often than once a day. Saving a rule that comes back every hour, or every fifteen minutes, is refused with **Recurring events cannot repeat more often than daily**. This is checked on the server, so it applies to events created through the API and by a model, as well as ones created in the interface.
+An event cannot repeat more often than once a day. Saving a rule that comes back every hour, or every fifteen minutes, is refused with **Recurring events cannot repeat more often than daily**. This is checked on the server, so it applies to events created through the API and by a model, as well as ones created in the interface.
 
 Anything faster than daily is a job rather than an appointment, and it belongs in [Automations](/features/chat-conversations/chat-features/automations), which are built to run on that kind of schedule.
 
@@ -216,8 +220,7 @@ Calendars support the same access grant system used by knowledge bases, models, 
 
 ### Share a calendar
 
-1. Open the calendar's **settings** (via the calendar list or edit endpoint)
-2. Add access grants for specific users or groups with `read` or `write` permission
+Sharing is set through the API: send the calendar's full list of access grants to `POST /api/v1/calendars/{calendar_id}/access/update`, each grant naming a user or group with `read` or `write` permission.
 
 ### What shared access provides
 
@@ -228,8 +231,8 @@ Calendars support the same access grant system used by knowledge bases, models, 
 
 Only the calendar **owner** (or an admin) can manage access grants and delete the calendar itself.
 
-:::info Public sharing is permission-gated
-Wildcard access grants (calendar readable or writable by every user with the Calendar feature) are gated by the **Calendars Public Sharing** permission. When disabled for a non-admin owner, public principals are silently stripped from the access grant list on calendar create/update; per-user and per-group grants remain unaffected. Admins always retain the ability to share publicly. Configurable per-group in **Admin Panel > Users > Groups > Permissions** or via [`USER_PERMISSIONS_CALENDAR_ALLOW_PUBLIC_SHARING`](/reference/env-configuration#user_permissions_calendar_allow_public_sharing).
+:::info Sharing is permission-gated
+Users who are not admins can share only as far as their [sharing permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions) allow. **Calendars Public Sharing** opens a calendar to every user with Calendar. Calendars can never be shared with people who are not signed in.
 :::
 
 ---
@@ -268,7 +271,7 @@ The default is **10 minutes before**.
 2. **Browser notification**: if browser notifications are enabled in user settings, a native OS notification is shown.
 3. **Webhook**: if the user has a webhook URL configured in **Settings > Notifications**, a `calendar_alert` payload is sent.
 
-Alerts are de-duplicated server-side via `meta.alerted_at`, so each event fires at most once per start time, even across restarts and multi-instance deployments.
+Alerts are de-duplicated server-side via `meta.alerted_at`, so each event fires at most once per start time, even across restarts and multi-instance deployments. Moving an event to a new start time arms its alert again.
 
 The global alert polling window is configurable via [`CALENDAR_ALERT_LOOKAHEAD_MINUTES`](/reference/env-configuration#calendar_alert_lookahead_minutes) (default: 10 minutes).
 

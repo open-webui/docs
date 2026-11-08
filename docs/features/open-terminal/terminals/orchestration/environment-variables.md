@@ -44,7 +44,7 @@ Policy env vars are visible to the user inside their terminal. Do not put secret
 
 ## Automatically Injected Resource Vars
 
-These are set automatically by the orchestrator from the policy's `cpu_limit` and `memory_limit`, so a system prompt or tool can read the container's resource budget. They are not user-configured.
+These are set automatically by the orchestrator from the policy's `cpu_limit` and `memory_limit`, so a system prompt or tool can read the container's resource budget. They are not user-configured. Inside a capped workspace, `nproc` and `free` still report the host's cores and memory, so these variables are the only in-container source of the real limits.
 
 | Variable | Purpose |
 | :--- | :--- |

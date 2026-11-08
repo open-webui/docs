@@ -13,10 +13,10 @@ Choose how to run Open WebUI in your environment. Start with a single instance o
 | Deployment | When to use it | Guide |
 | :--- | :--- | :--- |
 | Docker or Python | You want to get an instance running on a machine you manage. | [Quick Start](/getting-started/quick-start) |
-| Kubernetes | Your team operates a cluster and wants to deploy with Helm. | [Kubernetes Deployment](./kubernetes) |
-| AWS ECS / Fargate | You want AWS-managed container tasks with an Application Load Balancer. | [AWS ECS / Fargate](./aws-ecs) |
-| Azure Container Apps | You want managed containers integrated with Azure networking and services. | [Azure Container Apps](./azure-container-apps) |
-| Google Cloud Run | You want managed Google Cloud containers and can accommodate request-duration and instance-lifecycle limits. | [Google Cloud Run](./google-cloud-run) |
+| Kubernetes | Your team operates a cluster and wants to deploy with Helm. | [Kubernetes Deployment](/deployment/kubernetes) |
+| AWS ECS / Fargate | You want AWS-managed container tasks with an Application Load Balancer. | [AWS ECS / Fargate](/deployment/aws-ecs) |
+| Azure Container Apps | You want managed containers integrated with Azure networking and services. | [Azure Container Apps](/deployment/azure-container-apps) |
+| Google Cloud Run | You want managed Google Cloud containers and can accommodate request-duration and instance-lifecycle limits. | [Google Cloud Run](/deployment/google-cloud-run) |
 | Managed container service | Your organization runs applications on a managed container platform. | [Container Service](/enterprise/deployment/container-service) |
 | Python on virtual machines | You manage application processes and scaling on VMs. | [Python / Pip on VMs](/enterprise/deployment/python-pip) |
 
@@ -24,7 +24,7 @@ Choose how to run Open WebUI in your environment. Start with a single instance o
 
 | Guide | What it covers |
 | :--- | :--- |
-| [Docker Swarm](./docker-swarm) | A Swarm stack across nodes, with GPU and without |
+| [Docker Swarm](/deployment/docker-swarm) | A Swarm stack across nodes, with GPU and without |
 
 Running **one instance** on a machine you manage, on Podman, WSL, the Docker Desktop extension or a plain Python environment, is covered in the [Quick Start tabs](/getting-started/quick-start). The tag reference, including the GPU, Ollama and slim variants, is [Docker images and tags](/getting-started/quick-start#image-variants).
 

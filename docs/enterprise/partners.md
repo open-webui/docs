@@ -11,7 +11,7 @@ If you are a **consulting agency**, **AI services provider**, or **reseller**, p
 
 Instead, we ask that you **fill out our partnership interest form**:
 
-🔗 **[Apply to Partner Network](https://forms.gle/SemdgxjFXpHmdCby6)**
+**[Apply to Partner Network](https://forms.gle/SemdgxjFXpHmdCby6)**
 
 #### Eligibility & Expectations
 

@@ -60,7 +60,7 @@ The Gateway settings page also shows the **Base URL** for your instance (e.g., `
 
 1. Open Open WebUI in your browser.
 2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
-3. Click ➕ **Add Connection**.
+3. Click **Add Connection**.
 4. Enter the following:
 
 | Setting | Value |
@@ -68,7 +68,7 @@ The Gateway settings page also shows the **Base URL** for your instance (e.g., `
 | **URL** | `http://localhost:8000/v1` |
 | **API Key** | The `sk-cptr-...` key from Step 2 |
 
-5. Click the ✅ checkmark to verify, then **Save**.
+5. Click the checkmark to verify, then **Save**.
 
 :::tip Running Open WebUI in Docker?
 Replace `localhost` with `host.docker.internal`:
@@ -138,7 +138,7 @@ echo "anthropic/claude-sonnet-5" > /path/to/workspace/.cptr/model
 
 ### Connection test passes but no models load
 
-Almost always the missing `/v1` suffix. Open WebUI's connection test checks basic connectivity, not model discovery.
+Open WebUI's connection test requests `GET <URL>/models` with your key, so a URL without the `/v1` suffix normally fails the test itself. If the test passes but no models load, the `/models` response was not JSON with a `data` list (or a bare list), or the connection is switched off. If you filled in Model IDs, only those IDs are listed and `/models` is not queried.
 
 ### Docker networking issues
 

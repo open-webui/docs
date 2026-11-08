@@ -14,14 +14,8 @@ After upgrading, restart the server and verify it starts correctly:
 open-webui serve
 ```
 
-:::warning Multi-Worker Environments
-If you run Open WebUI with `UVICORN_WORKERS > 1` (e.g., in a production environment), you **MUST** ensure the update migration runs on a single worker first to prevent database schema corruption.
-
-**Steps for proper update:**
-1. Update `open-webui` using `pip`.
-2. Start the application with `UVICORN_WORKERS=1` environment variable set.
-3. Wait for the application to fully start and complete migrations.
-4. Stop and restart the application with your desired number of workers.
+:::warning Multiple workers
+Migrations run at startup in every process. If you run with `UVICORN_WORKERS` above `1`, start the new version with `UVICORN_WORKERS=1`, wait until the migrations finish, then restart. Running more than one worker is not recommended; scale with [replicas](/getting-started/advanced-topics/scaling#step-3-run-multiple-instances) instead.
 :::
 
 For version pinning, rollback, and backup procedures, see the [full update guide](/getting-started/updating).

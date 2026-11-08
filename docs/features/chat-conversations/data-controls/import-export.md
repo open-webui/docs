@@ -43,6 +43,7 @@ Click the **Import Chats** button and select a JSON file to restore conversation
 - Imported chats are added to your existing conversations (they don't replace them)
 - Each imported chat receives a new unique ID, so re-importing the same file will create duplicates
 - If using ChatGPT exports, the format is automatically detected and converted
+- Tags your account does not have yet are created from the file. An export stores each tag in lowercase with underscores, so a tag named Import Test comes back as import_test
 
 ## Chat Import JSON Schema
 
@@ -133,42 +134,44 @@ If the objects in the array do **not** have a `chat` key, the entire object is t
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `chat` | object | ✅ | The conversation data (see Chat Data below) |
-| `meta` | object | ❌ | Metadata such as `tags` (array of strings). Defaults to `{}` |
-| `pinned` | boolean | ❌ | Whether the chat is pinned. Defaults to `false` |
-| `folder_id` | string \| null | ❌ | ID of the folder to place the chat in. Defaults to `null`. It has to name a folder **you own**: a folder that does not exist, or one merely shared with you, is cleared and the chat is imported outside any folder rather than failing the import |
-| `created_at` | integer \| null | ❌ | Unix timestamp (seconds) for when the chat was created |
-| `updated_at` | integer \| null | ❌ | Unix timestamp (seconds) for when the chat was last updated |
+| `chat` | object | Yes | The conversation data (see Chat Data below) |
+| `meta` | object | No | Metadata such as `tags` (array of strings). Defaults to `{}` |
+| `pinned` | boolean | No | Whether the chat is pinned. Defaults to `false` |
+| `archived` | boolean | No | Whether the chat is archived. Defaults to `false`. An archived chat is imported into **Settings > Archived Chats** |
+| `variables` | object | No | Values filled in for the chat's [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables). Defaults to `{}` |
+| `folder_id` | string \| null | No | ID of the folder to place the chat in. Defaults to `null`. It has to name a folder you can write to, either one you own or one shared with you with **Write** access. A folder that does not exist, or one shared with you for reading only, is cleared and the chat is imported outside any folder rather than failing the import |
+| `created_at` | integer \| null | No | Unix timestamp (seconds) for when the chat was created |
+| `updated_at` | integer \| null | No | Unix timestamp (seconds) for when the chat was last updated |
 
 #### Chat Data Object
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `title` | string | ❌ | The conversation title. Defaults to `"New Chat"` |
-| `models` | string[] | ❌ | List of model identifiers used in the conversation |
-| `history` | object | ✅ | Contains the message tree (see History below) |
-| `options` | object | ❌ | Chat-level options/parameters |
+| `title` | string | No | The conversation title. Defaults to `"New Chat"` |
+| `models` | string[] | No | List of model identifiers used in the conversation |
+| `history` | object | Yes | Contains the message tree (see History below) |
+| `options` | object | No | Chat-level options/parameters |
 
 #### History Object
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `currentId` | string | ✅ | ID of the last message in the active conversation branch |
-| `messages` | object | ✅ | A map of message ID → message object (see Message below) |
+| `currentId` | string | Yes | ID of the last message in the active conversation branch |
+| `messages` | object | Yes | A map of message ID → message object (see Message below) |
 
 #### Message Object
 
 | Field | Type | Required | Description |
 |---|---|---|---|
-| `id` | string | ✅ | Unique identifier for the message |
-| `parentId` | string \| null | ✅ | ID of the parent message, or `null` for the first message |
-| `childrenIds` | string[] | ✅ | Array of child message IDs. Empty array `[]` for the last message |
-| `role` | string | ✅ | Either `"user"` or `"assistant"` |
-| `content` | string | ✅ | The message text (supports Markdown) |
-| `model` | string | ❌ | Model identifier (relevant for assistant messages) |
-| `done` | boolean | ❌ | Whether the response is complete |
-| `timestamp` | integer | ❌ | Unix timestamp (seconds) for the message |
-| `context` | string \| null | ❌ | Additional context for the message |
+| `id` | string | Yes | Unique identifier for the message |
+| `parentId` | string \| null | Yes | ID of the parent message, or `null` for the first message |
+| `childrenIds` | string[] | Yes | Array of child message IDs. Empty array `[]` for the last message |
+| `role` | string | Yes | Either `"user"` or `"assistant"` |
+| `content` | string | Yes | The message text (supports Markdown) |
+| `model` | string | No | Model identifier (relevant for assistant messages) |
+| `done` | boolean | No | Whether the response is complete |
+| `timestamp` | integer | No | Unix timestamp (seconds) for the message |
+| `context` | string \| null | No | Additional context for the message |
 
 :::info Message Tree Structure
 Messages use a **tree structure** rather than a flat list. Each message references its parent via `parentId` and its children via `childrenIds`. This allows Open WebUI to support branching conversations (e.g. editing a message and getting a different response). The `history.currentId` field points to the last message in the currently active branch.

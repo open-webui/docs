@@ -1,19 +1,14 @@
-# 👋 Open WebUI Documentation
+# Open WebUI Documentation
 
-Welcome to the official documentation for **Open WebUI** — a self-hosted, privacy-focused, and extensible AI interface for LLMs like Ollama and OpenAI-compatible APIs.
+Source for [docs.openwebui.com](https://docs.openwebui.com/), built with Docusaurus.
 
-This site is built with [Docusaurus](https://docusaurus.io/) and includes:
+Use the Node.js version in [.node-version](.node-version), then run:
 
-- 🔧 Installation & setup guides (Docker, local, manual)
-- 🧩 Plugin & extension documentation
-- 📚 API reference & pipeline usage
-- 🗂 File uploads & RAG integration
-- 🤖 Developer contribution guide
+```bash
+npm ci
+npm start
+```
 
-## 📝 Contributing
+Edit pages in `docs/`. Run `npm run build` to check the production build before submitting a pull request.
 
-Contributions are welcome! Please read the [contributing guide](docs/tutorials/contributing-tutorial.md) for details.
-
-## 🌐 Live Docs
-
-👉 Visit the docs: [docs.openwebui.com](https://docs.openwebui.com/)
+See the [contributing guide](docs/tutorials/contributing-tutorial.md) for more details.

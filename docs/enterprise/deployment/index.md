@@ -24,31 +24,29 @@ Regardless of which deployment pattern you choose, every scaled Open WebUI deplo
 | Component | Why It's Required | Options |
 | :--- | :--- | :--- |
 | **PostgreSQL** | Multi-instance deployments require a real database. SQLite does not support concurrent writes from multiple processes. | Self-managed, Amazon RDS, Azure Database for PostgreSQL, Google Cloud SQL |
-| **Redis** | Session management, WebSocket coordination, and configuration sync across instances. | Self-managed, Amazon ElastiCache, Azure Cache for Redis, Google Memorystore |
+| **Redis** | WebSocket coordination, token revocation, and shared caches across instances (configuration is shared through PostgreSQL). | Self-managed, Amazon ElastiCache, Azure Cache for Redis, Google Memorystore |
 | **Vector Database** | The default ChromaDB uses a local SQLite backend that is not safe for multi-process access. | PGVector (shares PostgreSQL), Milvus, Qdrant, or ChromaDB in HTTP server mode |
 | **Shared Storage** | Uploaded files must be accessible from every instance. | Shared filesystem (NFS, EFS, CephFS) or object storage (`S3`, `GCS`, `Azure Blob`) |
-| **Content Extraction** | The default `pypdf` extractor leaks memory under sustained load. | Apache Tika or Docling as a sidecar service |
-| **Embedding Engine** | The default SentenceTransformers model loads ~500 MB into RAM per worker process. | OpenAI Embeddings API, or Ollama running an embedding model |
+| **Content Extraction** | The default extractor parses documents inside the Open WebUI process, on its CPU and memory. | Apache Tika or Docling as a separate service |
+| **Embedding Engine** | The default SentenceTransformers model loads into every worker process at startup and runs on its CPU. | OpenAI Embeddings API, or Ollama running an embedding model |
 
 ### Critical Configuration
 
 These environment variables **must** be set consistently across every instance:
 
 ```bash
-# Shared secret — MUST be identical on all instances
+# Shared secret: MUST be identical on all instances
 WEBUI_SECRET_KEY=your-secret-key-here
 
 # Database
 DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
 
-# Vector Database
+# Vector Database (PGVector uses DATABASE_URL unless PGVECTOR_DB_URL is set)
 VECTOR_DB=pgvector
-PGVECTOR_DB_URL=postgresql://user:password@db-host:5432/openwebui
 
 # Redis
 REDIS_URL=redis://redis-host:6379/0
 WEBSOCKET_MANAGER=redis
-ENABLE_WEBSOCKET_SUPPORT=true
 
 # Content Extraction
 CONTENT_EXTRACTION_ENGINE=tika
@@ -57,15 +55,15 @@ TIKA_SERVER_URL=http://tika:9998
 # Embeddings
 RAG_EMBEDDING_ENGINE=openai
 
-# Storage — choose ONE:
+# Storage: choose ONE
 # Option A: shared filesystem (mount the same volume to all instances, no env var needed)
 # Option B: object storage (see https://docs.openwebui.com/reference/env-configuration#cloud-storage for all required vars)
 # STORAGE_PROVIDER=s3
 
-# Workers — let the orchestrator handle scaling
+# Workers: let the orchestrator handle scaling
 UVICORN_WORKERS=1
 
-# Migrations — only ONE instance should run migrations
+# Migrations: only ONE instance should run migrations
 ENABLE_DB_MIGRATIONS=false
 ```
 
@@ -83,15 +81,15 @@ For the complete step-by-step scaling walkthrough, see [Scaling Open WebUI](/get
 
 Open WebUI supports three production deployment patterns. Each guide covers architecture, scaling strategy, and key considerations specific to that approach.
 
-### [Python / Pip on Auto-Scaling VMs](./python-pip)
+### [Python / Pip on Auto-Scaling VMs](/enterprise/deployment/python-pip)
 
 Deploy `open-webui serve` as a systemd-managed process on virtual machines in a cloud auto-scaling group (AWS ASG, Azure VMSS, GCP MIG). Best for teams with established VM-based infrastructure and strong Linux administration skills, or when regulatory requirements mandate direct OS-level control.
 
-### [Container Service](./container-service)
+### [Container Service](/enterprise/deployment/container-service)
 
 Run the official Open WebUI container image on a managed platform such as AWS ECS/Fargate, Azure Container Apps, or Google Cloud Run. Best for teams wanting container benefits (immutable images, versioned deployments, no OS management) without Kubernetes complexity.
 
-### [Kubernetes with Helm](./kubernetes-helm)
+### [Kubernetes with Helm](/enterprise/deployment/kubernetes-helm)
 
 Deploy using the official Open WebUI Helm chart on any Kubernetes distribution (EKS, AKS, GKE, OpenShift, Rancher, self-managed). Best for large-scale, mission-critical deployments requiring declarative infrastructure-as-code, advanced auto-scaling, and GitOps workflows.
 
@@ -104,7 +102,7 @@ Deploy using the official Open WebUI Helm chart on any Kubernetes distribution (
 | **Operational complexity** | Moderate (OS patching, Python management) | Low (platform-managed containers) | Higher (requires K8s expertise) |
 | **Auto-scaling** | Cloud ASG/VMSS with health checks | Platform-native, minimal configuration | HPA with fine-grained control |
 | **Container isolation** | None (process runs directly on OS) | Full container isolation | Full container + namespace isolation |
-| **Rolling updates** | Manual (scale down, update, scale up) | Platform-managed rolling deployments | Declarative rolling updates with rollback |
+| **Updates** | Manual (scale down, update, scale up) | Stop all tasks, run one migration task, restart | Scripted with Helm; rollback does not undo migrations |
 | **Infrastructure-as-code** | Terraform/Pulumi for VMs + config mgmt | Task/service definitions (CloudFormation, Bicep, Terraform) | Helm charts + GitOps (Argo CD, Flux) |
 | **Best suited for** | Teams with VM-centric operations, regulatory constraints | Teams wanting container benefits without K8s complexity | Large-scale, mission-critical deployments |
 | **Minimum team expertise** | Linux administration, Python | Container fundamentals, cloud platform | Kubernetes, Helm, cloud-native patterns |
@@ -117,8 +115,9 @@ Production deployments should include monitoring and observability regardless of
 
 ### Health Checks
 
-- **`/health`**: Basic liveness check. Returns HTTP 200 when the application is running. Use this for load balancer and auto-scaler health checks.
-- **`/api/models`**: Verifies the application can connect to configured model backends. Requires an API key.
+- **`/health`**: Liveness check. Returns HTTP 200 while the process runs.
+- **`/ready`**: Readiness check. Returns 503 until startup has finished and the database and Redis (if configured) answer a ping. Use it for readiness probes and load balancer health checks.
+- **`/api/models`**: Lists the models the caller can use. It still returns 200 when a model backend is unreachable, so it does not prove backend health. Requires an authenticated user token; API keys work only after an admin enables them (`ENABLE_API_KEYS`, off by default).
 
 ### OpenTelemetry
 
@@ -126,11 +125,14 @@ Open WebUI supports **OpenTelemetry** for distributed tracing and HTTP metrics. 
 
 ```bash
 ENABLE_OTEL=true
-OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4318
+ENABLE_OTEL_TRACES=true
+ENABLE_OTEL_METRICS=true
+OTEL_EXPORTER_OTLP_ENDPOINT=http://your-collector:4317
+OTEL_EXPORTER_OTLP_INSECURE=true
 OTEL_SERVICE_NAME=open-webui
 ```
 
-This auto-instruments FastAPI, SQLAlchemy, Redis, and HTTP clients, giving visibility into request latency, database query performance, and cross-service traces.
+This auto-instruments FastAPI, SQLAlchemy, Redis, and HTTP clients, giving visibility into request latency, database query performance, and cross-service traces. `ENABLE_OTEL` alone exports nothing; each signal has its own switch (`ENABLE_OTEL_LOGS` for logs). The exporter speaks OTLP over gRPC by default, which is why the endpoint uses port 4317. Set `OTEL_EXPORTER_OTLP_INSECURE=true` when the collector's gRPC port has no TLS; Open WebUI passes this flag explicitly, so an `http://` endpoint alone does not disable TLS. To use an HTTP collector instead, set `OTEL_OTLP_SPAN_EXPORTER=http` and give the full signal URL, for example `http://your-collector:4318/v1/traces` (and `OTEL_METRICS_EXPORTER_OTLP_ENDPOINT` and `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT` ending in `/v1/metrics` and `/v1/logs`), because Open WebUI passes the endpoint to the exporter unchanged.
 
 ### Structured Logging
 

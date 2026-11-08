@@ -5,11 +5,11 @@ title: "Tools"
 
 # What are Tools?
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Workspace Tools and Functions execute arbitrary Python code on your server.** Only install from trusted sources, review code before importing, and restrict Workspace access to trusted administrators only. Granting a user the ability to create or import Tools is equivalent to giving them shell access to the server. For full details, see the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
-⚙️ Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things like search the web, scrape data, generate images, talk back using AI voices, and more.
+Tools are the various ways you can extend an LLM's capabilities beyond simple text generation. When enabled, they allow your chatbot to do amazing things like search the web, scrape data, generate images, talk back using AI voices, and more.
 
 Because there are several ways to integrate "Tools" in Open WebUI, it's important to understand which type you are using.
 
@@ -17,7 +17,7 @@ Because there are several ways to integrate "Tools" in Open WebUI, it's importan
 
 ## Tooling Taxonomy: Which "Tool" are you using?
 
-🧩 Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
+Users often encounter the term "Tools" in different contexts. Here is how to distinguish them:
 
 ![Installed tools in the workspace](/images/workspace/tools-list.png)
 
@@ -42,15 +42,15 @@ These are deeply integrated into Open WebUI and generally don't require external
 In [**Native Mode**](#built-in-system-tools-nativeagentic-mode), these features are exposed as **Tools** that the model can call independently.
 
 ### 2. Workspace Tools (Custom Plugins)
-These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations**: they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](../development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
+These are **Python scripts** that run directly within the Open WebUI environment. **For the most demanding use cases, Workspace Tools are by far the most powerful option with the fewest limitations**: they run in-process with full access to Python, the `open_webui` codebase, and the request context, so there is very little they *can't* do (see [Under the Hood](/features/extensibility/plugin/development/under-the-hood) for the full extent). The external tool servers above are more constrained: they only see what you pass over HTTP and can't reach into Open WebUI itself.
 - **Capability**: Can do anything Python can do (web scraping, complex math, API calls), and hold secrets (API keys) entirely server-side so neither the user nor the model can read them.
 - **Access**: Managed via the `Workspace` menu. 
 - **Safety**: Always review code before importing, as these run on your server.
-- **⚠️ Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
+- **Security Warning**: Normal or untrusted users should **not** be given permission to access the Workspace Tools section. This access allows a user to upload and execute arbitrary Python code on your server, which could lead to a full system compromise.
 
 ### 3. MCP (Model Context Protocol)
 
-🔌 MCP is an open standard that allows LLMs to interact with external data and tools.
+MCP is an open standard that allows LLMs to interact with external data and tools.
 - **Native HTTP MCP**: Open WebUI can connect directly to any MCP server that exposes an HTTP/SSE endpoint.
 - **MCPO (Proxy)**: Most community MCP servers use `stdio` (local command line). To use these in Open WebUI, you use the [**MCPO Proxy**](../../plugin/tools/openapi-servers/mcp.mdx) to bridge the connection.
 
@@ -65,7 +65,7 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 
 ## How to Install & Manage Workspace Tools
 
-📦 Workspace Tools are the most common way to extend your instance with community features.
+Workspace Tools are the most common way to extend your instance with community features. They need [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), which is on by default.
 
 1. Go to [Community Tool Library](https://openwebui.com/search)
 2. Choose a Tool, then click the **Get** button.
@@ -76,23 +76,52 @@ Beyond the tool types above, Open WebUI also integrates with **[Open Terminal](/
 Never import a Tool you don’t recognize or trust. These are Python scripts and might run unsafe code on your host system. **Crucially, ensure you only grant "Tool" permissions to trusted users**, as the ability to create or import tools is equivalent to the ability to run arbitrary code on the server.
 :::
 
+### Turning a tool off
+
+The switch on a tool's row in **Workspace > Tools** turns it on or off. It appears on tools you can edit. A disabled tool is left out of chats, including chats that already have it selected, and its Python requirements are not installed.
+
+### Sharing a tool
+
+The **⋯** menu on a tool in **Workspace > Tools** has an **Access** entry that opens the tool's [access settings](/features/authentication-access/rbac/groups#resource-access-rbac) straight from the list, without opening the editor. It appears on tools you can edit, and for anyone but an admin only with the **Tools Sharing** permission. The **Access** button in the tool editor follows the same permission.
+
+### Version history
+
+Every save that changes a tool's name, description, translations or code is kept as a version, together with the text typed into **Describe this change** beside **Save**. The version picker next to **Back** at the top of the tool editor starts on **Production**, the version chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). Anyone who can edit the tool can use it.
+
+- **Open a version** by picking it. The editor shows its name, description, translations and code read-only.
+- **Compare to current** shows what differs between that version and Production: changed fields side by side, then the code as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**. Code longer than 5000 lines in either version cannot be compared (`Diff is limited to 5000 lines per version`).
+- **Set as Production** makes the opened version the one chats use. Its code is loaded and checked the same way as a save. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
+- **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
+
+A version holds the name, description, translations and code. Valves and access settings belong to the tool itself and keep their current values when you change versions. Setting a version as Production is refused when:
+
+- the current Valves do not fit that version's code (**Current Valves are incompatible with this code**). Adjust the Valves first (see [Changing Valves in Existing Code](/features/extensibility/plugin/development/valves#changing-valves-in-existing-code)).
+- the version's code differs from Production and you have neither the [**Tools Access** nor the **Import Tools** permission](/features/authentication-access/rbac/permissions#1-workspace-permissions). Without either permission, write access covers only a tool's name, description and translations, for saves and version changes alike.
+
+Every existing tool starts with one version, created by the upgrade.
+
+The same actions are available over the API: `GET /api/v1/tools/id/{id}/history` (paged with `?page=`), `GET /api/v1/tools/id/{id}/history/{history_id}`, `GET /api/v1/tools/id/{id}/history/diff?from_id=...&to_id=...`, `DELETE /api/v1/tools/id/{id}/history/{history_id}` and `POST /api/v1/tools/id/{id}/update/version` with `{"version_id": "..."}`. A save through `POST /api/v1/tools/id/{id}/update` accepts an optional `commit_message`.
+
+### Translating a tool
+
+The globe selector in the tool editor stores a name, a description and valve labels per language. User valve labels are the ones worth translating first, since those are what ordinary users see under **Controls** in the **Model controls** menu. See [Translations](/features/administration/translations).
+
 ---
 
 ## How to Use Tools in Chat
 
-🔧 Once installed or connected, here’s how to enable them for your conversations:
+Once installed or connected, here’s how to enable them for your conversations:
 
 ### Option 1: Enable on-the-fly (Specific Chat)
-While chatting, click the **Integrations** icon in the input area (the four-diamond icon next to the ➕ button), then select **Tools**. You’ll see a list of available Tools, and you can toggle them on specifically for that session.
+While chatting, open the **+** menu in the input area, then select **Tools**. You’ll see a list of available Tools, and you can toggle them on specifically for that session.
 
 ### Option 2: Enable by Default (Global/Model Level)
-1. Go to **Workspace ➡️ Models**.
-2. Choose the model you’re using and click the ✏️ edit icon.
-3. Scroll to the **Tools** section.
-4. ✅ Check the Tools you want this model to always have access to by default.
-5. Click **Save**.
+1. Go to **Workspace → Models**.
+2. Choose the model you’re using and click the edit icon.
+3. Open the **Tools** row and pick the tools you want this model to always have access to by default.
+4. Click **Save**.
 
-For models that support it, **Native tool calling mode** (see [Tool Calling Modes](#tool-calling-modes-default-vs-native) below) lets the model itself decide which of the attached tools to call on each turn. This replaces the older prompt-injection "auto-tool" filter approach and is the recommended way to let the model auto-select tools.
+For models that support it, **Native tool calling mode** (see [Tool Calling Modes](#tool-calling-modes-default-vs-native) below) lets the model itself decide which of the attached tools to call on each turn. It is the recommended way to let the model auto-select tools.
 
 :::caution Attached Tools Still Require User Access
 Attaching a workspace tool to a model does **not** bypass access control. When a user chats with the model, Open WebUI checks whether **that specific user** has read access to each attached tool. Tools the user cannot access are silently skipped, so the model won't be able to call them.
@@ -106,21 +135,21 @@ Attaching a workspace tool to a model does **not** bypass access control. When a
 
 ## Tool Calling Modes: Native vs. Legacy {#tool-calling-modes-default-vs-native}
 
-:::danger Native is the default as of v0.10.0; "Legacy" (formerly "Default") is the unsupported opt-out
-**Native (Agentic) Mode is now the default.** As of **v0.10.0**, every chat and model that has not explicitly chosen a tool-calling mode runs **Native**, which relies on the model's built-in function-calling support. The old prompt-injection approach, previously called **Default**, is now renamed **Legacy**. It is the explicit opt-out and remains **unsupported**: no feature work, no bug fixes, no built-in system tools, and incompatible with modern Open WebUI features (Agentic Research, Interleaved Thinking, the built-in Memory/Notes/Knowledge/Channels tools, and web-search/image-gen/code-interpreter tool injection).
+:::danger Native is the default; "Legacy" is the unsupported opt-out
+**Native (Agentic) Mode is the default.** Every chat and model that has not explicitly chosen a tool-calling mode runs **Native**, which relies on the model's built-in function-calling support. The prompt-injection approach, **Legacy**, is the explicit opt-out and remains **unsupported**: no feature work, no bug fixes, no built-in system tools, and incompatible with modern Open WebUI features (Agentic Research, Interleaved Thinking, the built-in Memory/Notes/Knowledge/Channels tools, and web-search/image-gen/code-interpreter tool injection).
 
-**Breaking change:** if any of your models depended on the old prompt-based behavior, they now run Native unless you switch them back to **Legacy**, [per chat, per model, or globally in your default model parameters](#enable-legacy-for-all-models). If a model struggles with Native, the right fix is a stronger tool-calling model, not falling back to Legacy.
+Models that depend on the prompt-based behavior need **Legacy** set [per chat, per model, or globally in your default model parameters](#enable-legacy-for-all-models). If a model struggles with Native, use a stronger tool-calling model.
 :::
 
-Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode** (formerly **Default**), the prompt-based opt-out kept only for backward compatibility.
+Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode**, the prompt-based opt-out kept only for backward compatibility.
 
-### 🔴 Legacy Mode (Prompt-based, formerly "Default")
+### Legacy Mode (Prompt-based)
 
 :::warning Unsupported
-Legacy Mode (the option previously labeled **Default**) is **no longer supported**. It is documented here for reference only. New and existing deployments should use Native Mode. Bug reports, feature requests, and support questions about Legacy Mode behavior will not be actioned.
+Legacy Mode is **unsupported**. It is documented here for reference only. New and existing deployments should use Native Mode. Bug reports, feature requests, and support questions about Legacy Mode behavior will not be actioned.
 :::
 
-In Legacy Mode, Open WebUI manages tool selection by injecting a long prompt template that guides the model to output a tool request in a bespoke format. It was a reasonable approach in 2023; it has been obsolete since mainstream providers and open-weights models gained proper function-calling APIs.
+In Legacy Mode, Open WebUI manages tool selection by injecting a long prompt template that guides the model to output a tool request in a bespoke format. Mainstream providers and open-weights models offer proper function-calling APIs, which makes this approach obsolete.
 
 Why it is legacy:
 - **Breaks KV cache.** The injected prompt changes every turn, preventing LLM engines from reusing cached key-value pairs. Every message pays the full prefill cost again.
@@ -131,14 +160,14 @@ Why it is legacy:
 
 #### How to switch all models to Legacy {#enable-legacy-for-all-models}
 
-Since v0.10.0 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** back on for models that depended on the old prompt-injection behavior and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
+Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** on for models that depend on prompt injection and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
     *   Navigate to **Settings → Admin → Models**.
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
-    *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value now runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and set **Function Calling** to `Legacy` under **Model Params → Advanced Params**. Overrides the global default for that model only.
-3.  **Per-Chat Override**: inside a chat, open **Chat Controls → Advanced Params** and set **Function Calling** to `Legacy` for that chat only.
+    *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value runs Legacy. You do **not** need to edit them one by one.
+2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and open the **Advanced Params** row and set **Function Calling** to `Legacy`. Overrides the global default for that model only.
+3.  **Per-Chat Override**: inside a chat, open the **Model controls** menu next to the message input, then **Controls → Advanced Params**, and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
 To move an entire instance to Legacy through env vars, set the same global default with:
@@ -150,11 +179,11 @@ DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
 `function_calling` is a key inside `DEFAULT_MODEL_PARAMS`; there is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable. The only value that changes behavior is `"legacy"`; leaving it unset (or `"native"`) keeps the default, Native.
 :::
 
-### 🟢 Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
-Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** as of v0.10.0 and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
+### Native Mode (Agentic Mode / System Function Calling): The Only Supported Mode
+Native Mode (also called **Agentic Mode**) leverages the model's built-in capability to handle tool definitions and return structured tool calls (JSON). It is the **default** and the **recommended mode** for all models that support it, which includes the vast majority of modern models (2024+).
 
 :::warning Model Quality Matters
-**Agentic tool calling needs a model that is current, not one that is expensive.** Very small or older models often struggle with the multi-step reasoning and strict state management involved, and may produce malformed JSON. A cheap, fast, current model is plenty: **GPT-5.6 Luna**, **Gemini 3.5 Flash-Lite**, **MiniMax M3**, **DeepSeek V4 Flash**, or locally **Qwen 3.6 27B** or **Muse Glimmer 30B**.
+**Agentic tool calling needs a model that is current, not one that is expensive.** Very small or older models often struggle with the multi-step reasoning and strict state management involved, and may produce malformed JSON. A cheap, fast, current model is plenty; see [Model Requirements & Caveats](#model-requirements--caveats).
 :::
 
 #### Why use Native Mode (Agentic Mode)?
@@ -166,7 +195,7 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 - **System Tools**: Only Native Mode unlocks the [built-in system tools](#built-in-system-tools-nativeagentic-mode) (memory, notes, knowledge, channels, etc.).
 
 #### How to Enable Native Mode (Agentic Mode)
-Native Mode is the **default** as of v0.10.0, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
+Native Mode is the **default**, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
     *   Navigate to **Settings → Admin → Models**.
@@ -175,44 +204,36 @@ Native Mode is the **default** as of v0.10.0, so new and existing models use it 
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
     *   In **Settings → Admin → Models**, pick a specific model and click its edit button.
-    *   Under **Model Params**, expand **Advanced Params** and set **Function Calling** to `Native`. This value overrides the global default for that model only.
+    *   Open the **Advanced Params** row and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
-    *   Inside a chat, open **Chat Controls** (right sidebar).
+    *   Inside a chat, open the **Model controls** menu next to the message input and expand **Controls**.
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-The **global model parameters** panel (the **Model Defaults** button in **Settings → Admin → Models**) lets you configure any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) **once, for every model in your Open WebUI instance**, current and future, unless a specific model overrides it. For tool calling specifically you rarely need it: Native is already the default. The one tool-calling switch you would set here is `Function Calling = Legacy`, to move a whole instance back to Legacy (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
+**Model Defaults** in **Settings → Admin → Models** sets any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) once for every model, current and future, unless a specific model overrides it. The environment variable equivalent is `DEFAULT_MODEL_PARAMS` (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
-:::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
-If you configure your instance entirely through env vars, `DEFAULT_MODEL_PARAMS` sets the same global defaults. `function_calling` is a key inside it; there is **no** standalone `FUNCTION_CALLING_MODE` (or similar) variable. Because Native is the default, the only value worth setting here is `"legacy"` (to move the whole instance to Legacy, per [above](#enable-legacy-for-all-models)):
+#### Tool call labels
 
-```yaml
-DEFAULT_MODEL_PARAMS: '{"function_calling": "legacy"}'
-```
-
-Leaving `function_calling` unset (or `"native"`) keeps the default, Native.
-:::
-
-![Chat Controls](/images/features/plugin/tools/chat-controls.png)
+A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Admin > Interface** ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required `__labels__` argument to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
 
 #### Model Requirements & Caveats
 
 :::tip Minimum model tier (not a maintained list)
-Reliable agentic tool calling does not require a frontier model — it requires a *current* one. Any of these is a solid **minimum**, each verified working at the time of writing:
+Reliable agentic tool calling needs a *current* model, not a frontier one. Each of these is a solid **minimum**:
 
-- **GPT-5.6 Luna** (OpenAI) — cheap, fast, and genuinely strong at tool calling
+- **GPT-5.6 Luna** (OpenAI): cheap, fast and strong at tool calling
 - **Gemini 3.5 Flash-Lite** or **Gemini 3.1 Flash-Lite** (Google)
 - **MiniMax M3**
 - **DeepSeek V4 Flash**
 - **Muse Glimmer 30B** or **Qwen 3.6 27B** (local, open-weight)
 
-**This list is not continuously updated** — chasing every model release is impossible and adds no value. Use whatever current model your provider offers; you don't need the latest *and greatest*, just something recent.
+**This list is not continuously updated.** Use whatever current model your provider offers.
 :::
 
 - **Capable Local Models**: Open-weight models built for agentic work (e.g., **Muse Glimmer 30B**, **Qwen 3.6 27B**, **Gemma 4 12B**, **gpt-oss 120B**) work well with Native Mode. Muse Glimmer in particular is Apache 2.0, runs agentic loops reliably on a single 24 GB GPU, and is a good default for local tool calling.
-- **Small Local Models**: Small local models (under ~30B parameters) often produce malformed JSON or fail multi-step tool chains even in Native Mode. **The fix is to use a stronger model for tool-calling workloads**, not to fall back to Legacy Mode (Legacy is unsupported). If your hardware forces you to use a small model, accept that tool calling will be unreliable at this tier, or offload only tool-using conversations to a cloud model.
+- **Small Local Models**: Small local models (under ~30B parameters) often produce malformed JSON or fail multi-step tool chains even in Native Mode. **Use a stronger model for tool-calling workloads.** Legacy Mode is unsupported. If your hardware forces a small model, tool calling stays unreliable at this tier; offload tool-using conversations to a cloud model.
 
 #### Known Model-Specific Issues
 
@@ -239,42 +260,119 @@ Reliable agentic tool calling does not require a frontier model — it requires 
 Legacy Mode is **not** a supported workaround even for DeepSeek; it is unsupported and will not be extended to cover this case. This is a DeepSeek model/API issue, not an Open WebUI issue. Open WebUI correctly sends tools in standard OpenAI format; the malformed output originates from DeepSeek's non-standard internal DSML format.
 :::
 
-| Feature | Legacy Mode (formerly Default) | Native Mode (Default, Only Supported) |
+| Feature | Legacy Mode | Native Mode (Default, Only Supported) |
 |:---|:---|:---|
-| **Status** | ❌ Legacy, no longer supported | ✅ Required, all models should use this |
+| **Status** | Unsupported | Required, all models should use this |
 | **Latency** | Medium/High | Low |
-| **KV Cache** | ❌ Breaks cache on every turn | ✅ Cache-friendly |
+| **KV Cache** | Breaks cache on every turn | Cache-friendly |
 | **Model Compatibility** | Any text model (obsolete concern) | Every mainstream model since 2024 |
 | **Logic** | Prompt-injection parsed by Open WebUI | Structured tool calls via provider API |
-| **System Tools** | ❌ Not available | ✅ Full access (Memory, Notes, Knowledge, Channels, Web Search, Image Gen, Code Interpreter) |
-| **Agentic Research / Interleaved Thinking** | ❌ Unsupported | ✅ Supported |
-| **Complex Chaining** | ⚠️ Unreliable | ✅ Excellent |
-| **Future development** | ❌ None | ✅ All new features target this mode |
+| **System Tools** | Not available | Full access (Memory, Notes, Knowledge, Channels, Web Search, Image Gen, Code Interpreter) |
+| **Agentic Research / Interleaved Thinking** | Unsupported | Supported |
+| **Complex Chaining** | Unreliable | Excellent |
+| **Future development** | None | All new features target this mode |
+
+#### Malformed tool calls in Native Mode
+
+Open WebUI repairs common argument mistakes before it runs a call:
+
+- Arguments wrapped in a code fence, encoded twice or written as a Python literal are accepted.
+- Text values are converted to the types in the tool's schema, for example `"5"` to `5` or `"true"` to `true`.
+- Parameters that a non-MCP tool does not declare are dropped.
+- Several calls glued together in one set of arguments are split into separate calls.
+- A reply that consists only of `<tool_call>` or `<function=...>` blocks for available tools runs as tool calls. Such markup mixed with other text stays plain text.
+
+The loop stops in these cases:
+
+- The model repeats a call (same tool and same arguments) that failed twice in a row. The repeat returns an error and the model is asked to answer with the results it has.
+- The reply is cut off, for example by the token limit or a content filter. Its tool calls do not run.
+- The iteration limit ([`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations)) is reached. The model writes a final answer without tools.
+
+Earlier tool calls in the chat history whose arguments cannot be read are sent to Ollama with empty arguments.
 
 ### Tool Approval
 
-By default a model runs its tool calls as soon as it makes them. An administrator can offer a second mode by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
+By default a model runs its tool calls as soon as it makes them. An administrator can offer more modes by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
 
-Once it is on, the chat input's ➕ menu gains a **Tool Permissions** entry with two choices:
+Once it is on, the chat input's **+** menu gains a **Tool Permissions** entry with two choices, or three when **Auto permissions** is on:
 
 | Mode | Behaviour |
 | :--- | :--- |
-| **Full access** (default) | Tool calls run immediately, as they always have. |
-| **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
+| **Full access** (default when **Auto** is not offered) | Tool calls run immediately, as they always have. |
+| **Ask for approval** | The reply stops at the first tool call. The pending call shows **Allow** and **Deny** in the message, and the model only continues once you answer. While it waits, the chat's sidebar entry shows a yellow dot labelled **Waiting for approval**. If the model asked for several tools at once you approve them one at a time; the rest wait their turn. |
+| **Auto** | Each tool call is checked against an approval policy. A call that needs approval waits for **Allow** or **Deny** like under **Ask for approval**; the others run immediately. Users who have not chosen a mode get **Auto**. |
 
 You can answer from the keyboard as well: **Allow tool call** (`Cmd+Alt+Enter`) and **Deny tool call** (`Cmd+Alt+Backspace`), both rebindable under [keyboard shortcuts](/features/chat-conversations/chat-features/keyboard-shortcuts).
 
-Your choice is saved to your user settings, so it carries over to new chats until you change it back. A denied call is reported back to the model as an error, so it can react rather than silently losing the result, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
+Your choice is saved to your user settings, so it carries over to new chats until you change it back. It is also stored on the chat, so reopening that chat keeps its mode. A denied call is reported back to the model as an error, so the model can react to it, and the tool call is marked as denied in the message. Pressing **Stop** on a reply that is waiting for approval finalizes it, denying whatever is still pending.
 
-Two cases always run with full access regardless of the setting: **automations**, which run on a schedule with nobody watching, and **channel** replies.
+**Channel** replies always run with full access, and **Auto** cannot be selected in channel chats. **Automations** have no chosen mode, so they run in **Auto** when it is offered and with full access otherwise. Questions from the ask user tool never need approval.
 
-:::info Requires a saved chat
-Approval works by persisting the pending call on the assistant message, so a temporary chat has nowhere to store it. Approval prompts also survive a page reload, since the pending state lives in the message rather than in the browser.
+#### Auto
+
+An administrator turns on **Auto permissions** below **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto)) and picks the **Engine** that decides which calls need approval:
+
+| Setting | Default |
+| :--- | :--- |
+| **Engine** ([`TOOL_PERMISSIONS_AUTO_ENGINE`](/reference/env-configuration#tool_permissions_auto_engine)) | **Default** |
+| **Approval policy** ([`TOOL_PERMISSIONS_AUTO_PROMPT`](/reference/env-configuration#tool_permissions_auto_prompt)) | Empty (built-in policy) |
+| **API Base URL** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](/reference/env-configuration#tool_permissions_auto_decisions_api_base_url)) | `https://api.openai.com/v1` |
+| **API Key** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_API_KEY`](/reference/env-configuration#tool_permissions_auto_decisions_api_key)) | Empty |
+| **Model** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_MODEL`](/reference/env-configuration#tool_permissions_auto_decisions_model)) | `gpt-6-luna` |
+| **Approval threshold** ([`TOOL_PERMISSIONS_AUTO_DECISIONS_THRESHOLD`](/reference/env-configuration#tool_permissions_auto_decisions_threshold)) | `0.5` |
+
+Both engines use the **Approval policy**. The last four settings apply to the **Decisions API** engine only.
+
+With the **Default** engine, the chat model decides. Open WebUI adds the approval policy to the system prompt and a required `__approval__` argument to each tool, and removes that argument before the tool runs. A call runs without approval only when the model sends exactly `{"required": false}` in that argument; anything else, including leaving it out, asks for approval. Tools whose parameters are not a plain JSON object or that define their own `__approval__` parameter get no `__approval__` argument, so their calls always ask for approval. In [Legacy Mode](#legacy-mode-prompt-based) no tool gets the argument, so every call asks for approval. The decision arrives with the call, so this engine needs no extra service. The chat model judges its own calls, so content that steers the model, such as instructions in a tool result, can also steer its decision.
+
+With the **Decisions API** engine, Open WebUI sends a `POST` request to `<API Base URL>/decisions` for each tool call with the **Model**, the approval policy, your latest request and your last four messages, the tool's definition and name, the call's arguments and the tool type and Open Terminal ID. The service answers with the probability that the call needs approval. The call asks for approval when that probability is at or above the **Approval threshold**. The call also asks for approval when the review does not answer within 5 seconds, fails or returns an invalid answer, when the **Approval threshold** is not a number from 0 to 1 and when the request data apart from the model and approval policy would exceed 64 KB. The review service must implement the same `/decisions` endpoint as the [Tool Search](#tool-search) **Decisions API** engine.
+
+The `search_tools` call of [Tool Search](#tool-search) runs without a review. If you turn **Auto permissions** off, chats that used **Auto** switch to **Ask for approval**.
+
+:::info Saved and temporary chats
+In a saved chat the pending call is stored on the assistant message, so approval prompts survive a page reload. In a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) each call opens a live **Tool Permissions** dialog showing the tool name and its arguments, with **Allow** and **Deny**. The call is denied at once when that chat is not the one open in the tab. It is also denied when the browser tab is gone or nobody answers within 120 seconds, or within [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) when that is set lower.
 :::
+
+### Tool Search
+
+With many tools enabled, their definitions alone can fill a large part of every request. **Tool Search** keeps large tool definitions out of the request until the model asks for them. The feature is **experimental**, off by default and applies to chats in Native Mode.
+
+An administrator turns it on in **Settings > Admin > Interface**, in the **Chat** section. The settings apply to every model and every user:
+
+| Setting | Default | What it does |
+| :--- | :--- | :--- |
+| **Tool Search** ([`ENABLE_TOOL_SEARCH`](/reference/env-configuration#enable_tool_search)) | Off | Turns the feature on. The settings below appear once it is on. |
+| **Search engine** ([`TOOL_SEARCH_ENGINE`](/reference/env-configuration#tool_search_engine)) | **BM25** | How a search is matched to deferred tools: **BM25**, **Embeddings** or **Decisions API**. See [Search engines](#search-engines). |
+| **Defer Built-in Tools** ([`TOOL_SEARCH_DEFER_BUILTIN_TOOLS`](/reference/env-configuration#tool_search_defer_builtin_tools)) | On | Treats built-in tools like any other tool. Turn it off to always send built-in tools in full. |
+| **Deferral Threshold (characters)** ([`TOOL_SEARCH_DEFER_THRESHOLD`](/reference/env-configuration#tool_search_defer_threshold)) | `400` | A tool whose definition (name, description and parameter schema, as JSON) is longer than this many characters is deferred. `0` defers every tool. |
+| **Always Loaded Tools** ([`TOOL_SEARCH_ALWAYS_LOADED`](/reference/env-configuration#tool_search_always_loaded)) | Empty | Comma-separated tool names or glob patterns, such as `jira_create_issue, github_*`, that are always sent in full. Matching is case-sensitive. |
+
+![The Chat section of Settings > Admin > Interface with Tool Search switched on, Defer Built-in Tools, Deferral Threshold (characters) set to 400 and an empty Always Loaded Tools field](/images/features/plugin/tools/tool-search-settings.webp)
+
+How it works:
+
+- **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.
+- **What the model sees.** A short `<available_tools>` instruction at the end of the system prompt tells the model to look tools up with `search_tools`. It does not list the deferred tools. Two built-in tools are added to the tool list: `search_tools` and `call_tool`.
+- **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by the selected search engine. To run tools it found, the model calls `call_tool` with a `calls` array. Each entry holds `tool_name`, the tool's exact name, and `params`, the tool's arguments as a JSON-encoded object string, for example `call_tool(calls=[{"tool_name": "get_weather", "params": "{\"city\":\"Dubai\"}"}])`. One `call_tool` call can run several independent tools. Open WebUI runs each entry as if the model had called that tool directly, so approvals, results, citations and the chat display are per tool.
+- **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
+- **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself. Under **Auto**, `search_tools` runs without a review. Each tool a `call_tool` call runs is approved on its own, under that tool's name.
+- **Backend support.** Every call the model makes goes to a tool in the list sent to the provider, so Tool Search also works on backends that only accept calls to listed tools, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server.
+
+#### Search engines
+
+| Engine | How it ranks |
+| :--- | :--- |
+| **BM25** (default) | Keyword match of the query against each tool's name, description and parameter names. |
+| **Embeddings** | Similarity between the query and each tool's definition, using the [Documents](/features/chat-conversations/rag) embedding model. The tool embeddings are cached in memory per worker (up to 2048 entries in total, kept separately for each user) and are not stored. They are recomputed after a restart or when the embedding model changes. |
+| **Decisions API** | A service rates each tool's relevance to the query. Tools at or above the **Relevance threshold** ([`TOOL_SEARCH_DECISIONS_THRESHOLD`](/reference/env-configuration#tool_search_decisions_threshold), default `0.5`) are returned, best first. |
+
+The **Decisions API** engine has its own **API Base URL** ([`TOOL_SEARCH_DECISIONS_API_BASE_URL`](/reference/env-configuration#tool_search_decisions_api_base_url), default `https://api.openai.com/v1`), **API Key** ([`TOOL_SEARCH_DECISIONS_API_KEY`](/reference/env-configuration#tool_search_decisions_api_key)), **Model** ([`TOOL_SEARCH_DECISIONS_MODEL`](/reference/env-configuration#tool_search_decisions_model), default `gpt-6-luna`) and **Prompt** ([`TOOL_SEARCH_DECISIONS_PROMPT`](/reference/env-configuration#tool_search_decisions_prompt), empty for the built-in instructions). Each search sends a `POST` request to `<API Base URL>/decisions` with the **Model**, the model's search query and one question per deferred tool, which holds the **Prompt** and that tool's definition (in batches of up to 400 tools, within 30 seconds in total). The service answers with a probability per tool. When a search fails, the model receives an error message instead of results.
+
+Write Always Loaded patterns against the [tool names the model sees](/features/extensibility/mcp#tool-names-the-model-sees). MCP tools carry their server's ID as a prefix (a `get_issue` tool on a server with the ID `github` is named `github_get_issue`), so `github_*` keeps every tool of that server loaded.
 
 ### Built-in System Tools (Native/Agentic Mode)
 
-🛠️ These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
+These are the **Builtin Tools** (the capability name shown in the Model Editor). When **Native Mode (Agentic Mode)** is enabled, Open WebUI automatically injects powerful system tools. This unlocks truly agentic behaviors where any current tool-calling model (GPT-5.6 Luna, Claude Sonnet 5, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally) can perform multi-step research, explore knowledge bases, or manage user memory autonomously.
 
 | Tool | Purpose |
 |------|---------|
@@ -289,20 +387,22 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | `query_knowledge_files` | Search file contents via the RAG retrieval pipeline (hybrid + rerank when enabled). Main tool for finding answers in docs. |
 | `search_knowledge_files` | Search files by filename. |
 | `grep_knowledge_files` | Exact text / regex search across knowledge file content. Returns matching lines with line numbers. Complements `query_knowledge_files` (semantic) when you need literal matches. |
-| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, optional `line_numbers`). |
-| `view_knowledge_file` | Read a knowledge-base file by ID with pagination (`offset`, `max_chars`). |
+| `view_file` | Read a user-accessible file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered, capped by [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars)); `line_numbers` numbers character pages. |
+| `view_knowledge_file` | Read a knowledge-base file by ID with character pagination (`offset`, `max_chars`) or line range (`start_line`, `end_line`, always numbered, capped by [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars)); `line_numbers` numbers character pages. |
+| `display_file` | Show a knowledge-base file to the user inline in the chat, optionally opened at a page or slide. |
 | `kb_exec` *(opt-in)* | Filesystem-style command interface for knowledge bases (`ls`, `tree`, `cat`, `head`, `tail`, `sed`, `grep`, `find`, `wc`, `stat`, with pipe support). Directory-aware: `ls docs/`, `tree`, `grep "x" docs/`, and path-based file refs (`docs/api/auth.md`). Replaces the discovery/read tools above when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set. |
-| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **File Context** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **File Context** off for this is also the setup that keeps the prompt prefix cacheable, so turn **Citations** off alongside it and put your citation rules in the system prompt instead; see [prompt caching](/features/chat-conversations/prompt-caching).* |
+| **Files** | *Requires per-model "Files" category enabled, the model's **File Upload** capability on with **Preload files** off, the user's `chat.file_upload` permission, and at least one file attached to the current chat. Covers files the user attached to the conversation, not knowledge bases. Turning **Preload files** off also keeps the prompt prefix cacheable; see [prompt caching](/features/chat-conversations/prompt-caching).* |
 | `list_chat_files` | List the files attached to the current chat, with each file's ID, filename, content type and size. |
 | `query_chat_files` | Semantic / RAG search across the attached files, or one file when given its ID. Results are returned as cited chunks. |
 | `grep_chat_files` | Exact text / regex search across the attached files, returning matching lines with file IDs and line numbers, or just per-file counts. Capped at 50 matches by default, the same [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches) limit the knowledge greps use. |
 | `view_file` | Read one of the attached files by ID, with character pagination or a line range. Same tool, and the same [`VIEW_FILE_DEFAULT_MAX_CHARS`](/reference/env-configuration#view_file_default_max_chars) / [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars) sizing, as when it reads a knowledge file. |
+| `display_file` | Show one of the attached files to the user inline in the chat. |
 | **Image Gen** | *Requires image generation enabled (per-tool) AND per-chat "Image Generation" toggle enabled.* |
 | `generate_image` | Generates a new image based on a prompt. Requires `ENABLE_IMAGE_GENERATION`. |
 | `edit_image` | Edits existing images based on a prompt and image URLs. Requires `ENABLE_IMAGE_EDIT`. |
 | **Code Interpreter** | *Requires `ENABLE_CODE_INTERPRETER` enabled (default: on) AND per-chat "Code Interpreter" toggle enabled.* |
 | `execute_code` | Executes code in a sandboxed environment and returns the output. |
-| **Memory** | *Requires Memory feature enabled AND per-model "Memory" category enabled (default: on).* |
+| **Memory** | *Requires Memory feature enabled AND per-model "Memory" capability and "Memory" category enabled (default: on).* |
 | `search_memories` | Searches the user's personal memory/personalization bank. |
 | `list_memory_paths` | Lists the paths memories are filed under. |
 | `read_memory_path` | Reads the memories stored under one path. |
@@ -313,12 +413,12 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | `delete_memory` | Deletes a memory by its ID. |
 | **Notes** | *Requires `ENABLE_NOTES` AND per-model "Notes" category enabled (default: on) AND the user's `features.notes` permission. Inside a note-attached chat these three checks are skipped and the note tools are always injected; see the note below.* |
 | `search_notes` | Search the user's notes by title and content. |
-| `view_note` | Get the full markdown content of a specific note. |
+| `view_note` | Read one page of a note, or the whole note with its list of pages. |
 | `write_note` | Create a new private note for the user. |
-| `replace_note_content` | Update an existing note, replacing the whole content or applying range edits to part of it. |
+| `replace_note_content` | Update one page of an existing note, replacing its whole content or editing part of it by exact text or by character range. |
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
-| `view_chat` | Reads and returns the full message history of a specific chat by ID. |
+| `view_chat` | Reads and returns the message history of a specific chat by ID. With [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) set, it keeps the newest messages up to that many characters and says the result was cut. |
 | **Channels** | *Requires `ENABLE_CHANNELS` AND per-model "Channels" category enabled (default: on).* |
 | `search_channels` | Find public or accessible channels by name/description. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
@@ -338,22 +438,33 @@ Approval works by persisting the pending call on the assistant message, so a tem
 | `create_calendar_event` | Create a new event on the user's default or specified calendar. |
 | `update_calendar_event` | Update an existing event's title, time, description, location, or cancel it. |
 | `delete_calendar_event` | Delete a calendar event permanently. |
-| **Skills** | *Requires at least one skill to be attached to the model via **Workspace or Settings > Admin > Models → Edit → Skills**. The model receives a summary of attached skills in its system prompt and can call `view_skill` to load full instructions on demand. No separate builtin tools category checkbox is needed; attaching a skill is the only requirement.* |
-| `view_skill` | Load the full instructions of a skill by name. The tool is injected when skills are attached; resolving a skill still follows normal ownership/access-grant checks. |
+| **Skills** | *Requires built-in tools to be active for the chat AND per-model "Skills" category enabled (default: on). The model gets a list of every skill the user can read and loads one on demand. Selected skills load before it answers. See [Skills](/features/workspace/skills#skill-tools).* |
+| `view_skill` | Load a skill's `SKILL.md` and the list of its supporting files by skill id. Resolving a skill follows normal ownership/access-grant checks. |
+| `read_skill_file` | Read one file of a skill by path, paging through long text. |
+| `grep_skill_files` | Search a skill's text files for literal text or a regular expression and return bounded excerpts around the matches. |
+| `update_skill_files` | Save file changes (write, move, delete) to a skill the user can edit, as a new version. Text writes only. |
+| `create_skill` | Create a private workspace skill from `SKILL.md` text and optional text files. |
+| **Tool Creation** | *Requires [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) AND per-model "Tool Creation" category enabled (default: on) AND the user's **Tools Access** permission (admins always pass).* |
+| `create_tool` | Create a private Python workspace tool from chat. Saving runs the module on the server, like any [workspace tool](#2-workspace-tools-custom-plugins). |
 | **Time Tools** | *Requires per-model "Time & Calculation" category enabled (default: on).* |
 | `get_current_timestamp` | Get the current UTC Unix timestamp and ISO date. |
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
-| **Ask User** | *Requires per-model "Ask User" category enabled (default: on) AND a saved chat, since the pending question is stored on the assistant message. Not available in a [temporary chat](/features/chat-conversations/chat-features/url-params).* |
+| **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
-| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, or for direct connections. This category gates `timer` as well; there is no separate Timers category.* |
-| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same model and tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
+| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, for direct connections or in temporary chats. This category gates `timer` as well; there is no separate Timers category.* |
+| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
+| **Voice Avatar** | *Only during a [voice call](/features/chat-conversations/chat-features/voice-mode#animations-and-gestures) with a model whose [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) has named gestures, AND the user holding the **Allow Call** permission (admins always pass). No per-model category of its own.* |
+| `play_animation` | Play one of the avatar's named gestures on the call screen. In a Realtime call the voice model plays the gestures, so this tool returns `unavailable` to the chat model. |
+| **Tool Search** | *Requires [Tool Search](#tool-search) turned on AND at least one tool deferred in the request. Added even when the model's **Builtin Tools** capability is off. No per-model category of its own.* |
+| `search_tools` | Find deferred tools by keywords or exact name and return their full definitions. |
+| `call_tool` | Run one or more tools found with `search_tools` in one call, each given by its `tool_name` and its arguments as a JSON-encoded object string in `params`. |
 
 #### Attached Chat Files
 
-The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but does **not** use file context, when file context is on, the content is already in the conversation and the tools would be redundant, and only while the chat actually has attachments.
+The **Files** category is the agentic alternative to putting an uploaded file's text straight into the prompt. It is injected only when the model uploads files but **Preload files** is off. With **Preload files** on, the content is already in the conversation and the tools would be redundant, and only while the chat actually has attachments.
 
 The model then works the file the way it works a knowledge base: `list_chat_files` to see what is there, `query_chat_files` for meaning, `grep_chat_files` for literal strings and line numbers, `view_file` to read a passage. Chunks returned by `query_chat_files` are rendered as citations, the same as knowledge results. Every file is still re-checked against the user's own access before it is read, so an attachment they can no longer open is skipped rather than searched.
 
@@ -372,16 +483,17 @@ Use this quick matrix instead of memorizing per-row caveats.
 
 | Tool | Model has attached knowledge | Model has no attached knowledge |
 |------|------------------------------|---------------------------------|
-| `list_knowledge` | ✅ | ❌ |
-| `list_knowledge_bases` | ❌ | ✅ |
-| `search_knowledge_bases` | ❌ | ✅ |
-| `query_knowledge_bases` | ❌ | ✅ |
-| `search_knowledge_files` | ✅ (auto-scoped) | ✅ (all accessible KBs) |
-| `query_knowledge_files` | ✅ (auto-scoped) | ✅ |
-| `grep_knowledge_files` | ✅ (auto-scoped) | ✅ |
-| `view_file` | ✅ (when attached items include files/collections) | ❌ |
-| `view_knowledge_file` | ✅ (when attached items include files/collections) | ✅ |
-| `view_note` | ✅ (when attached items include notes) | ❌ |
+| `list_knowledge` | Yes | No |
+| `list_knowledge_bases` | No | Yes |
+| `search_knowledge_bases` | No | Yes |
+| `query_knowledge_bases` | No | Yes |
+| `search_knowledge_files` | Yes (auto-scoped) | Yes (all accessible KBs) |
+| `query_knowledge_files` | Yes (auto-scoped) | Yes |
+| `grep_knowledge_files` | Yes (auto-scoped) | Yes |
+| `view_file` | Yes (when attached items include files/collections) | No |
+| `view_knowledge_file` | Yes (when attached items include files/collections) | Yes |
+| `display_file` | Yes (when attached items include files/collections) | Yes |
+| `view_note` | Yes (when attached items include notes) | No |
 
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
@@ -389,12 +501,12 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
 - knowledge attached to the model in its editor,
 - knowledge attached to the [folder](/features/chat-conversations/chat-features/conversation-organization) the chat sits in,
-- knowledge bases and notes attached to the chat itself, counted only when the model's **File Context** capability is off, since with it on the content is already in the conversation.
+- knowledge bases and notes attached to the chat itself, counted only when the model's **Preload files** capability is off, since with it on the content is already in the conversation.
 
-When the **Knowledge Base** category is enabled and any of these are present, the model's system prompt gains an `<attached_knowledge>` block listing each item's type, ID, name, and which of the three it came from. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
+When the **Knowledge Base** category is enabled and any of these are present, a hidden `list_attached_knowledge` tool result after the user's message holds an `<attached_knowledge>` block listing each item's type, ID and name, and whether it came from the model or the folder. Chat attachments are not listed, since each user message already names its own. The result is skipped when nothing is attached and when a reply is continued. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
 
 :::info `kb_exec` replaces the matrix when enabled
-When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI injects `kb_exec` instead of the file-oriented tools listed above. Still injected alongside it: `query_knowledge_files` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
+When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI replaces the file-oriented tools listed above with `kb_exec`. Still injected alongside it: `query_knowledge_files` and `display_file` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
 :::
 
 #### Tool Reference
@@ -409,15 +521,16 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `list_knowledge_bases` | `count` (default: 10), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
 | `query_knowledge_bases` | `query` (required), `count` (default: 5) | Array of `{id, name, description}` by similarity |
 | `search_knowledge_bases` | `query` (required), `count` (default: 5), `skip` (default: 0) | Array of `{id, name, description, file_count}` |
-| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
+| `query_knowledge_files` | `query` (required), `knowledge_ids` (optional, picks the bases to search when the model has no attached knowledge; with attached knowledge the search covers that attached set), `count` (default: 5) | Array of chunks like `{content, source, file_id, distance?}`; note hits include `{note_id, type: "note"}` |
 | `search_knowledge_files` | `query` (required), `knowledge_id` (optional), `count` (default: 5), `skip` (default: 0) | Array of `{id, filename, knowledge_id, knowledge_name}` |
 | `grep_knowledge_files` | `pattern` (required; regex auto-detected), `file_id` (optional, single-file mode), `case_insensitive` (default: false), `count_only` (default: false) | Matching lines with file IDs, filenames, and 1-indexed line numbers (capped at 50 matches by default, see [`KNOWLEDGE_GREP_MAX_MATCHES`](/reference/env-configuration#knowledge_grep_max_matches)) |
 | `view_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable), `line_numbers` (default: false), `start_line` / `end_line` (optional; line-based addressing overrides `offset`/`max_chars`) | `{id, filename, content, updated_at, created_at}`, includes `truncated`, `total_chars`, `next_offset` when paginated, or `total_lines`, `showing_lines`, `next_start_line` in line mode |
-| `view_knowledge_file` | `file_id` (required), `offset` (default: 0), `max_chars` (default: 10000, cap: 100000; both configurable) | `{id, filename, content, knowledge_id, knowledge_name}`, includes pagination metadata when truncated |
-| `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
+| `view_knowledge_file` | Same parameters as `view_file` | `{id, filename, content, updated_at, created_at, knowledge_id, knowledge_name}`, with the same pagination and line-mode fields as `view_file` |
+| `display_file` | `path` (required; a `file_id` or `/api/v1/files/<file_id>/content`), `page` (optional; 1-based page or slide for PDF, DOCX and PPTX previews) | `{type, source, exists, displayed, path, name, content_type}`; the file is shown inline in the chat |
+| `kb_exec` | `command` (required), a filesystem-style command: `ls` (root) / `ls <dir>/` / `ls -a` (flat with paths), sorted by path unless `-t` (newest), `-S` (largest) or `-r` (reverse) is given, `tree` / `tree <dir>/`, `cat -n <file>`, `head -N <file>`, `tail -N <file>`, `sed -n '<a>,<b>p' <file>`, `grep [-i\|-l\|-c] "<pattern>" [<dir>/\|<file>\|*.ext]`, `find [<dir>/] "<glob>"`, `wc <file>`, `stat <file>`; supports pipes (`grep "auth" \| head -5`); files referenced by path (`docs/api/auth.md`), filename, or file ID | Plain text command output (matches/listing/tree/file content as appropriate) |
 | **Image Gen** | | |
-| `generate_image` | `prompt` (required) | `{status, message, images}`, auto-displayed |
-| `edit_image` | `prompt` (required), `image_urls` (required) | `{status, message, images}`, auto-displayed |
+| `generate_image` | `prompt` (required), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed. With a terminal selected, each image also carries `terminal_path` |
+| `edit_image` | `prompt` (required), `image_urls` (required; image URLs or [absolute file paths in the selected terminal](/features/chat-conversations/image-generation-and-editing/usage#image-editing-inpainting)), `size` (optional, `WIDTHxHEIGHT` such as `1536x1024`; omit for the configured default) | `{status, message, images}`, auto-displayed. With a terminal selected, each image also carries `terminal_path` |
 | **Code Interpreter** | | |
 | `execute_code` | `code` (required) | `{status, stdout, stderr, result}` |
 | **Memory** | | |
@@ -430,13 +543,13 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `delete_memory` | `memory_id` (required) | `{status: "success", message}` |
 | `list_memories` | None | Array of `{id, type, path, content, created_at, updated_at}` |
 | **Notes** | | |
-| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}` |
-| `view_note` | `note_id` (required) | `{id, title, content, updated_at, created_at}` |
+| `search_notes` | `query` (required), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, page_id, page_title, url, updated_at}`, where the snippet and link come from the best matching page |
+| `view_note` | `note_id` (required), `page_id` (optional; omit it to read the whole note) | `{id, title, content, page_id, page_title, pages: [{id, title, parent_id}], updated_at, created_at}`. Without `page_id`, `content` holds every page under its own heading |
 | `write_note` | `title` (required), `content` (required; markdown text. A JSON object or array is stored as a fenced `json` code block rather than left in the note as structured data) | `{status: "success", id}` |
-| `replace_note_content` | `note_id` (required), `content` (optional; the new markdown for a whole-note update. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; range edits, each `{"action": "replace", "content": ...}` or `{"action": "replace_range", "start", "end", "content", "expected"}`), `title` (optional) | `{status: "success", id, title, updated_at, applied_operation_count}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …) |
+| `replace_note_content` | `note_id` (required), `page_id` (required on notes with several pages), `content` (optional; the new markdown for the whole page. A JSON object or array is stored as a fenced `json` code block), `operations` (optional; each `{"action": "replace", "content": ...}`, `{"action": "replace_text", "find", "content", "occurrence", "replace_all"}` or `{"action": "replace_text", "start", "end", "content", "expected"}`. `find` is literal and case sensitive. With several matches, `occurrence` picks one (0-indexed) and `replace_all: true` replaces all of them; with neither set, nothing changes and the error lists every match. `replace_range` is a deprecated alias of the `start`/`end` form), `title` (optional) | `{status: "success", id, page_id, title, updated_at, applied_operation_count, applied_ranges}`. Errors carry a machine-readable `code` (`not_found`, `write_access_denied`, `read_required` (the page was not read with `view_note` earlier in the same reply), `page_conflict` (no `page_id` on a note with several pages, the page is gone or it changed since it was read), `text_not_found`, `ambiguous_match`, `invalid_find`, `invalid_occurrence`, `invalid_range`, `range_out_of_bounds`, `expected_mismatch`, `overlapping_operations`, `content_required`, …). An `ambiguous_match` error carries `matches`, each with `start`, `end` and `context` (the match with up to 50 characters on either side) |
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
-| `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}]}` |
+| `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}], updated_at, created_at}`. A result cut by [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) adds `truncated: true`, `total_messages` and `returned_messages` |
 | **Channels** | | |
 | `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
 | `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{channel_id, channel_name, message_id, content_snippet, is_thread_reply, parent_id, created_at}` |
@@ -457,17 +570,28 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `update_calendar_event` | `event_id` (required), `title`, `description`, `start`, `end`, `all_day`, `location`, `is_cancelled` (all optional; only provided fields are changed) | `{status, id, title, start, end, ...}` |
 | `delete_calendar_event` | `event_id` (required) | `{status, message}` |
 | **Skills** | | |
-| `view_skill` | `name` (required) | `{name, content}` |
+| `view_skill` | `id` (required) | `{id, name, content, next_offset, files: [{path, size, encoding}]}`, plus `notice` when the file list was shortened. `content` holds the whole `SKILL.md` up to the **Skill Read Limit** (20,000 characters by default). A longer one returns its first **Skill Preview Length** characters (5,000 by default), with `next_offset` set to where `read_skill_file` continues. A terminal skill returns `{name, description, directory, content, next_offset, resources}` with the same preview rules |
+| `read_skill_file` | `id` (required), `path` (required), `offset` (default: 0), `max_chars` (default: 10000, at most the **Skill Read Limit**, 20000 by default) | `{path, content, next_offset}`; for a binary file `{path, size, encoding, url}` with a link into the skill editor. A terminal skill supports `path: "SKILL.md"` only |
+| `grep_skill_files` | `id` (required), `pattern` (required; literal text or an RE2 regex, detected automatically; up to 4,096 characters), `path` (optional; one exact file, otherwise every text file), `case_insensitive` (default: true), `max_results` (default: 10, 1-30) | `{matches: [{path, offset, match_length, section, section_offset, excerpt}], total_matches, truncated}`, at most 6,000 characters. When excerpts were left out it adds `notice`, `omitted_matches` (`[{path, offset, section}]`) and `omitted_matches_truncated`. A terminal skill supports `SKILL.md` only. Never creates a skill version |
+| `update_skill_files` | `id` (required), `operations` (required; each `{op: "put", path, content}`, `{op: "move", path, destination}` or `{op: "delete", path}`), `commit_message` (optional) | `{id}`. When the skill changed after the model read it, `{error: {code: "version_conflict", message}}` asks the model to call `view_skill` again and reapply the edit |
+| `create_skill` | `id` (required), `name` (required), `content` (required; the complete `SKILL.md` including `name` and `description` frontmatter), `files` (optional; text files as `{path, content}`), `commit_message` (optional) | `{id, url}` |
+| **Tool Creation** | | |
+| `create_tool` | `id` (required; lowercase Python identifier), `name` (required), `description` (required), `content` (required; the complete Python source with a `Tools` class) | `{id, url}`, or `{error}` |
 | **Time Tools** | | |
 | `get_current_timestamp` | None | `{current_timestamp, current_iso}` |
 | `calculate_timestamp` | `days_ago`, `weeks_ago`, `months_ago`, `years_ago` (all default: 0) | `{current_timestamp, current_iso, calculated_timestamp, calculated_iso}` |
 | **Ask User** | | |
 | `ask_user` | `questions` (required, 1-3 objects of `{id, header, question, options}` where `options` is 2-3 `{label, description}` pairs and an optional per-question `allow_other`), `allow_other` (default: `true`), `timeout_ms` (default: `120000`, clamped to 60000-240000) | `{status: "answered", answers}` keyed by question id, or `{status: "cancelled", answers: {}}` when the card times out. Dismissing the card returns a rejection error instead |
 | **Sub-agents** | | |
-| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `model_id` (optional; one of the model's [sub-agent models](/features/workspace/models#capabilities-and-bindings), offered only when some are set; omitted, the current model runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
+| **Tool Search** | | |
+| `search_tools` | `query` (required; keywords or an exact tool name), `count` (default: `5`, at most `20`) | `{"tools": [...]}` with the full definitions, `{"tools": [], "message": ...}` when nothing matches, or `{"error": ...}` when the search engine fails |
+| `call_tool` | `calls` (required; an array of `{tool_name, params}`, with `tool_name` the exact name and `params` the tool's arguments as a JSON-encoded object string, `"{}"` for none) | `{"results": [{tool_name, status, output}]}` with each tool's own result in order, or an `Error: ...` string when the call is malformed. A tool that is not available gets an `Error: ...` in its entry |
+
+In `view_file` and `view_knowledge_file` line mode, `end_line` without `start_line` reads from line 1, and `start_line` without `end_line` returns 100 lines. A line range stops at the last whole line that fits [`VIEW_FILE_MAX_CHARS`](/reference/env-configuration#view_file_max_chars), counting the line-number prefixes. The response then has `truncated: true` and `next_start_line` to continue from. Character paging with `line_numbers` on returns every character exactly once: following `next_offset` page after page reads the whole file with no gaps.
 
 :::warning Builtin tools behave differently inside a note-attached chat
 
@@ -479,7 +603,7 @@ The chat opened from a note is an internal chat of type `note`, and builtin tool
 
 Separately, `view_note` and `replace_note_content` **short-circuit access control for admins**: an admin reads or rewrites any note without the owner or grant check other users are subject to. Consistent with admins being root-equivalent elsewhere, but worth knowing if you relied on the previous behaviour, where admins were checked like everyone else.
 
-Note attachments are also injected: every non-image file on the note is added as retrieval context on **every** message in that chat.
+Note attachments are also injected: every file on the page the user has open is added as retrieval context on **every** message in that chat.
 
 :::
 
@@ -496,14 +620,14 @@ Knowledge tool availability changes based on whether the model has attached know
 :::
 
 :::caution Attached Knowledge Still Requires User Access
-Attaching a knowledge base to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge item. Items the user cannot access are silently excluded from search results.
+Attaching a knowledge base or note to a custom model does **not** bypass access control. When a user chats with the model, `query_knowledge_files` checks whether **that specific user** has permission to access each attached knowledge base and note. Items the user cannot access are silently excluded from search results. Individual files are different: a file attached directly to the model is shared with everyone who can use the model, and the model's author must be able to read it when attaching it.
 
 **Access requirements by knowledge type:**
 
 | Attached Type | User Needs |
 |---------------|-----------|
 | **Knowledge Base** (collection) | Owner, admin, or explicit read access grant |
-| **Individual File** | Owner or admin only (no access grants) |
+| **Individual File** | Anyone who can use the model (checked against the model's author when attached) |
 | **Note** | Owner, admin, or explicit read access grant |
 
 **Example scenario**: An admin creates a private knowledge base and attaches it to a custom model shared with all users. Regular users chatting with this model will get **empty results** from `query_knowledge_files` because they don't have read access to the KB itself, even though they can use the model.
@@ -520,9 +644,9 @@ Attaching a knowledge base to a custom model does **not** bypass access control.
 **Without attached knowledge:**
 1. First call `list_knowledge_bases` to discover what knowledge is available
 2. Then use `query_knowledge_files` to search file contents within relevant KBs
-3. If still empty, the files may not be embedded yet, or you may have **Full Context mode enabled** which bypasses the vector store
+3. If still empty, the files may not be embedded yet, or you may have **Always Use Full Text enabled** which bypasses the vector store
 
-**Do NOT use Full Context mode with knowledge tools.** Full Context injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
+**Do NOT use Always Use Full Text or Using Entire Document with knowledge tools.** Full text injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
 :::
 
 :::tip Knowledge Base Tools and Hybrid Search
@@ -535,7 +659,7 @@ The native `query_knowledge_files` tool uses **hybrid search + reranking** when 
 **If your model isn't using attached knowledge:**
 1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering. If no knowledge is attached to this model, use list_knowledge_bases first to discover available KBs."*
 2. **Or disable Native Function Calling** for that model to restore automatic RAG injection.
-3. **Or use "Full Context" mode** for attached knowledge (click on the attachment and select "Use Entire Document") which always injects the full content.
+3. **Or use "Using Entire Document"** for attached knowledge (click on the attachment and switch its mode) which always injects the full content.
 
 See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for more details.
 :::
@@ -558,12 +682,12 @@ The **Builtin Tools** capability can be toggled on or off for each model in the 
 **What happens when Builtin Tools is disabled:**
 
 1. **No tool injection**: The model won't receive any of the built-in system tools, even in Native Mode.
-2. **RAG still works** (if File Context is enabled): Attached files are still processed via RAG and injected as context.
+2. **RAG still works** (if Preload files is enabled): Attached files are still processed via RAG and injected as context.
 3. **No autonomous retrieval**: The model cannot decide to search knowledge bases or fetch additional information; it works only with what's provided upfront.
 
 #### Granular Builtin Tool Categories (Per-Model)
 
-When the **Builtin Tools** capability is enabled, you can further control which **categories** of builtin tools are available to the model. This appears in the Model Editor as a set of checkboxes under **Builtin Tools**.
+When the **Builtin Tools** capability is enabled, you can further control which **categories** of built-in tools are available to the model. This appears in the Model Editor as a **Builtin Tools** row with one switch per category.
 
 ![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
 
@@ -574,7 +698,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file` (or `kb_exec` + `query_knowledge_files` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `display_file` (or `kb_exec` + `query_knowledge_files` + `display_file` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |
@@ -582,17 +706,21 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Task Management** | `create_tasks`, `update_task` | Create a structured task/todo list and update individual task statuses in the active chat |
 | **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
 | **Calendar** | `search_calendar_events`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event` | Search, create, update, and delete calendar events |
+| **Skills** | `view_skill`, `read_skill_file`, `grep_skill_files`, `update_skill_files`, `create_skill` | Find, read, search, edit and create skills |
+| **Tool Creation** | `create_tool` | Create Python workspace tools from chat. Needs [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) and, for non-admins, the **Tools Access** permission |
 
 All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
-:::info Skills / view_skill, Not a Category Toggle
-The `view_skill` tool does **not** appear in the Builtin Tools category checkboxes. It is injected when at least one skill is **attached to the model** via **Workspace → Models → Edit → Skills**. When skills are attached:
+:::info Skills
+While built-in tools are active for the chat and the model's **Skills** category is on:
 
-1. The model receives a summary of each attached skill (name + description) in its system prompt via `<available_skills>` tags
-2. The `view_skill` tool is injected so the model can load full instructions on demand
-3. If no skills are attached, `view_skill` is not available
+1. Skills selected for the chat load before the model answers, as hidden `view_skill` results, once per chat. Every new chat pre-selects the model's skills
+2. The model receives a summary (name + description) of **every active skill the user can read** in a hidden `list_available_skills` tool result via `<available_skills>` tags, including skills that are not attached to the model and skills the user switched off in the chat
+3. `view_skill`, `read_skill_file` and `grep_skill_files` are injected while at least one skill is listed, so the model can load, read and search instructions and files on demand. `update_skill_files` is injected while at least one workspace skill is listed, to edit skills the user can write to, plus `create_skill` for admins and users with the Skills Access permission
+4. When the user can read no active skill, or when a reply is continued, the `<available_skills>` block is left out
 
-Users can also select skills per-chat (via the chat input bar), which injects the skill's full content directly into the system prompt instead of requiring a `view_skill` call.
+Long `SKILL.md` files are cut at the **Skill Read Limit**, and the model reads on with `read_skill_file`. Without the skill tools, selected skills are injected up to their first 100,000 characters. See [Skills](/features/workspace/skills#model-attached-skills).
+
 :::
 
 **Use cases for granular control:**
@@ -645,24 +773,24 @@ This means users can disable web search (or image generation, or code interprete
 For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In **Settings > Admin > Models**, click the pencil (**Edit**) on your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
 :::
 
-:::tip Builtin Tools vs File Context
-**Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG; that's controlled by the separate **File Context** capability.
+:::tip Builtin Tools vs Preload files
+**Builtin Tools** controls whether the model gets *tools* for autonomous retrieval. It does **not** control whether file content is injected via RAG; that's controlled by the separate **Preload files** capability.
 
-- **File Context** = Whether Open WebUI extracts and injects file content (RAG processing)
+- **Preload files** = Whether Open WebUI extracts and injects file content (RAG processing)
 - **Builtin Tools** = Whether the model gets tools to autonomously search/retrieve additional content
 
-See [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools) for a detailed comparison.
+See [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools) for a detailed comparison.
 :::
 
 ### Interleaved Thinking {#interleaved-thinking}
 
-🧠 When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
+When using **Native Mode (Agentic Mode)**, high-tier models can engage in **Interleaved Thinking**. This is a powerful "Thought → Action → Thought → Action → Thought → ..." loop where the model can reason about a task, execute one or more tools, evaluate the results, and then decide on its next move.
 
 :::info Quality Models Required
-Interleaved thinking requires a model that can maintain context across multiple tool calls and choose tools sensibly. Current reasoning-capable models handle this — GPT-5.6, Claude Sonnet 5, Gemini 3.6 Flash, or MiniMax M3 are a reasonable minimum. Older or very small models will not.
+Interleaved thinking requires a model that can maintain context across multiple tool calls and choose tools sensibly. Current reasoning-capable models handle this; GPT-5.6, Claude Sonnet 5, Gemini 3.6 Flash or MiniMax M3 are a reasonable minimum. Older or very small models do not.
 :::
 
-This is fundamentally different from a single-shot tool call. In an interleaved workflow, the model follows a cycle:
+In an interleaved workflow, the model follows a cycle:
 1.  **Reason**: Analyze the user's intent and identify information gaps.
 2.  **Act**: Call a tool (e.g., `query_knowledge_files` for internal docs or `search_web` and `fetch_url` for web research).
 3.  **Think**: Read the tool's output and update its internal understanding.
@@ -677,7 +805,7 @@ For long-running workflows, combine interleaved tool use with `create_tasks` (to
 
 ---
 
-## 🚀 Summary & Next Steps
+## Summary & Next Steps
 
 Tools bring your AI to life by giving it hands to interact with the world.
 - **Browse Tools**: [openwebui.com/search](https://openwebui.com/search)

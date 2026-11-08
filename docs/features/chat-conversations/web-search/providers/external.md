@@ -35,20 +35,22 @@ This option allows you to connect Open WebUI to your own self-hosted web search 
 2. Go to the `Settings` tab and then select `Web Search`.
 3. Toggle `Enable Web Search` to the on position.
 4. Set `Web Search Engine` from the dropdown menu to `external`.
-5. Fill `External Search URL` with the full URL of your custom search API endpoint (e.g., `http://localhost:8000/search` or `https://my-search-api.example.com/api/search`).
-6. Fill `External Search API Key` with the secret API key required to authenticate with your custom search endpoint. Leave blank if your endpoint doesn't require authentication (not recommended for public endpoints).
+5. Fill **External Web Search URL** (`EXTERNAL_WEB_SEARCH_URL`) with the full URL of your custom search API endpoint (e.g., `http://localhost:8000/search` or `https://my-search-api.example.com/api/search`).
+6. Fill **External Web Search API Key** (`EXTERNAL_WEB_SEARCH_API_KEY`) with the secret API key required to authenticate with your custom search endpoint. Leave blank if your endpoint doesn't require authentication (not recommended for public endpoints).
 7. Click `Save`.
 
 ![Open WebUI Admin panel showing External Search config](/images/tutorial_external_search.png)
 
 ### API Specification
 
-Open WebUI will interact with your `External Search URL` as follows:
+Open WebUI will interact with your **External Web Search URL** as follows:
 
 - **Method:** `POST`
 - **Headers:**
   - `Content-Type: application/json`
   - `Authorization: Bearer <YOUR_EXTERNAL_SEARCH_API_KEY>`
+  - `User-Agent: Open WebUI (https://github.com/open-webui/open-webui) RAG Bot`
+  - The user identity headers (`X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, `X-OpenWebUI-User-Role`, or a signed JWT when `FORWARD_USER_INFO_HEADER_JWT_SECRET` is set) and `X-OpenWebUI-Chat-Id` when a chat id is present
 - **Request Body (JSON):**
 
     ```json

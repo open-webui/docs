@@ -50,15 +50,17 @@ We use the CVE system and we believe in it. When a report against Open WebUI is 
 
 What this page documents is the opposite: records that work against the purpose the system exists to serve. In recent years a substantial share of the identifiers minted against Open WebUI have not survived scrutiny, and several were produced in ways that cannot be reconciled with coordinated disclosure at all. The pattern is consistent enough to describe plainly.
 
+As of 2026-11-07, 26 CVE records filed against Open WebUI have been published and later rejected. By that measure Open WebUI ranks third among all products in the CVE List, behind only the Linux kernel and the Robot Operating System (ROS). Every one of the 26 was withdrawn by the CNA that issued it, not overruled by the CVE Program: 23 after we disputed them and the issuing CNA conceded, and 3 by the issuing CNA on its own, as duplicates of CVEs in third-party dependencies, before we knew they existed.
+
 **Records filed against the wrong product.** More than one identifier describes an impact that occurs in software Open WebUI does not ship, does not run and does not control, while naming Open WebUI as the affected product. Identifying the affected product is the primary function of a CVE record.
 
 **Records describing code that is not there.** Several rest on a mechanism the cited code rules out, in the very lines the report itself quotes. These are not judgement calls. Reading the quoted code is enough to disprove them.
 
 **Publication without ever contacting us.** Some records were published without the report ever reaching our security channels, or in other words, without anyone informing us at any point before the CVE went public. This is the most serious of the six, because advance notice to the vendor is the entire premise of coordinated disclosure. Publishing a finding, with a proof of concept, for an issue the maintainers have never seen does not protect anyone. It maximises the window of exposure rather than closing it. Had any of those findings been real, the result would have been a zero day: a live, unpatched vulnerability with a working proof of concept, disclosed to attackers and defenders at the same moment, and published by an organisation whose stated purpose is to prevent exactly that.
 
-**Response times measured in months.** Once a record is disputed, the correction rests with the CNA that issued it, and no deadline obliges it to act. Disputes routinely pass through the issuing CNA, the CVE Program Secretariat and the Program Root before anything moves, and a record can remain published for months after its own CNA has agreed in writing that it should be marked rejected. The timeline on each page below records where that particular dispute stands.
+**Response times measured in months.** Once a record is disputed, the correction rests with the CNA that issued it, and no deadline obliges it to act. Disputes routinely pass through the issuing CNA, the CVE Program Secretariat and the Program Root before anything moves, and a record can remain published for months after its own CNA has agreed in writing that it should be marked rejected. The timeline on each page below records where that particular dispute stands. The same holds one level up. Rule 1.2.3.1 of the CNA Operational Rules states that serious or repeated failure to follow the rules "MUST be reviewed by an appropriate Root". We have filed several compliance requests with the Root under that rule since August 2026. None has received anything beyond an automatic acknowledgement.
 
-**Databases that never process rejections.** A withdrawal at cve.org only helps if downstream databases act on it. Several do not reprocess reject transitions at all, so a record the issuing CNA has formally withdrawn keeps displaying as a live finding to their customers, indefinitely. See [Rejected CVEs in Vulnerability Databases](/security/supply-chain-security/vulnerability-databases).
+**Databases that do not process rejections.** A withdrawal at cve.org only helps if downstream databases act on it. Several do not reprocess reject transitions, or reprocess only some of them, so a record the issuing CNA has formally withdrawn keeps displaying as a live finding to their customers, indefinitely. See [Rejected CVEs in Vulnerability Databases](/security/supply-chain-security/vulnerability-databases).
 
 **Vendors who cannot be reached about their own data.** Correcting those entries means reaching whoever runs the database, and in some cases no working route to do so exists. Some publish no contact address of any kind: no security contact, no `security.txt`, not even a sales form, leaving a telephone number as the only listed way to reach them. Others publish a security address that rejects mail outright. Where a channel does answer, it is often built for sales enquiries or for reports about the vendor's own software, with no path at all for telling them that their published data is wrong. These are the organisations telling their customers which findings to act on, and several of them have provided no way to be told that one of those findings is wrong.
 
@@ -84,7 +86,7 @@ That is what follows. Every externally filed CVE against Open WebUI that we cont
 
 On 2026-09-02, a maintainer of the [GitHub Advisory Database](https://github.com/github/advisory-database/pull/8031#issuecomment-5512489251) stated that three advisories mirroring CVEs filed against Open WebUI had been left `unreviewed` on purpose, "due to concerns by teammates and I had about the validity of the vulnerabilities described in the CVE records". Because they are unreviewed, they raise no Dependabot alerts.
 
-The three are one from each of the three CNAs that have filed against us:
+The three come from three different issuing CNAs:
 
 | Advisory | CVE | Issuing CNA | Our assessment |
 | :--- | :--- | :--- | :--- |
@@ -118,12 +120,12 @@ It is also the clearest illustration of the asymmetry described above. Three rec
 | [CVE-2024-7037](./cve-2024-7037.mdx) | Path Traversal in Pipeline Upload | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2024-10-09 |
 | [CVE-2024-7038](./cve-2024-7038.mdx) | Path Oracle in Embedding-Model Update | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2024-10-09 |
 | [CVE-2024-7039](./cve-2024-7039.mdx) | Cross-Admin User Deletion | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
-| [CVE-2024-7040](./cve-2024-7040.mdx) | Cross-Admin Chat Access via user_id Parameter | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-10-15 |
+| [CVE-2024-7040](./cve-2024-7040.mdx) | Cross-Admin Chat Access via user_id Parameter | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
 | [CVE-2024-7045](./cve-2024-7045.mdx) | Prompt Disclosure via /api/v1/prompts/ | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
 | [CVE-2024-7046](./cve-2024-7046.mdx) | Admin Details Disclosure via /api/v1/auths/admin/details | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
-| [CVE-2024-7049](./cve-2024-7049.mdx) | Token Issued to Pending-Role Account | huntr / Protect AI | Rejected | In progress | 2024-10-10 |
+| [CVE-2024-7049](./cve-2024-7049.mdx) | Token Issued to Pending-Role Account | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2024-10-10 |
 | [CVE-2024-7053](./cve-2024-7053.mdx) | Session Fixation via Markdown Image | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
-| [CVE-2024-7806](./cve-2024-7806.mdx) | CSRF to Pipeline Code Execution | huntr / Protect AI | Rejected | In progress | 2025-03-20 |
+| [CVE-2024-7806](./cve-2024-7806.mdx) | CSRF to Pipeline Code Execution | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
 | [CVE-2024-7959](./cve-2024-7959.mdx) | SSRF via Admin-Configured OpenAI URL | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
 | [CVE-2024-7990](./cve-2024-7990.mdx) | Stored XSS via Model Description | huntr / Protect AI | Rejected | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |
 | [CVE-2024-7999](./cve-2024-7999.mdx) | DoS via Malformed Multipart Boundary | huntr / Protect AI | Never disclosed to us | <span className="badge badge--success">CNA REJECTED</span> | 2025-03-20 |

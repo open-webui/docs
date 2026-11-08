@@ -1,20 +1,24 @@
 ---
 sidebar_position: 1
-title: "Usage"
+title: "Generate and Edit Images in Chat"
+sidebar_label: "Usage"
+description: "Enable image generation in a conversation, create images from prompts, and edit or combine uploaded images in Open WebUI."
 ---
+
+Generate images from a prompt, or upload images and describe the changes you want, in an Open WebUI conversation. An administrator must first configure an [image provider](/features/chat-conversations/image-generation-and-editing); keep your normal chat model selected while using it.
 
 Image generation is only available in a chat when all of the following are true:
 
-- **Image Generation** is enabled in **Settings** > **Admin** > **Experience** > **Images**.
+- **Image Generation** is enabled in **Settings** > **Admin** > **Images**.
 - Your role has the **Image Generation** feature permission. Admins always pass this check.
 - The model has the **Image Generation** capability checked in **Workspace** > **Models** > **Edit**. Outside Legacy mode its **Builtin Tools** capability and the **Image Generation** builtin tool category must stay enabled too. All of these are on by default.
-- The **Image** toggle is on for that chat, in the **Integrations** menu of the message input. Tick **Image Generation** under **Default Features** in the model editor to have it active in every new chat.
+- The **Image** toggle is on for that chat, in the **+** menu of the message input. Tick **Image Generation** under **Default Features** in the model editor to have it active in every new chat.
 
-If **Image** is missing from the **Integrations** menu entirely, then either image generation is off globally, the **Image Generation** capability is off on one of the selected models, or your role lacks the permission. The engine's own URL and key are a separate matter. Get those wrong and the toggle still appears, generation just fails once it runs.
+If **Image** is missing from the **+** menu entirely, then either image generation is off globally, the **Image Generation** capability is off on one of the selected models or your role lacks the permission. The engine's own URL and key are a separate matter. Get those wrong and the toggle still appears, generation just fails once it runs.
 
 ## Using Image Generation
 
-1. Switch **Image** on in the **Integrations** menu of the message input.
+1. Switch **Image** on in the **+** menu of the message input.
 2. Enter your image generation prompt.
 3. Click `Send`.
 
@@ -24,11 +28,13 @@ If **Image** is missing from the **Integrations** menu entirely, then either ima
 The model selector at the top of the chat stays on your normal chat model. The image model is configured once in the admin image settings and is never selected there.
 
 Picking the image model as the chat model is the most common setup mistake. Everything looks configured, and generation fails or returns nothing useful, because an image model cannot hold a conversation and is not being asked for a picture in the way it expects. If image generation has stopped working and the settings look right, check what the model selector says first.
+
+The exception is a chat model that creates images itself on a connection whose **API Type** is `Responses`, such as a Gemini image model through OpenRouter. Its images show in the reply.
 :::
 
-What happens next depends on the **Function Calling** mode. It can be set per chat in **Chat Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.
+What happens next depends on the **Function Calling** mode. It can be set per chat in **Model controls** > **Controls** > **Advanced Params**, for yourself in **Settings** > **General** > **Advanced Parameters**, per model in the model editor or globally under **Model Defaults** in the admin model settings. The first of those that is not **Default** wins, and Native applies when none of them is set.
 
-**Native** takes the tool path described below. In **Legacy** mode every message you send while the toggle is on goes straight to the image engine, whatever you asked for. It edits instead of creating when the recent conversation carries images and **Image Edit** is on. On the create path a task model rewrites your message into the image prompt first, unless you switch **Image Prompt Generation** off in the admin settings.
+**Native** takes the tool path described below. In **Legacy** mode every message you send while the toggle is on goes straight to the image engine, whatever you asked for. It edits instead of creating when the recent conversation carries images and **Image Edit** is on. On the create path a task model rewrites your message into the image prompt first, unless you switch **Image Prompt Generation** off in the admin settings. In both modes, with a terminal selected in the chat, generated and edited images are also saved to its working directory, so the model can keep working on them with terminal tools.
 
 ## Native Tool-Based Generation (Agentic)
 
@@ -46,7 +52,7 @@ This approach allows the model to "reason" about the prompt before generating, o
 
 :::info
 **Legacy "Generate Image" Button:**
-As of Open WebUI v0.7.0, the native "Generate Image" button (which allowed generating an image directly from a message's content) was removed. If you wish to restore this functionality, you can use the community-built **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)**.
+Open WebUI has no button that generates an image from a message's content. To add one, use the community-built **[Generate Image Action](https://openwebui.com/posts/3fadc3ca-c955-4c9e-9582-7438f0911b62)**.
 :::
 
 ## Restoring the "Generate Image" Button
@@ -61,7 +67,7 @@ This action adds a "Generate Image" icon to the message action bar, allowing you
 
 
 :::info
-**Requirement:** Image editing runs through the same conditions listed at the top of this page. To use **Image Editing** or **Image+Image Generation**, also turn on **Image Edit** in the **Edit Image** section of **Settings** > **Admin** > **Experience** > **Images**, with an edit engine (`Default (Open AI)`, `ComfyUI` or `Gemini`) and a model that supports inpainting or img2img.
+**Requirement:** Image editing runs through the same conditions listed at the top of this page. To use **Image Editing** or **Image+Image Generation**, also turn on **Image Edit** in the **Edit Image** section of **Settings** > **Admin** > **Images**, with an edit engine (`Default (Open AI)`, `ComfyUI` or `Gemini`) and a model that supports inpainting or img2img.
 :::
 
 ## Image Editing (Inpainting)
@@ -71,6 +77,8 @@ You can edit an image by providing the image and a text prompt directly in the c
 1. **Upload an image** to the chat.
 2. **Enter a prompt** describing the change you want to make (e.g., "Change the background to a sunset" or "Add a hat").
 3. The model will generate a new version of the image based on your prompt.
+
+With an [Open Terminal](/features/open-terminal) that an administrator added, or a [Tether](/ecosystem/tether) terminal, selected in the chat, the model can also edit any image stored in that terminal, whatever [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads) is set to. It passes their absolute paths to `edit_image`, and Open WebUI reads them from that terminal with your access to it, in the same workspace the chat uses. Each image must be a PNG, JPEG, WebP or GIF of at most 25 megapixels and 50 MB.
 
 ## Image Compositing (Multi-Image Fusion)
 

@@ -24,7 +24,7 @@ Once installed, you can access the application via the `continue` tab in the sid
 
 ## Setup
 
-Click on the assistant selector to the right of the main chat input. Then hover over `Local Assistant` and click on the settings icon (⚙️).
+Click on the assistant selector to the right of the main chat input. Then hover over `Local Assistant` and click on the settings icon.
 This will open the `config.yaml` file in your editor. Here you can change the settings of your `Local Assistant`.
 
 ![continue.dev chat input](/images/tutorials/continue-dev/continue_dev_extension_input_field.png)
@@ -79,7 +79,7 @@ version: 1.0.0
 schema: v1
 ```
 
-The context section provides additional information to the models. Find more information in the [official config guide](https://docs.continue.dev/reference#context) and in the [context provider guide](https://docs.continue.dev/customize/custom-providers).
+The context section provides additional information to the models. Find more information in the [official config guide](https://docs.continue.dev/reference#context) and in the [context provider guide](https://docs.continue.dev/customize/model-providers/overview).
 
 ```yaml
 context:
@@ -140,7 +140,7 @@ model: qwen3.6:27b
 
 ### Legacy completions endpoint
 
-This setting is not needed for Open WebUI, though more information is available in the [original guide](https://platform.openai.com/docs/guides/completions/completions-api-legacy).
+This setting is not needed for Open WebUI, though more information is available in the [original guide](https://platform.openai.com/docs/guides/completions).
 
 ```yaml
 env:

@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Prompts
 
 <ThemedImage
-  alt="Workspace map with the Prompts cell highlighted: Models, Knowledge, Prompts, Skills and Tools around the Open WebUI core"
+  alt="Workspace Prompts: a template block above a row of identical copies"
   sources={{
     light: useBaseUrl('/images/banners/workspace-prompts-light.svg'),
     dark: useBaseUrl('/images/banners/workspace-prompts-dark.svg'),
@@ -39,11 +39,11 @@ Add typed input variables (dropdowns, date pickers, number fields, checkboxes) a
 
 ### Version history with rollback
 
-Every change creates a new version. Compare versions side-by-side, restore a previous version to production, and track who changed what.
+Every content change creates a new version. Browse the history, preview a version, compare it with the live one, edit it into a new version, set it live or delete it. Each version records who changed what. Untick **Set as Production** to save a version without making it live. Renaming, re-tagging or changing the command creates no version.
 
 ### Controlled sharing
 
-Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace.
+Share prompts with specific users or groups. Public prompts appear in everyone's `/` suggestions. Private prompts stay in your own workspace. On prompts you can edit, and with the **Prompts Sharing** permission, **Access** in the **⋯** menu of the **Workspace > Prompts** list opens the [sharing settings](/features/authentication-access/rbac/groups#resource-access-rbac) without opening the editor, and each change there is saved right away. Saving a prompt with write access keeps the sharing it already has, including a **Public** setting you do not have permission to set yourself.
 
 ---
 
@@ -51,13 +51,13 @@ Share prompts with specific users or groups. Public prompts appear in everyone's
 
 | | |
 | :--- | :--- |
-| ⚡ **Slash commands** | Type `/command` to insert the full prompt |
-| 📋 **Input variable forms** | Typed fields (text, dropdown, date, number, checkbox, and more) generate a popup form |
-| 🕑 **Version history** | Full change tracking with commit messages, rollback, and production pinning |
-| 🔄 **System variables** | `{{CURRENT_DATE}}`, `{{USER_NAME}}`, `{{CLIPBOARD}}` auto-replaced at runtime |
-| 🔒 **Access control** | Share with specific users, groups, or make public |
-| 🔀 **Enable/Disable toggle** | Deactivate prompts without deleting them |
-| 🏷️ **Tags** | Organize and filter your prompt library |
+| **Slash commands** | Type `/command` to insert the full prompt |
+| **Input variable forms** | Typed fields (text, dropdown, date, number, checkbox, and more) generate a popup form |
+| **Version history** | Full change tracking with commit messages, rollback, and production pinning |
+| **System variables** | `{{CURRENT_DATE}}`, `{{USER_NAME}}`, `{{CLIPBOARD}}` auto-replaced at runtime |
+| **Access control** | Share with specific users, groups, or make public |
+| **Enable/Disable toggle** | Deactivate prompts without deleting them |
+| **Tags** | Organize and filter your prompt library |
 
 ---
 
@@ -69,10 +69,12 @@ Navigate to **Workspace > Prompts** and click **Create** in the Workspace header
 | :--- | :--- |
 | **Name** | Descriptive title for identification |
 | **Tags** | Categorize for filtering |
-| **Access** | Control who can view and use the prompt |
+| **Access** | Control who can view and use the prompt. Needs the [**Prompts Sharing**](/features/authentication-access/rbac/permissions#2-sharing-permissions) permission |
 | **Command** | The slash command trigger (e.g., `/summarize`) |
 | **Prompt Content** | The actual text sent to the model, with variables |
 | **Commit Message** | Optional description of changes for version tracking |
+
+**Compare revision**, above the prompt content, opens the content next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the editor, so drop a change you do not want with **Original →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the prompt afterwards.
 
 Use clear variable names (`{{your_name}}` not `{{var1}}`), add descriptive `placeholder` text, provide `default` values where sensible, and mark only truly essential fields as `:required`. Public prompts appear in every user's `/` suggestions, so be selective about what you make public. Use the enable/disable toggle to shelve prompts you're not actively using.
 
@@ -94,13 +96,14 @@ Automatically replaced with their value at runtime:
 | `{{CURRENT_WEEKDAY}}` | Current day of the week |
 | `{{USER_NAME}}` | Your display name |
 | `{{USER_EMAIL}}` | Your email address |
+| `{{USER_ROLE}}` | Your role, such as `admin` or `user` |
 | `{{USER_BIO}}` | Bio from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_GENDER}}` | Gender from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_BIRTH_DATE}}` | Birth date from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_AGE}}` | Age calculated from birth date (unreplaced if not set) |
 | `{{USER_LANGUAGE}}` | Your selected language |
-| `{{USER_LOCATION}}` | Your location (requires HTTPS + Settings > Interface toggle) |
-| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to (empty if none). Resolved from the database only when the placeholder is present. |
+| `{{USER_LOCATION}}` | Your location. The browser asks for geolocation permission directly, which needs HTTPS. The Interface toggle only controls the location sent with chat requests |
+| `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to, including groups inherited through parent groups (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
 
 ### Custom input variables
 
@@ -204,9 +207,19 @@ With 20 messages, `{{MESSAGES:MIDDLETRUNCATE:6}}` keeps messages 1-3 and 18-20, 
 
 ## Version History
 
-Every save creates a new version. When editing a prompt, the **History sidebar** shows all versions with the commit message, author, timestamp, and a "Live" badge on the active production version.
+Every save that changes the prompt's content creates a new version. When editing a prompt, the history menu above the prompt content starts on **Live**, the active production version. Open it to list the versions newest first, each with its commit message and author (hover for the date), and **Load more** for older ones.
 
-**Preview** any version by clicking it. **Set as Production** to restore it as the active version. **Delete** old versions from the menu (the current production version cannot be deleted).
+- **Preview** any version by clicking it. Its content opens read-only, with the version ID and date underneath.
+- **Compare to current** shows what differs between that version and the live one: the name and tags side by side, then the prompt content as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**. Content longer than 5000 lines in either version cannot be compared (`Diff is limited to 5000 lines per version`).
+- **Edit as new version** makes the previewed content editable. Saving creates a new version from it. The **Set as Production** checkbox beside **Save** starts unticked here, so the live prompt stays as it is until you tick it.
+- **Set as Production** restores that version as the active one.
+- **Delete** in a version's **⋯** menu removes it after you confirm in the **Delete Version** dialog. The live version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the history stays connected.
+
+![Compare to current in the prompt editor, with an older version on the left and the production version on the right in the Split layout](/images/workspace/prompt-version-compare.webp)
+
+Switching to another version or leaving the editor while you have unsaved changes asks whether to discard them first. Anyone who can view a prompt can open and compare its versions; editing, setting a version live and deleting need write access.
+
+Over the API, `GET /api/v1/prompts/id/{prompt_id}/history/diff?from_id=...&to_id=...` returns both snapshots, the content diff as a list of lines, `name_changed` and `line_endings_only`, which is `true` when the contents differ only in their line endings.
 
 :::note Migration
 Prompts created before the versioning update were automatically migrated with their content preserved as the initial "Live" version. The URL structure changed from command-based to ID-based, so existing bookmarks may need updating. As of v0.5.0, all variables are optional by default.

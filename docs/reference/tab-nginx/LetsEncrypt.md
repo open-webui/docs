@@ -1,6 +1,6 @@
 ### Let's Encrypt
 
-Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for securing your production environment. 🔐
+Let's Encrypt provides free SSL certificates trusted by most browsers, ideal for securing your production environment.
 
 This guide uses a two-phase approach:
 
@@ -37,7 +37,7 @@ First, we'll set up the necessary files and a temporary Nginx configuration that
 
     Create the file `nginx/conf.d/open-webui.conf`. This initial config only listens on port 80 and serves the validation files for Certbot.
 
-    ⚠️ **Remember to replace `<YOUR_DOMAIN_NAME>`** with your actual domain.
+    **Remember to replace `<YOUR_DOMAIN_NAME>`** with your actual domain.
 
     ```nginx
     # nginx/conf.d/open-webui.conf
@@ -108,7 +108,7 @@ Now we'll run a script that uses Docker to fetch the certificate.
 
     Create an executable script named `enable_letsencrypt.sh` in your project root.
 
-    ⚠️ **Remember to replace `<YOUR_DOMAIN_NAME>` and `<YOUR_EMAIL_ADDRESS>`** with your actual information.
+    **Remember to replace `<YOUR_DOMAIN_NAME>` and `<YOUR_EMAIL_ADDRESS>`** with your actual information.
 
     ```bash
     #!/bin/bash
@@ -180,7 +180,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
 
     **Replace the entire contents** of `nginx/conf.d/open-webui.conf` with the final configuration below.
 
-    ⚠️ **Replace all 4 instances of `<YOUR_DOMAIN_NAME>`** with your domain.
+    **Replace all 4 instances of `<YOUR_DOMAIN_NAME>`** with your domain.
 
     ```nginx
     # nginx/conf.d/open-webui.conf
@@ -299,7 +299,7 @@ With the certificate saved in your `ssl` directory, you can now update the Nginx
 
 You can now access your Open WebUI instance securely via HTTPS.
 
-➡️ **`https://<YOUR_DOMAIN_NAME>`**
+→ **`https://<YOUR_DOMAIN_NAME>`**
 
 -----
 

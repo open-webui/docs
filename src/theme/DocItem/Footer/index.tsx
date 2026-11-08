@@ -1,5 +1,6 @@
 import React from "react";
 import DocItemFooter from "@theme-original/DocItem/Footer";
+import DocsFeedback from "@site/src/components/DocsFeedback";
 
 const DISCLAIMER_TEXT =
 	'This content is for informational purposes only and does not constitute a warranty, guarantee, or contractual commitment. Open WebUI is provided "as is." See your ';
@@ -7,6 +8,7 @@ const DISCLAIMER_TEXT =
 export default function DocItemFooterWrapper(props) {
 	return (
 		<>
+			<DocsFeedback />
 			<div className="disclaimer-bar">
 				{DISCLAIMER_TEXT}
 				<a href="/license">license</a> for applicable terms.

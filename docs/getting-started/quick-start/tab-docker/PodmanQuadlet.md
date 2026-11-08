@@ -2,7 +2,7 @@
 
 Podman Quadlets allow you to manage containers as native systemd services. This is the recommended way to run production containers on Linux distributions that use systemd (like Fedora, RHEL, Ubuntu, etc.).
 
-## 🛠️ Setup
+## Setup
 
 1. **Create the configuration directory:**
    For a rootless user deployment:
@@ -28,6 +28,7 @@ Podman Quadlets allow you to manage containers as native systemd services. This 
    # Networking: Pasta is used by default in Podman 5+
    # If you need to access host services (like Ollama on the host):
    AddHost=host.containers.internal:host-gateway
+   Environment=OLLAMA_BASE_URL=http://host.containers.internal:11434
 
    [Service]
    Restart=always
@@ -47,7 +48,7 @@ Podman Quadlets allow you to manage containers as native systemd services. This 
    systemctl --user enable open-webui
    ```
 
-## 📊 Management
+## Management
 
 - **Check status:**
   ```bash

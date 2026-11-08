@@ -40,7 +40,7 @@ Open your iTerm2 terminal and navigate to **Settings** (⌘,) from the **iTerm2*
 
 ### Verify the installed plugin
 
-Once the iTerm2 AI plugin is installed, verify that the **Plugin** section shows `Plugin installed and working ✅`.
+Once the iTerm2 AI plugin is installed, verify that the **Plugin** section shows `Plugin installed and working`.
 
 ---
 
@@ -98,7 +98,7 @@ You can find more information about the URLs in the [API Endpoints guide](/refer
 
 ### Legacy Completions API
 
-This setting is not needed for Open WebUI, though more information is available in the [original guide](https://platform.openai.com/docs/guides/completions/completions-api-legacy).
+This setting is not needed for Open WebUI, though more information is available in the [original guide](https://platform.openai.com/docs/guides/completions).
 
 ---
 

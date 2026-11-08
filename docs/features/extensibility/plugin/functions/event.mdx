@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Event Function: React to System Events
 
 <ThemedImage
-  alt="Event functions react to system events: auth.signup, chat.deleted, system.startup and config.updated flow into an Open WebUI Event function"
+  alt="Event Functions: a row of dominoes, the first one marked"
   sources={{
     light: useBaseUrl('/images/banners/event-function-light.svg'),
     dark: useBaseUrl('/images/banners/event-function-dark.svg'),
@@ -21,7 +21,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 Event functions are a new plugin primitive introduced in Open WebUI **0.10.0**.
 :::
 
-:::danger ⚠️ Critical Security Warning
+:::danger Critical Security Warning
 **Functions execute arbitrary Python code on your server**, and Event functions run automatically in response to system activity, not just when a user acts. Function creation is restricted to administrators. Only install from trusted sources and review code before importing. See the [Plugin Security Warning](/features/extensibility/plugin/).
 :::
 
@@ -99,16 +99,16 @@ Open WebUI emits **170+ events** spanning every subsystem. Each name is namespac
 | Area | Example events |
 | :--- | :--- |
 | **System** | `system.startup.started`, `system.startup.completed`, `system.shutdown.started`, `system.shutdown.completed` |
-| **Auth** | `auth.signup`, `auth.login`, `auth.logout`, `auth.password_changed`, `auth.api_key.created` |
+| **Auth** | `auth.signup`, `auth.login`, `auth.logout`, `auth.password_changed`, `auth.api_key.created`, `auth.sessions_revoked`, `auth.mfa.enrolled`, `auth.mfa.failed` |
 | **Users & groups** | `user.created`, `user.deleted`, `user.role_updated`, `user.permissions_updated`, `group.member_added` |
 | **Chats & messages** | `chat.created`, `chat.deleted`, `chat.shared`, `chat.archived`, `chat.compacted`, `chat.finished`, `chat.failed`, `message.created`, `message.reaction_added` |
-| **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `prompt.created` |
+| **Models & prompts** | `model.created`, `model.updated`, `model.access_updated`, `model.available`, `model.unavailable`, `prompt.created` |
 | **Knowledge & files** | `knowledge.created`, `knowledge.file.added`, `knowledge.reindexed`, `file.uploaded`, `file.deleted` |
 | **Plugins** | `tool.created`, `function.enabled`, `function.enable_started`, `function.disable_started`, `function.valves_updated`, `tool.valves_updated`, `skill.created` |
 | **Config** | `config.updated`, `config.models.updated`, `config.connections.updated`, `config.webhook.updated` |
 | **Other** | `channel.*`, `calendar.*`, `automation.*`, `memory.*`, `note.*`, `image.*`, `audio.*`, `terminal.*`, `feedback.*`, `notification.*` |
 
-A subset of these also drive user-facing [Notifications](/features/chat-conversations/chat-features/notifications): `chat.finished`, `chat.failed`, `channel.message` and `calendar.alert` are the four events a user can subscribe a webhook target to.
+Some of these also drive user-facing [Notifications](/features/chat-conversations/chat-features/notifications#events), which lists the events a user can subscribe a target to.
 
 The authoritative, complete list is exposed by the backend event catalog and shown in **Settings → Admin → General → Events** when configuring webhooks.
 
@@ -177,6 +177,7 @@ How often your `event()` runs depends on the event:
 
 - **Request-scoped events** (`auth.signup`, `chat.deleted`, `model.created`, …) fire on the **single** instance that handled that request. One signup, one handler call.
 - **Lifecycle events** (`system.startup.completed`, `system.shutdown.started`) fire on **every replica**, because every replica boots and shuts down independently. In a 4-replica deployment your startup handler runs **4 times**.
+- **Model list events** (`model.available`, `model.unavailable`) fire when a model appears in or disappears from the fetched model list. Each replica compares against its own previous fetch, so every replica that fetches the list reports the change. The first fetch after startup reports nothing.
 
 So the classic footgun: an Event function that logs signups, sends a "server is up" alert, or provisions a resource on startup will do it **once per replica**, not once globally, the moment you scale past a single instance.
 
@@ -228,7 +229,7 @@ Registering routes and calling admin endpoints from a function is powerful and e
 
 ## Configuration with Valves
 
-Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel > Functions > ⚙️**, not hard-coded.
+Like other functions, Event functions support [Valves](/features/extensibility/plugin/development/valves) for admin-configurable settings (and `UserValves` where relevant). Put your endpoints, allowlists, schedules, API keys, and toggles in `Valves` so the behavior is configured from **Admin Panel > Functions >**, not hard-coded.
 
 The `function.valves_updated` event also fires when an admin saves new Valve values, so a function can **react to its own configuration changing** and apply it live.
 

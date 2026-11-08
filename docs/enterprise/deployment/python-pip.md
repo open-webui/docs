@@ -43,11 +43,14 @@ flowchart TB
 
 ## Installation
 
-Install on each VM using pip with the `[all]` extra (includes PostgreSQL drivers):
+Install on each VM with the `postgres` extra, which adds the PostgreSQL and PGVector drivers:
 
 ```bash
-pip install open-webui[all]
+python3.12 -m venv /opt/open-webui/venv
+/opt/open-webui/venv/bin/pip install "open-webui[postgres]"
 ```
+
+The `all` extra also adds the optional vector store clients, Playwright and Unstructured; install it only if you use one of them.
 
 Create a systemd unit to manage the process:
 
@@ -60,7 +63,7 @@ After=network.target
 Type=simple
 User=openwebui
 EnvironmentFile=/etc/open-webui/env
-ExecStart=/usr/local/bin/open-webui serve
+ExecStart=/opt/open-webui/venv/bin/open-webui serve
 Restart=always
 RestartSec=5
 
@@ -68,24 +71,24 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
-Place your environment variables in `/etc/open-webui/env` (see [Critical Configuration](/enterprise/deployment#critical-configuration)).
+Place your environment variables in `/etc/open-webui/env` (see [Critical Configuration](/enterprise/deployment#critical-configuration)). Also set `DATA_DIR`, for example to `/var/lib/open-webui`, so local caches live outside the Python package directory, which is the default.
 
 ## Scaling Strategy
 
 - **Horizontal scaling**: Configure your auto-scaling group to add or remove VMs based on CPU utilization or request count.
-- **Health checks**: Point your load balancer health check at the `/health` endpoint (HTTP 200 when healthy).
-- **One process per VM**: Keep `UVICORN_WORKERS=1` and let the auto-scaler manage capacity. This simplifies memory accounting and avoids fork-safety issues with the default vector database.
-- **Sticky sessions**: Configure your load balancer for cookie-based session affinity to ensure WebSocket connections remain routed to the same instance.
+- **Health checks**: Point your load balancer health check at `/ready`, which answers once startup has finished and the database and Redis respond. `/health` only shows the process is running.
+- **One process per VM**: Keep `UVICORN_WORKERS=1` and let the auto-scaler manage capacity.
+- **Sticky sessions**: Optional; required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions).
 
 ## Key Considerations
 
 | Consideration | Detail |
 | :--- | :--- |
 | **OS patching** | You are responsible for OS updates, security patches, and Python runtime management. |
-| **Python environment** | Pin your Python version (3.11 recommended) and use a virtual environment or system-level install. |
+| **Python environment** | Use Python 3.11 or 3.12 (3.12 recommended) in a virtual environment. |
 | **Storage** | Use object storage (such as S3) or a shared filesystem (such as NFS) since VMs in an auto-scaling group do not share a local filesystem. |
 | **Tika sidecar** | Run a Tika server on each VM or as a shared service. A shared instance simplifies management. |
-| **Updates** | Scale the group to 1 instance, update the package (`pip install --upgrade open-webui`), wait for database migrations to complete, then scale back up. |
+| **Updates** | Scale the group to one instance, set `ENABLE_DB_MIGRATIONS=true` on it, update the package (`pip install --upgrade "open-webui[postgres]"`) and restart, wait for the migrations to finish, then scale back up with migrations off and the new version on every VM. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations). |
 
 For pip installation basics, see the [Quick Start guide](/getting-started/quick-start).
 

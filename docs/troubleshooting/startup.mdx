@@ -83,7 +83,7 @@ It happens when [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode)
 
 ### Cause
 
-Offline mode blocks the Hugging Face downloads and the version check. The default RAG embedding engine uses a **local SentenceTransformers model that must be downloaded once**. On a fresh install with offline mode already enabled, it was never cached, so there is nothing to load; the error surfaces on the first embedding call (0.9.6 aborted startup instead, fixed in 0.10.0).
+Offline mode blocks the Hugging Face downloads and the version check. The default RAG embedding engine uses a **local SentenceTransformers model that must be downloaded once**. On a fresh install with offline mode already enabled, it was never cached, so there is nothing to load. The error surfaces on the first embedding call.
 
 ### Fix
 
@@ -101,7 +101,7 @@ See the [Offline Mode guide](/tutorials/maintenance/offline-mode) for the full o
 
 ### Symptom
 
-On a fresh installation with no key set and no key file yet, `backend\start_windows.bat` prints `The system cannot find the file specified.` repeatedly while generating the key, then aborts:
+`backend\start_windows.bat` aborts at startup:
 
 ```text
 WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is enabled.
@@ -109,11 +109,11 @@ WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is ena
 
 ### Cause
 
-The key-generation step in older copies of the script wrote nothing, leaving an empty `.webui_secret_key` behind. The same copies also broke on an installation path containing spaces.
+The script reads the key from `.webui_secret_key` and generates one only when that file does not exist. An empty `.webui_secret_key`, left behind by an earlier failed run, is read as an empty key.
 
 ### Fix
 
-Update Open WebUI, and **delete the empty `.webui_secret_key` file first** from the `backend` folder. The script only generates a key when that file is missing, so an empty one left over from the failed run gives you the same abort.
+**Delete the empty `.webui_secret_key` file** from the `backend` folder and start again, so the script generates a key.
 
 Setting `WEBUI_SECRET_KEY` yourself also works, and is the right configuration for anything beyond a personal machine. With it set, the script skips key generation entirely.
 

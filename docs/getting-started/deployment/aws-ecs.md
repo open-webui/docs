@@ -15,7 +15,7 @@ For an overview of the architecture, see the existing [Container Service guide](
 
 | Component | Prepare before creating the service |
 | :--- | :--- |
-| Container image | Mirror `ghcr.io/open-webui/open-webui:v0.11.3` into ECR and use its immutable digest. Match the image architecture to the Fargate task. |
+| Container image | Mirror `ghcr.io/open-webui/open-webui:v0.13.0-slim` into ECR and use its immutable digest. Slim supports every service in this guide and leaves out the local machine-learning stack; see [slim](/getting-started/quick-start#what-slim-leaves-out). Match the image architecture to the Fargate task. |
 | ECS and networking | An ECS cluster, private subnets, and security groups. Allow image pulls, secret retrieval, log delivery, model APIs, and the backing-service connections. Use NAT or appropriate VPC endpoints for these paths. |
 | Database | RDS PostgreSQL or Aurora PostgreSQL, an application database and role, and the `vector` extension enabled by a database administrator. |
 | Redis | An ElastiCache Redis-compatible endpoint or another Redis service. Match Open WebUI's Redis mode and TLS settings to the actual service. |
@@ -45,13 +45,10 @@ In the ECS console, create a Linux Fargate task definition named `openwebui`:
 Set these non-secret environment values, replacing the example endpoints and bucket:
 
 ```ini
-HOST=0.0.0.0
-PORT=8080
 WEBUI_URL=https://ai.example.com
 UVICORN_WORKERS=1
 ENABLE_DB_MIGRATIONS=false
 ENABLE_OLLAMA_API=false
-ENABLE_WEBSOCKET_SUPPORT=true
 WEBSOCKET_MANAGER=redis
 VECTOR_DB=pgvector
 PGVECTOR_CREATE_EXTENSION=false
@@ -71,10 +68,10 @@ Create the credentials in Secrets Manager and map them into the container's **Se
 | Environment variable | Secret value |
 | :--- | :--- |
 | `WEBUI_SECRET_KEY` | A stable random signing key, identical on every instance. Generate once with `openssl rand -hex 32`. |
-| `DATABASE_URL` and `PGVECTOR_DB_URL` | The same PostgreSQL connection URL for this reference deployment, with your provider's required TLS parameters. |
-| `REDIS_URL` and `WEBSOCKET_REDIS_URL` | The same Redis connection URL, including authentication and TLS where configured. |
+| `DATABASE_URL` | The PostgreSQL connection URL, with your provider's required TLS parameters. PGVector uses it too unless you set `PGVECTOR_DB_URL`. |
+| `REDIS_URL` | The Redis connection URL, including authentication and TLS where configured. WebSockets use it too unless you set `WEBSOCKET_REDIS_URL`. |
 | `OPENAI_API_KEY` | Chat provider API key. |
-| `RAG_OPENAI_API_KEY` | Embedding provider API key. |
+| `RAG_OPENAI_API_KEY` | Embedding provider API key. Defaults to `OPENAI_API_KEY` when unset. |
 | `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` | Initial administrator credentials for an empty database. Keep the password in the secret store. |
 | `LICENSE_KEY` | Optional issued Enterprise license key. |
 
@@ -106,7 +103,7 @@ Use the same pinned application image as the service. Set `ENABLE_DB_MIGRATIONS=
 | Executable / entry point | `python` |
 | Arguments, as two separate values | `-c` and `import open_webui.config` |
 
-For **v0.11.3**, importing this module runs schema migrations when that flag is true and raises an error if they fail. This is a version-specific command based on the [application's migration implementation](https://github.com/open-webui/open-webui/blob/v0.11.3/backend/open_webui/config.py), not a stable public migration CLI. Recheck it when changing versions. It initializes the schema; normal application startup subsequently initializes runtime settings and the administrator account.
+Importing this module runs the schema migrations when that flag is true and exits with an error if they fail. It is an internal entry point, not a stable migration CLI, so recheck it against the [migration code](https://github.com/open-webui/open-webui/blob/v0.13.0/backend/open_webui/config.py) when you change versions. It initializes the schema; normal application startup subsequently initializes runtime settings and the administrator account.
 
 The migration container needs the same database connection, signing key, network access, and image-pull permissions. Run exactly one execution at a time, with automatic retries disabled, while all application instances using that database are stopped. Continue only when it exits successfully and the logs show no migration error.
 
@@ -118,9 +115,9 @@ Use **Run new task**, select Fargate, set task count to `1`, and use the applica
 
 Create an ECS service using the **application** task definition, with `ENABLE_DB_MIGRATIONS=false` and its normal command. Start with desired task count `1` and connect the ALB target group to container `openwebui`, port `8080`.
 
-Set the target group's health-check path to `/health/db`. Start with a service health-check grace period of 300 seconds and adjust based on measured startup time. `/health` can be used for a separate process-liveness check. Neither endpoint verifies model APIs or S3 permissions.
+Set the target group's health-check path to `/ready`, which answers once startup has finished and the database and Redis respond. Start with a service health-check grace period of 300 seconds and adjust it to the measured startup time. `/health` serves as a separate process-liveness check. Model APIs and S3 permissions need the checks under [Verify Before Adding Users](#verify-before-adding-users).
 
-Set ALB idle timeouts for your streaming workload and enable target-group stickiness if your Socket.IO transport needs affinity. Verify WebSockets and streamed responses through the ALB rather than relying on direct-container checks.
+Set ALB idle timeouts for your streaming workload. Target-group stickiness is optional; it is required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Verify WebSockets and streamed responses through the ALB.
 
 Use the AWS CLI to wait and inspect service events, replacing the identifiers:
 
@@ -160,9 +157,9 @@ An ECS rollback changes the image, not the database schema. Do not enable automa
 | Symptom | Check |
 | :--- | :--- |
 | Task cannot start or pull image | Execution role, ECR permissions, subnet egress/VPC endpoints, architecture, and Secrets Manager access. |
-| ALB reports unhealthy targets | IP target type, container port, task security group, `/health/db`, startup logs, and database connectivity. |
+| ALB reports unhealthy targets | IP target type, container port, task security group, `/ready`, startup logs, and database and Redis connectivity. |
 | Chats work but uploads fail | Task-role S3 permissions, bucket name/region, and extraction/embedding endpoints. |
-| Login loops across tasks | Shared signing key, common database, and both Redis URLs. |
-| Streams disconnect | ALB idle timeout, client reconnection, Redis mode, and target-group affinity. |
+| Login loops across tasks | Shared signing key, common database, and Redis URL. |
+| Streams disconnect | ALB idle timeout, client reconnection, and Redis mode. |
 
 Deleting the ECS service does not delete RDS, S3, or Secrets Manager resources provisioned separately. Remove resources deliberately according to your retention policy; keep restoreable backups before removing persistent services.

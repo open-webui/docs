@@ -2,7 +2,7 @@
 
 - [Docker Engine](https://docs.docker.com/engine/install/) installed and running
 - Open WebUI running (or ready to deploy alongside)
-- [Open WebUI Enterprise License](https://openwebui.com/enterprise) (required for production use)
+- [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise) (required for production use)
 
 ## Quick start with Docker Compose
 
@@ -97,7 +97,7 @@ The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to m
 | `TERMINALS_IDLE_TIMEOUT_MINUTES` | `0` (disabled) | Minutes of inactivity before a container is stopped. Set to `30` for typical usage. |
 | `TERMINALS_MAX_CPU` | (empty) | CPU limit for user containers (e.g., `2`). |
 | `TERMINALS_MAX_MEMORY` | (empty) | Memory limit for user containers (e.g., `4Gi`). |
-| `TERMINALS_OPEN_WEBUI_URL` | (empty) | If set, validates incoming JWTs against this Open WebUI instance instead of using `TERMINALS_API_KEY`. |
+| `TERMINALS_OPEN_WEBUI_URL` | (empty) | If set, validates user JWTs against this Open WebUI instance instead of using `TERMINALS_API_KEY`. The key stays required for the admin APIs. |
 | `TERMINALS_ENABLE_UI` | `true` | Serve the built-in minimal admin UI at `/`. Set `false` for API-only deployments. |
 | `TERMINALS_LOG_LEVEL` | `INFO` | Server and operator log level (DEBUG, INFO, WARNING, ERROR, CRITICAL). |
 
@@ -108,7 +108,7 @@ The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to m
 <details>
 <summary>Container lifecycle details</summary>
 
-**Naming.** Containers are named `terminals-<user-hash>` (where `<user-hash>` is the first 12 hex chars of the SHA-256 of the user ID, for a DNS-safe name), or `terminals-<user-hash>-<policy>` for non-default policies. They are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`.
+**Naming.** Containers are named `terminals-<user-hash>` (where `<user-hash>` is the first 12 hex chars of the SHA-256 of the user ID, for a DNS-safe name), or `terminals-<user-hash>-<policy>` for non-default policies. They are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`. One container is also provisioned under the user id `system`, which Open WebUI uses to read a policy's tool list and system prompt, so a row for a user you do not recognize is expected.
 
 **Health checks.** After creating a container, the orchestrator polls its `/health` endpoint until it returns HTTP 200 (up to 15 seconds). Only then does it start proxying traffic.
 

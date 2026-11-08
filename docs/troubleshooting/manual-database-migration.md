@@ -211,14 +211,14 @@ echo "WEBUI_SECRET_KEY: ${WEBUI_SECRET_KEY:0:10}..."
 ```
 
 :::note Local Installation Environment
-Local installations often have `DATABASE_URL` in a `.env` file, but Alembic's `env.py` may not automatically load `.env` files. You must explicitly export these variables in your shell before running Alembic commands.
+Local installations often have `DATABASE_URL` in a `.env` file, but Running `alembic` imports `open_webui.env`, which loads the repository's `.env`. A `.env` kept anywhere else is ignored, so export the variables in that case in your shell before running Alembic commands.
 :::
 
   </TabItem>
 </Tabs>
 
 :::danger Both Variables Required
-Alembic commands will fail with `Required environment variable not found` if `WEBUI_SECRET_KEY` is missing. Open WebUI's code imports `env.py` which validates this variable exists before Alembic can even connect to the database.
+Alembic commands will fail with `WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is enabled.` if `WEBUI_SECRET_KEY` is missing while `WEBUI_AUTH` is on. Open WebUI's code imports `env.py` which validates this variable exists before Alembic can even connect to the database.
 :::
 
 :::warning Path Syntax for SQLite
@@ -241,8 +241,8 @@ alembic heads
 # List all migration history
 alembic history
 
-# Show pending migrations (what would be applied)
-alembic upgrade head --sql | head -30
+# Show pending migrations (what an upgrade would apply)
+alembic history -r current:head
 
 # Check for branching (indicates issues)
 alembic branches
@@ -252,7 +252,7 @@ alembic branches
 
 ```
 # alembic current should show something like:
-ae1027a6acf (head)
+b8f2c6d91a04 (head)
 
 # If you see multiple heads or branching, your migration history has issues
 ```
@@ -261,7 +261,7 @@ ae1027a6acf (head)
 
 - `alembic current` = what version your database thinks it's at
 - `alembic heads` = what version the code expects
-- `alembic upgrade head --sql` = preview SQL that would be executed (doesn't apply changes)
+- `alembic history -r current:head` = every migration from your current version up to the latest, newest first; all lines above the bottom one are pending
 - If `current` is older than `heads`, you have pending migrations
 - If `current` equals `heads`, your database is up-to-date
 :::
@@ -331,7 +331,7 @@ If you need to apply migrations up to a specific point:
 alembic history
 
 # Upgrade to specific revision
-alembic upgrade ae1027a6acf
+alembic upgrade <revision>
 ```
 
 ### Downgrade (Rollback)
@@ -339,6 +339,10 @@ alembic upgrade ae1027a6acf
 :::danger Data Loss Risk
 Downgrading can cause **permanent data loss** if the migration removed columns or tables. Only downgrade if you understand the consequences.
 :::
+
+Downgrading past the [Apps](/features/channels/apps) migration (`c92da83b017f`) stops with `Export/remove app messages before downgrading apps` while any message posted by an app exists. Once those messages are gone it removes the app table and every app channel membership.
+
+Downgrading past the migration that adds sign-in records for [SCIM](/features/authentication-access/auth/scim#integration-with-sso) users (`0bd252b206fb`) keeps the records it added, since those accounts may have gained a password or two-factor sign-in after the upgrade.
 
 ```bash title="Terminal - Downgrade Migrations"
 # Downgrade one version
@@ -359,11 +363,11 @@ After running migrations, confirm everything is correct:
 # Verify current version matches expected
 alembic current
 # Should show (head) indicating you're at latest
-# Example: ae1027a6acf (head)
+# Example: b8f2c6d91a04 (head)
 
 # Confirm no pending migrations
-alembic upgrade head --sql | head -20
-# If output contains only comments or is empty, you're up to date
+alembic history -r current:head
+# If it shows a single line marked (head), you're up to date
 
 # Verify key tables exist (SQLite)
 sqlite3 /app/backend/data/webui.db ".tables" | grep -E "user|chat|model"
@@ -395,7 +399,7 @@ sqlite3 /app/backend/data/webui.db "SELECT COUNT(*) FROM user;"
   <TabItem value="local" label="Local Install">
     ```bash title="Terminal"
     # Start Open WebUI
-    python -m open_webui.main
+    open-webui serve
 
     # Watch for successful startup messages
     # Test by navigating to http://localhost:8080
@@ -430,7 +434,7 @@ or similar errors referencing other missing tables (e.g., `message`, `channel`).
 
 **Cause:** One or more Alembic migrations did not apply successfully. This can happen when:
 
-- A migration silently failed during an automated upgrade (Open WebUI logs the error but continues startup)
+- A migration failed during an automated upgrade (Open WebUI logs the traceback and aborts startup, so the container restarts in a loop)
 - The upgrade process was interrupted while migrations were running
 - `ENABLE_DB_MIGRATIONS=False` was set in the environment (disables automatic migrations on startup)
 - Multiple workers or replicas attempted to run migrations simultaneously
@@ -500,8 +504,8 @@ or similar errors for other tables (e.g., `access_grant`).
 
 **Cause:** A previous migration **partially completed**: the table was created in the database, but Alembic's version tracking was not updated (typically because the migration was interrupted during the data backfill step that runs after table creation). Alembic still thinks the migration hasn't been applied, so it tries to create the table again.
 
-:::tip Migrations are idempotent as of v0.9.6
-v0.9.6 reworked the bundled Alembic migrations to introspect the live schema and **skip tables, indexes, and columns that already exist** (and to add missing primary keys to legacy peewee-era tables). Many partially-applied-schema upgrades that used to fail with this error now complete cleanly on a straight `alembic upgrade head`. If you are hitting "table already exists" on an older version, upgrading to v0.9.6+ before manual intervention is often the simplest fix. The recovery steps below remain valid for databases mutated in other ways.
+:::tip Migrations are idempotent
+The bundled Alembic migrations introspect the live schema and **skip tables, indexes, and columns that already exist**, and add missing primary keys to legacy peewee-era tables. Many partially-applied-schema upgrades complete cleanly on a straight `alembic upgrade head`. The recovery steps below remain valid for databases mutated in other ways.
 :::
 
 **Diagnosis:**
@@ -1021,7 +1025,7 @@ If you're not comfortable with SQL or aren't sure which column is the duplicate,
 
 **What happens automatically:**
 
-1. Open WebUI's `internal/db.py` runs old Peewee migrations first via `handle_peewee_migration()`
+1. No Peewee migration code remains. The only Peewee-era handling is Alembic revision `461111b60977`, which adds missing primary keys to legacy tables. A leftover `migratehistory` table is inert.
 2. Then `config.py` runs Alembic migrations via `run_migrations()`
 3. Both systems should work transparently
 
@@ -1109,22 +1113,45 @@ Zero downtime but requires double infrastructure.
 
 ### Generate SQL Without Applying
 
-For review or audit purposes, generate the SQL that would be executed:
+To see the SQL changes without touching your real database, run the upgrade on a copy and diff its schema before and after. The upgrade output lists each migration it runs, and the diff shows the resulting schema changes as SQL.
 
-```bash title="Terminal - Generate Migration SQL"
-# Generate SQL for pending migrations
-alembic upgrade head --sql > /tmp/migration-plan.sql
+<Tabs groupId="database-type">
+  <TabItem value="sqlite" label="SQLite" default>
+    ```bash title="Terminal - Preview Upgrade on a Copy"
+    # Copy the database and save its current schema
+    cp /path/to/webui.db /tmp/webui-preview.db
+    sqlite3 /tmp/webui-preview.db ".schema" > /tmp/schema-before.sql
 
-# Review what would be applied
-cat /tmp/migration-plan.sql
-```
+    # Upgrade the copy
+    DATABASE_URL="sqlite:////tmp/webui-preview.db" alembic upgrade head
+
+    # Compare the schema after the upgrade
+    sqlite3 /tmp/webui-preview.db ".schema" > /tmp/schema-after.sql
+    diff /tmp/schema-before.sql /tmp/schema-after.sql
+    ```
+  </TabItem>
+  <TabItem value="postgresql" label="PostgreSQL">
+    ```bash title="Terminal - Preview Upgrade on a Copy"
+    # Copy the database (stop Open WebUI first so the source has no open connections)
+    createdb -h localhost -U your_user -T open_webui_db open_webui_preview
+    pg_dump -h localhost -U your_user -d open_webui_preview --schema-only > /tmp/schema-before.sql
+
+    # Upgrade the copy
+    DATABASE_URL="postgresql://user:password@localhost:5432/open_webui_preview" alembic upgrade head
+
+    # Compare the schema after the upgrade, then drop the copy
+    pg_dump -h localhost -U your_user -d open_webui_preview --schema-only > /tmp/schema-after.sql
+    diff /tmp/schema-before.sql /tmp/schema-after.sql
+    dropdb -h localhost -U your_user open_webui_preview
+    ```
+  </TabItem>
+</Tabs>
 
 **Use cases:**
 
 - DBA review in enterprise environments
 - Understanding what changes will occur
 - Debugging migration issues
-- Applying migrations in restricted environments
 
 :::info When to Use This
 This is advanced functionality for DBAs or DevOps engineers. Regular users should just run `alembic upgrade head` directly.
@@ -1132,26 +1159,21 @@ This is advanced functionality for DBAs or DevOps engineers. Regular users shoul
 
 ### Offline Migration (No Network)
 
-If your database server is offline or isolated:
+If your database server is offline or isolated, upgrade a copy of the SQLite database on a machine running the same Open WebUI version, then put it back:
 
 ```bash title="Terminal - Offline Migration Workflow"
-# 1. Generate SQL on development machine
-alembic upgrade head --sql > upgrade-to-head.sql
+# 1. Stop Open WebUI on production, then transfer the database to the development machine
+scp production-server:/app/backend/data/webui.db /tmp/webui.db
 
-# 2. Transfer SQL file to production
-scp upgrade-to-head.sql production-server:/tmp/
+# 2. On the development machine, upgrade the copy
+DATABASE_URL="sqlite:////tmp/webui.db" alembic upgrade head
 
-# 3. On production, apply SQL manually
-sqlite3 /app/backend/data/webui.db < /tmp/upgrade-to-head.sql
+# 3. Confirm it reached the latest version
+DATABASE_URL="sqlite:////tmp/webui.db" alembic current
 
-# 4. Update alembic_version table manually
-sqlite3 /app/backend/data/webui.db \
-  "UPDATE alembic_version SET version_num='<target_revision>';"
+# 4. Transfer the upgraded database back to production and start Open WebUI
+scp /tmp/webui.db production-server:/app/backend/data/webui.db
 ```
-
-:::danger Manual alembic_version Updates
-Only update `alembic_version` if you've **actually applied** the corresponding migrations. Lying to Alembic about migration state causes permanent corruption.
-:::
 
 ## Recovery Procedures
 

@@ -88,7 +88,7 @@ Tailscale can provision trusted Let's Encrypt certificates for your tailnet host
 
 For the full step-by-step HTTPS setup (certificate generation, `tailscale serve`, configuring `WEBUI_URL`), see the dedicated reference guide:
 
-👉 [**HTTPS using Tailscale**](/reference/https/tailscale)
+[**HTTPS using Tailscale**](/reference/https/tailscale)
 
 The short version:
 

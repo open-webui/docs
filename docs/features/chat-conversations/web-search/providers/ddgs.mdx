@@ -28,7 +28,7 @@ It reaches each search provider through that provider's public pages rather than
 ### Setup
 
 1.  Enable **Web Search** in the Admin Settings.
-2.  Select **DDGS** as the **Web Search Engine**.
+2.  Select **DDGS** as the **Web Search Engine**. The engine value behind that entry is `duckduckgo`, so set `WEB_SEARCH_ENGINE=duckduckgo` when configuring by environment variable. `ddgs` matches nothing. The entry is disabled on the slim image, where DDGS is unavailable.
 3.  Choose your desired **DDGS Backend** from the dropdown menu.
 
 #### DDGS Backend Options

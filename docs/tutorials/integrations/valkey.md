@@ -13,9 +13,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## What is Valkey?
 
-[Valkey](https://valkey.io/) is an open-source (BSD-licensed) fork of Redis, started by the community and the Linux Foundation after Redis changed its license. It speaks the **Redis protocol**, so Open WebUI talks to it through the exact same `REDIS_*` settings; there is no Valkey-specific code path for caching or websockets. If you want the permissively-licensed option, Valkey is a drop-in replacement for Redis everywhere Open WebUI uses it: token revocation on sign-out, websocket coordination, and shared state across multiple workers or instances.
-
-In short, this is the **same setup as the [Redis tutorial](/tutorials/integrations/redis)** with the Valkey image swapped in. Everything Open WebUI needs is still passed as `REDIS_URL` and the other `REDIS_*` variables.
+[Valkey](https://valkey.io/) is a BSD-licensed fork of Redis that speaks the **Redis protocol**, so Open WebUI talks to it through the same `REDIS_*` settings. This is the **same setup as the [Redis tutorial](/tutorials/integrations/redis)** with the Valkey image swapped in. Valkey is not part of what Open WebUI tests; see [Step 2: Add Redis](/getting-started/advanced-topics/scaling#step-2-add-redis) for what that means.
 
 :::info Two different "Valkey" features, do not mix them up
 - **Valkey as the Redis layer (this page)** is the cache, websocket and session store. It is configured with **`REDIS_URL`** and the `redis://` scheme, because Open WebUI uses the Redis protocol.
@@ -26,7 +24,7 @@ They are unrelated and you can run either, both, or neither. This tutorial is ab
 
 ## When do you need it?
 
-The rules are the same as for Redis: a single instance with `UVICORN_WORKERS=1` does not strictly need it, but multi-worker (`UVICORN_WORKERS > 1`) and multi-instance deployments do, and without it signing out cannot revoke a JWT until it expires. See [When is Redis Required?](/tutorials/integrations/redis#when-is-redis-required) for the full breakdown, and the [Scaling guide](/getting-started/advanced-topics/scaling) for where it fits in a larger deployment.
+The same as for Redis: see [When is Redis Required?](/tutorials/integrations/redis#when-is-redis-required).
 
 ## Setting up Valkey
 
@@ -39,7 +37,7 @@ services:
     container_name: valkey
     volumes:
       - valkey-data:/data
-    command: "valkey-server --save 30 1 --maxclients 10000 --timeout 1800"
+    command: "valkey-server --save 30 1 --appendonly yes --maxmemory-policy noeviction --maxclients 10000 --timeout 1800"
     healthcheck:
       test: "[ $$(valkey-cli ping) = 'PONG' ]"
       start_period: 5s
@@ -76,7 +74,7 @@ docker network create openwebui-network
 ```
 
 :::tip Do not skip `--maxclients` and `--timeout`
-These flags are not decoration. With the default `timeout 0`, idle connections never close and slowly accumulate until they hit the limit, which one day locks every user out with a 500 on login. The full reasoning, plus the matching client-side `REDIS_HEALTH_CHECK_INTERVAL`, is in the Redis tutorial's [Critical: Redis Server Configuration](/tutorials/integrations/redis#critical-redis-server-configuration) section and applies identically to Valkey.
+With the default `timeout 0`, idle connections never close and accumulate until they hit the limit, which locks every user out with a 500 on login. See [Critical: Redis Server Configuration](/tutorials/integrations/redis#critical-redis-server-configuration), which applies to Valkey as well.
 :::
 
 ## Connecting Open WebUI
@@ -85,18 +83,12 @@ Point Open WebUI at the Valkey container. The variables and the `redis://` schem
 
 ```bash
 REDIS_URL="redis://valkey:6379/0"
-
-# Websocket support
-ENABLE_WEBSOCKET_SUPPORT="true"
 WEBSOCKET_MANAGER="redis"
-WEBSOCKET_REDIS_URL="redis://valkey:6379/1"
 ```
 
 :::info The scheme stays `redis://`
 Open WebUI connects over the Redis protocol, so the connection string is `redis://...` even though the server is Valkey. There is no `valkey://` form of these variables (that scheme belongs to the unrelated vector-database feature noted above).
 :::
-
-For everything beyond the basics (Sentinel, Cluster, AWS Elasticache, key prefixes, CORS for websockets, connection health checks), use the [Redis tutorial's configuration section](/tutorials/integrations/redis#configuring-open-webui) as the reference. Every variable is the same.
 
 ## Verify
 

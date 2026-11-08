@@ -17,7 +17,7 @@ pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 
 :::
 
-## 🚀 Quick Start with Docker Compose
+## Quick Start with Docker Compose
 
 The fastest way to get started with observability is to download the example Compose file and start Open WebUI with a local Grafana LGTM stack:
 
@@ -39,7 +39,7 @@ After startup:
 - Grafana is available at [http://localhost:3000](http://localhost:3000) with `admin` / `admin`
 - Open WebUI sends OTLP data to `http://lgtm:4317` from inside the Compose network
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 You can configure OpenTelemetry in Open WebUI with these environment variables (as used in the Compose file):
 
@@ -78,7 +78,7 @@ Override defaults in your `.env` file or Compose file as needed.
       # You may set OTEL_BASIC_AUTH_USERNAME/PASSWORD here if needed
 ```
 
-## 📊 Data Collection
+## Data Collection
 
 ### Distributed Tracing
 
@@ -106,7 +106,9 @@ WebUI exports the following metrics via OpenTelemetry:
 
 Metrics are sent via OTLP (default every 10 seconds, configurable via `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`) and can be visualized in **Grafana** (via Prometheus/Mimir).
 
-## 🔧 Custom Collector Setup
+To leave routes such as health checks out of both traces and HTTP metrics, set `OTEL_PYTHON_FASTAPI_EXCLUDED_URLS` (or `OTEL_PYTHON_EXCLUDED_URLS`) to comma-separated regular expressions. Each is matched anywhere in the request URL, so `/health,/_app/immutable/.*` also covers `/health/db`.
+
+## Custom Collector Setup
 
 To use a different (external) OpenTelemetry Collector/Stack:
 
@@ -163,7 +165,7 @@ service:
       exporters: [otlphttp/arize]
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 **Traces/metrics not appearing in Grafana?**
 

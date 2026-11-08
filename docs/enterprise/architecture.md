@@ -32,7 +32,7 @@ For organizations with demanding uptime requirements, Open WebUI supports produc
 | **Load Balancing** | Multiple container instances behind a load balancer for resilience and optimal performance. |
 | **External Databases** | PostgreSQL for the main database (SQLite is not supported for multi-instance). |
 | **External Vector Database** | A client-server vector database (PGVector, Milvus, Qdrant) or ChromaDB in HTTP server mode. The default ChromaDB local mode uses SQLite which is not safe for multi-process access. |
-| **Redis** | Required for session management, WebSocket coordination, and configuration sync across instances. |
+| **Redis** | Required for WebSocket coordination, token revocation, and shared caches (such as the model list) across instances. Configuration is shared through the common PostgreSQL database, not Redis. |
 | **Persistent Storage** | Flexible storage backends to meet your data residency and performance requirements. |
 | **Observability** | Integration with modern logging and metrics tools for proactive monitoring. |
 
@@ -42,9 +42,9 @@ When properly configured, Open WebUI is designed to support high availability su
 
 Open WebUI isn't theoretically scalable, it's **deployed at scale**. The platform is already trusted in deployments supporting extremely high user counts, including:
 
-* 🎓 **Universities** managing institution-wide AI access.
-* 🏢 **Multinational Enterprises** deploying across regions and business units.
-* 🏛️ **Major Organizations** requiring consistent performance under heavy load.
+* **Universities** managing institution-wide AI access.
+* **Multinational Enterprises** deploying across regions and business units.
+* **Major Organizations** requiring consistent performance under heavy load.
 
 With the right infrastructure configuration, Open WebUI scales from pilot projects to mission-critical worldwide rollouts.
 

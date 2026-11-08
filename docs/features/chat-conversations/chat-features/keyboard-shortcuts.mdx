@@ -7,7 +7,7 @@ title: "Keyboard Shortcuts"
 
 Open WebUI ships with keyboard shortcuts for the things you do constantly, and most of them can be **rebound to keys you prefer**. Shortcuts are per user and stored with your settings.
 
-Manage them in **Settings > Keyboard**. Each configurable shortcut can be reassigned individually, or left unassigned, and a **Reset Defaults** button restores **all** of them at once. There is no per-shortcut reset.
+Manage them in **Settings > Keyboard**. Click a shortcut's keys to record new ones. The small **x** beside a shortcut unassigns it. **Reset Defaults** restores all of them.
 
 ## Turning Shortcuts Off
 
@@ -15,50 +15,88 @@ An **Enable Keyboard Shortcuts** toggle at the top of **Settings > Keyboard** sw
 
 Turn it off when Open WebUI's shortcuts collide with ones your browser or operating system already uses, `Cmd+Shift+C` for the browser inspector being a common example. While it is off, the configurable shortcuts below do not fire and the key combinations pass through to the browser or OS untouched, dictation included, and the small hotkey hints stop appearing in the interface.
 
+To stop a single shortcut, unassign it. Its key combination then reaches the browser like any other. That is the usual fix for **Regenerate Response**, bound by default to the keys browsers use to reload the page.
+
 Nothing locks you out: the **Settings > Keyboard** tab keeps working while shortcuts are disabled, so you can rebind them or switch them back on at any time. The chat input triggers (`/`, `@`, `#`), `Tab` to accept an autocomplete suggestion, and `Esc` to stop a response or close a dialog are unaffected, since they are not global shortcuts.
 
 `Cmd` below means the `Ctrl` key on Windows and Linux. On macOS it means the `Command` key specifically: `Ctrl` is treated as its own modifier there and does not stand in for `Cmd`, so `Ctrl+K` will not open search on a Mac, only `Cmd+K` will.
 
 ## Configurable Shortcuts
 
-These eighteen can be rebound:
+These can be rebound. The tab shortcuts are listed in their own table below. Anything not listed in either table is fixed and cannot be reassigned.
 
 | Action | Default |
 |---|---|
-| New chat | `Cmd+Shift+O` |
-| New temporary chat | `Cmd+Shift+'` |
-| Delete chat | `Cmd+Shift+Backspace` |
-| Open model selector | `Cmd+Shift+M` |
-| Toggle dictation | `Cmd+Shift+L` |
-| Navigate to previous chat | *(unassigned)* |
-| Navigate to next chat | *(unassigned)* |
+| New Chat | `Cmd+Shift+O` |
+| New Temporary Chat | `Cmd+Shift+'` |
+| Delete Chat | `Cmd+Shift+Backspace` |
+| Open Model Selector | `Cmd+Shift+M` |
+| Toggle Dictation | `Cmd+Shift+L` |
+| Navigate to Previous Chat | *(unassigned)* |
+| Navigate to Next Chat | *(unassigned)* |
 | Search | `Cmd+K` |
-| Open settings | `Cmd+.` |
-| Show shortcuts | `Cmd+/` |
-| Toggle sidebar | `Cmd+Shift+S` |
+| Open Settings | `Cmd+.` |
+| Show Shortcuts | `Cmd+/` |
+| Toggle Sidebar | `Cmd+Shift+S` |
 | Toggle Controls | *(unassigned)* |
-| Close modal | `Escape` |
-| Focus input | `Shift+Escape` |
-| Generate message pair | `Cmd+Shift+Enter` |
-| Regenerate response | `Cmd+R` |
-| Allow tool call | `Cmd+Alt+Enter` |
-| Deny tool call | `Cmd+Alt+Backspace` |
-| Copy last code block | `Cmd+Shift+;` |
-| Copy last response | `Cmd+Shift+C` |
+| Close Modal | `Escape` |
+| Focus Chat Input | `Shift+Escape` |
+| Clear Input Selections | `Escape` |
+| Generate Message Pair | `Cmd+Shift+Enter` |
+| Regenerate Response | `Cmd+R` |
+| Allow Tool Call | `Cmd+Alt+Enter` |
+| Deny Tool Call | `Cmd+Alt+Backspace` |
+| Copy Last Code Block | `Cmd+Shift+;` |
+| Copy Last Response | `Cmd+Shift+C` |
 
-Anything not listed here is fixed and cannot be reassigned.
+**Generate Message Pair** adds the text in the chat input as your message, with a placeholder reply for each selected model that you can then edit by hand.
 
-**Allow tool call** and **Deny tool call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
+**Clear Input Selections** resets the chat input's choices: it removes the model override, deselects tools and filters and turns off web search, image generation and code interpreter. It only fires while the chat input has focus.
 
-Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to previous / next chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle Controls** opens and closes the chat controls panel. They are left unbound so they cannot collide with an existing binding on arrival, pick keys that suit you.
+**Close Modal** closes only the dialog on top, so a confirmation opened over **Settings** closes and leaves **Settings** open. `Escape` always closes dialogs, so keys you assign here work alongside `Escape`, not in place of it.
 
-**Delete chat** follows the [Chat Delete permission](/features/authentication-access/rbac/permissions#3-chat-permissions). If an administrator has taken it away, the shortcut stays bound and listed but does nothing, in step with the delete actions being hidden from the sidebar and the menus. Admins are always exempt.
+### Tab Shortcuts
 
-:::info Changes in this release
-Shortcuts used to be a fixed list shown in a modal. They are now rebindable and live in **Settings > Keyboard**; the separate shortcuts modal is gone.
+These sit under **Tabs** in **Settings > Keyboard** and work in the [workspace tabs](/features/chat-conversations/chat-features/#tabs-side-panel). `Cmd` means `Ctrl` off Mac as above, but **New Terminal** uses `Ctrl` on every system. A shortcut does nothing when its tab is not available, for example the terminal ones without a selected terminal that supports them.
 
-One default changed: **Delete chat** is now `Cmd+Shift+Backspace` only. It previously also responded to `Delete`.
-:::
+| Action | Default |
+|---|---|
+| Files | `Cmd+Shift+E` |
+| Desktop | `Cmd+Alt+D` |
+| New Chat Tab | `Cmd+Alt+O` |
+| Comments | `Cmd+Shift+Y` |
+| New File | `Cmd+Alt+N` |
+| New Terminal | `Ctrl+backtick` |
+| New Browser | `Cmd+Shift+B` |
+| Close Tab | `Cmd+W` |
+| Next Tab | `Cmd+Shift+]` |
+| Previous Tab | `Cmd+Shift+[` |
+| Toggle Split | `Cmd+\` |
+| Quick Open | `Cmd+P` |
+| Voice Note | `Cmd+Alt+M` |
+
+**Quick Open** searches the files of the selected terminal by name. **Voice Note** records from your microphone. **Transcribe** then turns the recording into text with the speech-to-text engine set in **Admin Settings > Audio**, for users with the **Allow Speech to Text** [permission](/features/authentication-access/rbac/permissions#3-chat-permissions). It is not available while the engine is the browser's. **Save** writes a Markdown note with the transcript and a link to the audio, plus the audio file, to the terminal's current folder.
+
+## Fixed Shortcuts
+
+These eight are built in and cannot be rebound. **Settings > Keyboard** lists them for reference.
+
+| Action | Key | Active when |
+|---|---|---|
+| Accept Autocomplete Generation, Jump to Prompt Variable | `Tab` | The chat input is focused |
+| Prevent File Creation | `Cmd+Shift+V` | Pasting in a chat or a channel while **Paste Large Text as File** is on |
+| Attach File From Knowledge | `#` | Typed in the chat input |
+| Add Custom Prompt | `/` | Typed in the chat input |
+| Talk to Model | `@` | Typed in the chat input |
+| Stop Generating | `Escape` | The chat input is focused and a response is being generated |
+| Edit Last Message | `ArrowUp` | The chat input is focused |
+| Toggle Mute | `M` | Voice mode |
+
+**Allow Tool Call** and **Deny Tool Call** apply to a reply that is waiting for approval, which only happens when [Tool Permissions](/features/extensibility/plugin/tools#tool-approval) is on and the chat is set to ask first. They act on the most recent call still waiting, so with several pending you answer them one keypress at a time. At any other moment they do nothing and the keystroke passes through.
+
+Three of them ship **unassigned** and do nothing until you give them keys in **Settings > Keyboard**. **Navigate to Previous Chat** and **Navigate to Next Chat** step through the sidebar chat list in order, moving to the chat above or below the one you have open, and start at the top of the list if the current chat is not in it. **Toggle Controls** opens and closes the [tabs panel](/features/chat-conversations/chat-features/#tabs-side-panel) on a small screen. They are left unbound so they cannot collide with an existing binding on arrival, pick keys that suit you.
+
+**Delete Chat** follows the [Chat Delete permission](/features/authentication-access/rbac/permissions#3-chat-permissions). If an administrator has taken it away, the shortcut is not listed in **Settings > Keyboard** and does nothing, in step with the delete actions being hidden from the sidebar and the menus. **New Temporary Chat** is likewise not listed without the **Allow Temporary Chat** permission. Admins are always exempt.
 
 ## Chat Input Triggers
 
@@ -77,3 +115,7 @@ The `/` menu includes a **Model** entry that opens the model picker with its sea
 ## Keyboard Navigation
 
 Distinct from the shortcuts above, stepping through the interface with `Tab` and `Shift+Tab` works everywhere and is unaffected by the **Enable Keyboard Shortcuts** toggle. Whatever you have reached is marked with a clear outline, so you can always see where you are. Buttons that normally appear under the pointer, such as the actions under a message, appear when you reach them with `Tab` as well.
+
+The first `Tab` on a page reaches a **Skip to main content** link. Tooltips also show on keyboard focus, and `Escape` closes them. Opening a menu from the keyboard moves focus to its first item, and arrow keys move through it.
+
+Screen readers get names for icon buttons and hear reply status, notifications and the call status as they change.

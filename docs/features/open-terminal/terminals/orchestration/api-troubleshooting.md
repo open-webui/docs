@@ -112,7 +112,7 @@ Use policy `env` for values that should appear inside per-user Open Terminal con
 
 The user probably already had a running terminal. Save the policy, then refresh matching terminals or wait for idle teardown.
 
-### Why can users no longer browse to `/etc` in the file browser?
+### Why can't users browse to `/etc` in the file browser?
 
 For orchestrated terminals, the file browser intentionally starts inside the root reported by Open Terminal and hides parents above that root. By default that root is `Home`. This prevents confusing support cases. It is not a security boundary.
 

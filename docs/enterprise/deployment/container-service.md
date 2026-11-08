@@ -49,21 +49,21 @@ Use **versioned tags** for production stability:
 ghcr.io/open-webui/open-webui:v0.x.x
 ```
 
-Avoid the `:main` tag in production. It tracks the latest development build and can introduce breaking changes without warning. Check the [Open WebUI releases](https://github.com/open-webui/open-webui/releases) for the latest stable version.
+Avoid the rolling `:main` and `:latest` tags in production; pin a `v0.x.y` tag from the [Open WebUI releases](https://github.com/open-webui/open-webui/releases). With PostgreSQL, PGVector, S3 storage and external embedding and extraction services, the `v0.x.y-slim` variant is enough and much smaller. See [image variants](/getting-started/quick-start#image-variants).
 
 ## Scaling Strategy
 
 - **Platform-native auto-scaling**: Configure your container service to scale on CPU utilization, memory, or request count.
-- **Health checks**: Use the `/health` endpoint for both liveness and readiness probes.
+- **Health checks**: Use `/health` for liveness and `/ready` for readiness; `/ready` waits for startup to finish and checks database and Redis connectivity.
 - **Task-level env vars**: Pass all shared infrastructure configuration as environment variables or secrets in your task definition.
-- **Session affinity**: Enable sticky sessions on your load balancer for WebSocket stability. While Redis handles cross-instance coordination, session affinity reduces unnecessary session handoffs.
+- **Session affinity**: Optional; required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). With `WEBSOCKET_MANAGER=redis`, Redis carries live updates between instances either way.
 
 ## Key Considerations
 
 | Consideration | Detail |
 | :--- | :--- |
 | **Storage** | Use object storage (S3, GCS, Azure Blob) or a shared filesystem (such as EFS). Container-local storage is ephemeral and not shared across tasks. |
-| **Tika sidecar** | Run Tika as a sidecar container in the same task definition, or as a separate service. Sidecar pattern keeps extraction traffic local. |
+| **Tika sidecar** | Run Tika as a sidecar container in the same task definition, or as a separate service. A sidecar keeps extraction traffic local. |
 | **Secrets management** | Use your platform's secrets manager (AWS Secrets Manager, Azure Key Vault, GCP Secret Manager) for `DATABASE_URL`, `REDIS_URL`, and `WEBUI_SECRET_KEY`. |
 | **Updates** | Scale the service down to a single task, deploy the new image on it (`ENABLE_DB_MIGRATIONS=true`), wait for it to become healthy, then scale the remaining tasks back up (`ENABLE_DB_MIGRATIONS=false`). Rolling updates are not supported across a release that changes the schema, so old and new tasks must never serve traffic at the same time. See [Updates and Migrations](/troubleshooting/multi-replica#updates-and-migrations). |
 
@@ -74,7 +74,7 @@ Avoid the `:main` tag in production. It tracks the latest development build and 
 | Using local SQLite | Data loss on task restart, database locks with multiple tasks | Set `DATABASE_URL` to PostgreSQL |
 | Default ChromaDB | SQLite-backed vector DB crashes under multi-process access | Set `VECTOR_DB=pgvector` (or Milvus/Qdrant) |
 | Inconsistent `WEBUI_SECRET_KEY` | Login loops, 401 errors, sessions that don't persist across tasks | Set the same key on every task via secrets manager |
-| No Redis | WebSocket failures, config not syncing, "Model Not Found" errors | Set `REDIS_URL` and `WEBSOCKET_MANAGER=redis` |
+| No Redis | WebSocket failures, "Model Not Found" errors | Set `REDIS_URL` and `WEBSOCKET_MANAGER=redis` |
 
 For container basics, see the [Quick Start guide](/getting-started/quick-start).
 

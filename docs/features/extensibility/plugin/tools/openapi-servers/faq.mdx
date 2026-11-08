@@ -3,7 +3,7 @@ sidebar_position: 10
 title: "FAQ"
 ---
 
-#### 🌐 Q: Why isn't my local OpenAPI tool server accessible from the WebUI interface?
+#### Q: Why isn't my local OpenAPI tool server accessible from the WebUI interface?
 
 **A:** If you added the server under your own **Settings → Integrations**, the browser calls it directly, so a tool server on `http://localhost:8000` is subject to CORS (Cross-Origin Resource Sharing). Global tool servers added in Admin Settings are called by the Open WebUI backend instead, and CORS never applies to them.
 
@@ -31,7 +31,7 @@ To work securely in production over HTTPS, your OpenAPI servers must also be ser
 
 ---
 
-#### 🚀 Q: Do I need to use FastAPI for my server implementation?
+#### Q: Do I need to use FastAPI for my server implementation?
 
 **A:**  No! While our reference implementations are written using FastAPI for clarity and ease of use, you can use any framework or language that produces a valid OpenAPI (Swagger) specification. Some common choices include:
 
@@ -46,33 +46,33 @@ It is important to set a custom operationId for all endpoints.
 
 ---
 
-#### 🚀 Q: Why choose OpenAPI over MCP?
+#### Q: Why choose OpenAPI over MCP?
 
 **A:** OpenAPI wins over MCP in most real-world scenarios due to its simplicity, tooling ecosystem, stability, and developer-friendliness. Here's why:
 
-- ✅ **Reuse Your Existing Code**: If you’ve built REST APIs before, you're mostly done: you don’t need to rewrite your logic. Just define a compliant OpenAPI spec and expose your current code as a tool server.
+- **Reuse Your Existing Code**: If you’ve built REST APIs before, you're mostly done: you don’t need to rewrite your logic. Just define a compliant OpenAPI spec and expose your current code as a tool server.
 
   With MCP, you had to reimplement your tool logic inside a custom protocol layer, duplicating work and increasing the surface area to maintain.
 
-- 💼 **Less to Maintain & Debug**: OpenAPI fits naturally into modern dev workflows. You can test endpoints with Postman, inspect logs with built-in APIs, troubleshoot easily with mature ecosystem tools, and often without modifying your core app at all.
+- **Less to Maintain & Debug**: OpenAPI fits naturally into modern dev workflows. You can test endpoints with Postman, inspect logs with built-in APIs, troubleshoot easily with mature ecosystem tools, and often without modifying your core app at all.
 
   MCP introduced new layers of transport, schema parsing, and runtime quirks, all of which had to be debugged manually.
 
-- 🌍 **Standards-Based**: OpenAPI is widely adopted across the tech industry. Its well-defined structure means tools, agents, and servers can interoperate immediately, without needing special bridges or translations.
+- **Standards-Based**: OpenAPI is widely adopted across the tech industry. Its well-defined structure means tools, agents, and servers can interoperate immediately, without needing special bridges or translations.
 
-- 🧰 **Better Tooling**: There’s an entire universe of tools that support OpenAPI: automatic client/server generation, documentation, validation, mocking, testing, and even security audit tools.
+- **Better Tooling**: There’s an entire universe of tools that support OpenAPI: automatic client/server generation, documentation, validation, mocking, testing, and even security audit tools.
 
-- 🔐 **First-Class Security Support**: OpenAPI includes native support for things like OAuth2, JWTs, API Keys, and HTTPS, making it easier to build secure endpoints with common libraries and standards.
+- **First-Class Security Support**: OpenAPI includes native support for things like OAuth2, JWTs, API Keys, and HTTPS, making it easier to build secure endpoints with common libraries and standards.
 
-- 🧠 **More Devs Already Know It**: Using OpenAPI means you're speaking a language already familiar to backend teams, frontend developers, DevOps, and product engineers. There’s no learning curve or costly onboarding required.
+- **More Devs Already Know It**: Using OpenAPI means you're speaking a language already familiar to backend teams, frontend developers, DevOps, and product engineers. There’s no learning curve or costly onboarding required.
 
-- 🔄 **Future-Proof & Extensible**: OpenAPI evolves with API standards and is designed for forward compatibility. MCP, by contrast, was less standardized, often requiring changes as the surrounding ecosystem changed.
+- **Future-Proof & Extensible**: OpenAPI evolves with API standards and is designed for forward compatibility. MCP, by contrast, was less standardized, often requiring changes as the surrounding ecosystem changed.
 
-🧵 Bottom line: OpenAPI lets you do more with less effort, less code duplication, and fewer surprises. It’s a production-ready, developer-friendly route to powering LLM tools, without rebuilding everything from scratch.
+Bottom line: OpenAPI lets you do more with less effort, less code duplication, and fewer surprises. It’s a production-ready, developer-friendly route to powering LLM tools, without rebuilding everything from scratch.
 
 ---
 
-#### 🔐 Q: How do I secure my OpenAPI tool server?
+#### Q: How do I secure my OpenAPI tool server?
 
 **A:** OpenAPI supports industry-standard security mechanisms like:
 
@@ -85,7 +85,7 @@ Use HTTPS in production to encrypt data in transit, and restrict endpoints with 
 
 ---
 
-#### ❓ Q: What kind of tools can I build using OpenAPI tool servers?
+#### Q: What kind of tools can I build using OpenAPI tool servers?
 
 **A:** If it can be exposed via a REST API, you can build it. Common tool types include:
 
@@ -99,7 +99,7 @@ Use HTTPS in production to encrypt data in transit, and restrict endpoints with 
 
 ---
 
-#### 🔌 Q: Can I run more than one tool server at the same time?
+#### Q: Can I run more than one tool server at the same time?
 
 **A:** Absolutely. Each tool server runs independently and exposes its own OpenAPI schema. Your agent configuration can point to multiple tool servers, allowing you to mix and match based on need.
 
@@ -107,7 +107,13 @@ There's no limit: just ensure each server runs on its own port or address and is
 
 ---
 
-#### 🧪 Q: How do I test a tool server before linking it to an LLM agent?
+#### Q: My global tool servers were down and their tools disappeared. Do I need to restart Open WebUI?
+
+**A:** No. When every enabled server was unreachable, the next request tries them again, so the tools come back on their own once a server is reachable. When only some servers were down, they come back after a restart or after saving the tool server settings in **Settings → Admin → Integrations**.
+
+---
+
+#### Q: How do I test a tool server before linking it to an LLM agent?
 
 **A:** You can test your OpenAPI tool servers using:
 
@@ -121,7 +127,7 @@ Once validated, you can register the tool server with an LLM agent or through Op
 
 ---
 
-#### 🛠️ Q: Can I extend or customize the reference servers?
+#### Q: Can I extend or customize the reference servers?
 
 **A:** Yes! All servers in the servers/ directory are built to be simple templates. Fork and modify them to:
 
@@ -133,7 +139,7 @@ Once validated, you can register the tool server with an LLM agent or through Op
 
 ---
 
-#### 🌍 Q: Can I run OpenAPI tool servers on cloud platforms like AWS or GCP?
+#### Q: Can I run OpenAPI tool servers on cloud platforms like AWS or GCP?
 
 **A:** Yes. These servers are plain HTTP services. You can deploy them as:
 
@@ -147,9 +153,9 @@ Just make sure they’re securely configured and publicly reachable (or VPN'd) i
 
 ---
 
-#### 🧪 Q: What if I have an existing MCP server?
+#### Q: What if I have an existing MCP server?
 
-**A:** Great news! You can use our MCP-to-OpenAPI Bridge: [mcpo](https://github.com/open-webui/mcpo), exposing your existing MCP-based tools as OpenAPI-compatible APIs is now easier than ever. No rewrites, no headaches, just plug and go! 🚀
+**A:** Great news! You can use our MCP-to-OpenAPI Bridge: [mcpo](https://github.com/open-webui/mcpo), exposing your existing MCP-based tools as OpenAPI-compatible APIs is now easier than ever. No rewrites, no headaches, just plug and go!
 
 If you've already built tools using the MCP protocol, `mcpo` helps you instantly unlock compatibility with Open WebUI and any OpenAPI-based agent, helping keep your hard work accessible and future-ready.
 
@@ -160,11 +166,11 @@ If you've already built tools using the MCP protocol, `mcpo` helps you instantly
 uvx mcpo --port 8000 -- uvx mcp-server-time --local-timezone=America/New_York
 ```
 
-✨ That’s it, your MCP server is now OpenAPI-ready!
+That’s it, your MCP server is now OpenAPI-ready!
 
 ---
 
-#### 🗂️ Q: Can one OpenAPI server implement multiple tools?
+#### Q: Can one OpenAPI server implement multiple tools?
 
 **A:** Yes. A single OpenAPI server can offer multiple related capabilities grouped under different endpoints. For example, a document server may provide search, upload, OCR, and summarization, all within one schema.
 
@@ -172,5 +178,5 @@ You can also modularize completely by creating one OpenAPI server per tool if yo
 
 ---
 
-🙋 Have more questions? Visit the GitHub discussions for help and feedback from the community:
-👉 [Community Discussions](https://github.com/open-webui/openapi-servers/discussions)
+Have more questions? Visit the GitHub discussions for help and feedback from the community:
+[Community Discussions](https://github.com/open-webui/openapi-servers/discussions)

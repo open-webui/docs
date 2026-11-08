@@ -7,7 +7,7 @@ import ThemedImage from '@theme/ThemedImage';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 <ThemedImage
-  alt="Chat & Conversations map with the Documents (RAG) cell highlighted"
+  alt="Documents: a stack of sheets with one slid out"
   sources={{
     light: useBaseUrl('/images/banners/chat-conversations-documents-light.svg'),
     dark: useBaseUrl('/images/banners/chat-conversations-documents-dark.svg'),
@@ -17,7 +17,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 :::warning
 
-If you're using **Ollama**, note that it **defaults to a 2048-token context length**. This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
+If you're using **Ollama**, note that it **picks a model's default context length from your GPU's VRAM, and on GPUs with less than 24 GiB that is 4096 tokens** (see [Ollama's context length documentation](https://docs.ollama.com/context-length)). This severely limits **Retrieval-Augmented Generation (RAG) performance**, especially for web search, because retrieved data may **not be used at all** or only partially processed.
 
 :::
 
@@ -27,15 +27,13 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 ## Local and Remote RAG Integration
 
-To use a local document in RAG, upload it from the Documents section in the Workspace area. In a chat, type `#` before your query and select the uploaded document from the suggestion box that appears above the message input. Once selected, a document icon appears above `Send a message`, indicating that the document has been attached for retrieval.
+To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input. Once selected, a document icon appears above `Send a message`, indicating that the document has been attached for retrieval.
 
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
 :::tip Bulk File Management
-Need to clean up multiple uploaded documents or audit your storage? You can now use the centralized **[File Manager](/features/chat-conversations/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
+Need to clean up multiple uploaded documents or audit your storage? Use the centralized **[File Manager](/features/chat-conversations/data-controls/files)** located in **Settings > Data Controls > Manage Files**. Deleting files there will automatically clean up their corresponding RAG embeddings.
 :::
-
-You can also load documents into the workspace area with their access by starting a prompt with `#`, followed by a URL. This can help incorporate web content directly into your conversations.
 
 ## External Knowledge Sources (External Vector Databases)
 
@@ -75,6 +73,10 @@ Configure these under **Settings > Admin > Integrations > External Knowledge Sou
 
 Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. At chat time, Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
 
+With [Retrieval Query Generation](/reference/env-configuration#enable_retrieval_query_generation) on, all generated queries run at the same time. Their results are merged by rank (the top result of each query, then the second of each, and so on), duplicates are dropped and the list is cut to the result count.
+
+In the sources under an answer, each result is listed by its title. When a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
+
 :::info Embedding model must match
 Because Open WebUI embeds the query and searches your database by vector, the vectors stored in your external database must come from the **same embedding model** Open WebUI uses (matching model and dimensions). Mismatched embeddings produce poor or meaningless results.
 :::
@@ -82,12 +84,12 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 ## Web Search for RAG
 
 :::warning
-**Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 2048 tokens available, you're getting less than half the page content, often missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
+**Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 4096 tokens available, you're often getting half the page content, missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
 **To Fix This:** Navigate to **Settings > Admin > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
 :::
 
-For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. If it cannot, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. A link to a file, such as a PDF, is read with document extraction. If it cannot read the URL, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 :::tip
 
@@ -99,7 +101,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 Customize the RAG template from the `Settings` > `Admin` > `Documents` menu.
 
-The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. That is the placeholder the template exists for, without it, retrieved context has nowhere to go.
+The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. Without it, retrieved context has nowhere to go.
 
 :::warning Do not include a query placeholder
 Your message (the query) is **always appended automatically** after the rendered template, so the model already sees it once. The template also recognizes `{{QUERY}}` / `[query]` and will substitute the query there, but because the query is still appended afterward, including that placeholder makes the query appear **twice** in the final prompt. Leave `{{QUERY}}` / `[query]` out of your template: it is a wrapper for the retrieved context, not the place to position the query.
@@ -119,7 +121,7 @@ Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Documen
 
 Open WebUI allows you to fine-tune how documents are split into chunks for embedding. This is crucial for optimal retrieval performance.
 
-- **Text Splitter**: Choose how chunk size is measured. [`RAG_TEXT_SPLITTER`](/reference/env-configuration#rag_text_splitter) is `character` (default, RecursiveCharacterTextSplitter) or `token`. The `token` splitter counts tokens with Tiktoken by default; set [`RAG_TOKENIZER_MODEL`](/reference/env-configuration#rag_tokenizer_model) to a HuggingFace tokenizer (e.g. `bert-base-uncased`) to match chunk boundaries to your embedding model's own tokenizer.
+- **Text Splitter**: Choose how chunk size is measured. [`RAG_TEXT_SPLITTER`](/reference/env-configuration#rag_text_splitter) is `character` (default, RecursiveCharacterTextSplitter), `token`, or `token_transformers`. The `token` splitter counts tokens with Tiktoken. The `token_transformers` splitter counts them with the HuggingFace tokenizer named by [`RAG_TOKENIZER_MODEL`](/reference/env-configuration#rag_tokenizer_model) (e.g. `bert-base-uncased`), which matches chunk boundaries to your embedding model's own tokenizer. It is unavailable on the slim image.
 - **Chunk Size**: Sets the maximum number of characters (or tokens) per chunk.
 - **Chunk Overlap**: Specifies how much content is shared between adjacent chunks to maintain context.
 - **Chunk Min Size Target**: Although [Markdown Header Splitting](#markdown-header-splitting) is excellent for preserving structure, it can often create tiny, fragmented chunks (e.g., a standalone sub-header, a table of contents entry, a single-sentence paragraph, or a short list item) that lack enough semantic context for high-quality embedding. You can counteract this by setting the **Chunk Min Size Target** to intelligently merge these small pieces with their neighbors.
@@ -197,13 +199,13 @@ The algorithm is O(n) in the number of chunks: a single pass with no lookahead o
 
 The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute, you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
 
-Testing has shown that a well-configured threshold (e.g., 1000 for a chunk size of 2000) can reduce chunk counts by over 90% while improving retrieval accuracy, because each remaining chunk carries meaningful semantic context rather than being a fragment that confuses both the embedding model and the retrieval ranking. As positive side effects, it also uses less storage space in the vector database and requires fewer embedding operations, which can be a significant cost saving if outsourcing to an embedding service.
+Each remaining chunk carries meaningful semantic context instead of being a fragment that confuses both the embedding model and the retrieval ranking.
 
 </details>
 
 ## RAG Embedding Support
 
-Change the RAG embedding model directly in the `Settings` > `Admin` > `Documents` menu. This feature supports Ollama and OpenAI models, enabling you to enhance document processing according to your requirements.
+Change the RAG embedding model in **Admin Settings** > **Documents**. The embedding engine is the built-in SentenceTransformers default, Ollama, OpenAI or Azure OpenAI.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -223,7 +225,7 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model in `Settings` > `Admin` > `Documents`, navigate to `Settings` > `Admin` > `Documents` and click the **Reindex** button to re-embed all knowledge base documents with the new model.
+After changing the embedding model, click the **Reindex** button in **Admin Settings** > **Documents** to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
@@ -250,43 +252,43 @@ If you change the embedding model, those standalone chat file embeddings will st
 
 | Change | New Documents | Knowledge Base Documents (no re-index) | Knowledge Base Documents (after re-index) | Standalone Chat Files |
 |---|---|---|---|---|
-| **Chunk Size / Overlap** | ✅ Uses new settings | ⚠️ Old chunks still work, but quality may vary | ✅ Re-chunked with new settings | ⚠️ Old chunks, re-upload to update |
-| **Embedding Model** | ✅ Uses new model | ❌ Old embeddings, incompatible vector space | ✅ Re-embedded with new model | ❌ Old embeddings, re-upload to update |
+| **Chunk Size / Overlap** | Uses new settings | Old chunks still work, but quality may vary | Re-chunked with new settings | Old chunks, re-upload to update |
+| **Embedding Model** | Uses new model | Old embeddings, incompatible vector space | Re-embedded with new model | Old embeddings, re-upload to update |
 
 ## Citations in RAG Feature
 
-The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats.
+The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
 
-## File Context vs Builtin Tools
+## Preload files vs Builtin Tools
 
 Open WebUI provides two separate capabilities that control how files are handled. Understanding the difference is important for configuring models correctly.
 
-### File Context Capability
+### Preload files Capability
 
-The **File Context** capability controls whether Open WebUI performs RAG (Retrieval-Augmented Generation) on attached files:
+The **Preload files** capability controls whether Open WebUI performs RAG (Retrieval-Augmented Generation) on attached files. It is off by default with Native function calling and on with Legacy. The model editor and **Model Defaults** show the effective value. For API requests that do not come from a chat in the web UI, it is on unless the model saves a value for it, so files and knowledge sent in the `files` field reach the model.
 
-| File Context | Behavior |
+| Preload files | Behavior |
 |--------------|----------|
-| ✅ **Enabled** (default) | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
-| ❌ **Disabled** | File content is never extracted or injected. If [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) is also enabled, the model still receives a short listing of which files are attached, their names rather than their content, so it can decide to fetch one with a tool. |
+| **Enabled** | Attached files are processed via RAG. Content is retrieved and injected into the conversation context. |
+| **Disabled** | File content is never extracted or injected. With Native or Default function calling, the model sees a list of the attached files and reads them with the builtin **Files** tools (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`). These tools need the **Files** builtin tool category, the model's **File Upload** capability and the user's upload permission. |
 
-**When to disable File Context:**
+**When to disable Preload files:**
 - **Bypassing RAG entirely**: When you don't want Open WebUI to process attached files at all.
-- **Using [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling File Context is also what injects the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), which let the model list, search and read the chat's attachments itself.
+- **Using [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) only**: If you prefer the model to retrieve content on demand rather than having it pre-injected. Disabling Preload files is also what makes the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) available, which let the model list, search and read the chat's attachments itself.
 - **Debugging/testing**: To isolate whether issues are related to RAG processing.
 
-:::warning File Context Disabled = No Pre-Injected Content
-When File Context is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
+:::warning Preload files Disabled = No Pre-Injected Content
+When Preload files is disabled, file content is **not automatically extracted or injected**. Open WebUI does not forward files to the model's native API. If you disable this, the only way the model can access file content is through [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (if enabled) that query knowledge bases or retrieve attached files on-demand (agentic file processing).
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
 
 To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
 
 :::info
-The File Context toggle only appears when **File Upload** is enabled for the model.
+The Preload files toggle only appears when **File Upload** is enabled for the model.
 :::
 
 ### Builtin Tools Capability
@@ -295,8 +297,8 @@ The **[Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools
 
 | Builtin Tools | Behavior |
 |---------------|----------|
-| ✅ **Enabled** (default) | Unless the model is set to Legacy, it receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats` and others. |
-| ❌ **Disabled** | No [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) are injected. The model works only with pre-injected context. |
+| **Enabled** (default) | Unless the model is set to Legacy, it receives tools like `query_knowledge_bases`, `view_knowledge_file`, `search_chats` and others. |
+| **Disabled** | No [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) are injected. The model works only with pre-injected context. |
 
 **When to disable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode):**
 - **Model doesn't support function calling**: Smaller or older models may not handle the `tools` parameter.
@@ -306,22 +308,22 @@ The **[Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools
 
 These capabilities work independently, giving you fine-grained control, and the rows below describe files and knowledge bases attached **inside the chat** on a model set to Default or Native function calling.
 
-On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so File Context alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
+On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) setting has no effect on those attachments. No autonomous retrieval tool is given to the model whatever that setting says, so Preload files alone decides the outcome: on, and the content is injected upfront, as in the traditional RAG row; off, and nothing reaches the model at all, as in the no-processing row.
 
-| File Context | Builtin Tools | Result |
+| Preload files | Builtin Tools | Result |
 |--------------|---------------|--------|
-| ✅ Enabled | ✅ Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
-| ✅ Enabled | ❌ Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
-| ❌ Disabled | ✅ Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
-| ❌ Disabled | ❌ Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
+| Enabled | Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
+| Enabled | Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
+| Disabled | Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
+| Disabled | Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
 :::warning Knowledge attached to a model or a folder behaves differently
 The table above covers attachments made in the chat. Knowledge attached to a model in the Workspace, and knowledge attached to a folder, follow the Function Calling mode instead:
 
-- **Legacy**: the knowledge is queued for retrieval and injected upfront, exactly as the table describes, provided File Context is enabled. Turning File Context off removes the retrieval step entirely, so nothing is injected on Legacy either.
-- **Default and Native**: nothing is injected regardless of File Context. The knowledge is offered to the model through the [builtin knowledge tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), and the model decides whether to search it.
+- **Legacy**: the knowledge is queued for retrieval and injected upfront, exactly as the table describes, provided Preload files is enabled. Turning Preload files off removes the retrieval step entirely, so nothing is injected on Legacy either.
+- **Default and Native**: nothing is injected regardless of Preload files. The knowledge is offered to the model through the [builtin knowledge tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), and the model decides whether to search it.
 
-The consequence is a configuration that silently does nothing. With File Context enabled, [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
+The consequence is a configuration that silently does nothing. With Preload files enabled, [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) disabled, and Function Calling left on Default, knowledge attached to a model or a folder is never reached: nothing is injected, and the model has no tool to query it. Default is the setting most deployments never change, so this combination is easy to arrive at by accident.
 
 Any one of these resolves it:
 
@@ -331,9 +333,9 @@ Any one of these resolves it:
 :::
 
 :::tip Choosing the Right Configuration
-- **Most models**: Keep both enabled (defaults) for full functionality.
+- **Most models**: Keep both enabled for full functionality.
 - **Small/local models**: Disable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) if they don't support function calling.
-- **On-demand retrieval only**: Disable File Context, enable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with File Context off nothing would be retrieved at all.
+- **On-demand retrieval only**: Disable Preload files, enable [Builtin Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) and set the model to Default or Native function calling, if you want it to decide what to retrieve rather than having everything pre-injected. This does not work on Legacy, which never uses the on-demand tools, so with Preload files off nothing would be retrieved at all.
 :::
 
 ## Enhanced RAG Pipeline
@@ -371,10 +373,10 @@ When paired with a Google Cloud project that has the Google Picker API and Googl
 ### Detailed Instructions
 
 1. Create an OAuth 2.0 client and configure both the Authorized JavaScript origins & Authorized redirect URI to be the URL (include the port if any) you use to access your Open-WebUI instance.
-2. Make a note of the Client ID associated with that OAuth client.
+2. Make a note of the Client ID associated with that OAuth client. Use it exactly as Google shows it, in the form `<project number>-....apps.googleusercontent.com`. The picker reads the Cloud project number from the leading digits of the Client ID.
 3. Make sure that you enable both Google Drive API and Google Picker API for your project.
-4. Also set your app (project) as Testing and add your Google Drive email to the User List
-5. Set the permission scope to include everything those APIs have to offer. And because the app would be in Testing mode, no verification is required by Google to allow the app from accessing the data of the limited test users.
+4. On the OAuth consent screen, set the app to In production, or keep it in Testing and add your users to the test user list.
+5. Add the `https://www.googleapis.com/auth/drive.file` scope. Open WebUI asks only for this scope, which grants access to the files each user picks. Google classes it as non-sensitive, so a self-hosted install needs no restricted-scope verification or security assessment, and users get no "Google hasn't verified this app" warning.
 6. Go to the Google Picker API page, and click on the create credentials button.
 7. Create an API key and under Application restrictions and choose Websites. Then add your Open-WebUI instance's URL, same as the Authorized JavaScript origins and Authorized redirect URIs settings in the step 1.
 8. Set up API restrictions on the API Key to only have access to Google Drive API & Google Picker API
@@ -383,3 +385,5 @@ When paired with a Google Cloud project that has the Google Picker API and Googl
 11. Set up the `GOOGLE_REDIRECT_URI` to my Open-WebUI instance's URL (include the port, if any).
 12. Then relaunch your Open-WebUI instance with those three environment variables.
 13. After that, make sure Google Drive was enabled under `Settings` > `Admin` > `Documents` > `Google Drive`
+
+The picker opens in list view, because the `drive.file` scope gives it no access to file thumbnails.

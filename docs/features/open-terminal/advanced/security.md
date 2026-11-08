@@ -45,7 +45,7 @@ Without Docker (bare metal mode), the AI can run any command with your user's pe
 
 ## Always set a password
 
-An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the terminal. Keyless operation is no longer possible. As of v0.11.30 the server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set (it exits otherwise), and the CLI auto-generates one for you when you don't supply your own. The protection is now enforced at startup, so set a strong key of your own rather than relying on the generated one.
+An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the terminal. The server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set, and the CLI generates one when you don't supply your own. Set a strong key of your own rather than relying on the generated one.
 
 ```bash
 -e OPEN_TERMINAL_API_KEY=a-strong-password-here
@@ -238,23 +238,30 @@ Mounting the socket is not a narrow permission. It hands the container the same 
 
 ## Port previews run sandboxed
 
-When the agent starts a server, the port preview shows it inside a sandboxed frame. Scripts, forms, popups, modals and downloads are permitted, so an ordinary app behaves normally, but the frame is treated as a separate origin from Open WebUI by default, which keeps whatever is running in the terminal away from your session.
+When the agent starts a server, the [Browser tab](../use-cases/web-development.md#the-browser-tab) shows it inside a sandboxed frame. Scripts, forms, popups, modals and downloads are permitted, so an ordinary app behaves normally, but the frame is treated as a separate origin from Open WebUI by default, which keeps whatever is running in the terminal away from your session.
 
 **Settings > Interface > Terminal Preview Allow Same Origin** relaxes that, and it is off unless you turn it on. Switch it on only for something you wrote and trust that genuinely needs same-origin browser APIs, such as storage or cookies, and remember that the code being previewed is often code the agent has just written.
 
+## Multi-user mode is a workspace split
+
+`OPEN_TERMINAL_MULTI_USER=true` gives each Open WebUI user their own Linux account and home folder inside one container, which keeps people and their agents out of each other's files while they work. Everyone still shares the kernel, the process list, the network namespace and the system, and provisioning those accounts requires elevated privileges inside the container, so root in there is within reach of any account. Run it only where every user on that instance is trusted at the same level.
+
+When users need to be protected from each other, give each one their own container with [Terminals](../terminals/). See [Multi-user setup](./multi-user.md) for both options side by side.
+
+---
+
 ## Security checklist
 
-| ✅ | Recommendation |
-| :--- | :--- |
-| ☐ | Use Docker, not bare metal |
-| ☐ | Set a strong API key |
-| ☐ | Use admin-configured connections |
-| ☐ | Set memory and CPU limits |
-| ☐ | Use network isolation (internal Docker network) |
-| ☐ | Enable egress filtering if internet access isn't needed |
-| ☐ | Don't mount the Docker socket unless necessary |
-| ☐ | Use `slim` or `alpine` images if you don't need runtime package installs |
-| ☐ | Leave **Terminal Preview Allow Same Origin** off unless a preview genuinely needs it |
+- [ ] Use Docker, not bare metal
+- [ ] Set a strong API key
+- [ ] Use admin-configured connections
+- [ ] Set memory and CPU limits
+- [ ] Use network isolation (internal Docker network)
+- [ ] Enable egress filtering if internet access isn't needed
+- [ ] Don't mount the Docker socket unless necessary
+- [ ] Use `slim` or `alpine` images if you don't need runtime package installs
+- [ ] Leave **Terminal Preview Allow Same Origin** off unless a preview genuinely needs it
+- [ ] Give each user their own container when users must be protected from each other
 
 ## Related
 

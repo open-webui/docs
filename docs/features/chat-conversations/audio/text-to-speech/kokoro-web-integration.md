@@ -13,7 +13,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 [Kokoro Web](https://github.com/eduardolat/kokoro-web) provides a lightweight, OpenAI-compatible API for the powerful [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) text-to-speech model, seamlessly integrating with Open WebUI to enhance your AI conversations with natural-sounding voices.
 
-## 🚀 Two-Step Integration
+## Two-Step Integration
 
 ### 1. Deploy Kokoro Web API (One Command)
 
@@ -35,7 +35,7 @@ Run with: `docker compose up -d`
 
 ### 2. Connect OpenWebUI (30 Seconds)
 
-1. In OpenWebUI, go to `Settings` → `Admin` → `Experience` → `Audio`
+1. In OpenWebUI, go to `Settings` → `Admin` → `Audio`
 2. Configure:
    - Text-to-Speech Engine: `OpenAI`
    - API Base URL: `http://localhost:3000/api/v1`
@@ -46,7 +46,7 @@ Run with: `docker compose up -d`
 
 **That's it! Your OpenWebUI now has AI voice capabilities.**
 
-## 🌍 Supported Languages
+## Supported Languages
 
 Kokoro Web supports 8 languages with specific voices optimized for each:
 
@@ -61,7 +61,7 @@ Kokoro Web supports 8 languages with specific voices optimized for each:
 
 Each language has dedicated voices for optimal pronunciation and natural flow. See the [GitHub repository](https://github.com/eduardolat/kokoro-web) for the complete list of language-specific voices or use the [Kokoro Web Demo](https://voice-generator.pages.dev) to preview and create your own custom voices instantly.
 
-## 💾 Optimized Models for Any Hardware
+## Optimized Models for Any Hardware
 
 Choose the model that fits your hardware needs:
 
@@ -76,7 +76,7 @@ Choose the model that fits your hardware needs:
 | model_q4 | 4-bit matmul | 305 MB | High quality option |
 | model | fp32 | 326 MB | Maximum quality (slower) |
 
-## ✨ Try Before You Install
+## Try Before You Install
 
 Visit the [**Kokoro Web Demo**](https://voice-generator.pages.dev) to preview all voices instantly. This demo:
 

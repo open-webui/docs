@@ -25,6 +25,12 @@ Firstly, before deploying your stack with Docker, ensure that your Docker Compos
 
 ![Database settings in admin](/images/admin/admin-database.png)
 
+:::note
+
+The **Database** download in **Admin Settings > Database** is not the recommended way to back up the database. It streams `webui.db` as it is on disk, and with SQLite WAL mode recent writes can still sit in `webui.db-wal`, so the file can miss recent data. Copy the database file yourself as described in [Exporting & Importing DB](/tutorials/maintenance/database) or use `pg_dump` on PostgreSQL.
+
+:::
+
 Docker containers are ephemeral and data must be persisted to ensure its survival on the host filesystem.
 
 ## Using Docker volumes
@@ -405,7 +411,7 @@ In the interest of keeping this guide reasonably thorough these additional subje
 | Topic | Description |
 |---|---|
 | SQLite Built-in Backup | Consider using SQLite's `.backup` command for a consistent database backup solution. |
-| Encryption | Modify backup scripts to incorporate encryption at rest. See [Database Encryption with SQLCipher](/reference/database-schema#database-encryption-with-sqlcipher) for database-level encryption. |
+| Encryption | Modify backup scripts to incorporate encryption at rest. |
 | Disaster Recovery and Testing | Develop a disaster recovery plan and regularly test the backup and restore process. |
 | Alternative Backup Tools | Explore other command-line backup tools like `borgbackup` or `restic` for advanced features. |
 | Email Notifications and Webhooks | Implement email notifications or webhooks to monitor backup success or failure. |

@@ -1,25 +1,28 @@
 ---
 sidebar_position: 1
-title: "Configuration"
+title: "Configure Speech-to-Text"
+sidebar_label: "Configuration"
+description: "Choose a local, browser, or hosted speech-to-text engine, configure audio settings, and dictate prompts in Open WebUI."
 ---
 
-Open WebUI supports both local, browser, and remote speech to text.
+Use speech-to-text to dictate prompts in Open WebUI. Choose local Whisper, your browser's speech recognition, or a hosted transcription provider, then configure the corresponding admin and user settings below.
 
 ![alt text](/images/tutorials/stt/image.png)
 
 ![alt text](/images/tutorials/stt/stt-providers.png)
 
-## Cloud / Remote Speech To Text Providers
+## Choose a Speech-to-Text Provider {#cloud--remote-speech-to-text-providers}
 
 The following speech-to-text providers are supported:
 
 | Service | API Key Required | Guide |
 |---------|------------------|-------|
-| Local Whisper (default) | ❌ | Built-in, see [Environment Variables](/features/chat-conversations/audio/speech-to-text/env-variables) |
-| OpenAI (Whisper API) | ✅ | [OpenAI STT Guide](/features/chat-conversations/audio/speech-to-text/openai-stt-integration) |
-| Mistral (Voxtral) | ✅ | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
-| Deepgram | ✅ | N/A |
-| Azure | ✅ | N/A |
+| Local Whisper (default) | No | Built-in, see [Environment Variables](/features/chat-conversations/audio/speech-to-text/env-variables) |
+| OpenAI (Whisper API) | Yes | [OpenAI STT Guide](/features/chat-conversations/audio/speech-to-text/openai-stt-integration) |
+| Self-hosted (OpenAI-compatible) | Yes | [Self-Hosted STT Guide](/features/chat-conversations/audio/speech-to-text/self-hosted-stt) (uses an authenticated server) |
+| Mistral (Voxtral) | Yes | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
+| Deepgram | Yes | N/A |
+| Azure | Yes | [Azure AI Speech STT Guide](/features/chat-conversations/audio/speech-to-text/azure-stt-integration) |
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 
@@ -35,9 +38,9 @@ To configure a speech to text provider:
 
 ### Restricting Accepted Audio Extensions
 
-Open WebUI ships with an **Allowed Extensions** list under **Settings → Admin → Audio → STT** that controls which audio file extensions the upload endpoint will accept (default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`). Uploads with any other extension are rejected with `400 Invalid audio file extension` before transcription runs.
+Open WebUI keeps an allowed extensions list that controls which audio file extensions the upload endpoint will accept (default: `mp3,wav,m4a,webm,ogg,flac,mp4,mpga,mpeg`). Uploads with any other extension are rejected with `400 Invalid audio file extension` before transcription runs.
 
-This is enforced server-side in addition to the MIME-type check (`AUDIO_STT_SUPPORTED_CONTENT_TYPES`), so tightening it is a low-cost way to harden the STT endpoint against unexpected file types. Set the matching `AUDIO_STT_ALLOWED_EXTENSIONS` environment variable to seed the list at startup, or clear it in the UI to skip the extension check entirely.
+This is enforced server-side in addition to the MIME-type check (`AUDIO_STT_SUPPORTED_CONTENT_TYPES`), so tightening it is a low-cost way to harden the STT endpoint against unexpected file types. The admin **Audio** settings do not show this list. Set it with the `AUDIO_STT_ALLOWED_EXTENSIONS` environment variable, or set that variable to an empty value to skip the extension check entirely.
 
 ## User-Level Settings
 
@@ -45,6 +48,8 @@ In addition the instance settings provisioned in the admin panel, there are also
 
 - **STT Settings:** Contains settings related to Speech-to-Text functionality.
 - **Speech-to-Text Engine:** Determines the engine used for speech recognition (Default or Web API).
+
+These settings are on the **Audio** tab of your **Settings**. The tab shows for admins and for users who hold at least one of **Allow Speech to Text**, **Allow Text to Speech** or **Allow Call** (see [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions)).
 
 ![alt text](/images/tutorials/stt/user-settings.png)
 

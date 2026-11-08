@@ -103,7 +103,7 @@ The AI:
 4. Runs them to verify they pass
 5. If any fail, it determines whether it's a test bug or a code bug
 
-![AI writing and running unit tests with pytest](/images/open-terminal-ai-test-suite.png)
+![AI running the pytest suite and reporting each result](/images/open-terminal-ai-test-suite.png)
 
 ---
 

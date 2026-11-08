@@ -47,21 +47,21 @@ There are two ways to use a skill:
 
 **Option 1: Mention it in chat (`$`)**
 
-Type `$` in the chat input, then search for your skill by name. Select it, and the AI receives the **full instructions** for that conversation. This is best when you want to explicitly tell the AI to follow a specific skill right now.
+Type `$` in the chat input, then search for your skill by name. Select it, and the AI receives the **instructions** for that conversation. This is best when you want to explicitly tell the AI to follow a specific skill right now.
 
 ![AI interacting with data using skills and structured workflows](/images/open-terminal-ai-csv-analysis.png)
 
-**Option 2: Attach it to a Model (auto-discovery)**
+**Option 2: Let the AI find it (auto-discovery)**
 
-This is the more powerful option. Go to **Workspace → Models → Edit** and check the skill under the **Skills** section. Now the AI **automatically discovers and uses it when relevant**. You don't need to mention the skill at all.
+This is the more powerful option. With built-in tools active and the model's **Skills** category on, the AI **automatically discovers and uses every active skill you can read when relevant**. You don't need to mention the skill at all. Attaching a skill to a model (**Workspace → Models → Edit**, **Skills** row) pre-selects it in the chat. Without built-in tools, an attached skill is injected into every chat with that model.
 
 Here's how it works behind the scenes:
 
-1. The AI receives a manifest listing each attached skill's **name and description** (not the full instructions, that would waste context)
-2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the full instructions
+1. The AI receives a manifest listing the **name and description** of every active skill you can read, attached ones included, which keeps the full instructions out of the context until needed
+2. When your request matches a skill's description, the AI **autonomously calls a built-in `view_skill` tool** to load the instructions and the list of the skill's supporting files
 3. The AI then follows those instructions to handle your request
 
-This means you can attach a "Data Report Generator" skill to your model, and any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.
+This means that with a "Data Report Generator" skill in your workspace, any time you drop a CSV and say "analyze this," the AI will automatically load and follow the reporting instructions, without you needing to remember the skill exists.
 
 ![Model capabilities settings page](/images/open-terminal-model-capabilities.png)
 
@@ -76,7 +76,7 @@ Skills have access controls. You can:
 - Share with **specific users or groups**
 - Make them **public** (available to everyone on your instance)
 
-Click the **Access** button in the skill editor to configure who can use your skill.
+Click the **Access** button in the skill editor to configure who can use your skill. Users who are not admins see it only with the **Skills Sharing** permission.
 
 ![AI integration settings and access controls](/images/open-terminal-integrations-page.png)
 
@@ -88,16 +88,16 @@ Each page below is a complete workflow with a copy-pasteable skill:
 
 | Workflow | What it does |
 | :--- | :--- |
-| **[Data Reports](./data-reports)** | Turn messy CSVs into polished PDF reports with charts |
-| **[Database Analysis](./database-analysis)** | Connect to PostgreSQL/MySQL/SQLite, run queries, produce insights |
-| **[Research Assistant](./research-assistant)** | Gather web sources and write structured briefings |
-| **[Email Processing](./email-processing)** | Extract action items and deadlines from .eml files |
-| **[Document Comparison](./document-comparison)** | Diff two versions of a contract or proposal |
-| **[Finance Dashboard](./finance-dashboard)** | Analyze bank statements and chart spending |
-| **[Image Processing](./image-processing)** | Batch resize, watermark, and convert images |
-| **[Competitive Analysis](./competitive-analysis)** | Scrape competitor pricing and build comparisons |
-| **[App Builder](./app-builder)** | Build a complete web app from a description |
-| **[Code Review](./code-review)** | Review code changes for security, performance, and style issues |
+| **[Data Reports](/features/open-terminal/use-cases/advanced-workflows/data-reports)** | Turn messy CSVs into polished PDF reports with charts |
+| **[Database Analysis](/features/open-terminal/use-cases/advanced-workflows/database-analysis)** | Connect to PostgreSQL/MySQL/SQLite, run queries, produce insights |
+| **[Research Assistant](/features/open-terminal/use-cases/advanced-workflows/research-assistant)** | Gather web sources and write structured briefings |
+| **[Email Processing](/features/open-terminal/use-cases/advanced-workflows/email-processing)** | Extract action items and deadlines from .eml files |
+| **[Document Comparison](/features/open-terminal/use-cases/advanced-workflows/document-comparison)** | Diff two versions of a contract or proposal |
+| **[Finance Dashboard](/features/open-terminal/use-cases/advanced-workflows/finance-dashboard)** | Analyze bank statements and chart spending |
+| **[Image Processing](/features/open-terminal/use-cases/advanced-workflows/image-processing)** | Batch resize, watermark, and convert images |
+| **[Competitive Analysis](/features/open-terminal/use-cases/advanced-workflows/competitive-analysis)** | Scrape competitor pricing and build comparisons |
+| **[App Builder](/features/open-terminal/use-cases/advanced-workflows/app-builder)** | Build a complete web app from a description |
+| **[Code Review](/features/open-terminal/use-cases/advanced-workflows/code-review)** | Review code changes for security, performance, and style issues |
 
 ---
 

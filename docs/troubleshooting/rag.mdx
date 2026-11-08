@@ -1,9 +1,11 @@
 ---
 sidebar_position: 3
-title: "RAG"
+title: "Troubleshoot Document Retrieval (RAG)"
+sidebar_label: "RAG"
+description: "Diagnose missing document answers, upload failures, context limits, and knowledge retrieval problems in Open WebUI."
 ---
 
-Retrieval-Augmented Generation (RAG) enables language models to reason over external content (documents, knowledge bases, and more) by retrieving relevant info and feeding it into the model. When things don't work as expected (e.g., the model "hallucinates" or misses relevant info), it's often not the model's fault, it's a context issue.
+If a model cannot find an answer in your documents, check that the files finished processing, the conversation can access them, and the model has the tools and context it needs to retrieve their contents. This guide covers upload failures, retrieval settings, and model-specific context limits.
 
 This page covers the most common RAG problems and their solutions.
 
@@ -24,14 +26,14 @@ Typical for Ollama models on consumer hardware (Qwen 3.5 4B, Gemma 4 12B, Muse G
 | Setting | Value | Why |
 |---------|-------|-----|
 | **Text Splitter** | `token` | Consistent chunk sizes aligned to actual token counts |
-| **Markdown Header Splitting** | **On** | Preserves document structure |
+| **Markdown Header Text Splitter** | **On** | Preserves document structure |
 | **Chunk Size** | `1000` | Smaller chunks so each retrieval result fits comfortably |
 | **Chunk Overlap** | `100` | Standard overlap |
 | **Top K** | `3` to `5` | Fewer chunks to avoid blowing out your limited context budget |
-| **Full Context Mode** | Off | Cannot afford to send full documents |
+| **Always Use Full Text** | Off | Cannot afford to send full documents |
 
 :::tip Context budget math
-With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. Add your system prompt and conversation history. If your model has an 8K context window, that leaves about 2 to 3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
+With a chunk size of 1000 tokens and Top K of 5, RAG will inject roughly 5,000 tokens of retrieved content. With hybrid search on, **Top K Reranker** sets how many chunks reach the model, so use it for this math. Add your system prompt and conversation history. If your model has an 8K context window, that leaves about 2 to 3K tokens for the conversation itself. Adjust Top K downward if follow-up questions get cut off.
 :::
 
 ### Cloud models with large context (32K+ tokens)
@@ -41,14 +43,14 @@ Typical for OpenAI (GPT-5.6), Anthropic (Claude), Google (Gemini), DeepSeek, and
 | Setting | Value | Why |
 |---------|-------|-----|
 | **Text Splitter** | `token` | Consistent chunk sizes |
-| **Markdown Header Splitting** | **On** | Preserves document structure |
+| **Markdown Header Text Splitter** | **On** | Preserves document structure |
 | **Chunk Size** | `2000` | Larger chunks preserve more surrounding context per hit |
 | **Chunk Overlap** | `200` | More overlap prevents sentence splits |
 | **Top K** | `15` to `25` | Cast a wide net, you have the context budget for it |
-| **Full Context Mode** | Consider for small docs | If a document is under ~20K tokens, full context can outperform retrieval |
+| **Always Use Full Text** | Consider for small docs | If a document is under ~20K tokens, full text can outperform retrieval. **Full Text Threshold (Characters)** sets which files are included in full without it |
 
-:::tip When to use Full Context Mode
-If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, Full Context Mode often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Toggle it per-chat in the chat settings.
+:::tip When to use full text
+If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, full text often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Switch an attachment to **Using Entire Document** to do this for one file, or turn on **Always Use Full Text** in **Admin Settings** > **Documents** for all of them.
 :::
 
 ### Mixed environment (local + cloud)
@@ -58,7 +60,7 @@ If you use both local and cloud models, configure for the lowest common denomina
 | Setting | Value | Why |
 |---------|-------|-----|
 | **Text Splitter** | `token` | Works for both |
-| **Markdown Header Splitting** | **On** | Works for both |
+| **Markdown Header Text Splitter** | **On** | Works for both |
 | **Chunk Size** | `1500` | Compromise, not too large for local, not too small for cloud |
 | **Chunk Overlap** | `200` | Safe default |
 | **Top K** | `10` | Moderate, a good middle ground for mixed model usage |
@@ -104,14 +106,14 @@ Try uploading a document and preview the extracted content. If it's blank or mis
 
 ### 2. Only a Small Part of the Document is Being Used
 
-Open WebUI is designed to work with models that have limited context windows by default. For instance, many local models (e.g., Ollama's default models) are limited to 2048 tokens. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
+Open WebUI is designed to work with models that have limited context windows by default. For instance, Ollama picks a model's default context length from available VRAM, and on GPUs with less than 24 GiB that is 4096 tokens (see [Ollama's context length documentation](https://docs.ollama.com/context-length)), well below what most models support. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
 
 **Solutions:**
 
 - Go to **Settings > Admin > Documents**
 - Either:
   - **Enable "Bypass Embedding and Retrieval"**: sends full content directly without applying retrieval filters.
-  - **Toggle on "Full Context Mode"**: injects more comprehensive content into the model prompt.
+  - **Toggle on "Always Use Full Text"**: injects more comprehensive content into the model prompt.
 
 :::warning
 
@@ -125,7 +127,7 @@ Be mindful of context limits: if your model can't handle more tokens, content wi
 
 Even if retrieval works, your model might still not process all the content it receives, because it simply can't.
 
-By default, many models (especially Ollama-hosted LLMs) are limited to a 2048-token context window. That means only a fraction of your retrieved data will actually be used.
+By default, Ollama-hosted models on GPUs with less than 24 GiB of VRAM run with a 4096-token context window (Ollama picks the default from available VRAM: 4096 below 24 GiB, 32768 from 24 to 48 GiB, and 262144 at 48 GiB and above). That means only a fraction of your retrieved data will actually be used.
 
 **Why Web Search Especially Needs Larger Context Windows:**
 Web pages are particularly challenging for small context windows because they contain far more content than typical documents. A single web page often includes:
@@ -135,7 +137,7 @@ Web pages are particularly challenging for small context windows because they co
 - Comments sections and related links
 - Metadata and embedded scripts
 
-Even after content extraction and cleaning, web pages easily consume 4,000-8,000+ tokens of context. With a 2048-token limit, you're getting less than half the content, often missing the most relevant information that appears later in the page. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
+Even after content extraction and cleaning, web pages easily consume 4,000-8,000+ tokens of context. With a 4096-token limit, you're often getting only half the content, missing the most relevant information that appears later in the page. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
 **Solutions:**
 
@@ -146,7 +148,7 @@ Even after content extraction and cleaning, web pages easily consume 4,000-8,000
 
 - **For OpenAI and Other Integrated Models**: These models typically have their own context limits that cannot be modified through Open WebUI settings. Ensure you're using a model with sufficient context length.
 
-The 2048-token default is a significant limiter for web search. For better RAG results with web content, use at least 8192 tokens, with 16384+ being ideal for complex web pages.
+Ollama's 4096-token default on smaller GPUs is a significant limiter for web search. For better RAG results with web content, use at least 8192 tokens, with 16384+ being ideal for complex web pages.
 
 **Alternative:** Use an external LLM with larger context capacity (e.g., GPT-5.6, Claude, Gemini with 8k+ context). Comparing results with a large-context model is a good way to isolate whether token limits are the bottleneck.
 
@@ -166,8 +168,7 @@ Bad embeddings = bad retrieval. If the vector representation of your content is 
 
 - Change to a high-quality embedding model (e.g., all-MiniLM-L6-v2, Instructor X, or OpenAI embeddings)
 - Go to: **Settings > Admin > Documents**
-- After changing the model, be sure to:
-After changing the model, **reindex all existing documents** so the new embeddings take effect. Embedding quality directly affects what content is retrieved.
+- After changing the model, **reindex all existing documents** so the new embeddings take effect. Embedding quality directly affects what content is retrieved.
 
 ---
 
@@ -199,14 +200,14 @@ After fixing the configuration, try re-embedding a document and verify no error 
 Open WebUI implements various limits to ensure system stability and prevent abuse. It is important to understand how these limits apply to different upload methods:
 
 *   **Chat Uploads:** Subject to global file size and count limits.
-    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Size**.
+    *   **Max File Size:** Controlled by `RAG_FILE_MAX_SIZE` (default: Unlimited). Configurable in **Settings > Admin > Documents > Files > Max Upload Size**.
     *   **Office and EPUB documents** are additionally checked against what they contain, because those formats are archives. One that unpacks to far more than its own size is refused with a message about the archive being too large after decompression, even though the file itself is small. A genuine document rarely trips this; one that does is either corrupt or built to exhaust memory on whatever opens it.
-    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Documents > General > Max Upload Count**.
-    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Documents > General > Allowed File Extensions**.
+    *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Admin > Documents > Files > Max Upload Count**.
+    *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Admin > Documents > Files > Allowed File Extensions**.
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
-    *   **File Limit:** Subject to the same `RAG_FILE_MAX_SIZE` limit as chats, but **not** subject to the `RAG_FILE_MAX_COUNT` limit, allowing for unlimited file uploads.
-    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used in **Full Context Mode** (accessible in chat settings), which feeds the full document content to the model instead of using vector search retrieval.
+    *   **File Limit:** Subject to `RAG_FILE_MAX_SIZE` and the knowledge base [file limits](/features/workspace/knowledge#file-limits).
+    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used with **Using Entire Document** (click the attachment in a chat), which feeds the full document content to the model instead of using vector search retrieval.
 
 :::info
 By separating these limits, administrators can better manage resource usage across different features. For example, you might want to allow larger uploads in a curated Knowledge Base while restricting the number of files in ad-hoc Folder uploads.
@@ -216,13 +217,13 @@ By separating these limits, administrators can better manage resource usage acro
 
 ### 7. Fragmented or Tiny Chunks
 
-When using the **Markdown Header Splitter**, documents can sometimes be split into very small fragments (e.g., just a table of contents entry or a short sub-header). These tiny chunks often lack enough semantic context for the embedding model to represent them accurately, leading to poor RAG results and unnecessary overhead.
+When using the **Markdown Header Text Splitter**, documents can sometimes be split into very small fragments (e.g., just a table of contents entry or a short sub-header). These tiny chunks often lack enough semantic context for the embedding model to represent them accurately, leading to poor RAG results and unnecessary overhead.
 
 **Solution:**
 
 - Go to **Settings > Admin > Documents**.
 - Increase the **Chunk Min Size Target**.
-- Setting this to a value like `1000` (or ~50-60% of your `CHUNK_SIZE`) merges small fragments with neighboring chunks, resulting in better semantic coherence and fewer total chunks.
+- Setting this to about 50-60% of your **Chunk Size** (for example `1000` with a Chunk Size of `2000`) merges small fragments with neighboring chunks, resulting in better semantic coherence and fewer total chunks.
 
 ---
 
@@ -241,20 +242,21 @@ If your initial response is fast but follow-up questions become increasingly slo
 
 | Problem | Fix |
 |--------|------|
-| 🤔 Model can't "see" content | Check document extractor settings |
-| 🧹 Only part of content used | Enable Full Context Mode or Bypass Embedding |
-| ⏱ Limited by 2048 token cap | Increase model context length or use large-context LLM |
-| 📉 Inaccurate retrieval | Switch to a better embedding model, then reindex |
-| ❌ Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`); Knowledge Base limits are separate |
-| 🧩 Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
-| 🐌 Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
-| 📄 API returns "empty content" | Wait for file processing to complete before adding to knowledge base |
-| 💥 CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
-| 📷 PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
-| 💀 Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-worker setups |
-| 💀 Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
-| 🧠 Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or disable native function calling |
-| 🗂 Single attached file returns nothing | Re-index to rebuild the per-file indexes |
+| Model can't "see" content | Check document extractor settings |
+| Only part of content used | Enable Always Use Full Text or Bypass Embedding |
+| Limited by a small context length | Increase model context length or use large-context LLM |
+| Inaccurate retrieval | Switch to a better embedding model, then reindex |
+| Upload limits bypass | Use Folder uploads (with `FOLDER_MAX_FILE_COUNT`); Knowledge Base limits are separate |
+| Fragmented/Tiny Chunks | Increase **Chunk Min Size Target** to merge small sections |
+| Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
+| API returns "empty content" | Wait for file processing to complete before adding to knowledge base |
+| CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
+| PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
+| Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
+| Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
+| Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or try Using Entire Document |
+| Single attached file returns nothing | Re-index to rebuild the per-file indexes |
+| Docling citations show the wrong page | [Re-upload the file](/features/chat-conversations/rag/document-extraction/docling#citations-point-to-the-wrong-page) |
 
 ---
 
@@ -268,7 +270,7 @@ When uploading files via the API and immediately adding them to a knowledge base
 
 **The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously: the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
 
-✅ **Solution: Wait for Processing to Complete**
+**Solution: Wait for Processing to Complete**
 
 Before adding a file to a knowledge base, poll the status endpoint until processing is done:
 
@@ -298,8 +300,9 @@ def wait_for_processing(token, file_id, timeout=300):
 **Status Values:**
 | Status | Meaning |
 |--------|---------|
-| `pending` | Still processing |
-| `completed` | Ready to add to knowledge base |
+| `pending` | Waiting to be processed |
+| `processing` | Content extraction and embedding are running |
+| `completed` | Processing finished, including any knowledge base link |
 | `failed` | Processing failed (check error field) |
 
 :::tip
@@ -321,7 +324,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 - PyTorch memory fragmentation from repeated small allocations
 - Large documents creating memory spikes during embedding
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Isolate Embedding to a Different GPU** (if available):
    Set `CUDA_VISIBLE_DEVICES` to pin embedding to a specific GPU separate from your chat model.
@@ -356,7 +359,7 @@ Error generating embeddings: 429 Rate limit reached
 
 **The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits, especially on free-tier or lower-tier plans.
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Limit Concurrent Embedding Requests**:
    Set [`RAG_EMBEDDING_CONCURRENT_REQUESTS`](/reference/env-configuration#rag_embedding_concurrent_requests) to cap the number of simultaneous embedding API calls. For example, set it to `5` or `10` depending on your provider's rate limits:
@@ -365,7 +368,7 @@ Error generating embeddings: 429 Rate limit reached
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
-   Or configure it in the **Settings > Admin > Documents > Concurrent Requests** field. The default of `0` means unlimited concurrency.
+   Or configure it in the **Settings > Admin > Documents > Embedding Concurrent Requests** field. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
    Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
@@ -379,7 +382,7 @@ If PDFs containing images with text are returning empty content:
 
 **The Problem**: The default "pypdf" content extractor may struggle with certain PDF formats, especially those containing primarily image-based content.
 
-✅ **Solutions:**
+**Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
    - Navigate to **Settings > Admin > Documents**
@@ -387,6 +390,7 @@ If PDFs containing images with text are returning empty content:
 
 2. **Enable PDF Image Extraction**:
    - In **Settings > Admin > Documents**, ensure **PDF Extract Images (OCR)** is enabled
+   - OCR uses one processor thread per upload. On an idle many-core server, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster.
 
 3. **Update pypdf** (if using the default engine):
    Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
@@ -398,66 +402,26 @@ If PDFs containing images with text are returning empty content:
 
 ### 12. Worker Dies During Document Upload
 
-When uploading documents in a **multi-worker** deployment, you may see:
+When uploading documents in a deployment with several replicas or workers, you may see:
 
 ```
 INFO:     Waiting for child process [12]
 INFO:     Child process [12] died
 ```
 
-There are **two distinct causes** for this in multi-worker setups:
+The cause is the **default ChromaDB** vector database with `UVICORN_WORKERS > 1` or several replicas. Embedded ChromaDB keeps its data in local SQLite files that only one process may write. When several processes write at once, they crash. You will typically see this pattern within the same second:
 
-#### Cause A: ChromaDB SQLite + Fork (Instant Crash)
-
-If you are using the **default ChromaDB** vector database (which uses a local SQLite-backed `PersistentClient`) with `UVICORN_WORKERS > 1`, the crash is caused by SQLite being **not fork-safe**. When uvicorn forks multiple workers, each process inherits the same SQLite database connection. Concurrent writes to the vector database from multiple workers cause an immediate crash, not a timeout, but an instant fatal error.
-
-You will typically see this pattern all within the same second:
 ```
-save_docs_to_vector_db:1619 - adding to collection file-id
+save_docs_to_vector_db:1573 - adding to collection file-id
 INFO:     Waiting for child process [pid]
 INFO:     Child process [pid] died
 ```
 
-**Solution:** You **must** switch away from the default local ChromaDB when using multiple workers:
-- Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `mariadb-vector`, `milvus`, or `qdrant`
+**Solution:** set `UVICORN_WORKERS=1` and scale with replicas. With more than one replica, switch away from the embedded ChromaDB:
+- Set [`VECTOR_DB`](/reference/env-configuration#vector_db) to `pgvector`, `mariadb-vector`, `milvus` or `qdrant`
 - Or run ChromaDB as a separate HTTP server and set [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port)
 
 See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker) for full details.
-
-#### Cause B: SentenceTransformers Health Check Timeout (Older Versions)
-
-When using the **default SentenceTransformers** embedding engine (local embeddings) with multiple workers, uvicorn monitors worker health via periodic pings. The default health check timeout is just **5 seconds**. In older versions of Open WebUI, the embedding call blocked the event loop entirely, preventing the worker from responding to health checks. Uvicorn then killed the worker as unresponsive.
-
-:::note
-
-This issue was **fixed** in Open WebUI. The embedding system now uses `run_coroutine_threadsafe` to keep the main event loop responsive during embedding operations, so workers will no longer be killed during uploads regardless of how long embeddings take.
-
-If you are running a version with this fix and still experiencing worker death, check **Cause A** above (ChromaDB SQLite) first, then ensure your Open WebUI is up to date.
-
-:::
-
-**Who is affected:**
-- Only deployments using the **default SentenceTransformers** embedding engine (local embeddings).
-- Only when running **multiple uvicorn workers**. Single-worker deployments don't have health check timeouts.
-- External embedding engines (Ollama, OpenAI, Azure OpenAI) are **not affected** since their API calls don't block the event loop.
-
-✅ **Solutions (for older versions without the fix):**
-
-1. **Update Open WebUI** to a version that includes the `run_coroutine_threadsafe` fix.
-
-2. **Increase the health check timeout** as a workaround:
-   ```yaml
-   # docker-compose.yaml
-   command: ["bash", "start.sh", "--workers", "2", "--timeout-worker-healthcheck", "120"]
-   ```
-
-3. **Switch to an external embedding engine** to avoid local blocking entirely:
-   ```
-   RAG_EMBEDDING_ENGINE=ollama
-   RAG_EMBEDDING_MODEL=nomic-embed-text
-   ```
-
-4. **Optionally set a safety timeout** via [`RAG_EMBEDDING_TIMEOUT`](/reference/env-configuration#rag_embedding_timeout) to abort abnormally long embedding operations (does not affect health checks).
 
 ---
 
@@ -472,7 +436,7 @@ You attached a knowledge base to a model in **Workspace > Models > Edit**, but w
 | **Legacy (non-native)** | Open WebUI automatically performs RAG: it queries the attached knowledge base, retrieves relevant chunks, and injects them into the conversation context. This happens behind the scenes without the model doing anything. |
 | **Native Function Calling** | Knowledge is **not auto-injected**. Instead, the model receives tools (like `query_knowledge_bases`) and must actively decide to call them. This is **agentic RAG**: the model autonomously searches when it determines it needs information. |
 
-Because **Native Function Calling is now the default**, the model needs both the **ability** and the **instruction** to use the knowledge tools (unless you switch the model to Legacy).
+Because **Native Function Calling is the default**, the model needs both the **ability** and the **instruction** to use the knowledge tools. Keep Native mode enabled while checking the retrieval setup below.
 
 #### Knowledge Retrieval Behavior Matrix
 
@@ -481,7 +445,7 @@ Because **Native Function Calling is now the default**, the model needs both the
 | **Legacy Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG; user must manually add a knowledge base to the chat via `#` |
 | **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** (must actively call them) | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled); must actively call them |
 
-Key takeaway: in Native Mode (the supported mode), the model must use its knowledge tools regardless. Attaching a KB only restricts *which* KBs are searchable. Legacy Mode's auto-injection behavior is documented here for legacy deployments only; Legacy Mode is no longer supported and all models should be on Native Mode.
+Key takeaway: in Native Mode, the model must use its knowledge tools regardless. Attaching a KB only restricts *which* KBs are searchable.
 
 :::tip Preventing Knowledge Base Access in Native Mode
 If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Workspace > Models > Edit > Builtin Tools**. This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.
@@ -489,40 +453,40 @@ If you want to prevent a model from accessing **any** knowledge base in native m
 
 ![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
 
-✅ **Solutions (check in order):**
+**Solutions (check in order):**
 
 1. **Check Global Model Settings first**:
-   - Go to **Settings > Admin > Models > Model Defaults > Configure**
+   - Go to **Settings > Admin > Models** and open **Model Defaults**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
-   - If it is, this **overrides all models** that don't explicitly set their own `function_calling` parameter, even if you never intended for a specific model to use native mode
-   - Either change the global setting to `default`, or explicitly set `function_calling` in the per-model **Advanced Params** to override the global value
-   - Also check the **Model Capabilities** section: if **File Context** is disabled globally, RAG won't process files for any model that doesn't explicitly enable it
+   - Models without an explicit per-model value inherit this setting. Keep the effective value set to `native` and check that the selected model supports tool calling
+   - Also check the **Model Capabilities** section: **Preload files** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access
 
-:::warning Global Settings Override
-The most common cause of this issue is a global `Function Calling: native` setting in **Settings > Admin > Models > Model Defaults > Configure > Model Parameters**. This silently applies to **every model** that doesn't explicitly set its own `function_calling` parameter. Per-model settings in **Workspace > Models > Edit > Advanced Params** will override the global default, but only if explicitly set. A model that simply doesn't have `function_calling` configured will inherit the global value.
+:::info Check the effective model settings
+Per-model settings in **Workspace > Models > Edit > Advanced Params** override the global default when explicitly set. A model without its own `function_calling` value inherits the global setting. Check both places when the model's behavior differs from what you expect.
 :::
 
-2. **Ensure Built-in Tools are enabled for the model** (if using native mode):
+2. **Ensure Built-in Tools are enabled for the model**:
    - Go to **Workspace > Models > Edit** for your model
    - Under **Builtin Tools**, make sure the **Knowledge Base** category is enabled (it is by default)
    - If this is disabled, the model has no way to query attached knowledge bases
 
-3. **Add a system prompt hint** (if using native mode):
+3. **Add a system prompt hint**:
    - Some models need explicit guidance to use their tools. Add something like:
-     > "When users ask questions, first use list_knowledge_bases to see what knowledge is available, then use query_knowledge_bases to search for relevant information before answering."
+     > "When users ask about attached documents, use the available knowledge tools to search those documents before answering, and cite the relevant passage."
 
-4. **Or disable Native Function Calling** for that model:
-   - In the model settings, disable Native Function Calling to restore the classic auto-injection RAG behavior from earlier versions
+4. **Check processing and access**:
+   - Confirm the uploaded file finished processing and the current user can access the knowledge base
+   - Try a model with reliable native tool calling, then ask about a specific fact you can verify in the document
 
-5. **Or use Full Context mode**:
-   - Click on the attached knowledge base and select **"Use Entire Document"**
-   - This bypasses RAG entirely and always injects the full content, regardless of native function calling settings
+5. **For a small document, try Using Entire Document**:
+   - Click on the attached knowledge base and turn on **Using Entire Document**
+   - This sends the full extracted content instead of retrieving selected passages. Ensure the document fits the model's context window
 
-:::info Why the Change?
-Open WebUI is moving toward **agentic RAG**, where the model autonomously decides when and how to search knowledge bases. This is more powerful than classic RAG because the model can retry searches with different queries if the first attempt didn't yield good results. However, it does require models that are capable of using tools effectively. For smaller or older models that struggle with tool calling, disabling Native Function Calling is the recommended approach.
+:::info Why Agentic RAG?
+Open WebUI uses **agentic RAG**, where the model decides when and how to search knowledge bases and can retry with different queries. This requires a model that can use tools effectively. If the selected model cannot retrieve a known fact reliably, use a model with stronger tool calling or test a small document with Using Entire Document.
 :::
 
-For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [File Context vs Builtin Tools](/features/chat-conversations/rag#file-context-vs-builtin-tools).
+For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
 
 ---
 
@@ -540,9 +504,9 @@ Attaching one file with `#` retrieves nothing, while attaching the knowledge bas
 
 **The Problem**: a file belonging to a knowledge base is indexed twice, once with the knowledge base and once on its own. Attaching it by itself searches only its own index, which can go missing after a vector database migration, a partial reset or a deletion made directly in the vector database.
 
-✅ **Solutions:**
+**Solutions:**
 
-1. **Re-index** at **Settings > Admin > Documents > Reindex Knowledge Base Vectors**. This rebuilds each knowledge base and the per-file index of every file inside it. It re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
+1. **Re-index** at **Settings > Admin > Documents > Reindex Knowledge and Memory Vectors**. This rebuilds each knowledge base, the per-file index of every file inside it and every user's memories. It re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
 2. **Re-upload the file** if it is not in any knowledge base, since re-indexing only covers knowledge bases.
 
 ---

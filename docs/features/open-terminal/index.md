@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Open Terminal
 
 <ThemedImage
-  alt="Open Terminal: the Open WebUI core driving a real terminal session in a loop, running commands and reading the output"
+  alt="Terminal: a screen block with a cursor"
   sources={{
     light: useBaseUrl('/images/banners/terminal-light.svg'),
     dark: useBaseUrl('/images/banners/terminal-dark.svg'),
@@ -23,11 +23,11 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 An agent harness is the system around a model that lets it do real work: instructions, context, tools, state, permissions, feedback loops, observability, and an execution environment. Open WebUI already gives you the control side of that harness: models, chats, knowledge, prompts, tools, MCP connections, memory, users, permissions, automations, and shared workflow controls. Open Terminal completes it with the part most chat products are still missing: a real computer substrate where actions run and evidence comes back.
 
-That means the agent can do real work. Not just answer questions about a task, and not just emit code you run somewhere else. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
+That means the agent does the work itself. It can plan, create files, run code, inspect output, install dependencies, start servers, render previews, recover from errors, and continue until there is an artifact you can use: a script, report, patch, chart, website, migration, or organized folder.
 
-Despite the name, Open Terminal is not just a terminal panel. It is the computer-like workspace that makes Open WebUI's agent loop capable of acting on files, code, packages, servers, documents, and generated artifacts. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
+Open Terminal is the computer-like workspace that makes Open WebUI's agent loop capable of acting on files, code, packages, servers, documents, and generated artifacts. Run it in Docker for isolation, or bare metal when the agent should work directly on the host.
 
-![Open WebUI with Open Terminal, file browser sidebar and chat](/images/open-terminal-file-browser.png)
+![Open WebUI with Open Terminal selected and the Files tab open beside a new chat](/images/open-terminal-file-browser.png)
 
 ## The Right Mental Model
 
@@ -115,7 +115,7 @@ Describe a site or app. The agent can create the files, install dependencies, st
 
 ### Software development
 
-Clone repos, inspect architecture, run test suites, debug failures, refactor code, and work with Git. The key capability is not just writing code; it is running and verifying it.
+Clone repos, inspect architecture, run test suites, debug failures, refactor code, and work with Git. The agent runs and verifies the code it writes.
 
 ### File and system automation
 
@@ -129,40 +129,41 @@ Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage di
 
 | | |
 | :--- | :--- |
-| 🖥️ **Use a real shell** | Run commands, scripts, CLIs, tests, build tools, and package managers |
-| 📁 **Own a workspace** | Browse, upload, download, edit, create, rename, convert, and organize files |
-| 📄 **Process documents and data** | Handle PDF, Word, Excel, PowerPoint, RTF, EPUB, email, text, code, and data files |
-| 🌐 **Run and preview software** | Start local servers and show live previews inside Open WebUI |
-| 🔁 **Iterate from feedback** | Read output, inspect artifacts, fix errors, retry, and verify the result |
-| 🔒 **Choose the boundary** | Run isolated in Docker, or bare metal when direct host access is intentional |
+| **Use a real shell** | Run commands, scripts, CLIs, tests, build tools, and package managers |
+| **Own a workspace** | Browse, upload, download, edit, create, rename, convert, and organize files |
+| **Process documents and data** | Handle PDF, Word, Excel, PowerPoint, RTF, EPUB, email, text, code, and data files |
+| **Run and preview software** | Start local servers and show live previews inside Open WebUI |
+| **Iterate from feedback** | Read output, inspect artifacts, fix errors, retry, and verify the result |
+| **Choose the boundary** | Run isolated in Docker, or bare metal when direct host access is intentional |
 
 ---
 
 ## Get Started
 
-**[Installation →](./setup/installation)** · **[Connect to Open WebUI →](./setup/connecting)**
+**[Installation →](/features/open-terminal/setup/installation)** · **[Connect to Open WebUI →](/features/open-terminal/setup/connecting)**
 
 :::info Model requirements
-Open Terminal needs a model that performs tool calling at agentic quality, not just one that technically supports tools. Working inside a computer substrate is a multi-step loop: choose an action, observe files or output, decide what changed, recover from errors, and repeat across many turns. Small models often fail at that loop even when they can emit a valid tool call. Use a capable frontier model for complex software, data, and automation work. Native tool calling is the default as of v0.10.0; [check the model's tool-calling mode](./setup/connecting#8-enable-native-function-calling) if tools are not firing.
+Open Terminal needs a model that performs tool calling at agentic quality, not just one that technically supports tools. Working inside a computer substrate is a multi-step loop: choose an action, observe files or output, decide what changed, recover from errors, and repeat across many turns. Small models often fail at that loop even when they can emit a valid tool call. Use a capable frontier model for complex software, data, and automation work. Native tool calling is the default; [check the model's tool-calling mode](/features/open-terminal/setup/connecting#8-enable-native-function-calling) if tools are not firing.
 :::
 
 ---
 
 ## Use Cases
 
-- **[Code execution](./use-cases/code-execution)**: write, run, and debug scripts
-- **[Software development](./use-cases/software-development)**: repos, tests, debugging, refactoring, Git
-- **[Document & data analysis](./use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
-- **[Web development](./use-cases/web-development)**: build and preview websites
-- **[System automation](./use-cases/system-automation)**: file management, backups, batch operations
-- **[Advanced workflows](./use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
-- **[File browser](./file-browser)**: uploading, previewing, editing files
+- **[Code execution](/features/open-terminal/use-cases/code-execution)**: write, run, and debug scripts
+- **[Software development](/features/open-terminal/use-cases/software-development)**: repos, tests, debugging, refactoring, Git
+- **[Document & data analysis](/features/open-terminal/use-cases/file-analysis)**: spreadsheets, PDFs, Word docs, emails
+- **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites in the Browser tab
+- **[System automation](/features/open-terminal/use-cases/system-automation)**: file management, backups, batch operations
+- **[Advanced workflows](/features/open-terminal/use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
+- **[Coding agents](/features/open-terminal/coding-agents)**: Claude Code, Codex and Pi in the model picker
+- **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files, Git
 
 ---
 
 ## Enterprise Multi-User
 
-Need isolated, per-user agent workspaces for your team? **[Terminals](./terminals/)** is the orchestrator for Open Terminal. It provisions a dedicated computer substrate for every user and policy, with automatic lifecycle management, resource limits, custom images, persistent storage, scheduled resets, and policy-controlled environments.
+Need isolated, per-user agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It provisions a dedicated computer substrate for every user and policy, with automatic lifecycle management, resource limits, custom images, persistent storage, scheduled resets, and policy-controlled environments.
 
 ---
 

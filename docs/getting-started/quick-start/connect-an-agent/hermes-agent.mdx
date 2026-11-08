@@ -9,7 +9,7 @@ title: "Hermes Agent"
 
 [Hermes Agent](https://github.com/NousResearch/hermes-agent) by **Nous Research** is an autonomous AI agent with built-in tools: terminal access, file operations, web search, memory, and extensible skills. It exposes an **OpenAI-compatible API server**, so connecting it to Open WebUI takes just a few minutes.
 
-When you send a message through Open WebUI, Hermes Agent receives it, decides which tools to use (if any), executes them, and streams the final response back. You'll see inline progress indicators in real time (e.g., `💻 ls -la`, `🔍 searching...`).
+When you send a message through Open WebUI, Hermes Agent receives it, decides which tools to use (if any), executes them, and streams the final response back. You'll see inline progress indicators in real time (e.g., `ls -la`, `searching...`).
 
 :::info What You'll Need
 - **Hermes Agent** installed on your machine ([quickstart guide](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart))
@@ -73,7 +73,7 @@ The gateway must stay running for Open WebUI to communicate with your agent. Con
 
 1. Open Open WebUI in your browser.
 2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
-3. Click ➕ **Add Connection**.
+3. Click **Add Connection**.
 4. Enter the following:
 
 | Setting | Value |
@@ -81,7 +81,7 @@ The gateway must stay running for Open WebUI to communicate with your agent. Con
 | **URL** | `http://localhost:8642/v1` |
 | **API Key** | The `API_SERVER_KEY` you set in Step 2 |
 
-5. Click the ✅ checkmark to verify, then **Save**.
+5. Click the checkmark to verify, then **Save**.
 
 :::tip Running Open WebUI in Docker?
 Replace `localhost` with `host.docker.internal`:
@@ -146,7 +146,7 @@ Environment variables only take effect on Open WebUI's **first launch**. After t
 
 ### Connection test passes but no models load
 
-Almost always the missing `/v1` suffix. Open WebUI's connection test checks basic connectivity, not model discovery.
+Open WebUI's connection test requests `GET <URL>/models` with your key, so a URL without the `/v1` suffix normally fails the test itself. If the test passes but no models load, the `/models` response was not JSON with a `data` list (or a bare list), or the connection is switched off. If you filled in Model IDs, only those IDs are listed and `/models` is not queried.
 
 ### "Invalid API key" errors
 

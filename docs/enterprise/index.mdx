@@ -16,7 +16,7 @@ Whether you're a startup scaling fast or a Fortune 500 managing global operation
 **Stateless by design, built to scale horizontally.** Open WebUI keeps application replicas interchangeable by using shared databases and storage, with Redis coordinating sessions and real-time events. Add replicas behind a load balancer as demand grows. [Explore the architecture →](/enterprise/architecture)
 
 <ThemedImage
-  alt="Open WebUI Enterprise platform diagram showing identity, data, deployment, and support connected through self-hosted control"
+  alt="Enterprise: a tower of floors, one floor marked"
   sources={{
     light: useBaseUrl('/images/banners/enterprise-light.svg'),
     dark: useBaseUrl('/images/banners/enterprise-dark.svg'),
@@ -49,7 +49,7 @@ To help us respond quickly, **please use your official work email address** and 
 | Deployment Model | License Requirements |
 | :--- | :--- |
 | **Standard Use** (Internal use with original branding exactly intact.) | **[Free](/license)** |
-| **Enterprise Use** (White-labeling, rebranding, modifications to original branding, or enterprise-exclusive offerings like [Terminals](/features/open-terminal/terminals/)) | **[Enterprise License Required](/license)** |
+| **Enterprise Use** (White-labeling, rebranding, modifications to original branding, or enterprise-exclusive offerings like [Terminals](/features/open-terminal/terminals/) and [Tether](https://github.com/open-webui/tether)) | **[Enterprise License Required](/license)** |
 
 Whether you need a full enterprise deployment or just want to explore what Open WebUI can do for your organization, we're here to help. Send us your deployment **end user count (seats)**, and let’s explore how we can work together!
 
@@ -69,41 +69,50 @@ If you are a consulting agency, solution provider, or reseller looking to deploy
 
 ### Why Enterprises Choose Open WebUI
 
-#### 🚀 Faster Innovation, No Vendor Lock-In
+#### Faster Innovation, No Vendor Lock-In
 Unlike proprietary AI platforms that dictate your path, **Open WebUI puts you in control**. Deploy on-premise, in a private cloud, or hybrid environments, without restrictive contracts.
 
-#### 🔒 Security-First Architecture
+#### Security-First Architecture
 Security is a business-critical requirement. Open WebUI's self-hosted, on-premise, and air-gapped deployment options give your organization **full control over its data pipeline**, providing the technical foundation needed to operate within frameworks such as SOC 2, HIPAA, GDPR, FedRAMP, and ISO 27001. Compliance responsibility sits with the deploying organization.
 
-#### ⚡ Stateless Architecture, Horizontal Scaling
+#### Stateless Architecture, Horizontal Scaling
 Open WebUI's **stateless application layer** lets you add replicas across servers as demand grows. Shared databases, storage, and Redis keep those replicas working with the same data and coordinated state, providing the foundation for multi-node high availability. See the [scaling guide](/getting-started/advanced-topics/scaling) for the required configuration.
 
-#### 💡 Highly Customizable & Modular
+#### Highly Customizable & Modular
 **White-label the interface** to match your brand identity. Integrate proprietary or third-party AI models. Extend functionality to fit your organization's unique workflows, Open WebUI adapts to you, not the other way around.
 
 ---
 
+### Enterprise-Exclusive Offerings
+
+Extend Open WebUI with tools for managed agent workspaces and desktop access:
+
+- **[Terminals](/features/open-terminal/terminals/)** provisions isolated Open Terminal containers for each user, with policies, resource limits, persistent storage, and automatic lifecycle management on Docker or Kubernetes. Production use requires an Open WebUI Enterprise License with Terminals access.
+- **[Tether](https://github.com/open-webui/tether)** brings Open WebUI to your desktop and gives your AI access to work directly on your computer. Commercial or organizational production use requires an Open WebUI Enterprise License with Tether access.
+
+[Contact Enterprise Sales](https://openwebui.com/contact/sales) to discuss access for your organization.
+
 ### Explore Enterprise Capabilities
 
-#### [🏗️ Architecture & High Availability](./architecture)
+#### [Architecture & High Availability](/enterprise/architecture)
 Understand how Open WebUI supports large-scale deployments. Explore multi-node configurations designed for high availability, workload optimization across regions, and architectural patterns for mission-critical reliability.
 
-#### [🌐 Sovereign AI](./sovereign-ai)
+#### [Sovereign AI](/enterprise/sovereign-ai)
 Plan AI deployments around infrastructure, data residency, model exposure, identity, permissions, logs, backups, and operator access. Open WebUI provides the self-hosted workspace layer for governed AI usage inside the boundaries your organization chooses. See the [Sovereign AI product overview](https://openwebui.com/sovereign-ai) for a summary.
 
-#### [🛡️ Security](./security)
+#### [Security](/enterprise/security)
 Learn how Open WebUI integrates with your existing identity infrastructure, including LDAP, Active Directory, and SSO providers. Ideal for organizations requiring on-premise or air-gapped deployments.
 
-#### [🚀 Deployment Options](./deployment)
+#### [Deployment Options](/enterprise/deployment)
 Choose the right deployment pattern for your organization, from Python on auto-scaling VMs to managed container services to Kubernetes with Helm.
 
-#### [🔗 Integration](./integration)
+#### [Integration](/enterprise/integration)
 Connect proprietary, third-party, or local AI models. Extend functionality with plugins, pipelines, and custom workflows that fit your existing infrastructure.
 
-#### [🎨 Customization](./customization)
+#### [Customization](/enterprise/customization)
 White-label the interface to match your brand identity. Customize theming, user experience, and workflows to make Open WebUI feel native to your organization.
 
-#### [🤝 Support & SLAs](./support)
+#### [Support & SLAs](/enterprise/support)
 Review the dedicated support options available to enterprise customers. Support engagements are structured to match your organization's needs, from teams requiring branding flexibility to enterprises needing hands-on guidance.
 
 ---
@@ -114,7 +123,7 @@ Review the dedicated support options available to enterprise customers. Support 
 
 Thanks to our enterprise clients and individual sponsors who support the project, Open WebUI is **free to use as-is** for everyone. You can deploy it today without an enterprise agreement.
 
-We are **sustained** by our users. **Optional** licenses are available to **support** ongoing development while providing **additional benefits such as white labeling, and dedicated support** for businesses.
+We are **sustained** by our users. Enterprise licenses **support** ongoing development and provide **additional benefits such as white labeling, dedicated support, and access to enterprise offerings like Terminals and Tether**. These offerings have their own license requirements, as described above.
 
 :::
 
@@ -125,10 +134,10 @@ Ready to explore how Open WebUI can help you transform your organization?
 
 ---
 
-### Keep Open WebUI Thriving ❤️
+### Keep Open WebUI Thriving
 
 Even if you **don't need an enterprise license**, consider becoming a **sponsor** to help fund continuous development.
 
 Open WebUI is free to use, but building, maintaining, and improving a platform of this scale takes real time, resources, and ongoing engineering work. Sponsorships help fund stability, security, new features, and long-term development.
 
-💙 **[Sponsor Open WebUI](https://github.com/sponsors/open-webui)**
+**[Sponsor Open WebUI](https://github.com/sponsors/open-webui)**

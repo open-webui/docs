@@ -9,7 +9,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 # Ecosystem
 
 <ThemedImage
-  alt="Open WebUI Ecosystem: an expanding set of Open WebUI-made projects, connectors, agents, and tools around the core platform"
+  alt="Ecosystem: a central block with spokes to four blocks around it"
   sources={{
     light: useBaseUrl('/images/banners/ecosystem-light.svg'),
     dark: useBaseUrl('/images/banners/ecosystem-dark.svg'),
@@ -24,3 +24,5 @@ Open WebUI is the core AI interface and agent control layer. The ecosystem is th
 - [**Open Terminal & Terminals**](/ecosystem/open-terminal): the action layer that turns Open WebUI into a full agent harness, plus the enterprise orchestrator that provisions governed per-user workspaces with policies for images, tools, resources, storage, security context, cleanup, and resets.
 - [**Open WebUI Computer**](/ecosystem/computer): your whole computer served to any browser (files, terminal, git, editor), with its own agent runtime for work that should happen on your real machine. The newest capabilities ship here first and graduate into the stable Open WebUI platform where they fit. Connects to Open WebUI through an OpenAI-compatible gateway.
 - [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync): mirror folders, repos, buckets, wikis, and other sources into Open WebUI Knowledge Bases with incremental sync.
+- [**Tether**](/ecosystem/tether): the desktop companion that connects your own computer to Open WebUI as a terminal and shows desktop notifications.
+- [**Open WebUI Community**](/ecosystem/community): the community platform at openwebui.com, where people share models, prompts, tools, functions, and chats, review models, and rank them by real usage. Models, prompts, tools, and functions import into your instance straight from their posts.

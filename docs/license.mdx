@@ -251,41 +251,41 @@ We want to make it as straightforward as possible for everyone, users, businesse
 - The Open WebUI NAME and LOGO must remain in their original, prominent locations throughout the application and user interface, including, but not limited to, the site header, sidebar, login screens, about page, and any other area where Open WebUI branding appears by default.
 - ALL visual “Open WebUI” elements, logos, wordmarks, “About”/“Help” links, and any system/credits screens, must remain unmodified and fully visible.
 - You must NOT obscure, overlay, or minimize Open WebUI branding in any way that de-emphasizes its identity, or suggests your build is the “official” one when it isn’t.
-- Co-branding is not permitted. You may not place your own logo alongside, adjacent to, or in comparable prominence to the Open WebUI logo or name.
+- **Rebranding and co-branding in any form are prohibited**, regardless of size, placement, separation, or visual prominence. This includes organization names, logos, wordmarks, branded links, and text-only notices such as “Managed by Company X”. Keeping Open WebUI’s original branding and color scheme unchanged does not make these additions permissible. Updating model icons or chat backgrounds through the platform’s built-in settings is permitted customization, not deployment co-branding. Branding exceptions described above apply only within their stated scope; an enterprise/proprietary license must explicitly authorize the intended branding changes.
 
 ### **What is (Typically) ALLOWED Without a License**
 
 | Scenario | Allowed Without License? | Guidance / Notes |
 |---|:---:|---|
-| **Use Open WebUI “as is” with branding** | ✅ | Just use the software as provided; no changes to logo, name, or identity. Easiest option! |
-| **Add custom features, UI extensions, plugins while keeping Open WebUI branding fully intact** | ✅ | Absolutely encouraged! You can add new buttons, workflows, extensions, etc., just don’t remove or alter Open WebUI’s own name and logo. |
-| **Deploy to any number of internal users within your own organization (with all official branding kept)** | ✅ | Scale however you like! No per-user limits for internal/staff/company-wide use as long as Open WebUI branding is always present and prominent. |
-| **Integrate Open WebUI with internal tools, scripts, or enterprise authentication** | ✅ | SSO, LDAP, custom backends, all welcomed! Integration is wide open, provided branding remains. |
-| **Add a small, unobtrusive info banner at top, bottom, or side (e.g., “Managed by YourOrg”)** | ✅ | Banner must be visually secondary/subordinate (footer, bottom-right, etc.), not obscuring or distracting from Open WebUI’s branding. |
-| **Add a legal or company link/notice in the About modal/dialog** | ✅ | Feel free to provide an additional legal link, team contact, or credits section, just never replace or remove Open WebUI credits. |
-| **Add monitoring, analytics, or custom backend features** | ✅ | Backend integrations and observability are totally permitted. No restrictions if branding/UI is untouched. |
-| **Create and maintain your own public fork (with all branding, plus “fork disclosure” notice)** | ✅ | As long as you keep branding as required and clearly state it’s “a fork of Open WebUI, not official.” |
-| **Link to your company/project/github in the footer or About box** | ✅ | No problem if subordinate, must not give impression of replacing or rebranding the app. |
-| **For deployments ≤50 users/rolling 30-day period** | ✅ | “Small scale” deployments may remove Open WebUI branding, but only under the explicit user count threshold, see policy for details. |
+| **Use Open WebUI “as is” with branding** | Yes | Just use the software as provided; no changes to logo, name, or identity. Easiest option! |
+| **Update model icons or chat backgrounds through Open WebUI’s built-in settings** | Yes | Using the platform as provided to customize model icons or chat backgrounds is allowed. This does not authorize adding organization branding to the deployment’s footer or administrative notices. |
+| **Add custom features, UI extensions, plugins while keeping Open WebUI branding fully intact** | Yes | Absolutely encouraged! You can add new buttons, workflows, extensions, etc., just don’t remove or alter Open WebUI’s own name and logo, or introduce rebranding or co-branding. |
+| **Deploy to any number of internal users within your own organization (with all official branding kept)** | Yes | Scale however you like! No per-user limits for internal/staff/company-wide use as long as Open WebUI branding is always present and prominent. |
+| **Integrate Open WebUI with internal tools, scripts, or enterprise authentication** | Yes | SSO, LDAP, custom backends, all welcomed! Integration is wide open, provided branding remains. |
+| **Add a text-only legal link or support contact in the About modal/dialog** | Yes | Use plain text with a font size strictly smaller than `text-xs`, solely for legal information or support. This must not introduce organization branding, promotional attribution, or “Managed by” notices. Never replace or remove Open WebUI credits. |
+| **Add monitoring, analytics, or custom backend features** | Yes | Backend integrations and observability are totally permitted. No restrictions if branding/UI is untouched. |
+| **Create and maintain your own public fork (with all branding, plus “fork disclosure” notice)** | Yes | As long as you keep branding as required and clearly state it’s “a fork of Open WebUI, not official.” |
+| **For deployments ≤50 users/rolling 30-day period** | Yes | “Small scale” deployments may remove Open WebUI branding, but only under the explicit user count threshold, see policy for details. |
 
 ### **What is NOT ALLOWED Without an Enterprise/Proprietary License**
 
 | Scenario                            | Allowed Without License? | Why NOT Allowed/Details                                              |
 |--------------------------------------|:------------------------:|----------------------------------------------------------------------|
-| Removing **ANY** Open WebUI logo/name from the UI |      ❌        | This is a clear violation, even if you add “Powered by Open WebUI” somewhere else. |
-| Modifying/changing the Open WebUI logo or color scheme to your branding |  ❌  | The identity must remain clear and intact. No recoloring or swaps. |
-| Adding your logo side-by-side/equal in size or priority (**Co-branding**) | ❌         | Co-branding of any kind is strictly forbidden. Your logo must NOT appear next to, be the same size as, or in comparable proximity or prominence to Open WebUI’s logo or name under any circumstances. |
-| Calling your fork “Open WebUI Enterprise” or misleadingly similar | ❌         | Don’t use our project’s name or branding in a way that could confuse users about source or official status. |
-| Major UI modifications that move, minimize, or obscure original Open WebUI branding | ❌ | Moving the logo, shrinking it, hiding it, or pushing it offscreen violates the terms. |
-| White-labelling for your business/SaaS                        | ❌        | You MUST get an enterprise or proprietary license before removing our branding for mass redistribution or resale. |
-| “Powered by Open WebUI” credit ONLY (if all native branding is hidden/removed) | ❌ | This is NOT enough and does not meet license terms. |
+| Removing **ANY** Open WebUI logo/name from the UI |      No        | This is a clear violation, even if you add “Powered by Open WebUI” somewhere else. |
+| Modifying/changing the Open WebUI logo or color scheme to your branding |  No  | The identity must remain clear and intact. No recoloring or swaps. |
+| Rebranding or adding your organization’s identity to the deployment (**including co-branding**) | No | Rebranding and co-branding in any form are prohibited, including names, logos, wordmarks, branded links, and text-only attribution, even when smaller, visually subordinate, or clearly separated from Open WebUI’s branding. Retaining all original Open WebUI branding does not permit adding your own deployment branding. Built-in model icon and chat background customization is permitted as described above. |
+| Adding a “Managed by Company X” notice or organization logo anywhere in the UI | No | These are co-branding, including text-only administrative notices. Small fonts, footer placement, or identifying the deployment administrator do not make them permissible. |
+| Calling your fork “Open WebUI Enterprise” or misleadingly similar | No         | Don’t use our project’s name or branding in a way that could confuse users about source or official status. |
+| Major UI modifications that move, minimize, or obscure original Open WebUI branding | No | Moving the logo, shrinking it, hiding it, or pushing it offscreen violates the terms. |
+| White-labelling for your business/SaaS                        | No        | You MUST get an enterprise or proprietary license before removing our branding for mass redistribution or resale. |
+| “Powered by Open WebUI” credit ONLY (if all native branding is hidden/removed) | No | This is NOT enough and does not meet license terms. |
 
-### **How to Add Custom Branding Responsibly**
+### **How to Preserve Open WebUI Branding**
 
 - **DO NOT remove, shrink, relocate, or recolor Open WebUI branding.**
-- **Co-branding is not allowed at all.** You may NOT display your branding/logo adjacent to or alongside Open WebUI’s logo/name, nor may you display your branding in a manner that creates visual equivalence or confusion.
-- **If you want to add a “Managed by Company X” banner**, it must remain clearly distinct, unobtrusive, and subordinate to Open WebUI’s own visual hierarchy.
-- **Do not place your logo next to ours.** Co-branding is not permitted under any license tier except enterprise.
+- **Rebranding and co-branding in any form are prohibited.** Making your organization’s name or logo smaller, placing it elsewhere, or keeping Open WebUI’s branding unchanged does not create an exception. This includes branded links, footer logos, and text-only administrative notices. Updating model icons or chat backgrounds through the built-in settings is allowed.
+- **“Managed by Company X” notices are not permitted**, including plain text at any font size. Presenting organization attribution as an administrative notice does not exempt it from the prohibition on rebranding and co-branding.
+- **Custom branding requires an applicable exception or an enterprise/proprietary license explicitly authorizing it**, as described above. Permission to add legal information or a support contact does not authorize rebranding or co-branding.
 - **Always show us a screenshot before launch!** If in doubt, email [hello@openwebui.com](mailto:hello@openwebui.com), we’re happy to review and advise.
 
 ### **Still Unsure?**

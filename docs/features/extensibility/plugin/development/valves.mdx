@@ -9,7 +9,7 @@ Valves and UserValves are used to allow users to provide dynamic details such as
 
 Hence, Valves and UserValves class can be defined in a `Pipe`, `Filter`, `Action` or `Tools` class. An `Event` class can carry `Valves` too, but never `UserValves`, since event handlers run without a user.
 
-Function Valves are configurable by admins alone, since Functions are admin-only. Tool Valves can also be edited by the tool's owner and by anyone holding a write grant on it, so treat a tool's valves as readable by everyone you share write access with. UserValves are configurable by any user directly from a chat session.
+Function Valves are configurable by admins alone, since Functions are admin-only. Tool Valves can also be edited by the tool's owner and by anyone holding a write grant on it, so treat a tool's valves as readable by everyone you share write access with. UserValves are configurable by any user directly from a chat session, in the **Valves** section under **Model controls > Controls**. The section lists only enabled tools and functions.
 
 <details>
 <summary>Commented example</summary>
@@ -72,9 +72,19 @@ class Filter:
 
 </details>
 
+## Changing Valves in Existing Code
+
+Saving a tool or function checks the Valve values already stored for it against the new code. When a stored value does not validate, for example because the new code changed a field's type or limits, the save is refused with `Current Valves are incompatible with this code: <field>: <message>` and the saved code stays as it was. Keep changed fields compatible with the values already stored, or adjust the Valves first. Only fields with a stored value are checked. Setting an older version as Production runs the same check.
+
+## Translating valve labels
+
+Valve titles, help text and dropdown option labels can be stored per language, from the globe selector in the tool or function editor. Only the labels change, the field names and the values you receive in code stay exactly as written. See [Translations](/features/administration/translations#translating-valve-labels).
+
 ## Input Types
 
 Valves support special input types that change how fields are rendered in the UI. You can configure these using `json_schema_extra` with the `input` key in your Pydantic `Field` definitions.
+
+The renderer picks the control in a fixed order. A `Literal` or enum field always renders as a select, a `bool` as a switch, a multiselect as its own control, a range as a slider and any other non-string type as a plain text box that ignores `input.type`. The `password` and `select` input types therefore only take effect on `str` fields.
 
 ### Password Input (Masked Fields)
 
@@ -157,7 +167,7 @@ class Tools:
 
 #### Dynamic Options
 
-For options that need to be generated at runtime (e.g., fetching available models, databases, or user-specific resources), specify a method name as a string. The method will be called when the configuration UI is rendered:
+For options that need to be generated at runtime (e.g., fetching available models, databases, or user-specific resources), specify a method name as a string. The method is called synchronously each time the valves dialog opens, and it must return a list. An `async def` returns a coroutine, which fails that check and leaves the field with no options and a warning in the log. The method may take a `__user__` or `user` argument to receive the current user as a dict:
 
 ```python
 from pydantic import BaseModel, Field
@@ -261,3 +271,22 @@ Dynamic options are particularly useful for:
 - Any scenario where options change based on runtime context
 :::
 
+### Slider Input (Number Ranges)
+
+A number field can render as a slider with a number box beside it. Both edit the same value, so you can drag or type. Use the range input type and set the ends with `ge` and `le`:
+
+```python
+from pydantic import BaseModel, Field
+
+class Tools:
+    class Valves(BaseModel):
+        temperature: float = Field(
+            default=0.7,
+            ge=0,
+            le=2,
+            description="Sampling temperature",
+            json_schema_extra={"input": {"type": "range", "step": 0.1}}
+        )
+```
+
+`step` is optional. Without it the slider moves in whole steps of 1. Always set `ge` and `le`; without them the slider runs from 0 to 100. It works in `Valves` and `UserValves`.
