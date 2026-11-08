@@ -15,197 +15,88 @@ For a comprehensive list of all environment variables related to Web Search (inc
 
 :::
 
-This guide provides instructions on how to set up web search capabilities in Open WebUI using SearXNG in Docker.
-
-## SearXNG (Docker)
+This guide sets up web search in Open WebUI with a self-hosted SearXNG container.
 
 > "**SearXNG is a free internet metasearch engine which aggregates results from various search services and databases. Users are neither tracked nor profiled.**"
 
-## 1. SearXNG Configuration
+SearXNG deprecated the [`searxng-docker`](https://github.com/searxng/searxng-docker) repository in March 2026. Cloning it and editing `docker-compose.yaml` no longer works: the repository no longer contains that file, and its README points at the current install. The compose template lives in the SearXNG repository, and the container runs [Granian](https://docs.searxng.org/admin/installation-granian.html) instead of uWSGI. There is no `uwsgi.ini` to create, and the old `cap_drop` workaround for that file does not apply.
 
-To configure SearXNG optimally for use with Open WebUI, follow these steps:
+The steps below follow [SearXNG's compose installation](https://docs.searxng.org/admin/installation-docker.html#compose-instancing). If you already have a `searxng-docker` directory, [move that install](https://docs.searxng.org/admin/installation-docker.html#migrate-from-searxng-docker) onto the new template first, then enable JSON as described here.
 
-**Step 1: `git clone` SearXNG Docker and navigate to the folder:**
+## 1. Install SearXNG
 
-1. Clone the repository `searxng-docker`
-
- Clone the searxng-docker repository. This will create a new directory called `searxng-docker`, which will contain your SearXNG configuration files. Refer to the [SearXNG documentation](https://docs.searxng.org/) for configuration instructions.
+**Step 1: Fetch the compose template**
 
 ```bash
-git clone https://github.com/searxng/searxng-docker.git
+mkdir -p ./searxng/core-config/
+cd ./searxng/
+curl -fsSL \
+    -O https://raw.githubusercontent.com/searxng/searxng/master/container/docker-compose.yml \
+    -O https://raw.githubusercontent.com/searxng/searxng/master/container/.env.example
+cp -i .env.example .env
 ```
 
-Navigate to the `searxng-docker` repository, and run all commands from there:
+The template publishes port 8080 on the host and listens on 8080 inside the container. If 8080 is already in use, set another port in `.env`:
 
 ```bash
-cd searxng-docker
+SEARXNG_PORT=8888
 ```
 
-**Step 2: Locate and and modify the `.env` file:**
+Use that same port in the Open WebUI query URL later. Leave `SEARXNG_HOST` unset unless you want to bind to a single address. The template also starts Valkey (`searxng-valkey`), which SearXNG uses only if you turn the limiter on.
 
-1. Uncomment `SEARXNG_HOSTNAME` from the `.env` file and set it accordingly:
-
-```bash
-
-# By default listen on https://localhost
-
-# To change this:
-
-# * uncomment SEARXNG_HOSTNAME, and replace <host> by the SearXNG hostname
-
-# * uncomment LETSENCRYPT_EMAIL, and replace <email> by your email (require to create a Let's Encrypt certificate)
-
-SEARXNG_HOSTNAME=localhost
-
-# LETSENCRYPT_EMAIL=<email>
-
-# Optional:
-
-# If you run a very small or a very large instance, you might want to change the amount of used uwsgi workers and threads per worker
-
-# More workers (= processes) means that more search requests can be handled at the same time, but it also causes more resource usage
-
-# SEARXNG_UWSGI_WORKERS=4
-
-# SEARXNG_UWSGI_THREADS=4
-```
-
-**Step 3: Modify the `docker-compose.yaml` file**
-
-3. Remove the `localhost` restriction by modifying the `docker-compose.yaml` file:
-
-If port 8080 is already in use, change `0.0.0.0:8080` to `0.0.0.0:[available port]` in the command before running it.
-
-Run the appropriate command for your operating system:
-
-- **Linux**
-```bash
-sed -i 's/127.0.0.1:8080/0.0.0.0:8080/' docker-compose.yaml
-```
-
-- **macOS**:
-```bash
-sed -i '' 's/127.0.0.1:8080/0.0.0.0:8080/' docker-compose.yaml
-```
-
-**Step 4: Grant Necessary Permissions**
-
-4. Allow the container to create new config files by running the following command in the root directory:
-
-```bash
-sudo chmod a+rwx searxng
-```
-
-**Step 5: Create a Non-Restrictive `limiter.toml` File**
-
-5. Create a non-restrictive `searxng-docker/searxng/limiter.toml` config file:
-
-*If the file already exists, append the missing lines to it.*
-
-<!-- markdownlint-disable-next-line MD033 -->
-<details>
-<!-- markdownlint-disable-next-line MD033 -->
-<summary>searxng-docker/searxng/limiter.toml</summary>
-
-```bash
-
-# This configuration file updates the default configuration file
-
-# See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
-
-[botdetection.ip_limit]
-
-# activate link_token method in the ip_limit method
-link_token = false
-
-[botdetection.ip_lists]
-block_ip = []
-pass_ip = []
-```
-
-</details>
-
-**Step 6: Remove the Default `settings.yml` File**
-
-6. Delete the default `searxng-docker/searxng/settings.yml` file if it exists, as it will be regenerated on the first launch of SearXNG:
-
-```bash
-rm searxng/settings.yml
-```
-
-**Step 7: Create a Fresh `settings.yml` File**
-
-7. Bring up the container momentarily to generate a fresh settings.yml file:
-
-If you have multiple containers running with the same name, such as caddy, redis, or searxng, you need to rename them in the docker-compose.yaml file to avoid conflicts.
-
-```bash
-docker compose up -d ; sleep 10 ; docker compose down
-```
-
-After the initial run, add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
-
-If Open WebUI is running in the same Docker network as Searxng, you may remove the `0.0.0.0` and only specify the port mapping. In this case, Open WebUI can access Searxng directly using the container name.
-
-<details>
-<summary>docker-compose.yaml</summary>
-
-```yaml
-searxng:
-    container_name: searxng
-    image: docker.io/searxng/searxng:latest
-    restart: unless-stopped
-    networks:
-      - searxng
-    ports:
-      - "0.0.0.0:8080:8080" # use 8080:8080 if containers are in the same Docker network
-    volumes:
-      - ./searxng:/etc/searxng:rw
-      - searxng-data:/var/cache/searxng:rw
-    environment:
-      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
-    cap_drop:
-      - ALL
-```
-
-</details>
-
-**Step 8: Add Formats**
-
-8. Add HTML and JSON formats to the `searxng-docker/searxng/settings.yml` file:
-
-- **Linux**
-```bash
-sed -i 's/- html/- html\n    - json/' searxng/settings.yml
-```
-
-- **macOS**
-```bash
-sed -i '' 's/- html/- html\n    - json/' searxng/settings.yml
-```
-
-**Step 9: Run the Server**
-
-9. Start the container with the following command:
+**Step 2: Start SearXNG so it can write `settings.yml`**
 
 ```bash
 docker compose up -d
 ```
 
-The searXNG will be available at http://localhost:8080 (or the port number you set earlier).
+On first start the image creates `core-config/settings.yml` from its template and replaces the placeholder `secret_key`. Do not create that file yourself before the first start, or the container will keep whatever secret you put there. Confirm the file exists, then continue:
 
-## 2. Alternative Setup
+```bash
+docker compose ps
+ls core-config/settings.yml
+```
 
-Alternatively, if you don't want to modify the default configuration, you can simply create an empty `searxng-docker` folder and follow the rest of the setup instructions.
+`docker compose ps` should show `searxng-core` as running. The generated file is short. It turns on `use_default_settings` and does not list search formats, so the `sed` edits from older copies of this guide (they look for a line `- html`) change nothing.
 
-### Docker Compose Setup
+If your editor cannot save the file, the entrypoint created it as a different user. Edit it with `sudo`.
 
-Add the following environment variables to your Open WebUI `docker-compose.yaml` file:
+**Step 3: Enable the JSON format**
+
+Open WebUI calls the [SearXNG search API](https://docs.searxng.org/dev/search_api.html) with `format=json`. SearXNG returns `403 Forbidden` for a format that is not listed, and the built-in list is only `html`.
+
+Add a `search` block to `core-config/settings.yml`. Keep `use_default_settings: true` and the generated `server.secret_key`:
+
+```yaml
+search:
+  formats:
+    - html
+    - json
+```
+
+Leave `server.limiter` unset. It defaults to off. The [limiter](https://docs.searxng.org/admin/searx.limiter.html) is for public instances and rejects the JSON requests Open WebUI sends, including when `SEARXNG_LIMITER=true`.
+
+Restart so SearXNG reads the file:
+
+```bash
+docker compose restart core
+```
+
+**Step 4: Confirm JSON on the host**
+
+Quote the URL. An unquoted `&` makes the shell run `format=json` as a separate command.
+
+```bash
+curl -fsS 'http://127.0.0.1:8080/search?q=test&format=json'
+```
+
+A JSON object means the format is enabled. An HTML page or `403` means `settings.yml` was not picked up. Check `docker compose logs core`.
+
+## 2. Point Open WebUI at SearXNG
+
+The official compose file does not put Open WebUI on its network. From another container, `localhost` is that container, not SearXNG.
+
+When Open WebUI runs in Docker, publish SearXNG's port and call it through the host. Add the query URL to the Open WebUI service:
 
 ```yaml
 services:
@@ -215,115 +106,41 @@ services:
       WEB_SEARCH_ENGINE: "searxng"
       WEB_SEARCH_RESULT_COUNT: 3
       WEB_SEARCH_CONCURRENT_REQUESTS: 10
-      SEARXNG_QUERY_URL: "http://searxng:8080/search"
+      SEARXNG_QUERY_URL: "http://host.docker.internal:8080/search"
 ```
 
-Create a `.env` file for SearXNG:
+`host.docker.internal` is provided by Docker Desktop. On Linux Docker Engine, add it to the Open WebUI service:
 
-```env
-# SearXNG
-SEARXNG_HOSTNAME=localhost:8080/
+```yaml
+extra_hosts:
+  - "host.docker.internal:host-gateway"
 ```
 
-Next, add the following to SearXNG's `docker-compose.yaml` file:
+To use the container name instead, attach Open WebUI to the network created by the template. The template sets the Compose project name to `searxng`, so that network is `searxng_default` and the container name is `searxng-core` (not `searxng`):
 
 ```yaml
 services:
+  open-webui:
+    environment:
+      SEARXNG_QUERY_URL: "http://searxng-core:8080/search"
+    networks:
+      - searxng
+
+networks:
   searxng:
-    container_name: searxng
-    image: searxng/searxng:latest
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./searxng:/etc/searxng:rw
-    env_file:
-      - .env
-    restart: unless-stopped
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-      - DAC_OVERRIDE
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
-```
-
-Your stack is ready to be launched with:
-
-```bash
-docker compose up -d
-```
-
-:::note
-
-On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi.ini`. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
-
-:::
-
-**Configure SearXNG for Open WebUI Integration**
-
-After starting the container, you need to configure SearXNG to support JSON format queries from Open WebUI:
-
-1. Stop the container after about 30 seconds to allow initial configuration files to be generated:
-
-```bash
-docker compose down
-```
-
-2. Navigate to the `./searxng` folder and edit the `settings.yml` file:
-
-```bash
-cd searxng
-```
-
-3. Open the `settings.yml` file in your preferred text editor and locate the `search` section. Add `json` to the formats list:
-
-```yaml
-search:
-  safe_search: 0
-  autocomplete: ""
-  default_lang: ""
-  formats:
-    - html
-    - json  # Add this line to enable JSON format support for Open WebUI
-```
-
-Alternatively, you can use the following command to automatically add JSON support:
-
-```bash
-sed -i '/formats:/,/]/s/html/html\n    - json/' searxng/settings.yml
-```
-
-4. Save the file and restart the container:
-
-```bash
-docker compose up -d
-```
-
-:::warning
-
-Without adding JSON format support, SearXNG will block queries from Open WebUI and you'll encounter `403 Client Error: Forbidden` errors in your Open WebUI logs.
-
-:::
-
-Alternatively, you can run SearXNG directly using `docker run`:
-
-```bash
-docker run --name searxng --env-file .env -v ./searxng:/etc/searxng:rw -p 8080:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m --log-opt max-file=1 searxng/searxng:latest
+    external: true
+    name: searxng_default
 ```
 
 ## 3. Confirm Connectivity
 
-Confirm connectivity to SearXNG from your Open WebUI container instance in your command line interface:
+From the Open WebUI container, the same quoted URL should return JSON:
 
 ```bash
-docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+is+a+test+query&format=json
+docker exec open-webui curl -fsS 'http://host.docker.internal:8080/search?q=test&format=json'
 ```
+
+Use `http://searxng-core:8080/search?q=test&format=json` instead when the container is on `searxng_default`.
 
 ## 4. GUI Configuration
 
@@ -332,11 +149,13 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 3. Set `Web Search Engine` from dropdown menu to `searxng`
 4. Set `Searxng Query URL` to one of the following examples:
 
-- `http://localhost:8080/search` (using the host and host port, suitable for Docker-based setups)
-- `http://searxng:8080/search` (using the container name and exposed port, suitable for Docker-based setups)
-- `http://host.docker.internal:8080/search` (using the `host.docker.internal` DNS name and the host port, suitable for Docker-based setups)
+- `http://127.0.0.1:8080/search` when Open WebUI runs on the host
+- `http://host.docker.internal:8080/search` when Open WebUI runs in Docker and SearXNG's port is published on the host
+- `http://searxng-core:8080/search` when Open WebUI is attached to the `searxng_default` network
 - `http://<searxng.local>/search` (using a local domain name, suitable for local network access)
-- `https://<search.domain.com>/search` (using a custom domain name for a self-hosted SearXNG instance, suitable for public or private access)
+- `https://<search.domain.com>/search` (using a custom domain name for a self-hosted SearXNG instance)
+
+Replace `8080` with `SEARXNG_PORT` if you changed it.
 
 Point the URL at the `/search` endpoint. Open WebUI adds the query parameters itself (`q`, `format=json`, `language` and the rest). The older `/search?q=<query>` form still works, since Open WebUI strips the query string when it sees `<query>`, but it is not required.
 
