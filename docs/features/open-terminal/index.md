@@ -42,10 +42,6 @@ Modern agentic workflows are not one prompt in, one answer out. They are statefu
 
 Open WebUI coordinates that loop. Open Terminal gives the loop a real place to happen: files to inspect, code to run, outputs to verify, and artifacts to hand back. Together, they form the full harness: model, context, tools, state, action, observation, and verification.
 
-:::tip Looking for "your computer in a browser" instead?
-Open Terminal is the computer substrate an **AI agent** drives from chat. If you want to operate your own machine from any browser, with files, editor, terminal, git, and AI as an optional helper, see [**Open WebUI Computer**](/ecosystem/computer), a separate Open WebUI project. [Choose the right execution environment](/ecosystem/computer/choose).
-:::
-
 ---
 
 ## How the Harness Fits Together
@@ -164,9 +160,3 @@ Open Terminal needs a model that performs tool calling at agentic quality, not j
 ## Enterprise Multi-User
 
 Need isolated, per-user agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It provisions a dedicated computer substrate for every user and policy, with automatic lifecycle management, resource limits, custom images, persistent storage, scheduled resets, and policy-controlled environments.
-
----
-
-## Your Whole Machine
-
-Open Terminal adds a computer substrate to Open WebUI for the agent to use. [**Open WebUI Computer**](/ecosystem/computer) is the computer itself for you to use: files, terminal, git, editor, and AI in a browser tab, accessible from any device.

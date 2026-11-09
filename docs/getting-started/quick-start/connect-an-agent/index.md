@@ -30,13 +30,16 @@ The agent decides when and how to use these tools based on your message, and Ope
 
 ## Available Agents
 
+For new setups, we recommend **Open WebUI with [Open Terminal](/features/open-terminal)** for agent workflows. The integrations below connect separate agent runtimes.
+
 | Agent | Description | Guide |
 |-------|-------------|-------|
-| **Open WebUI Computer** | Your computer in a browser tab, by the Open WebUI team. Each workspace connects to Open WebUI as a model with full tool access via an OpenAI-compatible gateway. | [Set up Open WebUI Computer →](/getting-started/quick-start/connect-an-agent/cptr) |
 | **Hermes Agent** | Autonomous agent by Nous Research with terminal, file ops, web search, memory, and extensible skills | [Set up Hermes Agent →](/getting-started/quick-start/connect-an-agent/hermes-agent) |
 | **OpenClaw** | Open-source self-hosted agent framework with shell access, file operations, web browsing, and messaging channel integrations | [Set up OpenClaw →](/getting-started/quick-start/connect-an-agent/openclaw) |
 
 ---
+
+[Open WebUI Computer](/getting-started/quick-start/connect-an-agent/cptr) is being gradually deprecated; its integration guide remains available for existing installations.
 
 ## How It Works
 

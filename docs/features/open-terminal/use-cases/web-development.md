@@ -94,7 +94,3 @@ On terminals that support it, the **+** menu also offers **Desktop**. It shows t
 - **[Run code from chat →](./code-execution.md)**: the AI writes, runs, and debugs code
 - **[Analyze documents & data →](./file-analysis.md)**: spreadsheets, PDFs, Word docs, emails
 - **[Automate tasks →](./system-automation.md)**: file management, backups, batch operations
-
-:::tip
-Want to preview and iterate on websites from your phone? [**Open WebUI Computer**](/ecosystem/computer) gives you your whole machine in a browser tab, accessible from any device.
-:::
