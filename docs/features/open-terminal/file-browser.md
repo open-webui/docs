@@ -216,7 +216,7 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Working directory
 
-With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. For a Per chat terminal the button appears once the chat is saved. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in.
+With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a Per chat terminal, the button appears once the chat is saved, and temporary chats offer only the other terminals. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in.
 
 **Recently Used** lists your last eight folders on that terminal. They are stored as files on the terminal, under `.open-webui/users/<user id>/folders` in its home folder, so they follow you to other browsers. Anyone who can read that home folder can see them.
 
