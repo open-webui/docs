@@ -42,7 +42,7 @@ The two rows are independent. A terminal can be **Per chat** in chats and **Off*
 
 Whichever mode you pick applies to the whole terminal: the model's tools, the file browser and the terminal panel all work in the same place.
 
-A terminal that is **Off** for chats is not listed in the chat terminal picker, so users do not run into it. The **Automation** row has no equivalent, because an [automation](/features/chat-conversations/chat-features/automations) runs with the terminal configured on its model and the model editor lists every terminal. A model pointed at a terminal that is closed to automations still works in chat, and its automation runs fail with an error saying the terminal is not available for automations.
+A terminal that is **Off** for chats is not listed in the chat terminal picker, and one that is **Off** for automations is not listed in the [automation](/features/chat-conversations/chat-features/automations#giving-a-run-a-terminal) editor, so users do not run into them. The model editor lists every terminal. A model pointed at a terminal that is closed to automations still works in chat, and its automation runs fail with an error saying the terminal is not available for automation.
 
 ## Per Chat Needs a Saved Chat
 

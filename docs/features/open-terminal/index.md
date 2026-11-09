@@ -156,7 +156,7 @@ Open Terminal needs a model that performs tool calling at agentic quality, not j
 - **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites in the Browser tab
 - **[System automation](/features/open-terminal/use-cases/system-automation)**: file management, backups, batch operations
 - **[Advanced workflows](/features/open-terminal/use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
-- **[Coding agents](/features/open-terminal/coding-agents)**: Claude Code, Codex, Cursor, Grok, OpenCode, Cline, Gemini CLI and Pi in the model picker
+- **[Coding agents](/features/open-terminal/coding-agents)**: agents such as Claude Code or Codex in the model picker
 - **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files, Git
 
 ---

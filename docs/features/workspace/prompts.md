@@ -88,7 +88,7 @@ Automatically replaced with their value at runtime:
 
 | Variable | Description |
 | :--- | :--- |
-| `{{CLIPBOARD}}` | Content from your clipboard (requires clipboard permission) |
+| `{{CLIPBOARD}}` | Content from your clipboard. If the browser blocks clipboard access, a message says the clipboard could not be read. |
 | `{{CURRENT_DATE}}` | Current date |
 | `{{CURRENT_DATETIME}}` | Current date and time |
 | `{{CURRENT_TIME}}` | Current time |

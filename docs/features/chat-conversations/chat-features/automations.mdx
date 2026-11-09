@@ -74,15 +74,15 @@ After creation, Open WebUI opens the dedicated automation editor page at `/autom
 
 The automation editor has a **Terminal** list and, once one is picked, a **Working Directory** field. The run uses that terminal and starts in that folder; with the field empty it starts in the terminal's default folder. The list appears when at least one terminal is available to you, and a terminal picked here replaces the one configured on the model.
 
-Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models**: edit the model and pick the terminal from the **Terminal** list. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default.
+Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models**: edit the model and pick the terminal from the **Default terminal** field. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default.
 
 :::info A terminal can be closed to automations
-Administrators can take an orchestrated terminal out of automations, and can give each automation a workspace of its own rather than sharing one across everything. The automation editor does not list such a terminal. The model editor's **Terminal** list does, so a run can fail with an error saying the terminal is not available for automations, which means its **Automation** context is set to **Off**. Pick a different terminal for the model, or ask an administrator to reopen that one. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+Administrators can take an orchestrated terminal out of automations, and can give each automation a workspace of its own rather than sharing one across everything. The automation editor leaves such a terminal out. The model editor's **Terminal** list does, so a run can fail with an error saying the terminal is not available for automation, which means its **Automation** context is set to **Off**. Pick a different terminal for the model, or ask an administrator to reopen that one. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
 :::
 
-### Running a coding agent
+### Running a Coding Agent
 
-With a terminal picked, the **Model** list also offers the coding agents that terminal reports, named `<agent>/<model>`. Changing the terminal or folder reloads the list, and **Create** and **Save** wait for it. An agent needs a terminal, so an agent automation cannot be saved without one. Its results go to a chat; the channel destination is not available for it. Before each run Open WebUI checks that the terminal and the agent are still available and the run fails if either is gone.
+With a terminal picked, the **Model** list also offers the coding agents that terminal reports, named `<agent>/<model>`. Changing the terminal or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a terminal before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the terminal and the agent are still available and the run fails if either is gone.
 
 ## Edit and Manage
 
