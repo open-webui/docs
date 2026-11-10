@@ -9,9 +9,19 @@ Tether is the desktop companion app for Open WebUI, available for macOS, Windows
 
 ## Connecting
 
-1. In Tether, enter the address of your Open WebUI instance.
-2. Tether opens your browser at `/auth/sessions/<id>` on that instance. If you are not signed in yet, you sign in first. After sign-in the page returns you to Tether.
-3. Tether stays signed in and renews its session in the background.
+Everything is set up in the Tether app, on the computer you want to use from your chats. An instance that meets the [requirements](#requirements) accepts the app as it is, with nothing to switch on in the Admin Panel.
+
+1. Install Tether on that computer from the [releases page](https://github.com/open-webui/tether/releases/latest).
+2. In Tether, enter the address of your Open WebUI instance. For a further instance or account, click **Add connection**. Enter the address the instance ends up on: if `http://` redirects to `https://`, enter the `https://` address.
+3. Tether opens your browser at `/auth/sessions/<id>` on that instance. If you are not signed in yet, you sign in first, with the account you chat with. After sign-in the page returns you to Tether.
+4. Tether offers to install Open Terminal, the part that lets chats work on this computer. Accept it. After **Not now**, you install it later in Tether under **Settings > Open Terminal**.
+5. The terminal indicator in Tether reads **Connected to WebUI**. Tether stays signed in and renews its session in the background.
+
+## Using Your Computer in a Chat
+
+Open your instance in any browser, on any device, signed in to the same account as Tether. Click the **terminal button** (cloud icon) in the chat input and pick your computer under **Your devices**. It is listed by its computer name, or by the **Device name** you set in Tether's settings. From there it works like any other terminal, see [Select a terminal in chat](/features/open-terminal/setup/connecting#7-select-a-terminal-in-chat).
+
+The terminal button is shown as soon as you have at least one terminal. If Tether is your only one, the button appears the moment Tether connects and leaves when Tether disconnects.
 
 Each signed-in app is a separate session. Signing out from the app ends its session. A session also ends when it is deleted through the API or when nobody uses it for [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) (default `90d`). Access tokens last 15 minutes and every renewal replaces the refresh token.
 
@@ -24,8 +34,26 @@ Each signed-in app is a separate session. Signing out from the app ends its sess
 
 - [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is on.
 - Open WebUI runs with one worker, or with [Redis](/reference/env-configuration#redis_url) when [`UVICORN_WORKERS`](/reference/env-configuration#uvicorn_workers) is above 1. Without Redis, a multi-worker instance refuses Tether connections and requests to a Tether terminal fail with "Tether requires Redis with multiple WebUI workers."
+- [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is on, which is the default. It is the switch for every terminal on the instance, Tether computers included.
+- The computer running Tether reaches the instance's address. Tether opens the connection from the computer to the instance, so the computer needs no open port and no address the instance can reach.
 
-The app configuration at `/api/config` reports `features.tether` when these requirements are met and `features.auth_sessions` on every instance.
+The app configuration at `/api/config` reports `features.tether` when the first two requirements are met and `features.auth_sessions` on every instance.
+
+Access follows the account: every user who can sign in can connect their own computer, and it is listed for that account only.
+
+## Troubleshooting
+
+If the terminal button or your computer is missing in the chat input, check these in order:
+
+| Check | Fix |
+| --- | --- |
+| Tether shows **Running locally · Not connected to WebUI** | Tether is not connected to this instance. Add the instance's address as a connection and sign in. |
+| The browser is signed in to a different account than Tether | Sign in to the same account in both. |
+| Open Terminal is not installed in Tether | Install it in Tether under **Settings > Open Terminal**. |
+| `/api/config` on the instance shows no `"tether":true` | An admin brings the instance in line with the [requirements](#requirements). |
+| The **Tools** and **Open Terminal** sections of **Settings > Admin > Integrations** are greyed out | An admin removes `ENABLE_TOOL_SERVERS=False` and `ENABLE_PLUGINS=False` from the instance's environment and restarts it. |
+
+If the computer is selected and the model does not use it, the model's **Terminal** capability is off. Turn it on in the model editor, see [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
 
 ## Session API
 
