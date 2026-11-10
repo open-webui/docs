@@ -232,14 +232,15 @@ After changing the embedding model, click the **Reindex** button in **Admin Sett
 The re-index process performs the following steps for each knowledge base:
 
 1. **Deletes** the existing vector collection for the knowledge base.
-2. **Re-chunks** every file using the current chunk size, overlap and text splitter settings.
-3. **Re-embeds** all chunks using the currently configured embedding model.
-4. **Rebuilds** the per-file collection of every file in the knowledge base as well, so attaching one of those files to a chat on its own retrieves the same content as searching the knowledge base it belongs to.
+2. **Re-extracts** every file from its original upload using the current content extraction engine and its settings.
+3. **Re-chunks** every file using the current chunk size, overlap and text splitter settings.
+4. **Re-embeds** all chunks using the currently configured embedding model.
+5. **Rebuilds** the per-file collection of every file in the knowledge base as well, so attaching one of those files to a chat on its own retrieves the same content as searching the knowledge base it belongs to.
 
-This means a single re-index applies both chunking setting changes and embedding model changes simultaneously.
+This means a single re-index applies content extraction, chunking and embedding model changes simultaneously.
 
-:::note Re-indexing does not parse the file again
-Re-indexing works from the text that was extracted when the file was first uploaded. The original document is not opened again, so changing the content extraction engine or any other parsing setting has no effect on files that are already in a knowledge base. Re-upload them if you need them parsed again.
+:::note Re-indexing parses the file again
+Every file goes through the content extraction engine again, so allow for the extraction time on top of the embedding. Text edited in the knowledge base file viewer is replaced by the fresh extraction. Audio, image and video files keep their stored text, and so does a file whose original is missing or fails to extract.
 :::
 
 :::warning Re-indexing does not cover chat files
@@ -364,7 +365,7 @@ When using **Temporary Chat**, document processing is restricted to **frontend-o
 
 A parsed CSV is its rows and nothing else, so a model asked how many orders a spreadsheet holds answers from whichever rows were retrieved. Setting [`ENABLE_RAG_CSV_SUMMARY=true`](/reference/env-configuration#enable_rag_csv_summary) (off by default, restart required) puts one line in front of every `.csv` file naming its row count, its data row count and its column names.
 
-The `external`, `tika` and `docling` extraction engines parse `.csv` files themselves and get no summary. Only files parsed after you turn the setting on get one, and re-indexing does not add it, so existing CSVs have to be re-uploaded.
+The `external`, `tika` and `docling` extraction engines parse `.csv` files themselves and get no summary. Only files parsed after you turn the setting on get one, so re-index to add it to the CSVs already in a knowledge base.
 
 ## Google Drive Integration
 

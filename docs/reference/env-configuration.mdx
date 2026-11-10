@@ -4707,7 +4707,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Puts one line in front of every parsed `.csv` file naming its row count, its data row count and its column names, so a question about the size of the table is not answered from whichever rows happened to be retrieved. No summary is added when `CONTENT_EXTRACTION_ENGINE` is `external`, `tika` or `docling`, which parse `.csv` files themselves. Only files parsed after you turn it on get one, and re-indexing does not add it, so a CSV has to be re-uploaded. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
+- Description: Puts one line in front of every parsed `.csv` file naming its row count, its data row count and its column names, so a question about the size of the table is not answered from whichever rows happened to be retrieved. No summary is added when `CONTENT_EXTRACTION_ENGINE` is `external`, `tika` or `docling`, which parse `.csv` files themselves. Only files parsed after you turn it on get one, so re-index to add it to the CSVs already in a knowledge base. See the [RAG guide](/features/chat-conversations/rag#csv-table-summary).
 - Persistence: Set via environment variable; changing it requires a restart (not a `ConfigVar`, so it does not appear in the admin settings).
 
 #### `RAG_FILE_MAX_SIZE`

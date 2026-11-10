@@ -233,7 +233,7 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via e
 
 **Cause**: Docling marks only page changes in its Markdown output, so a blank page leaves no page break. Page numbers counted from those breaks make every citation after a blank page show an earlier page number. Open WebUI takes the page numbers from the JSON output Docling returns alongside the Markdown.
 
-**Solution**: Upload the affected files again, for example by removing a file from its knowledge base and adding it back. Page numbers are set when Docling extracts a file, and **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents** reuses the text already extracted, so it keeps the old page numbers.
+**Solution**: Run **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents**, which extracts every knowledge base file again, and upload again the affected files that are not in a knowledge base. Page numbers are set when Docling extracts a file.
 
 ### "Error calling Docling" with no specific details
 
