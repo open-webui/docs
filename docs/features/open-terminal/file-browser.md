@@ -272,7 +272,3 @@ An administrator can set an orchestrated terminal to give every conversation a w
 - **[Analyze documents & data →](./use-cases/file-analysis.md)**: drag in a spreadsheet or PDF and ask about it
 - **[Run code from chat →](./use-cases/code-execution.md)**: the AI creates files you can see here
 - **[Build & preview websites →](./use-cases/web-development.md)**: the files the AI creates appear in the browser
-
-:::tip
-Want to browse and edit your real files from any device? [**Open WebUI Computer**](/ecosystem/computer) puts your entire machine in a browser tab, with a full file browser, terminal, git, and editor.
-:::

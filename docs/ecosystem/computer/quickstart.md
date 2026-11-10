@@ -5,6 +5,10 @@ sidebar_position: 3
 
 # Quickstart
 
+:::info Recommended setup
+Open WebUI Computer is being gradually deprecated. For new setups, use [Open WebUI](/getting-started) with [Open Terminal](/features/open-terminal). These Computer guides remain available for existing installations.
+:::
+
 From zero to your real files in a browser, in about two minutes. You need Python 3.10+ on the machine that has your work (macOS, Linux, or Windows). No AI key, no account with anyone, no cloud.
 
 ## 1. Install and run

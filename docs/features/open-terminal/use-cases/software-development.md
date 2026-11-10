@@ -7,10 +7,6 @@ title: "Software Development"
 
 Open Terminal enables the AI to interact with real codebases: cloning repos, running tests, reading errors, installing dependencies, and iterating on fixes.
 
-:::tip
-For a full development environment accessible from any device, see [**Open WebUI Computer**](/ecosystem/computer). Your computer in a browser tab.
-:::
-
 ---
 
 ## Clone and explore a repo

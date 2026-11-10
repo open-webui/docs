@@ -27,10 +27,6 @@ Use it when a chat needs more than a text answer: analyze a spreadsheet, write a
 
 [Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate workspaces per user and policy, controlled images, resource limits, storage, environment variables, security context, idle cleanup, refreshes, and scheduled resets.
 
-:::tip Looking for your own machine in a browser?
-Open Terminal gives **AI** a computer substrate inside Open WebUI's harness. [Open WebUI Computer](/ecosystem/computer) gives **you** your real machine in a browser: files, editor, terminal, git, and optional AI. See [Computer, Open WebUI, or Open Terminal?](/ecosystem/computer/choose) for the short comparison.
-:::
-
 ## The Familiar Words
 
 If you have heard people talk about agent harnesses, agentic workflows, tool use, computer use, runtimes, guardrails, and orchestration, this is where Open Terminal and Terminals fit.
@@ -120,9 +116,5 @@ Open Terminal can run isolated in Docker or directly on a host, depending on how
 | Configuration options | [Configuration](/features/open-terminal/advanced/configuration) |
 | Multi-user setup choices | [Multi-user](/features/open-terminal/advanced/multi-user) |
 | Terminals troubleshooting | [Troubleshooting](/features/open-terminal/terminals/#troubleshooting) |
-
-## Related Ecosystem Projects
-
-- [**Open WebUI Computer**](/ecosystem/computer): serves your real computer to any browser, with files, terminal, editor, git, and AI as an optional helper.
 
 Terminals requires an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise) for production use. The project lives at [github.com/open-webui/terminals](https://github.com/open-webui/terminals).
