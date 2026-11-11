@@ -7,6 +7,8 @@ title: "Google PSE"
 
 **New Google PSE projects are no longer supported.** Google has restricted the legacy JSON API to existing customers only. New users attempting to use Google PSE will receive a `403 Forbidden` error.
 
+Existing projects have an end date too. Google's [Custom Search JSON API overview](https://developers.google.com/custom-search/v1/overview) says: "Existing Custom Search JSON API customers have until January 1, 2027 to transition to an alternative solution." The `google_pse` engine in Open WebUI sends its searches to this API, so if you use it, choose another engine from the [Web Search](/features/chat-conversations/web-search) page before that date.
+
 :::
 
 :::warning
