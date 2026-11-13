@@ -15,7 +15,7 @@ The model writes a small piece of HTML, SVG and JavaScript through the `render_v
 
 ## Turn It On
 
-Visualizations are off by default. Turn them on per model in **Workspace > Models > Edit**, under **Builtin Tools** > **Visualizations**. The tool needs [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) and the model's **Builtin Tools** capability.
+Visualizations are off by default. Turn them on per model in the model editor, under **Builtin Tools** > **Visualizations**. Open the editor for a base model in **Settings > Admin > Models** or for your own model in **Workspace > Models**. The tool needs [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) and the model's **Builtin Tools** capability.
 
 ## Change the Instructions
 
