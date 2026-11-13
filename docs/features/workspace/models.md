@@ -163,12 +163,12 @@ The editor shows only the options that can work on this instance, for example **
 | **Citations** | Show the sources behind a reply, from knowledge, file retrieval and the builtin tools that return them. On by default; with it off no sources are shown. Web search hits are not sources in Native mode, see [Agentic Search](/features/chat-conversations/web-search/agentic-search) |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
-| **Builtin Tools** | The capability switches the built-in tools on as a whole. While it is on, a **Builtin Tools** row below **Capabilities** controls which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills, Tool Creation. A category shows only while its feature is on |
+| **Builtin Tools** | The capability switches the built-in tools on as a whole. While it is on, a **Builtin Tools** row below **Capabilities** controls which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills, Tool Creation, [Visualizations](/features/chat-conversations/chat-features/visualizations) (off by default). A category shows only while its feature is on |
 | **Sub-agents** | Shown while the **Sub-agents** builtin tool category is on: the models this model can hand [sub-agent](/features/chat-conversations/chat-features/subagents) work to. Users only get the listed models they have access to. Left empty, sub-agents run on the current model |
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **Preload files** disappears from this editor since there is nothing to extract |
 | **Preload files** | When enabled, attached files are processed via RAG and injected into the conversation. When disabled, nothing is injected and the model reads attached files with the builtin **Files** tools. Off by default with Native function calling and on with Legacy; the editor and **Model Defaults** show the effective value |
 | **Default Features** | The row right below **Capabilities** lists **Web Search**, **Image Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |
-| **Default terminal** | Shown while **Terminal** is on: the [Open Terminal](/features/open-terminal) server selected by default for chats with this model |
+| **Default terminal** | Shown while **Terminal** is on: the [Open Terminal](/features/open-terminal) server or [terminal](/features/open-terminal/terminals/orchestration/creating-terminals) selected by default for chats with this model. A terminal with a separate machine per model needs access to the model |
 | **TTS Voice** | In the **Voice** row: a specific voice for this model's responses |
 
 :::info Usage covers every chat the model runs
@@ -211,7 +211,7 @@ The controls are saved with the model and apply to everyone who can use it. Peop
 
 An option's parameters work like the ones added with **Add Custom Parameter** in **Advanced Params**: the parameter name goes to the provider exactly as written, and a value that reads as JSON (a number, `true`, an object) is sent as that type, anything else as text. When an option has several parameters, all of them are sent together. For an Ollama model they end up in Ollama's `options`, except `think`, `format` and `keep_alive`, which go at the top level of the request. A `think`, `format` or `keep_alive` the model sets itself still wins over a control; leave those three unset on the model if a control should drive them.
 
-Controls need a model served through one of the instance's connections, such as an OpenAI-compatible or Ollama connection. Saving controls on a model backed by a pipe function, on an arena model or on a model from a direct connection fails with **Model controls require a server-managed provider model.**
+Saving controls on a model backed by a pipe function or on an arena model fails with **Model controls require a server-managed provider model.**
 
 #### Using model controls in chat
 
@@ -391,7 +391,7 @@ Hold **Shift** while the model list is open and every row exposes inline icon bu
 
 ### Reviewing what is configured
 
-Open the view filter (the dropdown next to **Actions**, which starts on **Available**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by All, Available, Unavailable, Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here.
+Open the view filter (the dropdown next to **Actions**, which starts on **Available**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by All, Available, Unavailable, Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here. **Arena Models** lists the [arena models](/features/administration/evaluation#configuring-an-arena-model) an admin has set up.
 
 ![The view filter with the Selected and Pinned options](/images/features/models/model-view-filter.png)
 

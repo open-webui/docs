@@ -25,7 +25,7 @@ It gives the model a stateful workspace where it can create, run, inspect, repai
 
 Use it when a chat needs more than a text answer: analyze a spreadsheet, write a script, build a small app, render a report, inspect logs, run tests, organize files, or start a server and preview the result. Open WebUI stays the interface; Open Terminal gives the agent a workspace where those results can actually be produced.
 
-[Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate workspaces per user and policy, controlled images, resource limits, storage, environment variables, security context, idle cleanup, refreshes, and scheduled resets.
+[Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate machines per user, chat or model, controlled images, resource limits, storage, environment variables, sharing and idle cleanup.
 
 ## The Familiar Words
 
@@ -39,9 +39,9 @@ If you have heard people talk about agent harnesses, agentic workflows, tool use
 | **Computer use** | The agent works inside a computer-like workspace: files, commands, packages, previews, and generated artifacts |
 | **Agent runtime** | The loop and state around the model; Open Terminal supplies the OS-level action workspace inside it |
 | **Stateful session** | The workspace keeps files, output, processes, and task context around long enough for multi-step work |
-| **Guardrails / human review** | Open WebUI controls the user, model, tool, and approval layer; Terminals controls the workspace boundary by policy |
-| **Orchestration** | Terminals provisions, routes, isolates, refreshes, and cleans up Open Terminal workspaces for teams |
-| **Observability / auditability** | Admins can reason about which user, policy, workspace, image, limits, and lifecycle produced a result |
+| **Guardrails / human review** | Open WebUI controls the user, model, tool and approval layer; Terminals controls the workspace boundary per terminal |
+| **Orchestration** | Terminals provisions, routes, isolates and cleans up Open Terminal workspaces for teams |
+| **Observability / auditability** | Admins can reason about which user, terminal, workspace, image, limits and lifecycle produced a result |
 
 ## Start With Open Terminal
 
@@ -61,17 +61,15 @@ If you have heard people talk about agent harnesses, agentic workflows, tool use
 
 ## Scale With Terminals
 
-Use Terminals when agent workspaces need to be provisioned, isolated, reused, refreshed, and reset by policy instead of hand-wired one environment at a time.
+Use Terminals when agent workspaces need to be provisioned, isolated, reused and reset from shared terminals.
 
 | I want to... | Go to |
 | :--- | :--- |
 | Read the Terminals overview | [Terminals overview](/features/open-terminal/terminals/) |
 | Understand the provisioning flow | [Orchestration](/features/open-terminal/terminals/orchestration) |
-| Configure images, resources, storage, env vars, and idle timeout | [Policies](/features/open-terminal/terminals/orchestration/policies) |
+| Create and share terminals with their own image, resources, storage and env vars | [Creating terminals](/features/open-terminal/terminals/orchestration/creating-terminals) |
 | Understand env var forwarding and reserved keys | [Environment variables](/features/open-terminal/terminals/orchestration/environment-variables) |
 | Build and roll out custom workspace images | [Custom images](/features/open-terminal/terminals/orchestration/custom-images) |
-| Refresh users after policy changes | [Applying changes](/features/open-terminal/terminals/orchestration/applying-changes) |
-| Reset persisted workspaces on a schedule | [Scheduled resets](/features/open-terminal/terminals/orchestration/scheduled-resets) |
 | Run on OpenShift | [OpenShift](/features/open-terminal/terminals/orchestration/openshift) |
 | Tune generated system prompts | [System prompts](/features/open-terminal/terminals/orchestration/system-prompts) |
 | Expose a clean file-browser root | [File browser root](/features/open-terminal/terminals/orchestration/file-browser-home-boundary) |
@@ -100,15 +98,15 @@ For teams, the same model becomes infrastructure:
 | Layer | Role |
 | :--- | :--- |
 | Open WebUI | Chat, users, permissions, model selection, tools, and the visible workflow |
-| Terminals | Auth, routing, policy resolution, provisioning, lifecycle, refresh, and cleanup |
+| Terminals | Auth, routing, provisioning, lifecycle and cleanup |
 | Open Terminal workspace | Files, shell, processes, packages, code execution, previews, and artifacts |
-| Policy | Image, tools, limits, storage, env vars, security context, and idle timeout |
+| Terminal | Image, limits, storage, env vars, start directory, setup script and machine scope |
 
 In harness-engineering terms: Open WebUI plus Open Terminal is the full harness, Open Terminal is the computer substrate inside it, and Terminals is the fleet manager for those substrates.
 
 ## Operate It Safely
 
-Open Terminal can run isolated in Docker or directly on a host, depending on how much access the agent should have. Terminals adds policy, lifecycle, and per-user isolation for shared deployments. Start with the security and configuration pages before giving agents broad filesystem, process, or network access.
+Open Terminal can run isolated in Docker or directly on a host, depending on how much access the agent should have. Terminals adds shared terminals, lifecycle and separate machines per user, chat or model for shared deployments. Start with the security and configuration pages before giving agents broad filesystem, process or network access.
 
 | Need | Go to |
 | :--- | :--- |

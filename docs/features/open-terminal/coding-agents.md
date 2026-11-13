@@ -9,6 +9,14 @@ When the selected Open Terminal lists coding agents, they show up in the model p
 
 Which agents and models appear depends on the Open Terminal you select. Agents the terminal reports as unavailable are not listed.
 
+## What You Can Do With It
+
+- **Hand over a whole coding task.** Describe a feature or a bug and let the agent edit the project's files and run its commands in the terminal.
+- **Stay in one place.** Follow the agent's work, answer its questions and approve its tool requests in the chat.
+- **Use the agent you prefer.** Pick Claude Code, Codex or another listed agent from the model picker like any other model.
+
+Use an agent when a task needs real work on a project, and a normal model when you only want an answer. It is for anyone who has a terminal selected that lists agents.
+
 ## Picking an Agent
 
 Select a terminal in the chat, then open the model picker. Each agent model is named `<agent>/<model>`.
@@ -17,6 +25,10 @@ Select a terminal in the chat, then open the model picker. Each agent model is n
 - **New messages only.** Continue an agent conversation by sending a new message. Agent chats cannot be regenerated, continued or edited and resent, and you cannot branch from an earlier message; start a new chat instead.
 - **Missing agents.** When the terminal or its agent model is unavailable, the agent is removed from the selection and the default model is used.
 - **Saved chats only.** Agent conversations need a saved chat, so they are not available in temporary chats.
+
+## Model IDs
+
+An agent model ID uses only letters, digits, dashes and underscores. A model name with other characters, such as dots, has them replaced by dashes plus a short suffix. Pins, default models and [automations](/features/chat-conversations/chat-features/automations#running-a-coding-agent) store this ID.
 
 ## Options
 

@@ -11,16 +11,23 @@ import Kubernetes from './tab-deployment/Kubernetes.md';
 
 # Terminals (Orchestrator)
 
-**Terminals** is the enterprise orchestration layer for [Open Terminal](/features/open-terminal). It provisions a dedicated computer substrate for every Open WebUI user: separate files, processes, package environment, resource limits, network boundary, and optional persistent storage.
+**Terminals** manages [Open Terminal](/features/open-terminal) machines for a team. Each machine is a container where the AI runs commands and works with files. A machine can belong to a user, a chat or a model, or be shared by everyone, with its own files, processes, packages, resource limits, network profile and optional persistent storage.
 
 [View on GitHub →](https://github.com/open-webui/terminals)
 
-Open Terminal turns one Open WebUI chat into a full agent harness with a real workspace for action. Terminals turns that into managed fleet infrastructure, so every user or policy can get the right workspace without sharing state or hand-wiring containers.
+Open Terminal gives an Open WebUI chat a real workspace to act in. Terminals manages those workspaces for many people, so everyone gets the right one without hand-wiring containers. Open WebUI is where you create, share and use terminals. Terminals starts, reuses and cleans up the machines behind them.
 
-Open WebUI is where the harness is configured, governed, and observed. Terminals is the workspace lifecycle layer inside that harness: it provisions, isolates, reuses, refreshes, and resets the computer substrates agents use to do real work.
+## What You Can Do With It
+
+- **Give every person their own workspace.** Each user, chat or model can get a separate machine, so files and processes never mix.
+- **Offer ready-made environments.** Set an image, resources, a start folder and a setup script once, then share the terminal with a group.
+- **Keep it tidy.** Idle machines are cleaned up after the idle timeout you set.
+
+It is for admins who run Open WebUI for a team and for the users they give access to. Use it when one shared Open Terminal is not enough because people need separate files, tools and limits.
 
 :::tip Quick navigation
 - **Need to operate per-user terminal environments?** → [Orchestration](/features/open-terminal/terminals/orchestration)
+- **Need to create and share terminals?** → [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals)
 :::
 
 ```mermaid
@@ -28,9 +35,9 @@ flowchart LR
     OW["Open WebUI"]
     OR["Orchestrator"]
     OW -->|X-User-Id| OR
-    OR --> TA["Agent workspace<br/>User A"]
-    OR --> TB["Agent workspace<br/>User B"]
-    OR --> TC["Agent workspace<br/>User C"]
+    OR --> TA["Machine<br/>User A"]
+    OR --> TB["Machine<br/>User B"]
+    OR --> TC["Machine<br/>User C"]
 
     style OW fill:#4a90d9,color:#fff
     style OR fill:#e67e22,color:#fff
@@ -43,34 +50,32 @@ flowchart LR
 
 ## How It Works
 
-The orchestrator sits between Open WebUI and the per-user Open Terminal workspaces:
+The orchestrator sits between Open WebUI and the Open Terminal machines:
 
 1. A user activates Open Terminal in Open WebUI.
 2. Open WebUI proxies the request to the **orchestrator**, which manages workspace lifecycle.
-3. The orchestrator resolves the selected policy: image, resources, storage, env vars, security context, and idle timeout.
-4. The orchestrator provisions or reuses a personal Open Terminal workspace for that user and policy, and for the [terminal context](/features/open-terminal/terminals/orchestration/contexts) when the connection is scoped per chat or per automation.
-5. All traffic is proxied through the orchestrator. The user never connects to the workspace directly.
-6. Idle workspaces are cleaned up after a configurable timeout. Files can persist across sessions when storage is enabled.
+3. The orchestrator reads the selected [terminal](/features/open-terminal/terminals/orchestration/creating-terminals): image, resources, storage, env vars, start directory, setup script and machine scope.
+4. The orchestrator provisions or reuses the matching Open Terminal machine: one per user, chat or model, or a single one for everyone, depending on the terminal's machine scope.
+5. All traffic goes through the orchestrator.
+6. Idle machines are cleaned up after the idle timeout you set. Files in the home folder are kept: Docker keeps them in the data folder, Kubernetes keeps them on a persistent volume when storage is enabled.
 
-The orchestrator exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can work with files, run code, execute commands, start servers, and inspect results, all scoped to the requesting user's workspace.
+The orchestrator exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can work with files, run code, execute commands, start servers and inspect results, all inside the machine the terminal's scope selects.
 
 ## Why It Matters
 
-Terminals is what makes the full agent harness operable for teams. It lets admins give agents enough environment to do real work while still controlling the boundary:
+Terminals lets admins give agents enough environment to do real work while controlling its limits:
 
 | Need | What Terminals provides |
 | :--- | :--- |
-| Isolation | One workspace per user and policy, with separate files and processes, and optionally one per saved chat or per automation |
-| Governance | Policy-controlled images, env vars, resource limits, storage, and security context |
+| Isolation | Separate files and processes per machine, with one machine per user, saved chat or model when the terminal asks for it |
+| Governance | Terminals with set images, env vars, resource limits and storage, checked against server maximums, and shared only with chosen users and groups |
 | Repeatability | Custom images and startup packages so users get the right tools every time |
-| Lifecycle | Reuse, idle cleanup, refresh, and scheduled resets |
+| Lifecycle | Reuse, idle cleanup and start, stop, restart and delete per machine |
 | Scale | Docker for a single host, Kubernetes/operator mode for larger deployments |
-| Supportability | Admin UI, logs, status, policy APIs, and predictable routing |
-
-In harness-engineering terms, Terminals owns the workspace lifecycle: provision, route, persist, reap, refresh, and reset.
+| Supportability | Admin UI, logs, status, templates API and predictable routing |
 
 :::info Admin UI
-The orchestrator serves a built-in minimal admin UI at `/` for viewing terminal status, active sessions, and policies. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
+The orchestrator serves a built-in minimal admin UI at `/` with **Templates** (create and edit terminals, reset schedules, delete) and **Environments** (inspect machines, including stopped ones, and start, stop, restart, reset or delete them). It signs in with `TERMINALS_API_KEY`. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
 :::
 
 ---
@@ -94,19 +99,13 @@ The orchestrator serves a built-in minimal admin UI at `/` for viewing terminal 
 
 ## Authentication
 
-The orchestrator supports three authentication modes:
+Open WebUI and the orchestrator share one API key. Set `TERMINALS_API_KEY` on the orchestrator, and on the connection in Open WebUI set **Auth** to **Bearer** with the same value as **API Key**. Open WebUI checks who may use a terminal. Terminal requests carry the verified user ID, and the orchestrator accepts requests that carry the key. Keep the key secret: it also opens the built-in admin UI and the templates API.
 
-| Mode | When to use | How to configure |
-| :--- | :--- | :--- |
-| **Open WebUI JWT** | Production. The orchestrator validates tokens against your Open WebUI instance. | Set `TERMINALS_OPEN_WEBUI_URL` on the orchestrator to your Open WebUI URL, and set the connection's **Auth** to **Session** in Open WebUI. |
-| **Shared API key** | Standard. Open WebUI includes a shared secret in every request. | Set `TERMINALS_API_KEY` on the orchestrator, and on the connection in Open WebUI set **Auth** to **Bearer** with the same value as **API Key**. |
-| **Open** | Development only. No authentication. Do not use in production. | Leave both `TERMINALS_OPEN_WEBUI_URL` and `TERMINALS_API_KEY` unset. |
+If `TERMINALS_API_KEY` is unset, `terminals serve` generates a key and prints it. The generated key changes on every restart, so set a fixed value for any real deployment.
 
-When deployed via Docker Compose or Helm, the shared API key is configured automatically between Open WebUI and the orchestrator.
+With Helm the chart generates the shared key and configures it on both sides. With Docker Compose set `TERMINALS_API_KEY` in a `.env` file next to the Compose file, see [Deployment](#deployment).
 
-JWT mode needs the two sides to agree. The orchestrator checks each request against the identity of the user who made it, so Open WebUI has to send that user's own token instead of one shared key. **Auth > Session** on the connection does this for the model's tools, coding agents, the file browser and the terminal panel. **Auth > Bearer** in JWT mode fails authentication, which shows up as a terminal that closes the moment it opens.
-
-The policy, lifecycle, status and refresh APIs take the orchestrator's own `TERMINALS_API_KEY` and never a user's token, whichever mode is in use. Keep that key set even in JWT mode, and send it when you call those endpoints yourself. With **Auth** set to **Bearer** or **Session**, Open WebUI attaches the connection's **API Key** to Verify Connection, the policy, lifecycle and refresh calls and the loading of the terminal's tool list. Enter the orchestrator's `TERMINALS_API_KEY` there.
+The key covers every call from Open WebUI: **Verify Connection**, the terminals API and terminal traffic, which also carry the user's ID and the `X-Terminal-*` [headers](/features/open-terminal/terminals/orchestration/api-troubleshooting#headers-sent-to-the-terminals-server).
 
 ---
 
@@ -114,24 +113,23 @@ The policy, lifecycle, status and refresh APIs take the orchestrator's own `TERM
 
 ### Terminal won't start
 
-1. **Check orchestrator logs.** The orchestrator logs the full provisioning flow, including image pull and workspace creation. Look for errors related to image availability, policy configuration, or resource limits.
-2. **Verify the API key.** Ensure `TERMINALS_API_KEY` matches between Open WebUI and the orchestrator. A mismatch causes silent auth failures.
+1. **Check orchestrator logs.** The orchestrator logs the full provisioning flow, including image pull and workspace creation. Look for errors related to image availability, terminal settings or resource limits.
+2. **Verify the API key.** Ensure `TERMINALS_API_KEY` matches between Open WebUI and the orchestrator. A mismatch makes the connection fail with a `401` error.
 3. **Check image pull access.** If using a private container registry, make sure the orchestrator (Docker) or cluster (Kubernetes) has pull credentials configured.
 4. **Raise the timeout.** If a request fails with `Terminal '<name>' timed out. It may still be starting.`, raise [`AIOHTTP_CLIENT_TIMEOUT_TERMINAL`](/reference/env-configuration#aiohttp_client_timeout_terminal).
 
 ### Authentication failures
 
-- If using **JWT mode**, confirm `TERMINALS_OPEN_WEBUI_URL` points to a reachable Open WebUI instance, that the connection's **Auth** is set to **Session** and that its **API Key** matches `TERMINALS_API_KEY`.
-- If using **API key mode**, confirm the key is set identically on both sides. Check for extra whitespace or newlines.
+- Confirm the key is set identically on both sides. Check for extra whitespace or newlines.
 - Check the orchestrator logs for `401` or `403` responses.
 
 ### Workspace is reaped too quickly
 
-Increase `TERMINALS_IDLE_TIMEOUT_MINUTES` (or `idle_timeout_minutes` in a policy). The default is `0` (disabled), but if set too low, workspaces may be cleaned up while users are still working. A value of `30` is typical.
+Raise the idle timeout, see [Idle cleanup, lifetime and scheduled resets](/features/open-terminal/terminals/orchestration#idle-cleanup-lifetime-and-scheduled-resets).
 
 ### Connection refused
 
-- **Docker:** ensure `TERMINALS_NETWORK` is set so containers can communicate by name. Without it, containers use published ports and the `TERMINALS_DOCKER_HOST` address must be reachable.
+- **Docker:** ensure `TERMINALS_DOCKER_NETWORK` is set so containers can communicate by name. Without it, containers use published ports and the `TERMINALS_DOCKER_HOST` address must be reachable.
 - **Kubernetes:** verify the orchestrator Service is accessible from the Open WebUI Pod. Run `kubectl get svc -n open-webui` to confirm the service exists.
 
 ---

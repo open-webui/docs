@@ -102,6 +102,7 @@ When using a model with **Native Function Calling** enabled (see the [**Central 
 ### Available History Tools:
 - **`search_chats`**: Text search across chat titles and message content, using the same matching as the **Reference Chats** picker and skipping the chat the model is currently in. Returns matching chat IDs and snippets.
 - **`view_chat`**: Reads and returns the message history of a specific chat by ID, cut to the newest messages when [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) is set.
+- **`search_users`**: Looks up users by name or email so the model can mention them in a reply. Each mentioned user who can see the chat gets an [inbox](/features/chat-conversations/chat-features/notifications#inbox) notification that opens the chat at that reply.
 
 ### Why use native tool calling for Search?
 This allows the model to leverage its own previous work. You can ask: *"What was the feedback I got on my last email draft?"* or *"Find the Python script I wrote about image processing two weeks ago."*

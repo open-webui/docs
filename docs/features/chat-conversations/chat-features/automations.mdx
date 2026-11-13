@@ -76,8 +76,8 @@ The automation editor has a **Terminal** list and, once one is picked, a **Worki
 
 Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models**: edit the model and pick the terminal from the **Default terminal** field. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default.
 
-:::info A terminal can be closed to automations
-Administrators can take an orchestrated terminal out of automations, and can give each automation a workspace of its own rather than sharing one across everything. The automation editor leaves such a terminal out. The model editor's **Terminal** list does, so a run can fail with an error saying the terminal is not available for automation, which means its **Automation** context is set to **Off**. Pick a different terminal for the model, or ask an administrator to reopen that one. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+:::info Terminal limits in automations
+Terminals, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 :::
 
 ### Running a Coding Agent

@@ -5,11 +5,11 @@ title: "Environment Variables"
 
 # Environment Variables
 
-Policy environment variables are passed into the per-user Open Terminal container. They are raw strings, not shell commands.
+The **Environment variables** of a terminal, under **Advanced** in the [terminal dialog](/features/open-terminal/terminals/orchestration/creating-terminals), are passed into every Open Terminal machine it starts. They are raw strings, not shell commands.
 
-Use raw values in the Open WebUI admin panel:
+Use raw values in the dialog:
 
-| Desired value inside the container | Enter this in the admin panel |
+| Desired value inside the container | Enter this in the dialog |
 | :--- | :--- |
 | `sk-proj-abc` | `sk-proj-abc` |
 | `*.pypi.org,github.com` | `*.pypi.org,github.com` |
@@ -20,12 +20,12 @@ Do not add `'` or `"` around a value unless the quote characters are part of the
 
 ## Forwarding Behavior
 
-Use policy `env` for values that should appear inside per-user Open Terminal containers. Orchestrator process env vars configure the orchestrator itself.
+Use the terminal's **Environment variables** for values that should appear inside Open Terminal machines. Orchestrator process env vars configure the orchestrator itself. The exception is `OPEN_TERMINAL_SYSTEM_PROMPT` in the orchestrator's own environment: every machine receives it as a default, and a terminal's own value replaces it.
 
-The orchestrator refuses to forward `OPEN_TERMINAL_API_KEY` from policy env. It generates a private API key per terminal instance and uses that key to proxy requests safely.
+The orchestrator drops `OPEN_TERMINAL_API_KEY` from a terminal's environment variables. It generates a private API key per terminal instance and uses that key to proxy requests.
 
 :::warning
-Policy env vars are visible to the user inside their terminal. Do not put secrets in a policy unless users are allowed to see and use them.
+Environment variables are visible to everyone who uses the terminal. Do not put secrets in a terminal unless every person it is shared with may see and use them.
 :::
 
 ## Common Open Terminal Env Vars
@@ -44,11 +44,11 @@ Policy env vars are visible to the user inside their terminal. Do not put secret
 
 ## Automatically Injected Resource Vars
 
-These are set automatically by the orchestrator from the policy's `cpu_limit` and `memory_limit`, so a system prompt or tool can read the container's resource budget. They are not user-configured. Inside a capped workspace, `nproc` and `free` still report the host's cores and memory, so these variables are the only in-container source of the real limits.
+The orchestrator sets these automatically for each field that is filled in under **CPU** and **Memory**, so a system prompt or tool can read the container's resource budget. They carry the workspace's real limits.
 
 | Variable | Purpose |
 | :--- | :--- |
-| `OPEN_TERMINAL_CPU_LIMIT` | CPU limit from the policy `cpu_limit` |
-| `OPEN_TERMINAL_CPU_COUNT` | CPU count derived from the policy `cpu_limit` |
-| `OPEN_TERMINAL_MEMORY_LIMIT` | Memory limit from the policy `memory_limit` |
-| `OPEN_TERMINAL_MEMORY_BYTES` | Memory limit in bytes derived from the policy `memory_limit` |
+| `OPEN_TERMINAL_CPU_LIMIT` | CPU limit from the terminal's **CPU** |
+| `OPEN_TERMINAL_CPU_COUNT` | CPU count derived from the terminal's **CPU** |
+| `OPEN_TERMINAL_MEMORY_LIMIT` | Memory limit from the terminal's **Memory** |
+| `OPEN_TERMINAL_MEMORY_BYTES` | Memory limit in bytes derived from the terminal's **Memory** |

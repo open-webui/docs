@@ -24,3 +24,7 @@ From the branch picker you can create, switch, rename, and delete branches. If s
 ## Worktrees
 
 The worktree picker lists the repository's git worktrees and lets you create new ones. A worktree is its own directory with its own checked-out branch, so opening one opens it as its own workspace, with its own tabs, terminals, and layout. That's the way to work on two branches at once instead of bouncing a single checkout back and forth. See [add and switch workspaces](./workspaces.md) for how workspaces behave.
+
+## Pull requests
+
+For GitHub repositories with the GitHub CLI (`gh`) installed and signed in, the git panel has a **Pull requests** view. List the open pull requests, create one from the current branch, check one out and open it to see its **Summary**, **Code**, **Checks** and **Activity**. From there you can comment, approve or request changes, edit the title and description, mark it ready for review, update its branch, close or reopen it or merge it with **Merge**, **Squash** or **Rebase**.

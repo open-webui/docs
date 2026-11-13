@@ -79,24 +79,21 @@ If you are running a multi-user or organizational deployment, **Jupyter is not r
 - **Container isolation**: runs in its own Docker container, separate from Open WebUI and other services.
 - **Rich pre-installed toolset**: the Docker image comes with Python 3.12, data science libraries, build tools, networking utilities, and more.
 - **Built-in file browser**: browse, preview, create, delete, upload and download files directly from the **Files** tab.
-- **Built-in multi-user mode**: a single container can serve multiple users with per-user Linux account isolation (good for small teams, not for large-scale deployments).
+- **Built-in multi-user mode**: a single container can serve multiple users with a separate Linux account and home folder per user (good for small, trusted teams, and not a security boundary between users).
 
 For full documentation, see the [Open Terminal integration guide](/features/open-terminal).
 
 ### Terminals (Multi-Tenant Orchestrator)
 
-[Terminals](https://github.com/open-webui/terminals) is a multi-tenant orchestrator that provisions and manages **isolated Open Terminal containers per user**. Where Open Terminal is a single instance, Terminals is the scaling layer on top that handles the full lifecycle: provisioning, routing, idle cleanup, and teardown. It requires an [enterprise license](/enterprise).
+[Terminals](https://github.com/open-webui/terminals) is an orchestrator that provisions and manages Open Terminal machines for your team. Where Open Terminal is a single instance, Terminals is the layer on top that handles the full lifecycle: provisioning, routing, idle cleanup and teardown. It requires an [enterprise license](/enterprise).
 
-- **One container per user**: each user gets their own isolated Open Terminal container with its own filesystem, processes, and resources. No shared kernel or process space between users.
-- **Automatic lifecycle management**: containers are provisioned on first request, stopped after configurable idle timeout, and cleaned up automatically.
-- **Multiple backends**: Docker (one container per user), Kubernetes (Pod + PVC + Service per user), Kubernetes Operator (CRD-based), local (subprocess for dev), or static (proxy to a single instance).
-- **Transparent routing**: all Open Terminal API endpoints are available under `/terminals/`. Terminals routes requests to the correct user's container based on the `X-User-Id` header.
-- **Enterprise-ready**: supports PostgreSQL for tenant state, JWT authentication against Open WebUI, audit logging, SIEM webhook integration, and encrypted API key storage.
-- **Admin dashboard**: built-in frontend for managing tenants and monitoring instances.
+- **Separate machines**: a terminal can give each user, chat or model its own machine with its own filesystem, processes and resources, or share one machine with everyone who uses it.
+- **Automatic lifecycle management**: machines are provisioned on first request and stopped after the idle timeout you set.
+- **Multiple backends**: Docker, Kubernetes or the Kubernetes Operator (CRD-based).
+- **Transparent routing**: Terminals sends each request to the right machine.
+- **Enterprise-ready**: supports PostgreSQL for storing terminal state.
+- **Admin dashboard**: built-in frontend for managing terminals and monitoring machines.
 
-:::warning Alpha Software
-Terminals is under active development and not yet ready for production use. APIs, configuration, and features may change without notice.
-:::
 
 :::note License
 Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), not MIT.
@@ -109,11 +106,11 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 | **Runs in** | Browser (WebAssembly) | Server (Python kernel) | Server (Docker container) | Server (orchestrated containers) |
 | **Library support** | Limited subset | Full Python ecosystem | Full OS (any language, any tool) | Full OS (any language, any tool) |
 | **Shell access** | None | Limited | Full shell | Full shell |
-| **File persistence** | IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | Shared filesystem | Container filesystem (until removal) | Persistent volumes per user |
+| **File persistence** | IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | Shared filesystem | Container filesystem (until removal) | Persistent storage per machine |
 | **File browser** | Built-in sidebar panel | None | Built-in sidebar panel | Built-in sidebar panel |
 | **User file access** | Attached files placed in `/mnt/uploads/` | Manual | Attached files available | Attached files available |
-| **Isolation** | Browser sandbox | Shared environment | Container-level (when using Docker) | Full container-per-user isolation |
-| **Multi-user safety** | Per-user by design | Not isolated | Built-in multi-user mode (small teams) | Container-per-user with lifecycle management |
+| **Isolation** | Browser sandbox | Shared environment | Container-level (when using Docker) | Separate machine per user, chat or model |
+| **Multi-user safety** | Per-user by design | Not isolated | Built-in multi-user mode (small teams) | Separate machines with lifecycle management |
 | **File generation** | Write to `/mnt/uploads/`, download via file browser | Full support | Full support with upload/download | Full support with upload/download |
 | **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations | Separate service + Docker socket or K8s cluster |
 | **Recommended for orgs** | Legacy (safe but limited) | Not without isolation | Best for small teams | Designed for multi-tenant orgs |

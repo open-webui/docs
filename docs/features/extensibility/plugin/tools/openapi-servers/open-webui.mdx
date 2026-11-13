@@ -43,63 +43,24 @@ Once running, this will host a local OpenAPI server at http://localhost:8000, wh
 
 ## Step 2: Connect Tool Server in Open WebUI
 
-Next, connect your running tool server to Open WebUI:
+Next, connect your running tool server to Open WebUI. There are two ways to register tool servers:
 
-1. Open WebUI in your browser.
-2. Open **Settings → Integrations**.
-3. Click the plus button in the **Tools** section to add a new tool server.
-4. Enter the URL where your OpenAPI tool server is running (e.g., http://localhost:8000).
-5. Click "Save".
+#### 1. Tool servers added by an admin
+
+Admins add shared tool servers that are available to all or selected users across the deployment:
+
+1. Open **Settings > Admin > Integrations** and go to the **Tools** section.
+2. Click the plus button to add a new tool server.
+3. Enter the URL where your OpenAPI tool server is running (for example `http://localhost:8000`).
+4. Click **Save**.
 
 ![Settings Page](/images/openapi-servers/open-webui/settings.png)
 
-### User Tool Servers vs. Global Tool Servers
+Requests to these servers are sent by the Open WebUI backend, so the backend must be able to reach the URL. `localhost` means the backend server. If the backend runs in Docker, `localhost` inside the container does not reach your host machine, so use `host.docker.internal` or the machine's actual IP instead. Only expose endpoints that are safe to be used by multiple users.
 
-There are two ways to register tool servers in Open WebUI:
+#### 2. Tool servers added in Tether
 
-#### 1. User Tool Servers (added via regular Settings)
-
-- Only accessible to the user who registered the tool server.
-- The connection is made directly from the browser (client-side) by the user.
-- Perfect for personal workflows or when testing custom/local tools.
-- The Integrations tab of Settings only shows while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** ([`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which is off by default. Admins then see it right away. Everyone else also needs the **Direct Tool Servers** permission, which is off by default too. While **Direct Integrations** is off, servers saved here are not used in chats; they apply again once it is back on.
-- **Auth** picks what your browser sends to the server, both for the connection check in the dialog and for the saved connection: **Bearer** sends the key, **Session** sends your Open WebUI token and **None** sends nothing.
-
-#### 2. Global Tool Servers (added via Admin Settings)
-
-Admins can manage shared tool servers available to all or selected users across the entire deployment:
-
-- Go to **Settings → Admin → Integrations**, **Tools** section.
-- Add the tool server URL just as you would in user settings.
-- These tools are treated similarly to Open WebUI's built-in tools.
-
-#### Main Difference: Where Are Requests Made From?
-
-The primary distinction between **User Tool Servers** and **Global Tool Servers** is where the API connection and requests are actually made:
-
-- **User Tool Servers**
-  - Requests to the tool server are performed **directly from your browser** (the client).
-  - This means you can safely connect to localhost URLs (like `http://localhost:8000`), even exposing private or development-only endpoints such as your local filesystem or dev tools, without risking exposure to the wider internet or other users.
-  - Your connection is isolated; only your browser can access that tool server.
-
-- **Global Tool Servers**
-  - Requests are sent **from the Open WebUI backend/server** (not your browser).
-  - The backend must be able to reach the tool server URL you specify, so `localhost` means the backend server's localhost, *not* your computer's.
-  - Use this for sharing tools with other users across the deployment, but be mindful: since the backend makes the requests, you cannot access your personal local resources (like your own filesystem) through this method.
-  - Think security! Only expose remote/global endpoints that are safe and meant to be accessed by multiple users.
-
-**Summary Table:**
-
-| Tool Server Type   | Request Origin        | Use Localhost? | Use Case Example                        |
-| ------------------ | -------------------- | ------------------ | ---------------------------------------- |
-| User Tool Server   | User's Browser (Client-side) | Yes (private to you) | Personal tools, local dev/testing        |
-| Global Tool Server | Open WebUI Backend (Server-side) | No (unless running on the backend itself) | Team/shared tools, enterprise integrations |
-
-:::tip
-
-User Tool Servers are best for personal or experimental tools, especially those running on your own machine, while Global Tool Servers are ideal for production or shared environments where everyone needs access to the same tools.
-
-:::
+Users add their own tool servers in the Tether app. They are visible only to the user who added them, run on that user's computer through Tether and show under **Your devices** in the **Tools** list of the **+** menu. See [Your Own Connections](/ecosystem/tether#your-own-connections).
 
 ### Optional: Using a Config File with mcpo
 
@@ -115,7 +76,7 @@ For example, if you're using memory and time tools simultaneously through mcpo, 
 This means:
 
 - When connecting a tool in Open WebUI, you must enter the full route to that specific tool. Do NOT enter just the root URL (http://localhost:8000).
-- Add each tool individually in Open WebUI Settings using their respective subpath URLs.
+- Add each tool individually under **Settings > Admin > Integrations** using their respective subpath URLs.
 
 ![MCPO Config Tools Setting](/images/openapi-servers/open-webui/mcpo-config-tools.png)
 
@@ -134,7 +95,7 @@ This ensures Open WebUI recognizes and communicates with each tool server correc
 
 :::info Forward cookies
 
-**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default and applies to admin-configured connections; a user's own direct connections never forward cookies.
+**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default.
 
 Turn it on only for a server you control that authenticates the person behind the request by cookie, typically one sitting inside your own network behind the same sign-on. Everything the browser holds for your Open WebUI domain goes with the request, session cookie included, so a third-party endpoint should never have this on.
 
@@ -162,7 +123,7 @@ Here's what the tool information modal looks like:
 
 ### Global Tool Servers Look Different, And Are Hidden by Default!
 
-If you've connected a Global Tool Server (i.e., one that's admin-configured), it will not appear automatically in the input area like user tool servers do.
+If you've connected a Global Tool Server (i.e., one that's admin-configured), it will not appear automatically in the input area.
 
 Instead:
 
@@ -177,7 +138,6 @@ Important Notes for Global Tool Servers:
 
 - They will not show up in the tool indicator popup until enabled from the **+** menu.
 - Each global tool must be individually toggled on to become active inside your current chat.
-- Once toggled on, they function the same way as user tools.
 - Admins can control access to global tools via role-based permissions.
 
 This is ideal for team setups or shared environments, where commonly-used tools (e.g., document search, memory, or web lookup) should be centrally accessible by multiple users.
@@ -234,29 +194,12 @@ Connection failures, authentication errors, and tool-server errors still need th
 
 ### Connection fails even though the server is running
 
-**Understand which machine "localhost" refers to.** This is the most common connectivity issue and depends on which type of tool server you are registering:
-
-- **User Tool Servers**: Requests come from **your browser**. `localhost` means *the machine running your browser*. This usually works for local development setups, but there is a catch (see below).
-- **Global Tool Servers**: Requests come from the **Open WebUI backend**. `localhost` means the *backend server*, not your personal machine. If the backend runs in Docker, `localhost` inside the container does not reach your host machine, so use `host.docker.internal` or the machine's actual IP instead.
-
-:::warning User Tool Servers: Browser IP matters
-
-Even for User Tool Servers, `localhost` only works if you're accessing Open WebUI at `http://localhost:...` in your browser.
-
-If you're accessing Open WebUI at a different IP address (for example, connecting from another device on your LAN via `http://10.0.0.5:3000`, or using the network URL that `npm run dev` outputs) then your browser is *not* on `localhost` relative to the tool server. The browser will try to reach `localhost` on the device it's running on, not the machine hosting the tool server.
-
-**Fix:** Replace `localhost` with the actual IP of the machine where your tool server is running (e.g., `http://10.0.0.5:8000`), and ensure the tool server is binding to `0.0.0.0` (not just `127.0.0.1`).
-
-:::
-
-### CORS errors in the browser console
-
-If you see CORS errors, your tool server needs to allow requests from the Open WebUI origin. See the [FAQ entry on CORS](/features/extensibility/plugin/tools/openapi-servers/faq) for a FastAPI example.
+**Understand which machine "localhost" refers to.** This is the most common connectivity issue. The backend sends the requests, so `localhost` and `host.docker.internal` follow the [rules for admin-added servers](#1-tool-servers-added-by-an-admin). Make sure the tool server binds to `0.0.0.0` if it runs on another machine.
 
 ### General tips
 
 - If you're using remote servers, check firewalls and HTTPS configs.
 - To make servers persist across reboots, consider deploying them in Docker or with system services.
-- When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) directly in the same browser you use for Open WebUI. If it loads, the browser can reach it.
+- When in doubt, try opening the tool server URL (e.g., `http://localhost:8000/docs`) from the machine that sends the requests, the Open WebUI backend host.
 
 Need help? Visit the [Discussions page](https://github.com/open-webui/openapi-servers/discussions) or [open an issue](https://github.com/open-webui/openapi-servers/issues).

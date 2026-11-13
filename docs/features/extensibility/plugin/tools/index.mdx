@@ -25,9 +25,9 @@ Users often encounter the term "Tools" in different contexts. Here is how to dis
 | :--- | :--- | :--- | :--- |
 | **Native Features** | Admin/Settings | Core platform functionality (these are the [built-in system tools](#built-in-system-tools-nativeagentic-mode)) | Built-in to Open WebUI |
 | **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts, **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
-| **Native MCP (HTTP)** | `Settings > Connections` | Standard MCP servers reachable via HTTP/SSE | External tool server |
-| **MCP via Proxy (MCPO)** | `Settings > Connections` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
-| **OpenAPI Servers** | `Settings > Connections` | Standard REST/OpenAPI web services | External tool server |
+| **Native MCP (HTTP)** | `Settings > Admin > Integrations` | Standard MCP servers reachable via HTTP/SSE | External tool server |
+| **MCP via Proxy (MCPO)** | `Settings > Admin > Integrations` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
+| **OpenAPI Servers** | `Settings > Admin > Integrations` | Standard REST/OpenAPI web services | External tool server |
 
 The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool servers**: the tool code runs on a separate process or machine and Open WebUI calls it over HTTP. **Native Features** are the built-in system tools that ship with Open WebUI. **Workspace Tools** are Python that runs in-process; for the most demanding use cases they are by far the most capable option with the fewest limitations (see below).
 
@@ -419,6 +419,7 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the message history of a specific chat by ID. With [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) set, it keeps the newest messages up to that many characters and says the result was cut. |
+| `search_users` | Look up users by name or email. The model can mention a found user in its reply, and each mentioned user who can see the chat gets an [inbox](/features/chat-conversations/chat-features/notifications#inbox) notification that opens the chat at that reply. |
 | **Channels** | *Requires `ENABLE_CHANNELS` AND per-model "Channels" category enabled (default: on).* |
 | `search_channels` | Find public or accessible channels by name/description. |
 | `search_channel_messages` | Search for specific messages inside accessible channels. |
@@ -451,11 +452,13 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
 | **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
-| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on). Never injected into a sub-agent itself, for direct connections or in temporary chats. This category gates `timer` as well; there is no separate Timers category.* |
+| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on) AND the user holding the `features.subagents` permission (admins always pass). Never injected into a sub-agent itself or in temporary chats. This category gates `timer` as well; there is no separate Timers category.* |
 | `delegate_task` | Delegate a focused task to a parallel sub-agent running the same tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
+| **Visualizations** | *Requires per-model "Visualizations" category enabled (default: off).* |
+| `render_visualization` | Draw an interactive chart, diagram, calculator or explainer inline in the chat. See [Visualizations](/features/chat-conversations/chat-features/visualizations). |
 | **Voice Avatar** | *Only during a [voice call](/features/chat-conversations/chat-features/voice-mode#animations-and-gestures) with a model whose [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) has named gestures, AND the user holding the **Allow Call** permission (admins always pass). No per-model category of its own.* |
 | `play_animation` | Play one of the avatar's named gestures on the call screen. In a Realtime call the voice model plays the gestures, so this tool returns `unavailable` to the chat model. |
 | **Tool Search** | *Requires [Tool Search](#tool-search) turned on AND at least one tool deferred in the request. Added even when the model's **Builtin Tools** capability is off. No per-model category of its own.* |
@@ -550,6 +553,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}], updated_at, created_at}`. A result cut by [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) adds `truncated: true`, `total_messages` and `returned_messages` |
+| `search_users` | `query` (required; a name or email), `count` (default: 5, at most 20) | Array of `{id, name, email, mention}`. The model copies a user's `mention` value into its reply to mention them |
 | **Channels** | | |
 | `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
 | `search_channel_messages` | `query` (required), `count` (default: 10), `start_timestamp`, `end_timestamp` | Array of `{channel_id, channel_name, message_id, content_snippet, is_thread_reply, parent_id, created_at}` |
@@ -575,6 +579,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | `grep_skill_files` | `id` (required), `pattern` (required; literal text or an RE2 regex, detected automatically; up to 4,096 characters), `path` (optional; one exact file, otherwise every text file), `case_insensitive` (default: true), `max_results` (default: 10, 1-30) | `{matches: [{path, offset, match_length, section, section_offset, excerpt}], total_matches, truncated}`, at most 6,000 characters. When excerpts were left out it adds `notice`, `omitted_matches` (`[{path, offset, section}]`) and `omitted_matches_truncated`. A terminal skill supports `SKILL.md` only. Never creates a skill version |
 | `update_skill_files` | `id` (required), `operations` (required; each `{op: "put", path, content}`, `{op: "move", path, destination}` or `{op: "delete", path}`), `commit_message` (optional) | `{id}`. When the skill changed after the model read it, `{error: {code: "version_conflict", message}}` asks the model to call `view_skill` again and reapply the edit |
 | `create_skill` | `id` (required), `name` (required), `content` (required; the complete `SKILL.md` including `name` and `description` frontmatter), `files` (optional; text files as `{path, content}`), `commit_message` (optional) | `{id, url}` |
+| **Visualizations** | | |
+| `render_visualization` | `title` (required; 1 to 160 characters), `html` (required; an HTML, SVG, CSS and JavaScript fragment of at most 256 KiB), `libraries` (optional; `["chartjs"]` to get Chart.js) | `{status: "accepted"}`, or `{error}` when an argument is invalid |
 | **Tool Creation** | | |
 | `create_tool` | `id` (required; lowercase Python identifier), `name` (required), `description` (required), `content` (required; the complete Python source with a `Tools` class) | `{id, url}`, or `{error}` |
 | **Time Tools** | | |
@@ -696,7 +702,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Time & Calculation** | `get_current_timestamp`, `calculate_timestamp` | Get current time and perform date/time calculations |
 | **Ask User** | `ask_user` | Pause a response to ask the user a clarifying question |
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
-| **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
+| **Chat History** | `search_chats`, `view_chat`, `search_users` | Search and view user chat history, and look up users to mention |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
 | **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `display_file` (or `kb_exec` + `query_knowledge_files` + `display_file` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
@@ -707,9 +713,10 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Automations** | `create_automation`, `update_automation`, `list_automations`, `toggle_automation`, `delete_automation` | Create and manage scheduled automations from chat |
 | **Calendar** | `search_calendar_events`, `create_calendar_event`, `update_calendar_event`, `delete_calendar_event` | Search, create, update, and delete calendar events |
 | **Skills** | `view_skill`, `read_skill_file`, `grep_skill_files`, `update_skill_files`, `create_skill` | Find, read, search, edit and create skills |
+| **Visualizations** | `render_visualization` | Draw interactive charts, diagrams and calculators in the chat. Off by default |
 | **Tool Creation** | `create_tool` | Create Python workspace tools from chat. Needs [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools) and, for non-admins, the **Tools Access** permission |
 
-All categories are **enabled by default**. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
+All categories are **enabled by default** except **Visualizations**, which is off. Disabling a category prevents those specific tools from being injected, while keeping other categories active.
 
 :::info Skills
 While built-in tools are active for the chat and the model's **Skills** category is on:
@@ -753,6 +760,7 @@ Builtin tools that correspond to an RBAC feature permission are also gated by th
 | Channels | `features.channels` |
 | Automations | `features.automations` |
 | Calendar | `features.calendar` |
+| Sub-agents (also gates `timer`) | `features.subagents` |
 
 This ensures that RBAC permissions are respected end-to-end: disabling a feature for a user prevents the model from calling those tools on their behalf, not just hiding the UI.
 

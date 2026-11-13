@@ -46,7 +46,6 @@ User Settings control personal preferences: your default model, interface theme,
 
 - System prompt, and the default model you save with **Set as default** in the model selector
 - Interface theme and language
-- Personal API keys (if [Direct Connections](/features/chat-conversations/direct-connections) are enabled)
 - Per-feature toggles like autocomplete or rich text input
 
 ---
@@ -69,7 +68,7 @@ Many features follow a **two-layer pattern**:
 If an admin **disables** a feature globally, users **cannot** enable it for themselves. The admin setting is always the ceiling.
 :::
 
-This pattern applies across web search, image generation, direct connections, code interpreter, and more. The admin controls **what is possible**. Users control **what they want**.
+This pattern applies across web search, image generation, code interpreter and more. The admin controls **what is possible**. Users control **what they want**.
 
 ---
 
@@ -105,7 +104,7 @@ Check whether the admin has enabled it globally first. Your personal toggle only
 Settings > Admin > Connections. These are instance-wide and shared by all users.
 
 **"I want to use my own API key without sharing it with the server."**
-If the admin has enabled **Direct Connections**, you can add personal API keys in User Settings > Connections. See [Direct Connections](/features/chat-conversations/direct-connections).
+Connections added in the Tether app keep the keys on your computer, see [Your Own Connections](/ecosystem/tether#your-own-connections). An admin can add shared connections under **Settings > Admin > Connections**.
 
 **"I set a system prompt but my admin's model settings override it."**
 A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat under **Model controls > Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
