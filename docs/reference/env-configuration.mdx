@@ -737,7 +737,7 @@ Whether a deployment has to mark or disclose AI-generated content, and in what f
 
 - Type: `str`
 - Default: Empty string (no CSP injected)
-- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, citation modals and MCP Apps. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset for sandbox-only.
+- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, citation modals, MCP Apps and Visualizations. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset for sandbox-only.
 
 #### `THREAD_POOL_SIZE`
 
@@ -1951,21 +1951,7 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 - Description: Specifies the timeout for the Jupyter code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-### Direct Connections (OpenAPI/MCPO Tool Servers)
-
-#### `ENABLE_DIRECT_CONNECTIONS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables direct connections.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `ENABLE_DIRECT_INTEGRATIONS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers and Open Terminal connections. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Admin > Integrations**, in the **User Connections** section. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is not enough. While it is off, the tool servers and Open Terminal connections that users and admins saved in that tab are not used in chats, and the server ignores them even when a request still includes them. They stay saved and apply again once it is turned on. The **Direct Tool Servers** toggle in the group and default permissions only shows while it is on.
-- Persistence: This environment variable is a `ConfigVar` variable.
+### Tool Servers
 
 #### `TOOL_SERVER_CONNECTIONS`
 
@@ -2076,7 +2062,7 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
 
 - Type: `str` (JSON object)
 - Default: `{}`
-- Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward and take precedence on conflicts, so admins can set deployment-specific headers on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added.
+- Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward. Names match regardless of letter case and replace the terminal's own header of that name. Repeated headers from the terminal, such as several `Set-Cookie`, are all passed on. Entries here take precedence on conflicts, so admins can set deployment-specific headers on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added.
 
   **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional: many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
 
@@ -7800,13 +7786,6 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 ### Feature Permissions
 
-#### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables user permission to access direct tool servers.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
 #### `USER_PERMISSIONS_FEATURES_WEB_SEARCH`
 
 - Type: `bool`
@@ -7872,6 +7851,21 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 :::
 
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
+
+#### `USER_PERMISSIONS_FEATURES_SUBAGENTS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables Sub-agents access for non-admin users. Users without it get neither the `delegate_task` tool nor the `timer` tool.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+:::info
+
+This setting maps to **Features > Sub-agents** in RBAC permissions. The switch shows while [`ENABLE_SUBAGENTS`](#enable_subagents) is on, and admin users are exempt from this permission check.
+
+See [Sub-agents](/features/chat-conversations/chat-features/subagents#enable-sub-agents) for details.
+
+:::
 
 - Type: `bool`
 - Default: `True`
@@ -9222,8 +9216,8 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections and users' own direct tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
-- Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest), the code interpreter and direct model connections, since those are part of Open WebUI itself.
+- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
+- Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) and the code interpreter, since those are part of Open WebUI itself.
 - Note: this decides whether plugins and tool servers *run*. Some management endpoints stay reachable while it is off, for example deleting a tool or function and saving the tool server list, so treat it as an execution switch, and keep the permission to create Tools and Functions limited to people you trust.
 
 #### `ENABLE_TOOLS`
@@ -9242,7 +9236,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections (admin and personal) and the direct tool servers users add themselves. Set to `False`, none of them is loaded or called, the **Tools** and **Open Terminal** sections of **Settings > Admin > Integrations** are greyed out, the terminal picker leaves the chat, and [`ENABLE_DIRECT_INTEGRATIONS`](#enable_direct_integrations) counts as off. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections, including the terminals of [Tether computers](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Admin > Integrations** are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 

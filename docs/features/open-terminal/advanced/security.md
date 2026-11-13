@@ -70,17 +70,11 @@ Treat that generated value as a starting point, not a password. Replace it with 
 
 ---
 
-## Use admin connections (not user connections)
+## Use admin connections
 
-When connecting to Open WebUI, prefer the **admin-configured** approach:
+Add the Open Terminal connection as an admin. The API key stays hidden on the server, requests go through Open WebUI's backend and you control who has access.
 
-| | Admin-configured | User-configured |
-| :--- | :--- | :--- |
-| API key visibility | Hidden on the server | Stored in the user's browser |
-| Requests go through | Open WebUI's backend | Directly from the browser |
-| Terminal network access needed from | Just the Open WebUI server | Every user's computer |
-
-Admin-configured connections keep the API key out of users' browsers and let you control who has access.
+A terminal a user adds in Tether is reached through that user's own computer, see [Your Own Connections](/ecosystem/tether#your-own-connections).
 
 ![The Open Terminal connection in admin settings with the API key masked](/images/open-terminal-connection-masked-key.png)
 

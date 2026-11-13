@@ -104,7 +104,8 @@ In a chat with replies allowed:
 - Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt. The editor offers **Send**, which adds the edited prompt as a new branch with a new reply and leaves the original as it was. Other people in the chat stay on the branch they had selected.
 - Only the owner can edit replies and save an edit in place, and only on their own messages and the reply versions they generated. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
 - **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version.
-- Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
+- Anyone who can write into the chat can change and save the chat's model, terminal and working folder. Everyone who can write into the chat can also use the chat's own terminal.
+- Only the owner's messages generate titles and tags or change the chat's attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
 - When someone loses access, the chat closes for them at once and they stop getting its updates.
 

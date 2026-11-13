@@ -36,7 +36,7 @@ This approach ensures that new users don't accidentally get access to sensitive 
 
 Permissions are organized into five main categories: **Workspace**, **Sharing**, **Chat**, **Features**, and **Settings**.
 
-Some toggles only show while their feature is on for the whole instance, for example **Notes Sharing**, **API Keys**, **Web Search** and **Direct Tool Servers**. A hidden toggle keeps its value. Admins are exempt from every permission on this page.
+Some toggles only show while their feature is on for the whole instance, for example **Notes Sharing**, **API Keys** and **Web Search**. A hidden toggle keeps its value. Admins are exempt from every permission on this page.
 
 ### 1. Workspace Permissions
 Controls access to the "Workspace" section where users create and manage resources.
@@ -144,10 +144,10 @@ Controls access to broad platform capabilities.
 | **Web Search** | Ability to use Web Search integration. |
 | **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. Manual code execution (the **Run** button on code blocks) has no permission of its own; it follows [`ENABLE_CODE_EXECUTION`](/reference/env-configuration#enable_code_execution) for everyone. See [Manual Code Execution](/features/chat-conversations/chat-features/code-execution/python#manual-code-execution-pyodide). |
-| **Direct Tool Servers** | Ability to add personal tool servers and Open Terminal connections under **Settings > Integrations**. Also needs [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations). |
 | **Memories** | Access to the Memories feature for persistent user context. Taking it away hides the **Personalization** settings tab, blocks the memory API endpoints, withholds the memory tools from the model and stops stored memories being injected into the chat's system context. The injection check runs server-side on every chat request, so a client that still asks for memory does not get it. Admins are always exempt. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. |
 | **Calendar** | Access to the Calendar feature for creating calendars, managing events, and viewing shared calendars. |
+| **Sub-agents** | Ability to use the `delegate_task` and `timer` tools ([`USER_PERMISSIONS_FEATURES_SUBAGENTS`](/reference/env-configuration#user_permissions_features_subagents)). The switch shows while [sub-agents](/features/chat-conversations/chat-features/subagents) are enabled. |
 | **User Webhooks** | Ability for users to set their own personal webhook URL (under **Settings > Account**) for notifications. Disabled by default. |
 
 :::info Image Generation and the Active Model
