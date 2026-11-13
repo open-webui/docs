@@ -7,19 +7,9 @@ sidebar_position: 3
 
 Tether is the desktop companion app for Open WebUI, available for macOS, Windows and Linux. It links your own computer to your Open WebUI account, so a chat can work on that computer and your own connections stay private to you.
 
-## What You Can Do With It
+Ask a chat to read your files, run commands or build a small project on your machine. The chat can be open in a browser on any device, such as your phone or a work laptop, while the work happens on the computer that runs Tether. In the app you can also add your own OpenAI-compatible connections, tool servers and terminals. Only you see them, and their addresses and keys stay on your computer. The app shows a desktop notification when a chat finishes or fails, a calendar alert fires or a channel message arrives.
 
-- **Let the AI work on your own computer.** Ask a chat to read your files, run commands or build a small project on your machine. The chat can be open in a browser on any device, such as your phone or a work laptop, while the work happens on the computer that runs Tether.
-- **Keep your own keys and servers private.** Add your own OpenAI-compatible connections, tool servers and terminals in the app. Only you see them, and their addresses and keys stay on your computer.
-- **Get desktop notifications.** When a chat finishes or fails, a calendar alert fires or a channel message arrives, the app shows a notification.
-
-## Who It Is For
-
-Anyone who uses Open WebUI and wants the AI to act on their own computer, or wants personal connections that are not shared with the rest of the instance. Your instance needs no extra setup from an admin if it meets the [requirements](#requirements).
-
-## When to Use It
-
-Use Tether when the AI should work with files or tools on your own computer and Open WebUI runs somewhere else, for example on a server. Terminals that an admin sets up for the whole instance are covered under [Open Terminal](/features/open-terminal).
+Use Tether when the AI should work with files or tools on your own computer and Open WebUI runs somewhere else, for example on a server. Every user can set it up for their own account, and the instance needs no extra setup from an admin if it meets the [requirements](#requirements). Terminals that an admin sets up for the whole instance are covered under [Open Terminal](/features/open-terminal).
 
 The project lives at [github.com/open-webui/tether](https://github.com/open-webui/tether). It is free for personal non-commercial use. Commercial or organizational production use needs an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise).
 

@@ -7,17 +7,7 @@ title: "Creating Terminals"
 
 A **terminal** is a ready-made workspace the AI can run commands and work with files in. You create it yourself from the chat, give it a name and decide who can use it. Each terminal starts one or more **machines**, the containers where the commands run.
 
-## What You Can Do With It
-
-- **Give a team a shared workspace.** Create one terminal with the tools and files everyone needs and share it with a group.
-- **Keep people apart.** Give each user, chat or model its own machine, so files never mix.
-- **Start every machine the same way.** Set an image, resources, a start folder and a setup script once.
-
-## When to Use It
-
-Use a terminal when the AI needs a real computer to work on, such as running code, editing files or building a project, and each person or chat needs a clean, separate place for it.
-
-## Who It Is For
+Use a terminal when the AI needs a real computer to work on, such as running code, editing files or building a project, and each person or chat needs a clean, separate place for it. One terminal can serve a whole team through a shared group, or give each user, chat or model its own machine so files never mix. Set an image, resources, a start folder and a setup script once and every machine starts the same way.
 
 Admins add the Terminals server as a connection and give people **Write** access. People with **Write** access create and manage terminals. Everyone else uses the terminals that are shared with them.
 

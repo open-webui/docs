@@ -7,16 +7,7 @@ title: "Visualizations"
 
 Visualizations let a model draw interactive charts, diagrams, calculators and explainers directly in the chat.
 
-## What You Can Do With It
-
-- **Chart your numbers.** Paste a table or a list of figures and ask for a chart.
-- **See how something works.** Ask for a diagram of a process, a system or a timeline.
-- **Try numbers yourself.** Ask for a small calculator, such as a loan or unit converter, with fields you can change.
-- **Learn a concept.** Ask for an interactive explainer where you move a slider and watch the result change.
-
-## Who It Is For
-
-Anyone who chats with a model that has Visualizations turned on. Admins and model owners turn it on per model. Use it whenever a picture or something you can click explains the answer better than plain text.
+Paste a table and ask for a chart, ask for a diagram of a process or a timeline, a small calculator with fields you can change, or an interactive explainer with a slider. Use it whenever a picture or something you can click explains the answer better than plain text. Admins and model owners turn it on per model.
 
 ## How It Works
 
