@@ -427,7 +427,7 @@ See the [Scaling & HA guide](/troubleshooting/multi-replica#6-worker-crashes-dur
 
 ### 13. Knowledge Base Attached to Model Not Working
 
-You attached a knowledge base to a model in **Workspace > Models > Edit**, but when you chat with the model it doesn't seem to know about the knowledge base content at all.
+You attached a knowledge base to a model in **Workspace > Models > Edit** (or **Settings > Admin > Models** for a base model), but when you chat with the model it doesn't seem to know about the knowledge base content at all.
 
 **The Problem**: Open WebUI has two distinct RAG modes, and they handle model-attached knowledge bases very differently:
 
@@ -448,7 +448,7 @@ Because **Native Function Calling is the default**, the model needs both the **a
 Key takeaway: in Native Mode, the model must use its knowledge tools regardless. Attaching a KB only restricts *which* KBs are searchable.
 
 :::tip Preventing Knowledge Base Access in Native Mode
-If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Workspace > Models > Edit > Builtin Tools**. This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.
+If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Workspace > Models > Edit > Builtin Tools** (or **Settings > Admin > Models** for a base model). This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.
 :::
 
 ![Builtin Tools categories in the Model Editor](/images/features/plugin/tools/builtin_tools.png)
@@ -462,11 +462,11 @@ If you want to prevent a model from accessing **any** knowledge base in native m
    - Also check the **Model Capabilities** section: **Preload files** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access
 
 :::info Check the effective model settings
-Per-model settings in **Workspace > Models > Edit > Advanced Params** override the global default when explicitly set. A model without its own `function_calling` value inherits the global setting. Check both places when the model's behavior differs from what you expect.
+Per-model settings in **Workspace > Models > Edit > Advanced Params** (or **Settings > Admin > Models** for a base model) override the global default when explicitly set. A model without its own `function_calling` value inherits the global setting. Check both places when the model's behavior differs from what you expect.
 :::
 
 2. **Ensure Built-in Tools are enabled for the model**:
-   - Go to **Workspace > Models > Edit** for your model
+   - Go to **Workspace > Models > Edit** (or **Settings > Admin > Models** for a base model) for your model
    - Under **Builtin Tools**, make sure the **Knowledge Base** category is enabled (it is by default)
    - If this is disabled, the model has no way to query attached knowledge bases
 

@@ -275,7 +275,7 @@ Token data is normalized across different model providers (OpenAI, Ollama, llama
 
 Each call to the provider counts once, even when the provider resends its usage with every streamed chunk. When a reply makes several calls because the model uses tools, their usage is added up. A reply without usage stays unrecorded, and one where only some calls report usage is marked partial.
 
-The figures are the ones the provider reports, and most OpenAI-compatible providers report nothing on a streamed reply unless they are asked. Asking is what the **Usage** capability in **Workspace > Models > Edit** does, so a model without it can show no tokens at all. See [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
+The figures are the ones the provider reports, and most OpenAI-compatible providers report nothing on a streamed reply unless they are asked. Asking is what the **Usage** capability in **Workspace > Models > Edit** (or **Settings > Admin > Models** for a base model) does, so a model without it can show no tokens at all. See [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
 
 :::info Scheduled and delegated runs are counted too
 The request for token counts is added server-side, so a model with **Usage** enabled reports its tokens in every chat it runs, including the ones Open WebUI starts on a user's behalf through [automations](/features/chat-conversations/chat-features/automations), [timers](/features/chat-conversations/chat-features/timers), [sub-agents](/features/chat-conversations/chat-features/subagents) and [channels](/features/channels). Those runs are part of the same totals as the chats people type in.

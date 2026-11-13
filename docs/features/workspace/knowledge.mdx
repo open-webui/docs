@@ -27,7 +27,7 @@ Start with a running Open WebUI instance, a connected model, and permission to c
 
 1. Click **Workspace > Knowledge**, then **Create**. Give the knowledge base a name and description.
 2. Upload a small text-based PDF or text file. Wait for processing to finish before asking about it.
-3. Reference the knowledge base in chat with `#`, or attach it to a model in **Workspace > Models > Edit** and start a conversation with that model.
+3. Reference the knowledge base in chat with `#`, or attach it to a model in **Workspace > Models > Edit** (or **Settings > Admin > Models** for a base model) and start a conversation with that model.
 4. Ask a question whose answer is in the file, such as: "Use the attached handbook to find the office opening hours. Quote the relevant passage."
 5. Compare the answer and any source references with the original document. If the model cannot find the content, follow [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working).
 
@@ -216,7 +216,7 @@ Asking "what changed lately" in a knowledge base of a few thousand files is `ls 
 - The model still has `query_knowledge_files` for semantic search; reach for it when literal commands won't find a paraphrased concept.
 - Built on top of the directory model. `kb_exec` is the only tool that fully reflects the directory structure created in the UI.
 
-Autonomous exploration works best with frontier models that can intelligently chain search, browse, and synthesize. Smaller models may struggle with multi-step retrieval. Administrators can disable the **Knowledge Base** tool category per-model in **Workspace > Models > Edit > Builtin Tools**.
+Autonomous exploration works best with frontier models that can intelligently chain search, browse, and synthesize. Smaller models may struggle with multi-step retrieval. Administrators can disable the **Knowledge Base** tool category per-model in **Workspace > Models > Edit > Builtin Tools** (or **Settings > Admin > Models** for a base model).
 
 #### Guiding tool choice across mixed knowledge bases
 
