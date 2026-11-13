@@ -4807,7 +4807,6 @@ Only increase this variable's value if it does. Otherwise you might run into une
 #### `RAG_EMBEDDING_BUFFER_SIZE`
 
 - Type: `int`
-:::
 - Default: `1000`
 - Description: Number of chunks embedded and saved to the vector database per step while a document is processed. Rounded up to a whole multiple of [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size). Must be a positive integer.
 
@@ -4821,6 +4820,8 @@ Only increase this variable's value if it does. Otherwise you might run into une
 :::tip
 
 It may be needed to increase the value of `THREAD_POOL_SIZE` if many other users are simultaneously using your Open WebUI instance while having async embeddings turned on to prevent
+
+:::
 
 :::warning
 

@@ -6,7 +6,7 @@ title: "API Endpoints"
 This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.
 
 :::note Endpoints are not documented any more
-The API changes so often that documenting it makes little sense. To find the latest endpoints and specs, point an AI agent at the Open WebUI backend and let it read them. The endpoints below stay for reference.
+The API changes often and documenting it makes little sense. To find the latest endpoints and specs, point an AI agent at the Open WebUI backend and let it read them. The endpoints below stay for reference.
 :::
 
 ## Authentication
