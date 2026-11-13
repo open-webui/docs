@@ -5955,7 +5955,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 #### `BYPASS_PYDUB_PREPROCESSING`
 
 - Type: `bool`
-- Default: `False`
+- Default: `False` (always `True` on the slim image)
 - Description: When enabled, skips pydub-based preprocessing (format conversion to MP3, compression, and chunked splitting by size) before audio is sent to the Speech-to-Text engine. Useful when the upstream provider already handles these steps, when ffmpeg is unavailable on the host, or when you want to pass audio through untouched. Applies to all STT engines.
 
 ### Whisper Speech-to-Text (Local)
@@ -5976,8 +5976,8 @@ Note: If none of the specified languages are available and `en` was not in your 
 #### `WHISPER_COMPUTE_TYPE`
 
 - Type: `str`
-- Default: `int8` (CPU), `float16` (CUDA)
-- Description: Sets the compute type for Whisper model inference. Defaults to `int8` for CPU and `float16` for CUDA (with fallback to `int8/int8_float16`).
+- Default: `int8`
+- Description: Sets the compute type for Whisper model inference. The default is `int8` on every device, including the `:cuda` image: Open WebUI does not switch it automatically. On a GPU, set it explicitly (for example `float16`).
 
 #### `WHISPER_VAD_FILTER`
 
