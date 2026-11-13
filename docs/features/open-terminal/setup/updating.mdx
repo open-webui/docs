@@ -136,7 +136,18 @@ Office rendering needs the default image. The `slim`, `alpine` and `openshift` i
 
 ## Running Terminals
 
-[Terminals](/features/open-terminal/terminals) provisions a container per user from a policy, so operators update the image on the policy rather than by hand. Change the image there, then refresh the affected terminals as described in [Applying Changes](/features/open-terminal/terminals/orchestration/applying-changes).
+[Terminals](/features/open-terminal/terminals) starts the machines itself, so users update the image in the terminal itself. Open the terminal in the terminal menu, change **Image** under **Advanced** and save. The new image is used the next time the terminal starts a machine. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
+
+### Upgrading Terminals
+
+Open WebUI needs Terminals 0.4.0 or later, and Terminals 0.4.0 and later need Open WebUI 0.13.4 or later. Terminals 0.3.x and earlier have no automatic upgrade, because the database schema, storage paths and saved terminal selections change and a populated older database is rejected by the new version. Back up both databases and all terminal files, start a fresh Terminals installation with a new, empty database, recreate your policies as templates, copy each workspace's files to its new storage location and select the new terminals in Open WebUI. The steps are in the [Terminals changelog](https://github.com/open-webui/terminals/blob/main/CHANGELOG.md#moving-to-040-manually). On Kubernetes, update the operator and the Terminal CRD too. Remove `TERMINALS_OPEN_WEBUI_URL` and `TERMINALS_TOKEN_CACHE_TTL` from the settings, because the connection authenticates with `TERMINALS_API_KEY`. From Terminals 0.4.0, replace the image as usual.
+
+A connection no longer has a policy. Policy ID, image, CPU, memory, storage, idle timeout, environment variables, lifecycle and the terminal contexts are gone from the connection form. Users with **Write** access to the connection create terminals instead, and the settings live in each terminal. After the upgrade:
+
+- Create the terminals you need and share them.
+- Select one of the new terminals again in every model, folder, automation and chat that used the old connection.
+- Reopen older chats and select a terminal again, see [Chats](/features/open-terminal/terminals/orchestration/creating-terminals#chats).
+- Pick coding agent models again in pins, default models and automations whose model name contained dots, see [Model IDs](/features/open-terminal/coding-agents#model-ids).
 
 ---
 

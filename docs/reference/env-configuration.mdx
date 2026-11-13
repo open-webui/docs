@@ -327,6 +327,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.automations` | Automations | **Automations** under **Builtin Tools** in the model editor |
 | `model_editor.tools.calendar` | Calendar | **Calendar** under **Builtin Tools** in the model editor |
 | `model_editor.tools.subagents` | Sub-agents | **Sub-agents** under **Builtin Tools** in the model editor |
+| `model_editor.tools.visualizations` | Visualizations | **Visualizations** under **Builtin Tools** in the model editor |
 | `model_editor.tools.skills` | Skills | **Skills** under **Builtin Tools** in the model editor |
 | `model_editor.tools.tools` | Tool Creation | **Tool Creation** under **Builtin Tools** in the model editor |
 | `chat.capture` | Capture | **Capture** in the chat input's **+** menu |
@@ -494,6 +495,13 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Default: empty, which means no limit
 - Description: The most characters of message text the `view_chat` tool returns when a model reads a previous chat. The newest messages are kept, and the result tells the model it was cut and how many messages it holds. Must be a positive integer, or Open WebUI stops at startup. See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > Admin > General > Chat Read Limit**. Leave the field empty for no limit.
+
+#### `VISUALIZATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Default: Empty string, which falls back to the built-in instructions.
+- Description: The instructions the model receives for the `render_visualization` tool, which decide when and how it draws. See [Visualizations](/features/chat-conversations/chat-features/visualizations).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.visualizations.prompt_template`. It can be configured in **Settings > Admin > Interface > Visualization Prompt**.
 
 #### `ENABLE_AUTOMATIONS`
 
@@ -2000,7 +2008,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). These are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
 - Example (direct Open Terminal connection):
 ```json
 [
@@ -2025,28 +2033,21 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
     "key": "your-api-key",
     "name": "Terminals",
     "auth_type": "bearer",
-    "policy_id": "ai-computer",
     "config": {
       "access_grants": [
         {"principal_type": "user", "principal_id": "*", "permission": "read"}
-      ],
-      "contexts": {
-        "chat": {"context_id": "chat_id"},
-        "automation": false
-      }
+      ]
     }
   }
 ]
 ```
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-For an orchestrator connection, set `policy_id` to route every terminal request through that named policy. Omitting it intentionally uses the orchestrator's service defaults through its backward-compatible unscoped route.
+`config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
 
-`config.contexts` gives an orchestrator connection a separate workspace per chat or per automation, or withholds it from either, with the keys `chat` and `automation`. It is ignored on connections that are not orchestrator ones. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the values, the admin controls and the capacity trade-off.
+`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
-`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. The default, `default`, uploads it to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's current working directory instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
-
-`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` for an orchestrator connection when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it.
+`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. An orchestrator connection needs `key` set to the orchestrator's `TERMINALS_API_KEY`.
 
 :::tip Helm chart auto-configuration
 When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
@@ -2586,7 +2587,7 @@ Available placeholders, substituted at request time (any placeholder that has no
 
 The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
-Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections.
+Custom headers are honored by OpenAI and Ollama connections, tool servers (OpenAPI and MCP) and external document-processing connections.
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 

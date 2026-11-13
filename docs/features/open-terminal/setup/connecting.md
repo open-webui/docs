@@ -25,8 +25,6 @@ Click your **name** at the bottom of the left sidebar to open the user menu, the
 
 In the settings sidebar, find the **Admin** section and click **Integrations**.
 
-The settings sidebar lists **Integrations** twice, once under **Personal** in the *Services* group and once under **Admin** in the *Tools* group. Open Terminal belongs in the Admin one. Configuring the personal entry connects the terminal to your account alone and the deployment will not work as described here.
-
 ![Settings > Admin > Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
@@ -46,7 +44,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
 | **Auth** | Leave as `Bearer` (the default) |
-| **Chat Uploads** | Leave as `Default`. [Chat Uploads](#chat-uploads) covers what `Filesystem` changes |
+| **Chat Uploads** | Starts on `Filesystem` for a new connection. [Chat Uploads](#chat-uploads) covers what each option does |
 | **Working Directory Context** | Under **Advanced**, on by default. [Working Directory Context](#working-directory-context) covers when to turn it off |
 | **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
 | **Forward cookies** | Under **Advanced**, off by default. Only turn it on for a terminal server that authenticates by cookie, since every cookie the browser holds for your Open WebUI domain travels with the request |
@@ -66,20 +64,18 @@ Limit terminal access to specific user groups via the access control button.
 ![The access control panel listing user groups with checkboxes](/images/open-terminal-access-grants.png)
 
 :::tip Orchestrator connections can be scoped further
-A connection Open WebUI has detected as a [Terminals orchestrator](/features/open-terminal/terminals/) gets an extra **Orchestrator > Terminal Contexts** section, where you decide whether the terminal is offered in chats and in automations, and whether everything shares one workspace or each saved chat or automation gets its own. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). A direct Open Terminal connection has no such setting and is always available in both.
-
-The same section carries a **Policy** block that takes environment variables for the terminals the orchestrator starts. That is where you set `OPEN_TERMINAL_SYSTEM_PROMPT` to replace the generated system prompt with your own, along with any other [environment variable](/features/open-terminal/terminals/orchestration/environment-variables) those terminals should run with. See [System Prompts](/features/open-terminal/terminals/orchestration/system-prompts) for the template placeholders.
+A connection to a [Terminals orchestrator](/features/open-terminal/terminals/) has **Read** and **Write** access. Users with **Write** create their own terminals from the terminal menu in the message input, each with its own image, resources, environment variables and sharing. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals). A direct Open Terminal connection has no terminals to create and is available to everyone with access.
 :::
 
 ### 7. Select a terminal in chat
 
-In the chat input area, click the **terminal button** (cloud icon). Your admin-configured terminals appear under **System**. Select one to activate it for the conversation.
+In the chat input area, click the **terminal button** (cloud icon). Your terminals appear under **Terminals**. Select one to activate it for the conversation.
 
 ![Terminal dropdown showing Open Terminal under System](/images/open-terminal-chat-dropdown.png)
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another terminal at any time except while a reply is generating.
 
-Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a [Per chat](/features/open-terminal/terminals/orchestration/contexts) terminal the button appears once the chat is saved.
+Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a terminal with a separate machine per chat, the button appears once the chat is saved.
 
 ### 8. Enable native function calling
 
@@ -117,15 +113,9 @@ For Docker deployments, you can configure terminal connections automatically usi
 
 ---
 
-## Personal Settings (testing only)
+## Your own terminal (Tether)
 
-:::caution Not recommended for regular use
-Adding a terminal connection via personal Settings sends the API key to your browser and routes requests directly from it. This is fine for **quick testing**, but for anything beyond that, use Admin Settings instead. It's more secure and works for all users automatically.
-:::
-
-If you need to test a connection without admin access, you can add one from the **Personal** part of settings, under *Services*, at **Integrations → Open Terminal**. The same URL and API key fields apply, and the connection is yours alone rather than the instance's.
-
-The personal **Integrations** tab shows only while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** (or [`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)). While it is off, connections saved there are not used in chats.
+Without admin access, add a terminal in the Tether app. It is yours alone and its URL and key stay on your computer. See [Your Own Connections](/ecosystem/tether#your-own-connections).
 
 ---
 
@@ -133,9 +123,11 @@ The personal **Integrations** tab shows only while an admin has turned on **Dire
 
 **Chat Uploads** on the connection form decides where a file attached in the chat input goes while that terminal is selected.
 
-`Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what a connection nobody has touched does, and what happens with no terminal selected at all.
+`Default` uploads the file to Open WebUI, extracts its text and hands the model the contents to read, through retrieval or in full depending on the chat's settings. It is what happens with no terminal selected at all.
 
-`Filesystem` writes the file into the terminal. It lands in the folder the [file browser](../file-browser.md) has open, or in the terminal's current working directory when the browser has not opened a folder on that terminal, and appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
+New terminal connections start on `Filesystem`, and [Tether](/ecosystem/tether) terminals always use it.
+
+`Filesystem` writes the file into the terminal's working folder, the folder the [file browser](../file-browser.md) has open or the terminal's current working directory, and it appears there straight away. Nothing is stored in Open WebUI, no text is extracted and no retrieval runs, so the model never receives the contents. It receives the path and opens the file with the terminal's own tools, the way it reads anything else in the workspace.
 
 A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
 
@@ -146,9 +138,9 @@ Four things change with it:
 - **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
 
-On a [**Per chat**](/features/open-terminal/terminals/orchestration/contexts) terminal, a file attached to a new chat's first message uploads into that chat's terminal when you send it.
+On a terminal with a [separate machine per chat](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope), a file attached to a new chat's first message uploads into that chat's machine when you send it.
 
-The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
+The field is on every terminal connection an administrator adds. [Tether](/ecosystem/tether) terminals always use **Automatic**.
 
 ![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)
 
@@ -167,13 +159,13 @@ A **New Terminal** tab, from the **+** menu of the **Tabs**, is your own shell. 
 - `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks your browser whether it is.
 - `Always Include`: on every message, open shell or not. The tool list stays the same from message to message, which keeps the [prompt cache](/features/chat-conversations/prompt-caching) intact when you open and close the shell.
 
-Automations and sub-agents never get the two tools. The field is on every terminal connection, the ones an administrator adds and the ones you add under your own settings.
+Automations and sub-agents never get the two tools. The field is on every terminal connection an administrator adds. [Tether](/ecosystem/tether) terminals always use **Automatic**.
 
 ## AGENTS.md
 
 When a terminal is selected in the chat, Open WebUI reads `AGENTS.md` from the home folder of the terminal's user on every message. Its content is added to the conversation as a user message just before the first user message, so the model gets your standing instructions for that workspace. Edits to the file apply from the next message. Windows home folders work too.
 
-A file larger than 32 KiB is skipped, and so is a read that takes longer than 5 seconds. A terminal an admin configured is read by the Open WebUI server. A terminal a user added in their own settings is read through that user's browser, so the chat tab has to stay open.
+A file larger than 32 KiB is skipped, and so is a read that takes longer than 5 seconds. A terminal an admin configured is read by the Open WebUI server. A terminal a user added in the Tether app is read through Tether, so the Tether app has to stay connected.
 
 ---
 
@@ -231,13 +223,13 @@ Make sure:
 
 Only terminals the user is allowed to use are listed, so check the connection's access grants and that the connection is enabled.
 
-For an orchestrator connection, [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) also decides this. A terminal whose **Chat** context is **Off** never appears in a chat, and one set to **Per chat** is hidden in temporary chats because it needs a saved conversation to attach to.
+For an orchestrator connection, a terminal is listed for you only when it is shared with you or you have **Write** access to the connection. A terminal with a separate machine per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 
 ### Wrong API key
 
 If you see "unauthorized" or "invalid key":
 - Double-check the key matches what you set during installation
-- If you forgot it, run `docker logs open-terminal` and look for the `API key:` line
+- If you forgot it, run `docker logs open-terminal` and look for the `API Key:` line
 
 ## Next steps
 

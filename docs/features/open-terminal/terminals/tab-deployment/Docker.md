@@ -23,6 +23,7 @@ services:
           "url": "http://terminals:3000",
           "key": "${TERMINALS_API_KEY}",
           "auth_type": "bearer",
+          "server_type": "orchestrator",
           "config": {
             "access_grants": [{
               "principal_type": "user",
@@ -44,22 +45,24 @@ services:
       - TERMINALS_BACKEND=docker
       - TERMINALS_API_KEY=${TERMINALS_API_KEY}
       - TERMINALS_IMAGE=ghcr.io/open-webui/open-terminal:latest
-      - TERMINALS_NETWORK=open-webui-network
+      - TERMINALS_DOCKER_NETWORK=open-webui-network
+      - TERMINALS_DOCKER_HOST_DATA_DIR=${PWD}/data/terminals
       - TERMINALS_IDLE_TIMEOUT_MINUTES=30
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - terminals-data:/app/data
+      - ./data:/app/data
     networks:
       - webui
 
 volumes:
   open-webui:
-  terminals-data:
 
 networks:
   webui:
     name: open-webui-network
 ```
+
+Terminals keeps its database and the files of every machine in the `data` folder next to your Compose file. `TERMINALS_DOCKER_HOST_DATA_DIR` tells Docker where that folder lives on the host, so the machine containers mount the same files the orchestrator manages.
 
 Set the shared API key in a `.env` file next to your Compose file:
 
@@ -73,7 +76,7 @@ Then start everything:
 docker compose up -d
 ```
 
-Open WebUI will be available at `http://localhost:3000`. When any user activates a terminal, the orchestrator provisions their personal container automatically.
+Open WebUI will be available at `http://localhost:3000`. The connection above gives every user **Read** access, so users can use terminals that are shared with them. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals). When a user opens a terminal, the orchestrator provisions the machine automatically.
 
 :::warning Docker socket access
 The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to manage containers. For production, use a Docker socket proxy like [Tecnativa/docker-socket-proxy](https://github.com/Tecnativa/docker-socket-proxy) to restrict the API calls it can make.
@@ -81,40 +84,16 @@ The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to m
 
 ---
 
-<details>
-<summary>Configuration reference</summary>
-
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `TERMINALS_BACKEND` | `docker` | Backend type. Set to `docker` for this deployment mode. |
-| `TERMINALS_API_KEY` | (empty) | Shared secret for authenticating requests from Open WebUI. Required. |
-| `TERMINALS_IMAGE` | `ghcr.io/open-webui/open-terminal:latest` | Default container image for user terminals. |
-| `TERMINALS_PORT` | `3000` | Port the orchestrator listens on. |
-| `TERMINALS_HOST` | `0.0.0.0` | Address the orchestrator binds to. |
-| `TERMINALS_NETWORK` | (empty) | Docker network for user containers. When set, containers communicate by name. |
-| `TERMINALS_DOCKER_HOST` | `127.0.0.1` | Address for published container ports. Only relevant without `TERMINALS_NETWORK`. |
-| `TERMINALS_DATA_DIR` | `data/terminals` | Host directory for per-user workspace data. |
-| `TERMINALS_IDLE_TIMEOUT_MINUTES` | `0` (disabled) | Minutes of inactivity before a container is stopped. Set to `30` for typical usage. |
-| `TERMINALS_MAX_CPU` | (empty) | CPU limit for user containers (e.g., `2`). |
-| `TERMINALS_MAX_MEMORY` | (empty) | Memory limit for user containers (e.g., `4Gi`). |
-| `TERMINALS_OPEN_WEBUI_URL` | (empty) | If set, validates user JWTs against this Open WebUI instance instead of using `TERMINALS_API_KEY`. The key stays required for the admin APIs. |
-| `TERMINALS_ENABLE_UI` | `true` | Serve the built-in minimal admin UI at `/`. Set `false` for API-only deployments. |
-| `TERMINALS_LOG_LEVEL` | `INFO` | Server and operator log level (DEBUG, INFO, WARNING, ERROR, CRITICAL). |
-
-</details>
+The orchestrator settings for this deployment, such as `TERMINALS_DOCKER_NETWORK`, `TERMINALS_DOCKER_DATA_DIR` and `TERMINALS_IDLE_TIMEOUT_MINUTES`, are listed in [Orchestrator Environment Variables](/features/open-terminal/terminals/orchestration#orchestrator-environment-variables).
 
 ---
 
 <details>
 <summary>Container lifecycle details</summary>
 
-**Naming.** Containers are named `terminals-<user-hash>` (where `<user-hash>` is the first 12 hex chars of the SHA-256 of the user ID, for a DNS-safe name), or `terminals-<user-hash>-<policy>` for non-default policies. They are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`. One container is also provisioned under the user id `system`, which Open WebUI uses to read a policy's tool list and system prompt, so a row for a user you do not recognize is expected.
+**Filtering.** Containers are easy to filter with `docker ps --filter "label=app.kubernetes.io/managed-by=terminals"`.
 
-**Health checks.** After creating a container, the orchestrator polls its `/health` endpoint until it returns HTTP 200 (up to 15 seconds). Only then does it start proxying traffic.
-
-**Reconciliation.** If the orchestrator restarts, it rediscovers existing running containers by their labels and recovers their API keys from the container configuration. This prevents duplicate containers from being created.
-
-**Conflict handling.** If a container with the same name already exists (e.g., from a previous failed cleanup), the orchestrator force-removes the old container and retries up to 3 times.
+**Startup.** After creating a container, the orchestrator waits until the container answers, for up to 15 seconds, and then starts proxying traffic. It logs a warning if the container was not ready in time.
 
 </details>
 

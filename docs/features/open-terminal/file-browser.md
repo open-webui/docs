@@ -120,7 +120,7 @@ Uploading is switched off in a folder marked **Read-only**, and dropping files o
 
 ### From the chat input
 
-Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the folder open in the file browser and show up here like anything else. The model opens them with the terminal's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. With the connection's **Chat Uploads** set to `Filesystem`, they go to the terminal instead. Attachments then land in the chat's working folder (the terminal's default folder when none is set) and show up here like anything else. The model opens them with the terminal's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 ### Attaching terminal files to a message
 
@@ -216,7 +216,7 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Working directory
 
-With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a Per chat terminal, the button appears once the chat is saved, and temporary chats offer only the other terminals. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in.
+With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a terminal that has a separate machine per chat, the button appears once the chat is saved and temporary chats offer only the other terminals. Each chat saves its working folder and restores it when reopened. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in. The folder icon on a **Recently Used** row, also labelled **Open folder**, shows that folder in the Files tab.
 
 **Recently Used** lists your last eight folders on that terminal. They are stored as files on the terminal, under `.open-webui/users/<user id>/folders` in its home folder, so they follow you to other browsers. Anyone who can read that home folder can see them.
 
@@ -228,12 +228,17 @@ When the terminal supports Git, the **Open folder** dialog and the folder picker
 
 ## Git
 
+The Git panel lets you review, commit and publish what the AI changed in a project, and, for GitHub repositories, work through issues and pull requests without leaving the chat. Use it when the AI works on a code project in your terminal: check its changes, commit them, then hand it the next issue in one click that fills the message input for you to review and send. Anyone who uses a terminal with a Git repository can use it.
+
 When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
 
 - **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
   **Discard changes** works for staged, unstaged and new files. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
 - **History**: past commits and their diffs.
-- **Pull requests**, for GitHub repositories when the terminal supports them: list, search, create, edit, comment, approve, request changes, merge, close, reopen, check out and mark ready.
+- **Issues**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed** or **All**, create, edit, comment, close as completed or not planned and reopen.
+- **Pull requests**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed**, **Merged** or **All**, create, edit, comment, approve, request changes, close, reopen, check out, update the branch and mark ready. A pull request has **Summary**, **Code**, **Checks** and **Activity** views and shows whether it has conflicts. The merge button has a **Merge method** menu with **Squash and merge**, **Create a merge commit** and **Rebase and merge**.
+
+**Work on this** on an issue, **Fix** on a failing check, **Address feedback** on a pull request and **Resolve conflicts in chat** on a conflicting one write a request into the message input. **Add to chat** on a comment or review (in a pull request's **Activity** or on an issue) writes that comment's text there. Review it and send it to hand the work to the AI.
 
 The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. Staging, pushing, pulling and fetching show their progress. Drag the divider next to the file list to resize it. A file with changes gets **Show diff** in the file browser toolbar.
 
@@ -264,7 +269,7 @@ If you have more than one terminal connected, switching between them in the drop
 :::
 
 :::info Terminals that give each chat its own files
-An administrator can set an orchestrated terminal to give every conversation a workspace of its own, so the files you see in one chat are not the files you see in another. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and the terminal is not offered in temporary chats at all. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+A terminal can give every conversation a machine of its own, so each chat has its own files. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a terminal but its files and details open once the chat is saved. Temporary chats do not list it. To browse a terminal's files without selecting it, use **View files** in its **More** menu. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
 :::
 
 ## More things to try

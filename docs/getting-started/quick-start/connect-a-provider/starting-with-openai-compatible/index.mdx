@@ -696,7 +696,7 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 :::info Forward cookies
 
-**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default and applies to admin-configured connections; a user's own direct connections never forward cookies.
+**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default.
 
 Turn it on only for a server you control that authenticates the person behind the request by cookie, typically one sitting inside your own network behind the same sign-on. Everything the browser holds for your Open WebUI domain goes with the request, session cookie included, so a third-party endpoint should never have this on.
 
@@ -725,7 +725,7 @@ Leaving it at **Default** is always safe. Chatting works the same with every opt
 | **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
 
 :::info Where the dropdown is not shown
-The **Provider** dropdown belongs to OpenAI connections only. Ollama connections are recognised on their own, and the personal **Direct Connections** users add in their own settings do not offer it.
+The **Provider** dropdown belongs to OpenAI connections only. Ollama connections are recognised on their own, and the [connections users add in Tether](/ecosystem/tether#your-own-connections) do not offer it.
 :::
 
 ---

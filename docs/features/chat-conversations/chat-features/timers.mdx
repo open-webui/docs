@@ -16,10 +16,10 @@ Timers are **one-shot**. For anything recurring, use [Automations](/features/cha
 Timers have **no toggle of their own**. They are part of the **Sub-agents** feature and are enabled by [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), which is off by default.
 
 :::warning Timers are enabled by the Sub-agents setting
-The `timer` tool is injected alongside `delegate_task` and shares its gate: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) plus the per-model **Sub-agents** builtin tools category. There is no separate Timers category or permission, so **turning Sub-agents off also removes timers**, and turning timers on means turning Sub-agents on.
+The `timer` tool is injected alongside `delegate_task` and shares its gate: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) plus the per-model **Sub-agents** builtin tools category and the [Sub-agents permission](/features/chat-conversations/chat-features/subagents#enable-sub-agents). There is no separate Timers category or permission, so **turning Sub-agents off also removes timers**, and turning timers on means turning Sub-agents on.
 :::
 
-As with other builtin tools, they also require native function calling in a chat started from the interface, and they are unavailable for direct connections and inside sub-agent chats.
+As with other builtin tools, they also require native function calling in a chat started from the interface, and they are unavailable inside sub-agent chats.
 
 ## Setting a Timer
 
@@ -35,7 +35,7 @@ The prompt is appended to the original chat as a message, the chat reloads on it
 
 The system prompt is built again when the timer fires, from the same pieces the original message used: the chat's own system prompt (from **Model controls > Controls** or your **Settings**), the model's system prompt, the chat's variables and the full text of any skills mentioned in the message. The folder's system prompt, tool server and terminal instructions are applied as for any message in the chat.
 
-One gap to know about: **your own direct tool-server connections (Settings > Integrations) are not carried across**. They are not part of what a timer captures, so a fired timer runs without them even if the chat had them attached. Admin-configured tool servers travel with the chat's tool ids and do run. The captured set also includes the attached files, the terminal connection and the prompt variables. Keep that in mind for a prompt whose whole job depends on an external tool server.
+Tool servers travel with the chat's tool ids, along with the attached files, the terminal connection and the prompt variables. A tool server you added in [Tether](/ecosystem/tether#your-own-connections) resolves only if the Tether device is connected when the timer fires, so keep that in mind for a prompt whose whole job depends on it.
 
 A timer never interrupts you: if the chat is busy generating when the timer comes due, it waits and fires once the chat is free.
 

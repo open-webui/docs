@@ -49,13 +49,14 @@ A file ID written into `context` is only text. The sub-agent receives the ID and
 
 ## Enable Sub-agents
 
-Sub-agents need three things to line up:
+Sub-agents need four things to line up:
 
 1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > Sub-agents**.
 2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Workspace > Models > Edit**, on by default once the feature is on.
-3. **Native function calling in a saved chat**: `delegate_task` is a builtin tool, so it needs Native mode and a request that carries a `session_id`, as every chat started in the interface does. It is not offered in legacy function calling or in temporary chats.
+3. **The user's permission**: the **Sub-agents** switch under **Features** in the [default and group permissions](/features/authentication-access/rbac/permissions#4-features-permissions), or [`USER_PERMISSIONS_FEATURES_SUBAGENTS`](/reference/env-configuration#user_permissions_features_subagents). Users without it get neither `delegate_task` nor the `timer` tool.
+4. **Native function calling in a saved chat**: `delegate_task` is a builtin tool, so it needs Native mode and a request that carries a `session_id`, as every chat started in the interface does. It is not offered in legacy function calling or in temporary chats.
 
-There is no per-user permission for sub-agents. Once enabled for a model, anyone who can use that model can trigger delegation through it.
+Admins always pass the permission check.
 
 ## Admin Limits
 
@@ -81,9 +82,9 @@ Sub-agents are narrower than the chat that starts them:
 
 - **No recursion.** A sub-agent cannot delegate again, so delegation cannot fan out without bound.
 - **No memory writes.** It can read memories but cannot add, change or delete them, keeping delegated work from quietly rewriting your personalization.
-- **No direct connections.** Models served through a direct connection cannot delegate.
 - **No code interpreter in the background**, unless the engine is Jupyter, since the browser-based Pyodide engine needs a live session.
-- **No user tool servers in the background.** A foreground sub-agent inherits the tool servers the user added in their own Settings, which run from the browser; a background one does not. Tool servers an admin added (OpenAPI and MCP) stay available to both. If a delegated task depends on a [user tool server](/features/extensibility/plugin/tools/openapi-servers/open-webui), keep it in the foreground.
+- **Sub-agent targets.** The **Sub-agents** list offers the instance's own models.
+- **Tether tool servers only while the device is online.** A sub-agent inherits the chat's tool servers, including the ones you added in Tether, and those resolve only while the Tether device is connected.
 
 Each sub-agent runs in its own chat. These chats are hidden from chat lists and search, and are deleted together with the parent chat. Admins can read them by id even with [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) off.
 

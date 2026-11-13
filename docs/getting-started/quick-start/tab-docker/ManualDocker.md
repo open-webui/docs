@@ -98,6 +98,8 @@ If you use Open WebUI as a chat front end for hosted models, none of the above a
 
 #### Building it yourself
 
+The standard and slim images install every Python package except PyTorch and its companion packages from the hash-pinned lock files `backend/requirements.lock` and `backend/requirements-slim.lock`. A custom image that edits `backend/requirements.txt` or `backend/requirements-slim.txt` must run `backend/update-locks.sh` (needs [uv](https://docs.astral.sh/uv/)) to regenerate the locks, or the edit has no effect.
+
 `USE_SLIM=true` cannot be combined with `USE_CUDA=true` or `USE_OLLAMA=true`. The build stops with an error rather than producing an image whose GPU support or bundled model server has nothing to run.
 
 #### Offline and air-gapped

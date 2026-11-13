@@ -5,98 +5,21 @@ title: "API and Troubleshooting"
 
 # API and Troubleshooting
 
-All orchestrator policy and lifecycle endpoints require:
+## Open WebUI Terminals API
 
-```http
-Authorization: Bearer {TERMINALS_API_KEY}
-```
+Terminals can also be managed through the Open WebUI API with a user token. Read and write rules follow [Connection Access](/features/open-terminal/terminals/orchestration/creating-terminals#connection-access). The endpoints change often, so they are not listed here. Point an AI agent at the Open WebUI backend to read the latest endpoints and specs.
 
-## Policy API
+## Headers Sent to the Terminals Server
 
-| Method | Endpoint | Purpose |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/policies` | List policies |
-| `POST` | `/api/v1/policies` | Create a policy |
-| `GET` | `/api/v1/policies/{policy_id}` | Read a policy |
-| `PUT` | `/api/v1/policies/{policy_id}` | Create or update a policy |
-| `DELETE` | `/api/v1/policies/{policy_id}` | Delete a policy |
+Open WebUI sends these headers with requests that run in a terminal:
 
-Example policy payload:
-
-```json
-{
-  "image": "ghcr.io/acme/open-terminal:python-ds",
-  "cpu_limit": "4",
-  "memory_limit": "16Gi",
-  "storage": "20Gi",
-  "storage_mode": "per-user",
-  "env": {
-    "OPEN_TERMINAL_ALLOWED_DOMAINS": "*.pypi.org,github.com",
-    "OPEN_TERMINAL_SYSTEM_PROMPT": "You are working on {{os}} at {{home}}."
-  },
-  "idle_timeout_minutes": 60
-}
-```
-
-## Policy Lifecycle API
-
-| Method | Endpoint | Purpose |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/policies/{policy_id}/lifecycle` | Read policy lifecycle config |
-| `PUT` | `/api/v1/policies/{policy_id}/lifecycle` | Create or update policy lifecycle config |
-
-Example lifecycle payload:
-
-```json
-{
-  "reset": {
-    "schedule": "@weekly",
-    "timezone": "UTC"
-  }
-}
-```
-
-## Status API
-
-| Method | Endpoint | Purpose |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/status` | Orchestrator status (for the admin UI) |
-| `GET` | `/api/v1/terminals` | List active terminals/sessions (for the admin UI) |
-
-## Refresh API
-
-| Method | Endpoint | Purpose |
-| :--- | :--- | :--- |
-| `POST` | `/api/v1/terminals/refresh` | Stop matching terminals so they provision fresh next time |
-| `POST` | `/api/v1/terminals/stop` | Stop one user's terminal so the next access starts fresh |
-
-Refresh request body:
-
-```json
-{
-  "user_id": "optional-user-id",
-  "policy_id": "optional-policy-id",
-  "context_id": "optional-context-id",
-  "only_idle": true,
-  "reset": false
-}
-```
-
-`only_idle` defaults to `true`. `reset` defaults to `false`. Omitting `context_id` matches every context a user has.
-
-Stop request body:
-
-```json
-{
-  "user_id": "...",
-  "policy_id": "default",
-  "context_id": "default"
-}
-```
-
-`policy_id` defaults to `default`.
-
-`context_id` also defaults to `default`, which is the shared terminal. Pass `chat:<chat-id>` or `automation:<automation-id>` to target one of the separate terminals created by [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts). Because stop defaults to the shared terminal rather than to everything, a user on a per chat connection keeps their chat terminals unless you name them.
+| Header | Value |
+| :--- | :--- |
+| `X-User-Id` | The verified ID of the user making the request |
+| `X-Session-Id` | The chat ID, when the request belongs to a chat |
+| `X-Terminal-Template-Id` | The ID of the terminal on the Terminals server |
+| `X-Terminal-Chat-Id` | The saved chat ID, whenever the request belongs to a saved chat |
+| `X-Terminal-Model-Id` | The model ID, for a **Model** terminal |
 
 ## Troubleshooting
 
@@ -106,14 +29,12 @@ No. Enter the value exactly as the container should receive it. Quotes are only 
 
 ### Can I pass env vars to the orchestrator and have it forward them?
 
-Use policy `env` for values that should appear inside per-user Open Terminal containers. Orchestrator process env vars configure the orchestrator itself.
+Use the terminal's **Environment variables**, see [Forwarding Behavior](/features/open-terminal/terminals/orchestration/environment-variables#forwarding-behavior).
 
 ### Why did my env var or image change not apply?
 
-The user probably already had a running terminal. Save the policy, then refresh matching terminals or wait for idle teardown.
+The machine was probably already running. Restart it from the **Machines** list of the terminal, or wait for idle cleanup.
 
 ### Why can't users browse to `/etc` in the file browser?
 
-For orchestrated terminals, the file browser intentionally starts inside the root reported by Open Terminal and hides parents above that root. By default that root is `Home`. This prevents confusing support cases. It is not a security boundary.
-
-To use a different visual root, set `OPEN_TERMINAL_FILE_BROWSER_ROOT` to an explicit path such as `/workspace`. To opt out, set `OPEN_TERMINAL_FILE_BROWSER_ROOT=filesystem` in policy `env` and refresh affected terminals.
+For orchestrated terminals, the file browser starts in the home folder, shown as `Home`, and hides the folders above it. To change or remove that root, see [File Browser Root](/features/open-terminal/terminals/orchestration/file-browser-home-boundary#configure-the-root).
