@@ -2,45 +2,67 @@
 sidebar_position: 2
 title: "Open WebUI & llama.cpp"
 sidebar_label: "Open WebUI & llama.cpp"
-description: "How to connect llama-server to Open WebUI. Integration guide for two essential local AI tools."
-keywords: ["Open WebUI vs llama.cpp", "llama.cpp frontend", "llama-server alternative", "llama.cpp web UI", "llama-server web interface", "open webui alternative", "open webui comparison"]
+description: "How to connect llama-server and Llama app to Open WebUI. Integration guide for two essential local AI tools."
+keywords: ["Open WebUI vs llama.cpp", "Llama app", "llama.app", "llama.cpp frontend", "llama-server alternative", "llama.cpp web UI", "llama-server web interface", "open webui alternative", "open webui comparison"]
 ---
 
 import Head from '@docusaurus/Head';
 
 <Head>
-<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Can I connect llama-server to Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. llama-server exposes an OpenAI-compatible API. Add `http://localhost:8081/v1` as a connection in Open WebUI and your models appear automatically."}}, {"@type": "Question", "name": "Does Open WebUI support llama-server's multi-model routing?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. If you're running llama-server in router mode with multiple models, Open WebUI will detect and list all available models through the API."}}]})}</script>
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "Does llama.cpp have an official desktop app?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Llama app is the official desktop app from the llama.cpp team and Hugging Face, available for Mac and Windows 11. It manages local models and opens the built-in browser chat. Linux users can use the CLI and web UI."}},
+    {"@type": "Question", "name": "Can I connect Llama app or llama-server to Open WebUI?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Both expose an OpenAI-compatible API. For Open WebUI running directly on the same machine, add http://localhost:9931/v1 for Llama app, or use your server's configured port. Select Auth: None for a keyless server. Docker deployments need an address reachable from the container."}},
+    {"@type": "Question", "name": "Does Open WebUI support llama-server's multi-model routing?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Open WebUI lists the models advertised by the router's /v1/models endpoint. The router loads models on demand when selected for inference."}},
+    {"@type": "Question", "name": "Is llama.cpp free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. llama.cpp and the official Mac and Windows apps are free and MIT licensed. Downloaded models have their own licenses."}}
+  ]
+})}</script>
 </Head>
 
 
 # Open WebUI & llama.cpp
 
-*Last updated: August 2026*
+*Last updated: November 14, 2026*
 
-[llama.cpp](https://github.com/ggml-org/llama.cpp) by Georgi Gerganov is one of the most important projects in the AI ecosystem, and we mean that. Without llama.cpp, the local AI movement as we know it wouldn't exist. It proved that you could run serious models on consumer hardware, introduced the GGUF format that became the industry standard, and inspired an entire generation of tools. And with `llama-server`, it's not just an engine anymore: it has its own built-in web interface and OpenAI-compatible API ready to go.
+[llama.cpp](https://github.com/ggml-org/llama.cpp), started by Georgi Gerganov, helped make running powerful models on everyday hardware accessible to an entire ecosystem. We're big fans of that work, and **[Llama app](https://llama.app/)** makes it even easier to enjoy: an official desktop app from the llama.cpp team and Hugging Face, with model downloads, browser chat, and a local API for your other apps.
 
-[GitHub](https://github.com/ggml-org/llama.cpp) · [MIT License](https://github.com/ggml-org/llama.cpp/blob/master/LICENSE)
+[Llama app](https://llama.app/) · [Documentation](https://llama.app/docs) · [GitHub](https://github.com/ggml-org/llama.cpp) · [MIT License](https://github.com/ggml-org/llama.cpp/blob/master/LICENSE)
+
+## Llama App: Local AI in a Few Clicks
+
+Llama lives in the **Mac menu bar** or **Windows 11 system tray**. Install it, choose a recommended model, download it, and open chat. The app also installs the `llama` command for terminal use. On Linux, the CLI and browser interface provide the way in. See the [official installation guide](https://llama.app/docs/installation).
+
+The app recommends models for your hardware and handles their settings. Models share the Hugging Face cache with llama.cpp, and load when requested and unload when idle. You can chat locally or let editors, coding agents, and other clients use the same API. It's a compelling standalone option for anyone who wants local AI with very little setup. [Explore Llama app →](https://llama.app/)
+
+### What's New in llama.cpp
+
+The team released **v1.0.0 on November 13, 2026**, with a commitment to signal breaking changes to the public library API and ABI through major version bumps. That's a useful milestone for the many projects building on llama.cpp. [Read the announcement →](https://huggingface.co/blog/ggml-org/llama-cpp-v1)
+
+The release also brings **chat groups, a redesigned browser interface, a live-preview Markdown editor, and mobile layout improvements**, alongside FP8 KV caches, improvements to caching mixture-of-experts models in host memory, and an OpenAI-compatible speech-generation endpoint for supported models. [See the v1.0.0 release notes →](https://github.com/ggml-org/llama.cpp/releases/tag/v1.0.0)
 
 ---
 
 ## What llama.cpp Does Well
 
-- **State-of-the-art inference performance** on consumer hardware, consistently pushing what's possible
-- **Built-in web interface** via `llama-server`, ready to use out of the box
+- **Official desktop apps** for managing and chatting with local models on Mac and Windows
+- **Built-in browser chat** with conversation branching, search, JSON import/export, reasoning display, and MCP support. Image, PDF, and audio attachments work with compatible models. [Web UI documentation](https://llama.app/docs/webui)
 - **Broad hardware support** including CPU, CUDA, Metal, Vulkan, and SYCL
-- **GGUF format** that became the quantized model standard for the entire industry
+- **GGUF model ecosystem** with ready-to-run quantized models on Hugging Face
 - **Quantization options** from Q2 to Q8 with multiple strategies for different quality/speed tradeoffs
 - **Speculative decoding** for faster generation using draft models
 - **Flash Attention** and other advanced inference optimizations
 - **Grammar-constrained generation** for structured outputs (JSON, code, etc.)
-- **OpenAI-compatible API** via `llama-server` so any tool can connect to it
-- **Multi-model router mode** for serving multiple models from one endpoint
-- **One of the most actively developed projects in AI** with a pace of commits that's hard to match
+- **OpenAI- and Anthropic-compatible APIs**, including streaming, tool calling, and structured output, for connecting other applications. [API documentation](https://llama.app/docs/api)
+- **Multi-model router mode** with loading on demand, plus concurrent requests and continuous batching. [Server documentation](https://llama.app/docs/serve)
 - **MIT licensed** and actively maintained
 
 ---
 
 ## What Open WebUI Does Well
+
+Llama already provides a capable chat interface and tool support. Open WebUI adds a shared workspace for knowledge, administration, customization, and multiple providers:
 
 - **Full agentic platform** on top of the models llama.cpp serves, with [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) the model calls itself, [MCP](/features/extensibility/mcp) servers, [sub-agents](/features/chat-conversations/chat-features/subagents), [timers](/features/chat-conversations/chat-features/timers) and [automations](/features/chat-conversations/chat-features/automations)
 - **Customise practically everything**, from per-model prompts, tools, knowledge and parameters to [filters, pipes, actions and event functions](/features/extensibility/plugin/functions) that change behaviour anywhere in the pipeline, plus theming, banners and per-group permissions
@@ -55,26 +77,37 @@ import Head from '@docusaurus/Head';
 
 ## When to Use Each
 
-**Use llama.cpp directly if** you want maximum control over inference. It gives you fine-grained tuning of quantization, context sizes, batch processing, and hardware utilization that no wrapper can match. The built-in web UI works well for solo use.
+**Use Llama app if** you want an easy desktop entry point for downloading models, chatting locally, and connecting your other apps. Its built-in chat may be all you need.
 
-**Add Open WebUI if** you want a richer interface, knowledge bases, team access, or the ability to connect other providers alongside llama.cpp. Open WebUI talks to `llama-server` via its OpenAI-compatible API.
+**Use the llama.cpp CLI if** you want direct control over inference, scripting, or server deployment. The current commands include `llama cli` for terminal chat and `llama serve` for the HTTP API and browser UI. [CLI documentation](https://llama.app/docs/cli)
 
-**Use both.** llama.cpp handles inference with maximum performance. Open WebUI handles the platform layer with knowledge, tools, and collaboration.
+**Add Open WebUI if** you want shared knowledge bases, team access and permissions, custom workflows, or local and cloud providers in the same workspace. It connects to Llama app or your llama.cpp server through the OpenAI-compatible API.
 
 ---
 
 ## Use Them Together
 
-llama.cpp's `llama-server` exposes an OpenAI-compatible API, which means Open WebUI can connect to it directly. Use llama.cpp for high-performance inference, Open WebUI for the platform layer.
+With **Llama app**, download a model and keep the app running. Its default API base URL is `http://localhost:9931/v1`. [Llama API details](https://llama.app/docs/api)
+
+For a **manual server**, start a local GGUF model with an explicit port:
 
 ```bash
-# Start llama-server
-llama-server -m your-model.gguf --port 8081
-
-# Point Open WebUI at it
-# In Admin → Settings → Connections, add:
-# URL: http://localhost:8081/v1
+llama serve -m /path/to/your-model.gguf --port 9931
 ```
+
+If your installation provides the standalone `llama-server` binary, use `llama-server -m /path/to/your-model.gguf --port 9931` instead.
+
+In Open WebUI, go to **Settings → Admin → Connections → OpenAI → Add Connection**:
+
+- **URL:** `http://localhost:9931/v1` when Open WebUI runs directly on the same machine. Use your configured port if different.
+- **Auth:** **None** for a keyless server, or **Bearer** with the key configured on your server.
+- **Provider:** under **Advanced**, choose `llama.cpp` to enable Open WebUI's local model management features.
+
+Save the connection and select a model. See the [connection guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp#step-4-connect-llamacpp-to-open-webui) for model management and troubleshooting.
+
+:::note Open WebUI in Docker
+Inside a container, `localhost` refers to that container. On Docker Desktop, use `http://host.docker.internal:9931/v1` and ensure the server accepts connections from Docker. A manually launched server can use `--host 0.0.0.0`; restrict access to trusted clients and configure `--api-key` when exposing it beyond loopback. On Linux, host networking or a host-gateway mapping may be needed. See [connection troubleshooting](/troubleshooting/connection-error).
+:::
 
 ---
 
@@ -88,14 +121,17 @@ llama-server -m your-model.gguf --port 8081
 
 ## Frequently Asked Questions
 
-**Can I connect llama-server to Open WebUI?**
-Yes. llama-server exposes an OpenAI-compatible API. Add `http://localhost:8081/v1` as a connection in Open WebUI and your models appear automatically.
+**Does llama.cpp have an official desktop app?**
+Yes. [Llama app](https://llama.app/) is the official desktop app from the llama.cpp team and Hugging Face, available for Mac and Windows 11. It manages local models and opens the built-in browser chat. Linux users can use the CLI and web UI.
+
+**Can I connect Llama app or llama-server to Open WebUI?**
+Yes. Both expose an OpenAI-compatible API. For Open WebUI running directly on the same machine, add `http://localhost:9931/v1` for Llama app, or use your server's configured port. Select **Auth: None** for a keyless server. Docker deployments need an address reachable from the container.
 
 **Does Open WebUI support llama-server's multi-model routing?**
-Yes. If you're running llama-server in router mode with multiple models, Open WebUI will detect and list all available models through the API.
+Yes. Open WebUI lists the models advertised by the router's `/v1/models` endpoint. The router loads models on demand when selected for inference.
 
 **Is llama.cpp free?**
-Yes. llama.cpp is MIT licensed and free for any use.
+Yes. llama.cpp and the official [Mac](https://github.com/ggml-org/Llama-macOS) and [Windows](https://github.com/ggml-org/Llama-Windows) apps are free and MIT licensed. Downloaded models have their own licenses.
 
 ---
 
