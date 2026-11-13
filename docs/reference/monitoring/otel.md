@@ -101,6 +101,15 @@ WebUI exports the following metrics via OpenTelemetry:
 |------------------------|-----------|------|--------------------------------------|
 | `http.server.requests` | Counter   | 1    | `http.method`, `http.route`, `http.status_code` |
 | `http.server.duration` | Histogram | ms   | (same as above)                      |
+| `webui.users.total`    | Gauge     | users | (none)                              |
+| `webui.users.active`   | Gauge     | users | (none)                              |
+| `webui.users.active.today` | Gauge | users | (none)                              |
+
+The three user gauges are read from the database at each export:
+
+- `webui.users.total`: registered users.
+- `webui.users.active`: users active in the last 3 minutes.
+- `webui.users.active.today`: users active since midnight **UTC** today, not local midnight.
 
 Metrics are sent via OTLP (default every 10 seconds, configurable via `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`) and can be visualized in **Grafana** (via Prometheus/Mimir).
 

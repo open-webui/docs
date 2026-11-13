@@ -111,7 +111,7 @@ sudo chmod a+rwx searxng
 
 # This configuration file updates the default configuration file
 
-# See https://github.com/searxng/searxng/blob/master/searx/botdetection/limiter.toml
+# See https://github.com/searxng/searxng/blob/master/searx/limiter.toml
 
 [botdetection.ip_limit]
 
