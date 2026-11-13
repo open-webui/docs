@@ -43,11 +43,11 @@ This setting tells Open WebUI's web content loader to respect the proxy settings
 
 ### 2. 403 Forbidden Errors from SearXNG
 
-If you're using SearXNG and seeing `403 Client Error: Forbidden` in your logs, the JSON format is not enabled.
+If you're using SearXNG and seeing `403 Client Error: Forbidden` in your logs, the JSON format is not enabled. SearXNG only serves formats listed in `settings.yml`, and the default list is `html`.
 
 **Solution:**
 
-Edit your SearXNG `settings.yml` and add `json` to the formats list:
+Edit SearXNG's `settings.yml` and add `json` to the formats list. Keep `html`. With the Compose layout in the [SearXNG guide](/features/chat-conversations/web-search/providers/searxng), that file is `core-config/settings.yml` next to `docker-compose.yml`. The current image writes a short file that uses `use_default_settings: true` and has no `formats` list, so an edit that only searches for a line `- html` does not add JSON.
 
 ```yaml
 search:
@@ -56,7 +56,7 @@ search:
     - json
 ```
 
-Restart SearXNG after making this change.
+Restart SearXNG after making this change (`docker compose restart core` from the directory that holds the compose file). Leave `server.limiter` off for an instance that only Open WebUI uses. The limiter also answers JSON requests with 403.
 
 ---
 
