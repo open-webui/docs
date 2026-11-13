@@ -36,7 +36,7 @@ When Open WebUI creates an Artifact, you'll see the content displayed in a dedic
 
 Artifact previews render inside a sandboxed `srcdoc` iframe. For tighter control over what that generated HTML can do (outbound network calls, scripts, styles), inject a dedicated Content Security Policy into the preview with the [`IFRAME_CSP`](/reference/env-configuration#iframe_csp) environment variable, separate from the main app's `CONTENT_SECURITY_POLICY`.
 
-It is empty by default (the iframe `sandbox` already provides baseline isolation) and applies to **every** `srcdoc` iframe in the UI: Artifacts, code/HTML previews, file previews and citation modals. When set, Open WebUI prepends a `<meta http-equiv="Content-Security-Policy">` tag to the iframe document, and per the CSP spec the first policy wins, so it overrides any CSP the generated HTML already declares. A reasonable starting point:
+It is empty by default (the iframe `sandbox` already provides baseline isolation) and applies to **every** `srcdoc` iframe in the UI: Artifacts, code/HTML previews, file previews, citation modals, MCP Apps and Visualizations. When set, Open WebUI prepends a `<meta http-equiv="Content-Security-Policy">` tag to the iframe document, and per the CSP spec the first policy wins, so it overrides any CSP the generated HTML already declares. A reasonable starting point:
 
 ```bash
 IFRAME_CSP=default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'

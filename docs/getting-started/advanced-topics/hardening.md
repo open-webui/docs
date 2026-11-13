@@ -144,7 +144,7 @@ JWT_EXPIRES_IN=24h
 
 Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will log a warning if this is set.
 
-Native apps such as [Tether](/ecosystem/tether) use renewable sessions instead, which end after [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) without use (default `90d`). Signing out of the app, deleting the session through the [Session API](/ecosystem/tether#session-api) and every account-wide sign-out below revoke such a session at once, with or without Redis.
+Native apps such as [Tether](/ecosystem/tether) use renewable sessions instead, which end after [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) without use (default `90d`). Signing out of the app, deleting the session through the API and every account-wide sign-out below revoke such a session at once, with or without Redis.
 
 ### Token revocation
 
@@ -464,15 +464,9 @@ ENABLE_COMMUNITY_SHARING=true
 
 # Allow admins to bulk export all user chats from the database (default: true)
 ENABLE_ADMIN_EXPORT=true
-
-# Allow users to connect directly to model providers with their own API keys,
-# bypassing the server-side proxy (default: false)
-ENABLE_DIRECT_CONNECTIONS=false
 ```
 
 `ENABLE_COMMUNITY_SHARING` shows the options that send chats, models, prompts, tools, functions, skills and usage statistics to the Open WebUI Community, and the links to discover community content. Set it to `false` to keep everything on your instance. Chat share links are a separate feature: a new link stays private until its owner picks who can view it, see [Chat Sharing](/features/chat-conversations/chat-features/chatshare).
-
-`ENABLE_DIRECT_CONNECTIONS`, when enabled, allows users to configure their own API keys and model endpoints in the browser. These connections are made from the backend, so the user's API key is sent to the Open WebUI server. This is off by default.
 
 ### Workspace permissions
 
@@ -616,7 +610,7 @@ PROFILE_IMAGE_ALLOWED_MIME_TYPES=image/png,image/jpeg
 
 ### Iframe content-security-policy
 
-Open WebUI renders LLM-generated and user-uploaded HTML inside `srcdoc` iframes for Artifacts, code/HTML previews, file previews, and citation modals. The `sandbox` attribute on those iframes provides the baseline isolation. For deployments that want a stronger limit on what the rendered HTML can do, particularly outbound network requests, set a CSP that is injected into every iframe document:
+Open WebUI renders LLM-generated and user-uploaded HTML inside `srcdoc` iframes for Artifacts, code/HTML previews, file previews, citation modals and Visualizations. The `sandbox` attribute on those iframes provides the baseline isolation. For deployments that want a stronger limit on what the rendered HTML can do, particularly outbound network requests, set a CSP that is injected into every iframe document:
 
 ```bash
 IFRAME_CSP=default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'
@@ -663,7 +657,7 @@ ENABLE_FUNCTIONS=false
 ENABLE_TOOL_SERVERS=false
 ```
 
-This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers, Open Terminal connections and users' direct tool servers from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers and Open Terminal connections from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
 
 ### Code execution
 
@@ -721,6 +715,10 @@ All default to `false`, meaning only administrators can manage Tools and Functio
 ### Base image
 
 The default Dockerfile uses `python:3.12-slim-trixie` (Python 3.12 on Debian 13). If your organization requires a hardened or approved base image, you can swap it by modifying the `FROM` line in the Dockerfile. This is common in enterprise environments that mandate minimal, vulnerability-scanned base images.
+
+### Pinned dependencies
+
+The standard and slim images install their Python packages from hash-pinned lock files, so a build installs the exact pinned versions. See [Building it yourself](/getting-started/quick-start#building-it-yourself) for custom images.
 
 ### Non-root execution
 
@@ -824,7 +822,6 @@ The table below summarizes the key hardening actions covered in this guide. Each
 | [Disable Tools and Functions if unused](#disabling-the-feature-entirely) | Enabled | `ENABLE_PLUGINS=false` |
 | [Disable auto pip install](#dependency-installation) | Enabled | `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` |
 | [Review community sharing](#data-sharing-and-export) | `true` | Disable if sensitive data |
-| [Review direct connections](#data-sharing-and-export) | `false` | Keep disabled unless needed |
 | [Use PostgreSQL](#postgresql) | SQLite | PostgreSQL |
 | [Verify outbound TLS](#outbound-tls) | Enabled | Keep enabled |
 | [Enable offline mode](#offline-mode) | Disabled | `OFFLINE_MODE=true` for air-gapped environments |
@@ -857,7 +854,7 @@ For organizations where security is a priority, the following practices define t
 
 7. **Keep Tool and Function creation restricted to administrators and review all code before importing.** By default, only administrators can create, import, and manage Tools and Functions. Do not grant workspace permissions to untrusted users. Treat third-party Tools with the same scrutiny as any code running on your infrastructure. Never import Tools without reviewing their source code first. [Details](#tools-functions-and-pipelines)
 
-8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely (`ENABLE_CODE_EXECUTION=false`, `ENABLE_CODE_INTERPRETER=false`). If it is needed, isolate it with **Open Terminal** (container-isolated) rather than relying on the legacy `pyodide` or `jupyter` engines, and never expose a `jupyter` engine without securing the Jupyter instance. Keep direct connections and direct tool servers disabled. [Details](#dependency-installation)
+8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely (`ENABLE_CODE_EXECUTION=false`, `ENABLE_CODE_INTERPRETER=false`). If it is needed, isolate it with **Open Terminal** (container-isolated) for code execution, and avoid the legacy `pyodide` and `jupyter` engines, and never expose a `jupyter` engine without securing the Jupyter instance. [Details](#dependency-installation)
 
 ### Data Protection
 
