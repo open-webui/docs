@@ -52,7 +52,7 @@ A file ID written into `context` is only text. The sub-agent receives the ID and
 Sub-agents need three things to line up:
 
 1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > Sub-agents**.
-2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Workspace > Models > Edit**, on by default once the feature is on.
+2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Settings > Admin > Models > Edit** (or **Workspace > Models** for your own model), on by default once the feature is on.
 3. **Native function calling in a saved chat**: `delegate_task` is a builtin tool, so it needs Native mode and a request that carries a `session_id`, as every chat started in the interface does. It is not offered in legacy function calling or in temporary chats.
 
 There is no per-user permission for sub-agents. Once enabled for a model, anyone who can use that model can trigger delegation through it.
