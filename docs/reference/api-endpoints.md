@@ -5,6 +5,10 @@ title: "API Endpoints"
 
 This guide provides essential information on how to interact with the API endpoints effectively to achieve seamless integration and automation using our models. Please note that this is an experimental setup and may undergo future updates for enhancement.
 
+:::note Endpoints are not documented any more
+The API changes so often that new endpoints, request fields and socket events are no longer documented here. To find the latest endpoints and specs, point an AI agent at the Open WebUI backend and let it read them. The endpoints below stay for reference.
+:::
+
 ## Authentication
 
 To ensure secure access to the API, authentication is required. You can authenticate your API requests using the Bearer Token mechanism. Obtain your API key from **Settings > Account** in the Open WebUI, or alternatively, use a JWT (JSON Web Token) for authentication. For full instructions on enabling and generating API keys (including the admin toggle and group permissions required for non-admin users) see [API Keys](/features/authentication-access/api-keys).
