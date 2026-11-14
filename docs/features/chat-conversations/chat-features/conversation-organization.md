@@ -127,18 +127,18 @@ The System Prompt field is only visible if you have permission to set system pro
 
 ### Attached Knowledge
 
-Link **knowledge bases and files** to your folder:
+Attach **knowledge bases, notes and files** in the folder's **Knowledge** field (under **Advanced**), the same picker as in the model editor ([Attaching knowledge and notes](/features/workspace/knowledge#attaching-knowledge-and-notes)):
 
-- All attached files and knowledge bases are automatically included as **context** for every chat in the folder.
+- Every chat in the folder works from them, and they [limit the knowledge tools to the attached items](/features/workspace/knowledge#scoped-access-keeps-things-organized).
 - With **Native** function calling, the model gets a list of the folder's knowledge and reads it with the **Knowledge Base** [builtin tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode), whether **Preload files** is on or off. With **Legacy** function calling, it is retrieved and injected through RAG (Retrieval Augmented Generation) while **Preload files** is on.
 - Knowledge is optional. Folders work for organization without any attached files.
 - **Attaching a folder to another chat.** Folders are listed in the `#` menu, and you can also drag one from the sidebar into the message input. This attaches the files and knowledge bases linked to the folder, and only while **Preload files** is on. With Preload files off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder.
 
 **Whose access decides what is attached.** Attaching needs both your access and the **folder owner's**; every chat in the folder then follows the owner's access:
 
-- Attaching a file, collection or note to a folder requires both the person attaching it and the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves, including their own private ones, nor documents they cannot open themselves. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
+- Attaching a file, knowledge base or note to a folder requires both the person attaching it and the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves, including their own private ones, nor documents they cannot open themselves. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
 - Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being used in the folder's chats.
-- Entries that are not a file, collection or note, or that carry no ID, are ignored.
+- Entries that are not a file, knowledge base or note, or that carry no ID, are ignored.
 
 ## Sharing Folders
 
@@ -190,7 +190,7 @@ Imagine you're working on a Python development project:
    ```
    You are an expert Python developer. You provide clean, efficient, and well-documented code. When asked for code, prioritize clarity and adherence to PEP 8 standards.
    ```
-3. **Attach Knowledge** by linking your project's technical specification PDF or library documentation.
+3. **Attach knowledge**: add your project's technical specification PDF or library documentation in the folder's **Knowledge** field.
 4. **Click on the folder** to select it as your active workspace.
 5. **Start chatting**: every new conversation will have:
    - The expert Python persona

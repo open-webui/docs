@@ -379,7 +379,7 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | **Search & Web** | *Requires `ENABLE_WEB_SEARCH` enabled AND per-chat "Web Search" toggle enabled.* |
 | `search_web` | Search the public web for information. Best for current events, external references, or topics not covered in internal documents. |
 | `fetch_url` | Visits a URL and extracts text content via the Web Loader. |
-| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether the model has attached knowledge; see note below.* |
+| **Knowledge Base** | *Requires per-model "Knowledge Base" category enabled (default: on). Which tools are injected depends on whether knowledge is attached to the model, its folder or the chat; see note below.* |
 | `list_knowledge` | List attached knowledge (KBs, files, notes). Start here when attachments exist. |
 | `list_knowledge_bases` | List accessible knowledge bases with file counts. |
 | `query_knowledge_bases` | Semantic search over KB names/descriptions to find the right KB. |
@@ -481,19 +481,21 @@ The effect is that a model on a Chat Completions provider can actually look at w
 
 Use this quick matrix instead of memorizing per-row caveats.
 
-| Tool | Model has attached knowledge | Model has no attached knowledge |
+| Tool | Knowledge attached | Nothing attached |
 |------|------------------------------|---------------------------------|
 | `list_knowledge` | Yes | No |
 | `list_knowledge_bases` | No | Yes |
 | `search_knowledge_bases` | No | Yes |
 | `query_knowledge_bases` | No | Yes |
-| `search_knowledge_files` | Yes (auto-scoped) | Yes (all accessible KBs) |
-| `query_knowledge_files` | Yes (auto-scoped) | Yes |
-| `grep_knowledge_files` | Yes (auto-scoped) | Yes |
-| `view_file` | Yes (when attached items include files/collections) | No |
-| `view_knowledge_file` | Yes (when attached items include files/collections) | Yes |
-| `display_file` | Yes (when attached items include files/collections) | Yes |
-| `view_note` | Yes (when attached items include notes) | No |
+| `search_knowledge_files` | Yes (attached only) | Yes (all accessible KBs) |
+| `query_knowledge_files` | Yes (attached only) | Yes (all accessible KBs) |
+| `grep_knowledge_files` | Yes (attached only) | Yes (all accessible KBs) |
+| `view_file` | When a knowledge base or file is attached | No |
+| `view_knowledge_file` | When a knowledge base or file is attached | Yes |
+| `display_file` | When a knowledge base or file is attached | Yes |
+| `view_note` | When a note is attached | No |
+
+`view_note` also comes with the separate **Notes** category, in every chat whatever is attached.
 
 Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 
@@ -503,10 +505,12 @@ Quick rule: `list_knowledge` and `list_knowledge_bases` are mutually exclusive.
 - knowledge attached to the [folder](/features/chat-conversations/chat-features/conversation-organization) the chat sits in,
 - knowledge bases and notes attached to the chat itself, counted only when the model's **Preload files** capability is off, since with it on the content is already in the conversation.
 
-When the **Knowledge Base** category is enabled and any of these are present, a hidden `list_attached_knowledge` tool result after the user's message holds an `<attached_knowledge>` block listing each item's type, ID and name, and whether it came from the model or the folder. Chat attachments are not listed, since each user message already names its own. The result is skipped when nothing is attached and when a reply is continued. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `query_knowledge_files` and friends, so it can scope a search to one knowledge base instead of guessing or searching everything.
+[Scoped access](/features/workspace/knowledge#scoped-access-keeps-things-organized) explains why and how to choose what a model gets.
+
+When the **Knowledge Base** category is enabled and any of these are present, a hidden `list_attached_knowledge` tool result after the user's message holds an `<attached_knowledge>` block listing each item's type, ID and name, and whether it came from the model or the folder. Chat attachments are not listed, since each user message already names its own. The result is skipped when nothing is attached and when a reply is continued. This is a table of contents, not the content: it tells the model what it may reach for and gives it the IDs to pass to `list_knowledge` and `search_knowledge_files`, so it can page or search one knowledge base.
 
 :::info `kb_exec` replaces the matrix when enabled
-When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI replaces the file-oriented tools listed above with `kb_exec`. Still injected alongside it: `query_knowledge_files` and `display_file` (always), `view_note` (when notes are attached), and `query_knowledge_bases` + `search_knowledge_bases` (when no KB is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
+When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Open WebUI replaces the file-oriented tools listed above with `kb_exec`. Still injected alongside it: `query_knowledge_files` and `display_file` (always), `view_note` (when a note is attached), and `query_knowledge_bases` + `search_knowledge_bases` (when nothing is attached). The model interacts with files through familiar shell commands. See the [Knowledge feature page](/features/workspace/knowledge#filesystem-style-access-kb_exec) for details.
 :::
 
 #### Tool Reference
@@ -612,7 +616,7 @@ Open WebUI automatically detects and stores your timezone when you log in. This 
 :::
 
 :::warning Knowledge Tool Injection Depends on Attachments
-Knowledge tool availability changes based on whether the model has attached knowledge. Use the **Knowledge Tool Availability** matrix above as the source of truth.
+Knowledge tool availability changes based on whether knowledge is attached to the model, its folder or the chat. Use the **Knowledge Tool Availability** matrix above as the source of truth.
 
 - With attachments: the model gets scoped knowledge tools.
 - Without attachments: the model gets KB discovery tools.
@@ -626,7 +630,7 @@ Attaching a knowledge base or note to a custom model does **not** bypass access 
 
 | Attached Type | User Needs |
 |---------------|-----------|
-| **Knowledge Base** (collection) | Owner, admin, or explicit read access grant |
+| **Knowledge Base** | Owner, admin, or explicit read access grant |
 | **Individual File** | Anyone who can use the model (checked against the model's author when attached) |
 | **Note** | Owner, admin, or explicit read access grant |
 
@@ -659,7 +663,7 @@ The native `query_knowledge_files` tool uses **hybrid search + reranking** when 
 **If your model isn't using attached knowledge:**
 1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering. If no knowledge is attached to this model, use list_knowledge_bases first to discover available KBs."*
 2. **Or disable Native Function Calling** for that model to restore automatic RAG injection.
-3. **Or use "Using Entire Document"** for attached knowledge (click on the attachment and switch its mode) which always injects the full content.
+3. **Or attach a small document in the chat with "Using Entire Document"** (click the attachment and switch its mode) while the model's **Preload files** capability is on, which injects its full content. Knowledge attached to the model or a folder is never injected in native mode.
 
 See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for more details.
 :::
@@ -698,7 +702,7 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
 | **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
-| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `display_file` (or `kb_exec` + `query_knowledge_files` + `display_file` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
+| **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `display_file`, `view_note` when a note is attached (or `kb_exec` + `query_knowledge_files` + `display_file` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |
 | **Image Generation** | `generate_image`, `edit_image` | Generate and edit images |
 | **Code Interpreter** | `execute_code` | Execute code in a sandboxed environment |

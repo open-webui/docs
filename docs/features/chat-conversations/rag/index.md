@@ -195,7 +195,7 @@ The merging logic is deliberately simple, a single forward pass through all chun
 
 ### Performance characteristics
 
-The algorithm is O(n) in the number of chunks: a single pass with no lookahead or backtracking. This makes it fast even for large document collections.
+The algorithm is O(n) in the number of chunks: a single pass with no lookahead or backtracking. This makes it fast even for large document sets.
 
 The efficiency gains from merging scale non-linearly in some ways. Retrieval over 45 vectors versus 588 isn't just ~13x faster in raw compute, you're also getting much cleaner top-k results because you've eliminated the noise of near-empty chunks that might score well on partial keyword matches but contribute nothing useful to the LLM. The quality improvement often matters more than the speed improvement.
 
@@ -283,7 +283,7 @@ When Preload files is disabled, file content is **not automatically extracted or
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+Individual files and knowledge bases attached in the chat can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
 
 To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
@@ -315,7 +315,7 @@ On Legacy, the [Builtin Tools](/features/extensibility/plugin/tools#built-in-sys
 |--------------|---------------|--------|
 | Enabled | Enabled | **Full Agentic Mode**: RAG content injected + model can autonomously query knowledge bases |
 | Enabled | Disabled | **Traditional RAG**: Content injected upfront, no autonomous retrieval tools |
-| Disabled | Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`) are injected so it can read and search the chat's own attachments. This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
+| Disabled | Enabled | **Tools-Only Mode**: No pre-injected content. The model queries knowledge bases on demand, and the [builtin **Files** tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (`list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file`) are injected so it can read and search the chat's own attachments. Knowledge bases and notes attached in the chat [limit the knowledge tools to them](/features/workspace/knowledge#scoped-access-keeps-things-organized). This combination is also the [prompt-caching optimum](/features/chat-conversations/prompt-caching) |
 | Disabled | Disabled | **No File Processing**: Attached files are ignored, no content reaches the model |
 
 :::warning Knowledge attached to a model or a folder behaves differently

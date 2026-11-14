@@ -254,7 +254,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 | PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
 | Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
 | Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
-| Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or try Using Entire Document |
+| Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or attach a small document in the chat with Using Entire Document |
 | Single attached file returns nothing | Re-index to rebuild the per-file indexes |
 | Docling citations show the wrong page | [Re-index, or re-upload the file](/features/chat-conversations/rag/document-extraction/docling#citations-point-to-the-wrong-page) |
 
@@ -440,12 +440,12 @@ Because **Native Function Calling is the default**, the model needs both the **a
 
 #### Knowledge Retrieval Behavior Matrix
 
-| | **KB Attached to Model** | **No KB Attached** |
+| | **Knowledge Attached to Model** | **No Knowledge Attached** |
 |---|---|---|
-| **Legacy Mode** | Open WebUI auto-injects RAG results from the **attached KB(s) only** | No automatic RAG; user must manually add a knowledge base to the chat via `#` |
-| **Native Function Calling** | Model receives tools scoped to **attached KB(s) only** (must actively call them) | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled); must actively call them |
+| **Legacy Mode** | Open WebUI auto-injects RAG results from the **attached knowledge only** | No automatic RAG; user must manually add a knowledge base to the chat via `#` |
+| **Native Function Calling** | Model receives tools limited to the **attached knowledge** (must actively call them) | Model receives tools with access to **all accessible KBs** (if Builtin Tools enabled); must actively call them |
 
-Key takeaway: in Native Mode, the model must use its knowledge tools regardless. Attaching a KB only restricts *which* KBs are searchable.
+Key takeaway: in Native Mode, the model must use its knowledge tools regardless. Attaching knowledge only restricts *what* is searchable; [scoped access](/features/workspace/knowledge#scoped-access-keeps-things-organized) lists everything that counts as attached.
 
 :::tip Preventing Knowledge Base Access in Native Mode
 If you want to prevent a model from accessing **any** knowledge base in native mode, you don't need to disable Builtin Tools entirely. Instead, disable only the **Knowledge Base** category in **Settings > Admin > Models > Edit > Builtin Tools** (or **Workspace > Models** for your own model). This removes all knowledge-related tools while keeping other builtin tools (web search, memory, notes, etc.) active. See [Granular Builtin Tool Categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) for the full list of categories.
@@ -479,7 +479,7 @@ Per-model settings in **Settings > Admin > Models > Edit > Advanced Params** (or
    - Try a model with reliable native tool calling, then ask about a specific fact you can verify in the document
 
 5. **For a small document, try Using Entire Document**:
-   - Click on the attached knowledge base and turn on **Using Entire Document**
+   - Attach the knowledge base in the chat, click it and turn on **Using Entire Document**, with the model's **Preload files** capability on. On a model-attached knowledge base the toggle only takes effect with Legacy function calling
    - This sends the full extracted content instead of retrieving selected passages. Ensure the document fits the model's context window
 
 :::info Why Agentic RAG?

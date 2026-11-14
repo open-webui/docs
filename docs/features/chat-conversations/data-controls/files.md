@@ -43,7 +43,7 @@ Files are at the heart of the platform's advanced capabilities:
 ### 1. Retrieval Augmented Generation (RAG)
 By uploading documents (PDFs, Word docs, text files, etc.), you can ground your AI's responses in your own data.
 - **Chat Uploads**: Simply drag and drop files into a chat or use the upload icon.
-- **Knowledge Bases**: Add files to structured collections for more permanent and organized retrieval.
+- **Knowledge Bases**: Add files to a [knowledge base](/features/workspace/knowledge) for more permanent and organized retrieval.
 
 ### 2. File Metadata
 Every file carries metadata that helps both you and the AI understand its context. This includes content type, original filename, and size.

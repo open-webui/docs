@@ -503,7 +503,7 @@ A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The e
 
 ### Retrieval Augmented Generation (RAG)
 
-The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
+The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge bases via the API, and how to use them in chat completions effectively.
 
 #### Uploading Files
 
@@ -632,7 +632,7 @@ Before adding a file to a knowledge base, verify that processing has completed u
 
 #### Adding Files to Knowledge Collections
 
-After uploading, you can group files into a knowledge collection or reference them individually in chats.
+After uploading, you can group files into a knowledge base or reference them individually in chats.
 
 :::important
 **Always wait for file processing to complete before adding files to a knowledge base.** Files that are still processing will have empty content, causing a `400` error. Use the status endpoint described above to verify the file status is `completed`.
@@ -669,7 +669,7 @@ A file whose extracted text is already in the knowledge base is rejected with `4
 
 #### Processing Web URLs into Knowledge Collections
 
-Use this endpoint to fetch a webpage, extract content, and store the resulting chunks in a knowledge collection.
+Use this endpoint to fetch a webpage, extract content, and store the resulting chunks in a vector collection.
 
 - **Endpoint**: `POST /api/v1/retrieval/process/web`
 - **Query Parameters**:
@@ -803,7 +803,7 @@ result = upload_and_add_to_knowledge('/path/to/document.pdf', 'your-knowledge-id
 
 #### Using Files and Collections in Chat Completions
 
-You can reference both individual files or entire collections in your RAG queries for enriched responses.
+You can reference both individual files or entire knowledge bases in your RAG queries for enriched responses.
 
 ##### Using an Individual File in Chat Completions
 
@@ -849,7 +849,7 @@ This method is beneficial when you want to focus the chat model's response on th
 
 ##### Using a Knowledge Collection in Chat Completions
 
-Leverage a knowledge collection to enhance the response when the inquiry may benefit from a broader context or multiple documents.
+Leverage a knowledge base to enhance the response when the inquiry may benefit from a broader context or multiple documents.
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Curl Example**:
@@ -861,7 +861,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
   -d '{
         "model": "gpt-5.6-terra",
         "messages": [
-          {"role": "user", "content": "Provide insights on the historical perspectives covered in the collection."}
+          {"role": "user", "content": "Provide insights on the historical perspectives covered in the knowledge base."}
         ],
         "files": [
           {"type": "collection", "id": "your-collection-id-here"}
@@ -889,7 +889,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
       return response.json()
   ```
 
-These methods enable effective utilization of external knowledge via uploaded files and curated knowledge collections, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within collections, you can customize the integration based on your specific needs.
+These methods enable effective utilization of external knowledge via uploaded files and curated knowledge bases, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within knowledge bases, you can customize the integration based on your specific needs.
 
 ## Advantages of Using Open WebUI as a Unified LLM Provider
 

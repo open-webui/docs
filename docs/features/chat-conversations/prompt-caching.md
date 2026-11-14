@@ -43,7 +43,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **Memory** | With Native function calling, adds the recalled memories once per reply as a hidden `recall_memories` tool result after your message. Without it, appends them to your message on every turn | None with Native. High with Legacy: changes whenever memories change |
 | **"Using Entire Document"** | Injects a whole file into every message | Very high: but a **Preload files** sub-mode; only fires while Preload files is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low: constant while voice mode is on |
-| **Attachment metadata block** | Lists the files, collections, notes and chats attached to a message as metadata (ids and names) in that message | Low: stable as long as the attachments don't change |
+| **Attachment metadata block** | Lists the files, knowledge bases, notes and chats attached to a message as metadata (ids and names) in that message | Low: stable as long as the attachments don't change |
 | **Attached knowledge list** | With Native function calling, lists the knowledge attached to the model or folder once per reply as a hidden `list_attached_knowledge` tool result after your message. Skipped when there is nothing to list | None: saved with the reply and replayed unchanged |
 | **Open Terminal `AGENTS.md`** | Reads the `AGENTS.md` in the terminal user's home directory on every turn and adds it as a user message just before the first user message | Invalidates everything from the first user message onward whenever the file changes, for example when the model edits it mid-chat. The system message and tools stay cached |
 | **Open Terminal skills** | Adds terminal skills to the skills list, which with Native function calling is a hidden `list_available_skills` tool result once per reply (skipped when there are no skills). With Legacy, only the skills you select are written into the system message | Changes only the tail of the request the turn a skill is added or removed. The tool list changes only when the first skill appears or the last one goes, since the skill tools are offered while at least one skill is listed |
@@ -92,7 +92,7 @@ Configure a fixed system prompt on the model and avoid anything that regenerates
 
 ### 2. Turn Preload files off (this is what switches the file tools on)
 
-Disable the **Preload files** capability on the model (it is off by default with Native function calling), and leave **File Upload** enabled. Attached files, collections, notes and referenced chats are still **surfaced to the model as stable metadata** in an `<attached_files>` block on the message that carried them, but their **content is no longer auto-retrieved or injected**. See [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
+Disable the **Preload files** capability on the model (it is off by default with Native function calling), and leave **File Upload** enabled. Attached files, knowledge bases, notes and referenced chats are still **surfaced to the model as stable metadata** in an `<attached_files>` block on the message that carried them, but their **content is no longer auto-retrieved or injected**. See [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
 
 Turning Preload files off also makes the builtin Files tools available, which let the model read and search chat attachments itself:
 
@@ -107,8 +107,8 @@ Turning Preload files on removes these tools, since the content is already in th
 
 Retrieval then becomes **on-demand**: the model decides what to fetch and calls a tool. Tool results are appended at the **end** of the conversation, so they never rewrite the cached prefix.
 
-:::info Chat-attached collections and notes are not orphaned
-Turning Preload files off also re-routes any knowledge collections or notes attached to the chat into the knowledge tool path, so they stay searchable through `query_knowledge_files` and friends rather than becoming invisible.
+:::info Chat-attached knowledge bases and notes are not orphaned
+Turning Preload files off also re-routes any knowledge bases or notes attached to the chat into the knowledge tool path, so they stay searchable through `query_knowledge_files` and friends. The knowledge tools then [search only the attached knowledge](/features/workspace/knowledge#scoped-access-keeps-things-organized).
 
 A **chat folder** attached with `#` or dragged into the input only reaches the model through Preload files, which retrieves from the folder's attached knowledge. With Preload files off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder, where its knowledge goes through the knowledge tools.
 :::
@@ -143,7 +143,7 @@ Enable **Builtin Tools** on the model and leave the categories you need switched
 | Resource | Tools | Category |
 |---|---|---|
 | Files attached to the chat | `list_chat_files`, `query_chat_files`, `grep_chat_files`, `view_file`, `display_file` | **Files** |
-| Knowledge bases and collections, including the knowledge of the folder the chat is in | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, `display_file`, plus the discovery tools when no knowledge is attached to the model | **Knowledge Base** |
+| Knowledge bases, including the knowledge of the folder the chat is in | `query_knowledge_files`, `search_knowledge_files`, `grep_knowledge_files`, `view_knowledge_file`, `display_file`, plus the discovery tools when no knowledge is attached | **Knowledge Base** |
 | Notes | `search_notes`, `view_note` | **Notes** |
 | The user's chats | `search_chats`, `view_chat` | **Chat History** |
 

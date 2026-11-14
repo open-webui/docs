@@ -19,7 +19,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-Use Knowledge Bases to ask questions across PDFs, documents, and other files in Open WebUI. Upload your files, attach the collection to a model or conversation, and ask a question. Where document content is processed depends on your extraction, embedding, and model providers; see [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption).
+Use Knowledge Bases to ask questions across PDFs, documents, and other files in Open WebUI. Upload your files, attach the knowledge base to a model or conversation, and ask a question. Where document content is processed depends on your extraction, embedding, and model providers; see [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption).
 
 ## Ask your first document question
 
@@ -27,7 +27,7 @@ Start with a running Open WebUI instance, a connected model, and permission to c
 
 1. Click **Workspace > Knowledge**, then **Create**. Give the knowledge base a name and description.
 2. Upload a small text-based PDF or text file. Wait for processing to finish before asking about it.
-3. Reference the knowledge base in chat with `#`, or attach it to a model in **Settings > Admin > Models > Edit** (or **Workspace > Models** for your own model) and start a conversation with that model.
+3. Attach the knowledge base to the chat, or to a model and start a conversation with that model. [Attaching knowledge and notes](#attaching-knowledge-and-notes) shows where.
 4. Ask a question whose answer is in the file, such as: "Use the attached handbook to find the office opening hours. Quote the relevant passage."
 5. Compare the answer and any source references with the original document. If the model cannot find the content, follow [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working).
 
@@ -36,10 +36,24 @@ Start with a running Open WebUI instance, a connected model, and permission to c
 | Need | Use |
 | :--- | :--- |
 | Ask about one file in one conversation | [Upload a file to the chat](/features/chat-conversations/data-controls/files#using-files-in-open-webui) |
-| Reuse a document collection across conversations | A Knowledge Base, using the steps above |
+| Reuse a set of documents across conversations | A Knowledge Base, using the steps above |
 | Analyze spreadsheets or create files through code | [Open Terminal's file-analysis guide](/features/open-terminal/use-cases/file-analysis) |
 
-Unlike [Notes](/features/notes), which inject full content into every message, Knowledge can retrieve relevant passages on demand. This makes it useful for document sets that would exceed the model's context window if sent in full. For local-only document chat, also follow [Run Open WebUI Offline](/tutorials/maintenance/offline-mode).
+A [note](/features/notes) reaches the model as its full text, while a knowledge base can retrieve the relevant passages on demand. This makes a knowledge base useful for document sets that would exceed the model's context window if sent in full. Knowledge bases and notes attach in the same places, and in this page "knowledge" covers both, along with single files. For local-only document chat, also follow [Run Open WebUI Offline](/tutorials/maintenance/offline-mode).
+
+## Attaching knowledge and notes
+
+Knowledge bases, notes and single files can be attached to a chat, to a [folder](/features/chat-conversations/chat-features/conversation-organization#attached-knowledge) (for every chat in it) or to a [model](/features/workspace/models). Some pickers label knowledge bases **Collections** (or **Collection** on a single item); that label means a knowledge base.
+
+**In a chat:**
+
+- Type `#` in the message input. The list offers **Folders**, **Collections** (knowledge bases) and **Files** (single files from knowledge bases), and accepts a web or YouTube URL.
+- Or click **+** (**More**) and open **Add Context**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**.
+- Or drag a note, folder or chat from the sidebar into the message input.
+
+**On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Admin > Models > Edit**) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Collections** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
+
+**Workspace > Knowledge** lists knowledge bases only. Notes live in [Notes](/features/notes).
 
 ---
 
@@ -51,7 +65,7 @@ Upload a folder of contracts, technical specs, or research papers. The AI search
 
 ### Two retrieval modes for different needs
 
-Choose **Using Focused Retrieval** (RAG) to let the AI search large collections efficiently, or **Using Entire Document** to inject a whole document word-for-word when precision matters.
+Choose **Using Focused Retrieval** (RAG) to let the AI search large document sets efficiently, or **Using Entire Document** to inject a whole document word-for-word when precision matters.
 
 ### Autonomous exploration with native function calling
 
@@ -59,7 +73,17 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 
 ### Scoped access keeps things organized
 
-Attach specific knowledge bases to a model so it only searches what's relevant. Or leave it unscoped and let the model discover everything the user has access to.
+When you attach knowledge to a model, a folder or a chat, you choose exactly which knowledge that model searches. Its knowledge tools then list and search only the attached items. This keeps answers focused and predictable, since the model draws only on the sources you picked. It also lets you decide which documents each model searches: a model on a cloud provider can get only a public handbook, while a model on your own hardware gets the internal documents too. The user's own access still applies on top.
+
+What narrows the knowledge tools:
+
+- anything in a model's **Knowledge** field (knowledge bases, notes and files),
+- anything in the **Knowledge** field of the folder the chat is in,
+- knowledge bases and notes attached in the chat itself, when the model's **Preload files** capability is off. With it on, they are injected into the conversation.
+
+In a chat, uploaded files, single files picked from a knowledge base, folders, referenced chats and webpages reach the model their own way and leave the knowledge tools unchanged.
+
+To let a model browse all the knowledge bases the user can read, attach nothing. To restrict it, attach exactly what it should use, including the notes you want it to read. Notes are also reachable through the separate **Notes** tool category, which reaches all of the user's notes whatever is attached; turn **Notes** off under the model's **Builtin Tools** to keep it to the attached notes. The [tool table](#agentic-knowledge-tools) shows which tools each case gets.
 
 ---
 
@@ -74,7 +98,7 @@ Attach specific knowledge bases to a model so it only searches what's relevant. 
 | **Always Use Full Text** | Inject entire documents with no chunking |
 | **Nested directories** | Organize files into subdirectories with drag-and-drop reordering |
 | **File browser with preview** | Browse files in a tree, preview each file next to the list and read or edit the indexed text the AI searches |
-| **Incremental directory sync** | Mirror a local folder into the KB, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
+| **Incremental directory sync** | Mirror a local folder into the knowledge base, only new and modified files upload, deletions are removed, folder structure preserved. Mirror remote sources too (Git, Confluence, S3 and more) with [oikb](/ecosystem/knowledge-base-sync) |
 | **Export and API** | Back up knowledge bases as zip files, manage via REST API |
 
 ---
@@ -95,7 +119,7 @@ Best for large document sets where only specific sections are relevant.
 
 ### Full Context
 
-Injects the complete content of the file into every message. No chunking, no semantic search. For files and collections attached in the chat it is injected whatever the function calling mode, as long as the model's **Preload files** capability is on. A knowledge base attached to the model, though, is only injected in legacy function calling mode: with native function calling the model reaches model-attached knowledge through the knowledge tools, Full Context or not.
+Injects the complete content of the file into every message. No chunking, no semantic search. For files and knowledge bases attached in the chat it is injected whatever the function calling mode, as long as the model's **Preload files** capability is on. A knowledge base attached to the model, though, is only injected in legacy function calling mode: with native function calling the model reaches model-attached knowledge through the knowledge tools, Full Context or not.
 
 Best for short reference documents, style guides, or context that's always relevant.
 
@@ -105,27 +129,29 @@ Files and text attachments up to **Full Text Threshold (Characters)** in **Admin
 
 ## Agentic Knowledge Tools
 
-With [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) enabled, models interact with your knowledge bases using built-in tools. Which tools appear depends on whether specific knowledge is attached to the model:
+With [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) enabled, models interact with your knowledge bases (KB for short) using built-in tools from the **Knowledge Base** tool category. Which tools appear depends on whether knowledge is attached, as described in [scoped access](#scoped-access-keeps-things-organized).
 
 ![Files inside a knowledge base, with search and sort](/images/workspace/knowledge-detail.png)
 
-| Tool | Attached KB | No KB attached | Description |
+| Tool | Knowledge attached | Nothing attached | Description |
 |------|:-----------:|:--------------:|-------------|
-| `list_knowledge` | Yes | No | List attached KBs (with file counts), standalone files, and notes; pass `knowledge_id` (with `skip`/`count`, max 200) to page one KB's files |
+| `list_knowledge` | Yes | No | List the attached KBs (with file counts), single files and notes; pass `knowledge_id` (with `skip`/`count`, max 200) to page one KB's files |
 | `list_knowledge_bases` | No | Yes | Browse available knowledge bases with file counts |
 | `search_knowledge_bases` | No | Yes | Find knowledge bases by name or description |
 | `query_knowledge_bases` | No | Yes | Search KB names/descriptions by semantic similarity |
-| `search_knowledge_files` | Yes (scoped) | Yes (all) | Search files by filename |
-| `query_knowledge_files` | Yes (scoped) | Yes | Search file contents using the RAG pipeline |
-| `grep_knowledge_files` | Yes (scoped) | Yes | Exact text / regex search across knowledge files (returns matching lines with line numbers; auto-detects regex like `error|warn`) |
-| `view_file` | Yes | No | Read file content with pagination (`offset`/`max_chars`) or by line range (`start_line`/`end_line`, optional `line_numbers`) |
-| `view_knowledge_file` | Yes | Yes | Read file content from any accessible KB |
-| `display_file` | Yes | Yes | Show a file to the user inline in the chat, optionally at a page or slide |
-| `view_note` | Yes | No | Read attached notes |
+| `search_knowledge_files` | Yes (attached only) | Yes (all) | Search files by filename |
+| `query_knowledge_files` | Yes (attached only) | Yes (all) | Search file contents using the RAG pipeline; an attached note comes back as its full text |
+| `grep_knowledge_files` | Yes (attached only) | Yes (all) | Exact text / regex search across knowledge files (returns matching lines with line numbers; auto-detects regex like `error|warn`) |
+| `view_file` | When a KB or file is attached | No | Read file content with pagination (`offset`/`max_chars`) or by line range (`start_line`/`end_line`, optional `line_numbers`) |
+| `view_knowledge_file` | When a KB or file is attached | Yes | Read file content from any accessible KB |
+| `display_file` | When a KB or file is attached | Yes | Show a file to the user inline in the chat, optionally at a page or slide |
+| `view_note` | When a note is attached | No | Read a note |
 
-"Attached" here covers knowledge on the model, knowledge on the chat's folder, and knowledge bases or notes attached to the chat itself when the model's **Preload files** capability is off. Whatever the source, the model is told what it has: a hidden `list_attached_knowledge` tool result after your message carries an `<attached_knowledge>` list of the items with their IDs, which it uses to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
+The model is told what is attached: a hidden `list_attached_knowledge` tool result after your message carries an `<attached_knowledge>` list of the model's and folder's items with their IDs, and each message lists the items attached to it. The model uses the IDs to page one knowledge base's file listing or to limit a filename search to a single knowledge base. Content search with `query_knowledge_files` covers all attached knowledge in one ranked pass and returns the highest scoring chunks across it, so chunks from different knowledge bases compete for the same result slots.
 
-The key split: `list_knowledge` and `list_knowledge_bases` are mutually exclusive. Attaching a KB scopes the model to only those documents. Leaving it unscoped lets the model discover everything the user has access to.
+`list_knowledge` and `list_knowledge_bases` are mutually exclusive: with knowledge attached the model lists what is attached, and with nothing attached it discovers every knowledge base the user can read.
+
+**Note tools.** The **Notes** tool category is separate from the knowledge tools. Whenever Notes is enabled for the user and the model's **Notes** category is on, the model gets `search_notes`, `view_note`, `write_note` and `replace_note_content` in every chat, attached knowledge or not, and these reach every note the user can read. That is why `view_note` shows up in a chat with nothing attached. See [Agentic note management](/features/notes#agentic-note-management).
 
 #### When to prefer `grep_knowledge_files` over `query_knowledge_files`
 
@@ -164,8 +190,11 @@ When [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec) is set
 **Tools that stay injected alongside `kb_exec`**, because they do something `kb_exec` can't:
 
 - **`query_knowledge_files`**: semantic / RAG search (always)
-- **`view_note`**: when notes are attached to the model (`kb_exec` is file-only, so notes need a dedicated reader)
-- **`query_knowledge_bases`** and **`search_knowledge_bases`**: when no KB is attached to the model, so the model can still discover and search across knowledge bases by name/description
+- **`display_file`**: always
+- **`view_note`**: when a note is attached (`kb_exec` covers files only, so notes need their own reader)
+- **`query_knowledge_bases`** and **`search_knowledge_bases`**: when nothing is attached, so the model can still discover and search across knowledge bases by name/description
+
+`kb_exec` follows the same [scoping](#scoped-access-keeps-things-organized). With nothing attached, `ls` lists the knowledge bases the user can read. With knowledge attached, `ls` lists only the attached knowledge bases, followed by the attached single files under **Attached Files**. Notes never appear in `kb_exec`: an attached note is read with `view_note` or found through `query_knowledge_files`, and when only notes are attached, `ls` answers `No knowledge bases found.`
 
 It is **off by default** and still experimental, but for an enhanced agentic RAG experience we recommend enabling it (`ENABLE_KB_EXEC=True`) for capable models running native function calling. It targets frontier models that already "think in shell": they tend to chain `ls`, `grep` and `cat` more reliably than they orchestrate a fan-out of specialized tools. It only works with native function calling on; for models set to Legacy it has no effect.
 
@@ -239,14 +268,14 @@ When native function calling is enabled, knowledge attached to a model or a fold
 
 1. **Add system prompt instructions** telling the model to use `list_knowledge` and `query_knowledge_files`.
 2. **Check the model's tool capabilities and retrieval setup** using [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working). Keep Native mode enabled and use a model that can call tools reliably.
-3. **Switch the attachment to Using Entire Document** to bypass RAG entirely.
+3. **For a small document, attach it in the chat with Using Entire Document** and the model's **Preload files** capability on, so its full text is injected. Knowledge attached to the model or folder is never injected with native function calling.
 :::
 
 ---
 
 ## Setting Up a Knowledge Base
 
-For the initial create, upload, and chat steps, see [Ask your first document question](#ask-your-first-document-question). The sections below cover managing the collection after setup.
+For the initial create, upload, and chat steps, see [Ask your first document question](#ask-your-first-document-question). The sections below cover managing the knowledge base after setup.
 
 Once you have more than a handful, the list can be reordered by clicking the **Title** or **Updated at** column headers. Clicking the header you are already sorted by reverses the direction. The list starts on **Updated at**, newest first.
 

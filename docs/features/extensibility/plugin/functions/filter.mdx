@@ -223,9 +223,9 @@ A filter whose switch is on runs on the next request.
 
 ### Owning Retrieval With file_handler
 
-When a user attaches a knowledge collection or uploads a file to a chat and the model's **Preload files** capability is on (the default with Legacy function calling), Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
+When a user attaches a knowledge base or uploads a file to a chat and the model's **Preload files** capability is on (the default with Legacy function calling), Open WebUI runs the built-in RAG pipeline **after** every inlet filter has returned. The chat-completion handler queries the vector DB for chunks relevant to the user's last message, wraps them in `<source>` tags, appends them to the last user message (or to a system message, depending on `RAG_SYSTEM_CONTEXT`), and only then calls the LLM.
 
-This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file/collection *references* (IDs, names, types). **The chunk text doesn't exist yet**: retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough. The data you want isn't there yet.
+This is important to understand for filter authors: at `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only the file and knowledge base *references* (IDs, names, types). **The chunk text doesn't exist yet**: retrieval hasn't happened. So if you want to inspect or transform the chunks themselves (PII / PHI redaction, reranking, custom hybrid scoring, translation, chunk-level access control, anonymization), the standard inlet contract is not enough. The data you want isn't there yet.
 
 **`file_handler = True`** is the opt-in escape hatch for exactly this case. Declared on the `Filter` instance, as `self.file_handler = True` in `__init__` or as a class attribute, it tells Open WebUI "I am handling retrieval and chunk injection myself, skip the built-in RAG step." When set, the backend strips `body["metadata"]["files"]` and `body["files"]` after your `inlet()` returns, so the chat-completion handler finds no files to retrieve over and goes straight to the LLM with whatever you injected.
 
@@ -249,7 +249,7 @@ class Filter:
         __user__: Optional[dict] = None,
         __model__: Optional[dict] = None,
     ) -> dict:
-        # body["metadata"]["files"] still contains the file/collection REFERENCES here.
+        # body["metadata"]["files"] still contains the file and knowledge base REFERENCES here.
         # After this method returns, Open WebUI strips them and does NOT run its own RAG.
         # Therefore: it is YOUR job to retrieve, transform, and inject chunks below.
         return body
@@ -299,7 +299,7 @@ If you genuinely need per-request switching between built-in and custom retrieva
 
 #### Why this matters compared to mutating `body["files"]` in inlet
 
-A naive alternative is to clear `body["metadata"]["files"] = []` and `body["files"] = []` inside `inlet()` to suppress the built-in RAG dynamically. This works in practice but is brittle: future Open WebUI versions can add new file/collection plumbing under additional keys, and the official "I'm handling this myself" contract is `file_handler`. Prefer the documented opt-in.
+A naive alternative is to clear `body["metadata"]["files"] = []` and `body["files"] = []` inside `inlet()` to suppress the built-in RAG dynamically. This works in practice but is brittle: future Open WebUI versions can add new file and knowledge base plumbing under additional keys, and the official "I'm handling this myself" contract is `file_handler`. Prefer the documented opt-in.
 
 ---
 
@@ -1085,7 +1085,7 @@ In the world of Open WebUI, the `inlet` function does this important prep work o
 Modify and return the `body`. The modified version of the `body` is what the LLM works with, so this is your chance to bring clarity, structure, and context to the input.
 
 :::info Want to transform RAG chunks? `inlet()` runs **before** retrieval
-At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file/collection *references*. The actual chunk text is fetched and injected later, after every inlet filter has returned. Two ways to reach the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs):
+At `inlet()` time, `body["metadata"]["files"]` and `body["files"]` contain only file and knowledge base *references*. The actual chunk text is fetched and injected later, after every inlet filter has returned. Two ways to reach the chunk text itself (PII redaction, reranking, translation, chunk-level ACLs):
 
 - **[`request()`](#the-request-step)** runs after retrieval, so the injected chunks are already in the body. Use this to *transform* what the built-in RAG produced. Simplest option, no opt-in required.
 - **[`file_handler`](#owning-retrieval-with-file_handler)** skips the built-in RAG entirely and hands you the references. Use this to *replace* retrieval with your own.

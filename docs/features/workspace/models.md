@@ -53,7 +53,7 @@ Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt a
 | **Model presets** | System prompt, tools, knowledge, skills, and parameters in one package |
 | **Dynamic variables** | `{{USER_NAME}}`, `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}` injected automatically |
 | **Bound tools** | Force-enable specific tools per model |
-| **Attached knowledge** | Knowledge bases and files always available via RAG or full context |
+| **Attached knowledge** | Knowledge bases, notes and files the model works from in every chat |
 | **Skills** | Bind markdown instruction sets that every new chat starts with selected |
 | **Access control** | Restrict to specific users or groups |
 | **Global defaults** | Set baseline capabilities and parameters for all models at once |
@@ -140,7 +140,7 @@ Bind resources in the picker rows:
 
 | Setting | What it controls |
 | :--- | :--- |
-| **Knowledge** | Bind collections or files. **Upload Files** in the picker adds files straight from your computer. Click an attached item to choose between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
+| **Knowledge** | Attach knowledge bases, notes or files, which also [limits the model's knowledge search to them](/features/workspace/knowledge#scoped-access-keeps-things-organized). **Upload Files** in the picker adds files straight from your computer. Click an attached item to choose between Focused Retrieval and Full Context. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) |
 | **Tools** | Force-enable specific tools (e.g., Calculator for a Math Bot) |
 | **Skills** | Bind [Skills](/features/workspace/skills). Every new chat with the model starts with them selected. See [Model-attached skills](/features/workspace/skills#model-attached-skills) |
 | **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
