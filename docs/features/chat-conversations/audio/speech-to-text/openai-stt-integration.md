@@ -39,10 +39,14 @@ See the companion guide: [Using OpenAI for Text-to-Speech](/features/chat-conver
 |-------|-------------|
 | `gpt-transcribe` | Current OpenAI transcription model (recommended) — roughly half the word error rate of `whisper-1` |
 | `gpt-live-transcribe` | Low-latency streaming transcription |
-| `whisper-1` | Legacy Whisper large-v2 model, still available |
+| `whisper-1` | Legacy Whisper large-v2 model, retiring on 2027-02-26 |
 
 :::info
-OpenAI recommends `gpt-transcribe` for new setups; `whisper-1` remains available and is what Open WebUI uses when `AUDIO_STT_MODEL` is unset. For fully local transcription, use Local Whisper (built into Open WebUI) or another provider such as Deepgram.
+OpenAI recommends `gpt-transcribe` for new setups. `AUDIO_STT_MODEL` is empty by default, so set the model explicitly. For fully local transcription, use Local Whisper (built into Open WebUI) or another provider such as Deepgram.
+:::
+
+:::caution OpenAI is retiring older transcription models
+OpenAI is removing `whisper-1`, `gpt-4o-transcribe`, `gpt-4o-mini-transcribe` and `gpt-4o-transcribe-diarize` from its API on 2027-02-26. If **STT Model** is set to one of them, switch to `gpt-transcribe` before then. See [OpenAI's deprecations page](https://developers.openai.com/api/docs/deprecations#2026-08-26-transcription-models) for details.
 :::
 
 ## Environment Variables Setup
@@ -68,7 +72,7 @@ services:
 | `AUDIO_STT_ENGINE` | Set to `openai` | empty (uses local Whisper) |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | OpenAI API base URL | `https://api.openai.com/v1` |
 | `AUDIO_STT_OPENAI_API_KEY` | Your OpenAI API key | empty |
-| `AUDIO_STT_MODEL` | STT model | `gpt-transcribe` |
+| `AUDIO_STT_MODEL` | STT model | empty |
 | `AUDIO_STT_SUPPORTED_CONTENT_TYPES` | Allowed audio MIME types | `audio/*,video/webm` |
 
 ### Supported Audio Formats
@@ -122,6 +126,7 @@ Choose **Local Whisper** if:
 1. Check your OpenAI API key is valid
 2. Verify the API Base URL is correct
 3. Check container logs for error messages
+4. If the API Base URL points to another OpenAI-compatible service, set **STT Model** to a model ID that service supports
 
 ### Language Issues
 

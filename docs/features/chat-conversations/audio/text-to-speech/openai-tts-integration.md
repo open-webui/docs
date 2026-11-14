@@ -40,6 +40,10 @@ See the companion guide: [Using OpenAI for Speech-to-Text](/features/chat-conver
 | `tts-1` | Standard quality, lower latency | Real-time applications, faster responses |
 | `tts-1-hd` | Higher quality audio | Pre-recorded content, premium audio quality |
 
+:::caution OpenAI is retiring these models
+OpenAI is removing `tts-1`, `tts-1-hd` and `gpt-4o-mini-tts` from its API on 2027-01-06. Its recommended replacement, `gpt-realtime-2.1-mini`, is not supported on the `/audio/speech` endpoint that the `OpenAI` engine calls, so changing the **TTS Model** is not enough. To keep using OpenAI for speech, switch to the [OpenAI Realtime engine](#using-the-openai-realtime-engine). See [OpenAI's deprecations page](https://developers.openai.com/api/docs/deprecations#2026-10-01-text-to-speech-models) for details.
+:::
+
 ## Available Voices
 
 OpenAI provides 6 built-in voices:
@@ -116,7 +120,7 @@ services:
 
 The **OpenAI Realtime** Text-to-Speech engine produces speech with OpenAI's realtime voice models, the same models used for [Realtime calls](/features/chat-conversations/chat-features/voice-mode#realtime-calls). For each piece of text, Open WebUI opens a short WebSocket session to `<API Base URL>/realtime`, asks the model to read the text aloud and saves the result as a finished WAV clip. It serves Read Aloud and Standard voice calls like any other Text-to-Speech engine.
 
-1. Go to **Settings > Admin > Audio**.
+1. Go to **Settings > Audio** (admin section).
 2. Set **Text-to-Speech Engine** to **OpenAI Realtime**. The model and voice switch to `gpt-realtime-2.1-mini` and `marin`.
 3. Fill in the **API Base URL** and **API Key**. These are the same fields the `OpenAI` engine uses.
 4. Optionally change the **TTS Model**, **TTS Voice** or **Prompt Template**, then click **Save**.
@@ -211,7 +215,7 @@ OpenRouter supports `mp3` and `pcm` output formats. Always select `mp3` in Open 
 
 ## Response Splitting
 
-When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Admin > Audio** under **Response Splitting**.
+When reading long responses, Open WebUI can split text into chunks before sending them to the TTS engine. This is configured in **Settings > Audio** (admin section) under **Response Splitting**.
 
 | Option | Description |
 |--------|-------------|
@@ -230,6 +234,7 @@ When reading long responses, Open WebUI can split text into chunks before sendin
 1. Check your OpenAI API key is valid and has Audio API access
 2. Verify the API Base URL is correct (`https://api.openai.com/v1`)
 3. Check browser console (F12) for errors
+4. If the API Base URL points to another OpenAI-compatible service, replace the default `tts-1` and `alloy` with a **TTS Model** and **TTS Voice** that service supports
 
 ### Audio Quality Issues
 

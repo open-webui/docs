@@ -60,7 +60,7 @@ A participant whose browser stops responding for about 45 seconds is removed fro
 
 ### Enable encrypted chats
 
-1. Go to **Settings > Admin > General**.
+1. Go to **Settings > General** (admin section).
 2. Turn on **Channels**. The **Encrypted channels** switch appears below it.
 3. Turn on **Encrypted channels** and save.
 

@@ -245,7 +245,7 @@ The `session_id` should be a unique UUID that you generate for this session. It 
 
 #### Step 2.1: Trigger Assistant Completion with Knowledge Integration (RAG)
 
-For advanced use cases involving knowledge bases or document collections, include knowledge files in the completion request:
+For advanced use cases involving knowledge bases, include knowledge files in the completion request:
 
 ```bash
 curl -X POST https://<host>/api/chat/completions \
@@ -844,7 +844,7 @@ This cleaning process handles:
 - `features`: Enable/disable features
 - `variables`: Template variables
 - `filter_ids`: Pipeline filters
-- `files`: Knowledge collections for RAG
+- `files`: Knowledge bases for RAG
 
 #### Field Constraints
 
@@ -885,7 +885,7 @@ This cleaning process handles:
 - `outlet()` filters run inline during `/api/chat/completions`, on both the streaming and non-streaming paths, controlled by [`ENABLE_API_OUTLET_FILTERS`](/reference/env-configuration#enable_api_outlet_filters) (default `True`). Neither a `chat_id` nor a message `id` is required in the request body; with neither present, the conversation is reconstructed from the `messages` you sent plus the assistant reply, and a message ID is generated for it. Inline execution does not rewrite the HTTP response body, so the filtered payload never comes back to an API caller over HTTP. The separate `/api/chat/completed` endpoint is deprecated and kept for backward compatibility, and it remains the way to have the filtered payload returned to you. See [Filter Behavior with API Requests](/features/extensibility/plugin/functions/filter#filter-behavior-with-api-requests) for the full picture
 - Background tasks like title generation can be controlled via the `background_tasks` object
 - Session IDs help maintain conversation context across requests
-- **Knowledge Integration:** Use the `files` array to include knowledge collections for RAG capabilities
+- **Knowledge Integration:** Use the `files` array to include knowledge bases for RAG capabilities
 - **Response Parsing:** Handle JSON responses that may be wrapped in markdown code blocks
 - **Error Handling:** Implement proper retry mechanisms for network timeouts and server errors
 
@@ -910,7 +910,7 @@ Use the Open WebUI backend APIs to:
 
 **Enhanced Capabilities:**
 
-- **RAG Integration**: Include knowledge collections for context-aware responses
+- **RAG Integration**: Include knowledge bases for context-aware responses
 - **Asynchronous Processing**: Handle long-running AI operations with streaming or polling
 - **Response Parsing**: Clean and validate JSON responses from the assistant
 - **Session Management**: Maintain conversation context across requests

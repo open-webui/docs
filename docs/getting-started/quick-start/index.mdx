@@ -169,7 +169,7 @@ Nothing loads? Run `docker logs -f open-webui` (`docker compose logs -f` with Co
 
 The first screen says **Get started with Open WebUI** and offers **Create Admin Account**. That first account is the administrator: it manages users and every instance-wide setting. Everything, including this login, stays in your own volume.
 
-Sign-up switches itself off once the admin account exists. To let other people join, turn on **New Sign Ups** under your avatar > **Settings > Admin > Authentication**; new accounts then wait as **Pending** until you approve them in the Admin Panel. Note the admin password: losing it locks you out of instance settings, see [Reset Admin Password](/troubleshooting/password-reset).
+Sign-up switches itself off once the admin account exists. To let other people join, turn on **New Sign Ups** under your avatar > **Settings > Authentication** (admin section); new accounts then wait as **Pending** until you approve them in the Admin Panel. Note the admin password: losing it locks you out of instance settings, see [Reset Admin Password](/troubleshooting/password-reset).
 
 :::note Two settings areas
 Your avatar > **Settings** is yours alone (theme, language). The **Admin** section inside it applies to the whole instance. [Understanding Settings](/getting-started/quick-start/settings) explains the split.
@@ -177,7 +177,7 @@ Your avatar > **Settings** is yours alone (theme, language). The **Admin** secti
 
 ## Connect a model provider
 
-Open WebUI has no models of its own. Go to your avatar > **Settings > Admin > Connections**.
+Open WebUI has no models of its own. Go to your avatar > **Settings > Connections** (admin section).
 
 **Ollama on this machine?** It is picked up automatically at `http://host.docker.internal:11434` from Docker (that is what `--add-host` in step 1 is for) or `http://localhost:11434` from Python, and shows under **Manage Ollama API Connections**. As the admin, download a model by typing its name into the model selector of a new chat and confirming the pull. Ollama on another machine: `-e OLLAMA_BASE_URL=http://server:11434`, or set the URL on the connection.
 

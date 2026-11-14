@@ -66,7 +66,7 @@ Saving a connection does not test it. Clicking the **Verify Connection** button 
 ## Step 1: Add Your Provider Connection
 
 1. Open Open WebUI in your browser.
-2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
+2. Go to **Settings > Connections** (admin section) and find the **Manage OpenAI API Connections** list.
 3. Click **Add Connection**.
 4. Fill in the **URL** and **API Key** for your provider (see tabs below). The URL field will **suggest common provider endpoints** as you type.
 5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs** allowlist. After a successful **Verify Connection**, the **Model IDs** field suggests the provider's model IDs as you type.
@@ -225,7 +225,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Step 3: Configure Connection in Open WebUI**
 
-  1. Open Open WebUI and navigate to **Settings > Admin > Connections**.
+  1. Open Open WebUI and navigate to **Settings > Connections** (admin section).
   2. Click the **+** (plus) icon under the **OpenAI API** section.
   3. Enter the URL and API Key from the table above.
   4. **Important**: MiniMax does not expose a `/models` endpoint, so you must add the model manually.
@@ -271,7 +271,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   :::tip
   OpenRouter exposes **thousands of models**, which will clutter your model selector and slow down the admin panel. We **strongly recommend**:
   1. **Use an allowlist**: add only the specific model IDs you need (e.g., `anthropic/claude-sonnet-5`, `google/gemini-3.6-flash`).
-  2. **Enable model caching** via `Settings > Admin > Connections > Cache Base Model List` or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
+  2. **Enable model caching** via `Settings > Connections > Cache Base Model List` (admin section) or `ENABLE_BASE_MODELS_CACHE=True`. Without caching, page loads can take 10-15+ seconds. See the [Performance Guide](/troubleshooting/performance) for more details.
   :::
 
   </TabItem>
@@ -346,7 +346,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   **Step 2: Add Connection in Open WebUI**
 
-  1. Go to **Settings > Admin > Connections**.
+  1. Go to **Settings > Connections** (admin section).
   2. Use the **+** button to add a new connection under OpenAI.
   3. For the URL, use `http://host.docker.internal:8000/api/v1`.
   4. For the API Key, the default key defined in BAG is `bedrock` (you can change this via `DEFAULT_API_KEYS` in BAG settings).
@@ -734,7 +734,7 @@ The **Provider** dropdown belongs to OpenAI connections only. Ollama connections
 
 Two provider types go beyond plain chat completions: setting **Provider** on the connection tells Open WebUI which management API the server speaks, which unlocks a model management panel for admins.
 
-Open it from **Settings > Admin > Models**, the **⋯** menu, then **Manage**. When you have both Ollama and a managed provider connection, a picker at the top of the dialog switches between them; a second picker lists every managed connection by URL.
+Open it from **Settings > Models** (admin section), the **⋯** menu, then **Manage**. When you have both Ollama and a managed provider connection, a picker at the top of the dialog switches between them; a second picker lists every managed connection by URL.
 
 | | `llama.cpp` | `LM Studio` |
 | :--- | :---: | :---: |

@@ -84,7 +84,7 @@ When using `UVICORN_WORKERS` greater than 1 with the default `LocalOrchestrator`
 ### Step 2: Configure Open WebUI
 
 1. Log in to your Open WebUI instance
-2. Navigate to **Settings** → **Admin** → **Documents**
+2. Navigate to **Settings** → **Documents** (admin section)
 3. Set **Content Extraction Engine** to **Docling**
 4. Set **Docling Server URL** to `http://host.docker.internal:5001` (Docker) or `http://localhost:5001` (native). The default is `http://docling:5001`.
 5. Optionally set **API Key** (`DOCLING_API_KEY`), which is sent to docling-serve as the `X-Api-Key` header
@@ -152,7 +152,7 @@ Open WebUI forwards the Docling Parameters values to docling-serve as multipart 
 
 ## Docling Parameters Reference (Open WebUI)
 
-Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via environment variable.
+Configure via `DOCLING_PARAMS` JSON in **Settings > Documents** (admin section) or via environment variable.
 
 | Parameter | Type | Description | Allowed Values |
 |-----------|------|-------------|----------------|
@@ -233,7 +233,7 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Admin > Documents** or via e
 
 **Cause**: Docling marks only page changes in its Markdown output, so a blank page leaves no page break. Page numbers counted from those breaks make every citation after a blank page show an earlier page number. Open WebUI takes the page numbers from the JSON output Docling returns alongside the Markdown.
 
-**Solution**: Run **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents**, which extracts every knowledge base file again, and upload again the affected files that are not in a knowledge base. Page numbers are set when Docling extracts a file.
+**Solution**: Run **Reindex Knowledge and Memory Vectors** in **Settings > Documents** (admin section), which extracts every knowledge base file again, and upload again the affected files that are not in a knowledge base. Page numbers are set when Docling extracts a file.
 
 ### "Error calling Docling" with no specific details
 

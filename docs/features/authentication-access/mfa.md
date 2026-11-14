@@ -25,14 +25,14 @@ While MFA is on, Open WebUI checks all of this at startup and refuses to start w
 
 ## Turning It On
 
-1. Open **Settings > Admin > Authentication**.
+1. Open **Settings > Authentication** (admin section).
 2. In the **Multi-factor authentication** section, turn on **Require an authenticator for all users**.
 3. Optionally turn on one or both exemptions that appear below it:
    - **Allow OAuth sign-in without an authenticator**: users who sign in through your OAuth or OIDC provider skip the code. Use this when the provider already enforces its own second factor.
    - **Allow trusted-header sign-in without an authenticator**: users who arrive through [trusted-header authentication](/features/authentication-access/auth/sso#trusted-header) skip the code. Use this when your authenticating proxy already enforces a second factor.
 4. Click **Save**.
 
-![The Multi-factor authentication section in Settings > Admin > Authentication, with Require an authenticator for all users switched on and the OAuth and trusted-header exemptions below it](/images/features/auth/mfa-admin-setting.webp)
+![The Multi-factor authentication section in Settings > Authentication (admin section), with Require an authenticator for all users switched on and the OAuth and trusted-header exemptions below it](/images/features/auth/mfa-admin-setting.webp)
 
 :::warning Saving a change signs everyone out
 Any change to these three switches signs every user out of every device, you included, and you land on the sign-in page. Users with an authenticator enter their code; users without one set it up on the spot.

@@ -91,7 +91,7 @@ A reply can involve several model calls, one per round of tool use. `input_token
 
 :::
 
-**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Admin > Models**. Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
+**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Models** (admin section). Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
 
 **Model controls.** A model with [Model controls](/features/workspace/models#model-controls) applies each control's default option to API requests as well, and those parameters also only fill in what your request left out. To pick another option, send the control and option IDs under `params.model_controls`, keyed by model ID. `GET /api/models` lists a model's controls under `info.params.model_controls`, with each control's ID, label, default and the IDs and labels of its options:
 
@@ -503,7 +503,7 @@ A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The e
 
 ### Retrieval Augmented Generation (RAG)
 
-The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge collections via the API, and how to use them in chat completions effectively.
+The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge bases via the API, and how to use them in chat completions effectively.
 
 #### Uploading Files
 
@@ -632,7 +632,7 @@ Before adding a file to a knowledge base, verify that processing has completed u
 
 #### Adding Files to Knowledge Collections
 
-After uploading, you can group files into a knowledge collection or reference them individually in chats.
+After uploading, you can group files into a knowledge base or reference them individually in chats.
 
 :::important
 **Always wait for file processing to complete before adding files to a knowledge base.** Files that are still processing will have empty content, causing a `400` error. Use the status endpoint described above to verify the file status is `completed`.
@@ -669,7 +669,7 @@ A file whose extracted text is already in the knowledge base is rejected with `4
 
 #### Processing Web URLs into Knowledge Collections
 
-Use this endpoint to fetch a webpage, extract content, and store the resulting chunks in a knowledge collection.
+Use this endpoint to fetch a webpage, extract content, and store the resulting chunks in a vector collection.
 
 - **Endpoint**: `POST /api/v1/retrieval/process/web`
 - **Query Parameters**:
@@ -803,7 +803,7 @@ result = upload_and_add_to_knowledge('/path/to/document.pdf', 'your-knowledge-id
 
 #### Using Files and Collections in Chat Completions
 
-You can reference both individual files or entire collections in your RAG queries for enriched responses.
+You can reference both individual files or entire knowledge bases in your RAG queries for enriched responses.
 
 ##### Using an Individual File in Chat Completions
 
@@ -849,7 +849,7 @@ This method is beneficial when you want to focus the chat model's response on th
 
 ##### Using a Knowledge Collection in Chat Completions
 
-Leverage a knowledge collection to enhance the response when the inquiry may benefit from a broader context or multiple documents.
+Leverage a knowledge base to enhance the response when the inquiry may benefit from a broader context or multiple documents.
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Curl Example**:
@@ -861,7 +861,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
   -d '{
         "model": "gpt-5.6-terra",
         "messages": [
-          {"role": "user", "content": "Provide insights on the historical perspectives covered in the collection."}
+          {"role": "user", "content": "Provide insights on the historical perspectives covered in the knowledge base."}
         ],
         "files": [
           {"type": "collection", "id": "your-collection-id-here"}
@@ -889,7 +889,7 @@ Leverage a knowledge collection to enhance the response when the inquiry may ben
       return response.json()
   ```
 
-These methods enable effective utilization of external knowledge via uploaded files and curated knowledge collections, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within collections, you can customize the integration based on your specific needs.
+These methods enable effective utilization of external knowledge via uploaded files and curated knowledge bases, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within knowledge bases, you can customize the integration based on your specific needs.
 
 ## Advantages of Using Open WebUI as a Unified LLM Provider
 

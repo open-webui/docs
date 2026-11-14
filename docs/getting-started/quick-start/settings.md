@@ -61,7 +61,7 @@ Many features follow a **two-layer pattern**:
 
 | Layer | Setting Location | Effect |
 |-------|-----------------|--------|
-| Admin enables it | Settings > Admin > Interface | Makes autocomplete **available** on the instance |
+| Admin enables it | Settings > Interface (admin section) | Makes autocomplete **available** on the instance |
 | User enables it | Settings > Interface | Turns autocomplete **on for you personally** |
 
 :::important Key Rule
@@ -76,7 +76,7 @@ This pattern applies across web search, image generation, code interpreter and m
 
 Feature toggles are a ceiling. One admin control works the other way round: **Default Interface Settings** decides what everyone's **Settings > Interface** page starts on, and each person can still change any of it for themselves. An option somebody has never touched keeps following your default, so a later change to it reaches them too.
 
-Set it in **Settings > Admin > General**, under **UI > Default Interface Settings**, or with the `DEFAULT_INTERFACE_SETTINGS` environment variable.
+Set it in **Settings > General** (admin section), under **UI > Default Interface Settings**, or with the `DEFAULT_INTERFACE_SETTINGS` environment variable.
 
 [**Learn about Default Interface Settings →**](/features/administration/interface-defaults)
 
@@ -101,7 +101,7 @@ The one deliberate exception is [Default Interface Settings](/features/administr
 Check whether the admin has enabled it globally first. Your personal toggle only takes effect if the admin has made the feature available at the instance level.
 
 **"I am the admin. Where do I configure connections to OpenAI or Ollama?"**
-Settings > Admin > Connections. These are instance-wide and shared by all users.
+Settings > Connections (admin section). These are instance-wide and shared by all users.
 
 **"I want to use my own API key without sharing it with the server."**
 Connections added in the Tether app keep the keys on your computer, see [Your Own Connections](/ecosystem/tether#your-own-connections). An admin can add shared connections under **Settings > Admin > Connections**.
@@ -124,5 +124,5 @@ The font has to already be installed on the computer you are sitting at. Nothing
 Yes, with [Default Interface Settings](/features/administration/interface-defaults). It sets where everyone starts; each person can still change any of it afterwards.
 
 :::tip First-Time Admin?
-Start with **Settings > Admin > Connections** to connect your model providers (Ollama, OpenAI, etc.), then explore **Settings > Admin > Interface** to enable or disable features for your users.
+Start with **Settings > Connections** (admin section) to connect your model providers (Ollama, OpenAI, etc.), then explore **Settings > Interface** (admin section) to enable or disable features for your users.
 :::

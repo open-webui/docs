@@ -87,7 +87,7 @@ This means your team can discuss freely without AI interrupting, and call on exa
 
 #### Where the reply appears
 
-By default a model answering a top-level mention replies **in a thread** under your message, so a long answer does not push the channel's conversation off the screen. An administrator can change this in **Settings > Admin > General** (**Model Response Mode**, or [`CHANNEL_MODEL_RESPONSE_MODE`](/reference/env-configuration#channel_model_response_mode)): set it to **Channel** and the reply is posted into the timeline instead, where the team reads it without opening a thread. Mentioning a model from inside a thread always answers in that thread either way.
+By default a model answering a top-level mention replies **in a thread** under your message, so a long answer does not push the channel's conversation off the screen. An administrator can change this in **Settings > General** (admin section) (**Model Response Mode**, or [`CHANNEL_MODEL_RESPONSE_MODE`](/reference/env-configuration#channel_model_response_mode)): set it to **Channel** and the reply is posted into the timeline instead, where the team reads it without opening a thread. Mentioning a model from inside a thread always answers in that thread either way.
 
 ### Full chat-completion pipeline
 
@@ -129,7 +129,7 @@ The **...** menu of a channel or direct message, in the sidebar or in the channe
 
 ### Apps
 
-External services can also join a channel as [Apps](/features/channels/apps). An admin installs them in **Settings > Admin > Apps**; the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.
+External services can also join a channel as [Apps](/features/channels/apps). An admin installs them in **Settings > Apps** (admin section); the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.
 
 ### Direct messages
 
@@ -139,7 +139,7 @@ Membership is measured against the accounts that still exist. When someone's acc
 
 ### Encrypted chats
 
-In a direct message or a private group channel, members with the **Encrypted Channels** permission can start a temporary [encrypted chat](/features/channels/encrypted-chats) from the conversation's **...** menu with **Encrypted Chat**. Messages are end-to-end encrypted in the browser and never stored on the server. An administrator turns this on in **Settings > Admin > General** (**Encrypted channels**) and grants the permission, which is off by default.
+In a direct message or a private group channel, members with the **Encrypted Channels** permission can start a temporary [encrypted chat](/features/channels/encrypted-chats) from the conversation's **...** menu with **Encrypted Chat**. Messages are end-to-end encrypted in the browser and never stored on the server. An administrator turns this on in **Settings > General** (admin section) (**Encrypted channels**) and grants the permission, which is off by default.
 
 ---
 
@@ -169,7 +169,7 @@ If you want a one-click path from a chat message into a channel, the community *
 Channels must be enabled by an administrator before use.
 :::
 
-1. Navigate to **Settings > Admin > General**
+1. Navigate to **Settings > General** (admin section)
 2. Toggle **Channels** on and save
 3. Channels appear in the sidebar. Click **(+)** to create your first one
 

@@ -206,7 +206,7 @@ There is no permission that locks personal settings as a whole. This one hides a
 
 For API key creation:
 
-1.  **Global Toggle Required**: The feature must be enabled globally in **Settings > Admin > Authentication > API Keys**. If this is off, *no one* can generate keys.
+1.  **Global Toggle Required**: The feature must be enabled globally in **Settings > Authentication > API Keys** (admin section). If this is off, *no one* can generate keys.
 2.  **Permission Check for Non-Admins**: Users with the `user` role must have the `features.api_keys` permission.
 3.  **Admins Are Exempt from `features.api_keys`**: Users with the `admin` role can generate API keys when API keys are globally enabled, even without that specific permission.
 

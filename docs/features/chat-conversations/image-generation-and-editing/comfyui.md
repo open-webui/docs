@@ -42,15 +42,15 @@ Once you have ComfyUI installed and running, you can connect it to Open WebUI fr
 
 This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results. It only applies to Legacy function calling; in the default Native mode the model writes the prompt itself when it calls the tool.
 
-The **Image Prompt Generation** toggle is located in the **Create Image** section of **Settings > Admin > Images**.
+The **Image Prompt Generation** toggle is located in the **Create Image** section of **Settings > Images** (admin section).
 
-To customize the prompt template used for generation, go to **Settings > Admin > Interface**, in the **Generation** section.
+To customize the prompt template used for generation, go to **Settings > Interface** (admin section), in the **Generation** section.
 
 ![Screenshot showing the Image Prompt Generation toggle location in Images settings](/images/image-generation-and-editing/image-prompt-generation-toggle.png)
 
 ## Create Image (Image Generation)
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Images** (admin section).
 
 2. **Enable and Configure ComfyUI:**
     - Ensure the **Image Generation** toggle at the top of the page is enabled.
@@ -122,7 +122,7 @@ Messages have no "Generate Image" button. Generation happens from the chat itsel
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Admin** > **Images**.
+1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Images** (admin section).
 
 2. **Configure Image Editing:**
     - Under the **Edit Image** section, switch **Image Edit** on. It is off by default, and without it the edit engine is never used.

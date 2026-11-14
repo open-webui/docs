@@ -21,7 +21,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 You search, you discover, you synthesize. Notes is where that becomes lasting knowledge. It's a dedicated workspace for content that lives outside of any single conversation: drafts, cheat sheets, research findings, project briefs. Things you build up over time, refine with AI, and inject into future chats as context.
 
-Unlike standard chats, which are linear and ephemeral, Notes are persistent documents you can return to, edit, and share. Unlike Documents (RAG), which use vector search to find relevant chunks, Notes inject their full content directly into context, giving you precise control over what the AI sees.
+Unlike standard chats, which are linear and ephemeral, Notes are persistent documents you can return to, edit, and share. Unlike [knowledge bases](/features/workspace/knowledge), which use vector search to find relevant chunks, a note reaches the model as its full text, giving you precise control over what the AI sees.
 
 ---
 
@@ -137,20 +137,22 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 
 1. Go to the **Chat Input** bar
 2. Click the **+ (More)** button
-3. Select **Attach Notes**
+3. Open **Add Context** and select **Attach Notes**
 4. Choose the note(s) to attach
 
 **Attach Notes** needs Notes enabled and the **Notes** permission.
 
-The full content of the note is injected into the context window for that conversation.
+With the model's **Preload files** capability on, the full content of the note is injected into the conversation. With it off (the default with native function calling), the model reads the note with its knowledge tools, which then search only the attached knowledge. [Scoped access](/features/workspace/knowledge#scoped-access-keeps-things-organized) explains this.
 
 You can also **drag a note straight from the sidebar into the chat** to attach it as a context reference, without opening the menu. The same drag-and-drop works for **chats**, **folders** and **models** from the sidebar.
+
+A note can also go in the **Knowledge** field of a model or a folder, next to knowledge bases and files. See [Attaching knowledge and notes](/features/workspace/knowledge#attaching-knowledge-and-notes).
 
 ---
 
 ## Agentic Note Management
 
-With [**native function calling**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) enabled, models can work with your notes autonomously:
+With [**native function calling**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) enabled, models can work with your notes autonomously. When Notes is enabled for you, these tools come with the model's **Notes** builtin tool category. They are offered in every chat whatever knowledge is attached, and reach every note you can read:
 
 | Tool | What it does |
 |------|-------------|
@@ -276,7 +278,7 @@ Paste server logs containing sensitive data into a Note, redact the keys (or ask
 
 ### Context window usage
 
-Attaching a note injects the full text. A very large note attached to a model with a small context window may cause the model to lose earlier conversation context.
+A note reaches the model as its full text. A very large note attached to a model with a small context window may cause the model to lose earlier conversation context.
 
 ### Write access
 

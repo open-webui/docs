@@ -8,18 +8,18 @@ title: "Image Generation"
 ### General Issues
 
 - **Image Not Generating** (asking for an image produces no image, or an error appears in the chat):
-    - Check the **Images** settings in **Settings** > **Admin** > **Images**. Ensure "Image Generation" is toggled **ON**.
+    - Check the **Images** settings in **Settings** > **Images** (admin section). Ensure "Image Generation" is toggled **ON**.
     - Ensure the **Image** toggle is on in the **+** menu of the message input. Nothing image-related happens without it, in any function calling mode.
     - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
     - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
 
-- **Images settings refuse to save** (saving **Settings** > **Admin** > **Images** shows an error such as `OpenAI API Key is required.`):
+- **Images settings refuse to save** (saving **Settings** > **Images** (admin section) shows an error such as `OpenAI API Key is required.`):
     - Keys and URLs are only required while their feature is on. Fill in the field, or switch the feature off, and save again.
     - Invalid JSON in **Additional Parameters** is refused with `Invalid JSON format for Parameters`. Fix or clear it and save again.
 
-- **Engine settings are missing** (**Settings** > **Admin** > **Images** shows only the **Image Generation** switch):
+- **Engine settings are missing** (**Settings** > **Images** (admin section) shows only the **Image Generation** switch):
     - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Their saved values are kept while hidden.
 
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):

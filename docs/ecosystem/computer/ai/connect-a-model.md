@@ -5,7 +5,7 @@ sidebar_position: 2
 
 # Connect a model (API keys and Ollama)
 
-Go to **Settings → Admin → Connections** and add a connection. There are exactly two provider types: **OpenAI** and **Anthropic**. There is no separate "Ollama" or "OpenAI-compatible" type: anything that speaks the OpenAI API (Ollama, OpenRouter, vLLM, LM Studio, Groq, ...) is added as provider **OpenAI** with a custom Base URL.
+Go to **Settings → Connections** (admin section) and add a connection. There are exactly two provider types: **OpenAI** and **Anthropic**. There is no separate "Ollama" or "OpenAI-compatible" type: anything that speaks the OpenAI API (Ollama, OpenRouter, vLLM, LM Studio, Groq, ...) is added as provider **OpenAI** with a custom Base URL.
 
 ## Connection fields
 

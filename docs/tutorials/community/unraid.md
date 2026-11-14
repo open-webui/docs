@@ -79,7 +79,7 @@ Choose one setup.
 1. Start the container.
 2. Open `http://<unraid-ip>:3000`.
 3. Complete initial admin setup.
-4. Open **Settings > Settings > Admin > Connections** and verify the Ollama endpoint.
+4. Open **Settings > Connections** (admin section) and verify the Ollama endpoint.
 5. Confirm models appear in the model selector.
 
 ## 4. Persistent Volume Notes
@@ -129,7 +129,7 @@ Symptoms:
 Checks:
 - Ensure proxy forwards WebSocket upgrade headers.
 - Open WebUI has no base-path setting, so a subpath such as `/openwebui` cannot work: the frontend requests `/api/...`, `/ws/socket.io` and `/_app/...` from the domain root. Serve it on a subdomain or at the root instead.
-- Set `WEBUI_URL` to that public URL without a trailing slash, for example `WEBUI_URL=https://ai.example.com`; it feeds OAuth redirects and links, not routing. On an install that has already started, change **WebUI URL** in Settings > Admin > General instead, since the environment variable only sets it on the first start.
+- Set `WEBUI_URL` to that public URL without a trailing slash, for example `WEBUI_URL=https://ai.example.com`; it feeds OAuth redirects and links, not routing. On an install that has already started, change **WebUI URL** in Settings > General (admin section) instead, since the environment variable only sets it on the first start.
 
 For broader reverse-proxy debugging, see [Connection Errors](/troubleshooting/connection-error).
 

@@ -88,7 +88,7 @@ A `SKILL.md` longer than the [read limit](#read-limits) arrives as a preview, an
 
 ### Loading selected skills on demand
 
-**Load selected skills on demand** in **Admin Settings > General** ([`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading), off by default) stops selected and model skills from loading before the model answers, so they load when the model asks for them. A skill mentioned with `$` in the chat still loads with the message. The setting needs the skill tools.
+**Load selected skills on demand** in **Settings > General** (admin section) ([`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading), off by default) stops selected and model skills from loading before the model answers, so they load when the model asks for them. A skill mentioned with `$` in the chat still loads with the message. The setting needs the skill tools.
 
 ### Skill tools
 
@@ -106,7 +106,7 @@ The tools that read a skill check the user's access to it. A user with write acc
 
 ### Read limits
 
-Two settings in **Admin Settings > General** set how much of a skill the model gets at once:
+Two settings in **Settings > General** (admin section) set how much of a skill the model gets at once:
 
 | Setting | Default | What it sets |
 | :--- | :--- | :--- |

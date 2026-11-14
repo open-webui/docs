@@ -17,7 +17,7 @@ Because you control that service, you also control what happens inside it. A few
 
 ## Configuration
 
-In **Settings > Admin > Documents**, set **Content Extraction Engine** to **External**, then fill in:
+In **Settings > Documents** (admin section), set **Content Extraction Engine** to **External**, then fill in:
 
 - **Document Loader URL**: the base URL of your service. Open WebUI appends `/process` to it.
 - **API Key**: sent as a bearer token. It is required. With the engine set to External but no key saved, Open WebUI silently falls back to its built-in loaders and never calls your service, and the admin panel does not warn about it.

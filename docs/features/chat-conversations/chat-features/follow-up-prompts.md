@@ -7,7 +7,7 @@ title: "Follow-Up Prompts"
 
 Open WebUI can automatically suggest follow-up messages after each model response. These suggestions appear as clickable chips below the response, helping you explore topics further without typing new prompts.
 
-With the built-in prompt, each suggestion is written as a message you might send next, a question or a request, and the strongest one comes first. Admins can replace it with **Follow Up Generation Prompt** in **Settings > Admin > Interface** or with [`FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#follow_up_generation_prompt_template).
+With the built-in prompt, each suggestion is written as a message you might send next, a question or a request, and the strongest one comes first. Admins can replace it with **Follow Up Generation Prompt** in **Settings > Interface** (admin section) or with [`FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#follow_up_generation_prompt_template).
 
 ## Settings
 
@@ -22,7 +22,7 @@ Automatically generates follow-up suggestions after each response. These suggest
 - **On**: Follow-up prompts are generated after each model response
 - **Off**: No follow-up suggestions are generated
 
-This switch shows only while the admin has **Follow Up Generation** on in **Settings > Admin > Interface**. Your saved choice is kept while it is hidden and applies again when the admin turns generation back on. The two settings below stay visible either way, because they also apply to follow-ups already saved in your chats.
+This switch shows only while the admin has **Follow Up Generation** on in **Settings > Interface** (admin section). Your saved choice is kept while it is hidden and applies again when the admin turns generation back on. The two settings below stay visible either way, because they also apply to follow-ups already saved in your chats.
 
 ### Keep Follow-Up Prompts in Chat
 

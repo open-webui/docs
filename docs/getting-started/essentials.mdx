@@ -39,7 +39,7 @@ There are two plugin families: **Tools** and **Functions**.
 | **Built-in** | System tools that ship with Open WebUI. Enable in the admin panel, no install needed. | Web Search, Code Interpreter, Image Generation, Memory, Notes, Knowledge retrieval |
 | **Custom** | | |
 | &nbsp;&nbsp;↳ Tool | Code you write yourself or install from the [community site](https://openwebui.com/). Manage in **Workspace > Tools**. | Langfuse / OpenLit observability, Home Assistant, arXiv / PubMed lookups, Wolfram Alpha, Jira / Linear, SQL queries |
-| &nbsp;&nbsp;↳ Tool server | External services connected via **MCP** or **OpenAPI**. Configure in **Settings > Admin > Integrations**. | Your own microservices, third-party APIs, existing MCP servers |
+| &nbsp;&nbsp;↳ Tool server | External services connected via **MCP** or **OpenAPI**. Configure in **Settings > Integrations** (admin section). | Your own microservices, third-party APIs, existing MCP servers |
 
 **Functions** run at the platform level and modify how Open WebUI itself behaves. There are three types:
 
@@ -88,7 +88,7 @@ Providers cache the opening tokens of your request and charge less for the part 
 
 ### Recommended caching config
 
-Set these on the model in **Settings > Admin > Models**, click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
+Set these on the model in **Settings > Models** (admin section), click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
 
 | Setting | Recommended value | Why |
 |---------|-------------------|-----|
@@ -119,7 +119,7 @@ Every time Open WebUI needs a short piece of "thinking" for a UI feature (writin
 
 These run in the background, so they are easy to overlook. A dedicated task model is a small change that makes a noticeable difference.
 
-**Fix:** In **Settings > Admin > Interface**, set a dedicated Task Model. There are two fields, because the right choice depends on what your main chat model is:
+**Fix:** In **Settings > Interface** (admin section), set a dedicated Task Model. There are two fields, because the right choice depends on what your main chat model is:
 
 :::tip Recommended task models
 - **Task Model (External)**: Set to a fast, cheap, *non-reasoning* cloud model like `gpt-5.6-luna`, `gemini-3.5-flash-lite`, or `deepseek-v4-flash`.
@@ -161,7 +161,7 @@ This error comes from your model provider, not from Open WebUI. Every time you s
 
 Open WebUI ships **Context Compaction** for exactly this. Once a chat's estimated context passes a token threshold, a model summarizes the older messages, and the conversation continues from that summary plus the most recent messages, so a long chat keeps going instead of hitting the wall. It runs server-side and changes only what is sent to the model on that turn. Your chat is still stored and displayed in full, and nothing is deleted. A **Context compacted** line marks the message where older messages were summarized, and clicking it shows the summary. While compaction runs, the chat shows **Compacting context** in that place, and an error there if it fails.
 
-It is **off by default**. An administrator turns it on in **Settings > Admin > Interface**, where the token threshold (default `80000`), the model that writes the summaries, the share of recent messages kept verbatim and an optional custom summary prompt are all configurable. Set the threshold below your model's real context window.
+It is **off by default**. An administrator turns it on in **Settings > Interface** (admin section), where the token threshold (default `80000`), the model that writes the summaries, the share of recent messages kept verbatim and an optional custom summary prompt are all configurable. Set the threshold below your model's real context window.
 
 Two things to know before you lean on it:
 
@@ -205,7 +205,7 @@ None of these matter for "a single user with a handful of PDFs." All of them sta
 
 If you just want RAG to work well out of the box, these settings are a solid general-purpose starting point. They are not fine-tuned for every use case, but they will produce noticeably better results than the defaults for most document types.
 
-Set these in **Settings > Admin > Documents**:
+Set these in **Settings > Documents** (admin section):
 
 | Setting | Default | Recommended value | Why |
 |---------|---------|-------------------|-----|
@@ -242,7 +242,7 @@ It is a built-in tool, so there is nothing to install. The one decision is **whi
 - **Self-hosted, no API key.** Run your own search backend and keep every query in-house. [**SearXNG**](/features/chat-conversations/web-search/providers/searxng) is the usual pick.
 - **Commercial APIs.** [**Tavily**](/features/chat-conversations/web-search/providers/tavily), [**Brave**](/features/chat-conversations/web-search/providers/brave), [**Exa AI**](/features/chat-conversations/web-search/providers/exa), [**Perplexity Search**](/features/chat-conversations/web-search/providers/perplexity_search), [**Firecrawl**](/features/chat-conversations/web-search/providers/firecrawl) and others trade an API key (and usually a bill) for higher-quality, AI-tuned results.
 
-**Enable it:** go to **Settings > Admin > Web Search**, toggle **Enable Web Search**, then pick your provider and paste its key or config. In any chat, switch web search on for a message with the **+** button in the prompt field.
+**Enable it:** go to **Settings > Web Search** (admin section), toggle **Enable Web Search**, then pick your provider and paste its key or config. In any chat, switch web search on for a message with the **+** button in the prompt field.
 
 :::tip Native function calling does the rest
 Native is the default tool-calling mode now. With web search switched on for the chat, the model decides on its own when a question needs the live web and runs the search as a tool. To have it on in every chat, check **Web Search** under **Default Features** in the model settings.

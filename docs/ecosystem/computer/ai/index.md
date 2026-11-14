@@ -7,7 +7,7 @@ sidebar_position: 1
 
 There are two ways to put AI in an Open WebUI Computer chat:
 
-1. **Connect a model by API**: OpenAI, Anthropic, Ollama, OpenRouter, or any OpenAI-compatible endpoint. Add it in **Settings → Admin → Connections**. See [Connect a model](/ecosystem/computer/ai/connect-a-model).
+1. **Connect a model by API**: OpenAI, Anthropic, Ollama, OpenRouter, or any OpenAI-compatible endpoint. Add it in **Settings → Connections** (admin section). See [Connect a model](/ecosystem/computer/ai/connect-a-model).
 2. **Plug in a coding agent you already subscribe to**: Codex, Claude Code, Cursor, Grok, OpenCode, Cline, or Pi run as native chat backends using the CLI login already on your machine. No API key needed. See [Use your coding agent subscription](/ecosystem/computer/ai/coding-agents).
 
 Both show up in the same model selector and work in the same workspace chat. You can mix them: an Ollama model for quick questions, your Claude Code subscription for real work.

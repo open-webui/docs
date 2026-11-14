@@ -89,7 +89,7 @@ openclaw gateway status
 ### Step 4: Add the Connection in Open WebUI
 
 1. Open Open WebUI in your browser.
-2. Go to **Settings > Admin > Connections** and find the **Manage OpenAI API Connections** list.
+2. Go to **Settings > Connections** (admin section) and find the **Manage OpenAI API Connections** list.
 3. Click **Add Connection**.
 4. Enter the following:
 
@@ -143,7 +143,7 @@ Want your OpenClaw agent to participate in **Open WebUI Channels** as a bot user
 4. Add this bot user to the channels you want it to monitor.
 
 :::note
-Make sure **Channels** are enabled in your Open WebUI instance (**Settings > Admin > General**).
+Make sure **Channels** are enabled in your Open WebUI instance (**Settings > General** (admin section)).
 :::
 
 ### Step 2: Install the Plugin
@@ -214,7 +214,7 @@ docker run --add-host=host.docker.internal:host-gateway ...
 ### Channels bot not responding
 
 - Verify the bot user has been added to the target channel
-- Check that Channels are enabled in **Settings > Admin > General**
+- Check that Channels are enabled in **Settings > General** (admin section)
 - Ensure the bot credentials are correct in the OpenClaw plugin config (`~/.openclaw/openclaw.json`)
 
 ---
