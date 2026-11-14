@@ -129,6 +129,8 @@ Their row in the **Access List** is where you change what someone already has. E
 
 Deleting a group deletes its access grants. Grants left behind by groups deleted on earlier versions show in the access list under the group's ID, with no member count, so you can remove them with **✕**.
 
+Deleting a user in **Admin Panel > Users** (or through [SCIM](/features/authentication-access/auth/scim)) removes that user from every access list they were on, so the list shows no leftover rows for the deleted account.
+
 :::tip Knowledge Scoping for Models
 Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for details.
 :::
