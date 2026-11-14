@@ -85,14 +85,14 @@ For full documentation, see the [Open Terminal integration guide](/features/open
 
 ### Terminals (Multi-Tenant Orchestrator)
 
-[Terminals](https://github.com/open-webui/terminals) is an orchestrator that provisions and manages Open Terminal machines for your team. Where Open Terminal is a single instance, Terminals is the layer on top that handles the full lifecycle: provisioning, routing, idle cleanup and teardown. It requires an [enterprise license](/enterprise).
+[Terminals](https://github.com/open-webui/terminals) is an orchestrator that provisions and manages Open Terminal instances for your team. Where Open Terminal is a single instance, Terminals is the layer on top that handles the full lifecycle: provisioning, routing, idle cleanup and teardown. It requires an [enterprise license](/enterprise).
 
-- **Separate machines**: a terminal can give each user, chat or model its own machine with its own filesystem, processes and resources, or share one machine with everyone who uses it.
-- **Automatic lifecycle management**: machines are provisioned on first request and stopped after the idle timeout you set.
+- **Separate instances**: a terminal can give each user, chat or model its own instance with its own filesystem, processes and resources, or share one instance with everyone who uses it.
+- **Automatic lifecycle management**: instances are provisioned on first request and stopped after the idle timeout you set.
 - **Multiple backends**: Docker, Kubernetes or the Kubernetes Operator (CRD-based).
-- **Transparent routing**: Terminals sends each request to the right machine.
+- **Transparent routing**: Terminals sends each request to the right instance.
 - **Enterprise-ready**: supports PostgreSQL for storing terminal state.
-- **Admin dashboard**: built-in frontend for managing terminals and monitoring machines.
+- **Admin dashboard**: built-in frontend for managing terminals and monitoring instances.
 
 
 :::note License
@@ -106,11 +106,11 @@ Terminals is licensed under the [Open WebUI Enterprise License](/enterprise), no
 | **Runs in** | Browser (WebAssembly) | Server (Python kernel) | Server (Docker container) | Server (orchestrated containers) |
 | **Library support** | Limited subset | Full Python ecosystem | Full OS (any language, any tool) | Full OS (any language, any tool) |
 | **Shell access** | None | Limited | Full shell | Full shell |
-| **File persistence** | IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | Shared filesystem | Container filesystem (until removal) | Persistent storage per machine |
+| **File persistence** | IDBFS within a session (reload persistence needs `ENABLE_PYODIDE_FILE_PERSISTENCE`) | Shared filesystem | Container filesystem (until removal) | Persistent storage per instance |
 | **File browser** | Built-in sidebar panel | None | Built-in sidebar panel | Built-in sidebar panel |
 | **User file access** | Attached files placed in `/mnt/uploads/` | Manual | Attached files available | Attached files available |
-| **Isolation** | Browser sandbox | Shared environment | Container-level (when using Docker) | Separate machine per user, chat or model |
-| **Multi-user safety** | Per-user by design | Not isolated | Built-in multi-user mode (small teams) | Separate machines with lifecycle management |
+| **Isolation** | Browser sandbox | Shared environment | Container-level (when using Docker) | Separate instances per user, chat or model |
+| **Multi-user safety** | Per-user by design | Not isolated | Built-in multi-user mode (small teams) | Separate instances with lifecycle management |
 | **File generation** | Write to `/mnt/uploads/`, download via file browser | Full support | Full support with upload/download | Full support with upload/download |
 | **Setup** | None (built-in) | Admin configures globally | Native integration via Settings → Integrations | Separate service + Docker socket or K8s cluster |
 | **Recommended for orgs** | Legacy (safe but limited) | Not without isolation | Best for small teams | Designed for multi-tenant orgs |

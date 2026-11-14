@@ -96,6 +96,8 @@ For models that support variable reasoning depth (like some API providers), this
 - Common values: `low`, `medium`, `high`
 - Some providers accept numeric values
 
+[Coding agents](/features/open-terminal/coding-agents#options) in Open Terminal receive the setting too.
+
 :::info
 Reasoning Effort is only applicable to models from specific providers that support this parameter. It is not forwarded on native Ollama connections, where the `think` setting above covers the same ground. Ollama's OpenAI-compatible endpoint does accept `reasoning_effort` when Ollama is added as an OpenAI connection instead.
 :::

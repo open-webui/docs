@@ -216,7 +216,7 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Working directory
 
-With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a terminal that has a separate machine per chat, the button appears once the chat is saved and temporary chats offer only the other terminals. Each chat saves its working folder and restores it when reopened. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in. The folder icon on a **Recently Used** row, also labelled **Open folder**, shows that folder in the Files tab.
+With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a terminal that has a separate instance per chat, the button appears once the chat is saved and temporary chats offer only the other terminals. Each chat saves its working folder and restores it when reopened. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in. The folder icon on a **Recently Used** row, also labelled **Open folder**, shows that folder in the Files tab.
 
 **Recently Used** lists your last eight folders on that terminal. They are stored as files on the terminal, under `.open-webui/users/<user id>/folders` in its home folder, so they follow you to other browsers. Anyone who can read that home folder can see them.
 
@@ -269,7 +269,7 @@ If you have more than one terminal connected, switching between them in the drop
 :::
 
 :::info Terminals that give each chat its own files
-A terminal can give every conversation a machine of its own, so each chat has its own files. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a terminal but its files and details open once the chat is saved. Temporary chats do not list it. To browse a terminal's files without selecting it, use **View files** in its **More** menu. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
+A terminal can give every conversation an instance of its own, so each chat has its own files. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a terminal but its files and details open once the chat is saved. Temporary chats do not list it. To browse a terminal's files without selecting it, use **View files** in its **More** menu. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
 :::
 
 ## More things to try

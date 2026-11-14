@@ -17,7 +17,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Trigger a run manually with **Run Now**
 - Pause/resume automations without deleting them
 - Review execution history for each automation
-- Optionally file the chats a schedule creates into one of your [folders](/features/chat-conversations/chat-features/conversation-organization)
+- Optionally file the chats a schedule creates into a [folder](/features/chat-conversations/chat-features/conversation-organization#the-folder-page) you can edit, shared folders included, so a team sees every run in one place
 - Give runs a terminal and working folder, and run a [coding agent](/features/open-terminal/coding-agents) from that terminal
 
 ## Access Control
@@ -27,7 +27,7 @@ Automations are permission-gated for non-admin users.
 - **Admins**: always have access to Automations
 - **Users**: require the **Features > Automations** permission
 
-Automations are private to the user who created them. Only the owner can open, edit, run, or delete one; every other request, including one from an administrator, is answered as if the automation did not exist. The **Features > Automations** permission decides whether someone may have automations at all, not whose automations they may reach.
+Only the creator can open, edit or delete an automation, administrators included; every other request is answered as if the automation did not exist. One exception covers automations that post into a folder: anyone who can edit that folder can also pause it, run it and read its run history (see [Folders](#folders)). The **Features > Automations** permission decides whether someone may have automations at all.
 
 See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
 
@@ -65,7 +65,7 @@ Administrators can set global limits on automation usage for non-admin users. Th
    - **Instructions** (prompt)
    - **Model**
    - **Schedule**
-4. (Optional) Choose a **Folder** for the chats the automation creates
+4. (Optional) Choose a **Folder** for the chats the automation creates. The picker lists your own folders; to post into a shared folder, create the automation from that folder's page instead (see [Folders](#folders))
 5. Click **Create**
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
@@ -88,16 +88,11 @@ With a terminal picked, the **Model** list also offers the coding agents that te
 
 From the Automations list, click an automation to open its dedicated editor page.
 
-On the editor page, you can:
+The page is the editor. Name and instructions sit at the top, followed by a **Properties** list with **Status**, **Schedule**, **Model**, **Destination**, **Terminal** and **Next run**. Click any value to change it in place. A **Save** button appears in the header as soon as something differs from the saved automation. The **Status** switch pauses or resumes the automation straight away without **Save**.
 
-- Update title, instructions, model and schedule
-- Save changes
-- Run immediately with **Run now**
-- Pause/resume automation state
-- Delete the automation
-- Review execution logs and open run chats
+The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
 
-Execution logs are paginated with infinite scroll in the editor, so large run histories load incrementally.
+Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. Runs load incrementally as you scroll.
 
 ### Quick delete
 
@@ -120,13 +115,16 @@ What import does and does not do:
 
 ## Folders
 
-An automation can be assigned a folder, and every chat it creates from then on is filed there instead of landing loose in the chat list. This keeps a recurring report or digest out of the way, and lets the folder's unread badge tell you how many runs you have not read yet.
+An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose and **Folder** lists your own folders.
 
-- Only your own folders can be chosen. A folder shared with you belongs to someone else and is not offered, and naming one anyway is rejected the same way an unknown folder is.
-- The folder is a filing destination, not a project context: the chat is placed in the folder, and the folder's system prompt and attached knowledge apply to it as they do to any other chat there.
-- The automations list can be narrowed to a folder through the API and the chat tools; the list page itself does not label or filter by folder. Asking for the list without a folder, or with an empty one, returns every automation you have, whichever folder each is filed into.
-- Clearing the folder is a normal edit. The automation keeps running and its future chats go back to the ungrouped list; chats already created stay where they are.
-- Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running. The same happens if a folder disappears between two runs: the run notices, clears the setting, and creates its chat outside any folder rather than failing.
+A folder's own page works as a home for its automations. Its header has a **Chats** and **Automations** switch (visible to users who have the Automations permission). The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
+
+- An automation can post into any folder its creator can edit, shared folders included. Create it from the shared folder's page; the **Destination** picker lists only your own folders.
+- Only the creator edits the automation and opens its page. Anyone who can edit the folder can pause it with the switch. Everyone with access to the folder sees it in the list, read-only access included.
+- Runs keep landing in the folder for as long as the creator can still edit it. When the creator loses that access, the next run clears the folder and creates its chat outside any folder, and the automation keeps running.
+- The folder is a filing destination: the folder's system prompt and attached knowledge apply to the chat as they do to any other chat there.
+- Clearing the folder is a normal edit. Future chats go back to the ungrouped list; chats already created stay where they are.
+- Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running.
 - Imported automations keep their folder only if a folder with that ID exists in your account; otherwise they are imported without one.
 
 ## Scheduling

@@ -82,7 +82,7 @@ Terminals on a Terminals server carry a `scope`: `null`, `user`, `chat` or `mode
 | `scope` | What the request needs |
 | :--- | :--- |
 | `null` or `user` | Nothing extra |
-| `chat` | A saved `chat_id`. Each chat gets its own machine |
+| `chat` | A saved `chat_id`. Each chat gets its own instance |
 | `model` | A model you have access to |
 
 Read `scope` before choosing a terminal. For a `chat` terminal you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one. [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope) covers what each scope does.

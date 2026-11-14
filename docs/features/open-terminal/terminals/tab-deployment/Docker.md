@@ -62,7 +62,7 @@ networks:
     name: open-webui-network
 ```
 
-Terminals keeps its database and the files of every machine in the `data` folder next to your Compose file. `TERMINALS_DOCKER_HOST_DATA_DIR` tells Docker where that folder lives on the host, so the machine containers mount the same files the orchestrator manages.
+Terminals keeps its database and the files of every instance in the `data` folder next to your Compose file. `TERMINALS_DOCKER_HOST_DATA_DIR` tells Docker where that folder lives on the host, so the instance containers mount the same files the orchestrator manages.
 
 Set the shared API key in a `.env` file next to your Compose file:
 
@@ -76,7 +76,7 @@ Then start everything:
 docker compose up -d
 ```
 
-Open WebUI will be available at `http://localhost:3000`. The connection above gives every user **Read** access, so users can use terminals that are shared with them. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals). When a user opens a terminal, the orchestrator provisions the machine automatically.
+Open WebUI will be available at `http://localhost:3000`. The connection above gives every user **Read** access, so users can use terminals that are shared with them. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals). When a user opens a terminal, the orchestrator provisions the instance automatically.
 
 :::warning Docker socket access
 The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to manage containers. For production, use a Docker socket proxy like [Tecnativa/docker-socket-proxy](https://github.com/Tecnativa/docker-socket-proxy) to restrict the API calls it can make.

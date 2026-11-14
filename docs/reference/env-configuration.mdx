@@ -350,7 +350,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `chat.merge` | Merge Responses | **Merge Responses** under multi-model responses |
 | `chat.code_preview` | Preview | **Preview** on code blocks |
 | `chat.fork` | Fork chat | **Fork chat** under a response and the `/fork` command |
-| `chat.artifacts` | Artifacts | **Artifacts** in the chat's top-bar menu |
+| `chat.artifacts` | Artifacts | **Artifacts** in the **+** menu of the tab bar and the **Artifacts** tab |
 | `chat.archive` | Archive | **Archive** in the chat menus and for chats selected in the sidebar, **Unarchive Chat** and **Unarchive All** in **Settings > Archived Chats** and **Archive All Chats** in **Settings > Data Controls** |
 | `chat.tags` | Tags | **Tags** in the chat's top-bar menu |
 | `models.set_default` | Set as default | **Set as default** in the model selector |
@@ -5837,7 +5837,7 @@ If you use `perplexity`, this variable is not relevant to you.
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
   - `safe_web` (default): Uses internal fetching with enhanced error handling.
-  - `playwright`: Uses Playwright for rendering pages with JavaScript support.
+  - `playwright`: Uses Playwright for rendering pages with JavaScript support. The loaded text includes definition lists and figures with their captions.
   - `firecrawl`: Uses Firecrawl service.
   - `tavily`: Uses Tavily service.
   - `exa`: Uses the [Exa](/features/chat-conversations/web-search/providers/exa#4-optional-use-exa-to-read-pages) Contents API with [`EXA_API_KEY`](#exa_api_key). Exa fetches the pages and returns their text and title. Requests time out after [`WEB_LOADER_TIMEOUT`](#web_loader_timeout) seconds, or 60 seconds when that is unset. A rejected key or a billing problem stops the load with an error; pages Exa cannot read are skipped. Exa returns the full page text, and the `fetch_url` tool still cuts it to [`WEB_FETCH_MAX_CONTENT_LENGTH`](#web_fetch_max_content_length). [`EXA_MAX_CONTENT_LENGTH`](#exa_max_content_length) applies to search results only.

@@ -66,18 +66,18 @@ When `terminals.enabled: true`, the chart creates:
 | :--- | :--- |
 | **CRD** (`terminals.openwebui.com`) | Defines the `Terminal` custom resource |
 | **Operator Deployment** | Kopf controller that watches Terminal CRs and provisions Pods, Services, PVCs, Secrets |
-| **Orchestrator Deployment + Service** | FastAPI service that receives requests from Open WebUI and proxies to the machine Pods |
+| **Orchestrator Deployment + Service** | FastAPI service that receives requests from Open WebUI and proxies to the instance Pods |
 | **Secret** | Shared API key (auto-generated if not provided) |
 
-For **each machine**, the operator creates a Pod, Service, Secret (API key) and optionally a PVC for persistent storage.
+For **each instance**, the operator creates a Pod, Service, Secret (API key) and optionally a PVC for persistent storage.
 
 ---
 
 ## Lifecycle
 
-When a machine is needed, the orchestrator creates a `Terminal` CR. The operator provisions a Pod with a Service, Secret and optional PVC. Once the Pod passes readiness checks, the orchestrator proxies traffic to it.
+When an instance is needed, the orchestrator creates a `Terminal` CR. The operator provisions a Pod with a Service, Secret and optional PVC. Once the Pod passes readiness checks, the orchestrator proxies traffic to it.
 
-When a machine has been idle longer than `idleTimeoutMinutes`, the operator deletes the Pod but keeps the PVC and Secret. On the next request, a fresh Pod is created with the same PVC reattached, so **user data persists** across idle cycles.
+When an instance has been idle longer than `idleTimeoutMinutes`, the operator deletes the Pod but keeps the PVC and Secret. On the next request, a fresh Pod is created with the same PVC reattached, so **user data persists** across idle cycles.
 
 ```bash
 # List all terminals
@@ -113,8 +113,8 @@ kubectl logs -n open-webui deployment/<release>-terminals-orchestrator --tail=50
 
 | Field | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `templateId` | string | *(required)* | ID of the terminal this machine belongs to |
-| `contextId` | string | `default` | Which machine of the terminal this is: `default`, `user:<id>`, `chat:<id>` or `model:<id>` |
+| `templateId` | string | *(required)* | ID of the terminal this instance belongs to |
+| `contextId` | string | `default` | Which instance of the terminal this is: `default`, `user:<id>`, `chat:<id>` or `model:<id>` |
 | `image` | string | `ghcr.io/open-webui/open-terminal:latest` | Container image |
 | `imagePullPolicy` | string | *(Kubernetes default)* | `Always`, `IfNotPresent` or `Never` |
 | `resources.requests.cpu` | string | *(unset)* | CPU request. The orchestrator sets limits only |
@@ -162,10 +162,10 @@ kubectl logs -n open-webui deployment/<release>-terminals-orchestrator --tail=50
 | `terminals.orchestrator.backend` | `kubernetes-operator` | Backend type |
 | `terminals.orchestrator.terminalImage` | `ghcr.io/open-webui/open-terminal:latest` | Default image for user Pods |
 | `terminals.orchestrator.idleTimeoutMinutes` | `30` | Idle timeout (minutes) |
-| `terminals.orchestrator.terminalImagePullPolicy` | `IfNotPresent` | Pull policy for the machine image |
+| `terminals.orchestrator.terminalImagePullPolicy` | `IfNotPresent` | Pull policy for the instance image |
 | `terminals.orchestrator.replicaCount` | `1` | Orchestrator replicas |
 | `terminals.operator.extraEnvVars`, `terminals.orchestrator.extraEnvVars` | `[]` | Extra environment variables, as a list or a map |
-| `terminals.networkPolicy.enabled` | `false` | Create NetworkPolicies for the operator, orchestrator and machine Pods |
+| `terminals.networkPolicy.enabled` | `false` | Create NetworkPolicies for the operator, orchestrator and instance Pods |
 | `terminals.orchestrator.service.type` | `ClusterIP` | Orchestrator Service type |
 | `terminals.orchestrator.service.port` | `8080` | Orchestrator Service port |
 
