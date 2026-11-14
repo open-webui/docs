@@ -161,7 +161,7 @@ After the admin account is created, sign-up is automatically disabled for securi
 - Type: `bool`
 - Default: `True`
 - Description: Shows the email and password fields, the sign-in button and the "or" divider (the divider only when `ENABLE_OAUTH_SIGNUP` is on) on the login page. Turning it off also refuses local sign-ups at `POST /api/v1/auths/signup`, so an SSO-only instance cannot create accounts that way; see [`ENABLE_INITIAL_ADMIN_SIGNUP`](#enable_initial_admin_signup) for bootstrapping the first administrator. Password sign-in through the API is unaffected, that one follows `ENABLE_PASSWORD_AUTH`. Set up SSO or LDAP before turning this off, or nobody can get in.
-- Also a toggle: **Login Form** in **Settings > Admin > Authentication**, which applies immediately and needs no restart.
+- Also a toggle: **Login Form** in **Settings > Authentication** (admin section), which applies immediately and needs no restart.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_PASSWORD_CHANGE_FORM`
@@ -209,7 +209,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' '), since `None`.
-- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working model. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. [Default models set on a group](/features/authentication-access/rbac/groups#default-models-per-group) replace this list for the group's members. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Sets a default Language Model. Accepts several IDs separated by commas, which pre-selects that set of models on a new chat. Models that no longer exist, or that are hidden, are dropped from a new chat's selection and replaced by these defaults, so a user whose last-used model has been removed still starts on a working model. A user's own default model, and a `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params), both take precedence and are left alone. [Default models set on a group](/features/authentication-access/rbac/groups#default-models-per-group) replace this list for the group's members. In the interface this list is managed per model as **Set as Selected Model** in **Settings > Models** (admin section), see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MODEL_ORDER_LIST`
@@ -223,7 +223,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Admin > Models**, see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Models** (admin section), see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Example: `gpt-5.6-sol,claude-opus-5,muse-glimmer:30b-q4_K_M`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -231,7 +231,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Settings → Admin → Models**.
+- Description: Sets global default metadata (capabilities and other model info) for all models. These defaults act as a baseline. Per-model overrides always take precedence. For capabilities, the defaults and per-model values are merged (per-model wins on conflicts). For other metadata fields, the default is only applied if the model has no value set. Configurable via **Settings → Models** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_metadata`.
 
 :::info
@@ -248,7 +248,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings > Admin > Models** (**Model Defaults** > **Model Parameters**).
+- Description: Sets global default parameters (temperature, top_p, max_tokens, seed, etc.) for all models. These defaults are applied as a baseline at chat completion time. Per-model parameter overrides always take precedence. Configurable via **Settings > Models** (admin section) (**Model Defaults** > **Model Parameters**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `models.default_params`.
 
 :::info
@@ -266,7 +266,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: Sets instance-wide starting values for the personal options in **Settings > Interface**, so every account opens on your preferences instead of the built-in ones, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins. An option nobody has touched keeps following the default, so changing it later moves everyone who has not overridden it. The defaults also reach personal settings written outside the **Interface** page, such as `system` and `params`, which the admin editor does not offer. Configurable via **Settings > Admin > General > UI > Default Interface Settings**. See [Default Interface Settings](/features/administration/interface-defaults) for the full list of keys, their labels and their built-in values.
+- Description: Sets instance-wide starting values for the personal options in **Settings > Interface**, so every account opens on your preferences instead of the built-in ones, for example `{"chatBubble": false, "widescreenMode": true, "chatHoverPreview": false}`. A user's own choice always wins. An option nobody has touched keeps following the default, so changing it later moves everyone who has not overridden it. The defaults also reach personal settings written outside the **Interface** page, such as `system` and `params`, which the admin editor does not offer. Configurable via **Settings > General > UI > Default Interface Settings** (admin section). See [Default Interface Settings](/features/administration/interface-defaults) for the full list of keys, their labels and their built-in values.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.default_interface_settings`.
 
 :::info
@@ -282,7 +282,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `dict` (JSON object)
 - Default: `{}` (every control shown)
-- Description: Hides controls from non-admin users. Set a control ID to `false` to hide it, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Admins always see every control. Hiding only removes the control from view; the feature behind it keeps working. Also configurable as **Visible controls** in **Admin Panel > Settings > Interface**, under **Visibility**.
+- Description: Hides controls from non-admin users. Set a control ID to `false` to hide it, for example `{"chat.fork": false, "models.pin": false, "settings.usage": false}`. Admins always see every control. Hiding only removes the control from view; the feature behind it keeps working. Also configurable as **Visible controls** in **Settings > Interface** (admin section), under **Visibility**.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `ui.visibility`.
 
 :::info
@@ -429,14 +429,14 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables temporary end-to-end [encrypted chats](/features/channels/encrypted-chats) in direct messages and private group channels. Messages are encrypted in the browser, and the server only relays them without storing them. Needs [`ENABLE_CHANNELS`](#enable_channels) on as well. Users also need the [`USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`](#user_permissions_features_encrypted_channels) and [`USER_PERMISSIONS_FEATURES_CHANNELS`](#user_permissions_features_channels) permissions; admins always qualify. Encrypted chats need a websocket connection (HTTP long polling is refused), [`WEBSOCKET_SERVER_LOGGING`](#websocket_server_logging) and [`WEBSOCKET_SERVER_ENGINEIO_LOGGING`](#websocket_server_engineio_logging) off and HTTPS when [`ENV`](#env) is `prod`. Can also be set in **Settings > Admin > General** (**Encrypted channels**), which appears once channels are enabled.
+- Description: Enables temporary end-to-end [encrypted chats](/features/channels/encrypted-chats) in direct messages and private group channels. Messages are encrypted in the browser, and the server only relays them without storing them. Needs [`ENABLE_CHANNELS`](#enable_channels) on as well. Users also need the [`USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`](#user_permissions_features_encrypted_channels) and [`USER_PERMISSIONS_FEATURES_CHANNELS`](#user_permissions_features_channels) permissions; admins always qualify. Encrypted chats need a websocket connection (HTTP long polling is refused), [`WEBSOCKET_SERVER_LOGGING`](#websocket_server_logging) and [`WEBSOCKET_SERVER_ENGINEIO_LOGGING`](#websocket_server_engineio_logging) off and HTTPS when [`ENV`](#env) is `prod`. Can also be set in **Settings > General** (admin section) (**Encrypted channels**), which appears once channels are enabled.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_APPS`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** tab to the admin settings, where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > Admin > General** (**Apps**).
+- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** tab to the admin settings, where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > General** (admin section) (**Apps**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `APP_ALLOWED_PRIVATE_ORIGINS`
@@ -451,7 +451,7 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Type: `str`
 - Options: `thread` (default), `channel`
 - Default: `thread`
-- Description: Where a model's reply goes when it is mentioned in a message posted at the top level of a channel. `thread` starts a thread under that message, keeping a long answer out of the main timeline. `channel` posts the reply straight into the channel, where everyone reads it without opening anything. A mention **inside** an existing thread always answers in that thread, whichever mode is set. Can also be set in **Settings > Admin > General** (**Model Response Mode**), which appears once channels are enabled; an unrecognised value is ignored and the current setting is kept.
+- Description: Where a model's reply goes when it is mentioned in a message posted at the top level of a channel. `thread` starts a thread under that message, keeping a long answer out of the main timeline. `channel` posts the reply straight into the channel, where everyone reads it without opening anything. A mention **inside** an existing thread always answers in that thread, whichever mode is set. Can also be set in **Settings > General** (admin section) (**Model Response Mode**), which appears once channels are enabled; an unrecognised value is ignored and the current setting is kept.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_FOLDERS`
@@ -466,42 +466,42 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Type: `int`
 - Default: `("") empty string`
 - Description: Sets the maximum number of files processing allowed per folder.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > General > Folder Max File Count**. Default is none (empty string) which is unlimited.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > General > Folder Max File Count** (admin section). Default is none (empty string) which is unlimited.
 
 #### `ENABLE_SKILL_LAZY_LOADING`
 
 - Type: `bool`
 - Default: `False`
 - Description: Lists the skills selected for a chat, including model skills, in the skill manifest, so the model loads them only when needed. A skill mentioned with `$` is still sent with every message. Needs the skill tools. See [Skills](/features/workspace/skills#loading-selected-skills-on-demand).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Load selected skills on demand**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > General > Load selected skills on demand** (admin section).
 
 #### `SKILL_CONTENT_MAX_CHARS`
 
 - Type: `int`
 - Default: empty, which uses `20000`
 - Description: The most characters of a skill's text the model gets in one read. A longer `SKILL.md` is sent as a preview of `SKILL_PREVIEW_MAX_CHARS` characters. Must be a positive integer, or Open WebUI stops at startup. See [Skills](/features/workspace/skills).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Read Limit**. Leave the field empty to use the default.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > General > Skill Read Limit** (admin section). Leave the field empty to use the default.
 
 #### `SKILL_PREVIEW_MAX_CHARS`
 
 - Type: `int`
 - Default: empty, which uses `5000`
 - Description: How many characters of a skill's instructions the model gets when the `SKILL.md` is longer than `SKILL_CONTENT_MAX_CHARS`. Capped at `SKILL_CONTENT_MAX_CHARS`. Must be a positive integer, or Open WebUI stops at startup.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Admin > General > Skill Preview Length**. Leave the field empty to use the default.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > General > Skill Preview Length** (admin section). Leave the field empty to use the default.
 
 #### `VIEW_CHAT_MAX_CHARS`
 
 - Type: `int`
 - Default: empty, which means no limit
 - Description: The most characters of message text the `view_chat` tool returns when a model reads a previous chat. The newest messages are kept, and the result tells the model it was cut and how many messages it holds. Must be a positive integer, or Open WebUI stops at startup. See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
-- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > Admin > General > Chat Read Limit**. Leave the field empty for no limit.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > General > Chat Read Limit** (admin section). Leave the field empty for no limit.
 
 #### `VISUALIZATION_PROMPT_TEMPLATE`
 
 - Type: `str`
 - Default: Empty string, which falls back to the built-in instructions.
 - Description: The instructions the model receives for the `render_visualization` tool, which decide when and how it draws. See [Visualizations](/features/chat-conversations/chat-features/visualizations).
-- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.visualizations.prompt_template`. It can be configured in **Settings > Admin > Interface > Visualization Prompt**.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.visualizations.prompt_template`. It can be configured in **Settings > Interface > Visualization Prompt** (admin section).
 
 #### `ENABLE_AUTOMATIONS`
 
@@ -546,7 +546,7 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Admin > Sub-agents**. See [Sub-agents](/features/chat-conversations/chat-features/subagents).
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Sub-agents** (admin section). See [Sub-agents](/features/chat-conversations/chat-features/subagents).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_BACKGROUND_ENABLED`
@@ -626,14 +626,14 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `bool`
 - Default: `False`
-- Description: Turns on [comments](/features/chat-conversations/chat-features/comments). Also set in **Admin Settings > General > Comments**.
+- Description: Turns on [comments](/features/chat-conversations/chat-features/comments). Also set in **Settings > General > Comments** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_NOTIFICATIONS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns on the [notification inbox](/features/chat-conversations/chat-features/notifications#inbox) for all users. Also set in **Admin Settings > General > Notifications**.
+- Description: Turns on the [notification inbox](/features/chat-conversations/chat-features/notifications#inbox) for all users. Also set in **Settings > General > Notifications** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MEMORIES`
@@ -647,7 +647,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `bool`
 - Default: `True`
-- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Injection additionally requires the user to hold the `features.memories` permission ([`USER_PERMISSIONS_FEATURES_MEMORIES`](#user_permissions_features_memories); admins are exempt). Surfaced as the "Memory System Context" toggle under **Settings > Admin > General** when Memories is enabled.
+- Description: When the [memory feature](/features/chat-conversations/memory) is on, controls whether stored memories are injected into the model's system context. Set to `False` to keep the memory tools available (the model can still add, update and delete memories) while no longer adding remembered context to the prompt. Injection additionally requires the user to hold the `features.memories` permission ([`USER_PERMISSIONS_FEATURES_MEMORIES`](#user_permissions_features_memories); admins are exempt). Surfaced as the "Memory System Context" toggle under **Settings > General** (admin section) when Memories is enabled.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBHOOK_URL`
@@ -722,7 +722,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `str`
 - Default: `""` (empty, no text is added)
-- Description: Sets a text that is appended, after a blank line, when a user copies an assistant reply with its **Copy** button. For example, `"This text was generated by AI."` is added to the end of every reply copied that way. Also set under **Response Watermark** in **Settings > Admin > General**.
+- Description: Sets a text that is appended, after a blank line, when a user copies an assistant reply with its **Copy** button. For example, `"This text was generated by AI."` is added to the end of every reply copied that way. Also set under **Response Watermark** in **Settings > General** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info The name is only a setting name
@@ -790,7 +790,7 @@ On weak hardware (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or
 - Type: `bool`
 - Default: `True`
 - Description: Controls the user status feature: the emoji, message and expiry a user sets on their own account to tell other people what they are up to. Enabled, the control sits in the user menu and a status set there is shown to others beside that user. Disabled, the control is gone and the two endpoints behind it (`GET /api/v1/users/user/status` and `POST /api/v1/users/user/status/update`) answer `403`.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > Admin > General > User Status**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be toggled in the **Settings > General > User Status** (admin section).
 
 #### `ENABLE_EASTER_EGGS`
 
@@ -1109,7 +1109,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
 ```
 
-  Per-language versions of these suggestions are set in the admin panel rather than here, under **Settings > Admin > Models > Model Defaults**. See [Translations](/features/workspace/models#translations).
+  Per-language versions of these suggestions are set in the admin panel rather than here, under **Settings > Models > Model Defaults** (admin section). See [Translations](/features/workspace/models#translations).
 
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -1530,7 +1530,7 @@ when using OpenAI-compatible endpoints.
 
 - Type: `dict` (JSON object)
 - Default: `{}`
-- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation stops at 1000 output tokens and the other tasks send no parameters. Setting anything here drops the title limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Context compaction summaries have no output limit unless `max_tokens` is set here. Can also be set in **Settings > Admin > Interface**, under **Tasks**. See [Task Models](/features/administration/task-models).
+- Description: The generation parameters sent with background task requests, taking the same keys as a model's advanced parameters. Left empty, title generation stops at 1000 output tokens and the other tasks send no parameters. Setting anything here drops the title limit, so include `max_tokens` yourself if you still want one; raising it is the fix for a reasoning task model that spends its budget thinking and returns a title that stops mid-sentence. Context compaction summaries have no output limit unless `max_tokens` is set here. Can also be set in **Settings > Interface** (admin section), under **Tasks**. See [Task Models](/features/administration/task-models).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.model.params`.
 
 :::info
@@ -1545,77 +1545,77 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: In Native function calling mode, asks the model to write a short running and completed label for each tool call in the user's language, which the chat shows in place of the default tool call text. Each tool gets an extra required `__labels__` argument that Open WebUI removes before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object are skipped. See [Tool call labels](/features/extensibility/plugin/tools#tool-call-labels). Can also be toggled in **Settings > Admin > Interface > Tool Call Labels**.
+- Description: In Native function calling mode, asks the model to write a short running and completed label for each tool call in the user's language, which the chat shows in place of the default tool call text. Each tool gets an extra required `__labels__` argument that Open WebUI removes before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object are skipped. See [Tool call labels](/features/extensibility/plugin/tools#tool-call-labels). Can also be toggled in **Settings > Interface > Tool Call Labels** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_call_labels.enable`.
 
 #### `ENABLE_TOOL_PERMISSIONS`
 
 - Type: `bool`
 - Default: `False`
-- Description: Adds a **Tool Permissions** entry to the chat input's **+** menu, where a user picks **Full access** (run tools without asking, the default when **Auto** is not offered), **Ask for approval** (stop before each tool call until it is allowed or denied) or, with [`ENABLE_TOOL_PERMISSIONS_AUTO`](#enable_tool_permissions_auto) on, **Auto**. Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Channel replies always run with full access. Automations have no chosen mode, so they run in **Auto** when it is offered and with full access otherwise. Can also be toggled in **Settings > Admin > Interface**.
+- Description: Adds a **Tool Permissions** entry to the chat input's **+** menu, where a user picks **Full access** (run tools without asking, the default when **Auto** is not offered), **Ask for approval** (stop before each tool call until it is allowed or denied) or, with [`ENABLE_TOOL_PERMISSIONS_AUTO`](#enable_tool_permissions_auto) on, **Auto**. Experimental. While the setting is off, every request runs with full access and the `tool_approval_mode` parameter is ignored. Channel replies always run with full access. Automations have no chosen mode, so they run in **Auto** when it is offered and with full access otherwise. Can also be toggled in **Settings > Interface** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.enable`.
 
 #### `ENABLE_TOOL_PERMISSIONS_AUTO`
 
 - Type: `bool`
 - Default: `False`
-- Description: Adds **Auto** next to **Full access** and **Ask for approval** in the **Tool Permissions** entry when [`ENABLE_TOOL_PERMISSIONS`](#enable_tool_permissions) is on. In **Auto**, the engine set by [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) decides for each tool call whether it runs or waits for approval. Users who have not chosen a mode get **Auto**. Not available in channel chats. See [Tool Approval](/features/extensibility/plugin/tools#tool-approval). Can also be toggled in **Settings > Admin > Interface** (**Auto permissions**).
+- Description: Adds **Auto** next to **Full access** and **Ask for approval** in the **Tool Permissions** entry when [`ENABLE_TOOL_PERMISSIONS`](#enable_tool_permissions) is on. In **Auto**, the engine set by [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) decides for each tool call whether it runs or waits for approval. Users who have not chosen a mode get **Auto**. Not available in channel chats. See [Tool Approval](/features/extensibility/plugin/tools#tool-approval). Can also be toggled in **Settings > Interface** (admin section) (**Auto permissions**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.enable`.
 
 #### `TOOL_PERMISSIONS_AUTO_ENGINE`
 
 - Type: `str` (empty or `decisions`)
 - Default: Empty string
-- Description: What decides which tool calls need approval in **Auto**. Empty lets the chat model decide: Open WebUI adds the approval policy to the system prompt and a required `__approval__` argument to each tool. `decisions` sends each tool call to a review service at [`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](#tool_permissions_auto_decisions_api_base_url). Any other value makes every call in **Auto** ask for approval. See [Auto](/features/extensibility/plugin/tools#auto). Can also be set in **Settings > Admin > Interface** (**Engine**: **Default** or **Decisions API**).
+- Description: What decides which tool calls need approval in **Auto**. Empty lets the chat model decide: Open WebUI adds the approval policy to the system prompt and a required `__approval__` argument to each tool. `decisions` sends each tool call to a review service at [`TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`](#tool_permissions_auto_decisions_api_base_url). Any other value makes every call in **Auto** ask for approval. See [Auto](/features/extensibility/plugin/tools#auto). Can also be set in **Settings > Interface** (admin section) (**Engine**: **Default** or **Decisions API**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.engine`.
 
 #### `TOOL_PERMISSIONS_AUTO_PROMPT`
 
 - Type: `str`
 - Default: Empty string (use the built-in approval policy)
-- Description: Approval policy that describes which tool calls need approval. Used by both engines. Can also be set in **Settings > Admin > Interface** (**Approval policy**).
+- Description: Approval policy that describes which tool calls need approval. Used by both engines. Can also be set in **Settings > Interface** (admin section) (**Approval policy**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.prompt`.
 
 #### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`
 
 - Type: `str`
 - Default: `https://api.openai.com/v1`
-- Description: Base URL of the review service used when [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) is `decisions`. Open WebUI sends each review request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Description: Base URL of the review service used when [`TOOL_PERMISSIONS_AUTO_ENGINE`](#tool_permissions_auto_engine) is `decisions`. Open WebUI sends each review request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Interface** (admin section) (**API Base URL**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.api_base_url`.
 
 #### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_KEY`
 
 - Type: `str`
 - Default: Empty string
-- Description: API key sent as a Bearer token to the review service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Description: API key sent as a Bearer token to the review service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Interface** (admin section) (**API Key**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.api_key`.
 
 #### `TOOL_PERMISSIONS_AUTO_DECISIONS_MODEL`
 
 - Type: `str`
 - Default: `gpt-6-luna`
-- Description: Model name sent to the review service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Description: Model name sent to the review service. Can also be set in **Settings > Interface** (admin section) (**Model**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.model`.
 
 #### `TOOL_PERMISSIONS_AUTO_DECISIONS_THRESHOLD`
 
 - Type: `float`
 - Default: `0.5`
-- Description: A value from `0` to `1`. A tool call asks for approval when the review service's probability that it needs approval is at or above this value. A value outside that range makes every call ask for approval. Can also be set in **Settings > Admin > Interface** (**Approval threshold**).
+- Description: A value from `0` to `1`. A tool call asks for approval when the review service's probability that it needs approval is at or above this value. A value outside that range makes every call ask for approval. Can also be set in **Settings > Interface** (admin section) (**Approval threshold**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.decisions.threshold`.
 
 #### `ENABLE_CONTEXT_COMPACTION`
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables automatic [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction). When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. The check runs at the start of each turn and again between tool rounds of a native tool loop. Can also be toggled in **Settings > Admin > Interface**.
+- Description: Enables automatic [context compaction](/troubleshooting/context-window#the-built-in-option-context-compaction). When a chat's estimated context exceeds `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, older messages are summarized into a checkpoint and dropped from what is sent to the model, while recent messages are kept, so long conversations stay within the model's context window. The check runs at the start of each turn and again between tool rounds of a native tool loop. Can also be toggled in **Settings > Interface** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_MODEL`
 
 - Type: `str`
 - Default: Empty string (use the chat's own model)
-- Description: The model that writes context compaction summaries. Leave it empty to use the chat's own model. Set it to give summarization its own model. A model ID that is not available falls back to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Admin > Interface** (**Context Compaction Model**), where **Current Model** means follow the chat.
+- Description: The model that writes context compaction summaries. Leave it empty to use the chat's own model. Set it to give summarization its own model. A model ID that is not available falls back to the chat model, so a stale value never blocks compaction. Can also be set in **Settings > Interface** (admin section) (**Context Compaction Model**), where **Current Model** means follow the chat.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_TOKEN_THRESHOLD`
@@ -1629,14 +1629,14 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `int`
 - Default: falls back to `CONTEXT_COMPACTION_TOKEN_THRESHOLD` when unset
-- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Admin > Interface** (**Token Cap**).
+- Description: The absolute ceiling, in tokens, for any per-model context compaction threshold. A model can raise or lower its own threshold with the `compact_token_threshold` advanced parameter, but the effective value is clamped to this cap. When unset it equals `CONTEXT_COMPACTION_TOKEN_THRESHOLD`, reproducing the previous behaviour in which per-model thresholds could only be lowered. Can also be set in **Settings > Interface** (admin section) (**Token Cap**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_RETENTION_PERCENTAGE`
 
 - Type: `int`
 - Default: `40`
-- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. At the start of a turn compaction splits on a user message, so the retained portion begins at a turn boundary; between tool rounds of a long tool loop it splits at the start of a tool round, keeping each tool call with its results. Can also be set in **Settings > Admin > Interface** (**Retained Messages**).
+- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. At the start of a turn compaction splits on a user message, so the retained portion begins at a turn boundary; between tool rounds of a long tool loop it splits at the start of a tool round, keeping each tool call with its results. Can also be set in **Settings > Interface** (admin section) (**Retained Messages**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -1650,70 +1650,70 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Admin > Interface** (**Tool Search**).
+- Description: Enables [Tool Search](/features/extensibility/plugin/tools#tool-search) for chats in Native Mode. Tools with large definitions are left out of the request, and the model loads the ones it needs with the built-in `search_tools` tool and runs them through the built-in `call_tool` tool. Experimental. Can also be toggled in **Settings > Interface** (admin section) (**Tool Search**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.enable`.
 
 #### `TOOL_SEARCH_ENGINE`
 
 - Type: `str` (`bm25`, `embeddings` or `decisions`)
 - Default: `bm25`
-- Description: How [Tool Search](/features/extensibility/plugin/tools#tool-search) matches a search to deferred tools. `bm25` ranks by keywords, `embeddings` uses the Documents embedding model and `decisions` asks a [Decisions API](/features/extensibility/plugin/tools#search-engines) service. Only the selected engine runs. Can also be set in **Settings > Admin > Interface** (**Search engine**).
+- Description: How [Tool Search](/features/extensibility/plugin/tools#tool-search) matches a search to deferred tools. `bm25` ranks by keywords, `embeddings` uses the Documents embedding model and `decisions` asks a [Decisions API](/features/extensibility/plugin/tools#search-engines) service. Only the selected engine runs. Can also be set in **Settings > Interface** (admin section) (**Search engine**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.engine`.
 
 #### `TOOL_SEARCH_DECISIONS_API_BASE_URL`
 
 - Type: `str`
 - Default: `https://api.openai.com/v1`
-- Description: Base URL of the service used when [`TOOL_SEARCH_ENGINE`](#tool_search_engine) is `decisions`. Open WebUI sends each search request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Admin > Interface** (**API Base URL**).
+- Description: Base URL of the service used when [`TOOL_SEARCH_ENGINE`](#tool_search_engine) is `decisions`. Open WebUI sends each search request to `<base URL>/decisions`. It must be an HTTP(S) URL without credentials, query or fragment. Can also be set in **Settings > Interface** (admin section) (**API Base URL**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.api_base_url`.
 
 #### `TOOL_SEARCH_DECISIONS_API_KEY`
 
 - Type: `str`
 - Default: Empty string
-- Description: API key sent as a Bearer token to the Tool Search Decisions service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Admin > Interface** (**API Key**).
+- Description: API key sent as a Bearer token to the Tool Search Decisions service. Without a key, no `Authorization` header is sent. Can also be set in **Settings > Interface** (admin section) (**API Key**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.api_key`.
 
 #### `TOOL_SEARCH_DECISIONS_MODEL`
 
 - Type: `str`
 - Default: `gpt-6-luna`
-- Description: Model name sent to the Tool Search Decisions service. Can also be set in **Settings > Admin > Interface** (**Model**).
+- Description: Model name sent to the Tool Search Decisions service. Can also be set in **Settings > Interface** (admin section) (**Model**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.model`.
 
 #### `TOOL_SEARCH_DECISIONS_THRESHOLD`
 
 - Type: `float`
 - Default: `0.5`
-- Description: A value from `0` to `1`. Only tools whose relevance probability is at or above this value are returned. Can also be set in **Settings > Admin > Interface** (**Relevance threshold**).
+- Description: A value from `0` to `1`. Only tools whose relevance probability is at or above this value are returned. Can also be set in **Settings > Interface** (admin section) (**Relevance threshold**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.threshold`.
 
 #### `TOOL_SEARCH_DECISIONS_PROMPT`
 
 - Type: `str`
 - Default: Empty string (use the built-in relevance instructions)
-- Description: Instructions the Decisions service follows when it rates a tool's relevance. The search query and tool definition are added automatically. Can also be set in **Settings > Admin > Interface** (**Prompt**).
+- Description: Instructions the Decisions service follows when it rates a tool's relevance. The search query and tool definition are added automatically. Can also be set in **Settings > Interface** (admin section) (**Prompt**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.decisions.prompt`.
 
 #### `TOOL_SEARCH_DEFER_THRESHOLD`
 
 - Type: `int`
 - Default: `400`
-- Description: The length, in characters, above which a tool's JSON definition (name, description and parameter schema) is deferred when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on. `0` defers every tool. Can also be set in **Settings > Admin > Interface** (**Deferral Threshold (characters)**).
+- Description: The length, in characters, above which a tool's JSON definition (name, description and parameter schema) is deferred when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on. `0` defers every tool. Can also be set in **Settings > Interface** (admin section) (**Deferral Threshold (characters)**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.defer_threshold`.
 
 #### `TOOL_SEARCH_ALWAYS_LOADED`
 
 - Type: `str` (comma-separated)
 - Default: Empty string
-- Description: Tool names or glob patterns that are always sent in full when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on, for example `jira_create_issue,github_*`. Patterns match the tool names the model sees and are case-sensitive; MCP tools carry their server's ID as a prefix. Can also be set in **Settings > Admin > Interface** (**Always Loaded Tools**).
+- Description: Tool names or glob patterns that are always sent in full when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on, for example `jira_create_issue,github_*`. Patterns match the tool names the model sees and are case-sensitive; MCP tools carry their server's ID as a prefix. Can also be set in **Settings > Interface** (admin section) (**Always Loaded Tools**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.always_loaded`.
 
 #### `TOOL_SEARCH_DEFER_BUILTIN_TOOLS`
 
 - Type: `bool`
 - Default: `True`
-- Description: Lets [Tool Search](/features/extensibility/plugin/tools#tool-search) defer built-in tools like any other tool. Set it to `False` to always send built-in tools in full. Can also be toggled in **Settings > Admin > Interface** (**Defer Built-in Tools**).
+- Description: Lets [Tool Search](/features/extensibility/plugin/tools#tool-search) defer built-in tools like any other tool. Set it to `False` to always send built-in tools in full. Can also be toggled in **Settings > Interface** (admin section) (**Defer Built-in Tools**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.defer_builtin_tools`.
 
 #### `TITLE_GENERATION_PROMPT_TEMPLATE`
@@ -2159,14 +2159,14 @@ Output:
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Admin > Evaluations**.
+- Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Evaluations** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EVALUATION_ARENA_MODELS`
 
 - Type: `str` (JSON)
 - Default: `[]`
-- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Admin > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) and saving it collapses the duplicates.
+- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) (admin section) and saving it collapses the duplicates.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUXILIARY_EMBEDDING_MODEL`
@@ -2340,7 +2340,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Admin > Connections > "Cache Base Model List".
+- Description: When enabled, caches the list of base models from connected Ollama and OpenAI-compatible endpoints. This reduces the number of API calls made to external model providers when loading the model selector, improving performance particularly for deployments with many users or slow connections to model endpoints. Can also be configured from Settings > Connections > "Cache Base Model List" (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 **How the cache works:**
@@ -2350,7 +2350,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
 - **Cache Hit**: Subsequent requests for models return the cached list without contacting external endpoints.
 - **Cache Refresh**: The cache is refreshed when:
   - The application restarts (without Redis; a list stored in Redis survives restarts)
-  - The connection settings are saved in the **Settings > Admin > Connections** (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
+  - The connection settings are saved in the **Settings > Connections** (admin section) (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
   - An admin downloads, deletes, loads or unloads a model on a connection
 - **No TTL**: There is no automatic time-based expiration.
 
@@ -2391,7 +2391,7 @@ For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODE
 
 - Type: `str`
 - Default: `4w`
-- Description: Sets how long a sign-in token stays valid, as a number followed by a unit: `ms`, `s`, `m`, `h`, `d` or `w`, for example `4w` or `12h`. Use `-1` for no expiration. A number without a unit, such as `30`, is not valid, and **Admin Panel > Settings > Authentication** does not save it.
+- Description: Sets how long a sign-in token stays valid, as a number followed by a unit: `ms`, `s`, `m`, `h`, `d` or `w`, for example `4w` or `12h`. Use `-1` for no expiration. A number without a unit, such as `30`, is not valid, and **Settings > Authentication** (admin section) does not save it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning
@@ -2549,7 +2549,7 @@ FORWARD_SESSION_INFO_HEADER_MESSAGE_ID=X-Amzn-Bedrock-AgentCore-Runtime-Custom-M
 
 Beyond the fixed user and session headers above, each connection can forward **arbitrary custom headers** whose values may embed **template placeholders** that Open WebUI substitutes for each request. Unlike the variables above, this is configured **per connection, not through an environment variable**, and it works **independently of `ENABLE_FORWARD_USER_INFO_HEADERS`** (custom headers are sent even when that toggle is `false`). They are applied **last**, so a custom header takes precedence over a built-in forwarded header of the same name.
 
-Set them in **Settings > Admin > Connections** by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
+Set them in **Settings > Connections** (admin section) by editing a connection and filling the **Headers** field with a JSON object, or in the connection's `headers` object inside [`OPENAI_API_CONFIGS`](#openai_api_configs) / [`OLLAMA_API_CONFIGS`](#ollama_api_configs). For example:
 
 ```json
 {
@@ -2682,7 +2682,7 @@ directly. Ensure that no users are present in the database if you intend to turn
 - Type: `bool`
 - Default: `False`
 - Description: Requires every user to enter a code from an authenticator app after their password, LDAP, OAuth or trusted-header sign-in. Users without an authenticator set one up at their next sign-in. The **Multi-factor authentication** section in **Settings > Account** only shows to users whose sign-in requires an authenticator, so it is hidden from everyone while this is off. Needs [`WEBUI_AUTH`](#webui_auth) and [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) on; while it is on, Open WebUI refuses to start if either is off or if a stored authenticator secret cannot be decrypted with the current key (see [`MFA_ENCRYPTION_KEY`](#mfa_encryption_key)). See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa).
-- Also a toggle: **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Admin > Authentication**, which applies immediately and needs no restart.
+- Also a toggle: **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Authentication** (admin section), which applies immediately and needs no restart.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning
@@ -2694,7 +2694,7 @@ Changing this setting, or either of the two exemptions below, signs every user o
 - Type: `bool`
 - Default: `False`
 - Description: Lets users who sign in through OAuth or OIDC skip the authenticator code while [`ENABLE_MFA`](#enable_mfa) is on. Use it when your identity provider already enforces its own second factor. It also lets the [OAuth token exchange](#enable_oauth_token_exchange) endpoint return a session token directly.
-- Also a toggle: **Allow OAuth sign-in without an authenticator** in **Settings > Admin > Authentication**, shown while MFA is on. See [Turning It On](/features/authentication-access/mfa#turning-it-on).
+- Also a toggle: **Allow OAuth sign-in without an authenticator** in **Settings > Authentication** (admin section), shown while MFA is on. See [Turning It On](/features/authentication-access/mfa#turning-it-on).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MFA_ALLOW_TRUSTED_HEADER_BYPASS`
@@ -2702,7 +2702,7 @@ Changing this setting, or either of the two exemptions below, signs every user o
 - Type: `bool`
 - Default: `False`
 - Description: Lets users who sign in through [trusted-header authentication](/features/authentication-access/auth/sso#trusted-header) skip the authenticator code while [`ENABLE_MFA`](#enable_mfa) is on. Use it when your authenticating proxy already enforces a second factor.
-- Also a toggle: **Allow trusted-header sign-in without an authenticator** in **Settings > Admin > Authentication**, shown while MFA is on. See [Turning It On](/features/authentication-access/mfa#turning-it-on).
+- Also a toggle: **Allow trusted-header sign-in without an authenticator** in **Settings > Authentication** (admin section), shown while MFA is on. See [Turning It On](/features/authentication-access/mfa#turning-it-on).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MFA_ENCRYPTION_KEY`
@@ -2858,7 +2858,7 @@ Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key). A key o
 
 - Type: `bool`
 - Default: `True`
-- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks. If the check cannot reach GitHub within one second, **Admin Panel > Settings > General** and **Settings > About** show **Could not check for updates** and the server logs `Version update check failed` as a warning.
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks. If the check cannot reach GitHub within one second, **Settings > General** (admin section) and **Settings > About** show **Could not check for updates** and the server logs `Version update check failed` as a warning.
 
 :::info
 
@@ -3327,7 +3327,7 @@ Set this to `true` before the first start of a new Milvus deployment. Standard m
 **Clean migration path from normal Milvus to multitenancy milvus:**
 - Before enabling multitenancy, export any critical knowledge content from the UI if possible
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true` and restart Open WebUI
-- Navigate to `Settings > Admin > Documents` and click **Reindex** next to **Reindex Knowledge and Memory Vectors**
+- Navigate to `Settings > Documents` (admin section) and click **Reindex** next to **Reindex Knowledge and Memory Vectors**
 
 **This rebuilds knowledge base vectors and user memory vectors into the new multitenancy collections, together with the per-file vectors of every file inside those knowledge bases**
 **Web search history and files that were never added to a knowledge base are NOT migrated by this operation**
@@ -3342,7 +3342,7 @@ After successful migration (from milvus to multitenancy milvus), legacy collecti
 
 **Current UI limitations:**
 - No one-click "migrate and cleanup" button exists
-- Vector DB reset from UI (Settings > Admin > Documents > Reset Vector Storage/Knowledge) only affects the active mode's collections
+- Vector DB reset from UI (Settings > Documents > Reset Vector Storage/Knowledge (admin section)) only affects the active mode's collections
 - Legacy collections require manual cleanup via Milvus client tools
 
 :::
@@ -3366,7 +3366,7 @@ For fresh installations, no migration concerns exist
 
 **To perform a full reset and switch to multitenancy:**
 - Backup any critical knowledge base content externally
-- Navigate to `Settings > Admin > Documents`
+- Navigate to `Settings > Documents` (admin section)
 - Click `Reset Vector Storage/Knowledge` (this deletes all active mode collections and stored knowledge metadata)
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
@@ -4086,7 +4086,7 @@ In a custom Docker image, change the version in the line that installs it and re
 
 - Type: `str` (comma-separated MIME types, wildcards allowed)
 - Default: unset
-- Description: Which uploaded **images and videos** are handed to the content extraction engine. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. It takes effect only with a content extraction engine selected. When unset, media goes to the extraction engine only when the engine is `external`. Media that is not handed over is stored without text extraction: an image then fails processing and a video is kept for vision models. An empty list disables media extraction for every engine, `external` included. `video/*` sends video uploads to the engine if yours can handle them. Audio follows the speech-to-text settings instead. Also set in **Settings > Admin > Documents** (**Supported Media MIME Types**).
+- Description: Which uploaded **images and videos** are handed to the content extraction engine. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. It takes effect only with a content extraction engine selected. When unset, media goes to the extraction engine only when the engine is `external`. Media that is not handed over is stored without text extraction: an image then fails processing and a video is kept for vision models. An empty list disables media extraction for every engine, `external` included. `video/*` sends video uploads to the engine if yours can handle them. Audio follows the speech-to-text settings instead. Also set in **Settings > Documents** (admin section) (**Supported Media MIME Types**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MISTRAL_OCR_API_KEY`
@@ -4107,14 +4107,14 @@ In a custom Docker image, change the version in the line that installs it and re
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Admin → Documents**.
+- Description: When enabled, PDFs are sent to the Mistral OCR API **inline as a base64 data URL** instead of being uploaded to Mistral's file store first. Useful when the separate upload step is undesirable (proxy/air-gapped setups) or fails; it trades the extra upload request for a single larger request. Also configurable as **Use Base64** in **Settings → Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MISTRAL_OCR_PARAMS`
 
 - Type: `str` (JSON object)
 - Default: Empty (the request is sent unchanged)
-- Description: JSON object merged into every Mistral OCR request, e.g. `{"model": "mistral-ocr-2512"}` to pick the OCR model. Also configurable as **Parameters** in **Settings → Admin → Documents** when Mistral OCR is the extraction engine.
+- Description: JSON object merged into every Mistral OCR request, e.g. `{"model": "mistral-ocr-2512"}` to pick the OCR model. Also configurable as **Parameters** in **Settings → Documents** (admin section) when Mistral OCR is the extraction engine.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXTERNAL_DOCUMENT_LOADER_URL`
@@ -4391,7 +4391,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `dict` (JSON object)
 - Default: `{}` (engine defaults)
-- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`) and `model_version` (`pipeline`). Also configurable in **Settings → Admin → Documents** (**Parameters**) when MinerU is the content-extraction engine.
+- Description: Extra options passed to the **MinerU** document loader as a JSON object. Recognized keys include `enable_ocr` (default `false`), `enable_formula` (`true`), `enable_table` (`true`), `language` (`en`) and `model_version` (`pipeline`). Also configurable in **Settings → Documents** (admin section) (**Parameters**) when MinerU is the content-extraction engine.
 
   For a self-hosted MinerU 4.x server, Open WebUI uses only these keys:
   - `tier`: parsing quality, `flash`, `basic`, `standard` or `advanced`. Leave it out to use the server's default.
@@ -4670,7 +4670,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Extracts images from PDFs using OCR when loading documents. Also configurable as **PDF Extract Images (OCR)** in **Admin Panel > Settings > Documents**. The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
+- Description: Extracts images from PDFs using OCR when loading documents. Also configurable as **PDF Extract Images (OCR)** in **Settings > Documents** (admin section). The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAPIDOCR_PARAMS`
@@ -4715,21 +4715,21 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Sets the maximum number of files per upload batch into a knowledge base. Covers file and folder uploads, directory sync and the batch add endpoint. Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Admin Settings > Documents > Knowledge Batch Upload Limit**.
+- Description: Sets the maximum number of files per upload batch into a knowledge base. Covers file and folder uploads, directory sync and the batch add endpoint. Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Settings > Documents > Knowledge Batch Upload Limit** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `KNOWLEDGE_MAX_FILE_COUNT`
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Sets the maximum total number of files in each knowledge base. A knowledge base can set a lower limit of its own; see [File limits](/features/workspace/knowledge#file-limits). Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Admin Settings > Documents > Knowledge File Count Limit**.
+- Description: Sets the maximum total number of files in each knowledge base. A knowledge base can set a lower limit of its own; see [File limits](/features/workspace/knowledge#file-limits). Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Settings > Documents > Knowledge File Count Limit** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `KNOWLEDGE_MAX_FILE_SIZE`
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Sets the maximum size in megabytes of a file added to a knowledge base. [`RAG_FILE_MAX_SIZE`](#rag_file_max_size) applies as well, and a knowledge base can set a lower limit of its own; see [File limits](/features/workspace/knowledge#file-limits). Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Admin Settings > Documents > Knowledge File Size Limit**.
+- Description: Sets the maximum size in megabytes of a file added to a knowledge base. [`RAG_FILE_MAX_SIZE`](#rag_file_max_size) applies as well, and a knowledge base can set a lower limit of its own; see [File limits](/features/workspace/knowledge#file-limits). Must be a positive integer; `0` or a negative value stops Open WebUI at startup. Also set in **Settings > Documents > Knowledge File Size Limit** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_CONTENT_SEARCH_MAX_CHARS`
@@ -4763,7 +4763,7 @@ These values are exposed through app config and consumed by the frontend chat up
 
 - Type: `str` (comma-separated)
 - Default: Empty (all supported file types are allowed)
-- Description: Specifies which file extensions are permitted for upload. Use lower-case extensions without a leading dot, for example `pdf,docx,txt`. Also set in **Admin Settings** > **Documents** > **Allowed File Extensions**.
+- Description: Specifies which file extensions are permitted for upload. Use lower-case extensions without a leading dot, for example `pdf,docx,txt`. Also set in **Settings** > **Documents** > **Allowed File Extensions** (admin section).
 
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -4828,7 +4828,7 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 :::tip
 
-If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches. This limit and [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size) also apply when memories are reindexed: from **Reindex Knowledge and Memory Vectors** in **Settings > Admin > Documents**, through the API or automatically when a memory is saved after a switch to an embedding model with a different vector size.
+If you are hitting rate limits from your embedding provider (e.g., 429 errors), set this to a value that keeps you within your API tier's rate limit (e.g., `5` or `10`). This is especially helpful when uploading large documents that generate many embedding batches. This limit and [`RAG_EMBEDDING_BATCH_SIZE`](#rag_embedding_batch_size) also apply when memories are reindexed: from **Reindex Knowledge and Memory Vectors** in **Settings > Documents** (admin section), through the API or automatically when a memory is saved after a switch to an embedding model with a different vector size.
 
 :::
 
@@ -4848,14 +4848,14 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the prefix string prepended to document content before generating embeddings. Some embedding models (e.g., nomic-embed-text) require task-specific prefixes to differentiate between content being stored vs. queries being searched. For nomic-embed-text, set this to `search_document: `. Only needed if your embedding model's documentation specifies a content/document prefix. Also configurable as **Content Prefix** in **Admin Panel > Settings > Documents**, under **Advanced** in the embedding settings. Include any trailing space the model expects. Reindex existing data after changing it.
+- Description: Sets the prefix string prepended to document content before generating embeddings. Some embedding models (e.g., nomic-embed-text) require task-specific prefixes to differentiate between content being stored vs. queries being searched. For nomic-embed-text, set this to `search_document: `. Only needed if your embedding model's documentation specifies a content/document prefix. Also configurable as **Content Prefix** in **Settings > Documents** (admin section), under **Advanced** in the embedding settings. Include any trailing space the model expects. Reindex existing data after changing it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_EMBEDDING_QUERY_PREFIX`
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the prefix string prepended to user queries before generating embeddings for retrieval. This is the counterpart to `RAG_EMBEDDING_CONTENT_PREFIX`. For nomic-embed-text, set this to `search_query: `. Only needed if your embedding model's documentation specifies a query prefix. Also configurable as **Query Prefix** in **Admin Panel > Settings > Documents**, under **Advanced** in the embedding settings. Include any trailing space the model expects.
+- Description: Sets the prefix string prepended to user queries before generating embeddings for retrieval. This is the counterpart to `RAG_EMBEDDING_CONTENT_PREFIX`. For nomic-embed-text, set this to `search_query: `. Only needed if your embedding model's documentation specifies a query prefix. Also configurable as **Query Prefix** in **Settings > Documents** (admin section), under **Advanced** in the embedding settings. Include any trailing space the model expects.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_EMBEDDING_PREFIX_FIELD_NAME`
@@ -5080,14 +5080,14 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Always includes the complete text of documents instead of retrieving chunks. Shown as **Always Use Full Text** in **Admin Settings** > **Documents**.
+- Description: Always includes the complete text of documents instead of retrieving chunks. Shown as **Always Use Full Text** in **Settings** > **Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FULL_TEXT_CHAR_THRESHOLD`
 
 - Type: `int`
 - Default: `50000`
-- Description: Sets the number of characters up to which the complete extracted text of an uploaded file or text attachment is included in the prompt. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** in **Admin Settings** > **Documents**. The aliases `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
+- Description: Sets the number of characters up to which the complete extracted text of an uploaded file or text attachment is included in the prompt. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** in **Settings** > **Documents** (admin section). The aliases `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_SYSTEM_CONTEXT`
@@ -5359,7 +5359,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Default: `auto`
 - Options: `auto` (Random), `bing`, `brave`, `duckduckgo`, `google`, `grokipedia`, `mojeek`, `wikipedia`, `yahoo`, `yandex`.
 - Description: Specifies the backend to be used by the DDGS engine.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > DDGS Backend** when DDGS is selected as the search engine.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > DDGS Backend** (admin section) when DDGS is selected as the search engine.
 
 #### `BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL`
 
@@ -5380,7 +5380,7 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 - Type: `str`
 - Default: `http://localhost:7000`
 - Description: Base URL of a self-hosted [OpenSERP](https://github.com/karust/openserp) instance, used when the web search engine is set to `openserp`. Open WebUI calls its `/mega/search` endpoint, which returns results from Google, Bing, Yandex, Baidu, DuckDuckGo and Ecosia together. No API key is involved, the base URL is the only required setting. See the [OpenSERP provider guide](/features/chat-conversations/web-search/providers/openserp).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > OpenSERP URL** when `openserp` is selected as the search engine.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > OpenSERP URL** (admin section) when `openserp` is selected as the search engine.
 
 #### `SEARXNG_QUERY_URL`
 
@@ -5442,7 +5442,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `int`
 - Default: `8192`
-- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Admin → Web Search → Context Tokens** (only shown when the `brave_llm_context` engine is selected).
+- Description: Maximum total tokens to retrieve per query when `WEB_SEARCH_ENGINE=brave_llm_context`. Sent to Brave's LLM Context API as `maximum_number_of_tokens`. Valid range is `1024` to `32768`. Higher values pull richer extracted passages at the cost of API quota; lower values keep responses lean. Configurable via **Settings → Web Search → Context Tokens** (admin section) (only shown when the `brave_llm_context` engine is selected).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.brave_search_context_tokens`.
 
 #### `KAGI_SEARCH_API_KEY`
@@ -5538,7 +5538,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str` (JSON object)
 - Default: `''` (parsed to `{}`; effective defaults are `{"url": "https://api.linkup.so/v1/search", "depth": "standard", "outputType": "sourcedAnswer"}`)
-- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Admin → Web Search** when the `linkup` engine is selected.
+- Description: Optional JSON object merged over the Linkup request defaults. Recognized keys include `depth` (`standard` or `deep`), `outputType` (`sourcedAnswer` or `searchResults`), and `url` (overrides the API endpoint). `q` (the query) and `maxResults` are injected automatically and cannot be overridden. Invalid JSON falls back to `{}`. Configurable via **Settings → Web Search** (admin section) when the `linkup` engine is selected.
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `rag.web.search.linkup_search_params`.
 
 #### `JINA_API_KEY`
@@ -5552,7 +5552,7 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 - Type: `str`
 - Default: `https://s.jina.ai/`
 - Description: Sets the Base URL for Jina Search API. Useful for specifying custom or regional endpoints (e.g., `https://eu-s-beta.jina.ai/`).
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Jina API Base URL**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Jina API Base URL** (admin section).
 
 #### `BING_SEARCH_V7_ENDPOINT`
 
@@ -5579,14 +5579,14 @@ Brave's free tier enforces a rate limit of 1 request per second. Open WebUI auto
 
 - Type: `str`
 - Default: `None`
-- Description: Sets the API key for [Exa](/features/chat-conversations/web-search/providers/exa). The same key is used by the Exa search engine (`WEB_SEARCH_ENGINE=exa`) and the Exa web loader ([`WEB_LOADER_ENGINE=exa`](#web_loader_engine)). When Exa is the web loader but another search engine is selected, the web loader settings in **Settings > Admin > Web Search** show their own **Exa API Key** field, which sets this same key.
+- Description: Sets the API key for [Exa](/features/chat-conversations/web-search/providers/exa). The same key is used by the Exa search engine (`WEB_SEARCH_ENGINE=exa`) and the Exa web loader ([`WEB_LOADER_ENGINE=exa`](#web_loader_engine)). When Exa is the web loader but another search engine is selected, the web loader settings in **Settings > Web Search** (admin section) show their own **Exa API Key** field, which sets this same key.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXA_MAX_CONTENT_LENGTH`
 
 - Type: `int`
 - Default: `None` (the full text of every result is kept)
-- Description: Caps how many characters of page text Exa returns per result, which is the lever for keeping a wide search from filling the context window. Leave it unset for no limit. A value that is not a positive integer stops the server at startup rather than being ignored, so a typo here is loud instead of silent. The same setting sits in **Settings > Admin > Web Search** and appears once the engine is Exa.
+- Description: Caps how many characters of page text Exa returns per result, which is the lever for keeping a wide search from filling the context window. Leave it unset for no limit. A value that is not a positive integer stops the server at startup rather than being ignored, so a typo here is loud instead of silent. The same setting sits in **Settings > Web Search** (admin section) and appears once the engine is Exa.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SERPAPI_API_KEY`
@@ -5663,7 +5663,7 @@ The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and th
 - Type: `str`
 - Default: `basic`
 - Options: `ultra-fast`, `fast`, `basic`, `advanced`
-- Description: Sets the `search_depth` sent with every [Tavily](/features/chat-conversations/web-search/providers/tavily#optional-configurations) search, from `ultra-fast` (quickest) to `advanced` (most thorough). Also set under **Tavily Search Depth** in **Settings > Admin > Web Search**. It is separate from `TAVILY_EXTRACT_DEPTH`, so search and extraction depth can be set independently.
+- Description: Sets the `search_depth` sent with every [Tavily](/features/chat-conversations/web-search/providers/tavily#optional-configurations) search, from `ultra-fast` (quickest) to `advanced` (most thorough). Also set under **Tavily Search Depth** in **Settings > Web Search** (admin section). It is separate from `TAVILY_EXTRACT_DEPTH`, so search and extraction depth can be set independently.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `YACY_QUERY_URL`
@@ -5890,7 +5890,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `int`
 - Default: `None`
 - Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Firecrawl Timeout**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Firecrawl Timeout** (admin section).
 
 #### `PLAYWRIGHT_TIMEOUT`
 
@@ -5920,7 +5920,7 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 - Type: `str`
 - Default: unset (requests come from the server's own address)
 - Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Admin > Web Search > Youtube Proxy URL**.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Youtube Proxy URL** (admin section).
 
 #### `YOUTUBE_LOADER_LANGUAGE`
 
@@ -6190,7 +6190,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Settings → Admin → Interface → Voice Mode Prompt** (toggle).
+- Description: Master switch for the voice-mode system prompt. When `True`, voice-mode chats prepend either the custom `VOICE_MODE_PROMPT_TEMPLATE` (if set) or `DEFAULT_VOICE_MODE_PROMPT_TEMPLATE`. When `False`, no voice-specific system prompt is injected: the model uses only the regular system prompt and chat history. Configurable in **Settings → Interface → Voice Mode Prompt** (admin section) (toggle).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `task.voice.prompt.enable`.
 
 #### `VOICE_MODE_PROMPT_TEMPLATE`
@@ -6201,7 +6201,7 @@ Note: If none of the specified languages are available and `en` was not in your 
 
 ### Realtime Voice Calls
 
-These variables configure **Realtime** call mode for [Voice Mode](/features/chat-conversations/chat-features/voice-mode#realtime-calls), set in **Settings > Admin > Audio > Voice calls**.
+These variables configure **Realtime** call mode for [Voice Mode](/features/chat-conversations/chat-features/voice-mode#realtime-calls), set in **Settings > Audio > Voice calls** (admin section).
 
 #### `AUDIO_REALTIME_ENABLED`
 
@@ -6788,7 +6788,7 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Admin > Authentication**, alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
+- Description: Master switch for signing in through an OAuth or OIDC provider. When set to `False`, both the provider login and the callback are refused, so single sign-on can be turned off without deleting the client ID, secret and endpoint settings. The equivalent toggle sits in **Settings > Authentication** (admin section), alongside the LDAP one. Leave it enabled unless you want to suspend SSO while keeping its configuration.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_SIGNUP`
@@ -6827,7 +6827,7 @@ Set this variable to `True` to persist OAuth settings in the database and manage
 
 :::info Read-only Admin Panel while this is `False`
 
-The environment is authoritative, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only: values stay visible, no control accepts input, and saving the page leaves them untouched. Change them in the environment and restart, or set this to `True` to manage them in the Admin Panel.
+The environment is authoritative, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only: values stay visible, no control accepts input, and saving the page leaves them untouched. Change them in the environment and restart, or set this to `True` to manage them in the Admin Panel.
 
 [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is the one in charge. While it is `False` nothing is saved whatever this variable says, so both have to be `True` for an edit to last.
 
@@ -7523,7 +7523,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `str`
 - Default: Empty string (`''`)
-- Description: Gives LDAP users without an email address one built from their sign-in name. When the attribute set by `LDAP_ATTRIBUTE_FOR_MAIL` is empty for a user, Open WebUI uses `username@domain`, where `username` is the name typed on the sign-in page. Leave it empty to turn this off; such users then cannot sign in and get the error `User does not have a valid email address.` If an Open WebUI account with that address already exists, for example one created through sign-up or SSO, the LDAP user signs in to that account. Set a domain you control, so no LDAP user can take over an account that belongs to someone else. Also configurable as **Default Email Domain** in **Admin Panel > Settings > Authentication > LDAP**.
+- Description: Gives LDAP users without an email address one built from their sign-in name. When the attribute set by `LDAP_ATTRIBUTE_FOR_MAIL` is empty for a user, Open WebUI uses `username@domain`, where `username` is the name typed on the sign-in page. Leave it empty to turn this off; such users then cannot sign in and get the error `User does not have a valid email address.` If an Open WebUI account with that address already exists, for example one created through sign-up or SSO, the LDAP user signs in to that account. Set a domain you control, so no LDAP user can take over an account that belongs to someone else. Also configurable as **Default Email Domain** in **Settings > Authentication > LDAP** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_USERNAME`
@@ -7593,21 +7593,21 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
+- Description: Enables the group management feature. Also configurable in the LDAP section of **Settings > Authentication** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_LDAP_GROUP_CREATION`
 
 - Type: `bool`
 - Default: `False`
-- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Admin > Authentication**.
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Authentication** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_GROUPS`
 
 - Type: `str`
 - Default: `memberOf`
-- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Admin > Authentication**, where group management cannot be saved while this is left empty.
+- Description: Specifies the LDAP attribute that contains the user's group memberships. `memberOf` is a standard attribute for this purpose in Active Directory environments. Also configurable in the LDAP section of **Settings > Authentication** (admin section), where group management cannot be saved while this is left empty.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ## SCIM
@@ -9239,7 +9239,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections, including the terminals of [Tether computers](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Admin > Integrations** are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections, including the terminals of [Tether computers](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 

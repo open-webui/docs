@@ -67,7 +67,7 @@ If the terminal button or your computer is missing in the chat input, check thes
 | The browser is signed in to a different account than Tether | Sign in to the same account in both. |
 | Open Terminal is not installed in Tether | Install it in Tether under **Settings > Open Terminal**. |
 | The instance does not offer Tether | An admin brings the instance in line with the [requirements](#requirements). |
-| The **Tools** and **Open Terminal** sections of **Settings > Admin > Integrations** are greyed out | An admin removes `ENABLE_TOOL_SERVERS=False` and `ENABLE_PLUGINS=False` from the instance's environment and restarts it. |
+| The **Tools** and **Open Terminal** sections of **Settings > Integrations** (admin section) are greyed out | An admin removes `ENABLE_TOOL_SERVERS=False` and `ENABLE_PLUGINS=False` from the instance's environment and restarts it. |
 
 If the computer is selected and the model does not use it, the model's **Terminal** capability is off. Turn it on in the model editor, see [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
 

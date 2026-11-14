@@ -13,7 +13,7 @@ Admins add the Terminals server as a connection and give people **Write** access
 
 ## Connection Access
 
-Add the connection in **Settings > Admin > Integrations** as described in [Connecting to Open WebUI](/features/open-terminal/setup/connecting) and the [Authentication](/features/open-terminal/terminals#authentication) section. The connection form has the Name, ID, URL, API Key, Auth, **Verify Connection**, Chat Uploads, **Access** and **Advanced** options. Terminals themselves are created from the chat.
+Add the connection in **Settings > Integrations** (admin section) as described in [Connecting to Open WebUI](/features/open-terminal/setup/connecting) and the [Authentication](/features/open-terminal/terminals#authentication) section. The connection form has the Name, ID, URL, API Key, Auth, **Verify Connection**, Chat Uploads, **Access** and **Advanced** options. Terminals themselves are created from the chat.
 
 **Access** on the connection has two permissions:
 

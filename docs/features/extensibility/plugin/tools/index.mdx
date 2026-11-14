@@ -25,9 +25,9 @@ Users often encounter the term "Tools" in different contexts. Here is how to dis
 | :--- | :--- | :--- | :--- |
 | **Native Features** | Admin/Settings | Core platform functionality (these are the [built-in system tools](#built-in-system-tools-nativeagentic-mode)) | Built-in to Open WebUI |
 | **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts, **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
-| **Native MCP (HTTP)** | `Settings > Admin > Integrations` | Standard MCP servers reachable via HTTP/SSE | External tool server |
-| **MCP via Proxy (MCPO)** | `Settings > Admin > Integrations` | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
-| **OpenAPI Servers** | `Settings > Admin > Integrations` | Standard REST/OpenAPI web services | External tool server |
+| **Native MCP (HTTP)** | `Settings > Integrations` (admin section) | Standard MCP servers reachable via HTTP/SSE | External tool server |
+| **MCP via Proxy (MCPO)** | `Settings > Integrations` (admin section) | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
+| **OpenAPI Servers** | `Settings > Integrations` (admin section) | Standard REST/OpenAPI web services | External tool server |
 
 The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool servers**: the tool code runs on a separate process or machine and Open WebUI calls it over HTTP. **Native Features** are the built-in system tools that ship with Open WebUI. **Workspace Tools** are Python that runs in-process; for the most demanding use cases they are by far the most capable option with the fewest limitations (see below).
 

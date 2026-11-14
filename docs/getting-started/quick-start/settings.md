@@ -104,7 +104,7 @@ Check whether the admin has enabled it globally first. Your personal toggle only
 Settings > Connections (admin section). These are instance-wide and shared by all users.
 
 **"I want to use my own API key without sharing it with the server."**
-Connections added in the Tether app keep the keys on your computer, see [Your Own Connections](/ecosystem/tether#your-own-connections). An admin can add shared connections under **Settings > Admin > Connections**.
+Connections added in the Tether app keep the keys on your computer, see [Your Own Connections](/ecosystem/tether#your-own-connections). An admin can add shared connections under **Settings > Connections** (admin section).
 
 **"I set a system prompt but my admin's model settings override it."**
 A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat under **Model controls > Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.

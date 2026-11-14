@@ -21,11 +21,11 @@ Click your **name** at the bottom of the left sidebar to open the user menu, the
 
 ![User menu showing the Settings option](/images/open-terminal-user-menu.png)
 
-### 2. Go to Settings > Admin > Integrations
+### 2. Go to Settings > Integrations (admin section)
 
 In the settings sidebar, find the **Admin** section and click **Integrations**.
 
-![Settings > Admin > Integrations](/images/open-terminal-integrations-page.png)
+![Settings > Integrations](/images/open-terminal-integrations-page.png)
 
 ### 3. Find the "Open Terminal" section
 

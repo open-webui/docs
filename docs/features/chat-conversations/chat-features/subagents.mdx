@@ -9,7 +9,7 @@ Sub-agents let a model hand a focused piece of work to a second agent that runs 
 
 A sub-agent is a full chat completion of its own. It runs with the same tools, skills and filters as the chat that spawned it, on the current model or one of the [sub-agent models](/features/workspace/models#capabilities-and-bindings) set on it, works through the task on its own, and hands back its final answer as the tool result. The work happens in a separate chat that is kept out of your chat list, so the parent conversation stays readable.
 
-Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Admin > Sub-agents** toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
+Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Sub-agents** (admin section) toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
 
 ## What a Sub-agent Is Told
 
@@ -33,7 +33,7 @@ Typical uses are researching several questions at once, working through a task t
 
 **Foreground** is the default. The parent chat waits for the sub-agent and receives its answer as the tool result, the same as any other tool call.
 
-**Background** must be enabled separately with [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) or **Enable background sub-agents** in **Settings > Admin > Sub-agents**. The model gets an immediate handle instead of an answer and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible "Background sub-agent finished" row. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
+**Background** must be enabled separately with [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) or **Enable background sub-agents** in **Settings > Sub-agents** (admin section). The model gets an immediate handle instead of an answer and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible "Background sub-agent finished" row. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
 
 While background is disabled, the `background` option is stripped from the tool definition entirely, so the model cannot ask for it.
 
@@ -51,8 +51,8 @@ A file ID written into `context` is only text. The sub-agent receives the ID and
 
 Sub-agents need four things to line up:
 
-1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Admin > Sub-agents**.
-2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Settings > Admin > Models > Edit** (or **Workspace > Models** for your own model), on by default once the feature is on.
+1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Sub-agents** (admin section).
+2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Settings > Models > Edit** (admin section) (or **Workspace > Models** for your own model), on by default once the feature is on.
 3. **The user's permission**: the **Sub-agents** switch under **Features** in the [default and group permissions](/features/authentication-access/rbac/permissions#4-features-permissions), or [`USER_PERMISSIONS_FEATURES_SUBAGENTS`](/reference/env-configuration#user_permissions_features_subagents). Users without it get neither `delegate_task` nor the `timer` tool.
 4. **Native function calling in a saved chat**: `delegate_task` is a builtin tool, so it needs Native mode and a request that carries a `session_id`, as every chat started in the interface does. It is not offered in legacy function calling or in temporary chats.
 
@@ -60,7 +60,7 @@ Admins always pass the permission check.
 
 ## Admin Limits
 
-Configure these in **Settings > Admin > Sub-agents**, or with the matching environment variables:
+Configure these in **Settings > Sub-agents** (admin section), or with the matching environment variables:
 
 | Setting | Variable | Default | Purpose |
 |---|---|---|---|

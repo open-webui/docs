@@ -15,11 +15,11 @@ The model writes a small piece of HTML, SVG and JavaScript through the `render_v
 
 ## Turn It On
 
-Visualizations are off by default. Turn them on per model in the model editor, under **Builtin Tools** > **Visualizations**. Open the editor for a base model in **Settings > Admin > Models** or for your own model in **Workspace > Models**. The tool needs [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) and the model's **Builtin Tools** capability.
+Visualizations are off by default. Turn them on per model in the model editor, under **Builtin Tools** > **Visualizations**. Open the editor for a base model in **Settings > Models** (admin section) or for your own model in **Workspace > Models**. The tool needs [native function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) and the model's **Builtin Tools** capability.
 
 ## Change the Instructions
 
-The instructions the model receives for the tool decide when and how it draws. Admins can rewrite them in **Settings > Admin > Interface > Visualization Prompt** or with [`VISUALIZATION_PROMPT_TEMPLATE`](/reference/env-configuration#visualization_prompt_template). An empty value uses the default.
+The instructions the model receives for the tool decide when and how it draws. Admins can rewrite them in **Settings > Interface > Visualization Prompt** (admin section) or with [`VISUALIZATION_PROMPT_TEMPLATE`](/reference/env-configuration#visualization_prompt_template). An empty value uses the default.
 
 ## Isolation and Security
 
