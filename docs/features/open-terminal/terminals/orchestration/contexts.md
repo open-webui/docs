@@ -18,7 +18,7 @@ The orchestrator provides the separate workspaces per chat and per automation. O
 
 ## Configure
 
-1. Open **Settings > Admin > Integrations** and scroll to the **Terminal** section.
+1. Open **Settings > Integrations** (admin section) and scroll to the **Terminal** section.
 2. Add or edit a connection, then use **Verify Connection** next to the URL so Open WebUI detects the server type. The **Orchestrator** section only appears once the connection is detected as an orchestrator, or when it already carries a **Policy ID**.
 3. Expand **Orchestrator** and set **Terminal Contexts**.
 

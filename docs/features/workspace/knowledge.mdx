@@ -51,7 +51,7 @@ Knowledge bases, notes and single files can be attached to a chat, to a [folder]
 - Or click **+** (**More**) and open **Add Context**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**.
 - Or drag a note, folder or chat from the sidebar into the message input.
 
-**On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Admin > Models > Edit**) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Collections** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
+**On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Models > Edit** (admin section)) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Collections** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
 
 **Workspace > Knowledge** lists knowledge bases only. Notes live in [Notes](/features/notes).
 
@@ -123,7 +123,7 @@ Injects the complete content of the file into every message. No chunking, no sem
 
 Best for short reference documents, style guides, or context that's always relevant.
 
-Files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full without choosing this mode, and **Always Use Full Text** applies it to every document. Knowledge base attachments are not affected by the threshold.
+Files and text attachments up to **Full Text Threshold (Characters)** in **Settings** > **Documents** (admin section) are included in full without choosing this mode, and **Always Use Full Text** applies it to every document. Knowledge base attachments are not affected by the threshold.
 
 ---
 
@@ -245,7 +245,7 @@ Asking "what changed lately" in a knowledge base of a few thousand files is `ls 
 - The model still has `query_knowledge_files` for semantic search; reach for it when literal commands won't find a paraphrased concept.
 - Built on top of the directory model. `kb_exec` is the only tool that fully reflects the directory structure created in the UI.
 
-Autonomous exploration works best with frontier models that can intelligently chain search, browse, and synthesize. Smaller models may struggle with multi-step retrieval. Administrators can disable the **Knowledge Base** tool category per-model in **Settings > Admin > Models > Edit > Builtin Tools** (or **Workspace > Models** for your own model).
+Autonomous exploration works best with frontier models that can intelligently chain search, browse, and synthesize. Smaller models may struggle with multi-step retrieval. Administrators can disable the **Knowledge Base** tool category per-model in **Settings > Models > Edit > Builtin Tools** (admin section) (or **Workspace > Models** for your own model).
 
 #### Guiding tool choice across mixed knowledge bases
 
@@ -283,7 +283,7 @@ To change who can see or edit a knowledge base, open the three-dot menu on its r
 
 ### File limits
 
-Admins set global limits in **Admin Settings > Documents**: **Knowledge Batch Upload Limit** (files per upload), **Knowledge File Size Limit** (MB per file) and **Knowledge File Count Limit** (total files per knowledge base). Empty means no limit. The same values can be set with [`KNOWLEDGE_MAX_UPLOAD_COUNT`](/reference/env-configuration#knowledge_max_upload_count), [`KNOWLEDGE_MAX_FILE_SIZE`](/reference/env-configuration#knowledge_max_file_size) and [`KNOWLEDGE_MAX_FILE_COUNT`](/reference/env-configuration#knowledge_max_file_count).
+Admins set global limits in **Settings > Documents** (admin section): **Knowledge Batch Upload Limit** (files per upload), **Knowledge File Size Limit** (MB per file) and **Knowledge File Count Limit** (total files per knowledge base). Empty means no limit. The same values can be set with [`KNOWLEDGE_MAX_UPLOAD_COUNT`](/reference/env-configuration#knowledge_max_upload_count), [`KNOWLEDGE_MAX_FILE_SIZE`](/reference/env-configuration#knowledge_max_file_size) and [`KNOWLEDGE_MAX_FILE_COUNT`](/reference/env-configuration#knowledge_max_file_count).
 
 The owner of a knowledge base or an admin can set a lower **File count limit** and **File size limit (MB)** for one knowledge base, under **Advanced** when creating it or later through the three-dot menu > **Settings** on the knowledge base page. When both a global and a local limit are set, the lower one applies. External knowledge bases have no local limits.
 

@@ -46,7 +46,7 @@ Ensure you have:
 ### 2. Configure Open WebUI
 
 1. Log in to Open WebUI with an admin account.
-2. Open **Settings → Admin → Web Search**.
+2. Open **Settings → Web Search** (admin section).
 3. Enable **Web Search** by toggling it **On**.
 4. Select **linkup** from the **Web Search Engine** dropdown.
 5. Paste your Linkup API key into the **Linkup API Key** field.

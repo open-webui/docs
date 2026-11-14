@@ -20,7 +20,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 Start with a working Open WebUI installation and administrator access. The machine, container, and any services it uses must have the files and dependencies they need before internet access is removed:
 
 - **Chat:** a local inference server and downloaded model. Follow the existing [Ollama connection guide](/getting-started/quick-start/connect-a-provider/starting-with-ollama), then select a local model rather than an Ollama cloud model or another hosted endpoint.
-- **Document retrieval:** a downloaded embedding model or reachable local embedding service, local document extraction, and a local reranker if you enable reranking. Check the providers selected in **Admin Settings → Documents**; a local chat model alone does not keep document processing local.
+- **Document retrieval:** a downloaded embedding model or reachable local embedding service, local document extraction, and a local reranker if you enable reranking. Check the providers selected in **Settings → Documents** (admin section); a local chat model alone does not keep document processing local.
 - **Installation and storage:** the Open WebUI image or packages, required dependencies, and persistent model caches. Any optional extraction or tool service needs its own installation files and dependencies too.
 - **Sign-in:** an authentication method that remains reachable on the isolated network. Test it before removing access to an external identity provider.
 - **Speech, if needed:** local speech models, voices, and dependencies. Speech features are optional for chat and document retrieval.
@@ -39,7 +39,7 @@ If the machine can connect to the internet during setup, prepare the same instal
 
 ### Prepare embeddings {#ii-embedding-model}
 
-In **Admin Settings → Documents**, select your local embedding model, such as [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), and use the download control. If you use a separate local embedding service, prepare its model and confirm Open WebUI can reach it.
+In **Settings → Documents** (admin section), select your local embedding model, such as [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), and use the download control. If you use a separate local embedding service, prepare its model and confirm Open WebUI can reach it.
 
 Upload a small text-based PDF or text file, wait for processing, and ask a question whose answer is in the file. Follow the [document-question quickstart](/features/workspace/knowledge#ask-your-first-document-question) for the complete workflow. A successful ordinary chat does not confirm that document processing is ready.
 

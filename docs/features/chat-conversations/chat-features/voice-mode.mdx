@@ -7,7 +7,7 @@ title: "Voice Mode"
 
 Voice Mode turns a chat into a spoken conversation. You talk, Open WebUI transcribes what you said and sends it as your message, and the model's reply is read back to you a sentence at a time as it is written. The conversation stays an ordinary chat, so every turn is saved as text you can read and continue later.
 
-Admins pick one of two call modes under **Settings > Admin > Audio > Voice calls**:
+Admins pick one of two call modes under **Settings > Audio > Voice calls** (admin section):
 
 - **Standard** (the default) uses the instance's [speech-to-text](/features/chat-conversations/audio/speech-to-text/stt-config) and [text-to-speech](/features/chat-conversations/audio) settings, so it works with whichever engines your admin has set up. The page covers Standard mode first.
 - **Realtime** connects the call to a speech-to-speech model from an OpenAI-compatible Realtime API or Azure OpenAI, which hears you directly and hands real questions to the chat's model. Its own section, [Realtime Calls](#realtime-calls), follows further down.
@@ -57,7 +57,7 @@ The reply is spoken in:
 
 **Speech Playback Speed** in **Settings > Audio** sets how fast replies are read.
 
-The speech itself comes from the text-to-speech engine your admin chose in **Settings > Admin > Audio**. If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser. **Read Aloud** then uses it too. Kokoro.js uses the GPU when the browser offers one and the CPU otherwise.
+The speech itself comes from the text-to-speech engine your admin chose in **Settings > Audio** (admin section). If the admin leaves it on **Web API**, your browser's built-in voices are used. You can also pick **Kokoro.js (Browser)** as your **Text-to-Speech Engine** in **Settings > Audio** to generate speech in your browser. **Read Aloud** then uses it too. Kokoro.js uses the GPU when the browser offers one and the CPU otherwise.
 
 The admin's **Response Splitting** setting decides how much of the reply is spoken at once:
 
@@ -82,7 +82,7 @@ Two options in **Settings > Interface**, under **Voice**, apply only to Voice Mo
 
 While Voice Mode is on, Open WebUI adds voice instructions to the start of the system prompt. The built-in instructions tell the model it is in a live voice call and ask for short, warm, conversational answers that are easy to follow by ear.
 
-Admins can turn this off, or replace the instructions with their own, under **Settings > Admin > Interface > Voice Mode Prompt**. The same settings are available as [`ENABLE_VOICE_MODE_PROMPT`](/reference/env-configuration#enable_voice_mode_prompt) and [`VOICE_MODE_PROMPT_TEMPLATE`](/reference/env-configuration#voice_mode_prompt_template). An empty template uses the built-in instructions.
+Admins can turn this off, or replace the instructions with their own, under **Settings > Interface > Voice Mode Prompt** (admin section). The same settings are available as [`ENABLE_VOICE_MODE_PROMPT`](/reference/env-configuration#enable_voice_mode_prompt) and [`VOICE_MODE_PROMPT_TEMPLATE`](/reference/env-configuration#voice_mode_prompt_template). An empty template uses the built-in instructions.
 
 The Voice Mode Prompt applies in both call modes. In a Realtime call, the chat model gets it with every message while the call is connected, including messages you type during the call, and the voice model speaks the answer.
 
@@ -103,13 +103,13 @@ The same permission covers both call modes. In Realtime mode, Open WebUI checks 
 
 - **"Permission denied when accessing media devices"**: the browser blocked the microphone. Browsers only allow microphone access on HTTPS or `localhost`, so opening Open WebUI by its IP address from another device usually causes this. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues).
 - **"Select only one model to call"**: more than one model is selected. Remove the others and try again.
-- **"Call feature is not supported when using Web STT engine"**: a call link or the desktop app's call shortcut was used while the admin's speech-to-text engine is set to **Web API**. The **Voice mode** button is hidden in that case. An admin needs to choose a server-side engine in **Settings > Admin > Audio**.
+- **"Call feature is not supported when using Web STT engine"**: a call link or the desktop app's call shortcut was used while the admin's speech-to-text engine is set to **Web API**. The **Voice mode** button is hidden in that case. An admin needs to choose a server-side engine in **Settings > Audio** (admin section).
 - **It keeps listening and never sends**: Voice Mode sends after about two seconds of silence, so steady background noise can keep it recording. Mute while it is noisy, or move somewhere quieter.
 - **No sound from the model**: see [Text-to-Speech (TTS) Issues](/troubleshooting/audio#text-to-speech-tts-issues).
 
 Realtime calls show their own messages:
 
-- **"Configure the Realtime model, voice, and transcription model"**: **Voice Model**, **Voice** or **Input Transcription Model** in **Settings > Admin > Audio > Voice calls** is empty.
+- **"Configure the Realtime model, voice, and transcription model"**: **Voice Model**, **Voice** or **Input Transcription Model** in **Settings > Audio > Voice calls** (admin section) is empty.
 - **"Configure the Realtime API key"**: **API Key** is empty while the call signs in with a key.
 - **"Invalid Realtime provider URL"**: the **API Base URL** (**Azure OpenAI API Base URL** with Azure) needs to start with `http://` or `https://` and contain no query string, user name or password.
 - **"Realtime provider authentication rejected. Check the credentials and access."**: the provider answered 401 or 403. The API key is wrong, or with Microsoft Entra ID the server's identity has no access to the Azure OpenAI resource.
@@ -132,7 +132,7 @@ In **Realtime** call mode, a realtime voice model holds the spoken conversation.
 
 ### Setting Up Realtime Calls
 
-Admins set this up in **Settings > Admin > Audio**, in the **Voice calls** section at the top of the page. Set **Call mode** to **Realtime** and the remaining fields appear:
+Admins set this up in **Settings > Audio** (admin section), in the **Voice calls** section at the top of the page. Set **Call mode** to **Realtime** and the remaining fields appear:
 
 ![Admin audio settings with Call mode set to Realtime, showing the OpenAI API Base URL, API Key, Voice Model, Voice, Input Transcription Model and Prompt Template fields above the Speech-to-Text and Text-to-Speech sections](/images/features/audio/audio-realtime-call-mode.webp)
 

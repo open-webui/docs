@@ -320,7 +320,7 @@ Leave this command running:
 kubectl -n openwebui port-forward service/openwebui 3000:80
 ```
 
-Open [http://localhost:3000](http://localhost:3000), create the first administrator account, select a model, and send a message. If models are missing, check **Admin Panel → Settings → Connections**.
+Open [http://localhost:3000](http://localhost:3000), create the first administrator account, select a model, and send a message. If models are missing, check **Settings → Connections** (admin section).
 
 Before exposing the service, disable open sign-up or configure your [identity provider](/features/authentication-access/auth/sso). Review the [hardening guide](/getting-started/advanced-topics/hardening).
 

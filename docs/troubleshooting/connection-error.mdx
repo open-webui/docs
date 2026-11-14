@@ -60,7 +60,7 @@ WEBSOCKET_REDIS_URL=redis://redis:6379/1
 
 The `WEBUI_URL` must be set correctly BEFORE using OAuth/SSO. Since it's a persistent config variable, you can only change it by:
 - Disabling persistent config temporarily with `ENABLE_PERSISTENT_CONFIG=false`
-- Changing it in Settings > Admin > General > WebUI URL
+- Changing it in Settings > General > WebUI URL (admin section)
 - Setting it correctly before first launch
 
 **CORS Configuration Details**
@@ -319,7 +319,7 @@ This reduces how long Open WebUI waits for each endpoint before giving up and co
 
 ### Solution 2: Fix or Remove Unreachable Endpoints
 
-1. Go to **Settings > Admin > Connections**
+1. Go to **Settings > Connections** (admin section)
 2. Review your Ollama and OpenAI base URLs
 3. Remove or correct any unreachable IP addresses or hostnames
 4. Save the configuration

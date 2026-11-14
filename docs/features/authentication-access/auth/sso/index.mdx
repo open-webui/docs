@@ -39,7 +39,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 |---------------------------------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------|
 | `WEBUI_URL`                           | *(none)*           | **Required.** Your public WebUI address, e.g., `http://localhost:8080`. |
 | `ENABLE_OAUTH_PERSISTENT_CONFIG`      | `false`            | Load OAuth settings from the database (when persistent config is on). Default `false` keeps environment variables authoritative for OAuth and shows the OAuth section of the Admin Panel read-only; set `true` to manage OAuth in the Admin Panel. |
-| `ENABLE_OAUTH`                        | `true`             | Master switch for provider sign-in. Set `false` to turn SSO off while keeping the client ID, secret and endpoints configured. Also a toggle in **Settings > Admin > Authentication**, next to the LDAP one. |
+| `ENABLE_OAUTH`                        | `true`             | Master switch for provider sign-in. Set `false` to turn SSO off while keeping the client ID, secret and endpoints configured. Also a toggle in **Settings > Authentication** (admin section), next to the LDAP one. |
 | `ENABLE_OAUTH_SIGNUP`                 | `false`            | Allows account creation upon OAuth login (separate from `ENABLE_SIGNUP`). |
 | `OAUTH_AUTO_REDIRECT`                 | `false`            | Send unauthenticated users at `/auth` straight to the provider login, skipping the "Continue with SSO" screen. Requires exactly one provider, `ENABLE_LOGIN_FORM=false` and no LDAP; visit `/auth?form=true` for the local login form. |
 | `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails). |
@@ -66,7 +66,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
    - Set `ENABLE_OAUTH_PERSISTENT_CONFIG=false` to always read from environment variables
    - Update settings through the Admin Panel instead of environment variables
 
-   With the default `ENABLE_OAUTH_PERSISTENT_CONFIG=false`, the **OAuth / OIDC** section of **Settings > Admin > Authentication** is read-only, so the Admin Panel is not an option until you set the variable to `true`. See [Read-only OAuth settings in the Admin Panel](#read-only-oauth-settings-in-the-admin-panel).
+   With the default `ENABLE_OAUTH_PERSISTENT_CONFIG=false`, the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is read-only, so the Admin Panel is not an option until you set the variable to `true`. See [Read-only OAuth settings in the Admin Panel](#read-only-oauth-settings-in-the-admin-panel).
 
 3. **Required Variables**: Always verify you're using the exact variable names from the [environment configuration documentation](https://docs.openwebui.com/reference/env-configuration/). Common mistakes include using non-existent variables like `OIDC_CONFIG`.
 
@@ -74,7 +74,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 
 ### Read-only OAuth settings in the Admin Panel
 
-`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Admin > Authentication** is shown read-only:
+`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only:
 
 - All values remain visible, and the section is dimmed with every field and switch inert, including the **OAuth / OIDC** master toggle.
 - A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.

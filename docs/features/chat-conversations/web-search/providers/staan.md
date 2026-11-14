@@ -22,7 +22,7 @@ For a comprehensive list of all environment variables related to Web Search (inc
 ## Configuration Steps
 
 1. Sign up at [staan.ai](https://staan.ai/) and create an API key.
-2. In Open WebUI, open **Settings > Admin > Web Search**.
+2. In Open WebUI, open **Settings > Web Search** (admin section).
 3. Turn **Web Search** on and select **Staan** as the **Web Search Engine**.
 4. Paste the key into **Staan API Key**.
 5. Press **Save**.

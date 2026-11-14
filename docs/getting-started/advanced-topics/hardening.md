@@ -90,7 +90,7 @@ If all authentication is handled by an OAuth/OIDC provider, you can hide the loc
 ENABLE_LOGIN_FORM=false
 ```
 
-This removes the email/password form from the UI and refuses local sign-ups, steering all users through your SSO flow. The same switch is **Login Form** in **Settings > Admin > Authentication**, so it can be turned off without a restart once SSO works. You can also disable local password authentication at the backend level:
+This removes the email/password form from the UI and refuses local sign-ups, steering all users through your SSO flow. The same switch is **Login Form** in **Settings > Authentication** (admin section), so it can be turned off without a restart once SSO works. You can also disable local password authentication at the backend level:
 
 ```bash
 ENABLE_PASSWORD_AUTH=false
@@ -112,7 +112,7 @@ Open WebUI can require a code from an authenticator app after every sign-in, for
 ENABLE_MFA=true
 ```
 
-The same switch is **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Admin > Authentication**. OAuth and trusted-header sign-ins can be exempted when your identity provider or proxy already enforces a second factor (`MFA_ALLOW_OAUTH_BYPASS`, `MFA_ALLOW_TRUSTED_HEADER_BYPASS`). Changing any of these settings signs every user out. While MFA is on, sign-in attempts are also limited per account and per client address. See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa) for enrollment, recovery and the limits.
+The same switch is **Require an authenticator for all users** in the **Multi-factor authentication** section of **Settings > Authentication** (admin section). OAuth and trusted-header sign-ins can be exempted when your identity provider or proxy already enforces a second factor (`MFA_ALLOW_OAUTH_BYPASS`, `MFA_ALLOW_TRUSTED_HEADER_BYPASS`). Changing any of these settings signs every user out. While MFA is on, sign-in attempts are also limited per account and per client address. See [Two-Factor Sign-In (MFA)](/features/authentication-access/mfa) for enrollment, recovery and the limits.
 
 ---
 

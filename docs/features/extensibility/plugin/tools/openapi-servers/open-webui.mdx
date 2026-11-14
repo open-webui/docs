@@ -62,14 +62,14 @@ There are two ways to register tool servers in Open WebUI:
 - Only accessible to the user who registered the tool server.
 - The connection is made directly from the browser (client-side) by the user.
 - Perfect for personal workflows or when testing custom/local tools.
-- The Integrations tab of Settings only shows while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Admin > Integrations** ([`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which is off by default. Admins then see it right away. Everyone else also needs the **Direct Tool Servers** permission, which is off by default too. While **Direct Integrations** is off, servers saved here are not used in chats; they apply again once it is back on.
+- The Integrations tab of Settings only shows while an admin has turned on **Direct Integrations** in the **User Connections** section of **Settings > Integrations** (admin section) ([`ENABLE_DIRECT_INTEGRATIONS`](/reference/env-configuration#enable_direct_integrations)), which is off by default. Admins then see it right away. Everyone else also needs the **Direct Tool Servers** permission, which is off by default too. While **Direct Integrations** is off, servers saved here are not used in chats; they apply again once it is back on.
 - **Auth** picks what your browser sends to the server, both for the connection check in the dialog and for the saved connection: **Bearer** sends the key, **Session** sends your Open WebUI token and **None** sends nothing.
 
 #### 2. Global Tool Servers (added via Admin Settings)
 
 Admins can manage shared tool servers available to all or selected users across the entire deployment:
 
-- Go to **Settings → Admin → Integrations**, **Tools** section.
+- Go to **Settings → Integrations** (admin section), **Tools** section.
 - Add the tool server URL just as you would in user settings.
 - These tools are treated similarly to Open WebUI's built-in tools.
 

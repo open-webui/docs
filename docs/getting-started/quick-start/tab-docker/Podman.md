@@ -43,7 +43,7 @@ podman run -d --network=slirp4netns:allow_host_loopback=true --name openwebui -p
 ```
 
 ### Connection Configuration
-Once inside Open WebUI, go to your avatar > **Settings > Admin > Connections** and set your Ollama API connection to:
+Once inside Open WebUI, go to your avatar > **Settings > Connections** (admin section) and set your Ollama API connection to:
 `http://host.containers.internal:11434`
 
 To have it set before the first start instead, add `-e OLLAMA_BASE_URL=http://host.containers.internal:11434` to the `podman run` command. The image's default, `http://host.docker.internal:11434`, does not resolve under Podman.

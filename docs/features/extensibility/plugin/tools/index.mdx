@@ -163,10 +163,10 @@ Why it is legacy:
 Native is the default, so you never need to "turn Native on". The only tool-calling switch you might need to make is the reverse: forcing **Legacy** on for models that depend on prompt injection and cannot be moved to a stronger Native-capable model. Set **Function Calling** to `Legacy` at whichever scope you need (mirrors the Native controls [below](#how-to-enable-native-mode-agentic-mode)):
 
 1.  **Every model at once (global default, fastest)**:
-    *   Navigate to **Settings → Admin → Models**.
+    *   Navigate to **Settings → Models** (admin section).
     *   Click the **Model Defaults** button at the **top** of the models list to open **global model parameters** (they apply to *every* model, current and future, unless a specific model overrides them).
     *   There, set **Function Calling** to `Legacy`, then Save. Every model that has not set its own value runs Legacy. You do **not** need to edit them one by one.
-2.  **Per-Model Override**: edit a specific model in **Settings → Admin → Models** and open the **Advanced Params** row and set **Function Calling** to `Legacy`. Overrides the global default for that model only.
+2.  **Per-Model Override**: edit a specific model in **Settings → Models** (admin section) and open the **Advanced Params** row and set **Function Calling** to `Legacy`. Overrides the global default for that model only.
 3.  **Per-Chat Override**: inside a chat, open the **Model controls** menu next to the message input, then **Controls → Advanced Params**, and set **Function Calling** to `Legacy` for that chat only.
 
 :::info Prefer environment variables? Use `DEFAULT_MODEL_PARAMS`
@@ -198,12 +198,12 @@ Native Mode (also called **Agentic Mode**) leverages the model's built-in capabi
 Native Mode is the **default**, so new and existing models use it unless they are explicitly set to Legacy. You can still set `Function Calling` explicitly (to pin Native, or to switch a model to Legacy) at these levels:
 
 1.  **Pin Native for Every Model (optional, since Native is already the default)**:
-    *   Navigate to **Settings → Admin → Models**.
+    *   Navigate to **Settings → Models** (admin section).
     *   Click the **Model Defaults** button at the top of the models list. This opens **global model parameters**, which apply to *every* model in your instance (current and future) unless a specific model overrides them.
     *   Under **Model Parameters**, set **Function Calling** to `Native`.
     *   Save. This only re-asserts the existing default; you would normally leave it unset. Use it if you want the value pinned explicitly rather than relying on the default.
 2.  **Per-Model Override**:
-    *   In **Settings → Admin → Models**, pick a specific model and click its edit button.
+    *   In **Settings → Models** (admin section), pick a specific model and click its edit button.
     *   Open the **Advanced Params** row and set **Function Calling** to `Native`. This value overrides the global default for that model only.
     *   Use this when a specific model needs different parameters; otherwise prefer the global setting.
 3.  **Per-Chat Override**:
@@ -211,12 +211,12 @@ Native Mode is the **default**, so new and existing models use it unless they ar
     *   Under **Advanced Params**, set **Function Calling** to `Native`. Applies to that chat only.
 
 :::tip Set any parameter globally, once, for all models
-**Model Defaults** in **Settings → Admin → Models** sets any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) once for every model, current and future, unless a specific model overrides it. The environment variable equivalent is `DEFAULT_MODEL_PARAMS` (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
+**Model Defaults** in **Settings → Models** (admin section) sets any model parameter (`function_calling`, temperature, top_p, max_tokens, etc.) once for every model, current and future, unless a specific model overrides it. The environment variable equivalent is `DEFAULT_MODEL_PARAMS` (see [How to switch all models to Legacy](#enable-legacy-for-all-models)).
 :::
 
 #### Tool call labels
 
-A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Admin > Interface** ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required `__labels__` argument to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
+A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Interface** (admin section) ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required `__labels__` argument to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
 
 #### Model Requirements & Caveats
 
@@ -292,7 +292,7 @@ Earlier tool calls in the chat history whose arguments cannot be read are sent t
 
 ### Tool Approval
 
-By default a model runs its tool calls as soon as it makes them. An administrator can offer more modes by turning on **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
+By default a model runs its tool calls as soon as it makes them. An administrator can offer more modes by turning on **Tool Permissions** in **Settings > Interface** (admin section) ([`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions)). The feature is **experimental** and off by default.
 
 Once it is on, the chat input's **+** menu gains a **Tool Permissions** entry with two choices, or three when **Auto permissions** is on:
 
@@ -310,7 +310,7 @@ Your choice is saved to your user settings, so it carries over to new chats unti
 
 #### Auto
 
-An administrator turns on **Auto permissions** below **Tool Permissions** in **Settings > Admin > Interface** ([`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto)) and picks the **Engine** that decides which calls need approval:
+An administrator turns on **Auto permissions** below **Tool Permissions** in **Settings > Interface** (admin section) ([`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto)) and picks the **Engine** that decides which calls need approval:
 
 | Setting | Default |
 | :--- | :--- |
@@ -337,7 +337,7 @@ In a saved chat the pending call is stored on the assistant message, so approval
 
 With many tools enabled, their definitions alone can fill a large part of every request. **Tool Search** keeps large tool definitions out of the request until the model asks for them. The feature is **experimental**, off by default and applies to chats in Native Mode.
 
-An administrator turns it on in **Settings > Admin > Interface**, in the **Chat** section. The settings apply to every model and every user:
+An administrator turns it on in **Settings > Interface** (admin section), in the **Chat** section. The settings apply to every model and every user:
 
 | Setting | Default | What it does |
 | :--- | :--- | :--- |
@@ -347,7 +347,7 @@ An administrator turns it on in **Settings > Admin > Interface**, in the **Chat*
 | **Deferral Threshold (characters)** ([`TOOL_SEARCH_DEFER_THRESHOLD`](/reference/env-configuration#tool_search_defer_threshold)) | `400` | A tool whose definition (name, description and parameter schema, as JSON) is longer than this many characters is deferred. `0` defers every tool. |
 | **Always Loaded Tools** ([`TOOL_SEARCH_ALWAYS_LOADED`](/reference/env-configuration#tool_search_always_loaded)) | Empty | Comma-separated tool names or glob patterns, such as `jira_create_issue, github_*`, that are always sent in full. Matching is case-sensitive. |
 
-![The Chat section of Settings > Admin > Interface with Tool Search switched on, Defer Built-in Tools, Deferral Threshold (characters) set to 400 and an empty Always Loaded Tools field](/images/features/plugin/tools/tool-search-settings.webp)
+![The Chat section of Settings > Interface (admin section) with Tool Search switched on, Defer Built-in Tools, Deferral Threshold (characters) set to 400 and an empty Always Loaded Tools field](/images/features/plugin/tools/tool-search-settings.webp)
 
 How it works:
 
@@ -774,7 +774,7 @@ This means users can disable web search (or image generation, or code interprete
 :::
 
 :::tip Full Agentic Experience
-For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In **Settings > Admin > Models**, click the pencil (**Edit**) on your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
+For the best out-of-the-box agentic experience, administrators can enable **Web Search**, **Image Generation**, and **Code Interpreter** as default features for a model. In **Settings > Models** (admin section), click the pencil (**Edit**) on your target model and toggle these three on under **Default Features**. This ensures they are active in every new chat by default, so users get the full tool-calling experience without manually enabling each toggle. Users can still turn them off per-chat if needed.
 :::
 
 :::tip Builtin Tools vs Preload files

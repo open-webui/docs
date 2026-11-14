@@ -28,7 +28,7 @@ You can configure the admin webhook in two ways:
 #### Option 1: Through the Admin Panel
 
 1.  Log in as an administrator.
-2.  Navigate to **Settings > Admin > General**.
+2.  Navigate to **Settings > General** (admin section).
 3.  Scroll to **Events** > **Webhooks** and click **+**. Give the webhook a name and URL, choose **Send events for** and **Events**, then save. Existing entries have **Configure** and **Delete**.
 4.  Enter the webhook URL provided by your external service (e.g., Discord, Slack).
 5.  Click **"Save"**.
@@ -83,7 +83,7 @@ User webhooks are disabled by default. Administrators can enable this feature fo
 This can be done in two ways:
 
 1.  **Directly in the Admin Panel:**
-    - Go to **Settings > Admin > General > Features**.
+    - Go to **Settings > General > Features** (admin section).
     - Toggle the switch for **"User Webhooks"**.
 
 2.  **Using Environment Variables:**

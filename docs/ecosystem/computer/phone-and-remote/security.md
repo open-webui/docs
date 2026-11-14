@@ -13,7 +13,7 @@ That's why the [remote-access options](./index.md) all reduce to the same questi
 
 - **Password mode (default).** On first run, `cptr` prints a one-time setup URL (`/?token=...`) that only works while no user exists; the account it creates is the admin. Passwords are at least 6 characters and stored bcrypt-hashed. Login is rate-limited to 5 attempts per minute per IP.
 - **Sessions.** Signing in sets a JWT cookie (`cptr_session`) valid for 30 days, renewed on use past the halfway point. Every request authenticates; there is no localhost bypass.
-- **Signup.** Admins can enable self-registration (**Settings → Admin**). New signups get the **pending** role and cannot log in until an admin approves them. Roles gate admin settings; they do not create filesystem isolation between users.
+- **Signup.** Admins can enable self-registration in **Settings → Authentication** (admin section). New signups get the **pending** role and cannot log in until an admin approves them. Roles gate admin settings; they do not create filesystem isolation between users.
 - **Other modes.** `pam` (Linux system users) and `trusted_header` (reverse-proxy SSO) exist for proxy setups; see [Reverse proxy and SSO](./reverse-proxy.md).
 
 ## Sign every session out

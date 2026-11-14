@@ -27,7 +27,7 @@ Firstly, before deploying your stack with Docker, ensure that your Docker Compos
 
 :::note
 
-The **Database** download in **Admin Settings > Database** is not the recommended way to back up the database. It streams `webui.db` as it is on disk, and with SQLite WAL mode recent writes can still sit in `webui.db-wal`, so the file can miss recent data. Copy the database file yourself as described in [Exporting & Importing DB](/tutorials/maintenance/database) or use `pg_dump` on PostgreSQL.
+The **Database** download in **Settings > Database** (admin section) is not the recommended way to back up the database. It streams `webui.db` as it is on disk, and with SQLite WAL mode recent writes can still sit in `webui.db-wal`, so the file can miss recent data. Copy the database file yourself as described in [Exporting & Importing DB](/tutorials/maintenance/database) or use `pg_dump` on PostgreSQL.
 
 :::
 

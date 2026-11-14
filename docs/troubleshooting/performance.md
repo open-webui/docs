@@ -29,7 +29,7 @@ If Open WebUI feels slow or unresponsive, especially during chat generation or h
 
 By default, Open WebUI automates background tasks like title generation, tagging, and autocomplete. These run in the background and can slow down your main chat model if they share the same resources.
 
-![Task model settings under Admin > Interface](/images/admin/admin-interface.png)
+![Task model settings under Settings > Interface (admin section)](/images/admin/admin-interface.png)
 
 **Recommendation**: Use a **very fast, small, and cheap NON-REASONING model** for these tasks. Avoid a large reasoning model: it spends seconds thinking, and charges you for those thinking tokens, before producing a three word chat title. Every major provider offers a small tier that suits this far better than its flagship.
 
@@ -37,7 +37,7 @@ By default, Open WebUI automates background tasks like title generation, tagging
 *   **External/Cloud**: `gpt-5.6-luna`, `gemini-3.5-flash-lite`, `claude-haiku-4-5-20251001` (OpenAI, Google and Anthropic directly, or the same models through OpenRouter).
 *   **Local**: `qwen3.5:2b`, `gemma4:e2b`, `llama3.2:3b`.
 
-**Configuration:** the two model pickers, the parameters those background requests are sent with, and the switches for turning individual tasks off are all in **Settings > Admin > Interface**. See [Task Models](/features/administration/task-models) for the walkthrough.
+**Configuration:** the two model pickers, the parameters those background requests are sent with, and the switches for turning individual tasks off are all in **Settings > Interface** (admin section). See [Task Models](/features/administration/task-models) for the walkthrough.
 
 ### 2. Caching & Latency Optimization
 
@@ -50,7 +50,7 @@ Drastically reduces startup time and API calls to external providers.
 If you are using **OpenRouter** or any provider with hundreds/thousands of models, enabling model caching is **highly recommended**. Without caching, initial page loads can take **10-15+ seconds** as the application queries all available models. Enabling the cache reduces this to near-instant.
 :::
 
-- **Admin Panel**: `Settings > Admin > Connections > Cache Base Model List`
+- **Admin Panel**: `Settings > Connections > Cache Base Model List` (admin section)
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
   *   *Note*: Caches the base model list, in Redis when Redis is configured (shared by all replicas), otherwise in each replica's memory. It refreshes when you click **Save** in Connections settings or use the refresh button next to the toggle. Without Redis it also refreshes on restart.
 
@@ -471,7 +471,7 @@ On the standard image, Open WebUI can run models for RAG and speech inside its o
     *   **Option B (Best Performance)**: Use an **External API** (OpenAI/Cloud).
 
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Admin > Documents > Embedding Model Engine`
+    *   **Admin Panel**: `Settings > Documents > Embedding Model Engine` (admin section)
     *   **Env Var**: `RAG_EMBEDDING_ENGINE=openai` (to offload completely)
 
 #### Speech-to-Text (STT)
@@ -479,7 +479,7 @@ The default engine is local Whisper, which loads into the Open WebUI process on 
 
 -   **Recommendation**: Use **Web API** (browser-based). It uses the user's device, costing no server RAM.
 -   **Configuration**:
-    *   **Admin Panel**: `Settings > Admin > Audio > STT Engine`
+    *   **Admin Panel**: `Settings > Audio > STT Engine` (admin section)
     *   **Env Var**: `AUDIO_STT_ENGINE=web`
 
 -   **Bypass Audio Preprocessing (offload to the STT provider)**: If you use an external STT engine (OpenAI, Deepgram, Azure, Mistral) that already accepts raw audio and handles format conversion on its side, set `BYPASS_PYDUB_PREPROCESSING=true`. This skips Open WebUI's pydub-based MP3 conversion, compression and chunk splitting, removing a CPU-heavy step on every upload and reducing latency on large files. Only enable it when you are confident the provider handles unprocessed audio correctly.
@@ -500,11 +500,11 @@ If resource usage is critical, disable automated features that constantly trigge
 **Recommendation order (Highest Impact first):**
 
 1.  **Autocomplete**: `ENABLE_AUTOCOMPLETE_GENERATION=False` (the default; keep it off, it triggers on every keystroke)
-    *   Admin: `Settings > Admin > Interface > Autocomplete`
+    *   Admin: `Settings > Interface > Autocomplete` (admin section)
 2.  **Follow-up Questions**: `ENABLE_FOLLOW_UP_GENERATION=False`
-    *   Admin: `Settings > Admin > Interface > Follow-up`
+    *   Admin: `Settings > Interface > Follow-up` (admin section)
 3.  **Title Generation**: `ENABLE_TITLE_GENERATION=False`
-    *   Admin: `Settings > Admin > Interface > Chat Title`
+    *   Admin: `Settings > Interface > Chat Title` (admin section)
 4.  **Tag Generation**: `ENABLE_TAGS_GENERATION=False`
 
 ### 4. Swap ChromaDB for Milvus Lite (Small Deployments)

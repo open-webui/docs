@@ -212,7 +212,7 @@ A filter whose switch is on runs on the next request.
 
 - Stored in the browser as **sessionStorage draft state**, keyed per chat.
 - Survives page reloads in the same browser session but is **not persisted to the chat record on the server**.
-- Initial state comes from the model's `defaultFilterIds` (Settings > Admin > Models → Edit the model → **Filters** → **Start enabled in new chats**). Admins decide which toggleable filters start **on** vs **off** per model.
+- Initial state comes from the model's `defaultFilterIds` (Settings > Models → Edit the model → **Filters** → **Start enabled in new chats** (admin section)). Admins decide which toggleable filters start **on** vs **off** per model.
 - Switching models applies the new model's default filters and keeps the ones the user turned on or off.
 
 ![Toggle Filter](/images/features/plugin/functions/toggle-filter.png)
@@ -806,7 +806,7 @@ class Filter:
 The hashed user UUID is added as a top-level body parameter and forwarded directly to OpenAI's API; no PII is sent, just an opaque hash.
 
 :::warning Cannot Inject HTTP Headers
-Filters can only modify the **request body** (`form_data`). Outbound HTTP headers are constructed separately and cannot be influenced from a filter. To add custom headers to API requests, use the **Settings → Admin → Connections → OpenAI API** headers configuration.
+Filters can only modify the **request body** (`form_data`). Outbound HTTP headers are constructed separately and cannot be influenced from a filter. To add custom headers to API requests, use the **Settings → Connections → OpenAI API** (admin section) headers configuration.
 :::
 
 #### Injecting OpenAI-Style `tools` From a Filter

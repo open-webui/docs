@@ -47,7 +47,7 @@ Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Pyt
 
 ### Adding an external knowledge source
 
-Configure these under **Settings > Admin > Integrations > External Knowledge Sources**:
+Configure these under **Settings > Integrations > External Knowledge Sources** (admin section):
 
 1. **Create a connection** to your vector database:
    - **Provider** (Qdrant / Milvus / pgvector)
@@ -86,7 +86,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 :::warning
 **Context Length Warning for Ollama Users:** Web pages typically contain 4,000-8,000+ tokens even after content extraction, including main content, navigation elements, headers, footers, and metadata. With only 4096 tokens available, you're often getting half the page content, missing the most relevant information. Even 4096 tokens is frequently insufficient for comprehensive web content analysis.
 
-**To Fix This:** Navigate to **Settings > Admin > Models**, click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
+**To Fix This:** Navigate to **Settings > Models** (admin section), click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
 :::
 
 For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. A link to a file, such as a PDF, is read with document extraction. If it cannot read the URL, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
@@ -99,7 +99,7 @@ Web pages often contain extraneous information such as navigation and footer. Fo
 
 ## RAG Template Customization
 
-Customize the RAG template from the `Settings` > `Admin` > `Documents` menu.
+Customize the RAG template from the `Settings` > `Documents` (admin section) menu.
 
 The RAG template formats the **retrieved context** and is prefixed to your message before it reaches the model. Use the `{{CONTEXT}}` placeholder (or the legacy `[context]`) to mark where the retrieved document context is inserted. Without it, retrieved context has nowhere to go.
 
@@ -113,7 +113,7 @@ When enabled, documents are first split by markdown headers (H1-H6). This preser
 
 :::tip
 
-Use the **Chunk Min Size Target** setting (found in **Settings > Admin > Documents**) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
+Use the **Chunk Min Size Target** setting (found in **Settings > Documents** (admin section)) to intelligently merge small sections after markdown splitting, improving retrieval coherence and reducing the total number of vectors in your database.
 
 :::
 
@@ -205,7 +205,7 @@ Each remaining chunk carries meaningful semantic context instead of being a frag
 
 ## RAG Embedding Support
 
-Change the RAG embedding model in **Admin Settings** > **Documents**. The embedding engine is the built-in SentenceTransformers default, Ollama, OpenAI or Azure OpenAI.
+Change the RAG embedding model in **Settings** > **Documents** (admin section). The embedding engine is the built-in SentenceTransformers default, Ollama, OpenAI or Azure OpenAI.
 
 ## Changing RAG Settings After Initial Setup
 
@@ -225,7 +225,7 @@ If you are only changing chunk settings and not the embedding model, a re-index 
 
 Changing the embedding model **requires a re-index** of all knowledge base documents. Embeddings from different models exist in different vector spaces and are not compatible with each other. Without re-indexing, retrieval against old embeddings will produce poor or nonsensical results.
 
-After changing the embedding model, click the **Reindex** button in **Admin Settings** > **Documents** to re-embed all knowledge base documents with the new model.
+After changing the embedding model, click the **Reindex** button in **Settings** > **Documents** (admin section) to re-embed all knowledge base documents with the new model.
 
 ### What Does Re-Indexing Do?
 
@@ -283,7 +283,7 @@ When Preload files is disabled, file content is **not automatically extracted or
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases attached in the chat can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Admin Settings** > **Documents** are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+Individual files and knowledge bases attached in the chat can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Settings** > **Documents** (admin section) are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
 
 To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
@@ -351,7 +351,7 @@ For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gi
 
 The dedicated RAG pipeline for summarizing YouTube videos via video URLs enables smooth interaction with video transcriptions directly. This innovative feature allows you to incorporate video content into your chats, further enriching your conversation experience.
 
-A video is attached as its transcript, so one with no usable transcript cannot be attached, and the error says which case it is: captions disabled by the uploader, an age restricted or unavailable video, no transcript in the requested languages or a request YouTube blocked because of the address it came from. Set the languages to try with [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language), and route blocked requests through a proxy with **Settings > Admin > Web Search > Youtube Proxy URL** ([`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url)). See [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+A video is attached as its transcript, so one with no usable transcript cannot be attached, and the error says which case it is: captions disabled by the uploader, an age restricted or unavailable video, no transcript in the requested languages or a request YouTube blocked because of the address it came from. Set the languages to try with [`YOUTUBE_LOADER_LANGUAGE`](/reference/env-configuration#youtube_loader_language), and route blocked requests through a proxy with **Settings > Web Search > Youtube Proxy URL** (admin section) ([`YOUTUBE_LOADER_PROXY_URL`](/reference/env-configuration#youtube_loader_proxy_url)). See [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 ## Document Parsing
 
@@ -369,7 +369,7 @@ The `external`, `tika` and `docling` extraction engines parse `.csv` files thems
 
 ## Google Drive Integration
 
-When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Admin` > `Documents` menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
+When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Documents` (admin section) menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
 
 ### Detailed Instructions
 
@@ -385,6 +385,6 @@ When paired with a Google Cloud project that has the Google Picker API and Googl
 10. Set up the environment variable `GOOGLE_DRIVE_API_KEY` to the API Key value setup up in step 7 (NOT the OAuth client secret from step 2).
 11. Set up the `GOOGLE_REDIRECT_URI` to my Open-WebUI instance's URL (include the port, if any).
 12. Then relaunch your Open-WebUI instance with those three environment variables.
-13. After that, make sure Google Drive was enabled under `Settings` > `Admin` > `Documents` > `Google Drive`
+13. After that, make sure Google Drive was enabled under `Settings` > `Documents` > `Google Drive` (admin section)
 
 The picker opens in list view, because the `drive.file` scope gives it no access to file thumbnails.

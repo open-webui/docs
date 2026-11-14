@@ -22,7 +22,7 @@ Create an account at [Serper](https://serper.dev/) and copy your API key from it
 
 ## Configure in Open WebUI
 
-1. Open **Settings → Admin → Web Search** and enable web search.
+1. Open **Settings → Web Search** (admin section) and enable web search.
 2. Set **Web Search Engine** to `serper`.
 3. Paste your key into **Serper API Key** and save the settings.
 4. Enable the model’s **Web Search** capability and its **Web Search** default feature, or turn on Web Search for the conversation. Follow the [native search setup](/features/chat-conversations/web-search/agentic-search#how-to-enable-agentic-behavior) for the model settings.

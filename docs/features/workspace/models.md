@@ -195,7 +195,7 @@ What you set here applies to every chat that does not set the same parameter its
 
 Model controls give people a few simple choices in the chat, such as how hard the model thinks or how long it answers, while you decide exactly which parameters each choice sends. A control called **Thinking** with the options Minimal, Low, Medium and High, each setting `reasoning_effort` to the matching value, lets anyone change the reasoning effort without knowing the parameter exists.
 
-Anyone with write access to a model can define its controls, in **Workspace > Models** or in **Settings > Admin > Models**. Use the **Model controls** row below **Advanced Params**: **+** adds a control, **Edit** changes one, **×** removes it and the handle on the left changes the order. Each row shows the control's default option.
+Anyone with write access to a model can define its controls, in **Workspace > Models** or in **Settings > Models** (admin section). Use the **Model controls** row below **Advanced Params**: **+** adds a control, **Edit** changes one, **×** removes it and the handle on the left changes the order. Each row shows the control's default option.
 
 The controls are saved with the model and apply to everyone who can use it. People who can edit the model see the parameters behind each option in the editor, the JSON Preview and the export. People who can only use it see the names, descriptions and option names, which can be translated (see [Translations](#translations)).
 
@@ -267,7 +267,7 @@ From the model list, click the ellipsis (**...**) on any model:
 
 ### Version history
 
-Every **Save & Update** that changes a model's configuration is kept as a version, together with the text typed into **Describe this change** beside the button. The version picker next to **Back** at the top of the model editor starts on **Production**, the configuration chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). It is there for anyone who can edit the model, in **Workspace > Models** and in **Settings > Admin > Models** for models with saved settings.
+Every **Save & Update** that changes a model's configuration is kept as a version, together with the text typed into **Describe this change** beside the button. The version picker next to **Back** at the top of the model editor starts on **Production**, the configuration chats use. Open it to list the saved versions, newest first and 20 per page, each with its author and its description (or a short version ID when the description was left empty). It is there for anyone who can edit the model, in **Workspace > Models** and in **Settings > Models** (admin section) for models with saved settings.
 
 ![The model editor with the version picker open next to Back, listing the Production version and older versions by their descriptions](/images/features/models/model-version-history.webp)
 
@@ -290,7 +290,7 @@ The same actions are available over the API, each taking the model ID as `?id=`:
 
 ### Enabled and disabled
 
-Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Admin > Models** alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **"Model not found"**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
+Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Models** (admin section) alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **"Model not found"**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
 
 **Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it.
 
@@ -305,14 +305,14 @@ A model's background image travels with it. Export carries the image inside the 
 A model whose ID is already taken by a model you cannot edit stops the import with **Uh-oh! This model id is already registered. Please choose another model id string.** Models before it in the file are imported.
 
 :::info Downloading base models
-To download new base models, go to **Settings > Admin > Connections** and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
+To download new base models, go to **Settings > Connections** (admin section) and open **Manage** on an Ollama connection, or type `ollama run hf.co/{username}/{repository}:{quantization}` in the model selector.
 :::
 
 ---
 
 ## Global Model Defaults (Admin)
 
-Administrators can set baseline capabilities and parameters that apply to all models in **Settings > Admin > Models**. Click **Model Defaults** at the top of the list to open it, and save with the page's **Save** button. It uses the same rows as the model editor: **Model Capabilities** holds the **Capabilities**, **Default Features** and **Builtin Tools** rows, a **Tools** picker sets the default tools, **Model Parameters** holds the advanced parameters and **Prompt Suggestions** the starter chips.
+Administrators can set baseline capabilities and parameters that apply to all models in **Settings > Models** (admin section). Click **Model Defaults** at the top of the list to open it, and save with the page's **Save** button. It uses the same rows as the model editor: **Model Capabilities** holds the **Capabilities**, **Default Features** and **Builtin Tools** rows, a **Tools** picker sets the default tools, **Model Parameters** holds the advanced parameters and **Prompt Suggestions** the starter chips.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, preload files, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
@@ -374,7 +374,7 @@ The **Model Defaults** panel at the top of the same page is a different feature:
 
 ### Setting a selected or pinned model
 
-1. Go to **Settings > Admin > Models**.
+1. Go to **Settings > Models** (admin section).
 2. Find the model with **Search Models**, or narrow the list with the view filter.
 3. Click the ellipsis (**...**) at the end of the model's row.
 4. Choose **Set as Selected Model** or **Set as Pinned Model**.
@@ -496,4 +496,4 @@ Model presets configure behavior through system prompts and tool bindings. They 
 
 ### Fallback requires configuration
 
-If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Admin > Models**. The fallback uses the first Selected Model.
+If a base model becomes unavailable, the preset will fail unless `ENABLE_CUSTOM_MODEL_FALLBACK` is set to `True` and at least one [Selected Model](#selected-and-pinned-models-admin) is configured in **Settings > Models** (admin section). The fallback uses the first Selected Model.

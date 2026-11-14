@@ -97,7 +97,7 @@ llama serve -m /path/to/your-model.gguf --port 9931
 
 If your installation provides the standalone `llama-server` binary, use `llama-server -m /path/to/your-model.gguf --port 9931` instead.
 
-In Open WebUI, go to **Settings → Admin → Connections → OpenAI → Add Connection**:
+In Open WebUI, go to **Settings → Connections → OpenAI → Add Connection** (admin section):
 
 - **URL:** `http://localhost:9931/v1` when Open WebUI runs directly on the same machine. Use your configured port if different.
 - **Auth:** **None** for a keyless server, or **Bearer** with the key configured on your server.

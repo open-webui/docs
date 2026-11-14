@@ -17,7 +17,7 @@ Back up your Milvus data before upgrading, and make sure Milvus has free disk sp
 - **Do not restart Open WebUI during the migration.** An interrupted run discards its partial copies on the next start and begins again from zero.
 - Your original collections are deleted only after every copy has succeeded. If a copy fails, the log shows `Milvus migration to native hybrid search failed, all collections are kept unchanged.` and Open WebUI keeps using the original collections.
 - If you run several Open WebUI instances, start only one for the upgrade and start the others after the `Migrated` line appears.
-- Once the migration is done, Milvus runs hybrid search itself whenever **Hybrid Search** is on in **Settings > Admin > Documents**. Turning on **Enrich Hybrid Search Text** (or [`ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`](/reference/env-configuration#enable_rag_hybrid_search_enriched_texts)) keeps Open WebUI's own keyword search in use.
+- Once the migration is done, Milvus runs hybrid search itself whenever **Hybrid Search** is on in **Settings > Documents** (admin section). Turning on **Enrich Hybrid Search Text** (or [`ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`](/reference/env-configuration#enable_rag_hybrid_search_enriched_texts)) keeps Open WebUI's own keyword search in use.
 
 ## Reference Speeds
 

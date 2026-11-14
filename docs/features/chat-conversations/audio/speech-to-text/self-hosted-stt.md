@@ -16,7 +16,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Configure Open WebUI
 
-With your transcription server running, open **Settings > Admin > Audio** and set:
+With your transcription server running, open **Settings > Audio** (admin section) and set:
 
 | Setting | Value for the LocalAI example below |
 |---------|------------------------------------|
@@ -82,7 +82,7 @@ AUDIO_STT_OPENAI_API_KEY=replace-with-your-own-secret
 AUDIO_STT_MODEL=whisper-1
 ```
 
-Use the reachable base URL for your deployment and the same key as LocalAI. Existing settings saved in Open WebUI's database can override these initial values; check **Settings > Admin > Audio** after restarting.
+Use the reachable base URL for your deployment and the same key as LocalAI. Existing settings saved in Open WebUI's database can override these initial values; check **Settings > Audio** (admin section) after restarting.
 
 ## Test and Troubleshoot
 
