@@ -130,7 +130,7 @@ Things to know about the access_grant table:
 - `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
 - `principal_type` of `anyone` is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
-- A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants
+- A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants, and deleting a user deletes the grants made to that user
 
 ## API Key Table
 
