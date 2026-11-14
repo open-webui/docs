@@ -7,11 +7,11 @@ title: "OpenShift"
 
 Terminals can run on OpenShift as a restricted per-user terminal sandbox.
 
-The restricted OpenShift setup runs terminals as non-root pods. Use prebuilt terminal images and let OpenShift provide the isolation boundary through one pod per machine.
+The restricted OpenShift setup runs terminals as non-root pods. Use prebuilt terminal images and let OpenShift provide the isolation boundary through one pod per instance.
 
 ## Supported Model
 
-- One Open Terminal pod per machine.
+- One Open Terminal pod per instance.
 - Persistent user files through PVCs.
 - Per-terminal images, env vars, CPU, memory, storage and idle timeout.
 - File browser, command execution, notebooks, and tools already installed in the image.

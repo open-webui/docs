@@ -25,7 +25,7 @@ It gives the model a stateful workspace where it can create, run, inspect, repai
 
 Use it when a chat needs more than a text answer: analyze a spreadsheet, write a script, build a small app, render a report, inspect logs, run tests, organize files, or start a server and preview the result. Open WebUI stays the interface; Open Terminal gives the agent a workspace where those results can actually be produced.
 
-[Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate machines per user, chat or model, controlled images, resource limits, storage, environment variables, sharing and idle cleanup.
+[Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate instances per user, chat or model, controlled images, resource limits, storage, environment variables, sharing and idle cleanup.
 
 ## The Familiar Words
 
@@ -100,13 +100,13 @@ For teams, the same model becomes infrastructure:
 | Open WebUI | Chat, users, permissions, model selection, tools, and the visible workflow |
 | Terminals | Auth, routing, provisioning, lifecycle and cleanup |
 | Open Terminal workspace | Files, shell, processes, packages, code execution, previews, and artifacts |
-| Terminal | Image, limits, storage, env vars, start directory, setup script and machine scope |
+| Terminal | Image, limits, storage, env vars, start directory, setup script and instance scope |
 
 In harness-engineering terms: Open WebUI plus Open Terminal is the full harness, Open Terminal is the computer substrate inside it, and Terminals is the fleet manager for those substrates.
 
 ## Operate It Safely
 
-Open Terminal can run isolated in Docker or directly on a host, depending on how much access the agent should have. Terminals adds shared terminals, lifecycle and separate machines per user, chat or model for shared deployments. Start with the security and configuration pages before giving agents broad filesystem, process or network access.
+Open Terminal can run isolated in Docker or directly on a host, depending on how much access the agent should have. Terminals adds shared terminals, lifecycle and separate instances per user, chat or model for shared deployments. Start with the security and configuration pages before giving agents broad filesystem, process or network access.
 
 | Need | Go to |
 | :--- | :--- |

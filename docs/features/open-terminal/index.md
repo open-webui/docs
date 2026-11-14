@@ -159,4 +159,4 @@ Open Terminal needs a model that performs tool calling at agentic quality, not j
 
 ## Enterprise Multi-User
 
-Need separate agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It starts a separate machine per user, chat or model, with automatic lifecycle management, resource limits, custom images, persistent storage and shareable terminals with their own environments.
+Need separate agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It starts a separate instance per user, chat or model, with automatic lifecycle management, resource limits, custom images, persistent storage and shareable terminals with their own environments.

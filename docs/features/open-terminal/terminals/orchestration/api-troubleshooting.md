@@ -33,7 +33,7 @@ Use the terminal's **Environment variables**, see [Forwarding Behavior](/feature
 
 ### Why did my env var or image change not apply?
 
-The machine was probably already running. Restart it from the **Machines** list of the terminal, or wait for idle cleanup.
+The instance was probably already running. Restart it from the **Instances** list of the terminal, or wait for idle cleanup.
 
 ### Why can't users browse to `/etc` in the file browser?
 

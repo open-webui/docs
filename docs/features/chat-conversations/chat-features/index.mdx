@@ -29,7 +29,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 ![A response with a syntax-highlighted code block](/images/features/chat/chat-code-answer.png)
 
-- **[Folders & Projects](./conversation-organization.md)**: Transform folders into powerful project workspaces with [a default model](./conversation-organization.md#default-model), custom system prompts and attached knowledge bases.
+- **[Folders & Projects](./conversation-organization.md)**: Transform folders into powerful project workspaces with [a default model](./conversation-organization.md#default-model), custom system prompts and attached knowledge bases. Each folder has a [page](./conversation-organization.md#the-folder-page) that shows its chats as a list or a board with statuses, tags and filters.
 
 - **[URL Parameters](./url-params.md)**: Configure chat sessions through URL parameters, enabling quick setup of models, tools, and other features.
 
@@ -47,7 +47,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **Fork a Chat**: Branch a conversation into an independent copy from any assistant response. The **Fork chat** action on a message copies the history from the start of the conversation up to that point into a new chat titled `<original title> (fork)`, so you can take a different direction without touching the original. A fork of your own chat keeps its folder, pin, tags and chat variables. Shared and read-only chats can be forked too; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat). Forking requires the [Chat Import](/features/authentication-access/rbac/permissions#3-chat-permissions) permission (`chat.import`, allowed by default; admins always pass). Without it the **Fork chat** action is not shown on a message at all. Forking is also unavailable while a response is still streaming, and in a temporary chat, which is never stored.
 
-- **Chat Overview**: A map of the whole conversation in a full-screen window. Open it with **Overview** in the chat's **...** menu, listed as soon as the chat has a message in it. A message where older messages were summarized by context compaction carries a **Context compacted** tag on the map.
+- **Chat Overview**: A map of the whole conversation in a full-screen window. Open it with **Overview** in the **+** menu of the [tab bar](#tabs-side-panel), listed as soon as the chat has a message in it. A message where older messages were summarized by context compaction carries a **Context compacted** tag on the map.
 
 - **Message Times**: The time on a reply is when it finished, so a long answer carries a later time than the prompt above it. Rest the pointer on a time to see the full date.
 
@@ -67,7 +67,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **[Follow-Up Prompts](./follow-up-prompts.md)**: Suggested follow-up messages, requests or questions, after each model response.
 
-- **[Automations](./automations.mdx)**: Schedule prompts to run automatically (hourly/daily/weekly/monthly/custom RRULE) and manage recurring runs.
+- **[Automations](./automations.mdx)**: Schedule prompts to run automatically (hourly/daily/weekly/monthly/custom RRULE) and manage recurring runs, optionally into a [folder](./automations.mdx#folders).
 
 - **[Task Management](./task-management.mdx)**: Let agentic models keep a structured task/todo list in chat for multi-step workflows and transparent progress tracking.
 
@@ -135,7 +135,7 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 The **Tabs** button (split panel icon) in the top bar opens the tabs. On a large screen the workspace is always full width and the chat is its first tab, which shows the chat title and its actions menu and cannot be closed. On a small screen the tabs open as a panel next to the chat.
 
-The panel holds these tabs when they apply: **Files** for the [Open Terminal](/features/open-terminal) or [Code Interpreter](./code-execution/python.md) files, **Artifacts**, **Preview** for embeds and opened citations, **Voice** for a running [voice call](./voice-mode.mdx) and **Comments** for a saved chat with [comments](./comments.mdx) turned on.
+The **+** menu opens most of these tabs and also holds **Overview**, the Chat Overview map described above. The panel holds these tabs when they apply: **Files** for the [Open Terminal](/features/open-terminal) or [Code Interpreter](./code-execution/python.md) files, **Artifacts**, **Preview** for embeds and opened citations, **Voice** for a running [voice call](./voice-mode.mdx) and **Comments** for a saved chat with [comments](./comments.mdx) turned on.
 
 **New Chat** in the **+** menu, the **New Chat Tab** [shortcut](./keyboard-shortcuts.mdx#tab-shortcuts), or `/side` in the chat input opens a chat tab that starts from the current conversation, so you can ask something on the side without adding to the chat. Each use opens another numbered tab, so you can keep several open. It needs the [Allow Side Chat](/features/authentication-access/rbac/permissions#3-chat-permissions) permission, and `/side` also needs exactly one selected model. A side chat has the same message input, commands and features as the main chat. It starts with the model's default tools and features and uses the main chat's terminal, which it cannot change.
 
@@ -143,7 +143,7 @@ A side chat is saved when you send its first message. It is a branch of the pare
 
 Drag a chat from the sidebar onto the chat area to open it as a chat tab. This needs the **Allow Side Chat** permission and is not available while **Enforce Temporary Chat** and **Allow Temporary Chat** are both on.
 
-Pages from the sidebar and the user menu open as tabs beside the chat: [Notes](/features/notes), [Channels](/features/channels), [Workspace](/features/workspace), [Automations](./automations.mdx), [Calendar](/features/calendar), the Playground and Home. Pinned models open as chat tabs. Drag one from the sidebar onto the chat area to place it in a pane. **New Chat** in the sidebar, including the one in a sidebar folder, keeps the open tabs. The **New Chat** button in the top bar on mobile and the temporary chat shortcut close them.
+Pages from the sidebar and the user menu open as tabs beside the chat: [Notes](/features/notes), [Channels](/features/channels), [Workspace](/features/workspace), [Automations](./automations.mdx), [Calendar](/features/calendar), the Playground and Home. Pinned models open as chat tabs. Drag one from the sidebar onto the chat area to place it in a pane. **New Chat** in the sidebar, including the one in a sidebar folder, keeps the open tabs. The **New Chat** button in the top bar on mobile and the temporary chat shortcut close them. Double-click the chat's tab to rename the chat. On a [folder page](./conversation-organization.md#the-folder-page) the same double-click renames the folder when you own it, are an admin or have write access to it.
 
 Without a terminal selected, the **Files**, **New File**, **New Terminal**, **Browser**, **Desktop** and **Voice Note** entries in the **+** menu open a terminal picker first. Search the list, pick a terminal and the tab opens on it. With [Code Interpreter](./code-execution/python.md) on, **Files** opens the Code Interpreter files directly.
 

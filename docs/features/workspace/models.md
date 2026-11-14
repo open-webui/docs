@@ -168,7 +168,7 @@ The editor shows only the options that can work on this instance, for example **
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **Preload files** disappears from this editor since there is nothing to extract |
 | **Preload files** | When enabled, attached files are processed via RAG and injected into the conversation. When disabled, nothing is injected and the model reads attached files with the builtin **Files** tools. Off by default with Native function calling and on with Legacy; the editor and **Model Defaults** show the effective value |
 | **Default Features** | The row right below **Capabilities** lists **Web Search**, **Image Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |
-| **Default terminal** | Shown while **Terminal** is on: the [Open Terminal](/features/open-terminal) server or [terminal](/features/open-terminal/terminals/orchestration/creating-terminals) selected by default for chats with this model. A terminal with a separate machine per model needs access to the model |
+| **Default terminal** | Shown while **Terminal** is on: the [Open Terminal](/features/open-terminal) server or [terminal](/features/open-terminal/terminals/orchestration/creating-terminals) selected by default for chats with this model. A terminal with a separate instance per model needs access to the model |
 | **TTS Voice** | In the **Voice** row: a specific voice for this model's responses |
 
 :::info Usage covers every chat the model runs

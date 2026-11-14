@@ -28,6 +28,8 @@ An agent model ID uses only letters, digits, dashes and underscores. A model nam
 
 If the agent offers them for the selected model, **Reasoning effort** and **Service tier** appear in the model controls menu of the message input. Your choice is saved to your settings.
 
+The **Reasoning Effort** advanced parameter, set in the chat controls or the model's advanced parameters, also reaches the agent when you set it yourself. A value from a custom parameter named `reasoningEffort` or `reasoning_effort` is read the same way. Claude Code receives it as its effort level and Pi as its thinking level. Codex receives it as the effort of the turn. Cursor, Gemini, Grok, OpenCode and Cline receive it as the thought level the agent offers for the model. When one of those last five does not offer the chosen level for the selected model, the reply fails with **Agent does not support the selected reasoning effort for this model**. Pick another level or clear the parameter.
+
 ## Working With an Agent
 
 - **Attachments.** Files you attach are uploaded to the terminal, and the agent is told their paths.

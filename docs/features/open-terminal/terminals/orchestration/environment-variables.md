@@ -5,7 +5,7 @@ title: "Environment Variables"
 
 # Environment Variables
 
-The **Environment variables** of a terminal, under **Advanced** in the [terminal dialog](/features/open-terminal/terminals/orchestration/creating-terminals), are passed into every Open Terminal machine it starts. They are raw strings, not shell commands.
+The **Environment variables** of a terminal, under **Advanced** in the [terminal dialog](/features/open-terminal/terminals/orchestration/creating-terminals), are passed into every Open Terminal instance it starts. They are raw strings, not shell commands.
 
 Use raw values in the dialog:
 
@@ -20,7 +20,7 @@ Do not add `'` or `"` around a value unless the quote characters are part of the
 
 ## Forwarding Behavior
 
-Use the terminal's **Environment variables** for values that should appear inside Open Terminal machines. Orchestrator process env vars configure the orchestrator itself. The exception is `OPEN_TERMINAL_SYSTEM_PROMPT` in the orchestrator's own environment: every machine receives it as a default, and a terminal's own value replaces it.
+Use the terminal's **Environment variables** for values that should appear inside Open Terminal instances. Orchestrator process env vars configure the orchestrator itself. The exception is `OPEN_TERMINAL_SYSTEM_PROMPT` in the orchestrator's own environment: every instance receives it as a default, and a terminal's own value replaces it.
 
 The orchestrator drops `OPEN_TERMINAL_API_KEY` from a terminal's environment variables. It generates a private API key per terminal instance and uses that key to proxy requests.
 

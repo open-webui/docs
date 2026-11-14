@@ -75,7 +75,7 @@ In the chat input area, click the **terminal button** (cloud icon). Your termina
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another terminal at any time except while a reply is generating.
 
-Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a terminal with a separate machine per chat, the button appears once the chat is saved.
+Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a terminal with a separate instance per chat, the button appears once the chat is saved.
 
 ### 8. Enable native function calling
 
@@ -138,7 +138,7 @@ Four things change with it:
 - **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
 - **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
 
-On a terminal with a [separate machine per chat](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope), a file attached to a new chat's first message uploads into that chat's machine when you send it.
+On a terminal with a [separate instance per chat](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope), a file attached to a new chat's first message uploads into that chat's instance when you send it.
 
 The field is on every terminal connection an administrator adds. [Tether](/ecosystem/tether) terminals always use **Automatic**.
 
@@ -223,7 +223,7 @@ Make sure:
 
 Only terminals the user is allowed to use are listed, so check the connection's access grants and that the connection is enabled.
 
-For an orchestrator connection, a terminal is listed for you only when it is shared with you or you have **Write** access to the connection. A terminal with a separate machine per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
+For an orchestrator connection, a terminal is listed for you only when it is shared with you or you have **Write** access to the connection. A terminal with a separate instance per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 
 ### Wrong API key
 

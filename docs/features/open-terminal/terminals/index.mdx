@@ -11,13 +11,13 @@ import Kubernetes from './tab-deployment/Kubernetes.md';
 
 # Terminals (Orchestrator)
 
-**Terminals** manages [Open Terminal](/features/open-terminal) machines for a team. Each machine is a container where the AI runs commands and works with files. A machine can belong to a user, a chat or a model, or be shared by everyone, with its own files, processes, packages, resource limits, network profile and optional persistent storage.
+**Terminals** manages [Open Terminal](/features/open-terminal) instances for a team. Each instance is a container where the AI runs commands and works with files. An instance can belong to a user, a chat or a model, or be shared by everyone, with its own files, processes, packages, resource limits, network profile and optional persistent storage.
 
 [View on GitHub →](https://github.com/open-webui/terminals)
 
-Open Terminal gives an Open WebUI chat a real workspace to act in. Terminals manages those workspaces for many people, so everyone gets the right one without hand-wiring containers. Open WebUI is where you create, share and use terminals. Terminals starts, reuses and cleans up the machines behind them.
+Open Terminal gives an Open WebUI chat a real workspace to act in. Terminals manages those workspaces for many people, so everyone gets the right one without hand-wiring containers. Open WebUI is where you create, share and use terminals. Terminals starts, reuses and cleans up the instances behind them.
 
-Terminals can give every person, chat or model its own workspace, so files and processes never mix. It also offers ready-made environments: set an image, resources, a start folder and a setup script once, then share the terminal with a group. Idle machines are cleaned up after the idle timeout you set. It is for admins who run Open WebUI for a team. Use it when one shared Open Terminal is not enough because people need separate files, tools and limits.
+Terminals can give every person, chat or model its own workspace, so files and processes never mix. It also offers ready-made environments: set an image, resources, a start directory and a setup script once, then share the terminal with a group. Idle instances are cleaned up after the idle timeout you set. It is for admins who run Open WebUI for a team. Use it when one shared Open Terminal is not enough because people need separate files, tools and limits.
 
 :::tip Quick navigation
 - **Need to operate per-user terminal environments?** → [Orchestration](/features/open-terminal/terminals/orchestration)
@@ -29,9 +29,9 @@ flowchart LR
     OW["Open WebUI"]
     OR["Orchestrator"]
     OW -->|X-User-Id| OR
-    OR --> TA["Machine<br/>User A"]
-    OR --> TB["Machine<br/>User B"]
-    OR --> TC["Machine<br/>User C"]
+    OR --> TA["Instance<br/>User A"]
+    OR --> TB["Instance<br/>User B"]
+    OR --> TC["Instance<br/>User C"]
 
     style OW fill:#4a90d9,color:#fff
     style OR fill:#e67e22,color:#fff
@@ -44,16 +44,16 @@ flowchart LR
 
 ## How It Works
 
-The orchestrator sits between Open WebUI and the Open Terminal machines:
+The orchestrator sits between Open WebUI and the Open Terminal instances:
 
 1. A user activates Open Terminal in Open WebUI.
 2. Open WebUI proxies the request to the **orchestrator**, which manages workspace lifecycle.
-3. The orchestrator reads the selected [terminal](/features/open-terminal/terminals/orchestration/creating-terminals): image, resources, storage, env vars, start directory, setup script and machine scope.
-4. The orchestrator provisions or reuses the matching Open Terminal machine: one per user, chat or model, or a single one for everyone, depending on the terminal's machine scope.
+3. The orchestrator reads the selected [terminal](/features/open-terminal/terminals/orchestration/creating-terminals): image, resources, storage, env vars, start directory, setup script and instance scope.
+4. The orchestrator provisions or reuses the matching Open Terminal instance: one per user, chat or model, or a single one for everyone, depending on the terminal's instance scope.
 5. All traffic goes through the orchestrator.
-6. Idle machines are cleaned up after the idle timeout you set. Files in the home folder are kept: Docker keeps them in the data folder, Kubernetes keeps them on a persistent volume when storage is enabled.
+6. Idle instances are cleaned up after the idle timeout you set. Files in the home folder are kept: Docker keeps them in the data folder, Kubernetes keeps them on a persistent volume when storage is enabled.
 
-The orchestrator exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can work with files, run code, execute commands, start servers and inspect results, all inside the machine the terminal's scope selects.
+The orchestrator exposes the same OpenAPI-based tool interface as Open Terminal, so the AI can work with files, run code, execute commands, start servers and inspect results, all inside the instance the terminal's scope selects.
 
 ## Why It Matters
 
@@ -61,15 +61,15 @@ Terminals lets admins give agents enough environment to do real work while contr
 
 | Need | What Terminals provides |
 | :--- | :--- |
-| Isolation | Separate files and processes per machine, with one machine per user, saved chat or model when the terminal asks for it |
+| Isolation | Separate files and processes per instance, with one instance per user, saved chat or model when the terminal asks for it |
 | Governance | Terminals with set images, env vars, resource limits and storage, checked against server maximums, and shared only with chosen users and groups |
 | Repeatability | Custom images and startup packages so users get the right tools every time |
-| Lifecycle | Reuse, idle cleanup and start, stop, restart and delete per machine |
+| Lifecycle | Reuse, idle cleanup and start, stop, restart and delete per instance |
 | Scale | Docker for a single host, Kubernetes/operator mode for larger deployments |
 | Supportability | Admin UI, logs, status, templates API and predictable routing |
 
 :::info Admin UI
-The orchestrator serves a built-in minimal admin UI at `/` with **Templates** (create and edit terminals, reset schedules, delete) and **Environments** (inspect machines, including stopped ones, and start, stop, restart, reset or delete them). It signs in with `TERMINALS_API_KEY`. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
+The orchestrator serves a built-in minimal admin UI at `/` with **Templates** (create and edit terminals, reset schedules, delete) and **Environments** (inspect instances, including stopped ones, and start, stop, restart, reset or delete them). It signs in with `TERMINALS_API_KEY`. It is on by default and toggled with `TERMINALS_ENABLE_UI`; set it to `false` for API-only deployments.
 :::
 
 ---
