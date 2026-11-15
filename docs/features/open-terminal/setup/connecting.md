@@ -75,7 +75,7 @@ In the chat input area, click the **terminal button** (cloud icon). Your termina
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another terminal at any time except while a reply is generating.
 
-Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a terminal with a separate instance per chat, the button appears once the chat is saved.
+The terminal menu entry also has a **System info** button that shows resource use.
 
 ### 8. Enable native function calling
 
@@ -131,12 +131,7 @@ New terminal connections start on `Filesystem`, and [Tether](/ecosystem/tether) 
 
 A zip archive, an SQLite database, a video file, an export far larger than a context window: text extraction has little to offer for any of them, and a shell handles all of them. Attaching one this way puts it where the commands the model runs can reach it.
 
-Four things change with it:
-
-- **The model does not need to support file upload.** With `Default`, attaching a file while a model without that capability is selected reports "Model(s) do not support file upload" and nothing uploads. With `Filesystem` the file never reaches the model as an attachment, so that check does not run.
-- **The model is told the path only when it can act on it.** Open WebUI passes the paths of attached files to the model alongside the message when the model is using native function calling in a saved conversation. Set the model to [Legacy](#8-enable-native-function-calling) function calling, or turn its **Builtin Tools** capability off, and the file still reaches the terminal while the model is left without its location.
-- **Images go the same way.** An image attached to a saved conversation is written to the working directory rather than passed to the model as a picture. Open WebUI still checks it against the selected models' image support first, so a model with no vision support turns it away at the input.
-- **Upload limits still apply.** The maximum file size and the maximum number of attachments configured for Open WebUI are both checked before anything is sent, so `Filesystem` does not lift them.
+The model is told the file path only when it uses native function calling in a saved conversation; set it to [Legacy](#8-enable-native-function-calling) or turn its **Builtin Tools** capability off and the file still reaches the terminal while the model is left without its location. Upload size and count limits still apply.
 
 On a terminal with a [separate instance per chat](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope), a file attached to a new chat's first message uploads into that chat's instance when you send it.
 

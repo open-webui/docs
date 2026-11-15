@@ -9,11 +9,8 @@ Notifications send a webhook to somewhere you actually watch, such as Slack, Dis
 
 Webhook notifications are **off by default** and are opt-in twice over: an administrator enables the feature, and each user adds their own targets.
 
-The [inbox](#inbox) in the sidebar needs no setup. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser. With **Notification Sound** on, **Notification sound style** picks the sound (**Chime**, the default, **Soft**, **Bell** or **Tap**), and the play button next to it previews it. Clicking a browser notification focuses Open WebUI and opens the chat, channel or calendar.
+The [inbox](#inbox) in the sidebar needs no setup. The **Browser Notifications** and **Notification Sound** toggles on the same settings page are separate, unrelated and handled by your browser. With **Notification Sound** on, pick a sound style under **Notification sound**. Clicking a browser notification focuses Open WebUI and opens the chat, channel or calendar.
 
-:::note "Always Play Notification Sound" has no toggle
-If **Always Play Notification Sound** was switched on for your account, sounds play even while you are active, and the interface has no control to switch it off.
-:::
 
 ## Inbox
 
@@ -40,7 +37,7 @@ Each target has:
 - **Events** it subscribes to.
 - **Enabled**, to pause a target without deleting it.
 - **Automatic Delivery**, either `away` or `always`.
-- **Target ID for notify**, the name the `notify` tool uses to pick this target. Left empty, it becomes the webhook's host name. It is saved in lowercase. Each run of characters other than letters, digits, `_` and `-` becomes a single `-`, so `Work/Slack` is saved as `work-slack`.
+- **Target ID for notify**, the name the `notify` tool uses to pick this target. Left empty, it becomes the webhook's host name.
 
 Use **Send Test** to fire a test notification and confirm the endpoint works.
 
@@ -77,11 +74,6 @@ Pairing this with [Timers](/features/chat-conversations/chat-features/timers) is
 
 ## Managing Notifications from Chat
 
-### Available tools
-
-| Tool | Purpose |
-|---|---|
-| `notify` | Send a notification to one of your configured targets. |
 
 ### Requirements
 

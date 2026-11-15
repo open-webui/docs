@@ -37,12 +37,10 @@ Type `@` in a channel where the app is a member and pick it from the **Apps** gr
 
 An app answers a mention with a channel message. A button click can be answered either way:
 
-- **Private replies** appear under the app's message whose button you clicked, marked **Only visible to you**, with a **Dismiss** link. Only you see them, and only until you dismiss them, reload the page or switch to another channel or thread. A private reply appears only if you are still in that channel or thread when it arrives. File downloads are only ever shown to you.
+- **Private replies** appear under the app's message whose button you clicked, marked **Only visible to you**. Only you see them, and only until you dismiss them, reload the page or switch to another channel. An app can also send a Markdown file as a private reply, shown as a **Download** button.
 - **Channel replies** are posted as normal channel messages under the app's name, with an **App** label. Everyone in the channel sees them and they stay in the history.
 
-After a button click, an app can also send a Markdown file as a private reply. It shows as a **Download** button with the file name, for example **Download report.md**, that saves the file to your device.
-
-If a mention fails, Open WebUI posts the reason under the app's name as a reply to your message, starting with `App error:`. Everyone in the channel sees it. If the app cannot post in the channel, for example because it is disabled or lacks the scope to post, the reason appears under your message and only you see it. If a button click fails, the reason appears under the app's message and only you see it. Ask an admin to check the app in **Settings > Apps** (admin section). [Troubleshooting](#troubleshooting) lists the messages you are most likely to see.
+If a mention or button click fails, the reason appears under the app's message or yours, starting with `App error:`. Ask an admin to check the app in **Settings > Apps** (admin section). [Troubleshooting](#troubleshooting) lists the messages you are most likely to see.
 
 ### Buttons
 
@@ -118,22 +116,12 @@ Receiving mentions needs `channels:mentions:read` or `channels:messages:read`. A
 
 ### Connection status
 
-Open WebUI keeps a live connection to each enabled app and reconnects on its own, waiting up to 30 seconds between attempts. Every Open WebUI worker opens its own connection; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling) for workers and Redis. The **Apps** tab shows the state of each enabled app and refreshes every few seconds:
-
-| Status | Meaning |
-|--------|---------|
-| **Connected** | A verified connection is open. With several workers sharing Redis, at least one of them is connected. |
-| **Connecting** | Open WebUI is trying to reach the app and will keep retrying. |
-| **Disconnected** | No connection is open. |
-
-Disabled apps are dimmed. Hover the switch to see **Enabled**, **Disabled** or **Uninstalled**.
-
-When an app stays on **Connecting** or **Disconnected**, turn its switch off and on again, then click **Connect** in the dialog that opens. The dialog shows why the connection fails; [Troubleshooting](#troubleshooting) explains each message.
+Open WebUI keeps a live connection to each enabled app and reconnects on its own. The **Apps** tab shows each app as **Connected**, **Connecting** or **Disconnected**. If an app stays on **Connecting** or **Disconnected**, turn its switch off and on again, then click **Connect** in the dialog that opens. The dialog shows why the connection fails; [Troubleshooting](#troubleshooting) explains each message. With several workers, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling).
 
 ### Update, disable and uninstall
 
-- **Configure** (gear icon) opens the app's settings. **Update app** (the refresh button next to the URL) loads the app's details again, for example after the operator added a scope or changed the profile image. Saving approves the updated details and selected scopes and reconnects the app. When the public key or the API key changes, saving connects the app again from scratch, as on first install.
-- **Edit details manually** (below the URL) opens the app's **Public key** and **Requested scopes** for editing. Use it for an app that does not publish its details. Saving approves the edited details and reconnects the app the same way.
+- **Update app** in the **Configure** dialog loads the app's details again, for example after the operator added a scope or changed the profile image. Saving approves the updated details and scopes and reconnects the app.
+- **Edit details manually** (below the URL) lets you enter the app's **Public key** and **Requested scopes** for an app that does not publish its details.
 - The switch disables an enabled app at once. Turning it back on opens the settings, where **Connect** connects it again.
 - **Uninstall**, at the bottom of the **Configure** dialog, removes the API key, the connection credential and the app's channel memberships. Messages the app already posted stay in the channels. The app stays in the list as **Uninstalled**, with its handle, scopes and access. To use it again, turn its switch on, enter the API key, click **Connect** and add it to its channels again.
 

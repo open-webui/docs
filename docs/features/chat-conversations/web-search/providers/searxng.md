@@ -147,34 +147,6 @@ After the initial run, add `cap_drop: - ALL` to the `docker-compose.yaml` file f
 
 If Open WebUI is running in the same Docker network as Searxng, you may remove the `0.0.0.0` and only specify the port mapping. In this case, Open WebUI can access Searxng directly using the container name.
 
-<details>
-<summary>docker-compose.yaml</summary>
-
-```yaml
-searxng:
-    container_name: searxng
-    image: docker.io/searxng/searxng:latest
-    restart: unless-stopped
-    networks:
-      - searxng
-    ports:
-      - "0.0.0.0:8080:8080" # use 8080:8080 if containers are in the same Docker network
-    volumes:
-      - ./searxng:/etc/searxng:rw
-      - searxng-data:/var/cache/searxng:rw
-    environment:
-      - SEARXNG_BASE_URL=https://${SEARXNG_HOSTNAME:-localhost}/
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
-    cap_drop:
-      - ALL
-```
-
-</details>
-
 **Step 8: Add Formats**
 
 8. Add HTML and JSON formats to the `searxng-docker/searxng/settings.yml` file:
@@ -201,8 +173,6 @@ The searXNG will be available at http://localhost:8080 (or the port number you s
 
 ## 2. Alternative Setup
 
-Alternatively, if you don't want to modify the default configuration, you can simply create an empty `searxng-docker` folder and follow the rest of the setup instructions.
-
 ### Docker Compose Setup
 
 Add the following environment variables to your Open WebUI `docker-compose.yaml` file:
@@ -218,104 +188,7 @@ services:
       SEARXNG_QUERY_URL: "http://searxng:8080/search"
 ```
 
-Create a `.env` file for SearXNG:
-
-```env
-# SearXNG
-SEARXNG_HOSTNAME=localhost:8080/
-```
-
-Next, add the following to SearXNG's `docker-compose.yaml` file:
-
-```yaml
-services:
-  searxng:
-    container_name: searxng
-    image: searxng/searxng:latest
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./searxng:/etc/searxng:rw
-    env_file:
-      - .env
-    restart: unless-stopped
-    cap_drop:
-      - ALL
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-      - DAC_OVERRIDE
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
-```
-
-Your stack is ready to be launched with:
-
-```bash
-docker compose up -d
-```
-
-:::note
-
-On the first run, you must remove `cap_drop: - ALL` from the `docker-compose.yaml` file for the `searxng` service to successfully create `/etc/searxng/uwsgi.ini`. This is necessary because the `cap_drop: - ALL` directive removes all capabilities, including those required for the creation of the `uwsgi.ini` file. After the first run, you should re-add `cap_drop: - ALL` to the `docker-compose.yaml` file for security reasons.
-
-:::
-
-**Configure SearXNG for Open WebUI Integration**
-
-After starting the container, you need to configure SearXNG to support JSON format queries from Open WebUI:
-
-1. Stop the container after about 30 seconds to allow initial configuration files to be generated:
-
-```bash
-docker compose down
-```
-
-2. Navigate to the `./searxng` folder and edit the `settings.yml` file:
-
-```bash
-cd searxng
-```
-
-3. Open the `settings.yml` file in your preferred text editor and locate the `search` section. Add `json` to the formats list:
-
-```yaml
-search:
-  safe_search: 0
-  autocomplete: ""
-  default_lang: ""
-  formats:
-    - html
-    - json  # Add this line to enable JSON format support for Open WebUI
-```
-
-Alternatively, you can use the following command to automatically add JSON support:
-
-```bash
-sed -i '/formats:/,/]/s/html/html\n    - json/' searxng/settings.yml
-```
-
-4. Save the file and restart the container:
-
-```bash
-docker compose up -d
-```
-
-:::warning
-
-Without adding JSON format support, SearXNG will block queries from Open WebUI and you'll encounter `403 Client Error: Forbidden` errors in your Open WebUI logs.
-
-:::
-
-Alternatively, you can run SearXNG directly using `docker run`:
-
-```bash
-docker run --name searxng --env-file .env -v ./searxng:/etc/searxng:rw -p 8080:8080 --restart unless-stopped --cap-drop ALL --cap-add CHOWN --cap-add SETGID --cap-add SETUID --cap-add DAC_OVERRIDE --log-driver json-file --log-opt max-size=1m --log-opt max-file=1 searxng/searxng:latest
-```
+SearXNG must list `json` under `formats` in its `settings.yml` (Step 8 above). Without it, SearXNG blocks queries from Open WebUI and the logs show `403 Client Error: Forbidden`.
 
 ## 3. Confirm Connectivity
 

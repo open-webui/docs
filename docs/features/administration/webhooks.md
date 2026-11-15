@@ -74,7 +74,7 @@ See **[Notifications](/features/chat-conversations/chat-features/notifications)*
 
 ### How it Works
 
-With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**, so you are not pinged about something you are already watching. Setting a target to **always** sends regardless. Channel messages ignore the delivery mode, in group channels and direct messages too, and are sent only while you have no Open WebUI tab open. They are sent for messages that people post, bot accounts posting over the API included. In a standard channel they reach you once you have opened or posted in that channel. A channel set to [**Mentions only**](/features/channels#muting-a-channel) sends only the messages that @mention you.
+With the default **away** delivery, a notification is only sent if you are **not actively using the WebUI**. Setting a target to **always** sends regardless. Channel messages ignore the delivery mode and arrive only while no Open WebUI tab is open; a channel set to [**Mentions only**](/features/channels#muting-a-channel) sends just the messages that @mention you.
 
 ### Enabling/Disabling User Webhooks
 
@@ -150,19 +150,11 @@ This URL is unique and contains an authentication token. Anyone with this URL ca
 
 #### Updating a Webhook
 
-1.  Open the **Webhooks** modal from the channel settings.
-2.  Click on the webhook you want to edit to expand it.
-3.  Modify the **Name** or **Profile Image** as needed.
-4.  Click **Save** to apply changes.
-
-The webhook URL remains the same when you update the name or image. All messages posted by the webhook, earlier ones included, show its current name and image.
+Open the **Webhooks** modal from the channel settings, expand the webhook and change its **Name** or **Profile Image**. The webhook URL remains the same, and all messages posted by the webhook, earlier ones included, show its current name and image.
 
 #### Deleting a Webhook
 
-1.  Open the **Webhooks** modal from the channel settings.
-2.  Click on the webhook you want to delete to expand it.
-3.  Click the **Delete** (trash) icon.
-4.  Confirm the deletion.
+Delete a webhook from the **Webhooks** modal in the channel settings with its **Delete** (trash) icon.
 
 Once deleted, the webhook URL will stop working immediately. Messages previously posted by the webhook will remain in the channel but show "Deleted Webhook" as the author.
 
@@ -224,12 +216,7 @@ On success, the webhook will return:
 
 ### Webhook Identity
 
-Messages posted via webhooks have a special identity system:
-- They appear with the webhook's **name** and **profile image**
-- The user role is marked as **"webhook"** to distinguish from regular users
-- If a webhook is deleted, its messages remain visible but show "Deleted Webhook" with the default avatar
-- Each message stores the webhook ID in its metadata, allowing proper attribution even if the webhook is later modified or deleted
-- Only Open WebUI writes that metadata. Metadata sent with a regular request to post or edit a message is ignored, so a message posted by an account always shows that account
+Messages posted via webhooks show the webhook's **name** and **profile image**, and show "Deleted Webhook" once it is deleted. Only Open WebUI writes the webhook attribution, so a message posted by an account always shows that account.
 
 ## Troubleshooting
 

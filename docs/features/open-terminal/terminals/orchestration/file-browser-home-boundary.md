@@ -19,7 +19,7 @@ Set an explicit path to visually root the file browser somewhere else:
 }
 ```
 
-Open Terminal resolves the path for the current user. The first breadcrumb shows `Home` for the user's home directory, otherwise the final path segment.
+Open Terminal resolves the path for the current user.
 
 You can also use `{{home}}` or `~` for paths under the current user's home:
 
@@ -39,13 +39,6 @@ Set this in the terminal's **Environment variables** to opt out entirely:
 
 With the value `filesystem`, the file browser shows the full filesystem.
 
-## Client Behavior
-
-- Opens at the root.
-- Shows the first breadcrumb as the root's label.
-- Hides parent folders above the root.
-- Keeps the user inside the root when they try to navigate above it.
-- Shows the full filesystem when the value is `filesystem`.
 
 ## What This Does Not Do
 

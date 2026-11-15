@@ -48,9 +48,7 @@ Controls what happens when you click a follow-up prompt.
 
 ## Taking one with Tab
 
-When a reply finishes, the first follow-up also appears as grey ghost text in the empty message box. Press **Tab** to write it into the input, then edit or send it. Type anything else and it disappears, so it never gets in the way of writing your own message.
-
-It shows only while the box is empty and the last message is a finished reply, and it goes away as soon as the model starts generating again. The chips under the reply are unchanged, and this is the same suggestion as the first of them.
+When a reply finishes, the first follow-up also appears as grey ghost text in the empty message box. Press **Tab** to write it into the input, then edit or send it.
 
 ## Regenerating Follow-Ups
 

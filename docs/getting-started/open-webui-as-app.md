@@ -13,7 +13,7 @@ Every Open WebUI instance is a **Progressive Web App (PWA)**. You can install it
 - **Full-screen experience** with no browser toolbar or address bar
 - **Standalone window** on desktop, full-screen on mobile
 - **Separate from the browser** with its own window and task entry
-- **Browser notifications** for finished responses, channel messages and calendar reminders, once you turn on **Browser Notifications** in Settings > Notifications. They fire only while the app is open; there is no push service. If your admin enables user webhooks (and, for non-admin users, grants the webhooks feature permission), **Notification Targets** in the same tab can send chat finished or failed, channel message, calendar and file-processing-failure alerts to a webhook, either only while you are away or always.
+- **Browser notifications** for finished responses appear while the app is open, once you turn on **Browser Notifications** in Settings > Notifications.
 
 ---
 

@@ -56,31 +56,12 @@ The attachment metadata block is intentionally **metadata only** (no file conten
 :::
 
 :::info Native function calling keeps citations, memories, skills and knowledge lists out of the cached prefix
-When the **Citations** capability is on and a tool returns sources (`query_chat_files`, `query_knowledge_files`, `view_file`, `view_knowledge_file`, `fetch_url`), the source markers are appended to that tool result and saved with it, so later requests replay the same text. Recalled memories, the skills list and the attached knowledge list arrive as hidden tool results (`recall_memories`, `list_available_skills`, `list_attached_knowledge`) after the user's message, once per reply. A list or recall with nothing in it is skipped, and so is a reply that is continued, because its saved output already holds them. They are saved in the reply's output and replayed unchanged on later turns. Nothing earlier in the request is rewritten.
-
-This applies to chats in the web UI with Native function calling and the model's **Builtin Tools** capability on. The skills list also needs the **Skills** category and the attached knowledge list the **Knowledge Base** category. With Legacy function calling, in API requests without a web UI session and with Builtin Tools off, memories are appended to your message on every turn and there is no skills or knowledge list.
-
-Custom pipes that read the last message can see a tool message there when memories are recalled, knowledge is attached or the user has skills. Filters run before these results are added: `inlet` never sees them and `request` sees them from the second call of a reply on.
+With Native function calling and the model's **Builtin Tools** capability on, recalled memories, the skills list, the attached knowledge list and tool sources are replayed unchanged on later requests, so the prefix stays cached.
 :::
 
 ### Why the injection goes into the latest user message
 
-The placement is deliberate, and worth understanding before treating it as a defect to be fixed.
-
-Automatic retrieval was built on the premise that the model mainly attends to the message it is answering. Very small local models and older models behave that way in practice: context placed earlier in the conversation gets ignored, or falls out of a context window too short to hold the whole history. Putting the retrieved context anywhere other than the message being answered means those models do not reliably see it, which is the difference between retrieval working and retrieval silently doing nothing.
-
-Breaking the cached prefix is the price of that guarantee, and it is a price worth paying when the alternative is a model that cannot use the context at all. It stops being worth paying the moment your model is large enough and long enough in context to attend to material further up the conversation, which is every frontier model and most current local ones.
-
-So the two capabilities are a choice between two designs rather than a feature and a bug:
-
-| | Context injection on | Context injection off |
-| :--- | :--- | :--- |
-| **Retrieval** | Forced, before the model runs | On demand, the model calls a tool |
-| **Placement** | Rewritten into the latest message every turn | Appended at the end as tool results |
-| **Prefix cache** | Invalidated each turn | Preserved |
-| **Suits** | Small and short-context models | Everything else |
-
-Turning Preload files off is not a workaround for the cost described above. It selects the other design, the one this page is about.
+Small or short-context models need retrieved context in the message they are answering, so **Preload files** forces it there each turn, which invalidates the prefix cache. Larger models do not need that, so turn Preload files off for them and let them fetch context with tools.
 
 ## The cache-optimal setup
 

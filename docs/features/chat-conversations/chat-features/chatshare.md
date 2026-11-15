@@ -97,13 +97,9 @@ Once at least one person or group has access, the modal also shows a **Sharing m
 
 In a chat with replies allowed:
 
-- In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
-- A line above the message input shows who is typing.
-- The chat's top bar shows the other people who have the chat open right now, up to three profile pictures followed by a count such as **+2**. Click the count for the **Collaborators** list, and hover or click a picture to open that person's profile card.
-- Anyone who can write into the chat and has the **Allow Regenerate Response** permission can **Regenerate** any reply. The new version belongs to the person who generated it. Each person continues, stops and rates only the reply versions they generated.
-- Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt. The editor offers **Send**, which adds the edited prompt as a new branch with a new reply and leaves the original as it was. Other people in the chat stay on the branch they had selected.
-- Only the owner can edit replies and save an edit in place, and only on their own messages and the reply versions they generated. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
-- **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version.
+- Anyone who can write into the chat and has the **Allow Regenerate Response** permission can **Regenerate** any reply. The new version belongs to the person who generated it.
+- Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt, which adds the edited prompt as a new branch and leaves the original as it was.
+- Only the owner can edit replies and save an edit in place. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
 - Anyone who can write into the chat can change and save the chat's model, terminal and working folder. Everyone who can write into the chat can also use the chat's own terminal.
 - Only the owner's messages generate titles and tags or change the chat's attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
@@ -151,12 +147,7 @@ To update a shared chat:
 3. Click on the **Share** option.
 4. The **Share Chat** Modal should look different if you've shared a chat before.
 
-The **Share Chat** Modal includes the following options:
-
-- **before**: Opens a new tab to view the previously shared chat from the share link.
-- **delete this link**: Deletes the shared link of the chat and presents the initial share chat modal.
-- **Share to Open WebUI Community**: Opens a new tab for https://openwebui.com/chats/upload with the chat ready to be shared as a snapshot.
-- **Update and Copy Link**: Updates the snapshot of the chat of the previously shared chat link and copies it to your device's clipboard.
+Open **Share** again and click **Update and Copy Link** to refresh the snapshot and copy the link. **delete this link** removes the share link.
 
 ### Deleting Shared Chats
 

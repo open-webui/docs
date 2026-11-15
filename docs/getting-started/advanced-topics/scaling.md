@@ -181,7 +181,7 @@ With several instances, every live update crosses Redis and is encoded and decod
 
 ### Per-Room Redis Channels
 
-With `WEBSOCKET_MANAGER=redis`, live updates addressed to a specific user, channel or note go out on a Redis channel of their own. Each instance subscribes only to the rooms of the users connected to it, so it skips decoding updates meant for other instances. Acknowledgements and control messages stay on the shared channel. The saving grows with the number of instances. This is on by default:
+Per-room channels are on by default:
 
 ```
 WEBSOCKET_REDIS_ROOM_CHANNELS=True

@@ -113,7 +113,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   :::
 
   :::warning Native tool calling is broken on this endpoint
-  Google's compatibility layer departs from the OpenAI streaming schema in two ways. It omits the `index` field that the schema carries on every streamed tool call, and Gemini 3 models attach a proprietary `thought_signature` that Google then requires back on the follow-up request. Open WebUI speaks the OpenAI schema, so on any turn where the model decides to call a tool, the call is discarded and **the assistant message arrives empty**, with nothing in the logs.
+  Google's compatibility layer departs from the OpenAI streaming schema, so on any turn where the model decides to call a tool, the call is discarded and **the assistant message arrives empty**, with nothing in the logs.
 
   This includes the builtin tools such as Memory, which is why it looks intermittent: the turn only breaks when the model chooses to call something. Your options:
 
@@ -562,7 +562,8 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **Model IDs** | Auto-detected from your LiteLLM configuration |
   | **Provider** | `LiteLLM` (optional, see below) |
 
-  Setting **Provider** to `LiteLLM` under **Advanced** only matters when something calls Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api), for example an Anthropic SDK or a coding agent pointed at Open WebUI. With it set, such a request is handed to LiteLLM untouched instead of being translated into Chat Completions and back, so Anthropic-only fields survive the trip. The trade is that the request goes straight to LiteLLM and skips the Open WebUI chat pipeline, so filters, tools and knowledge do not run on it. Normal chatting in the Open WebUI interface is unaffected either way.
+  Setting **Provider** to `LiteLLM` under **Advanced** only matters for requests to Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api). See the [Provider Setting](#the-provider-setting) section.
+
 
   **Quick setup:**
 
@@ -749,7 +750,7 @@ The connection URL you already use for chat is the right one here: Open WebUI st
 
 ### From the model selector
 
-Admins do not have to open the panel to pull a model. Type a model ref into the model selector's search box and Open WebUI offers one **Download** row per target: Ollama if it is connected, plus every `llama.cpp` and LM Studio connection, each labelled with the provider it would download from. Arrow keys reach the rows and **Enter** starts the download. A row in progress shows a percentage and an ✕ to cancel it, and up to three downloads can run at once across all targets.
+Admins can also type a model ref into the model selector's search box to download it from Ollama, `llama.cpp` or LM Studio.
 
 Model rows for these two providers also carry their parameter size, quantization and file size next to the name, taken from whatever the server reports.
 

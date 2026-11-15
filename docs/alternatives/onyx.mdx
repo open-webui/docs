@@ -51,53 +51,6 @@ Spotted an error or outdated information? [Let us know](https://github.com/open-
 
 ---
 
-## Licensing and Paid Tiers
-
-Both projects are free to self-host and both sell paid tiers. They place different capabilities in different tiers, so the practical question is which feature set matches the deployment you are planning.
-
-**Open WebUI** is source available under the [Open WebUI License](https://github.com/open-webui/open-webui/blob/main/LICENSE), a BSD-3 clause licence with one addition: you may not remove or replace Open WebUI branding once a deployment exceeds 50 users in a rolling 30 day period, unless you hold an enterprise licence.
-
-**Onyx** licenses its Community Edition core under MIT, covering chat, RAG, agents and actions. That grant is not repository-wide: Onyx's own [LICENSE](https://github.com/onyx-dot-app/onyx/blob/main/LICENSE) carves out everything under `ee` directories and places it under the Onyx Enterprise License instead. Taken on its own, MIT is a more permissive licence than ours, and that matters if you intend to redistribute or fork the core.
-
-### What each free self-hosted edition includes
-
-Open WebUI's free edition against Onyx's Community Edition, the part carrying the MIT licence. Onyx's column follows its [Enterprise Edition](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) and [access control](https://docs.onyx.app/security/architecture/access_controls) documentation, and the per-tier gating in its own `license_enforcement_config.py`. Onyx's paid tiers are available self-hosted as well as on its cloud, so "Business" and "Enterprise" below can still mean self-hosted.
-
-| Capability | Open WebUI (free) | Onyx Community Edition (free) |
-| :--- | :--- | :--- |
-| OIDC / OAuth single sign-on | Included | Enterprise Edition |
-| SAML single sign-on | Via a [trusted-header proxy](/features/authentication-access/auth/sso#trusted-header) that terminates SAML | Enterprise Edition native support |
-| LDAP / Active Directory | Included | Not documented |
-| User groups and role-based access control | Included | Business tier or above |
-| Per-resource access grants (users and groups) | Included | Business tier or above |
-| SCIM 2.0 provisioning | Included | Enterprise tier |
-| Audit logging | Included | Not documented |
-| User limit before paying | None | None |
-| Giving different teams access to different documents | Separate knowledge bases, each granted to the users or groups you choose | Enterprise Edition |
-| Different access to individual files **inside one** knowledge base | Access applies to a knowledge base as a whole | Enterprise Edition |
-| Permissions mirrored automatically from Slack, Drive or Confluence | Not a current Open WebUI feature | Enterprise Edition |
-| Removing product branding | Up to 50 users; enterprise licence beyond that | Enterprise Edition |
-| Dedicated support and SLAs | [Enterprise licence](/enterprise/support) | Enterprise Edition |
-| Priority on feature requests | Enterprise licence | Enterprise Edition |
-
-Nothing marked Included in Open WebUI's column needs a licence key, a seat count or a paid plan. They are configurable settings.
-
-Two rows deserve care, because the distinction is easy to blur. Open WebUI gives separate teams access to separate document sets by putting them in different knowledge bases and granting each to the right groups. Onyx's paid editions go deeper for enterprise search: they can mirror source-system permissions from tools like Slack, Drive and Confluence and enforce them during retrieval. If your documents already have complex permissions in those source systems, that is a real strength of Onyx.
-
-Dedicated support and priority on the roadmap are paid on both sides, which is how each project is funded, and neither pretends otherwise.
-
-On [Onyx Cloud](https://onyx.app/pricing) as of July 2026, the Business tier is $20 per user per month and buys role-based access control and permission inheritance, but not single sign-on, SCIM or outbound webhooks. Those are Enterprise, which is a contact-us.
-
-So the summary is this. If you are self-hosting and need managed identity in the free edition, Open WebUI includes it for any number of users. If you need per-document permissions mirrored from Slack or Drive, Onyx is designed for that in its paid editions. If you intend to fork or redistribute, Onyx's core carries the more permissive licence.
-
-:::note Check both before you decide
-
-Pricing and tiers change. These figures come from each project's own published terms on the date at the top of this page. Verify against [Onyx's pricing](https://onyx.app/pricing) and our [licence](https://github.com/open-webui/open-webui/blob/main/LICENSE) rather than trusting either vendor's summary, including this one.
-
-:::
-
----
-
 ## At a Glance
 
 | | Open WebUI | Onyx |
@@ -108,9 +61,8 @@ Pricing and tiers change. These figures come from each project's own published t
 | **Multi-provider** | Any OpenAI-compatible API + Ollama | Multiple LLM provider support |
 | **Extensibility** | Python tools, MCP, OpenAPI, pipelines | Focused on connector and search ecosystem |
 | **Collaboration** | Channels, Notes, shared conversations | AI-powered search and Q&A |
-| **License** | Open WebUI License (BSD-3 plus a branding clause above 50 users) | MIT for the Community Edition core; separate terms for Enterprise features, see [self-host terms](https://onyx.app/legal/self-host) |
+| **License** | Open WebUI License (BSD-3 plus a branding clause above 50 users) | MIT core with separate enterprise terms |
 
-For which identity and access features each free edition includes, see [the table above](#what-each-free-self-hosted-edition-includes) rather than this summary.
 
 ---
 
@@ -123,7 +75,7 @@ Two parts of that are worth being precise about, because they are areas where On
 - **Continuous sync into the knowledge base.** Open WebUI connects to cloud storage at the point of use: users can pull files from [Google Drive](/features/chat-conversations/rag#google-drive-integration), OneDrive and SharePoint straight into a chat. Knowledge bases are populated by upload, by directory sync or through the API, and [oikb](/ecosystem/knowledge-base-sync) extends that to repositories, buckets and wikis on a schedule. Onyx builds continuous connector sync directly into the product.
 - **Permission inheritance from the source system.** Open WebUI grants access per knowledge base, so you separate what different teams may read by putting it in different knowledge bases. Onyx can mirror a source system's access control list and enforce it at retrieval time, on its Enterprise Edition. If you are indexing a large shared Drive whose permissions already encode who may see what, that difference is the whole decision.
 
-If either is a hard requirement, Onyx is the better fit. Note that both are [Enterprise Edition features](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) on Onyx's side, so the comparison to make is against a paid Onyx deployment rather than the free Community Edition.
+If either is a hard requirement, Onyx is the better fit.
 
 **Choose Open WebUI if** you need a general-purpose AI platform with chat, knowledge bases, team collaboration, Python extensibility, and support for any model provider. Open WebUI includes SSO, LDAP, RBAC, SCIM 2.0 and audit logging in the free community edition, for unlimited users, which is the deciding factor for organisations that need managed identity without a per-seat contract.
 
@@ -143,7 +95,7 @@ If either is a hard requirement, Onyx is the better fit. Note that both are [Ent
 Onyx leans into enterprise search with 40+ connectors and permission-aware retrieval. Open WebUI comes at it from a more general angle with chat, knowledge bases, team collaboration, and extensibility. Different tools for different needs.
 
 **Is Onyx open source?**
-Partly. Onyx's Community Edition core is MIT licensed, and everything under its `ee` directories is excluded from that grant and carries separate enterprise terms. Additional [self-host terms](https://onyx.app/legal/self-host) may also apply. Note that the licence and the price are separate questions: MIT covers the core, while single sign-on and access control sit in Onyx's paid tiers. For redistribution specifically, MIT on that core is more permissive than the Open WebUI License.
+Partly. Onyx's Community Edition core is MIT licensed, and everything under its `ee` directories carries separate enterprise terms. Additional [self-host terms](https://onyx.app/legal/self-host) may also apply.
 
 **How do SSO and RBAC compare?**
 Open WebUI includes OIDC and OAuth single sign-on, LDAP, RBAC, SCIM 2.0 provisioning and audit logging in the free edition, for unlimited users, with no licence key. In Onyx, [user groups, RBAC and SSO are paid-tier features](https://docs.onyx.app/deployment/miscellaneous/enterprise_edition) for self-hosted deployments. On Onyx Cloud, RBAC starts at the Business tier and SSO at the Enterprise tier.

@@ -114,19 +114,8 @@ cp .env.example.docker .env  # Docker-specific paths, ready to use
 
 # Or: cp .env.example .env    # Local development paths, needs customization
 
-# Choose your deployment method:
-
-# API Only (default)
-docker compose -f docker/docker-compose.yml up -d             # Standard (pip-based)
-docker compose -f docker/docker-compose.uv.yml up -d          # uv-optimized (faster builds)
-docker compose -f docker/docker-compose.gpu.yml up -d         # Standard + GPU
-docker compose -f docker/docker-compose.uv.gpu.yml up -d      # uv + GPU (recommended for GPU users)
-docker compose -f docker/docker-compose.cpu.yml up -d         # CPU-only
-
-# API + Frontend (add --profile frontend to any of the above)
-docker compose -f docker/docker-compose.yml --profile frontend up -d             # Standard + Frontend
-docker compose -f docker/docker-compose.gpu.yml --profile frontend up -d         # GPU + Frontend
-docker compose -f docker/docker-compose.uv.gpu.yml --profile frontend up -d      # uv + GPU + Frontend
+# Start the API (the default compose file; the repository also ships GPU, uv and CPU variants)
+docker compose -f docker/docker-compose.yml up -d
 
 # Watch the logs as it initializes (the first use of TTS takes the longest)
 docker logs chatterbox-tts-api -f
@@ -137,69 +126,6 @@ curl -X POST http://localhost:4123/v1/audio/speech \
   -d '{"input": "Hello from Chatterbox TTS!"}' \
   --output test.wav
 ```
-
-<!-- markdownlint-disable-next-line MD033 -->
-<details>
-<!-- markdownlint-disable-next-line MD033 -->
-<summary>**Running with the Frontend Interface**</summary>
-
-This project includes an optional React-based web UI. Use Docker Compose profiles to easily opt in or out of the frontend:
-
-### With Docker Compose Profiles
-
-```bash
-
-# API only (default behavior)
-docker compose -f docker/docker-compose.yml up -d
-
-# API + Frontend + Web UI (with --profile frontend)
-docker compose -f docker/docker-compose.yml --profile frontend up -d
-
-# Or use the convenient helper script for fullstack:
-python start.py fullstack
-
-# Same pattern works with all deployment variants:
-docker compose -f docker/docker-compose.gpu.yml --profile frontend up -d    # GPU + Frontend
-docker compose -f docker/docker-compose.uv.yml --profile frontend up -d     # uv + Frontend
-docker compose -f docker/docker-compose.cpu.yml --profile frontend up -d    # CPU + Frontend
-```
-
-### Local Development
-
-For local development, you can run the API and frontend separately:
-
-```bash
-
-# Start the API first (follow earlier instructions)
-
-# Then run the frontend:
-cd frontend && npm install && npm run dev
-```
-
-> **Note:** If you encounter dependency issues, try running `npm install --force` instead of just `npm install`.
-
-Click the link provided from Vite to access the web UI.
-
-### Build for Production
-
-Build the frontend for production deployment:
-
-```bash
-cd frontend && npm install && npm run build
-```
-
-> **Note:** If the build fails due to dependency conflicts, try using `npm install --force`.
-
-You can then access it directly from your local file system at `/dist/index.html`.
-
-### Port Configuration
-
-- **API Only**: Accessible at `http://localhost:4123` (direct API access)
-- **With Frontend**: Web UI at `http://localhost:4321`, API requests routed via proxy
-
-The frontend uses a reverse proxy to route requests, so when running with `--profile frontend`, the web interface will be available at `http://localhost:4321` while the API runs behind the proxy.
-
-</details>
 
 ## Setting up Open WebUI to use `Chatterbox TTS API`
 

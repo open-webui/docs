@@ -106,14 +106,7 @@ Your instance's own [Evaluation](/features/administration/evaluation) leaderboar
 
 [`ENABLE_COMMUNITY_SHARING`](/reference/env-configuration#enable_community_sharing) sets it on an instance's first start. After that, the value saved in the Admin Panel wins.
 
-Turning it off hides these for every user, admins included:
-
-- the **Made by Open WebUI Community** links on the Models, Prompts, Skills, Tools and Functions pages
-- **Share** in the model, prompt, skill, tool and function menus
-- **Share to Open WebUI Community** in the chat share dialog
-- **Community Reviews** in the model selector, and the review link after rating a reply
-- the **Sync Usage Stats** dialog
-- the **By** line on a new chat that links a model imported from openwebui.com to its author there; the model keeps its author info, so the link returns once sharing is on again
+Turning it off hides all sharing and community links and dialogs for every user, admins included.
 
 The stats export behind that dialog still answers admins through the API, and refuses everyone else.
 

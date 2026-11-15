@@ -107,7 +107,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 
 Note: the `alembic_version` table, which records the applied migration, is not related to Open-WebUI's core functionality and is excluded from this list.
 
-Note on the `document` table: it is a **legacy** table from before the Knowledge feature. Its rows were migrated into the `knowledge` table (migration `6a39f3d8e55c`) and nothing writes to it anymore, but no migration drops it, so it may still be present (empty) in databases that predate the Knowledge feature. There is no backing model for it in current code.
+Note on the `document` table: it is a **legacy** table from before the Knowledge feature. Nothing writes to it anymore.
 
 Now that we have all the tables, let's understand the structure of each table.
 
@@ -239,7 +239,7 @@ Things to know about the channel table:
 - Case-insensitive channel names (stored lowercase)
 - `type` was added in migration `3781e22d8b01`. `is_private`, `updated_by`, `archived_at`, `archived_by`, `deleted_at` and `deleted_by` were added in migration `90ef40d4714e`.
 - Channel listing and member queries return only rows where both `archived_at` and `deleted_at` are null, so the schema is shaped for archiving and soft deletion.
-- No code path writes `archived_at`, `archived_by`, `deleted_at`, `deleted_by` or `updated_by`. Deleting a channel removes the row outright, so a deleted channel leaves nothing behind for the `deleted_at` filter to exclude. Anyone querying this table directly will find those five columns null on every row.
+- Those five columns are unused: deleting a channel removes the row outright.
 - The `access_control` column that this table was created with was dropped in migration `f1e2d3c4b5a6`. Channel access is managed through the `access_grant` table with `resource_type = 'channel'`.
 
 ## Channel Member Table
@@ -271,7 +271,6 @@ Things to know about the channel_member table:
 - `status` is written as `joined` when the membership is created. Leaving a channel writes `left`, sets `is_active` to false and stamps `left_at`. The row survives.
 - `is_active` is the flag that channel listings and member listings filter on, so a membership someone has left drops out of those results while remaining in the table. It is also written by `POST /api/v1/channels/{id}/members/active`.
 - `last_read_at` is stamped when the membership is created and updated over the socket connection when the user reads the channel.
-- `role` is read in one place, to test whether a member is a `manager`. Nothing writes `manager`: user memberships leave `role` null and app memberships are written as `member`, so that test never matches. Manager-only actions such as viewing and creating channel webhooks fall through to the other two branches of the check: the channel's own `user_id`, or an instance admin.
 - `is_channel_muted` is the member's [**Mentions only**](/features/channels#muting-a-channel) setting, written by `POST /api/v1/channels/{id}/members/mute`. Muting a standard channel the member has never opened creates their membership row. While it is true, channel notification webhooks reach the member only for messages that mention them. `is_channel_pinned` has a setter on the model, `Channels.pin_channel`, that nothing calls.
 - `joined_at` is NOT NULL in the database (migration `2f1211949ecc`) while the SQLAlchemy model omits the flag. The database constraint is the one that applies.
 - Removing an app from a channel, or uninstalling the app, sets `is_active` to false and stamps `left_at`; `status` stays `joined`. Adding the app again reactivates the same row.
@@ -299,7 +298,7 @@ Things to know about the channel_webhook table:
 - Deleting a channel cascades to delete its webhooks.
 - `token` is a URL-safe random token carrying 32 bytes of entropy, generated with `secrets.token_urlsafe(32)`, stored in plain text and carried in the request path. `POST /api/v1/channels/webhooks/{webhook_id}/{token}` takes no authentication and matches the `id` and `token` pair against this table, so anyone holding the pair can post to the channel.
 - `last_used_at` is stamped on each accepted post.
-- Listing and creating webhooks require the caller to be an instance admin or the channel's own creator. See the `role` note on the [Channel Member Table](#channel-member-table) for why the membership-based manager branch of that check never matches.
+- Listing and creating webhooks require the caller to be an instance admin or the channel's own creator.
 - The webhook's `id` and `name` are copied into the posted message's `meta.webhook`, which is what the interface renders in place of an author account.
 
 ## Channel File Table
@@ -545,11 +544,6 @@ Things to know about the chat_file table:
 - Foreign key relationships with CASCADE delete
 - Indexed on `chat_id`, `file_id`, `message_id`, and `user_id` for performance
 
-**Why this table was added:**
-
-- **Query Efficiency**: Before this, files were embedded in message objects. This table allows direct indexed lookups for finding all files in a chat without iterating through every message.
-- **Data Consistency**: Acts as a single source of truth for file associations. In multi-node deployments, all nodes query this table instead of relying on potentially inconsistent embedded data.
-- **Deduplication**: The database-level unique constraint prevents duplicate file associations, which is more reliable than application-level checks.
 
 ## Chat ID Tag Table
 
@@ -561,7 +555,7 @@ Things to know about the chat_file table:
 | user_id         | String        | nullable        | Reference to user  |
 | timestamp       | BigInteger    | nullable        | Creation timestamp |
 
-Note on the `chatidtag` table: it is a **legacy** table from before chat tags moved onto the chat record. Its rows were read out into the `chat` table (migration `1af9b942657b`), which wrote each tag into `chat.meta.tags` and turned the `pinned` tag into `chat.pinned`, and nothing writes to it anymore. That migration leaves the rows where they are and no migration drops the table, so an older database may still hold stale rows in it. There is no backing model for it in current code. Chat tags now live in the `tag` table.
+Note on the `chatidtag` table: it is a **legacy** table and nothing writes to it anymore. Chat tags now live in the `tag` table.
 
 ## Comment Table
 
@@ -754,7 +748,7 @@ Things to know about the group table:
 Things to know about the group_member table:
 
 - Unique constraint on (`group_id`, `user_id`) to prevent duplicate memberships, which also serves lookups that start from a group
-- Indexed on (`user_id`, `group_id`) for efficient lookups of the groups a user belongs to (migration `1ce6ade7d93b`). The unique constraint leads with `group_id` and cannot answer that question, so without this index every permission and access check reads the whole membership table, and the cost grows with the total number of memberships on the instance rather than with the number a single user has
+- Indexed on (`user_id`, `group_id`) for efficient lookups of the groups a user belongs to (migration `1ce6ade7d93b`).
 - Foreign key relationships with CASCADE delete to group and user tables
 
 ## Knowledge Table
@@ -1124,9 +1118,8 @@ Things to know about the user table:
 - One-to-One relationship with `auth` table (shared id)
 - One-to-Many relationship with `oauth_session` table (via `user_id` foreign key), one row per sign-in
 - `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
-- The `email` column carries no plain `UNIQUE` constraint in the database, which is why the row above shows none. The SQLAlchemy model declares `unique=True` on it, but the schema is built only from the migrations and none of them creates that constraint, so the index above is the whole of the enforcement.
 - `variables` was added by migration `b0018471bbbe`. It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
-- `oauth` replaced the single `oauth_sub` text column (migration `b10670c03dd5`), so one account can hold a subject from several identity providers at once. It stores `{"<provider>": {"sub": "<subject>"}}`. Databases upgraded across a long gap could have that value written as text rather than as an object, which locked the affected accounts out; migration `6d09d1bf1f23` rewrites those rows on startup and leaves every other row alone. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
+- `oauth` stores `{"<provider>": {"sub": "<subject>"}}`, so one account can hold a subject from several identity providers at once. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
 - API keys are rows in the [API Key Table](#api-key-table).
 - `timezone` holds an IANA zone name (for example `Europe/Vienna`), written by `POST /api/v1/auths/update/timezone`. Calendar recurrence expansion, automation scheduling and the per-user usage statistics read it. An unset or unrecognised value falls back to the server's zone for calendars and automations, and to UTC for usage statistics.
 - `status_emoji`, `status_message` and `status_expires_at` hold the status a user sets for themselves. They are written through `POST /api/v1/users/user/status/update`, which is refused unless the `users.enable_status` config key is on, and they are returned with the signin response and with channel member listings.
@@ -1145,12 +1138,6 @@ The `scim` field's expected structure:
     # "okta": { "external_id": "def-456" }
 }
 ```
-
-**Why this column was added:**
-
-- **SCIM account linking**: Stores per-provider `externalId` values from SCIM provisioning, enabling identity providers (like Azure AD, Okta) to match users by their external identifiers rather than relying solely on email.
-- **Multi-provider support**: The per-provider key structure allows a single user to be provisioned from multiple identity providers simultaneously, each storing their own `externalId`.
-- **OAuth fallback**: When looking up a user by `externalId`, the system falls back to matching it against the subject stored in the `oauth` field for the same provider if no `scim` entry is found, enabling seamless linking of SCIM-provisioned and OAuth-authenticated accounts.
 
 ## Entity Relationship Diagram
 

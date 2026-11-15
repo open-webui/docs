@@ -222,29 +222,6 @@ Instead of checking manually, use a tool to monitor for new releases. Options ar
 
 Notification-only. Alerts you when updates are available (email, Slack, Discord, Telegram, etc.) without touching your containers. You decide when and how to update.
 
-```yaml title="docker-compose.yml"
-services:
-  diun:
-    image: crazymax/diun:latest
-    container_name: diun
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./data:/data
-    environment:
-      - TZ=America/New_York
-      - LOG_LEVEL=info
-      - DIUN_WATCH_WORKERS=10
-      - DIUN_WATCH_SCHEDULE=0 */6 * * *  # Every 6 hours
-      - DIUN_PROVIDERS_DOCKER=true
-      - DIUN_NOTIF_MAIL_HOST=smtp.gmail.com
-      - DIUN_NOTIF_MAIL_PORT=587
-      - DIUN_NOTIF_MAIL_USERNAME=your-email@gmail.com
-      - DIUN_NOTIF_MAIL_PASSWORD=your-app-password
-      - DIUN_NOTIF_MAIL_FROM=your-email@gmail.com
-      - DIUN_NOTIF_MAIL_TO=your-email@gmail.com
-    restart: unless-stopped
-```
-
 See [Diun documentation](https://crazymax.dev/diun/) for full setup and notification options.
 
 ### What's Up Docker (WUD)

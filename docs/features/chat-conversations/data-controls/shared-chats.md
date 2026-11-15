@@ -18,19 +18,7 @@ This page documents the **management dashboard** for shared chats. For informati
 
 ## Dashboard Features
 
-The **Shared Chats** modal provides a unified interface for your public content:
-
-- **Centralized List**: View all conversations that have an active share link.
-- **Search & Filter**: Quickly find specific shared chats by title. The search bar includes a **500ms debounce** to ensure smooth performance while typing.
-- **Advanced Sorting**: Organize your shared history by:
-  - **Updated At** (Default)
-  - **Title**
-- **Copy Link**: Use the **Clipboard icon** next to any entry to instantly copy the share URL back to your clipboard.
-- **Revoke Access (Unshare)**: Use the **Unshare icon** (represented by a slashed link) to deactivate a share link.
-    - :::warning
-      Revoking access immediately invalidates the link. Anyone attempting to visit the URL will receive a "Not Found" error. For a chat shared with [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies), the people you shared with also lose access to the chat itself. This action is permanent, though you can generate a *new* unique link by sharing the chat again from the main interface.
-      :::
-- **Pagination**: Efficiently browse through your history using the "Load More" functionality at the bottom of the list.
+View, copy and revoke share links from one list. Revoking a link immediately invalidates it: anyone visiting the URL gets a "Not Found" error, and for a chat shared with [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies) the people you shared with also lose access to the chat itself. Sharing the chat again creates a new link.
 
 ## FAQ
 

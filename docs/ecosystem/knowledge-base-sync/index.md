@@ -152,7 +152,7 @@ Saved to `~/.config/oikb/config.yaml` (override the directory with `OIKB_CONFIG_
 
 1. oikb scans the source and computes a **SHA-256** checksum for every file.
 2. It sends that manifest (path, filename, checksum and size, **not** the file contents) to Open WebUI's `/sync/diff`, which replies with exactly what is **added**, **modified** and **deleted**, plus which directories to create or remove. This call is read-only; it does not change the Knowledge Base.
-3. oikb deletes the stale files (and now-empty directories), creates any missing directories, then uploads only the **new** and **modified** files, each tagged with its hash so the server skips re-hashing. On the server, cleanup also deletes a stale file's record and stored bytes unless `ENABLE_KNOWLEDGE_FILE_RETENTION=true`, the file is still linked to another Knowledge Base, or the key's user is neither the file's owner nor an admin. A file uploaded before 0.9.6 has no stored checksum and is reported as modified on the first sync, so it is replaced once and unchanged after that.
+3. oikb deletes the stale files (and now-empty directories), creates any missing directories, then uploads only the **new** and **modified** files, each tagged with its hash so the server skips re-hashing.
 
 Because the diff is by content hash, an unchanged repository re-syncs almost instantly: nothing is re-uploaded, re-extracted or re-embedded, so there is no cost to running it often. Only real changes do any work.
 
@@ -238,7 +238,7 @@ sources:
       max-size: 50mb                        # skip anything larger
 ```
 
-`max-size` accepts `b`, `kb`, `mb`, `gb`. Oversized files are warned about and skipped before the diff, so they never upload. It is also available as a CLI flag: `oikb sync ./docs --kb-id abc --max-file-size 50mb`. Open WebUI also enforces its own limits when an admin has set them (both are unset by default): files larger than the admin's Max Upload Size (`RAG_FILE_MAX_SIZE`, in MB) are rejected with HTTP 413, and extensions outside Allowed File Extensions (`RAG_ALLOWED_FILE_EXTENSIONS`) with HTTP 400, so such files fail on every sync until you filter them out here.
+`max-size` accepts `b`, `kb`, `mb`, `gb`. Oversized files are warned about and skipped before the diff, so they never upload. It is also available as a CLI flag: `oikb sync ./docs --kb-id abc --max-file-size 50mb`. Open WebUI also rejects files over its admin-set size or extension limits, so filter those out here or they fail on every sync.
 
 To route different parts of one source into different Knowledge Bases, use separate entries with different `filter.include` and `kb-id`:
 

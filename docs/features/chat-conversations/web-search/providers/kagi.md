@@ -55,14 +55,6 @@ services:
       WEB_SEARCH_CONCURRENT_REQUESTS: 1
 ```
 
-### Account Settings Inheritance
-
-The Kagi Search API inherits settings from your Kagi account, including:
-
-- **Blocked or promoted websites:** your [personalization rules](https://help.kagi.com/kagi/getting-started/index.html) apply to API results
-- **Snippet length:** configured in [Settings → Search](https://help.kagi.com/kagi/settings/search.html)
-
-This means you can customize your API search results the same way you customize the Kagi web interface.
 
 ### Kagi MCP Server (Alternative)
 

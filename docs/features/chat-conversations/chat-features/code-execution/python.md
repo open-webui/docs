@@ -102,12 +102,7 @@ plt.close()
 
 ### How Image Display Works
 
-1. The code executes and prints `data:image/png;base64,...` to stdout
-2. Open WebUI's middleware detects the base64 image data in the output
-3. The image is automatically uploaded and stored as a file
-4. The base64 string is **replaced with a file URL** (e.g., `/api/v1/files/{id}/content`)
-5. The model sees this URL in the code output and can reference it in its response
-6. The image renders inline in the chat
+The code prints `data:image/png;base64,...` to stdout. Open WebUI uploads the image as a file, replaces the base64 string with a file URL (for example `/api/v1/files/{id}/content`) and renders the image inline in the chat.
 
 :::info Understanding the Flow
 The model's code should print the base64 data URL. Open WebUI intercepts this and converts it to a permanent file URL. The model should then use this **resulting URL** in markdown like `![Chart](/api/v1/files/abc123/content)`. It should NOT paste the raw base64 string into its response text.
@@ -211,41 +206,6 @@ The file browser panel lets you download any file the model creates. Ask the mod
 :::note Jupyter Engine
 The persistent filesystem prompt and `/mnt/uploads/` integration are **Pyodide-only**. When using the Jupyter engine, files are managed through Jupyter's own filesystem. The file browser panel is not available for Jupyter.
 :::
-
-## Example: Creating a Chart
-
-**Prompt:**
-> "Create a bar chart with matplotlib showing: Acuity 4.1, Signify 7.2, Hubbell 5.6, Legrand 8.9. Output the chart as a base64 data URL so it displays inline."
-
-**Expected Code Output:**
-```python
-import matplotlib.pyplot as plt
-import io
-import base64
-
-companies = ['Acuity', 'Signify', 'Hubbell', 'Legrand']
-values = [4.1, 7.2, 5.6, 8.9]
-
-plt.figure(figsize=(10, 6))
-bars = plt.bar(companies, values, color=['#3498db', '#2ecc71', '#e74c3c', '#9b59b6'])
-
-for bar, value in zip(bars, values):
-    plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, 
-             str(value), ha='center', va='bottom', fontsize=12)
-
-plt.title('Company Values', fontsize=16, fontweight='bold')
-plt.xlabel('Company', fontsize=12)
-plt.ylabel('Value', fontsize=12)
-plt.tight_layout()
-
-buf = io.BytesIO()
-plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
-buf.seek(0)
-print(f"data:image/png;base64,{base64.b64encode(buf.read()).decode()}")
-plt.close()
-```
-
-The image will be automatically uploaded and displayed inline in your chat.
 
 ## Browser Compatibility
 

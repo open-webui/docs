@@ -97,7 +97,7 @@ Saving the admin **Audio** settings stores every field on that tab, empty ones i
 
 ## Long Recordings
 
-Before transcription, Open WebUI converts recordings in formats outside its supported list to MP3. Audio larger than 20 MB is re-encoded to a smaller MP3 and, if still too large, split into pieces of up to 20 MB. Each piece is sent to Azure as its own request, so the language is detected separately for each piece, and the texts are joined.
+Open WebUI converts long or unsupported recordings to MP3 and splits them before sending them to Azure.
 
 The slim image, or `BYPASS_PYDUB_PREPROCESSING=true`, skips this step and sends files whole. Open WebUI then rejects files over 200 MB, and Microsoft's reference for the API version Open WebUI uses (`2024-11-15`) limits audio to under 2 hours.
 

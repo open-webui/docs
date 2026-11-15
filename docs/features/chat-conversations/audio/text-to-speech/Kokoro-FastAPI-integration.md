@@ -24,19 +24,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
 ## Voices
 
-- af
-- af_bella
-- af_irulan
-- af_nicole
-- af_sarah
-- af_sky
-- am_adam
-- am_michael
-- am_gurney
-- bf_emma
-- bf_isabella
-- bm_george
-- bm_lewis
+See the [Kokoro-FastAPI repository](https://github.com/remsky/Kokoro-FastAPI) for the available voices.
 
 ## Languages
 

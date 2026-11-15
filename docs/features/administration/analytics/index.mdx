@@ -62,20 +62,7 @@ The **Overview** / **Sessions** switch picks the view. Both follow the same peri
 
 ### Time Period Selection
 
-At the top right of the Analytics dashboard, you can filter all data by time period:
-
-- **Last 24 hours**
-- **Last 7 days**
-- **Last 30 days**
-- **Last 90 days**
-- **Year to date** - From 1 January of the current year until now
-- **Last 12 months**
-- **All time** - Complete historical data
-- **Custom range** - A start and an end date you choose
-
-Choosing **Custom range** puts two date fields next to the period dropdown. Nothing is queried until both are filled in, so while you are still picking, the dashboard sits idle instead of showing a spinner, and it loads as soon as the second date is set. The end date is inclusive, so it covers the whole of that day.
-
-Your selected time period is **automatically saved** and persists across browser sessions, the custom dates included. If you leave Analytics on **Custom range** with the dates incomplete and come back to it later, the dashboard shows empty figures until you fill the range in, rather than loading indefinitely.
+At the top right of the Analytics dashboard, pick a time period to filter all data, from the last 24 hours up to all time, or a **Custom range** with a start and end date.
 
 ### Group Filtering
 
@@ -119,14 +106,7 @@ The chart has two views:
 
 Click a model in the legend under the chart, or a row name in the **Activity** view, to show only that model. Click it again or click **All models** to show every model. Hovering a time step shows the value for each model at that point. Times on the chart are server time.
 
-The interval dropdown sets the size of each time step. Its default and its choices follow the time period:
-
-| Time period | Default | Choices |
-|-------------|---------|---------|
-| **Last 24 hours** | **10 min** | **10 min**, **Hourly**, **Daily** |
-| **Last 7 days** | **Hourly** | **Hourly**, **Daily** |
-| **Last 30 days** | **6 hours** | **Hourly**, **3 hours**, **6 hours**, **Daily** |
-| Longer periods | **Daily** | **Daily** |
+The interval dropdown sets the size of each time step.
 
 **Compare** shows the previous period next to the current one in the **Volume** view. The previous period is the window of the same length directly before the selected one. The chart then draws the current period as a solid line and the previous period as a dashed line. Hovering a time step shows both values with their dates and the change in percent. **Compare** is unavailable for **All time**, since that period has nothing before it.
 
@@ -155,9 +135,6 @@ A detailed breakdown of how each model is being used:
 | **Token share** | Percentage share of all tokens. Shows as **Message share** when the chart counts messages |
 
 **Features:**
-- **Sortable columns** - Click any column header to sort, each of the three token columns included
-- **Model icons** - Visual identification with profile images
-- **Token tracking** - See which models consume the most resources
 - **Clickable rows** - Click any model to open the [Model Details Modal](#model-details-modal)
 
 **Use cases:**
@@ -175,8 +152,6 @@ Clicking on any model row opens a detailed modal with two tabs:
 The Overview tab provides:
 
 - **Feedback Activity Chart** - Visual history of user feedback (thumbs up/down) over time
-  - Toggle between **30D**, **1Y**, or **All** views
-  - Weekly aggregation for longer time ranges
 - **Tags** - Most common chat tags associated with this model (top 10)
 
 This helps you understand:
@@ -192,10 +167,7 @@ The Chats tab is only visible when [**`ENABLE_ADMIN_CHAT_ACCESS`**](/reference/e
 
 The Chats tab shows conversations that used this model:
 
-- **User info** - Who started each chat
-- **Preview** - First message of each conversation
-- **Timestamp** - When the chat was last updated
-- **Click to open** - Navigate directly to the shared chat view
+The Chats tab lists the conversations that used this model; click one to open it.
 
 This is useful for:
 - Understanding how users interact with specific models
@@ -217,8 +189,8 @@ Pick **Users** in the switch above the table to track user engagement and token 
 | **Token share** | Percentage share of all tokens. Shows as **Message share** when the chart counts messages |
 
 **Features:**
-- **Sortable columns** - Sort by name, messages, share or any of the three token columns. The table shows the 50 users with the most tokens in the period, or with the most messages when the chart counts messages. The API's `limit` parameter raises that
-- **User identification** - Profile pictures and display names. Hover or click a picture to open that person's profile card
+- **Top users** - The table shows the 50 users with the most tokens in the period, or with the most messages when the chart counts messages.
+- **User identification** - Profile pictures and display names.
 - **Token attribution** - See resource consumption per user
 
 **Use cases:**
@@ -237,23 +209,11 @@ The **Sessions** view is only shown when [**`ENABLE_ADMIN_CHAT_ACCESS`**](/refer
 
 **Sessions** lists one row per chat with messages in the selected period, filtered by group. Sub-agent, timer and note chats are included and labelled. The summary shows totals for sessions, prompts, tokens and response errors. Click a token range below it to filter the list.
 
-| Column | Description |
-|--------|-------------|
-| **Session** | Chat title, with its folder or model |
-| **User** | Owner of the chat |
-| **Last active** | Time of the last saved message |
-| **Responses** | Assistant responses in the period |
-| **Tokens** | Recorded input and output tokens. `-` means none were recorded, `*` means partial |
-| **Response errors** | Responses that ended in an error |
-| **Span** | Time from the first to the last saved message, idle time included |
-
-**Not logged** means a timestamp is missing. Search by chat title, user or folder, filter by model, or hide sub-agent chats in the **Session options** menu.
+Each row shows the chat, its owner, the last activity, responses, tokens, response errors and the time span.  Search by chat title, user or folder, filter by model, or hide sub-agent chats in the **Session options** menu.
 
 ### Session Details
 
-Click a session to see its token and cache totals, a chart per response (**Tokens** or **Timeline**) and the execution trace: each response with its tool calls, results and errors, their outcome and duration. **All**, **Tools** and **Errors** filter the trace. **Open chat** opens the chat in a new tab. Timing is saved for new replies only.
-
-Titles are cut to 10 words. Links, file paths, long identifiers and values that follow words like token or password are removed.
+Click a session to see its token and cache totals, a chart per response and the execution trace with each response's tool calls, results and errors. Titles are cut to 10 words. Links, file paths, long identifiers and values that follow words like token or password are removed.
 
 ---
 
@@ -361,32 +321,7 @@ Example for GPT-5.6:
 
 ### Data Storage
 
-Analytics data is stored in the `chat_message` table, which contains:
-
-- **Message content** - User and assistant messages
-- **Metadata** - Model ID, user ID, timestamps
-- **Token usage** - Input, output, and total tokens
-- **Relationships** - Links to parent messages and chats
-
-On upgrade, for every instance whether or not the flag is set, Open WebUI:
-1. Creates the `chat_message` table with optimized indexes
-2. **Backfills existing messages** from your chat history
-3. **Dual-writes** new messages to both the chat JSON and the message table
-
-This dual-write approach ensures:
-- **Backward compatibility** - Existing features continue working
-- **Fast queries** - Analytics doesn't impact chat performance
-- **Data consistency** - All messages are captured
-
-### Database Indexes
-
-The following indexes optimize analytics queries:
-
-- `chat_id` - Fast lookup of all messages in a chat
-- `user_id` - Quick user activity reports
-- `model_id` - Efficient model usage queries
-- `created_at` - Time-range filtering
-- Composite indexes for common query patterns
+Analytics data is stored in the `chat_message` table. On upgrade, Open WebUI creates it, backfills existing messages from your chat history and writes new messages to both the chat JSON and the message table.
 
 ### API Endpoints
 

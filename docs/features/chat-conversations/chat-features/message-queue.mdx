@@ -79,13 +79,7 @@ When disabled, sending a message while the AI is generating will:
 - **Interrupt** the current generation
 - **Send** your new message immediately
 
-:::tip Default Behavior
-Message Queue is **enabled by default**. The toggle allows you to choose between:
-- **Queue mode** (default) - Messages queue up until generation completes
-- **Interrupt mode** - New messages stop current generation immediately
-
 Either way, a message with an attachment that is still uploading is queued until the upload settles. See [Attachments Still Uploading](#attachments-still-uploading).
-:::
 
 ---
 
@@ -114,16 +108,5 @@ You're in a long conversation and need to capture quick notes:
 - Use "Send now" for urgent interruptions
 
 ---
-
-## Summary
-
-| Feature | Behavior |
-|---------|----------|
-| **Enabled** | Messages queue during generation, sent together when complete |
-| **Disabled** | New messages interrupt current generation immediately |
-| **Pending uploads** | Message is queued until its attachments finish, then sent, whether the toggle is on or off |
-| **Failed upload** | Queued message is marked **Upload failed** and holds the queue until you edit or delete it |
-| **Persistence** | Queue survives navigation within session |
-| **Actions** | Send now, Edit, Delete for each queued item |
 
 The Message Queue helps you maintain your flow of thought without the friction of waiting for AI responses to complete.

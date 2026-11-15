@@ -54,7 +54,6 @@ The first-run setup URL with its token is in the logs (`docker logs cptr` works 
 
 ## How the image works
 
-The container runs `cptr run --host 0.0.0.0 --headless` and sets `CPTR_DATA_DIR=/data`, so it listens on all container interfaces, never tries to open a browser, and keeps everything stateful (SQLite database, `config.toml`, uploads, logs) under `/data`. The image includes all optional feature groups, so no extras are needed.
 
 The `:dev` tag tracks the `main` branch if you want the latest changes; pin `:latest` or a release tag for stability.
 

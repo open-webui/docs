@@ -35,16 +35,7 @@ Open WebUI does **not** silently truncate your conversation. It ships one option
 
 1. **Every model uses a different tokenizer.** The token count for the same text differs between OpenAI (tiktoken), Anthropic, Gemini, GLM, Qwen, Mistral, and so on. A truly correct trimmer would need a per-model tokenizer for every provider in existence. Getting that wrong ships silent data corruption.
 2. **Every model has a different context window.** 8k, 32k, 128k, 200k, 1M, and that's before you factor in reserved output tokens, provider-side overhead, and multimodal content.
-3. **Everyone wants a different truncation policy.** We have seen users ask for all of the following, and all of them are reasonable:
-   - Trim by **token count**.
-   - Trim by **number of messages**.
-   - Trim by **number of conversational turns**.
-   - Trim only **non-system, non-assistant** messages.
-   - Trim **file attachments** first, keep the dialogue.
-   - Trim **tool-call results** first, keep everything else.
-   - Set a **hard ceiling** on chat length (block further messages beyond N turns).
-   - Summarize older messages instead of dropping them, and replace the dropped block with the summary.
-   - Per-model policies (keep 1M tokens for Gemini, 1M for GPT-5.6, 32k for smaller local models).
+3. **Everyone wants a different truncation policy.** Trimming by token count, message count, turns, attachments or tool results, a hard ceiling or per-model rules are all reasonable, so no single policy fits everyone.
 
 There is no single policy that is correct for every deployment, every user, and every model. That is why context management is **opt-in**: the built-in Context Compaction covers the common summarize-and-replace case, and for anything else the filter hook lets you pick exactly the policy you want.
 
@@ -56,7 +47,7 @@ It is **disabled by default**. An administrator enables and tunes it in **Settin
 
 - **Context Compaction**: the on/off toggle ([`ENABLE_CONTEXT_COMPACTION`](/reference/env-configuration#enable_context_compaction)).
 - **Context Compaction Model**: the model that writes the summaries ([`CONTEXT_COMPACTION_MODEL`](/reference/env-configuration#context_compaction_model)). Leave it on **Current Model** to use the chat's own model.
-- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window. This is the global default: an individual model can set its own **Context Compaction Threshold** (`compact_token_threshold`) in its advanced parameters, either lower or higher, bounded by the **Token Cap** ([`CONTEXT_COMPACTION_TOKEN_CAP`](/reference/env-configuration#context_compaction_token_cap)), which defaults to the threshold. So a model can compact later than the global default only if you raise the cap. The **Context Compaction Threshold** field under **Advanced Params** shows only while **Context Compaction** is on. In the model editor anyone who can edit the model sees it; in the model defaults, the chat settings, a chat's **Controls** and the task model parameters only admins do. A threshold already saved is kept and applies again once compaction is turned back on.
+- **Token Threshold**: the estimated context size, in tokens, above which older messages are compacted (default `80000`, [`CONTEXT_COMPACTION_TOKEN_THRESHOLD`](/reference/env-configuration#context_compaction_token_threshold)). Set it below your model's real window. This is the global default: an individual model can set its own **Context Compaction Threshold** (`compact_token_threshold`) in its advanced parameters, either lower or higher, bounded by the **Token Cap** ([`CONTEXT_COMPACTION_TOKEN_CAP`](/reference/env-configuration#context_compaction_token_cap)), which defaults to the threshold. So a model can compact later than the global default only if you raise the cap.
 - **Retained Messages**: the percentage of the most recent messages kept verbatim, everything older being replaced by the summary (default `40`, [`CONTEXT_COMPACTION_RETENTION_PERCENTAGE`](/reference/env-configuration#context_compaction_retention_percentage)). Values outside `10` to `50` are clamped, so at least a tenth and at most half of the conversation is always kept in full.
 - **Context Compaction Prompt**: an optional custom summarization prompt ([`CONTEXT_COMPACTION_PROMPT_TEMPLATE`](/reference/env-configuration#context_compaction_prompt_template)); leave it empty for the built-in default. It supports `{{COMPACTED_MESSAGES}}` (the messages being summarized) and `{{RECENT_MESSAGES}}` (the messages kept in context).
 - **Task Model Parameters**: the generation parameters the summarization request is sent with ([`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)), higher up the same page under **Tasks**. The summary request has no output limit of its own; put `max_tokens` here if you want one. The setting is shared with titles, tags and the other background tasks, so see [Task Models](/features/administration/task-models) before changing it.
@@ -65,31 +56,10 @@ This is the summarize-and-replace strategy (option 4 below), built in. If you ne
 
 ### How it works
 
-- **It runs server-side, per request.** Your full conversation is still stored and displayed in the UI; compaction only changes what is sent to the model on a given turn. A **Context compacted** line marks where older messages were summarized; click it to read the summary.
-- **It keeps a rolling checkpoint, it does not wipe history.** When the threshold is crossed, the oldest ~60% of the active window is summarized and the most recent ~40% (at least two messages) is kept verbatim, and the split never separates an assistant tool call from its result. The summary is saved onto a message as a checkpoint. Later turns resume from that checkpoint (the summary plus the messages after it), and if the window grows past the threshold again it compacts again, folding the previous summary into the new one and moving the checkpoint forward.
-- **It also runs between tool rounds.** In a long native tool loop, every follow-up call to the model is checked against the same threshold once the latest tool results are added. The check starts from the token usage the provider reported for the previous call and estimates only what was added since; without reported usage, the whole context is estimated. Over the threshold, the older part is summarized and the cut falls at the start of a tool round, so each tool call stays together with its results, and your message for that turn stays in context right after the summary. The summary reads only your own text from that message. Knowledge base and file content attached to it is put back for the model once the summary is written. The summary is stored with the reply, so the next message continues from it, together with the tool rounds kept after the cut. With [`ENABLE_RESPONSES_API_STATEFUL`](/reference/env-configuration#enable_responses_api_stateful) on, the provider keeps the tool loop's history and this check is skipped.
-- **The checkpoint is not where the chat resumes for you.** Opening a compacted chat takes you to its most recent message, and a chat left sitting on a checkpoint is moved forward the first time it is opened.
-- **A configurable model writes the summary.** It uses the chat's own model unless you give summarization a model of its own with [`CONTEXT_COMPACTION_MODEL`](/reference/env-configuration#context_compaction_model). An unavailable compaction model falls back to the chat model. The task model is never consulted, so compaction still runs. Without filters or pipes, a summary written by the chat model repeats the chat request with the summary prompt appended, so a provider with prompt caching can serve the history from its cache. The summary request has no output limit of its own unless [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params) sets one, so the provider's normal limits apply. See [Task Models](/features/administration/task-models).
-- **Your system prompt, tools and skills are preserved.** Compaction only summarizes conversation messages. The model, workspace and folder system prompts, the available tools and their instructions, skills and any RAG, web search or memory context are all reassembled fresh on every request, so they are never summarized away. The one exception is older **tool-call results** that live in the chat history: a past tool result inside the compacted block is condensed into the summary, though what the model can still call is unaffected. A system message already sitting at the head of the request is held aside before compaction runs and put back at the front afterwards, so it keeps its position ahead of the summary.
-- **It fails safe.** If the summarizer returns nothing, Open WebUI falls back to a short mechanical summary (the previous summary plus truncated excerpts of the dropped messages). If compaction errors entirely, it is logged and the request proceeds with the full, uncompacted history.
-- **It splits at a user message, and can decline to split at all.** At the start of a turn, the cut is placed at a user message so a turn is never severed mid-exchange. If no suitable user message sits far enough back, for example a long conversation that is one enormous exchange, **compaction does not run for that request** and the full over-threshold history is sent. It is silent: there is no error, and it will try again on the next turn. When that one exchange is a long run of tool calls, compaction can still cut between its tool rounds while the reply runs. So crossing the threshold does not guarantee compaction happened, and compaction is not a hard ceiling on what reaches the model. If you need a guaranteed bound, use a filter Function as below.
-- **You can read the current usage over the API.** `GET /api/v1/chats/{id}` and `POST /api/v1/chats/{id}/compact` include a `context_usage` object, so a client can show how close a chat is to compacting:
+Compaction runs server-side, per request: your full conversation is still stored and displayed, and compaction only changes what is sent to the model. When the threshold is crossed, older messages are summarized and the most recent ones are kept verbatim. Your system prompt, tools and skills are not summarized. Compaction is not a hard ceiling on what reaches the model: if no suitable cut point exists (for example one enormous exchange), it does not run for that request and the full history is sent. If you need a guaranteed bound, use a filter Function as below.
 
-  ```json
-  {
-    "tokens": 41234,
-    "estimated_tokens": 41234,
-    "threshold": 80000,
-    "percent": 52,
-    "source": "estimated"
-  }
-  ```
-
-  It is `null` when compaction is disabled or the chat has no messages. `source` is always `estimated`, even when the count was built from provider-reported usage, so it does not tell the two apart. Open WebUI prefers the token counts the provider itself reported: it walks back to the most recent message carrying a usage record, takes its prompt and completion totals, and only estimates the messages after that point. When no message carries usage, the whole figure is estimated, and an estimate is not a tokenizer-exact figure, so treat it as a gauge rather than a billing number.
-
-  The context usage shown in the chat measures against the same threshold compaction uses.
-
-  Provider vocabularies differ, and all the common ones are read: `prompt_tokens` / `completion_tokens` (OpenAI-style), `input_tokens` / `output_tokens`, `prompt_eval_count` / `eval_count` (Ollama), and `prompt_n` / `predicted_n` plus `cache_n` (llama.cpp). Local backends therefore compact on reported numbers instead of estimates. The stored usage travels with the chat history, so the reported count is available on later turns too, not only on the request that produced it.
+It fails safe: if the summarizer returns nothing, a short mechanical summary is used, and if compaction errors entirely, the request proceeds with the full history.
+The chat shows its context usage measured against the compaction threshold.
 
 ## The supported way: use a filter Function
 
@@ -369,14 +339,9 @@ class Filter:
 
 </details>
 
-A few things worth noticing:
+Set this filter as a **global** filter in Admin Panel > Functions and list your models in the `model_budgets_json` valve; anything else falls back to `default_budget_tokens`. Note:
 
-- **Configure once, run everywhere.** Set this filter as a **global** filter in Admin Panel > Functions. The `model_budgets_json` valve lets you enumerate every model you care about; anything else falls back to `default_budget_tokens`. Admins can tune budgets at runtime without touching code.
-- **Prefix match on model id, longest-first.** `claude-sonnet-5-20260514` transparently uses the `claude-sonnet-5` budget. If you list nested ids like `gpt-5.6-sol` and `gpt-5.6-sol-pro`, `_budget_for` sorts keys by length descending before the prefix loop so the more specific one wins; otherwise dict insertion order would decide and `gpt-5.6-sol` could shadow `gpt-5.6-sol-pro` for anyone who listed it first.
-- **One tokenizer, every model.** Counts come from `tiktoken`, loaded once and cached. `encoding_for_model(model_id)` returns the model's own encoding when the installed tiktoken recognizes the id, otherwise it falls back to `tiktoken_encoding` (default `cl100k_base`). tiktoken only ships OpenAI encodings, and only for models older than its release, so Claude, Gemini, Qwen, DeepSeek and any brand-new OpenAI model all use the fallback. That is an approximation, which is more than good enough for a trim budget with headroom. `cl100k_base` is the one Open WebUI pre-caches, so it works offline; the newer `o200k_base` is **not** pre-cached and is fetched on first use, so an air-gapped box either needs it in `TIKTOKEN_CACHE_DIR` or falls back to `cl100k_base` automatically.
-- **Images get a worst-case allowance; audio and files do not.** Open WebUI hands images to the model as `image_url` content parts, and the filter can't see their resolution without decoding the base64, so it charges a flat `tokens_per_image` (default **1600**) for each one rather than undercounting and busting the window. That default is sized for a 4K, high-detail upload: OpenAI high-detail tops out near 1445 tokens (85 + 170 per 512px tile), Claude near 1590 (about width × height / 750 after its resize). Gemini high-resolution tiling can run higher, so raise the valve if you lean on Gemini with many images. **Audio and file parts still count as zero**; add their own allowance the same way if you need it.
-- **Same tool-call repair.** Reused from the first example. This is the block that keeps the request valid after trimming.
-- **Fail-open when misconfigured.** If you somehow set the headroom larger than the budget, the filter passes the request through untouched rather than wiping the conversation. The provider's error is better than a silent delete.
+- **Images get a worst-case allowance; audio and files do not.** The filter cannot see image resolution, so it charges a flat `tokens_per_image` per image and counts no tokens for audio and files.
 
 :::warning Check your model ids
 Open WebUI doesn't always present the raw provider id to `body["model"]`. If an admin sets a connection `prefix_id`, every model is wrapped as `{prefix}.{raw_id}` (e.g. `openai.gpt-5.6-sol`). Pipe-function manifolds wrap their sub-models as `{pipe.id}.{sub_id}` (e.g. `anthropic.claude-sonnet-5-20260514`). Custom Workspace models can have arbitrary ids, often UUIDs.
@@ -394,24 +359,8 @@ This example already counts with `tiktoken` (via `encoding_for_model(model_id)` 
 
 The two examples on this page are deliberately minimal: they exist to show the shape of the `inlet()` hook and to teach the one non-obvious detail (tool-call repair). For a real deployment, **don't write your own from scratch** and don't ship these as-is. Go browse the [Open WebUI Community](https://openwebui.com/) and pick a context-management filter someone else has already battle-tested.
 
-Production-grade community filters typically handle things the minimal examples above skip:
+Production-grade community filters already cover real tokenizers per provider, image and file token accounting, summarization, per-user policies and observability. Search the community site before writing your own.
 
-- **Real tokenizers per provider**: `tiktoken` for OpenAI, Anthropic's tokenizer for Claude, Gemini's for Google, `transformers` tokenizers for local models. The example on this page uses one tiktoken encoding for every model (exact for OpenAI, approximate elsewhere); a production filter uses each provider's own tokenizer.
-- **Proper image / audio / file token accounting**: exact per-provider, per-resolution counts for every content-part type, instead of one worst-case constant for images and zero for audio and files.
-- **Summarize-and-replace strategies**: when the window is about to overflow, call a cheap model to summarize the oldest block and replace it with one summary message, preserving long-running context instead of silently forgetting.
-- **Per-user / per-role policies**: power users get larger budgets than free users; service accounts get different defaults than humans.
-- **Per-model-family policies**: more intelligent than a prefix match (e.g. recognize all Claude 3.x Sonnet variants via a regex or metadata).
-- **Tool-result-first or attachment-first trimming**: drop the giant scraped web pages and RAG citations from old turns before touching dialogue.
-- **Sliding-window summarization with checkpoints**: keep running summaries stored in `__metadata__` across turns so you don't re-summarize on every request.
-- **Hard message caps and user-facing errors**: refuse a request with a friendly "this chat is too long, please start a new one" event-emitter message instead of silently dropping context.
-- **Observability hooks**: log every trim decision to Langfuse, OpenLit, or your stack of choice so you can audit what the filter actually did.
-- **Configurable valves for everything**: admins tune everything at runtime without touching code.
-
-None of that is hard to do, but all of it together is a week of work if you're starting from one of the minimal examples above. Someone on the community site has almost certainly already done it. **Search first.**
-
-:::tip Really, search first
-When you're shopping for a context-management filter, look for names like *context window*, *trim*, *summarize*, *conversation length*, *token budget*, *history limiter*, and the provider name of the models you use. Sort by popularity on the community site: the top-downloaded filters tend to be the ones that already solved the edge cases you haven't hit yet.
-:::
 
 ## What users will experience
 

@@ -103,7 +103,7 @@ Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Calendar ad
 
 ### Create a Calendar
 
-Click the small **+** button next to the **Calendars** heading in the calendar sidebar to open the **New Calendar** modal. Enter a name and pick a color from the preset palette (blue, red, green, amber, violet, pink, cyan, orange) and click **Create**. The new calendar appears in the sidebar immediately and shows up in the calendar picker when creating or editing events. Each calendar belongs to its creator and can be shared via [Sharing Calendars](#sharing-calendars).
+Click the small **+** button next to the **Calendars** heading in the calendar sidebar to open the **New Calendar** modal. Enter a name and pick a color and click **Create**. The new calendar appears in the sidebar immediately and shows up in the calendar picker when creating or editing events. Each calendar belongs to its creator and can be shared via [Sharing Calendars](#sharing-calendars).
 
 To rename or recolor your Personal calendar or one you created, hover it in the sidebar and click the pencil (**Edit**), change the name or color and click **Save**.
 
@@ -119,7 +119,7 @@ To rename or recolor your Personal calendar or one you created, hover it in the 
    - **Description** (optional)
 3. Click **Create**
 
-**New Event** opens the form on today's date, starting at the current time and ending an hour later. Both come from your own clock, so opening the form late in the evening or early in the morning still gives you today rather than tomorrow or yesterday. Opening the form by clicking the grid prefills that slot instead: the hour you clicked in week and day view, 09:00 in month view.
+**New Event** opens on today; clicking a grid slot prefills that time.
 
 ### Edit or Delete an Event
 
@@ -145,19 +145,13 @@ Use the **arrow buttons** to navigate forward/backward, or click **Today** to ju
 
 ## Recurring Events
 
-Set **Repeat** in the event form to make an event come back: **No Repeat** (the default), **Daily**, **Monday – Friday**, **Weekly**, **Monthly** or **Yearly**. Occurrences are counted from the event's own start, so a weekly event lands on the weekday it starts on and a monthly one on the same day of the month.
-
-Every occurrence sits at the clock time you set, read in your time zone rather than the server's. A 09:00 standup shows at 09:00 whether the server runs on UTC or anywhere else, and it stays at 09:00 after the clocks go forward or back for daylight saving.
-
-Your time zone comes from your browser and is stored on your account, so there is nothing to configure. When an account carries no usable time zone, its recurring events fall back to the server's time zone.
+Set **Repeat** in the event form to make an event come back (daily, weekly, monthly, yearly and similar). Occurrences keep the clock time you set in your own time zone, daylight saving included.
 
 ### Daily is as often as an event can repeat
 
 An event cannot repeat more often than once a day. Saving a rule that comes back every hour, or every fifteen minutes, is refused with **Recurring events cannot repeat more often than daily**. This is checked on the server, so it applies to events created through the API and by a model, as well as ones created in the interface.
 
 Anything faster than daily is a job rather than an appointment, and it belongs in [Automations](/features/chat-conversations/chat-features/automations), which are built to run on that kind of schedule.
-
-Sub-daily events saved before the limit existed keep running as they are. They cannot be saved again until their repeat rule is changed, so editing anything else about such an event means fixing the rule at the same time.
 
 ---
 
@@ -173,13 +167,6 @@ For each active automation with an RRULE schedule, the calendar computes upcomin
 
 Completed automation runs appear as historical events. Each shows the automation name and includes metadata linking to the generated chat (if available). Click a past run event to open the chat it created.
 
-### How it works
-
-- The virtual calendar uses a constant ID (`__scheduled_tasks__`) and is excluded from the event editor's calendar picker
-- Virtual events have IDs prefixed with `auto_` (future) or `run_` (past)
-- They cannot be edited or deleted from the calendar UI
-- Clicking a future run event navigates to the automation editor
-- Clicking a past run event navigates to the run's chat
 
 ---
 
@@ -241,31 +228,13 @@ Users who are not admins can share only as far as their [sharing permissions](/f
 
 ## Attendees and RSVP
 
-Events support attendees with RSVP tracking:
-
-| Status | Meaning |
-|--------|---------|
-| `pending` | Invitation sent, no response yet |
-| `accepted` | Attendee confirmed attendance |
-| `declined` | Attendee declined |
-| `tentative` | Attendee is uncertain |
-
-Attendees can update their own RSVP status via the API. Events where a user is an attendee are visible regardless of calendar ownership.
+Events support attendees with RSVP tracking (pending, accepted, declined or tentative). Events where a user is an attendee are visible regardless of calendar ownership.
 
 ---
 
 ## Reminders & Alerts
 
-Each event has a **Reminder** setting that controls when an alert fires before the event starts.
-
-| Option | Behavior |
-|--------|----------|
-| **None** | No alert |
-| **At time of event** | Alert when the event starts |
-| **5 / 10 / 15 / 30 minutes before** | Alert that many minutes ahead |
-| **1 hour before** | Alert 60 minutes ahead |
-
-The default is **10 minutes before**.
+Each event has a **Reminder** setting; the default is 10 minutes before.
 
 ### How alerts are delivered
 

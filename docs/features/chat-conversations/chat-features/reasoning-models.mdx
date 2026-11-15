@@ -37,9 +37,7 @@ If your model uses different tags, you can provide a list of tag pairs in the `r
 
 ## Configuration & Behavior
 
-- **Stripping from Payload**: The `reasoning_tags` parameter itself is an Open WebUI-specific control and is **stripped** from the payload before being sent to the LLM backend (OpenAI, Ollama, etc.). This ensures compatibility with providers that do not recognize this parameter.
 - **Chat History**: Reasoning is kept in chat history. Whether it is sent back to the model depends on the connection; see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back).
-- **UI Rendering**: Internally, reasoning blocks are processed and rendered using a specialized UI component. When saved or exported, they may be represented as HTML `<details type="reasoning">` tags.
 
 ---
 
@@ -116,17 +114,11 @@ When a model uses **native function calling** (tool use) within a single turn, O
 
 ### How It Works
 
-During a multi-step tool calling turn, Open WebUI:
-
-1. **Captures** reasoning from the model's response, from `<think>`-style tags or from `reasoning_content`, `reasoning` or `thinking` fields
-2. **Stores** it alongside the tool calls
-3. **Sends it back** on the next call in the format the connection expects; see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back)
+During a multi-step tool calling turn, Open WebUI keeps the model's reasoning and sends it back on the next call in the format the connection expects; see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back).
 
 ### How Reasoning Is Sent Back
 
-Open WebUI stores reasoning separately from the answer, whether the model wrote it as `<think>`-style tags or sent it in a separate field. When a message is replayed, within a tool-call loop or on the next turn, the reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Connections → OpenAI → Advanced → Provider** (admin section), see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically). The same rules apply within a turn and across turns. See [Provider Compatibility](#provider-compatibility). With **Stream Chat Response** off, `<think>` tags a model writes inside its reply are stored as reply text, so they go back to the model with it.
-
-Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning text is left out there. Pipe functions and filters can add it back in a provider-specific shape.
+Reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Connections → OpenAI → Advanced → Provider** (admin section), see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically), the same within a turn and across turns. See [Provider Compatibility](#provider-compatibility). Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning text is left out there.
 
 Reasoning details that a provider returns in a `reasoning_details` field (as OpenRouter does) are sent back unchanged in that field, within a tool-call loop and on later turns. They are dropped when another model continues the chat.
 
@@ -262,16 +254,6 @@ Ensure you're running the latest version of Open WebUI, as reasoning model suppo
 docker pull ghcr.io/open-webui/open-webui:main
 ```
 
-#### 5. Verify the Model Response Format
-
-Use the Ollama CLI directly to check what format your model outputs:
-
-```bash
-ollama run your-model:tag "Explain step by step: What is 15 + 27?"
-```
-
-Look for `<think>` tags in the output. If they're not present, the model may require specific system prompts to enable thinking mode.
-
 ### Reasoning Lost Between Tool Calls
 
 **Symptom:** The model seems to "forget" what it was thinking about after a tool call completes.
@@ -297,9 +279,7 @@ a final `assistant` message must start with a thinking block.
 
 Open WebUI does not send Anthropic-style thinking blocks back, so Anthropic's requirement for structured thinking blocks is not met.
 
-**Why Open WebUI Doesn't Support This Natively:**
-
-There is no standard way for storing reasoning content as part of the API payload across different providers. If Open WebUI implemented support for one provider's format, it would likely break existing deployments for many other inference providers. Given the wide variety of backends Open WebUI supports, we follow the OpenAI Completions API as the common standard. For more details on this architectural decision, see our **[FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**.
+There is no standard way across providers to store reasoning content in the API payload, so Open WebUI follows the OpenAI Completions API. See the [FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api).
 
 **Workarounds:**
 

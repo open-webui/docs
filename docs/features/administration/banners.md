@@ -118,53 +118,7 @@ If users dismissed a banner and you want them to see an updated message, change 
 
 Banner `content` is parsed as Markdown and then sanitized, so inline Markdown (`**bold**`, `[link](url)`, backticks) and inline HTML both render. Because every newline is turned into a line break before parsing, block Markdown that spans lines (multi-line lists, tables, blockquotes, a heading on a later line) does not form. HTML lists, headings, tables and blockquotes do render. `title` is accepted in the JSON but never shown: the editor has no Title field, and the banner displays the type label plus the content.
 
-### Text formatting
-
-| HTML | Effect |
-| --- | --- |
-| `<b>` / `<strong>` | Bold |
-| `<i>` / `<em>` | Italic |
-| `<u>` | Underline |
-| `<s>` / `<del>` | Strikethrough |
-| `<mark>` | Highlight |
-| `<small>` | Slightly smaller text |
-| `<sub>` / `<sup>` | Subscript / Superscript |
-| `<code>` / `<kbd>` | Monospace inline code |
-| `<abbr title="tooltip">` | Hover tooltip |
-
-### Structure
-
-| HTML | Effect |
-| --- | --- |
-| `<br>` or literal newlines | Line break |
-| `<hr>` | Horizontal rule |
-| `<details><summary>Click</summary>...</details>` | Collapsible section |
-
-### Links & media
-
-| HTML | Effect |
-| --- | --- |
-| `<a href="...">` | Clickable link. The sanitizer strips `target`, so links open in the same tab |
-| `<img src="..." width="16" height="16">` | Inline image |
-
-### Custom styling
-
-Inline styles are supported on allowed tags:
-
-```html
-<span style="color: #b91c1c;">Colored text</span>
-<span style="font-weight: 600;">Heavier weight</span>
-<span style="background: linear-gradient(90deg,#e0f2fe,#fef9c3);">Gradient background</span>
-```
-
-You can also style a full message area by wrapping the content in a block element:
-
-```html
-<div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:10px 14px;line-height:1.3;display:block;width:100%;box-sizing:border-box;">
-  <b>Notice title</b><br>
-  Short supporting message.
-</div>
-```
+Inline HTML renders after sanitizing: `<b>`, `<i>`, `<u>`, `<code>`, `<br>`, `<hr>`, `<details>`, `<a href>` (opens in the same tab, because the sanitizer strips `target`), `<img>` and inline `style` attributes.
 
 > Keep styling purposeful. Large padding, large font sizes, or deeply nested layouts can make banners too tall and visually inconsistent across themes.
 
@@ -198,21 +152,7 @@ Avoid using `error` for non-urgent announcements. Users learn to ignore alerts w
 
 ### Use color carefully
 
-Color should support the banner type, not compete with it:
-
-- Use soft backgrounds for the full message area.
-- Use stronger colors for small accents, labels, or left borders.
-- Keep text contrast high enough to read in bright rooms and on dim screens.
-- Avoid mixing many unrelated colors in one banner.
-
-A useful pattern is a pale background plus a stronger left border:
-
-```html
-<div style="background:#f8fafc;color:#334155;border:1px solid #cbd5e1;border-left:6px solid #64748b;border-radius:12px;padding:10px 14px;line-height:1.3;display:block;width:100%;box-sizing:border-box;">
-  <b>Notice title</b><br>
-  Short supporting message.
-</div>
-```
+Keep styling light: a pale background with a stronger accent works well, and text contrast should stay high.
 
 ### Keep layouts responsive
 
@@ -240,81 +180,15 @@ renders more predictably than heavily formatted HTML with many line breaks.
 
 ## Unsupported content
 
-The following are not supported in banners and may render as plain text or break the layout:
-
-- Headings (`<h1>` to `<h6>`)
-- Lists (`<ul>`, `<ol>`)
-- Tables
-- Blockquotes
-- Markdown syntax
-
-If you need "list-like" content, use short lines separated by `<br>`.
+Block Markdown that spans several lines (lists, tables, blockquotes, a heading on a later line) does not form, because every newline becomes a line break. HTML lists, headings, tables and blockquotes do render. For list-like content, use short lines separated by `<br>`.
 
 ---
 
 ## Common pitfalls (and how to avoid them)
 
-### 1) Unexpected spacing from literal newlines
+### JSON/YAML escaping issues in `WEBUI_BANNERS`
 
-Banner content treats **literal newlines** as line breaks. If you paste nicely formatted/indented HTML with many line breaks, the banner may appear much taller than expected.
-
-**Recommendation:**
-- Use `<br>` deliberately, and keep the raw HTML relatively compact.
-- Avoid adding blank lines unless you truly want extra spacing.
-
-### 2) Broken links in banner content
-
-If a link appears "broken" or the rest of the banner becomes clickable, it’s usually due to invalid HTML.
-
-Use this exact pattern:
-
-```html
-<a href="https://example.com" target="_blank">Open link</a>
-```
-
-**Recommendations:**
-- Always close anchor tags with `</a>`.
-- `target="_blank"` is stripped by the sanitizer, so it has no effect. Links open in the same tab.
-- If your URL contains query parameters, escape `&` as `&amp;` inside the `href` attribute:
-  ```html
-  <a href="https://example.com/page?x=1&amp;y=2" target="_blank">Example</a>
-  ```
-- If you need guaranteed underlining, wrap link text with `<u>`:
-  ```html
-  <a href="https://example.com" target="_blank"><u>Support</u></a>
-  ```
-
-### 3) JSON/YAML escaping issues in `WEBUI_BANNERS`
-
-When using `WEBUI_BANNERS`, you are embedding JSON inside a YAML string (or a shell string). Common problems include:
-
-- Unescaped double quotes inside the JSON
-- Line breaks inserted into the JSON string
-- Copy/paste "smart quotes" (typographic quotes) instead of normal `"`
-
-**Recommendations:**
-- Validate the JSON in a JSON validator before deploying.
-- Keep `content` strings simple; avoid unescaped `"` characters.
-- Prefer using `\"` for quotes inside JSON strings if needed.
-- Check server logs if the banner does not appear.
-
-### 4) Overusing `<small>`
-
-`<small>` is useful for secondary text, but wrapping large parts of the banner in `<small>` can make content hard to read.
-
-**Recommendation:** Use normal text for the main message and reserve `<small>` for less important details.
-
-### 5) External images
-
-Images can be embedded via `<img>`, but external images may:
-- Fail to load due to network restrictions
-- Create inconsistent sizes across devices if not constrained
-- Introduce privacy/security concerns if loaded from third-party domains
-
-**Recommendations:**
-- Prefer internal/static assets when possible.
-- Always set explicit `width` and `height`.
-- Keep icons small (e.g., 16×16) to avoid increasing banner height.
+When using `WEBUI_BANNERS`, you are embedding JSON inside a YAML string (or a shell string). Escape double quotes inside the JSON as `\"`, avoid line breaks and "smart quotes", and validate the JSON before deploying. Check server logs if the banner does not appear.
 
 ---
 
@@ -334,22 +208,6 @@ Service updates: <a href="https://example.com/status" target="_blank"><u>Status 
   Scheduled
 </span>
 ```
-
-### Pattern: Styled notice block
-
-Use a full-width styled block when the whole message should read as one announcement area. Keep this HTML compact when pasting it into the banner content field, especially if it also contains `<br>` tags.
-
-```html
-<div style="background:#f8fafc;color:#334155;border:1px solid #cbd5e1;border-left:6px solid #64748b;border-radius:12px;padding:10px 14px;line-height:1.3;display:block;width:100%;box-sizing:border-box;"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:5px 8px;margin-bottom:5px;"><span style="display:inline-flex;align-items:center;background:#64748b;color:#fff;padding:1px 7px;border-radius:999px;line-height:1.25;font-size:10px;font-weight:700;letter-spacing:.04em;">NOTICE</span><b>Notice title</b><span style="display:inline-flex;align-items:center;background:#fff;color:#334155;padding:1px 8px;border-radius:999px;line-height:1.25;border:1px solid #cbd5e1;">Key detail</span></div><div>Short supporting message.</div></div>
-```
-
-This pattern uses:
-
-- A pale background for the full message area.
-- A stronger left border for fast visual recognition.
-- A small uppercase label for the event type.
-- A compact date/time chip for the most important metadata.
-- `flex-wrap` so the header row still works on narrow screens.
 
 ### Pattern: Collapsible details (keep banners short)
 

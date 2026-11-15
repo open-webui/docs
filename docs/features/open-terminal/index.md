@@ -58,33 +58,6 @@ Open WebUI plus Open Terminal is the full agent harness: the control layer, the 
 
 ---
 
-## The Terms People Use
-
-Different teams describe this stack with different language. Open Terminal fits the vocabulary people already use for agentic systems:
-
-| Term people use | What it means here |
-| :--- | :--- |
-| **Agentic AI** | A model that can take multi-step actions, observe results, and keep going |
-| **Agentic workflow** | A goal-driven process where the agent plans, acts, observes results, and adapts |
-| **AI agent** | The model plus instructions, tools, memory/context, and an execution loop |
-| **Agent harness** | The whole system around the model that turns reasoning into action: instructions, context, tools, state, permissions, feedback loops, evaluation, observability, and execution environments |
-| **Agent runtime** | The place where agent actions actually run: files, code, commands, servers, documents, and processes |
-| **Action runtime** | A runtime focused on executing real-world actions reliably, with authorization and auditability |
-| **Agentic infrastructure** | The compute, state, orchestration, tools, security, and observability needed to run agents in production |
-| **Computer substrate** | The filesystem, shell, packages, processes, previews, and artifacts the harness gives the agent so it can do work |
-| **Stateful session** | A task or workspace that persists across many model/tool turns instead of one stateless request |
-| **Tool calling / function calling** | The model choosing a structured tool action instead of only writing text |
-| **Tool result / context return** | The output from an action being returned to the model so it can decide the next step |
-| **Action tools** | Tools that modify an external environment, such as editing files, posting messages, or changing records |
-| **Computer use** | An agent operating a computer-like environment through files, commands, UI, or browser actions |
-| **Code interpreter** | A narrower execution surface for running code; Open Terminal is broader because it includes the filesystem, shell, packages, processes, and previews |
-| **MCP / tool servers** | Standard or API-backed ways to expose capabilities to the model |
-| **Orchestration** | The loop of choosing tools, sequencing steps, handling failures, and verifying results |
-| **Human-in-the-loop** | A human approval or review point inside an otherwise agent-driven workflow |
-| **Guardrails / governance** | Policy, permission, and safety controls around what the agent can see and do |
-| **Observability / auditability** | Logs, traces, and records that show what the agent did and why |
-| **Sandbox** | The isolation boundary around the agent's filesystem, processes, and network access |
-
 The practical point is simple: models got good enough to use tools, but a harness is only as useful as the environment it can act on. Open Terminal gives Open WebUI the computer-shaped action layer that makes the harness complete.
 
 ---

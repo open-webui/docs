@@ -58,19 +58,7 @@ Enter your previously created Open WebUI API token into the **API Key** field.
 
 ### Optional: customize your prompt
 
-If you want a specialized prompt sent to your LLM, feel free to edit the `Prompt template`.
-
-**Original prompt example:**
-
-```text
-Return commands suitable for copy/pasting into \(shell) on \(uname). Do
-NOT include commentary NOR Markdown triple-backtick code blocks as your
-whole response will be copied into my terminal automatically.
-
-The script should do this: \(ai.prompt)
-```
-
-You can read more about the Iterm2 prompt in the [Iterm2 documentation](https://gitlab.com/gnachman/iterm2/-/wikis/AI-Prompt).
+You can edit the `Prompt template` to send a specialized prompt to your LLM. See the [Iterm2 documentation](https://gitlab.com/gnachman/iterm2/-/wikis/AI-Prompt) for details.
 
 ---
 

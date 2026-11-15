@@ -69,7 +69,7 @@ Most providers work with a URL and an API key. A few need one extra choice in th
 | **LiteLLM proxy** | OpenAI connections | **Provider > LiteLLM**, which passes requests that arrive at Open WebUI's own Anthropic Messages endpoint straight on to LiteLLM. |
 | **A provider that offers the Responses API** | OpenAI connections | **API Type > Responses**. See [Open Responses](/getting-started/quick-start/connect-a-provider/starting-with-open-responses). |
 
-The **Provider** setting names the format of the requests Open WebUI sends. The llama.cpp option carries that name because llama.cpp introduced the format, and any server that speaks it can use the option, including DeepSeek's hosted API. **Default** sends plain OpenAI format, which every OpenAI-compatible server accepts. The [Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting) section lists everything each option switches on, and [How Reasoning Is Sent Back](/features/chat-conversations/chat-features/reasoning-models#how-reasoning-is-sent-back) shows which provider sends reasoning back in which field.
+The **Provider** setting names the format of the requests Open WebUI sends. **Default** sends plain OpenAI format, which every OpenAI-compatible server accepts. The [Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting) section lists everything each option switches on.
 
 To change it, open **Admin Settings > Connections**, click the gear icon next to the connection (or **+** for a new one), expand **Advanced** and pick the option from **Provider**. Save the dialog and the connection list. The dropdown shows on OpenAI connections only.
 

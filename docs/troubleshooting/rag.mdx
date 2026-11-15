@@ -492,7 +492,7 @@ For the full explanation of how knowledge scoping and retrieval modes work, see 
 
 ### 14. Attaching a Link or a YouTube Video Fails
 
-A webpage or YouTube attachment came back as an error toast. The message names the step that failed: a link that could not be read names the link, a refused YouTube transcript gives the reason, and a message about the knowledge base means the content was read and only saving it failed.
+A webpage or YouTube attachment came back as an error toast. Read the message: it names the step that failed.
 
 `[ERROR: Could not read content from <url>]` means nothing was attached. The usual causes are a site that blocks the request or serves its content only after JavaScript runs, which [`WEB_LOADER_ENGINE=playwright`](../reference/env-configuration.mdx#web_loader_engine) handles; a proxy Open WebUI is not being told to use, see [`WEB_SEARCH_TRUST_ENV`](../reference/env-configuration.mdx#web_search_trust_env); or an address refused on purpose, since private and loopback addresses, cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](../reference/env-configuration.mdx#web_fetch_filter_list) are never requested.
 

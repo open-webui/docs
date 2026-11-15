@@ -18,7 +18,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 - Outbound access from the Open WebUI server to the search provider and, for full-page retrieval, the sites returned by the search.
 - A chat model with reliable native tool calling and the Web Search capability enabled.
 
-Create a [Serpstack account](https://serpstack.com/signup/free) and copy the access key from your account dashboard. Check your search allowance and HTTPS entitlement against the [current plan details](https://serpstack.com/pricing). The pricing page currently lists HTTPS encryption on the Free plan as well as paid plans, while the [FAQ](https://serpstack.com/faq) still names HTTPS as a plan-dependent feature; confirm availability for your account rather than assuming all free accounts require HTTP.
+Create a [Serpstack account](https://serpstack.com/signup/free) and copy the access key from your account dashboard. Check your search allowance and HTTPS entitlement against the [current plan details](https://serpstack.com/pricing). Confirm that your plan includes HTTPS.
 
 ## Configure in Open WebUI
 

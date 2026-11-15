@@ -177,9 +177,8 @@ Notes
 
 The `ports` directive is not included in this configuration, as it is not necessary in most cases. The Redis service will still be accessible from within the Docker network by the Open WebUI service. However, if you need to access the Redis instance from outside the Docker network (e.g., for debugging or monitoring purposes), you can add the `ports` directive to expose the Redis port (e.g., `6379:6379`).
 
-The above configuration sets up a Redis container named `redis` and mounts a volume for data persistence. The `healthcheck` directive ensures that the container is restarted if it fails to respond to the `ping` command. The `--save 30 1` command option writes an RDB snapshot 30 seconds after a change if at least 1 key has changed, and `--appendonly yes` adds the append-only log for second-level durability.
 
-**Important:** The `--maxclients 10000 --timeout 1800` flags prevent connection exhaustion, and `--maxmemory-policy noeviction` stops Redis from silently evicting Open WebUI's session and token-revocation keys. See the [Critical: Redis Server Configuration](#critical-redis-server-configuration), [Memory Eviction Policy](#critical-memory-eviction-policy), and [Persistence](#persistence) sections above for details.
+**Important:** The server flags in this configuration matter. See the [Critical: Redis Server Configuration](#critical-redis-server-configuration), [Memory Eviction Policy](#critical-memory-eviction-policy) and [Persistence](#persistence) sections above for details.
 
 :::
 
@@ -452,7 +451,7 @@ You can also verify that Open WebUI is actually writing data to Redis:
 docker exec -it redis redis-cli --scan --pattern "open-webui*"
 ```
 
-If Redis is configured correctly, you should see keys with your configured prefix, such as `open-webui:session_pool` and `open-webui:usage_pool` once someone has the UI open, `open-webui:ratelimit:*` after a password sign-in and `open-webui:auth:token:*:revoked` after a sign-out. If you set `WEBSOCKET_REDIS_URL` to another database, the two pools live there (add `-n <db>` to the command). Persisted configuration is shared through the database, not Redis.
+If Redis is configured correctly, you should see keys starting with your prefix (`open-webui*`).
 
 The `/ready` endpoint also returns 503 while Redis does not answer, so a readiness probe on it catches a lost Redis connection.
 

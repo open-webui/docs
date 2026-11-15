@@ -23,9 +23,7 @@ As with other builtin tools, they also require native function calling in a chat
 
 ## Setting a Timer
 
-The model sets a timer with a prompt, a time, and optionally the events that should cancel it. Times are given either as a **relative offset** or as an **RFC 3339 timestamp that must include an explicit timezone**. A timestamp without a timezone is rejected rather than guessed at, and the time must be in the future.
-
-Relative offsets are forgiving about phrasing: `10s`, `5m`, `1h`, `2d` all work, as do `+10s`, `in 10 seconds`, `5 minutes` and `2 hours`. Units are seconds, minutes, hours and days.
+Ask for a time in plain words; the model sets it. The time must be in the future, and a timer can also be set to cancel on given events.
 
 Timers fire close to their stated time: the scheduler checks every second. [`TIMER_POLL_INTERVAL`](/reference/env-configuration#timer_poll_interval) can raise that interval, trading punctuality for less idle polling, but it cannot go below one second.
 
@@ -33,7 +31,6 @@ Timers fire close to their stated time: the scheduler checks every second. [`TIM
 
 The prompt is appended to the original chat as a message, the chat reloads on its own, and the model answers using the model, workspace tools, skills, filters and settings the chat had when the timer was set. That configuration is captured up front, so later changes to the chat do not alter what a pending timer does.
 
-The system prompt is built again when the timer fires, from the same pieces the original message used: the chat's own system prompt (from **Model controls > Controls** or your **Settings**), the model's system prompt, the chat's variables and the full text of any skills mentioned in the message. The folder's system prompt, tool server and terminal instructions are applied as for any message in the chat.
 
 Tool servers travel with the chat's tool ids, along with the attached files, the terminal connection and the prompt variables. A tool server you added in [Tether](/ecosystem/tether#your-own-connections) resolves only if the Tether device is connected when the timer fires, so keep that in mind for a prompt whose whole job depends on it.
 

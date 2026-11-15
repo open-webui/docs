@@ -57,35 +57,27 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
 ### Excel workbooks (XLSX, XLS)
-`.xlsx` and `.xls` files open as a table, one sheet at a time. A workbook with several sheets shows a picker to switch between them. The formula bar above the sheet shows the value or formula of the selected cell. Drag a column edge to resize it, or double-click the edge to fit the content.
+`.xlsx` and `.xls` files open as a table, one sheet at a time.
 
 An `.xlsx` file you can write to is editable in the preview. Double-click a cell or start typing to change it, or paste a range of cells. **Save** writes the workbook back to the file. Formula cells, table headers and protected sheets stay read-only. If the file changed on the terminal since you opened it, saving stops and asks you to reload it, and your edits stay in the editor.
 
 ### Word documents (DOCX)
-`.docx` files are laid out by the terminal itself, using the same engine an office suite uses, and the preview shows the finished document. What you see is what the file prints: real pagination, headers, footers, footnotes and endnotes, embedded images, fonts and spacing.
-
-A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
-
-Where the terminal cannot lay the document out, the browser draws it instead and the preview says that it may differ from the download. That rendering keeps the text, tables and images without matching the exact layout. Only when that fails too does it report an error and suggest downloading the file instead.
+`.docx` files are laid out by the terminal itself, so the preview shows the finished document with real pagination, headers, footers and images. Where the terminal cannot lay the document out, the browser draws it instead and the preview says that it may differ from the download.
 
 ### Presentations (PPTX)
-`.pptx` files open in a **slide viewer**, one slide at a time. The terminal renders the deck the same way it renders Word documents, so each slide arrives as the finished thing: backgrounds, fills, fonts, spacing and the position every placeholder takes from the layout or master.
-
-A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
-
-Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. That approximation draws single bar, line, pie and doughnut charts, negative values included. Stacked and combined charts and other chart types show **Chart preview unavailable**. Open the file in its own application when the exact rendering matters.
+`.pptx` files open in a **slide viewer**, one slide at a time, rendered by the terminal. Where the terminal cannot render the deck, the browser draws an approximation and the preview says that it may differ from the download. Open the file in its own application when the exact rendering matters.
 
 ### Markdown
 A Markdown file you can write to opens in a **rich text editor**: you edit the formatted text directly and **Save** writes it back as Markdown. Math, alerts and Mermaid diagrams show rendered; click one to edit its source. An image you paste or drop into the editor is uploaded to the terminal, into the folder of the Markdown file, and linked with a relative path. **Source** switches to the code editor for the raw Markdown, and **Editor** switches back.
 
-A read-only Markdown file shows a **rendered preview** that uses the same renderer as chat replies, so math, footnotes, highlighted code blocks, alerts and Mermaid diagrams all display. HTML blocks mixed into the Markdown render together with it, so `<details>` sections and wrappers like `<div align="center">` show their Markdown content formatted. A link to another file on the terminal opens that file in the browser.
+A read-only Markdown file shows a **rendered preview** that uses the same renderer as chat replies. A link to another file on the terminal opens that file in the browser.
 
 In both, images with a relative path load from the terminal.
 
 ![Rendered markdown with headings, a table and a code block](/images/open-terminal-preview-markdown.png)
 
 ### Comments in documents
-Word, Excel, PowerPoint and PDF previews show the comments stored in the file, with their replies, anchored where they sit in the document. Hover over a marker to read the thread, or tap it on a touch screen. Comments that have no place in the preview are collected behind a counter in the corner. If the comments cannot be read, the preview says **"Could not read comments. Download the original file to review them."**
+Word, Excel, PowerPoint and PDF previews show the comments stored in the file, anchored where they sit in the document.
 
 ### Images
 Images display inline at a comfortable size.
@@ -132,7 +124,7 @@ Drag files from the file browser onto the message input to attach them to your n
 
 Select two files, with the checkboxes or `Ctrl`-click, and pick **Compare**. You can also pick **Select for Compare** in one file's menu and then **Compare with Selected** in the other's. The two are shown side by side with the differences marked.
 
-Text files open in a read-only compare view: step through the changes with the arrows, **Swap sides** switches which file is on the left and **Refresh** reads both files again. The **Comparison options** menu (**...**) has **Ignore whitespace**, **Ignore emphasis markers**, which skips changes that only add or remove `*` and `_`, and **Only show changes**, which folds long runs of unchanged lines. Changed lines are lined up by their matching text. This view takes UTF-8 text files up to 2 MiB each.
+Text files open in a read-only compare view: step through the changes with the arrows, and use the **Comparison options** menu (**...**) to ignore whitespace or fold unchanged lines.
 
 Documents (PDF, Word, Excel, PowerPoint, OpenDocument and RTF files) are compared by the **text** extracted from them, so a Word file against a PDF, or yesterday's spreadsheet against today's, are all fair game.
 
@@ -178,7 +170,6 @@ By default the AI decides, and a file it shows opens in the file browser unless 
 
 Text and code files open straight in the code editor: type your changes and click **Save** or press `Ctrl+S` (`Cmd+S` on macOS). This is handy for quick fixes: editing a config value, correcting a typo, or tweaking something the AI generated. Files with a preview of their own, such as HTML, JSON or CSV, open the same editor with **Source**. [Markdown](#markdown) and [Excel](#excel-workbooks-xlsx-xls) files are edited in their preview.
 
-The editor suggests words that already appear in the file as you type; press `Tab` to accept one. In a Git repository, the line numbers carry a green mark next to added lines and an amber mark next to changed lines, compared with the last commit.
 
 ![Editing a file directly in the file browser](/images/open-terminal-preview-code.png)
 
@@ -204,11 +195,7 @@ You can create new files and folders, or delete things you don't need anymore, d
 
 ## Read-only files and folders
 
-Some files and folders cannot be changed. The file browser marks them **Read-only** and greys out the actions that would fail, so you find out before you try rather than after.
-
-A folder you cannot write to is marked **Read-only** next to the breadcrumbs at the top. **New File**, **New Folder** and **Upload** are greyed out while you are in it, dropping files onto it does nothing, and nothing inside it can be renamed or deleted.
-
-A single file or folder you cannot change is marked **Read-only** next to its name. **Rename** and **Delete** are greyed out in its menu, it cannot be dragged into another folder and its preview cannot be edited. If you select several items at once, **Delete** stays greyed out when any one of them is read-only.
+Some files and folders cannot be changed. The file browser marks them **Read-only** and greys out the actions that would fail, so you find out before you try.
 
 Being read-only limits changes, nothing else. You can still browse, preview and download these files as usual.
 
@@ -216,7 +203,7 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Working directory
 
-With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a terminal that has a separate instance per chat, the button appears once the chat is saved and temporary chats offer only the other terminals. Each chat saves its working folder and restores it when reopened. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in. The folder icon on a **Recently Used** row, also labelled **Open folder**, shows that folder in the Files tab.
+Use the **Working Directory** button next to the message input to pick the chat's folder. Each chat saves its working folder and restores it when reopened.
 
 **Recently Used** lists your last eight folders on that terminal. They are stored as files on the terminal, under `.open-webui/users/<user id>/folders` in its home folder, so they follow you to other browsers. Anyone who can read that home folder can see them.
 
@@ -230,19 +217,9 @@ When the terminal supports Git, the **Open folder** dialog and the folder picker
 
 The Git panel lets you review, commit and publish what the AI changed in a project, and, for GitHub repositories, work through issues and pull requests without leaving the chat. Use it when the AI works on a code project in your terminal: check its changes, commit them, then hand it the next issue in one click that fills the message input for you to review and send. Anyone who uses a terminal with a Git repository can use it.
 
-When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
+When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Use it to review changes, stage and commit, browse history and, for GitHub repositories, work with issues and pull requests.
 
-- **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
-  **Discard changes** works for staged, unstaged and new files. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
-- **History**: past commits and their diffs.
-- **Issues**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed** or **All**, create, edit, comment, close as completed or not planned and reopen.
-- **Pull requests**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed**, **Merged** or **All**, create, edit, comment, approve, request changes, close, reopen, check out, update the branch and mark ready. A pull request has **Summary**, **Code**, **Checks** and **Activity** views and shows whether it has conflicts. The merge button has a **Merge method** menu with **Squash and merge**, **Create a merge commit** and **Rebase and merge**.
-
-**Work on this** on an issue, **Fix** on a failing check, **Address feedback** on a pull request and **Resolve conflicts in chat** on a conflicting one write a request into the message input. **Add to chat** on a comment or review (in a pull request's **Activity** or on an issue) writes that comment's text there. Review it and send it to hand the work to the AI.
-
-The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. Staging, pushing, pulling and fetching show their progress. Drag the divider next to the file list to resize it. A file with changes gets **Show diff** in the file browser toolbar.
-
-The file list marks changes too. A changed file is colored by its status and shows how many lines were added and removed. A changed binary file shows a status letter such as `M` (modified) or `U` (untracked). A folder with changes inside gets a colored dot. Rest the pointer on a mark to see the status and whether the changes are staged.
+**Work on this** on an issue, **Fix** on a failing check, **Address feedback** on a pull request and **Resolve conflicts in chat** on a conflicting one write a request into the message input. Review it and send it to hand the work to the AI.
 
 ---
 
@@ -257,7 +234,7 @@ Switching chats opens the Files tab at that chat's working folder. Picking anoth
 :::
 
 :::tip Live updates
-On a terminal server that reports live events, the Git panel and the **Ports** list of the [Browser tab](./use-cases/web-development.md#the-browser-tab) update live, and so does the **Files** tab: the folders it shows refresh in the background without a loading spinner, including after commands run outside the chat. The Files tab pauses this while a file is open in it. Otherwise the Git panel refreshes when expanded and the **Ports** list has a **Refresh** button.
+Files and the Git panel update live when the terminal supports it.
 :::
 
 :::tip The terminal sits below it

@@ -32,8 +32,6 @@ While an encrypted chat runs, the other members see **Encrypted chat in progress
 ### Messages
 
 - A message holds at most 16 KiB of text. A longer message shows **Message exceeds the 16 KiB limit.** and is not sent.
-- Once every other participant received your message, **Delivered** shows under it when you hover over or focus the message.
-- Typing indicators show who is writing.
 - Each device keeps up to the last 500 messages of the current chat. Older ones drop off.
 
 ### Verify participants
@@ -44,15 +42,7 @@ Every participant has a code made from their encryption key. Open **Participants
 
 ### When a chat ends
 
-**Encrypted chat ended** appears and the messages are gone from your screen when:
-
-- you click **Leave**, reload the page, close the tab or lose the connection,
-- the host leaves,
-- a member is removed from the channel, the channel is edited or deleted or a direct message is hidden with **Hide conversation**,
-- a participant loses their access, for example through a role or permission change, or
-- the server cannot coordinate the session.
-
-A participant whose browser stops responding for about 45 seconds is removed from the chat. Adding a new member to the channel keeps the chat running; the new member can join it.
+**Encrypted chat ended** appears and the messages are gone from your screen when anyone leaves, reloads or closes the tab, or when the host leaves. Adding a new member to the channel keeps the chat running; the new member can join it.
 
 ---
 

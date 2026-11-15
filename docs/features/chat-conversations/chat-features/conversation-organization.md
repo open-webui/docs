@@ -49,18 +49,13 @@ Folders can be nested within other folders to create hierarchical organization:
 A folder shows a count of the chats inside it that you have not read yet or that are waiting for you to approve a tool call, next to its name in the sidebar.
 
 - The count includes the folder's own chats and everything in its subfolders, so a collapsed parent still shows what is waiting below it.
-- A chat counts as unread when it has changed since you last opened it. Archived chats never count, and a chat whose reply is still being generated is not counted until the response has finished. A chat paused on a tool approval counts once, straight away.
-- Opening a chat clears it from the count immediately, in every window you have open: the server recalculates your folder counts on the spot and pushes them to your other sessions rather than waiting for the next reload.
-- Unread state is about your own reading. Shared folders carry no badge, and chats belonging to someone else never show as unread to you, however recently they were touched.
-- A title generated automatically for a chat does not make it unread again.
-
-The folder's page marks the same state per chat: a dot for an unread conversation, a spinner for one whose answer is still streaming and a yellow dot for one waiting for approval. The page keeps itself current while you look at it, so a chat that starts or finishes generating updates in place, a chat that arrives in the folder is inserted without a full reload and the page reloads after a dropped connection is restored. Opening a chat from the page clears its dot immediately, without waiting for the chat to load. See [The Folder Page](#the-folder-page) for sorting, grouping and filtering by activity.
+- A chat counts as unread when it has changed since you last opened it. Archived chats never count, and opening a chat clears it from the count immediately. The folder's page marks the same state per chat with a dot, a spinner for a streaming answer and a yellow dot for one waiting for approval. See [The Folder Page](#the-folder-page) for sorting, grouping and filtering by activity.
 
 #### Marking Read and Unread
 
-- **Mark a chat unread**: open a chat's three-dot menu in the sidebar and choose **Mark as unread**. The chat gets its dot back, moves up with the other unread chats, and the folder count goes up again. Use it to keep a conversation on your radar after skimming it.
-- **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it; on a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
-- **Mark everything read**: the **Chats** section header in the sidebar has its own menu with **Mark all as read**, which clears every unread chat you own, loose chats and chats in folders alike, and zeroes all the folder badges at once. Archived chats are again left alone.
+Choose **Mark as unread** in a chat's three-dot menu to keep a conversation on your radar, and **Mark all as read** in a folder's three-dot menu to clear the unread chats in it and everything nested under it.
+
+The **Chats** section header in the sidebar has its own **Mark all as read** menu entry, which clears every unread chat you own.
 
 ### Starting a Chat in a Folder
 
@@ -77,7 +72,6 @@ Each folder in the sidebar is a link to its own page, so a middle click or Ctrl/
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
 
-The check is the same in all three places a chat is given a folder: creating a chat through the API, moving an existing chat into a folder, and sending the first message of a chat started inside one. Naming a folder that does not exist is refused the same way as naming one you cannot write to.
 
 ## The Folder Page
 
@@ -85,32 +79,26 @@ Click a folder in the sidebar and its page shows every chat in it, laid out like
 
 ### List and Board
 
-Open **Display options** (the sliders icon beside search and filter) to pick a **Layout**.
+Open **Display options** (the sliders icon beside search and filter) to pick a **Layout**: **List** shows one row per chat and **Board** shows each chat as a card, with columns for **Status**, **Tags** or **Activity**. With statuses as columns the board works like a kanban view. Your layout choices are remembered in your browser.
 
-- **List** shows one row per chat. **Grouping** splits it into collapsible groups by **Status**, **Tags** or **Activity**, or leaves it as one list with **None**. Empty groups stay hidden until you turn on **Show empty groups**.
-- **Board** shows each chat as a card. **Columns** picks **Status**, **Tags** or **Activity** for the columns, and **Rows** adds horizontal lanes from one of the other two. With statuses as columns the board works like a kanban view.
-
-**Ordering** sorts by **Updated** or **Title**, ascending or descending. Your layout, grouping, columns, rows and ordering are remembered in your browser, while filters start empty on every visit.
-
-**Activity** tells you what a chat is doing right now: **Unread** (changed since you last opened it), **Generating**, **Waiting for approval** (paused on a tool approval) and **Read**. Rows and cards mark the first three with a dot or spinner, so a chat that needs you stands out.
+**Activity** tells you what a chat is doing right now
 
 ### Searching and Filtering
 
-The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags. Active filters show as chips above the list, and **Clear filters** removes them. Pressing `c` jumps into the message box to start a new chat in the folder.
+Use the search and filter icons above the list to find chats by title, message text, status, tags, users, activity or update time. Active filters show as chips, and **Clear filters** removes them.
 
-Each chat in the list or on the board has the same three-dot menu as in the sidebar, with rename, move, clone, share, archive, delete and mark as unread. In a chat someone else started, the menu is shorter.
 
 ### Statuses
 
 A status says where a chat stands, for example **In progress** or **Done**. Every folder starts with **Backlog**, **To do**, **In progress**, **Waiting** and **Done**, and chats without a status show as **No status**.
 
-Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Hover it to see when this stretch began and how long the chat spent in other statuses. Earlier time spent in the same status counts toward it.
+Click the status icon at the start of a chat to pick a status, or drag its card to another column on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it.
 
-Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging. It also adds and deletes statuses. Chats in a deleted status go back to **No status**.
+Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu. Chats in a deleted status go back to **No status**.
 
 ### Tags
 
-Tags label chats by topic and feed the grouping, board and filter options above. A chat's owner adds them, and in a shared folder so does anyone who can edit the folder, with the **Tag** button that appears on hover in the chat's row (or by clicking its existing tags), or, for your own chats, from the **Tags** submenu in the chat's top-bar menu. Both open the same picker: type to find a tag and tick it to add or remove it. To make a new one, choose **Create “name”**. The colored dot beside a ticked tag opens the color choices, and the color applies to that tag wherever it is used. Tags a folder editor adds, removes or recolors on someone else's chat belong to the chat owner, so they show up in the owner's own tag list. Anyone without edit access sees the tags without the picker.
+Tags label chats by topic and feed the grouping, board and filter options above. A chat's owner adds them, and in a shared folder so does anyone who can edit the folder, with the **Tag** button on a chat's row or from the **Tags** submenu in the chat's top-bar menu.
 
 ### Automations
 
@@ -205,10 +193,9 @@ The **Add Access** picker lists only the people and groups the folder is not alr
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. When someone has inherited **Write** on a subfolder and a direct **Read** grant on it too, **Write** applies. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
-- **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** window. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
+- **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it.
 - **The folder's owner can tidy up other people's chats.** In a folder you own, you can rename chats other people started (title only) and move them to other folders in the same shared tree.
-- **Edit and regenerate together.** With **Allow replies** on, people with access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). The chat's top bar shows who else has it open right now.
-- **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**; click the count to see everyone. Hover or click a picture to open that person's profile card.
+- **Edit and regenerate together.** With **Allow replies** on, people with access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies).
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.

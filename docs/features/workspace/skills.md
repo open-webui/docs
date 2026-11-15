@@ -119,6 +119,173 @@ Leave a field empty for the default, or set [`SKILL_CONTENT_MAX_CHARS`](/referen
 
 A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the terminal, and the model opens them with the terminal's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
 
+A terminal an admin configured is called by the Open WebUI server with the connection's auth and the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs. A terminal a user added in the [Tether app](/ecosystem/tether#your-own-connections) is called through Tether from the user's computer.
+
+---
+
+## Creating a Skill
+
+Navigate to **Workspace > Skills** and click **Create** in the Workspace header.
+
+| Field | Description |
+| :--- | :--- |
+| **Name** | Human-readable display name (e.g., "Code Review Guidelines") |
+| **Skill ID** | Unique slug, auto-generated from the name. Editable during creation, read-only afterwards |
+| **Description** | Short summary shown in the manifest. For model-attached skills, the model uses this to decide whether to load the full instructions |
+| **Files** | `SKILL.md` with the full skill instructions in Markdown, plus any supporting files |
+
+The globe selector beside the name translates the **Name** and **Description** per language, so a skill reads in the user's own language wherever it is listed. See [Translations](/features/administration/translations).
+
+While you create a skill, YAML frontmatter typed or pasted into `SKILL.md` fills in an empty **Name** and **Description**: `name: code-review-guidelines` becomes the name "Code Review Guidelines". The frontmatter is parsed as real YAML, so quoted and multi-line values come through as written.
+
+Add a short note in **Describe this change** beside **Save** to label the version the save creates (see [Version History](#version-history)).
+
+### Supporting files
+
+A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The editor lists the skill's files as a tree where you add, rename, move and download them.
+
+| Limit | Value |
+| :--- | :--- |
+| Size of one file | 10 MiB |
+| Size of all files in one skill | 50 MiB |
+| Files per skill | 1,000 |
+
+Text files are stored as text and any other file as binary. `SKILL.md` stays at the root and must be UTF-8 text. All file changes land together when you click **Save**.
+
+### Importing skills
+
+The chevron menu beside **Create** has three import entries:
+
+- **Import** takes one or more `.zip`, `.skill`, `.json` or `.md` files, up to 200 MiB per import. A `.skill` file is a ZIP and is read the same way. A ZIP holds a single skill with `SKILL.md` at its root, or several skill folders that each contain a `SKILL.md`. A `.md` file becomes a skill with that file as its `SKILL.md`. A JSON file is a skill export from Open WebUI, older exports with a single `content` field included. A ZIP or `.skill` file that contains a symbolic link or another special file is refused with `Archives cannot contain links or special files`. Needs the **Skills Access** and **Import Skills** permissions.
+- **Import from URL** (admins only) downloads skills from a link. See [Importing from a URL](#importing-from-a-url).
+- **Import folder** takes a skill folder from your computer, or a folder holding several skill folders, each with its own `SKILL.md`. Needs the **Skills Access** and **Import Skills** permissions.
+
+Every import opens a preview listing each skill. For each one, choose **Create**, **Create copy**, **Replace** or **Skip**; a skill whose ID or name already exists starts on **Skip**. New skills and copies start private.
+
+### Importing from Markdown
+
+Skills imported from a ZIP, a folder or a `.md` file take their name and description from the `SKILL.md` frontmatter, and the ID from the name; a JSON export carries its own:
+
+```yaml
+---
+name: code-review-guidelines
+description: Step-by-step instructions for thorough code reviews
+---
+
+# Code Review Guidelines
+
+1. Check for correctness...
+```
+
+### Importing from a URL
+
+**Import from URL** in the chevron menu beside **Create** loads skills straight from the web. It is available to administrators. Paste one of these links:
+
+| Link | What gets imported |
+| :--- | :--- |
+| A GitHub repository, such as `https://github.com/owner/repo` | Every skill in the repository: each folder that holds a `SKILL.md`, or the whole repository when `SKILL.md` sits at its root |
+| A GitHub folder, `https://github.com/owner/repo/tree/<branch>/<folder>` | The skills in that folder |
+| A GitHub `SKILL.md`, `https://github.com/owner/repo/blob/<branch>/<folder>/SKILL.md` | The skill in that `SKILL.md`'s folder, with all its files |
+| A direct link to a `.zip`, `.skill`, `.json` or `.md` file | The skills in that file, read the same way as an upload |
+
+GitHub links are downloaded as a ZIP of the repository at that branch, tag or commit, so a skill arrives with its supporting files. A branch name containing `/` has to be URL-encoded (`%2F`), or use a commit link. The skills found open in the same import preview as an upload, where you choose what to create.
+
+The link is checked against the same address rules as web fetching, so with [`ENABLE_LOCAL_WEB_FETCH`](/reference/env-configuration#enable_local_web_fetch) off a link that leads into your private network is refused. A link that returns a web page is refused with a hint to use a raw file or a ZIP download link.
+
+### From a chat with `/skills:create`
+
+A workflow you just worked through in a chat can be turned into a skill without writing it out yourself. Type `/skills:create` in that chat, optionally followed by what the skill should cover, and the model gathers the material, authors one `SKILL.md` to the standard below and saves it to your **Workspace > Skills** with the `create_skill` tool, along with any supporting text files under `scripts/`, `references/`, `templates/` or `assets/`. The new skill is private. The model reports the name, the location and a one-line summary when it is done, and can revise an existing skill you can edit with `update_skill_files`.
+
+Anything you write after the command is treated as authoring guidance, all of it. Sources to pull from (paths, URLs, "what we just did", pasted notes) and requirements that shape the result (focus, exclusions, naming, style) can be mixed freely in one request.
+
+The command needs:
+
+- the **Skills Access** workspace permission (admins always have it),
+- a model with built-in tools active and its **Skills** category switched on under **Builtin Tools**,
+- a chat that **already has content**, since the chat is the raw material.
+
+The server checks all three before the model may save anything. The `/` menu offers the command once the chat has content and you hold the permission.
+
+---
+
+## Skill Authoring Standard
+
+A skill's `name` is lowercase and hyphenated, 64 characters at most, and its `description` is 1024 characters at most. The `SKILL.md` body works best with a short intro, `When to Use`, `Prerequisites`, `How to Run`, `Quick Reference`, `Procedure`, `Pitfalls` and `Verification` sections, in that order. This is the standard Open WebUI follows when it writes a skill through `/skills:create`.
+
+---
+
+## Binding Skills to a Model
+
+1. Go to **Workspace > Models**.
+2. Edit a model and open the **Skills** row.
+3. Pick the skills you want this model to always have access to.
+4. Click **Save & Update**.
+
+Every new chat with the model starts with these skills selected. The manifest already lists every skill the user can read, so bind a skill only when the model should follow it in every chat.
+
+---
+
+## Skill Management
+
+From the Skills workspace list, the ellipsis menu (**...**) on a skill you can edit lets you edit, clone, export, share or delete it. **Access** opens the skill's access settings and needs the **Skills Sharing** permission for non-admins; export needs the **Skills Access** and **Export Skills** permissions, and **Share** publishes the skill on openwebui.com (see [Community skills](#community-skills)). Use **Export ZIP** or **Export JSON** in the chevron menu beside **Create** to export all accessible skills at once.
+
+**Active/Inactive toggle** | Deactivate skills without deleting them |
+
+---
+
+## How Skills Work
+
+### User-selected skills ($ mention)
+
+Type `$` in the chat input, or use the `/` menu, and pick a skill. With the [skill tools](#skill-tools), the skill loads before the model answers, once per chat. Without them its instructions go into the system prompt with every message. A message that is only a `$` mention is sent with the skill names as its text.
+
+### Per-chat skills
+
+The **+** menu > **Skills** turns skills on for the current chat. The list is grouped into **Workspace** and the selected terminal server, named after it, see [Skills from a terminal server](#skills-from-a-terminal-server). A badge shows how many are on. Selected skills load like skills mentioned with `$`.
+
+### Model-attached skills
+
+A new chat with a single model starts with the model's skills selected.
+
+With the [skill tools](#skill-tools), every active skill you can read is listed by name and description in a hidden `list_available_skills` result after your message. The model loads one with `view_skill` when it needs it, so many skills cost little context. Selected skills are loaded the same way, as a hidden `view_skill` result, once per chat. A skill you switch off in the chat stays in the list.
+
+Without the skill tools there is no list. Selected, mentioned and model skills are injected into the system prompt on every message, up to the first 100,000 characters of `SKILL.md`, and model skills are injected even when switched off in the chat.
+
+A `SKILL.md` longer than the [read limit](#read-limits) arrives as a preview, and the model reads on with `read_skill_file`.
+
+### Loading selected skills on demand
+
+**Load selected skills on demand** in **Settings > General** (admin section) ([`ENABLE_SKILL_LAZY_LOADING`](/reference/env-configuration#enable_skill_lazy_loading), off by default) stops selected and model skills from loading before the model answers, so they load when the model asks for them. A skill mentioned with `$` in the chat still loads with the message. The setting needs the skill tools.
+
+### Skill tools
+
+With native function calling, the **Builtin Tools** capability and the model's **Skills** category on, the model gets these tools. The first three are offered while at least one skill is listed and `update_skill_files` while a workspace skill is listed. `/skills:create` needs them too.
+
+| Tool | What it does |
+| :--- | :--- |
+| `view_skill` | Loads a skill's `SKILL.md` and the list of its files, up to the read limit. |
+| `read_skill_file` | Reads one file of a skill from a given offset, up to the read limit per call. For a binary file it returns the size and a link to the skill editor. |
+| `grep_skill_files` | Searches a skill's text files for a word, phrase or regular expression and returns excerpts, 10 by default and up to 30. |
+| `update_skill_files` | Saves file changes as a new version of a skill the user can edit. Refused with a conflict when someone saved the skill in the meantime. |
+| `create_skill` | Creates a new private skill in the workspace from the `SKILL.md` text and optional text files. Offered to admins and to users with the **Skills Access** permission. |
+
+The tools that read a skill check the user's access to it. A user with write access to an inactive skill can still have the model load and read it.
+
+### Read limits
+
+Two settings in **Settings > General** (admin section) set how much of a skill the model gets at once:
+
+| Setting | Default | What it sets |
+| :--- | :--- | :--- |
+| **Skill Read Limit** | 20,000 | Most characters the model gets in one read |
+| **Skill Preview Length** | 5,000 | Characters the model gets first when `SKILL.md` is longer than the read limit |
+
+Leave a field empty for the default, or set [`SKILL_CONTENT_MAX_CHARS`](/reference/env-configuration#skill_content_max_chars) and [`SKILL_PREVIEW_MAX_CHARS`](/reference/env-configuration#skill_preview_max_chars).
+
+### Skills from a terminal server
+
+A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the terminal, and the model opens them with the terminal's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
+
 A terminal an admin configured is called by the Open WebUI server, with the connection's auth, `Accept: application/json`, `X-User-Id`, `X-Session-Id` (the chat id) and, for orchestrated terminals, the [`X-Terminal-*` headers](/features/open-terminal/terminals/orchestration/api-troubleshooting#headers-sent-to-the-terminals-server), the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs. Redirects are not followed. A terminal a user added in the [Tether app](/ecosystem/tether#your-own-connections) is called through Tether from the user's computer, so a terminal on that machine works with Open WebUI hosted elsewhere while Tether is connected.
 
 ---
@@ -280,14 +447,7 @@ With **Community Sharing** switched on (see [Open WebUI Community](/ecosystem/co
 
 Every save that changes a skill's name, description, translations or files stores a complete snapshot of the skill as a new version. Switching a skill on or off and changing its access leave the history as it is. Skills that existed before the upgrade start with one version holding their current content.
 
-The version menu at the top of the editor's file panel lists **Current** and every earlier version, newest first and 20 per page, each with its author and the note from **Describe this change** (or a short version ID when there is none). Picking an earlier version opens it read-only with two actions:
-
-- **Compare to current** shows what differs between that version and the current one: name, description and translations, plus every added, deleted or modified file with a line-by-line diff for text files. A file longer than 5000 lines in either version gets no line diff (`Diff is limited to 5000 lines per version`).
-- **Set as Production** makes that version the current one again. It needs write access. If someone saved the skill after you opened the version, the switch is refused and the editor offers to reload the latest state.
-
-The **...** beside each earlier version holds **Delete**, for users with write access. Versions that were based on a deleted one are linked to its parent, so the chain stays intact. With the **Export Skills** permission, the file panel's **...** menu also exports the version you are viewing as `.skill`, JSON or ZIP.
-
-If someone else saves the skill while you edit it, your save is refused and your draft stays in the editor. A banner offers **Reload latest**, **Save draft as copy** or **Keep editing**.
+Each save creates a version you can compare with the current one or set back as current. Setting a version as current, and deleting a version, need write access. If someone else saves the skill while you edit it, your save is refused and your draft stays in the editor.
 
 ---
 
@@ -323,24 +483,7 @@ See [Permissions](/features/authentication-access/rbac/permissions) for configur
 
 ## Skills API
 
-The editor's file, version, import and export features are backed by these endpoints under `/api/v1/skills`. Reads need read access to the skill; changing the current version and deleting a version need write access.
-
-| Endpoint | What it does |
-| :--- | :--- |
-| `GET /id/{id}/files` | Lists the skill's files with path, size and encoding. `version_id` picks a historical version. |
-| `GET /id/{id}/files/content` | Downloads one file, given `path` and `version_id`. |
-| `GET /id/{id}/history` | Lists versions, newest first, 20 per `page`. |
-| `GET /id/{id}/history/{history_id}` | Returns one version with its file list. |
-| `GET /id/{id}/history/diff` | Lists what changed between `from_id` and `to_id`: metadata and added, deleted or modified files. `/history/diff/file` with a `path` returns the line diff of one text file. |
-| `POST /id/{id}/update/version` | Makes a stored version the current one. The body carries `version_id` and `expected_version_id`, the version you believe is current; when that no longer matches, the call returns `409`. |
-| `DELETE /id/{id}/history/{history_id}` | Deletes a version other than the current one and links its child versions to its parent. |
-| `POST /id/{id}/clone` | Copies the skill under a new `id` and `name`, optionally from a given `version_id`. The copy is private. |
-| `GET /export` | Exports skills as `format=json`, `format=zip` or `format=skill`. Repeat `ids` to pick skills; `format=skill` takes exactly one. With exactly one id, `version_id` exports a historical version. |
-| `POST /load/url` | Admins only. Downloads the skills behind `{"url": "..."}` (see [Importing from a URL](#importing-from-a-url)) and returns them as skill packages, without saving anything. |
-| `POST /import/preview` | Reads uploaded ZIP, `.skill`, JSON or Markdown files (up to 200 MiB in total) and lists the skills found, flagging IDs and names that already exist. |
-| `POST /import` | Imports the same uploads with a `decisions` list, one entry per skill: `action` (`create`, `copy`, `replace` or `skip`), an optional `id` and `name`, plus `expected_version_id` for `replace`. |
-
-`POST /create` and `POST /id/{id}/update` take the skill's files as `files`, and an optional `commit_message` that labels the new version. An update can send `operations` (`put`, `move`, `delete`) to change single files. An update that sends `files` or `operations` needs `expected_version_id` and returns `409` when someone saved the skill in the meantime.
+Skill endpoints change often and are not documented here. Point an agent at the backend to read the current endpoints and specs.
 
 ---
 

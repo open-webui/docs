@@ -65,12 +65,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 
 ## The Editor
 
-Notes uses a context-aware **floating toolbar** for formatting:
-
-* **Click on empty space** to start new headers, lists, or task lists
-* **Double-click text** to apply bold, italic, underline, strikethrough, or inline code
-* **Drag-and-drop** list items to reorder
-* **Drag the handle** (⋮⋮) beside any top-level block to move it, or click it for **Move up** and **Move down**
+Notes uses a context-aware **floating toolbar** for formatting: select text to format it.
 
 The top bar shows real-time **word and character counts**. The **microphone icon** offers **Record**, **Capture Audio** and **Upload Audio**. The recording is saved to the note as soon as it is uploaded, and its transcription finishes on the server.
 
@@ -86,7 +81,7 @@ A note holds pages, and each page can hold subpages. Click the open page's title
 
 * **Add page** adds a top-level page, and the **+** next to a page adds a subpage
 * Drag a page to reorder it or to nest it inside another page
-* Each page's **⋯** menu offers **Add subpage**, **Rename page**, **Move up**, **Move down**, **Move page…** (pick a parent page or **Top level**; its subpages move along), **Copy page link**, **Download page** and **Delete page**
+* Each page's **⋯** menu offers actions such as **Add subpage**, **Rename page**, **Move page…**, **Copy page link**, **Download page** and **Delete page**
 
 Deleting a page moves its subpages up one level. The first page cannot be moved or deleted. A page link opens the note on that page, and search results and note links open the page that matches.
 
@@ -110,16 +105,11 @@ Opens the full chat interface in a pane beside the note, or over it on screens n
 
 **Several conversations per note.** The panel header is a dropdown listing every chat attached to this note. Use it to switch between them, start a new one or delete one. A new conversation is only stored once you send its first message, so opening one and walking away leaves nothing behind. Deleting the last remaining chat immediately recreates an empty one.
 
-**Suggested prompts.** While a conversation is still empty, four prompts are offered: enhance the note and update it, summarize it, extract action items, rewrite the selected text. They disappear as soon as the conversation has messages, and they are also suppressed if you set **Settings > Interface > Landing Page Mode** to **Chat**.
-
 **Selected text is passed along.** If you have text selected in the note, that selection is appended to whatever you send as the target for a rewrite. Selecting nothing sends the message on its own.
 
 :::info How the model actually sees the note
 
-The note is not pasted into the conversation. The chat carries a system prompt with the note's id, each message names the page you have open, and the model reads the page with `view_note` and edits it with `replace_note_content`. Edits land in the editor as the model makes them, without a reload.
-
-Two consequences. A model that cannot call tools will not see the note content at all. And builtin tools behave differently in this chat than anywhere else: the note tools are always injected, and the whole builtin-tool surface is force-enabled even for models an administrator configured without it. See [Builtin tools in a note-attached chat](/features/extensibility/plugin/tools#tool-reference).
-
+A model that cannot call tools cannot see the note. In a note-attached chat the note tools are always injected, and the whole builtin-tool surface is force-enabled even for models an administrator configured without it. See [Builtin tools in a note-attached chat](/features/extensibility/plugin/tools#tool-reference).
 
 :::
 
@@ -185,7 +175,7 @@ The sidebar Notes folder only appears when at least one note is pinned and the N
 
 :::info Pins are personal
 
-Pinning a note only affects **your** sidebar: collaborators with access to the same note can pin or unpin it independently without changing what you see. Pinned notes are listed in pin-time order (newest first), and toggling a pin no longer counts as an edit, so it does not bump the note's "Updated" timestamp. Pre-existing pins from before this change are kept for the note's owner only; other users will need to re-pin shared notes they want in their own sidebar.
+Pins only affect your own sidebar.
 
 :::
 
@@ -231,13 +221,13 @@ The non-image files on the open page are added as retrieval context on every mes
 
 **Formatting** in the **More (...)** menu decides whether the editor formats as you type and paste. It is on, and needs write access to change.
 
-Turn it off and Markdown characters stay as characters, a pasted URL stays text rather than becoming a link, and pasting brings the plain text without the source's styling. Anything already formatted in the note stays formatted, so this changes what happens next instead of stripping what is there.
+Turn it off and Markdown characters stay as characters and pasted URLs stay text. Anything already formatted stays formatted.
 
 ### Quick creation
 
 * Navigate to `/notes/new` to create a note titled with today's date
 * Add [query parameters](/features/chat-conversations/chat-features/url-params#12-new-note): `/notes/new?title=My%20Title&content=Initial%20text`
-* Create from the [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) (`Cmd+K` / `Ctrl+K`): open its **Actions** menu (`Cmd+K` / `Ctrl+K` again) and select **Create a new note**, which uses the search text as the note's content
+* Create from the search window (`Cmd+K` / `Ctrl+K`) with **Create a new note** in its **Actions** menu
 * Import `.md` files by dragging them onto the Notes list
 
 The first three open a **Create a new note** dialog showing the title and content, and the note is created once you confirm.
@@ -247,10 +237,6 @@ The first three open a **Create a new note** dialog showing the title and conten
 Toggle between **Created by you** and **Shared with you** filters, and switch between **List** and **Grid** layouts.
 
 The [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) also finds your notes and the notes shared with you, by title and content.
-
-### Quick delete
-
-Hold **Shift** while the Notes list is open and every note's **⋯** menu button turns into a delete button. Clicking it deletes that note straight away, with no menu and no confirmation prompt. It works in both **List** and **Grid** layouts, and holding Shift closes any note menu that is already open. Release Shift, or click away from the window, and the menu button comes back. Without Shift nothing changes: delete still goes through the menu and asks you to confirm.
 
 :::info Admin Visibility
 Notes are workspace items. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), administrators can see all users' notes. Set `BYPASS_ADMIN_ACCESS_CONTROL` to `False` to restrict this. See [Environment Configuration](/reference/env-configuration#bypass_admin_access_control) for details. To turn Notes off for the whole instance, see [`ENABLE_NOTES`](/reference/env-configuration#enable_notes).
@@ -286,11 +272,6 @@ When manually attached, notes are **read-only**. In **Native Mode** with the `re
 
 The tool edits one page. The model must read the page with `view_note` first, and an edit to a page that changed since that read is refused.
 
-The tool has two modes. Passing whole `content` replaces the entire page, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the page and leaves the rest untouched. Each operation names the text to change in one of two ways:
-
-- **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, nothing changes and the model gets the positions of all matches to choose from.
-- **By position.** `start` and `end` give a character range. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
-
-The older `replace_range` action still works as an alias of the position form, but it is deprecated. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for these operations.
+The model can replace the whole page or change only parts of it, and an edit to a page that changed since the model read it is refused.
 
 Notes keep no server-side history. **Undo/Redo** only walks the versions the editor recorded, which happens when you insert a chat response into the note or step through versions, so a tool edit on a note without such versions cannot be undone there. The previous text is still in the chat: the model reads the note with `view_note` before editing, and that tool result stays in the chat message. Expand the tool call in that message to copy the old content back. If the model edits a page you have open, or someone deletes it, a banner also offers your previous text as a download.

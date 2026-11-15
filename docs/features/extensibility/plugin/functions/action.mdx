@@ -159,7 +159,7 @@ class Action:
             return {"messages": [{"id": body["id"], "content": "Translation: ..."}]}
 ```
 
-A sub-action without a `name` is shown as `<function name> (<sub id>)`. Its icon is the sub-action's `icon_url`, then the frontmatter `icon_url`, then an `icon_url` or `icon` attribute on the class, then the default icon.
+A sub-action without a `name` is shown as `<function name> (<sub id>)`.
 
 ### Global vs Model-Specific Actions
 - **Global Actions**: Turn on the toggle in the Action's settings, to globally enable it for all users and all models.
@@ -169,16 +169,15 @@ An action is offered only while it is enabled. A user who is not an admin can ru
 
 ### Button Display Order (Priority)
 
-Action buttons beneath assistant messages are sorted by their `priority` valve value in **ascending order**: lower values appear first (leftmost), higher values appear later (rightmost). The default priority is `0`.
+Action buttons beneath assistant messages are sorted by their `priority` valve: lower values appear further left, and the default is `0`.
 
-To control the order, add a `priority` field to your Action's Valves:
+Add a `priority` field to your Action's Valves to control the order:
 
 ```python
 class Valves(BaseModel):
     priority: int = 0  # Lower = appears first in the button row
 ```
 
-This uses the same priority mechanism as [filter functions](/features/extensibility/plugin/functions/filter), so the behavior is consistent across the plugin system. Without a `priority` valve, actions default to `0` and their order among equal priorities is determined **alphabetically by function ID**.
 
 ## Advanced Capabilities
 

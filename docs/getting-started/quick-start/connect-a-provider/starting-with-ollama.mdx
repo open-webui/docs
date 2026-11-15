@@ -93,8 +93,6 @@ Both live in the same **Manage** dialog as downloading (see [Step 2](#step-2-man
 
 Next to **Pull a model from Ollama.com**, the **Update All Models** button pulls every model on that server again, one at a time, which brings each one up to the latest version of its tag. Ollama only downloads what changed, so a model that is already current finishes quickly.
 
-While it runs, the dialog shows **Updating "model-name"** with a progress bar. **Cancel** stops the model that is downloading and skips the rest. If a model cannot be pulled, for example one you created yourself rather than downloaded from Ollama.com, the update skips it and moves on to the next one. When the run ends, Open WebUI shows **All models are up to date**.
-
 After an update, a model that was already loaded keeps running the old version until it is unloaded. See [Unloading Loaded Models](#unloading-loaded-models).
 
 ### Deleting a Model
@@ -129,9 +127,8 @@ Ollama uses the model's own system prompt only when a chat sends none. A system 
 
 ## Unloading Loaded Models
 
-Open WebUI shows a green "Loaded" indicator next to any Ollama model that is currently kept warm by the runtime, and admins see an **Eject** button on the model row to unload it without restarting the server. Behind the scenes, Open WebUI calls `POST /api/models/unload` (admin-only), which forwards a `keep_alive=0` generate call to every Ollama node serving that model.
+Admins can eject a loaded Ollama model from the model selector to free GPU/VRAM without restarting the server. See [Unloading Loaded Models](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp#unloading-loaded-models) for the llama.cpp equivalent.
 
-This is useful for freeing GPU/VRAM when juggling multiple large models, or for forcing a fresh load after pulling a new revision. Trying to unload a model that the connected provider does not support unloading returns an error rather than silently failing.
 
 ---
 

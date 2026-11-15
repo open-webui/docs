@@ -75,7 +75,7 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 :::note `top_k` takes whole numbers
 
-`top_k` counts candidate tokens, so it accepts integers from 0 to 1000 and nothing else. Both its slider and its number box step by 1, and typing a fraction, a negative number or any other non-integer leaves the previous value in place instead of accepting it. This applies wherever the parameter is edited, per chat, per account or per model.
+`top_k` takes whole numbers from 0 to 1000.
 
 :::
 
@@ -160,7 +160,7 @@ Selecting more than one model merges their variables. Identical definitions coll
 
 ### Authoring checks
 
-The model editor lists what it found under **Detected Variables**, split into **Chat Variables** and **User Variables**. It warns about a key that is not lowercase snake case, a `select` with no `options=[...]`, the same key defined two different ways, and a user variable given a definition, since those are configured by each user and a definition has no effect on them.
+The model editor lists the detected variables under **Detected Variables** and warns about malformed or conflicting definitions.
 
 ## User Variables
 

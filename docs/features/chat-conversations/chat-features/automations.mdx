@@ -72,9 +72,9 @@ After creation, Open WebUI opens the dedicated automation editor page at `/autom
 
 ### Giving a Run a Terminal
 
-The automation editor has a **Terminal** list and, once one is picked, a **Working Directory** field. The run uses that terminal and starts in that folder; with the field empty it starts in the terminal's default folder. The list appears when at least one terminal is available to you, and a terminal picked here replaces the one configured on the model.
+The automation editor has a **Terminal** list and a **Working Directory** field. The run uses that terminal and starts in that folder, and a terminal picked here replaces the one configured on the model.
 
-Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models**: edit the model and pick the terminal from the **Default terminal** field. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default.
+Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models** with the **Default terminal** field.
 
 :::info Terminal limits in automations
 Terminals, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
@@ -88,15 +88,8 @@ With a terminal picked, the **Model** list also offers the coding agents that te
 
 From the Automations list, click an automation to open its dedicated editor page.
 
-The page is the editor. Name and instructions sit at the top, followed by a **Properties** list with **Status**, **Schedule**, **Model**, **Destination**, **Terminal** and **Next run**. Click any value to change it in place. A **Save** button appears in the header as soon as something differs from the saved automation. The **Status** switch pauses or resumes the automation straight away without **Save**.
+Open an automation to edit it: its name, instructions and properties (status, schedule, model, destination, terminal) can be changed in place, and **Save** appears when something differs from the saved automation. **Run now**, **Duplicate** and **Delete** sit in the header, and **Activity** lists the runs with a link to each run's chat.
 
-The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
-
-Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. Runs load incrementally as you scroll.
-
-### Quick delete
-
-Hold **Shift** while the Automations list is open and each automation's menu button and on/off switch turn into a delete button. Clicking it deletes that automation straight away, without asking. Release **Shift** and the menu and switch come back. Deleting from the menu still asks you to confirm.
 
 ## Export and Import
 
@@ -117,7 +110,7 @@ What import does and does not do:
 
 An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose and **Folder** lists your own folders.
 
-A folder's own page works as a home for its automations. Its header has a **Chats** and **Automations** switch (visible to users who have the Automations permission). The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
+A folder's own page lists its automations and can create one that starts in this folder.
 
 - An automation can post into any folder its creator can edit, shared folders included. Create it from the shared folder's page; the **Destination** picker lists only your own folders.
 - Only the creator edits the automation and opens its page. Anyone who can edit the folder can pause it with the switch. Everyone with access to the folder sees it in the list, read-only access included.
@@ -145,10 +138,9 @@ Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are re
 A few rules about how a custom rule is read:
 
 - **Sub-daily rules snap to the clock.** A `SECONDLY`, `MINUTELY` or `HOURLY` rule with no `DTSTART` is anchored to the clock, so every 5 minutes means `:00`, `:05`, `:10` rather than five minutes after you happened to save it.
-- **A `DTSTART` is honored where it is still meaningful.** Give the rule a start time and the schedule counts from there, keeping any phase you intended. If that start lies so far in the past that following it literally would mean walking through more than 100,000 occurrences to reach now, the rule falls back to clock alignment instead of stalling.
+- **A `DTSTART` is honored where it is still meaningful.** Give the rule a start time and the schedule counts from there, keeping any phase you intended.
 - **`INTERVAL` must be a positive whole number.** Zero or a negative value is rejected rather than quietly treated as one.
 - **One rule per schedule.** Multiple `RRULE` lines are rejected, and `EXRULE` is not supported at all; build the exclusion into the rule itself.
-- Property names are read case-insensitively, so `freq=daily` behaves like `FREQ=DAILY`.
 
 ## Notes
 
@@ -181,9 +173,7 @@ For chat-based automation tools to be available:
 4. **`ENABLE_AUTOMATIONS`** must be enabled globally (enabled by default)
 5. The user must have the **Features > Automations** permission (admins always pass)
 
-The folder argument these tools accept is a folder ID, and it is checked against the folders you own: a folder that is not yours, or no longer exists, comes back as an error instead of being applied.
+The folder argument these tools accept is a folder ID of a folder you own. See the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for the argument details.
 
-- On `update_automation`, omitting the argument or passing a blank string keeps the automation's current folder. Passing `null` clears it. The same applies to `model_id`: a blank value is ignored rather than wiping the automation's model.
-- On `list_automations`, omitting the argument or passing a blank string lists across all folders.
 
 See the [Builtin Tools reference](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for full details on all builtin tools.

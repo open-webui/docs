@@ -235,28 +235,9 @@ This is the most important flag to be aware of. It is **off by default** for sec
 Users can toggle this setting in **Settings → Interface → iframe Sandbox Allow Same Origin**.
 
 :::caution Practical Impact of Sandbox Settings
-When `allowSameOrigin` is **off** (default), the Rich UI iframe is heavily sandboxed. This means:
-- **Downloads from within the embed** are difficult or impossible, especially on iOS, where sandboxed iframes cannot trigger file downloads at all
-- **JavaScript in the embed cannot interact with Open WebUI itself**: the iframe has no access to the parent page's DOM, cookies, localStorage, or any Open WebUI APIs
-- **Cross-frame communication** is limited to `postMessage` only. However, [prompt submission](#prompt-submission) works cross-origin with a user confirmation dialog
-
-If your Rich UI embed needs to trigger downloads, interact with Open WebUI's frontend, or execute JavaScript that impacts the parent page, **enabling same-origin iframe access is required**. Enable it in **Settings → Interface → iframe Sandbox Allow Same Origin**.
-
-As an alternative for ephemeral interactions that need full page access, consider using the [`execute` event](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__) instead, which runs unsandboxed in the main page context.
+With `allowSameOrigin` off (default), downloads from within the embed are difficult or impossible, especially on iOS. If your embed needs downloads or access to the page, enable same-origin iframe access, or use the [`execute` event](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__), which runs unsandboxed in the main page context.
 :::
 
-:::tip Community Showcase: Streaming Rich UI with same-origin
-If you want to see how far Rich UI can go when same-origin is enabled, take a look at the community **[Inline Visualizer v2](https://github.com/Classic298/open-webui-plugins)** tool (see the [Show-and-tell discussion](https://github.com/open-webui/open-webui/discussions/23901)).
-
-It demonstrates patterns that aren't in the basic docs:
-
-- **Live streaming HTML/SVG.** The tool returns an empty wrapper; the model then emits markup inline between plain-text `@@@VIZ-START / @@@VIZ-END` markers in its normal response. A same-origin observer inside the iframe tails the parent chat's DOM, extracts the growing block, and reconciles new nodes into the iframe as tokens arrive, so dashboards and diagrams paint live, token-by-token, instead of popping in at the end of the stream.
-- **Bidirectional bridges.** `sendPrompt(text)` turns any clickable node into a follow-up user message. `saveState(k, v)` / `loadState(k, fallback)` proxies parent `localStorage` scoped per-message so sliders and toggles survive reloads. `copyText`, `toast(msg, kind)`, and `openLink` round it out.
-- **A shipped design system.** Theme-aware CSS variables, a 9-ramp color palette, SVG utility classes, auto light/dark adaptation, and 230 localized strings across 46 languages, all delivered from a single tool with no core changes.
-- **Incremental DOM reconciliation.** A safe-cut HTML parser flushes the longest valid prefix on every tick; the reconciler only appends new nodes so existing elements never re-mount and animations never re-trigger during the stream.
-
-This is a useful reference when you're trying to decide whether a generative-UI / streaming-UI feature needs a core change or can live purely in plugin-land. (Spoiler: almost always the latter.)
-:::
 
 ## Rendering Position
 
@@ -333,8 +314,7 @@ If you need to pass dynamic data into an embed rendered via either of the unsupp
 
 When `allowSameOrigin` is enabled, the iframe component auto-detects usage of certain libraries in your HTML and injects them automatically, with no CDN `<script>` tags needed:
 
-- **Alpine.js**: Detected when any `x-data`, `x-init`, `x-show`, `x-bind`, `x-on`, `x-text`, `x-html`, `x-model`, `x-modelable`, `x-for`, `x-if`, `x-effect`, `x-ignore`, `x-transition`, `x-cloak`, `x-ref`, `x-teleport`, or `x-id` directives are found
-- **Chart.js**: Detected when `new Chart(` or `Chart.` appears in the HTML
+Alpine.js and Chart.js are injected automatically when detected in your HTML.
 
 This means you can write Alpine or Chart.js code directly in your HTML and it will just work when same-origin is enabled, without importing scripts.
 

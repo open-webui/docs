@@ -61,21 +61,7 @@ First, you need to configure an OIDC application within your Okta organization a
 
 To enhance security, you can enforce Multi-Factor Authentication (MFA) for users logging into Open WebUI via Okta. This example demonstrates how to set up Google Authenticator as an additional factor.
 
-1.  **Configure an Authenticator**:
-    *   In the Okta Admin Console, navigate to **Security > Authenticators**.
-    *   Click **Add Authenticator** and add **Google Authenticator**.
-    *   During setup, you can set **"User verification"** to **"Required"** to enhance security.
-
-2.  **Create and Apply a Sign-On Policy**:
-    *   Go to **Security > Authenticators**, then click the **Sign On** tab.
-    *   Click **Add a policy** to create a new policy (e.g., "WebUI MFA Policy").
-    *   In the policy you just created, click **Add rule**.
-    *   Configure the rule:
-        *   Set **"IF User's IP is"** to **"Anywhere"**.
-        *   Set **"THEN Access is"** to **"Allowed after successful authentication"**.
-        *   Under **"AND User must authenticate with"**, select **"Password + Another factor"**.
-        *   Ensure your desired factor (e.g., Google Authenticator) is included under **"AND Possession factor constraints are"**.
-    *   Finally, assign this policy to your Open WebUI application. Go to **Applications > Applications**, select your OIDC app, and under the **Sign On** tab, select the policy you created.
+In the Okta Admin Console, add **Google Authenticator** under **Security > Authenticators**, then add a sign-on policy rule that requires **Password + Another factor** with that authenticator, and assign the policy to your Open WebUI OIDC application.
 
 Now, when users log in to Open WebUI, they will be required to provide their Okta password and an additional verification code from Google Authenticator.
 

@@ -128,9 +128,7 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 ## Unloading Loaded Models
 
-Once a model is held in memory by your `llama-server` instance, Open WebUI marks it with a green "Loaded" indicator in the model selector. Admins also see an **Eject** button on the row that unloads the model without restarting the server. It calls `POST /api/models/unload`, which in turn hits llama.cpp's `POST /models/unload` endpoint on the OpenAI-compatible connection's root URL.
-
-For this to work, the matching connection in **Settings → Connections → OpenAI** (admin section) must have its **Provider** set to `llama.cpp` (Open WebUI uses that hint to pick the correct unload mechanism). Connections left at the default OpenAI-compatible provider type return an error when an admin attempts to unload a model.
+Admins can eject a loaded model from the model selector without restarting the server. The matching connection in **Settings → Connections → OpenAI** (admin section) must have its **Provider** set to `llama.cpp`; connections left at the default provider type return an error on unload.
 
 The same **Provider** setting also gives admins a management panel under **Settings > Models > ⋯ > Manage** (admin section), which lists the server's models and can download, load, unload and delete them. See [Managing Local Models from Open WebUI](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#managing-local-models-from-open-webui).
 

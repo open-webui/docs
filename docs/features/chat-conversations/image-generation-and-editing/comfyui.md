@@ -97,7 +97,7 @@ To customize the prompt template used for generation, go to **Settings > Interfa
 
     You can find the node ID by clicking on a node in ComfyUI and viewing its details.
 
-    Open WebUI returns the images from the workflow's **Save Image**, **Save Image (Advanced)**, **Save Animated WEBP**, **Save Animated PNG** and **Preview Image** nodes. Animated images stay animated in the chat.
+    Images from the workflow's save and preview nodes appear in the chat.
 
     ![Screenshot of the ComfyUI Workflow Nodes section in Open WebUI, showing the mapping fields.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
@@ -151,15 +151,6 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
 
 Understanding the node ID mapping is often the biggest hurdle in integrating ComfyUI with an external service like Open WebUI. Integrating ComfyUI via API requires mapping Open WebUI's generic controls (e.g., "Model," "Width," "Prompt") to specific node inputs within your static ComfyUI workflow JSON.
 
-#### Mapping Workflow Nodes to Open WebUI
-
-Open WebUI's **ComfyUI Workflow Nodes** section lets you map generic controls to specific node inputs in your static ComfyUI workflow JSON. Each row has two fields:
-
-| Field | Description | Example |
-|-------|-------------|---------|
-| **Key** (left) | The input parameter name from the node's `inputs` block | `text`, `ckpt_name`, `seed` |
-| **Node Ids** (right) | Comma-separated node IDs to target | `6` or `1, 2, 3` |
-
 #### Identifying Node IDs and Input Keys in ComfyUI
 
 Before configuring Open WebUI, you must examine your exported workflow JSON files directly in a text editor. The Node ID is the unique number ComfyUI uses to identify the node in the JSON structure. The top-level keys in the JSON object are the node IDs.
@@ -209,49 +200,7 @@ The Key is the exact parameter name within that node's JSON structure that you n
 
 ![Screenshot of the Images page in Open WebUI's admin settings with ComfyUI as the engine, showing the base URL, API key, workflow upload and the Workflow Nodes mapping.](/images/image-generation-and-editing/comfyui-unet-name-node.png)
 
-#### Default Key Values by Task Type
-
-**Image Generation:**
-- Prompt: `text`
-- Model: `ckpt_name`
-- Width: `width`
-- Height: `height`
-- Steps: `steps`
-- Seed: `seed`
-
-**Image Editing:**
-- Image: `image`
-- Prompt: `prompt`
-- Model: `unet_name`
-- Width: `width`
-- Height: `height`
-
-#### Example: Mapping KSampler Seed
-
-Let's say you want to control the `seed` in your KSampler node, which has an ID of `3`. In the `Seed` section of the Open WebUI settings:
-
-| Key | Node Ids |
-|-----|----------|
-| `seed` | `3` |
-
-#### Handling Multiple Node IDs
-
-If multiple nodes need the same value (e.g., seed applied to multiple samplers), provide comma-separated IDs:
-
-| Key | Node Ids |
-|-----|----------|
-| `seed` | `3, 15, 22` |
-
-#### Handling Complex/Multimodal Nodes (Qwen Example)
-
-For specialized nodes, the Key may not be a simple text.
-
-| Parameter | Key | Node Ids | Note |
-|-----------|-----|----------|------|
-| **Prompt** | `text` or `prompt` | `76` | Depends on node type (CLIPTextEncode vs TextEncodeQwen) |
-| **Model** | `ckpt_name` | `37` | Used for CheckpointLoaderSimple |
-| **Model** | `unet_name` | varies | Used for UNETLoader in some workflows |
-| **Image Input** | `image` | `78` | The key passes the filename to the LoadImage node |
+If several nodes need the same value, list their IDs comma-separated (for example `3, 15, 22`). For specialized nodes such as Qwen workflows the key can differ (`text` or `prompt` for the prompt, `unet_name` instead of `ckpt_name` for the model, `image` for a LoadImage node).
 
 #### Troubleshooting Mismatch Errors
 
@@ -262,118 +211,8 @@ If ComfyUI stalls or gives a validation error, consult the log and the JSON stru
 | `Value not in list: ckpt_name: 'xyz.safetensors'` | You mapped the correct node ID (e.g., 37), but the value being passed (e.g., `xyz.safetensors`) is not a valid model name for that node type (e.g., accidentally sending a VAE model to a checkpoint loader). | Correct the model name set in Open WebUI for either image generation or editing, ensuring both model names match the type of model the ComfyUI node is expecting. |
 | `Missing input <key>` | Your workflow requires an input (e.g., `cfg` or `sampler_name`), but Open WebUI did not send a value because the field was not mapped. | Either hardcode the value in the workflow JSON, or map the required input key to the correct node ID. |
 
-By meticulously matching the Node ID and the specific Key, you ensure Open WebUI correctly overwrites the default values in your workflow JSON before submitting the prompt to ComfyUI.
 
-## Example Setup: Qwen Image Generation and Editing
-
-This section provides a supplementary guide on setting up the Qwen models for both image generation and editing.
-
-### Qwen Image Generation
-
-#### Model Download
-
-- **Diffusion Model**: [qwen_image_fp8_e4m3fn.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_fp8_e4m3fn.safetensors)
-- **Text Encoder**: [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
-- **VAE**: [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)
-
-#### Model Storage Location
-
-```
-ComfyUI/
-├── models/
-│   ├── diffusion_models/
-│   │   └── qwen_image_fp8_e4m3fn.safetensors
-│   ├── vae/
-│   │   └── qwen_image_vae.safetensors
-│   └── text_encoders/
-│       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
-```
-
-#### Workflow Node Mapping for Qwen Generation
-
-| Parameter | Key | Node Ids |
-|-----------|-----|----------|
-| Prompt | `prompt` | (depends on your workflow) |
-| Model | `ckpt_name` | (checkpoint loader node ID) |
-
-### Qwen Image Editing
-
-#### Model Download
-
-- **Diffusion Model**: [qwen_image_edit_fp8_e4m3fn.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_fp8_e4m3fn.safetensors)
-- **Text Encoder**: [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
-- **VAE**: [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)
-
-#### Model Storage Location
-
-```
-ComfyUI/
-├── models/
-│   ├── diffusion_models/
-│   │   └── qwen_image_edit_fp8_e4m3fn.safetensors
-│   ├── vae/
-│   │   └── qwen_image_vae.safetensors
-│   └── text_encoders/
-│       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
-```
-
-#### Workflow Node Mapping for Qwen Editing
-
-| Parameter | Key | Node Ids |
-|-----------|-----|----------|
-| Image | `image` | (load image node ID) |
-| Prompt | `prompt` | (text encoder node ID) |
-| Model | `unet_name` | (UNET loader node ID) |
-
-## Example Setup: FLUX.1 Image Generation
-
-This section provides a supplementary guide on setting up the FLUX.1 models for image generation.
-
-### FLUX.1 Dev
-
-#### Model Download
-
-- **Diffusion Model**: [flux1-dev.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors)
-- **Text Encoder 1**: [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true)
-- **Text Encoder 2**: [t5xxl_fp16.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors?download=true) (Recommended when your VRAM is greater than 32GB)
-- **VAE**: [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true)
-
-#### Model Storage Location
-
-```
-ComfyUI/
-├── models/
-│   ├── diffusion_models/
-│   │   └── flux1-dev.safetensors
-│   ├── vae/
-│   │   └── ae.safetensors
-│   └── text_encoders/
-│       ├── clip_l.safetensors
-│       └── t5xxl_fp16.safetensors
-```
-
-### FLUX.1 Schnell
-
-#### Model Download
-
-- **Diffusion Model**: [flux1-schnell.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors)
-- **Text Encoder 1**: [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true)
-- **Text Encoder 2**: [t5xxl_fp8_e4m3fn.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors?download=true) (Recommended when your VRAM is greater than 32GB)
-- **VAE**: [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true)
-
-#### Model Storage Location
-
-```
-ComfyUI/
-├── models/
-│   ├── diffusion_models/
-│   │   └── flux1-schnell.safetensors
-│   ├── vae/
-│   │   └── ae.safetensors
-│   └── text_encoders/
-│       ├── clip_l.safetensors
-│       └── t5xxl_fp8_e4m3fn.safetensors
-```
+Model files and folders are ComfyUI-side setup; see the [ComfyUI documentation](https://docs.comfy.org/) for downloading and placing models.
 
 ## Configuring with SwarmUI
 

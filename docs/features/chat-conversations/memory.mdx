@@ -43,14 +43,7 @@ Autonomous memory management needs a model that can decide which facts are worth
 
 Each memory carries a **type** and an optional **path** (see [Memory Types & Paths](#memory-types--paths) below). The model manages memory through these tools:
 
--   **`add_memory`**: Save a new fact, preference, or instruction, tagged as `user` or `context`, optionally under a `path`.
--   **`update_memory`**: Apply a batch of changes (add / replace / move / remove) in a single call.
--   **`replace_memory_content`**: Update or correct a specific existing memory using its `id`.
--   **`delete_memory`**: Remove a memory that is no longer relevant or correct, using its `id`.
--   **`search_memories`**: Search or browse the memory bank by content, path, type, or exact `id`. Results include a unique `id` per snippet (default returns 5).
--   **`list_memories`**: Retrieve all stored memories for the user, including content and timestamps.
--   **`list_memory_paths`**: List the saved memory paths (groups), so the model can find where related memories already live before writing.
--   **`read_memory_path`**: Read the memories stored at a given path, including nearby parent and child paths.
+Through these tools the model can save, update, correct, delete, search, list and browse memories by path. See the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) for details.
 
 ## Memory Types & Paths
 
@@ -63,12 +56,7 @@ These are set automatically by the memory tools; you do not need to assign them 
 
 ## Benefits of the Memory System
 
--   **Proactive Learning**: Instead of you manually typing preferences, a model can say: *"I'll remember that you prefer dark mode for your UI projects"* and call `add_memory` behind the scenes.
--   **Contextual Retrieval**: If a conversation drifts into a topic mentioned months ago, the model can "search its brain" using `search_memories` to find those past details.
--   **Dynamic Correction**: If the model remembers something incorrectly, it can use `replace_memory_content` to fix the fact rather than creating a duplicate.
--   **Cleanup**: The model can use `delete_memory` to remove outdated or irrelevant facts, keeping your memory bank clean.
--   **Full Visibility**: Using `list_memories`, the model can review everything it knows about you and identify gaps or contradictions.
--   **User Control**: Even though models can add memories, users retain full control. Every memory added by a model can be reviewed and deleted in the Personalization settings.
+The model can remember preferences without you typing them, and correct or clean up memories on its own. Every memory a model adds can be reviewed and deleted in the Personalization settings.
 
 ## Enabling Memory Tools
 
@@ -100,7 +88,7 @@ Administrators can also control Memory access on a per-role or per-group basis f
 - **Admin UI**: Admin Panel > Users > Permissions > Features > **Memories**
 - **Environment Variable**: [`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories) (Default: `True`)
 
-Taking the permission away closes every route memories take to a model. The affected users lose the **Personalization** tab, the memory API endpoints answer them with `403`, the model is no longer handed the memory tools and their stored memories are no longer added to the model's context. That last check runs server-side on each chat request, so a request that still asks for memory (a personal **Memory** toggle left on from before, or an API client sending `features: {"memory": true}`) does not bring the memories back. Administrators are exempt from the permission check.
+Removing the permission hides **Personalization**, blocks the memory endpoints and stops memories reaching the model. Administrators are exempt from the permission check.
 
 ### Background Review & Limits
 

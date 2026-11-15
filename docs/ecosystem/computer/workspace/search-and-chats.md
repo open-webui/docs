@@ -5,7 +5,7 @@ sidebar_position: 7
 
 # Search and chats
 
-Press `Cmd+K` (`Ctrl+K` on Windows/Linux) to search. With a workspace active, results are scoped to it: file names, chats, and the messages inside them. `Cmd+Shift+F` opens the broader search. With an empty query the dialog shows recent items, and `Cmd+1` through `Cmd+9` jumps straight to one of them.
+Press `Cmd+K` (`Ctrl+K` on Windows/Linux) to search. With a workspace active, results are scoped to it: file names, chats, and the messages inside them.
 
 That means "where did the AI explain that migration?" is a search away, from any device; chat history is indexed alongside the files.
 

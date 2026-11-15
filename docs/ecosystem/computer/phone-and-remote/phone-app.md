@@ -31,15 +31,5 @@ And where shared files land: the workspace root, ask for a folder each time, or 
 
 Where the OS and browser support PWA share targets, Open WebUI Computer appears in the system Share sheet. Share a URL, text, or file from any app, choose Computer, and it arrives according to your PWA settings: an article into a chat draft, a PDF into the project folder. On devices without share-target support, paste into a new chat or note, or upload through the file browser instead.
 
-## Keyboard shortcuts
-
-With a hardware keyboard (tablet or desktop):
-
-| Shortcut | Action |
-|---|---|
-| `Cmd+K` | Quick search (find anything) |
-| `Cmd+Shift+F` | Search across file contents |
-
-Use `Ctrl` instead of `Cmd` on Windows and Linux.
 
 Next: make sure the machine is still awake when you pull your phone out. See [Keep it running](./keep-it-running.md).

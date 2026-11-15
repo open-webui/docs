@@ -11,14 +11,7 @@ This guide covers breaking changes and required updates for Tools, Functions, Pi
 
 ## What Has Changed and Why?
 
-Open WebUI 0.9.0 ships a large internal refactor: the backend data layer has moved from **synchronous** to **asynchronous** from top to bottom. Almost every database-backed method on every model class (Users, Chats, Files, Models, Functions, Tools, Knowledge, Memories, Groups, Folders, Messages, Feedback, …) is now an `async def` and must be awaited.
-
-At the storage layer, SQLAlchemy is now used in its async mode: sessions are `AsyncSession` instances, and queries are issued via `await db.execute(select(...))` instead of the legacy `db.query(...).first()` style. A sync engine still exists internally, but it is reserved for startup-only tasks (config loading, Alembic/peewee migrations, health checks): **all runtime code, including plugins, must use the async engine**.
-
-**Why did we make this change?**
-- **Concurrency**: blocking DB calls on the event loop were the biggest bottleneck under load. Making the data layer async lets FastAPI handle many more concurrent chats without thread-pool saturation.
-- **Consistency**: request handlers were already async; the data layer being sync forced awkward `run_in_threadpool` wrappers throughout the codebase.
-- **Forward-looking**: SQLAlchemy 2.0's async API is the supported path going forward.
+Open WebUI 0.9.0 moved database access to async throughout: almost every database-backed method on every model class is now an `async def` and must be awaited. All runtime code, including plugins, must use the async SQLAlchemy engine (`AsyncSession`, `await db.execute(select(...))`).
 
 ---
 

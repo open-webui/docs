@@ -109,7 +109,7 @@ Something added in `inlet` reaches the first call and can be dropped from later 
 
 `inlet` runs near the start of the turn; `request` runs at the end, on the payload as it is about to leave. Everything the pipeline does happens between them, and that changes what is in the `body` you receive.
 
-**Gone by the time `request` runs.** The pipeline pops several keys out of the body after `inlet` returns: `features`, `tool_ids`, `terminal_id`, `files`, `folder_id` and `skill_ids`. A filter that needs any of these has to be an `inlet`. `variables`, `regeneration_prompt` and `params` are popped even earlier, before `inlet` runs, and `variables` stays readable as `__metadata__["variables"]`. (`features` is still reachable in `request` through the `__features__` reserved argument, which the pipeline sets aside before popping the key; the others are not.)
+**Gone by the time `request` runs.** Some inputs, such as `files`, `features` and `tool_ids`, are popped from the body after `inlet` returns, so a filter that needs them has to be an `inlet`. (`features` stays reachable in `request` through the `__features__` reserved argument.)
 
 **Only present by the time `request` runs.** Retrieved RAG chunks wrapped in `<source>` tags, the resolved `tools` array (server-side tools merged with anything a filter or the caller added), the chat's own system message and the folder system prompt (the workspace model's own System Prompt is added by the provider router after `request` returns), and web-search context, plus memory context on Legacy function calling. With Native function calling, recalled memories, the skills list and the attached knowledge list are added as hidden tool results after `inlet` and the first `request` call, so `inlet` never sees them and `request` sees them as tool messages from the second call of a reply on. If you want to read or rewrite the *retrieved chunk text* rather than the file references, `request` sees it natively, with no `file_handler` opt-in and no retrieval code of your own. That is often simpler than [owning retrieval](#owning-retrieval-with-file_handler); reach for `file_handler` when you need to *replace* how retrieval happens, and for `request` when you only need to transform its result.
 
@@ -144,7 +144,7 @@ Transformations that are naturally idempotent (clamping a value, downscaling an 
 
 `request` runs on every provider call, so anything expensive in it is paid for repeatedly inside a single answer. Because each call re-scans the full history, cost grows with both conversation length and tool-call count. Cache on a content hash if the work is heavy.
 
-What a raised exception does depends on the hook. From `inlet`, or from the first `request` call of a turn, it aborts the turn. From `request` on a later tool-loop hop it ends the loop with an error while what was already streamed stays. From `stream` it drops that one event in the WebUI path, but ends the whole stream for a direct API streaming caller. From `outlet` it is logged at debug level and otherwise ignored, except through `/api/chat/completed`, where it becomes an HTTP 400. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
+An exception in `inlet` aborts the turn. If your filter can fail on malformed input and you would rather degrade than kill the answer, catch it yourself and return the body unchanged.
 
 `file_handler` has no effect on a `request` filter; see [the note below](#owning-retrieval-with-file_handler).
 
@@ -189,29 +189,14 @@ class Filter:
 
 #### What `self.toggle = True` actually does
 
-It is a **visibility / gating flag**, read once at request-dispatch time, **not** a runtime state the UI flips on your Python object. Specifically:
-
-- **Visibility:** the filter only appears in the chat UI (the **+** menu entry and its chip) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
-- **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `request()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
-- **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__`, which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
-
-:::warning Upgrading from pre-0.9.0 filters
-Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally. The user controls whether `inlet()` runs by switching the filter on or off. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; the user opens it from the filter's **Valves** button.
-:::
+The filter runs only while the user has it switched on, so `self.toggle` is always `True` inside a handler. Do not branch on it; it is not a live on/off signal.
 
 #### How users interact with a toggleable filter
 
-When a toggleable filter is in scope for the current chat, it shows up in two places:
-
-- **The + menu in the chat input.** Lists every toggleable filter in scope with its `self.icon`, name and an on/off **Switch**. A filter that defines a `UserValves` class also gets a **Valves** button there.
-- **A chip beside the + button**, only while the user has **Show Input Selections** on in **Settings > Interface** (off by default). It shows for each selected filter. Clicking it opens the user-valves modal if the filter defines `UserValves`, otherwise it removes the filter from the selection; the **x** on hover always removes it.
-
-A filter whose switch is on runs on the next request.
+Toggleable filters appear in the chat input's **+** menu, where users switch them on or off. A filter whose switch is on runs on the next request.
 
 #### Where the selection lives
 
-- Stored in the browser as **sessionStorage draft state**, keyed per chat.
-- Survives page reloads in the same browser session but is **not persisted to the chat record on the server**.
 - Initial state comes from the model's `defaultFilterIds` (Settings > Models → Edit the model → **Filters** → **Start enabled in new chats** (admin section)). Admins decide which toggleable filters start **on** vs **off** per model.
 - Switching models applies the new model's default filters and keeps the ones the user turned on or off.
 
@@ -291,15 +276,7 @@ The flag is read exclusively on the `inlet` pass, and the file references are st
 
 #### Caveat: it's static, all-or-nothing per filter
 
-`file_handler` is read from the cached `Filter` instance before each `inlet()` call. It is not a per-request signal: a value changed inside `inlet()` applies from the next request, not the one being processed, and it cannot be flipped based on the model, user, or chat of the current request. When set, the built-in RAG is **always** skipped for any request where this filter is invoked, regardless of whether your `inlet()` actually called any retrieval logic on that particular request.
-
-In practice this means: if you use `file_handler = True`, your filter must handle retrieval for **every** scenario where files would normally be retrieved by the built-in path, including the cases where you'd have been happy with the default behavior. The retrieval call itself is identical in both cases; only any conditional *transformation* (e.g. "only redact for remote models") branches on context.
-
-If you genuinely need per-request switching between built-in and custom retrieval (e.g. "use built-in RAG for some users, custom for others on the same model"), the cleanest approach is to gate the custom-RAG filter on `self.toggle = True` so it only runs when the user has it selected. When the filter isn't selected, it doesn't run, its `file_handler` doesn't apply, and the built-in RAG handles the request normally. Don't try to dynamically mutate `file_handler` from inside `inlet()`; the flag is read off the module object before your method is called.
-
-#### Why this matters compared to mutating `body["files"]` in inlet
-
-A naive alternative is to clear `body["metadata"]["files"] = []` and `body["files"] = []` inside `inlet()` to suppress the built-in RAG dynamically. This works in practice but is brittle: future Open WebUI versions can add new file and knowledge base plumbing under additional keys, and the official "I'm handling this myself" contract is `file_handler`. Prefer the documented opt-in.
+When `file_handler` is set, the built-in RAG is skipped for every request this filter runs on, so the filter must handle retrieval for all of them. For per-request switching, gate the custom-RAG filter on `self.toggle = True` so it only runs when the user has it selected. Do not try to mutate `file_handler` from inside `inlet()`.
 
 ---
 
@@ -360,20 +337,7 @@ Open WebUI uses a sophisticated two-tier system for managing filters on a per-mo
 
 This controls which filters are **available** for a specific model.
 
-**Behavior:**
-- Opens a searchable picker with **all** filters (both global and model-specific)
-- **Global filters** are marked **Global** and cannot be clicked
-- **Regular filters** are added or removed with a click
-- Saves to: `model.meta.filterIds` in the database
-
-**Example:**
-```json
-{
-  "meta": {
-    "filterIds": ["filter-uuid-1", "filter-uuid-2"]
-  }
-}
-```
+Choose which filters the model can use. Global filters are marked **Global** and cannot be clicked.
 
 #### Tier 2: DefaultFiltersSelector (Which toggleable filters start enabled?)
 
@@ -493,56 +457,12 @@ class WebSearchFilter:
         return body
 ```
 
-**Where Toggleable Filters Appear:**
-
-1.  **Model Settings → Filters → Start enabled in new chats**
-    - Admin switches on the toggleable filters that start in the selection on new chats with that model.
-2.  **Chat input → + menu**
-    - Lists every toggleable filter in scope for the current model, each with an on/off **Switch**, and a **Valves** button when the filter defines `UserValves`.
-3.  **Chat input → chip beside the + button**
-    - Shown for every toggleable filter in the user's selection, only while **Show Input Selections** is on in **Settings > Interface**.
-    - Clicking the chip **opens the user-valves modal** if the filter defines `UserValves`, otherwise **removes the filter from the selection**.
-    - `self.icon` renders as the chip's image.
 
 ---
 
 ### Filter Execution Flow
 
-Here's the complete flow from admin configuration to filter execution:
-
-**1. ADMIN PANEL (Filter Creation & Global Settings)**
-- Admin Panel > Functions > Create New Function
-- Set type="filter"
-- Toggle is_active (enable/disable filter globally)
-- Toggle is_global (apply to all models)
-
-**2. MODEL CONFIGURATION (Per-Model Filter Selection)**
-- Model Settings → **Filters** row
-- Filters picker: Select which filters for this model
-- **Start enabled in new chats** switch: Set default enabled state (only for toggleable filters)
-
-**3. CHAT UI (User Interaction, Toggleable Filters Only)**
-- Chat input → **+** menu → Switch per toggleable filter
-- Chat input → chip per selected filter, with **Show Input Selections** on (click opens UserValves modal if defined, otherwise removes the filter)
-- Frontend tracks `selectedFilterIds` in sessionStorage (per chat, per session)
-- Initial selection seeded from the model's `defaultFilterIds`
-- Always-on filters (no `self.toggle`) run automatically with no UI control
-
-**4. REQUEST PROCESSING (Filter Compilation)**
-- Frontend ships the current `selectedFilterIds` with the request
-- Backend: `get_sorted_filter_ids(request, model, filter_ids)`
-- Fetch global filters (`is_global=True`, `is_active=True`) + model-specific filters from `model.meta.filterIds`
-- Filter by `is_active` status
-- **For toggleable filters:** keep only the ones whose ID is in the request's `filter_ids`. Others are dropped entirely (never invoked, `self.toggle` never read)
-- Sort by priority (from valves)
-
-**5. FILTER EXECUTION**
-- Execute inlet() filters (once, at the start of the turn)
-- Execute request() filters (immediately before the payload goes to the provider)
-- Send modified request to LLM
-- Execute stream() filters (during streaming)
-- Repeat request() and stream() for every further call the turn makes, such as after tool results come back
-- Execute outlet() filters (once, after the final response)
+Filters run in this order: `inlet()` once at the start of the turn, `request()` before every provider call, `stream()` during streaming and `outlet()` once after the final response.
 
 ---
 
@@ -834,8 +754,7 @@ class Filter:
 Behavior:
 
 - **Native function calling** (the default). Filter-injected tools are appended to the server-resolved tool list before the chat completion is sent. Both sets of tools are visible to the model on the same request.
-- **Tools provided by the original API caller.** If the request that *entered* the filter pipeline already had `body["tools"]` (e.g. an external client called `/api/chat/completions` with its own `tools` array), those caller-provided tools take precedence and Open WebUI **skips server-side tool resolution entirely**. Filter inlets should additively append in that case too; the caller's tools and yours both go to the LLM.
-- **Non-native function calling.** Server-side tool resolution still runs through Open WebUI's prompt-driven tool handler; filter-injected tools are forwarded to the LLM but the runtime executor for them is up to whatever you wired into the upstream call.
+- **Tools provided by the original API caller.** If the request already carries its own `tools` array, Open WebUI skips server-side tool resolution, so filter inlets should append their tools additively.
 
 Use this for tools that don't have a corresponding registered Tool in the workspace, for example transient per-request capabilities you want the model to know about on a specific user's chats only.
 
@@ -886,36 +805,6 @@ Filters can declare any of these parameters in their function signature to recei
 Only parameters you declare in your function signature are injected. Open WebUI inspects the signature at runtime to determine what to pass.
 
 `request()` is handed the same set as `inlet()` on the first call of a turn, so `__model__` resolves workspace models there exactly as shown above, plus `__features__`, which carries the `features` dict after the pipeline has popped it off the body. On the later tool-loop hops `__features__` is absent, so give it a default.
-
----
-
-### UI Indicators & Visual Feedback
-
-#### In the Admin Functions Panel
-
-| Indicator | Meaning |
-|-----------|---------|
-| Green toggle | Filter is active (`is_active=True`) |
-| Grey toggle | Filter is inactive (`is_active=False`) |
-| **Global** switch in the ⋮ menu | Filter is global (`is_global=True`) when on |
-
-#### In Model Settings (FiltersSelector)
-
-| State | Picker entry | Description |
-|-------|--------------|-------------|
-| Global Filter | ✓ Marked **Global**, not clickable | "This filter is globally enabled" |
-| Selected Filter | ✓ Checkmark, clickable | "This filter is selected for this model" |
-| Unselected Filter | No checkmark, clickable | "Click to include this filter" |
-
-Each selected or global toggleable filter shows a **Start enabled in new chats** switch below its entry.
-
-#### In the Chat Input's + Menu
-
-| Element | Description |
-|---------|-------------|
-| Filter name | Shows the filter's display name |
-| Custom icon | SVG icon from `self.icon` (if provided) |
-| Toggle switch | Enable/disable the filter for this chat |
 
 ---
 
@@ -992,81 +881,17 @@ You can enhance the user experience for your filter's settings by providing drop
 
 The `enum` keyword allows you to specify a list of predefined values that the UI should present as options in a dropdown.
 
-**Example:** Creating a dropdown for color themes in a filter.
+**Example:** a dropdown for a color theme.
 
 ```python
-from pydantic import BaseModel, Field
-from typing import Optional
-
-# Define your available options (e.g., color themes)
-COLOR_THEMES = {
-    "Plain (No Color)": [],
-    "Monochromatic Blue": ["blue", "RoyalBlue", "SteelBlue", "LightSteelBlue"],
-    "Warm & Energetic": ["orange", "red", "magenta", "DarkOrange"],
-    "Cool & Calm": ["cyan", "blue", "green", "Teal", "CadetBlue"],
-    "Forest & Earth": ["green", "DarkGreen", "LimeGreen", "OliveGreen"],
-    "Mystical Purple": ["purple", "DarkOrchid", "MediumPurple", "Lavender"],
-    "Grayscale": ["gray", "DarkGray", "LightGray"],
-    "Rainbow Fun": [
-        "red",
-        "orange",
-        "yellow",
-        "green",
-        "blue",
-        "indigo",
-        "violet",
-    ],
-    "Ocean Breeze": ["blue", "cyan", "LightCyan", "DarkTurquoise"],
-    "Sunset Glow": ["DarkRed", "DarkOrange", "Orange", "gold"],
-    "Custom Sequence (See Code)": [],
-}
-
 class Filter:
     class Valves(BaseModel):
         selected_theme: str = Field(
             "Monochromatic Blue",
-            description="Choose a predefined color theme for LLM responses. 'Plain (No Color)' disables coloring.",
-            json_schema_extra={"enum": list(COLOR_THEMES.keys())}, # KEY: This creates the dropdown
+            description="Choose a predefined color theme.",
+            json_schema_extra={"enum": ["Plain (No Color)", "Monochromatic Blue", "Warm & Energetic"]},  # creates the dropdown
         )
-        custom_colors_csv: str = Field(
-            "",
-            description="CSV of colors for 'Custom Sequence' theme (e.g., 'red,blue,green'). Uses xcolor names.",
-        )
-        strip_existing_latex: bool = Field(
-            True,
-            description="If true, attempts to remove existing LaTeX color commands. Recommended to avoid nested rendering issues.",
-        )
-        colorize_type: str = Field(
-            "sequential_word",
-            description="How to apply colors: 'sequential_word' (word by word), 'sequential_line' (line by line), 'per_letter' (letter by letter), 'full_message' (entire message).",
-            json_schema_extra={
-                "enum": [
-                    "sequential_word",
-                    "sequential_line",
-                    "per_letter",
-                    "full_message",
-                ]
-            }, # Another example of an enum dropdown
-        )
-        color_cycle_reset_per_message: bool = Field(
-            True,
-            description="If true, the color sequence restarts for each new LLM response message. If false, it continues across messages.",
-        )
-        debug_logging: bool = Field(
-            False,
-            description="Enable verbose logging to the console for debugging filter operations.",
-        )
-
-    def __init__(self):
-        self.valves = self.Valves()
-        # ... rest of your __init__ logic ...
 ```
-
-**What's happening?**
-
-*   **`json_schema_extra`**: This argument in `Field` allows you to inject arbitrary JSON Schema properties that Pydantic doesn't explicitly support but can be used by downstream tools (like Open WebUI's UI renderer).
-*   **`"enum": list(COLOR_THEMES.keys())`**: This tells Open WebUI that the `selected_theme` field should present a selection of values, specifically the keys from our `COLOR_THEMES` dictionary. The UI will then render a dropdown menu with "Plain (No Color)", "Monochromatic Blue", "Warm & Energetic", etc., as selectable options.
-*   The `colorize_type` field also demonstrates another `enum` dropdown for different coloring methods.
 
 Using `enum` for your `Valves` options makes your filters more user-friendly and prevents invalid inputs, leading to a smoother configuration experience.
 
@@ -1268,11 +1093,6 @@ async def stream(self, event: dict) -> dict:
 
 If `stream()` raises, Open WebUI drops that whole event, and losing `response.completed` costs the reply its token usage figures and its response id.
 
-:::note Valves are resolved once per response, not once per chunk
-
-`stream()` runs for every fragment, so its valves are read from the database once when the response starts and reused for the rest of it, rather than being re-read thousands of times. Both `self.valves` and `__user__["valves"]` are therefore stable for the whole of one streamed reply: a valve edited while a reply is streaming takes effect on the next reply, not partway through the current one. `inlet()` and `outlet()` are unaffected, as each runs once anyway.
-
-:::
 
 ---
 

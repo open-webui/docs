@@ -110,7 +110,25 @@ Connections added in the Tether app keep the keys on your computer, see [Your Ow
 A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat under **Model controls > Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
 
 **"A switch in Settings > Interface has Default written next to it. What does that mean?"**
-It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
+It means you have never changed that option, so it follows the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured.
+
+**"The interface is too small to read comfortably."**
+Raise **UI Scale** at the top of the **UI** section in **Settings > Interface**. It enlarges the whole application and is stored with your account.
+
+**"Can I change the font?"**
+**Font Family**, just under UI Scale in **Settings > Interface**, takes the name of a font that is installed on your computer, such as `Aptos`.
+
+**"I am the admin. Where do I configure connections to OpenAI or Ollama?"**
+Settings > Connections (admin section). These are instance-wide and shared by all users.
+
+**"I want to use my own API key without sharing it with the server."**
+Connections added in the Tether app keep the keys on your computer, see [Your Own Connections](/ecosystem/tether#your-own-connections). An admin can add shared connections under **Settings > Connections** (admin section).
+
+**"I set a system prompt but my admin's model settings override it."**
+A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat under **Model controls > Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
+
+**"A switch in Settings > Interface has Default written next to it. What does that mean?"**
+It means you have never changed that option, so it follows the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured.
 
 **"The interface is too small to read comfortably."**
 Raise **UI Scale** at the top of the **UI** section in **Settings > Interface**. It enlarges the whole application and is stored with your account.

@@ -61,11 +61,7 @@ People with access to a terminal can run commands in it. With **Separate instanc
 
 ## Manage Machines
 
-The **Instances** list in the dialog shows every instance of the terminal with its name and whether it is running or stopped. Open the **More options** menu of a row to act on it. A running instance offers **Restart** and **Stop**, plus **System info** and **View files** unless it belongs to another user. A stopped one offers **Start**. Every instance offers **Delete instance**. While an action runs, the row shows what is happening (**Restarting...**, **Stopping...**, **Starting...** or **Deleting...**) with a spinner. **Delete terminal** removes the terminal and its instances and files.
-
-## Terminal Menu
-
-Each terminal in the menu has a **More** menu with **Restart** and **Stop** while the instance runs or **Start** while it is stopped. While the instance runs it also lists **System info** and **View files**. **Terminal settings** is always there. **View files** opens the [file browser](/features/open-terminal/file-browser) for that terminal without selecting it for the chat. **System info** shows CPU, memory, disk and network use, uptime and top processes, and refreshes every 5 seconds while open.
+Restart, stop, start or delete an instance from the **Instances** list in the dialog. **Delete terminal** removes the terminal and its instances and files.
 
 ## Chats
 

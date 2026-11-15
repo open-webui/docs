@@ -172,14 +172,7 @@ await __event_emitter__(
 
 #### The `done` Field
 
-The `done` field controls the **shimmer animation** on the status text in the UI:
-
-| `done` value | Visual effect |
-|---|---|
-| `false` (or omitted) | Status text has a **shimmer/loading animation**, indicates ongoing processing |
-| `true` | Status text appears **static**, indicates the step is complete |
-
-The backend does not inspect `done` at all. It simply saves the value and forwards it to the frontend. The shimmer effect is purely a frontend visual cue.
+The `done` field controls the shimmer animation on the status text. `false` (or omitted) means processing is ongoing, `true` means the step is complete.
 
 :::warning Always Emit a Final `done: True`
 If you emit status events, always send at least one with `done: True` at the end of your status sequence. Without it, the last status item keeps its shimmer animation indefinitely, making it look like processing never finished, even after the response is complete.
@@ -198,13 +191,9 @@ await __event_emitter__({"type": "status", "data": {"description": "Fetching dat
 
 #### The `hidden` Field
 
-When `hidden` is `true`, the status is saved to `statusHistory` but **not shown** in the current status display. This is useful for internal status tracking that shouldn't be visible to the user.
+A hidden status is saved to the history but not shown.
 
-Additionally, when the message has no content yet and the last status has `hidden: true` (or no status exists at all), the frontend shows a pulsing typing cursor in place of the status bar, so hidden statuses don't replace the indicator that something is still running. A visible status suppresses that cursor while the message is still empty; once the first content arrives the cursor trails the text until the message is marked done, whether a status is on screen or not.
 
-#### Long Status Text
-
-The status line above a reply is cut to one line. Users click it to read the full text. When a message has several statuses, the click opens the status history, which shows every entry in full. Longer summaries, such as token usage reports, stay readable this way, also when several models answer side by side.
 
 ---
 
@@ -368,7 +357,7 @@ await __event_emitter__(
 #### Notes
 
 - **Persistence requires the short name.** Emit `"embeds"` (or `"chat:message:embeds"`) but be aware only the short name `"embeds"` is persisted to the database. See the [persistence table](#which-event-types-are-persisted-to-the-database) below. The `replace` flag has no effect on the unpersisted alias.
-- **Sandbox and sizing.** Each embed is rendered inside a sandboxed iframe with `allow-scripts` and `allow-downloads` enabled, plus `allow-popups` for embeds attached to an assistant message. Same-origin access is user-toggled; form submissions are always allowed on that surface, whatever the user setting says. For auto-resize behavior, height reporting, and the Chart.js / Alpine auto-injection details, see [Rich UI Embedding → Sandbox and Security](/features/extensibility/plugin/development/rich-ui#sandbox-and-security).
+- **Sandbox and sizing.** Each embed is rendered inside a sandboxed iframe. For sandbox details, auto-resize and the Chart.js / Alpine auto-injection, see [Rich UI Embedding → Sandbox and Security](/features/extensibility/plugin/development/rich-ui#sandbox-and-security).
 - **External tools.** External-tool callers can post the same `embeds` payload (including `replace: true`) to `/api/v1/chats/{chatId}/messages/{messageId}/event`. See [External Tools below](#external-tools-openapi--mcp).
 
 ---
@@ -476,8 +465,7 @@ await __event_emitter__(
 )
 ```
 
-**What this does exactly:**
-This event forces the Open WebUI frontend to update the "favorite" state of a message in its local cache. Without this emitter, if an **Action Function** modifies the `message.favorite` field in the database directly, the frontend (which maintains its own state) might overwrite your change during its next auto-save cycle. This emitter ensures the UI and database stay perfectly in sync.
+**What this does exactly:** emit this event after an **Action Function** changes `message.favorite` in the database, so the open page matches and the frontend does not overwrite your change on its next auto-save.
 
 :::note Designed for Actions
 While this event can technically be emitted from any plugin type (tools, pipes, filters), it is **designed for and meaningful in Actions**. Actions operate on existing messages and can modify the database directly. From a pipe or tool, emitting this event would update the frontend state temporarily, but unless the plugin also wrote to the database, the change would be lost on the next chat auto-save.
@@ -562,10 +550,6 @@ result = await __event_call__(
     }
 )
 ```
-
-:::tip
-This uses the same `SensitiveInput` component used for user valve password fields, providing a familiar "eye" icon toggle for showing/hiding the value.
-:::
 
 ---
 
@@ -939,14 +923,7 @@ A common question is: **what happens if the browser tab is closed while a tool, 
 
 ### Server-Side Execution Continues
 
-When you send a chat request, Open WebUI creates a background `asyncio` task that is **not tied to your HTTP connection or Socket.IO session**. If you close the tab:
-
-1. The WebSocket disconnects and the Socket.IO disconnect handler fires
-2. The disconnect handler cleans up session data but **does not cancel any running tasks**
-3. The background task continues running to completion on the server
-4. `sio.emit()` calls succeed silently: events are sent to an empty room and discarded
-5. **Database writes still happen** for persisted event types (see below)
-6. The task runs until the function returns, raises an error, or is manually cancelled
+When you send a chat request, Open WebUI creates a background `asyncio` task that is **not tied to your HTTP connection or Socket.IO session**. If you close the tab, the task keeps running to completion on the server, and **database writes still happen** for persisted event types (see below).
 
 :::info No Execution Timeout
 There is **no timeout** on pipe, tool, or action execution. Your code can run for minutes or hours, and nothing in Open WebUI will kill it automatically. The only things that can stop a running task are:
@@ -1015,7 +992,7 @@ If your pipe or tool needs to call an LLM and have the result persist even when 
 | `execute` via `__event_call__` | Uses `sio.call()`, waits for a client response and returns an error dictionary if the timeout elapses |
 | `execute` via `__event_emitter__` | Fires and forgets, **will not error**, but JS may not run if no browser is connected |
 
-`confirmation` and `input` fundamentally require a live browser connection via `__event_call__`. If the tab is closed the session is gone, so the call returns `{"error": "Client session disconnected."}` straight away. In a saved chat, if the connection drops while the dialog is open, the call waits up to 60 seconds for the user to reopen that chat and then shows the dialog again. If the tab is merely inactive the call waits for [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout). That is unset by default, so it waits indefinitely; set it to a number of seconds and once it elapses the call returns `{"error": "Event call timed out. The browser tab may be inactive or closed."}`. Neither case raises, so test the return value instead of relying on `try`/`except`, and note that a timeout leaves the browser session connected: a user who was slow to answer can still be prompted again.
+`confirmation` and `input` require a live browser connection via `__event_call__`. If the tab is closed the call returns `{"error": "Client session disconnected."}` straight away. For inactive tabs, see [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout).
 
 `execute` is more flexible: when used via `__event_emitter__`, it fires without waiting for a response, so it won't error on tab close (though the JS won't execute if no browser is listening). This makes `__event_emitter__` the safer choice for `execute` calls where you don't need the return value, particularly for file downloads on iOS PWA, where the two-way channel can fail with `"TypeError: Load failed"`.
 

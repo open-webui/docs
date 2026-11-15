@@ -69,82 +69,13 @@ context:
 
 ---
 
-### Miscellaneous Configuration Settings
-
-These values are needed by the extension to work properly. Find more information in the [official config guide](https://docs.continue.dev/reference).
-
-```yaml
-name: Local Assistant
-version: 1.0.0
-schema: v1
-```
-
-The context section provides additional information to the models. Find more information in the [official config guide](https://docs.continue.dev/reference#context) and in the [context provider guide](https://docs.continue.dev/customize/model-providers/overview).
-
-```yaml
-context:
-  - provider: code
-  - provider: docs
-  - provider: diff
-  - provider: terminal
-  - provider: problems
-  - provider: folder
-  - provider: codebase
-```
-
----
-
-### Models
-
-The models section is where you specify all models you want to add. Find more information in the [official models guide](https://docs.continue.dev/reference#models).
-
-```yaml
-models:
-  - ...
-```
-
----
-
-### Name
-
-Sets the name for the model you want to use. This will be displayed within the chat input of the extension.
-
-```yaml
-name: Qwen3.6
-```
-
-![continue.dev chat input](/images/tutorials/continue-dev/continue_dev_extension_input_field.png)
-
----
-
-### Provider
-
-Specifies the method used to communicate with the API, which in our case is the OpenAI API endpoint provided by Open WebUI.
-
-```yaml
-provider: openai
-```
-
----
-
 ### Model
 
-This is the actual name of your model in Open WebUI. Navigate to `Settings` > `Models` (admin section), and then click on your preferred LLM.
+The `model` is the actual name of your model in Open WebUI. Navigate to `Settings` > `Models` (admin section), and then click on your preferred LLM.
 Below the user-given name, you'll find the actual model name.
 
 ```yaml
 model: qwen3.6:27b
-```
-
----
-
-### Legacy completions endpoint
-
-This setting is not needed for Open WebUI, though more information is available in the [original guide](https://platform.openai.com/docs/guides/completions).
-
-```yaml
-env:
-  useLegacyCompletionsEndpoint: false
 ```
 
 ---
@@ -171,16 +102,5 @@ apiKey: YOUR_OPEN_WEBUI_API_KEY
 ```
 
 ---
-
-### Roles
-
-The roles will allow your model to be used by the extension for certain tasks. For the beginning you can choose `chat` and `edit`.
-You can find more information about roles in the [official roles guide](https://docs.continue.dev/customize/model-roles/intro).
-
-```yaml
-roles:
-  - chat
-  - edit
-```
 
 The setup is now completed and you can interact with your model(s) via the chat input. Find more information about the features and usage of the continue.dev plugin in the [official documentation](https://docs.continue.dev/getting-started/overview).

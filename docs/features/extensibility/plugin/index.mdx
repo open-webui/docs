@@ -45,11 +45,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 Getting started with Tools and Functions is easy because everything’s already built into the core system! You just **click a button** and **import these features directly from the community**, so there’s no coding or deep technical work required.
 
 :::tip The plugin system is more capable than these docs can show
-The pages that follow document the full plugin API surface: class shapes, lifecycle methods, arguments, event types, return contracts and every hook into the pipeline. The reference is complete.
-
-What these docs cannot cover is the range of things people actually build with it. Community plugins have been used for live-streaming HTML dashboards, per-user cost enforcement, context managers that summarize and replace older turns, bidirectional interactive UIs, in-chat MCP apps, forensic watermarking and much more.
-
-If you are considering a feature request and thinking "this needs a core change," first ask whether it can be done as a plugin. The plugin system has access to the full request/response lifecycle, persistent state, user metadata, the event emitter and the admin-configurable valves system. In practice, most features that feel like they need core changes (custom authentication logic, per-user rate limiting, response post-processing, provider-specific routing, cost tracking, context management strategies) can be implemented entirely as a plugin without touching the core codebase. Filing a plugin on the community site also means other users benefit immediately, without waiting for a release cycle.
+The pages that follow document the full plugin API surface. Before filing a feature request that seems to need a core change, check the community plugins: most such features can be built as a plugin.
 :::
 
 ## What are "Tools" and "Functions"?

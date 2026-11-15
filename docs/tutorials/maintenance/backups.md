@@ -166,70 +166,7 @@ exit 0
 
 ## Rsync Job With Container Interruption
 
-To maintain data integrity, it's generally recommended to run database backups on cold filesystems. Our default model backup job can be modified slightly to bring down the stack before running the backup script and bring it back after.
-
-The downside of this approach, of course, is that it will entail instance downtime. Consider running the job at times you won't be using the instance or taking "software" dailies (on the running data) and more robust weeklies (on cold data).
-
-```bash
-
-#!/bin/bash
-
-# Configuration
-COMPOSE_FILE="docker-compose.yml" # Path to your docker-compose.yml file
-B2_BUCKET="b2://OpenWebUI-backups" # Your Backblaze B2 bucket
-B2_PROFILE="your_rclone_profile" # Your rclone profile name
-SOURCE_DIR="."  # Current directory (where the file structure resides)
-
-# Define source and destination directories
-SOURCE_UPLOADS="$SOURCE_DIR/uploads"
-SOURCE_VECTORDB="$SOURCE_DIR/vector_db"
-SOURCE_WEBUI_DB="$SOURCE_DIR/webui.db"
-
-DEST_UPLOADS="$B2_BUCKET/user_uploads"
-DEST_CHROMADB="$B2_BUCKET/ChromaDB"
-DEST_MAIN_DB="$B2_BUCKET/main_database"
-
-# Exclude cache and audit.log
-EXCLUDE_LIST=(
-    "cache/"
-    "audit.log"
-)
-
-# Construct exclude arguments for rclone
-EXCLUDE_ARGS=""
-for EXCLUDE in "${EXCLUDE_LIST[@]}"; do
-    EXCLUDE_ARGS="$EXCLUDE_ARGS --exclude '$EXCLUDE'"
-done
-
-# Function to perform rclone sync with error checking
-rclone_sync() {
-    SOURCE="$1"
-    DEST="$2"
-    echo "Syncing '$SOURCE' to '$DEST'..."
-    rclone sync "$SOURCE" "$DEST" $EXCLUDE_ARGS --progress --transfers=32 --checkers=16 --profile "$B2_PROFILE"
-    if [ $? -ne 0 ]; then
-        echo "Error: rclone sync failed for '$SOURCE' to '$DEST'"
-        exit 1
-    fi
-}
-
-# 1. Stop the Docker Compose environment
-echo "Stopping Docker Compose environment..."
-docker compose -f "$COMPOSE_FILE" down
-
-# 2. Perform the backup
-echo "Starting backup..."
-rclone_sync "$SOURCE_UPLOADS" "$DEST_UPLOADS"
-rclone_sync "$SOURCE_VECTORDB" "$DEST_CHROMADB"
-rclone_sync "$SOURCE_WEBUI_DB" "$DEST_MAIN_DB"
-
-# 3. Start the Docker Compose environment
-echo "Starting Docker Compose environment..."
-docker compose -f "$COMPOSE_FILE" up -d
-
-echo "Backup completed successfully."
-exit 0
-```
+To maintain data integrity, it's generally recommended to run database backups on cold filesystems. Stop the stack with `docker compose down`, run the backup script above, then bring it back with `docker compose up -d`. This causes instance downtime, so run it when you won't be using the instance.
 
 ## Model Backup Script Using SQLite & ChromaDB Backup Functions To B2 Remote
 

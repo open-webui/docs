@@ -211,22 +211,6 @@ Deploy using Docker Compose, Kubernetes YAML manifests, or your favorite cloud c
 
 Your production MCP servers are now available via REST APIs!
 
-## Technical Details and Background
-
-### How It Works (Technical Summary)
-
-- **Dynamic Schema Discovery & Endpoints:** At server startup, the proxy connects to the MCP server to query available tools. It automatically builds FastAPI endpoints based on the MCP tool schemas, creating concise and clear REST endpoints.
-
-- **OpenAPI Auto-documentation:** Endpoints generated are seamlessly documented and available via FastAPI's built-in Swagger UI (`/docs`). No extra doc writing required.
-
-- **Asynchronous & Performant**: Built on robust asynchronous libraries, designed for speed and reliability with concurrent users.
-
-### Under the Hood:
-
-- FastAPI (Automatic routing & docs generation)
-- MCP Client (Standard MCP integration & schema discovery)
-- Standard JSON over HTTP (Easy integration)
-
 ## Why is the MCP-to-OpenAPI Proxy Superior?
 
 Here's why leveraging MCP servers through OpenAPI via the proxy approach is significantly better and why Open WebUI enthusiastically supports it:

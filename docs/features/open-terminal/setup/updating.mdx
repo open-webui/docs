@@ -110,15 +110,7 @@ Reload `http://localhost:8000/docs` and check the version number again. As long 
 
 ## What a newer server gives you
 
-A few things in the file browser are done by the terminal server rather than by your browser, so they only appear once it is new enough:
-
-| Version | What it adds |
-| :--- | :--- |
-| 0.12.1 | Word and PowerPoint files preview as the real thing. The server renders them the way Office does, instead of the browser approximating the layout. |
-| 0.12.0 | The file browser searches file contents as well as file names, and shows the matching lines. |
-| 0.11.35 | A configurable file browser home, read-only markers on files you cannot change, and template variables in custom system prompts. |
-
-Office rendering needs the default image. The `slim`, `alpine` and `openshift` images stay deliberately small and leave LibreOffice out, so a document preview there falls back to the browser's own rendering and warns that it may differ from the download.
+Keep the terminal server updated to get newer file browser features. Office document previews need the default image: the `slim`, `alpine` and `openshift` images leave LibreOffice out, so a document preview there falls back to the browser's own rendering.
 
 ---
 

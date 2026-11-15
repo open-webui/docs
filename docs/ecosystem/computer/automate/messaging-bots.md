@@ -36,10 +36,7 @@ Work on every platform:
 
 ## What to expect
 
-- **Streaming**: the bot edits its message roughly every 2 seconds with progress: tool activity lines plus the text so far. The final answer arrives as persistent messages, chunked to the platform's length limit. (WhatsApp and Signal don't support edits; you get the final answer only.)
-- **Attachments in**: images and documents you send are attached to the chat.
 - **Voice notes**: transcribed and answered when speech-to-text is configured; see [voice and audio](/ecosystem/computer/ai/voice-and-audio). Otherwise the bot tells you STT isn't set up.
-- **Queueing**: messages sent while a task is running are queued and processed in order.
 - **Synced**: every bot conversation is a real chat in the selected workspace; it appears in the Computer sidebar, and you can pick it up in the web UI.
 
 ## Telegram

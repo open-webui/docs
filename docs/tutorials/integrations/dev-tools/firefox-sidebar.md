@@ -52,60 +52,7 @@ To add custom prompts, follow these steps:
 
 ## URL Parameters for Open WebUI
 
-The following URL parameters can be used to customize your Open WebUI instance:
-
-### Models and Model Selection
-
-- `models`: Specify multiple models (comma-separated list) for the chat session (e.g., `/?models=model1,model2`)
-- `model`: Specify a single model for the chat session (e.g., `/?model=model1`)
-
-### YouTube Transcription
-
-- `youtube`: Provide a YouTube video ID to transcribe the video in the chat, after confirming the link (e.g., `/?youtube=VIDEO_ID`)
-
-### Web Search
-
-- `web-search`: Enable web search functionality by setting this parameter to `true` (e.g., `/?web-search=true`)
-
-### Tool Selection
-
-- `tools` or `tool-ids`: Specify a comma-separated list of tool IDs to activate in the chat (e.g., `/?tools=tool1,tool2` or `/?tool-ids=tool1,tool2`)
-
-### Call Overlay
-
-- `call` or `voice`: Start Voice Mode by setting this parameter to `true`, after confirming the microphone prompt (e.g., `/?call=true`)
-
-### Initial Query Prompt
-
-- `q`: Place a prompt in the message input, ready to send (e.g., `/?q=Hello%20there`)
-
-### Temporary Chat Sessions
-
-- `temporary-chat`: Mark the chat as a temporary session by setting this parameter to `true` (e.g., `/?temporary-chat=true`)
-  - *Note: Document processing is frontend-only in temporary chats. Complex files requiring backend parsing may not work.*
-
-See https://docs.openwebui.com/features/chat-conversations/chat-features/url-params for more info on URL parameters and how to use them.
-
-## Additional about:config Settings
-
-The following `about:config` settings can be adjusted for further customization:
-
-- `browser.ml.chat.shortcuts`: Enable custom shortcuts for the AI chatbot sidebar
-- `browser.ml.chat.shortcuts.custom`: Enable custom shortcut keys for the AI chatbot sidebar
-- `browser.ml.chat.shortcuts.longPress`: Set the long press delay for shortcut keys
-- `browser.ml.chat.sidebar`: Enable the AI chatbot sidebar
-- `browser.ml.checkForMemory`: Check for available memory before loading models
-- `browser.ml.defaultModelMemoryUsage`: Set the default memory usage for models
-- `browser.ml.enable`: Enable the machine learning features in Firefox
-- `browser.ml.logLevel`: Set the log level for machine learning features
-- `browser.ml.maximumMemoryPressure`: Set the maximum memory pressure threshold
-- `browser.ml.minimumPhysicalMemory`: Set the minimum physical memory required
-- `browser.ml.modelCacheMaxSize`: Set the maximum size of the model cache
-- `browser.ml.modelCacheTimeout`: Set the timeout for model cache
-- `browser.ml.modelHubRootUrl`: Set the root URL for the model hub
-- `browser.ml.modelHubUrlTemplate`: Set the URL template for the model hub
-- `browser.ml.queueWaitInterval`: Set the interval for queue wait
-- `browser.ml.queueWaitTimeout`: Set the timeout for queue wait
+Open WebUI accepts URL parameters such as `model`, `tools`, `web-search` and `temporary-chat` to customize the chat session, for example `/?model=model1&temporary-chat=true`. See [URL Parameters](/features/chat-conversations/chat-features/url-params) for the full list.
 
 ## Accessing the AI Chatbot Sidebar
 

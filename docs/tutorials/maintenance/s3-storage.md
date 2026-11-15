@@ -24,11 +24,7 @@ In order to follow this tutorial, you must have the following:
 
 ## What is Amazon S3
 
-Direct from AWS' website:
-
-"Amazon S3 is an object storage service that offers industry-leading scalability, data availability, security, and performance. Store and protect any amount of data for a range of use cases, such as data lakes, websites, cloud-native applications, backups, archive, machine learning, and analytics. Amazon S3 is designed for 99.999999999% (11 9's) of durability, and stores data for millions of customers all around the world."
-
-To learn more about S3, visit: [Amazon S3's Official Page](https://aws.amazon.com/s3/)
+Amazon S3 is an object storage service from AWS. To learn more about S3, visit [Amazon S3's Official Page](https://aws.amazon.com/s3/).
 
 # How to Set-Up
 

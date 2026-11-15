@@ -9,7 +9,7 @@ When the workspace is a git repository, a git status strip shows the current bra
 
 ## Review changes
 
-Open any changed file to see its diff in split or unified view. Word-level highlights mark what changed inside a line, and you can hide whitespace-only changes to cut noise in reformatted files. Images and other non-text files show a clear changed/added/deleted status instead of meaningless line counts.
+Open any changed file to see its diff.
 
 Stage exactly the files you want; the staged set is what gets committed.
 
@@ -27,4 +27,4 @@ The worktree picker lists the repository's git worktrees and lets you create new
 
 ## Pull requests
 
-For GitHub repositories with the GitHub CLI (`gh`) installed and signed in, the git panel has a **Pull requests** view. List the open pull requests, create one from the current branch, check one out and open it to see its **Summary**, **Code**, **Checks** and **Activity**. From there you can comment, approve or request changes, edit the title and description, mark it ready for review, update its branch, close or reopen it or merge it with **Merge**, **Squash** or **Rebase**.
+With the GitHub CLI (`gh`) installed and signed in, the git panel also lists, creates and merges pull requests.

@@ -59,7 +59,7 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 
 **Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
 
-**Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
+**Background images travel as data.** Exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
 **Voice avatars travel as references.** A [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) and its animations stay files on the source instance, and the export only carries their file IDs. Importing or syncing a model whose avatar or animation files are missing or not accessible on the target instance fails with `403` (`Avatar or animation file is not accessible. Upload it again.`). Upload the avatar on the target instance first.
 
@@ -91,7 +91,7 @@ A reply can involve several model calls, one per round of tool use. `input_token
 
 :::
 
-**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Models** (admin section). Both only fill in what your request left out, so `temperature`, `max_tokens`, `top_p`, `seed`, `stop`, `reasoning_effort`, `response_format`, `logit_bias` and, for Ollama models, the `options` object all keep the values you sent. For an Ollama model, `max_tokens` reaches Ollama as `num_predict`. Leave one out and the model's saved value applies, as before. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#anthropic-messages-api) below runs through this endpoint, so the same holds there and an SDK's `max_tokens` reaches the provider intact.
+**The parameters in your request are kept.** A workspace model carries its own advanced parameters, and an administrator can set instance-wide ones under **Model Defaults** in **Settings > Models** (admin section). Both only fill in what your request left out, so the values you send win. The exception is **Stream Chat Response**, which still decides whether the reply streams whatever `stream` your request carries. The [Anthropic Messages API](#anthropic-messages-api) below runs through this endpoint, so the same holds there.
 
 **Model controls.** A model with [Model controls](/features/workspace/models#model-controls) applies each control's default option to API requests as well, and those parameters also only fill in what your request left out. To pick another option, send the control and option IDs under `params.model_controls`, keyed by model ID. `GET /api/models` lists a model's controls under `info.params.model_controls`, with each control's ID, label, default and the IDs and labels of its options:
 
@@ -294,7 +294,7 @@ All models configured in Open WebUI are accessible through this endpoint, includ
 
 **Tool Use:** The Anthropic Messages endpoint supports tool use (`tools` and `tool_choice` parameters). Tool calls from the upstream model are translated into Anthropic-format `tool_use` content blocks in both streaming and non-streaming responses.
 
-**Usage reporting:** Responses carry whatever usage the upstream model reported, in the closing `message_delta` when streaming and in `usage` when not. Prompt-cache counters (`cache_creation_input_tokens`, `cache_read_input_tokens`), `output_tokens_details`, `server_tool_use` and `service_tier` are passed through when the provider sends them, so a client that tracks cache hits or reasoning tokens sees the real figures rather than losing them in translation. An OpenAI-style provider that reports cached tokens as `prompt_tokens_details.cached_tokens` has them mapped to `cache_read_input_tokens`, and `input_tokens` is reported the way Anthropic clients expect it: the uncached prompt tokens, with cache creation and cache read counted separately rather than a second time. On a streaming request `input_tokens` is reported only when it is actually known, so a provider that never reports it leaves the field out instead of showing a fabricated zero.
+**Usage reporting:** Responses carry the usage the upstream model reported, in the closing `message_delta` when streaming and in `usage` when not.
 
 Usage from the upstream provider is requested only when the model has the **Usage** capability enabled in its editor. Without it the provider is not asked to include usage in a stream, and the token counts a client receives fall back to what Open WebUI can determine on its own.
 :::
@@ -725,81 +725,6 @@ Use this endpoint to fetch a webpage, extract content, and store the resulting c
 :::tip
 If `ENV=dev` is enabled, this endpoint schema (including query params like `overwrite`) is also visible in Swagger at `/docs`.
 :::
-
-#### Complete Workflow Example
-
-Here's a complete example that uploads a file, waits for processing, and adds it to a knowledge base:
-
-```python
-import requests
-import time
-
-WEBUI_URL = 'http://localhost:3000'
-TOKEN = 'your-api-key-here'
-
-def upload_and_add_to_knowledge(file_path, knowledge_id, timeout=300):
-    """
-    Upload a file and add it to a knowledge base.
-    Properly waits for processing to complete before adding.
-    """
-    headers = {
-        'Authorization': f'Bearer {TOKEN}',
-        'Accept': 'application/json'
-    }
-    
-    # Step 1: Upload the file
-    with open(file_path, 'rb') as f:
-        response = requests.post(
-            f'{WEBUI_URL}/api/v1/files/',
-            headers=headers,
-            files={'file': f}
-        )
-    
-    if response.status_code != 200:
-        raise Exception(f"Upload failed: {response.text}")
-    
-    file_data = response.json()
-    file_id = file_data['id']
-    print(f"File uploaded with ID: {file_id}")
-    
-    # Step 2: Wait for processing to complete
-    print("Waiting for file processing...")
-    start_time = time.time()
-    
-    while time.time() - start_time < timeout:
-        status_response = requests.get(
-            f'{WEBUI_URL}/api/v1/files/{file_id}/process/status',
-            headers=headers
-        )
-        status_data = status_response.json()
-        status = status_data.get('status')
-        
-        if status == 'completed':
-            print("File processing completed!")
-            break
-        elif status == 'failed':
-            raise Exception(f"Processing failed: {status_data.get('error')}")
-        
-        time.sleep(2)  # Poll every 2 seconds
-    else:
-        raise TimeoutError("File processing timed out")
-    
-    # Step 3: Add to knowledge base
-    add_response = requests.post(
-        f'{WEBUI_URL}/api/v1/knowledge/{knowledge_id}/file/add',
-        headers={**headers, 'Content-Type': 'application/json'},
-        json={'file_id': file_id}
-    )
-    
-    if add_response.status_code != 200:
-        raise Exception(f"Failed to add to knowledge: {add_response.text}")
-    
-    print(f"File successfully added to knowledge base!")
-    return add_response.json()
-
-# Usage
-result = upload_and_add_to_knowledge('/path/to/document.pdf', 'your-knowledge-id')
-```
 
 #### Using Files and Collections in Chat Completions
 

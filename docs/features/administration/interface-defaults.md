@@ -31,9 +31,8 @@ An on/off option someone has never touched shows a small **Default** label besid
 Untouched options keep tracking your default, so changing a default later moves everyone who has not overridden that option. Saving the **Interface** page keeps them inherited, **Font Family** and the **Image Compression** size included.
 
 :::info Matching the default releases the option
-Moving a control to whatever your default currently is releases the override: the **Default** label comes back and the option follows your defaults again. That is how someone undoes a choice they made earlier.
+Moving a control to the current default releases its override: the **Default** label comes back and the option follows your defaults again.
 
-Releasing happens when that person saves their settings, and it compares against your defaults as they stand at that moment. So setting a default to the value someone had already chosen for themselves does not release their override on its own: their choice stays pinned, and your next change still will not reach them. It is released the next time they save anything on the **Interface** page, at which point every option of theirs that matches your current defaults is released together, not only the one they just changed.
 :::
 
 ---
@@ -48,7 +47,7 @@ Releasing happens when that person saves their settings, and it compares against
 4. Set the options you want. The list is the same one users see in **Settings > Interface**.
 5. Click **Save** at the bottom of the page.
 
-A line above the list counts how many settings you have configured. Every control you touch joins that set, including one you move and then move straight back, so use **Clear** to empty the set and put everything back on the built-in values.
+**Clear** puts every option back on the built-in values.
 
 ---
 
