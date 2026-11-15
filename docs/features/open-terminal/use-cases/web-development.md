@@ -87,7 +87,7 @@ The options menu (**...**) picks how pages load. **Chrome** runs Chrome on the t
 
 ## The Desktop tab
 
-On terminals that support it, the **+** menu also offers **Desktop**. It shows the terminal's desktop, which you use with mouse and keyboard, including paste, and a button opens it in full screen. When the terminal provides desktop audio, the speaker button (**Unmute** / **Mute**) plays its sound.
+On terminals that support it, the **+** menu also offers **Desktop**. It shows the terminal's desktop, which you use with mouse and keyboard, including paste (when the desktop has no clipboard of its own, the pasted text is typed into it), and a button opens it in full screen. When the terminal provides desktop audio, the speaker button (**Unmute** / **Mute**) plays its sound.
 
 ## More things to try
 
