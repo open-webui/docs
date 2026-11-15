@@ -31,9 +31,11 @@
 .notice p {
 	margin: 0 0 0.5rem;
 }
+
 .notice a {
 	text-decoration: underline;
 }
+
 .notice > div {
 	display: flex;
 	justify-content: flex-end;
