@@ -260,7 +260,7 @@ For work that takes longer than a single atomic claim, Open WebUI ships a renewa
 
 ## Footguns
 
-- **No sandboxing.** Tools and Functions execute Python in your backend process as the backend user. The security policy ([Rule 10](/security/security-policy#reporting-guidelines)) treats this as intended behaviour: granting Tool or Function creation permission is equivalent to granting shell access on the host. Treat plugin authors as administrators.
+- **No sandboxing.** Tools and Functions execute Python in your backend process as the backend user. The security policy ([Rule 9](/security/security-policy#reporting-guidelines)) treats this as intended behaviour: granting Tool or Function creation permission is equivalent to granting shell access on the host. Treat plugin authors as administrators.
 - **Stream hooks use a stale cache.** Edits to a `stream` method only take effect after another hook (or a process restart) refreshes the module. If you edit a stream filter and the change does not seem to apply, trigger an `inlet`/`outlet` reload or restart.
 - **Cross-plugin interference is not detected.** Two plugins patching the same function, registering the same route, or writing to the same `app.state` key will collide. Load order is not deterministic. Prefer additive patterns (your own namespaces, wrappers that delegate) over destructive ones.
 - **Disabling does not unload.** The module stays in `sys.modules` and any module-level side effects stay installed. Restart the process to fully revert.
@@ -276,4 +276,4 @@ For anything you can express through the documented hooks (filters that mutate `
 
 If your plugin needs an interface that does not exist yet, an upstream PR is more durable than a monkey-patch.
 
-If you file a bug report against a code path that your plugin is monkey-patching, expect it to be closed. Reports must reproduce against an unmodified Open WebUI ([Rule 6](/security/security-policy#reporting-guidelines)).
+If you file a bug report against a code path that your plugin is monkey-patching, expect it to be closed. Reports must reproduce against an unmodified Open WebUI ([Rule 5](/security/security-policy#reporting-guidelines)).
