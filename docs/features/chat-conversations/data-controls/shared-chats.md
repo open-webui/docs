@@ -21,7 +21,7 @@ This page documents the **management dashboard** for shared chats. For informati
 The **Shared Chats** modal provides a unified interface for your public content:
 
 - **Centralized List**: View all conversations that have an active share link.
-- **Search & Filter**: Quickly find specific shared chats by title. The search bar includes a **500ms debounce** to ensure smooth performance while typing.
+- **Search & Filter**: Quickly find specific shared chats by title.
 - **Advanced Sorting**: Organize your shared history by:
   - **Updated At** (Default)
   - **Title**

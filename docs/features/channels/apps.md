@@ -46,7 +46,7 @@ If a mention fails, Open WebUI posts the reason under the app's name as a reply 
 
 ### Buttons
 
-Channel messages from an app can carry buttons and cards. A card shows a title, text, fields and a small image, with a colored bar on the side. A link button opens a web page in a new tab. Any other button sends the click to the app, which can answer privately, post a new message or update the message the button belongs to.
+Channel messages from an app can carry buttons and cards. A link button opens a web page in a new tab. Any other button sends the click to the app, which can answer privately, post a new message or update the message the button belongs to.
 
 ---
 
@@ -125,8 +125,6 @@ Open WebUI keeps a live connection to each enabled app and reconnects on its own
 | **Connected** | A verified connection is open. With several workers sharing Redis, at least one of them is connected. |
 | **Connecting** | Open WebUI is trying to reach the app and will keep retrying. |
 | **Disconnected** | No connection is open. |
-
-Disabled apps are dimmed. Hover the switch to see **Enabled**, **Disabled** or **Uninstalled**.
 
 When an app stays on **Connecting** or **Disconnected**, turn its switch off and on again, then click **Connect** in the dialog that opens. The dialog shows why the connection fails; [Troubleshooting](#troubleshooting) explains each message.
 

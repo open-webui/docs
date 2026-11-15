@@ -23,7 +23,7 @@ A user reports that the signup form rejects valid emails. You're on a train. The
 
    Terminal output persists, so if the run is slow you can lock the phone and come back to it.
 
-4. **Make the edit.** Find the file with **Cmd+K** search (the on-screen search button on mobile), open it in the editor, and fix the regex. Syntax highlighting and tabs work the same as on desktop; the screen is just smaller.
+4. **Make the edit.** Find the file with **Cmd+K** search (the on-screen search button on mobile), open it in the editor, and fix the regex.
 
 5. **Verify and commit.** Re-run the test, then open the git panel: review the diff (split or unified view), stage just that file, and commit. Computer can suggest a commit title and description from the staged change. Push if the branch is yours to push.
 

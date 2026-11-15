@@ -23,7 +23,7 @@ and it answers, because "it" is the full agent running in that workspace.
 
 4. **Pick its home.** Select the workspace and model the bot starts in, then start it.
 
-5. **Talk to it.** Ask the build question. You'll see the reply stream in as the agent works: tool activity lines first, then the answer. Useful commands mid-conversation:
+5. **Talk to it.** Ask the build question. Useful commands mid-conversation:
 
    - `/workspace api` to switch projects
    - `/new` for a fresh chat, `/stop` to cancel a runaway task

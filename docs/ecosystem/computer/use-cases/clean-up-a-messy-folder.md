@@ -13,7 +13,7 @@ If you've never used Computer before, this is a good first project: you'll see e
 
 ## The walkthrough
 
-1. **Open the messy folder as a workspace.** In the workspace picker, choose your Downloads folder (or a copy of it, if you want to practice safely first). The file browser now shows the chaos in all its glory, with icons and file sizes.
+1. **Open the messy folder as a workspace.** In the workspace picker, choose your Downloads folder (or a copy of it, if you want to practice safely first).
 
 2. **Keep the AI on a leash.** In the chat, open the **+** menu and make sure approval mode is **ask**. This means the AI must show you every single change and wait for your tap before making it. Nothing moves without your say-so.
 
@@ -21,7 +21,7 @@ If you've never used Computer before, this is a good first project: you'll see e
 
    > Look through this folder and tell me what's in it. Propose a folder structure (like Screenshots, Documents, Installers, Old homework) and tell me what you'd move where. Don't move anything yet.
 
-   Watch it work: you'll see it listing files and reading names, then it answers with a plan you can react to. "Actually, keep anything from 2026 where it is" is a perfectly good reply.
+   "Actually, keep anything from 2026 where it is" is a perfectly good reply.
 
 4. **Let it execute, with you approving.** When the plan looks right:
 

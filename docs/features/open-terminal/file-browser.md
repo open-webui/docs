@@ -57,21 +57,21 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
 ### Excel workbooks (XLSX, XLS)
-`.xlsx` and `.xls` files open as a table, one sheet at a time. A workbook with several sheets shows a picker to switch between them. The formula bar above the sheet shows the value or formula of the selected cell. Drag a column edge to resize it, or double-click the edge to fit the content.
+`.xlsx` and `.xls` files open as a table, one sheet at a time. A workbook with several sheets shows a picker to switch between them.
 
 An `.xlsx` file you can write to is editable in the preview. Double-click a cell or start typing to change it, or paste a range of cells. **Save** writes the workbook back to the file. Formula cells, table headers and protected sheets stay read-only. If the file changed on the terminal since you opened it, saving stops and asks you to reload it, and your edits stay in the editor.
 
 ### Word documents (DOCX)
 `.docx` files are laid out by the terminal itself, using the same engine an office suite uses, and the preview shows the finished document. What you see is what the file prints: real pagination, headers, footers, footnotes and endnotes, embedded images, fonts and spacing.
 
-A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
+A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. The page is scaled to fit the width of the panel. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
 
 Where the terminal cannot lay the document out, the browser draws it instead and the preview says that it may differ from the download. That rendering keeps the text, tables and images without matching the exact layout. Only when that fails too does it report an error and suggest downloading the file instead.
 
 ### Presentations (PPTX)
 `.pptx` files open in a **slide viewer**, one slide at a time. The terminal renders the deck the same way it renders Word documents, so each slide arrives as the finished thing: backgrounds, fills, fonts, spacing and the position every placeholder takes from the layout or master.
 
-A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
+A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around.
 
 Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. That approximation draws single bar, line, pie and doughnut charts, negative values included. Stacked and combined charts and other chart types show **Chart preview unavailable**. Open the file in its own application when the exact rendering matters.
 
@@ -242,7 +242,7 @@ When the folder open in the file browser is inside a Git repository, a **Git** p
 
 The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. Staging, pushing, pulling and fetching show their progress. Drag the divider next to the file list to resize it. A file with changes gets **Show diff** in the file browser toolbar.
 
-The file list marks changes too. A changed file is colored by its status and shows how many lines were added and removed. A changed binary file shows a status letter such as `M` (modified) or `U` (untracked). A folder with changes inside gets a colored dot. Rest the pointer on a mark to see the status and whether the changes are staged.
+The file list marks changes too. A changed file is colored by its status and shows how many lines were added and removed. A changed binary file shows a status letter such as `M` (modified) or `U` (untracked).
 
 ---
 

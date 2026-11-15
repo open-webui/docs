@@ -25,8 +25,6 @@ Hovering a tab spells the same thing out in words, including the exit code. Sele
 
 Tabs for commands that have finished carry a **✕** that dismisses them. A running command cannot be dismissed, which is deliberate: the tab is the only place its output is shown. A tab you dismiss stays gone, even though the command itself is still listed by the terminal.
 
-**Arrow keys** move between tabs while the tab strip has focus, and **Home** and **End** jump to the first and last.
-
 ## Naming of shell tabs
 
 A **New Terminal** tab is named after the title the running program sets, so a tab with an editor, a dev server or a coding agent in it says so, and an idle shell shows its own title. Next to the name, an icon shows what the tab is running. Claude Code, Codex, Python, Node.js, npm, git, Docker and a few other well-known programs have their own icons, and any other program gets the plain terminal icon. The icon follows the program that Open Terminal reports as running in the foreground, which it does on Unix-like systems. Keep Open Terminal up to date, see [Updating](/features/open-terminal/setup/updating).

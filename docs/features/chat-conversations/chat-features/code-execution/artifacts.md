@@ -30,7 +30,7 @@ When Open WebUI creates an Artifact, you'll see the content displayed in a dedic
 
 - **Editing and iterating**: Ask an LLM within the chat to edit or iterate on the content, and these updates will be displayed directly in the Artifact window. You can switch between versions using the version selector at the bottom left of the Artifact. Each edit creates a new version, allowing you to track changes using the version selector.
 - **Updates**: Open WebUI may update an existing Artifact based on your messages. The Artifact window will display the latest content.
-- **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen, located in the lower right corner of the Artifact.
+- **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen.
 
 ## Securing artifact previews with a CSP
 

@@ -96,7 +96,7 @@ Open **Display options** (the sliders icon beside search and filter) to pick a *
 
 ### Searching and Filtering
 
-The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags. Active filters show as chips above the list, and **Clear filters** removes them. Pressing `c` jumps into the message box to start a new chat in the folder.
+The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags.
 
 Each chat in the list or on the board has the same three-dot menu as in the sidebar, with rename, move, clone, share, archive, delete and mark as unread. In a chat someone else started, the menu is shorter.
 
@@ -104,7 +104,7 @@ Each chat in the list or on the board has the same three-dot menu as in the side
 
 A status says where a chat stands, for example **In progress** or **Done**. Every folder starts with **Backlog**, **To do**, **In progress**, **Waiting** and **Done**, and chats without a status show as **No status**.
 
-Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Hover it to see when this stretch began and how long the chat spent in other statuses. Earlier time spent in the same status counts toward it.
+Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Earlier time spent in the same status counts toward it.
 
 Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging. It also adds and deletes statuses. Chats in a deleted status go back to **No status**.
 

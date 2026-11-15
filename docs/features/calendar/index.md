@@ -135,7 +135,7 @@ Switch between views using the dropdown in the top bar:
 
 | View | Description |
 |------|-------------|
-| **Month** | Full month grid with event chips. Events that overflow show a "+N more" link to the day view. |
+| **Month** | Full month grid with event chips. |
 | **Week** | 7-day time grid with hourly slots. Scroll vertically through the day. |
 | **Day** | Single-day time grid with hourly slots for detailed scheduling. |
 
