@@ -828,4 +828,54 @@ The table below summarizes the key hardening actions covered in this guide. Each
 
 ## Security-First Deployment
 
-The Quick Reference above is the recommended baseline. Also maintain an incident response plan: define procedures for compromised accounts, unauthorized access and unexpected resource consumption, and know how to disable user accounts, sign users out of all devices, reset a user's two-factor sign-in, rotate the secret key and review audit logs.
+For organizations where security is a priority, the following practices define the recommended deployment baseline. Each item addresses a distinct layer of the deployment, and together they provide defense in depth. Each item links to the relevant section above for detailed configuration.
+
+### Network and Transport
+
+1. **Place Open WebUI behind a VPN, reverse proxy, or zero-trust access layer with rate limiting and IP allowlisting.** Open WebUI is built for private, trusted networks. Do not expose it directly to the public internet without an additional access control layer in front of it. Configure your proxy to throttle connection rates, limit repeated authentication attempts, restrict access to known IP ranges, and use tools like fail2ban to block abusive sources. Restrict `FORWARDED_ALLOW_IPS` to your proxy's IP to prevent header spoofing. [Details](#network-placement)
+
+2. **Serve all traffic over HTTPS and enable all security headers.** Use a reverse proxy that terminates TLS. Configure session cookies with `Secure=true` and `SameSite=strict`. Never serve Open WebUI over plain HTTP in production. Enable HSTS, Content Security Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, and Permissions-Policy. Do not leave CORS set to `*`; restrict it to only the exact domains that need access. [Details](#https-and-tls)
+
+### Authentication and Access Control
+
+3. **Keep registration disabled.** Open WebUI automatically disables signup after the first user registers. The default role for any new account is `pending`, which requires explicit admin approval before the account can access any functionality. Do not re-enable open registration on instances that are accessible beyond a trusted network. [Details](#registration)
+
+4. **Use SSO with your identity provider and disable local authentication.** Integrate with your organization's OAuth/OIDC or LDAP provider. Restrict access to specific email domains and IdP groups, map IdP roles to Open WebUI roles, and disable the local login form and password authentication entirely. Limit concurrent sessions per user, enable backchannel logout with Redis so sessions are revoked immediately when users are deprovisioned, and do not enable OAuth account merging unless your provider guarantees email verification. [Details](#oauth-and-sso)
+
+5. **Enforce password complexity and shorten session lifetime.** If local accounts are used, enable password validation and two-factor sign-in. Reduce the default JWT expiration from 4 weeks to a shorter duration appropriate for your environment (e.g., 8 to 24 hours). Do not disable token expiration in production. [Details](#password-validation)
+
+6. **Review user accounts and permissions periodically.** Remove inactive accounts, audit group memberships, and verify that workspace permissions remain appropriate. Use SCIM provisioning to automate account lifecycle management through your identity provider. [Details](#access-control)
+
+### Tools, Functions, and Extensions
+
+7. **Keep Tool and Function creation restricted to administrators and review all code before importing.** By default, only administrators can create, import, and manage Tools and Functions. Do not grant workspace permissions to untrusted users. Treat third-party Tools with the same scrutiny as any code running on your infrastructure. Never import Tools without reviewing their source code first. [Details](#tools-functions-and-pipelines)
+
+8. **Disable automatic dependency installation and disable code execution if not needed.** Set `ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=false` to prevent Tools from pulling in arbitrary packages at runtime. If your deployment does not require in-chat code execution, disable it entirely (`ENABLE_CODE_EXECUTION=false`, `ENABLE_CODE_INTERPRETER=false`). If it is needed, isolate it with **Open Terminal** (container-isolated) for code execution, and avoid the legacy `pyodide` and `jupyter` engines, and never expose a `jupyter` engine without securing the Jupyter instance. [Details](#dependency-installation)
+
+### Data Protection
+
+9. **Restrict data sharing, file uploads, and API key access.** Set maximum file sizes, file count limits, and restrict allowed file extensions. Disable community sharing (`ENABLE_COMMUNITY_SHARING=false`) and admin bulk export (`ENABLE_ADMIN_EXPORT=false`) if not operationally needed. Keep API key creation restricted to administrators and enable endpoint restrictions to limit which routes each key can access. [Details](#data-sharing-and-export)
+
+10. **Encrypt data at rest and maintain regular backups.** For SQLite, use an encrypted filesystem. For PostgreSQL, use disk-level or Transparent Data Encryption. Maintain regular backups, store them in a separate security domain, and periodically test your restore procedure. [Details](#sqlcipher)
+
+### Outbound Network Controls
+
+11. **Keep SSRF protections, outbound TLS verification, and network restrictions enabled.** Do not enable local web fetch. The default configuration blocks access to private IP ranges and cloud provider metadata endpoints; extend the blocklist to include internal domains specific to your environment. Do not disable certificate verification for outbound connections. For air-gapped environments, enable offline mode so Open WebUI stops making its own outbound calls, and isolate the instance at the network level to close the connections it does not control. [Details](#ssrf-prevention)
+
+### Supply Chain and Change Management
+
+12. **Use official container images, or build from source.** Pull images from `ghcr.io/open-webui/open-webui` or `openwebui/open-webui` on Docker Hub. For full supply chain control, build directly from [source](https://github.com/open-webui/open-webui) using the provided Dockerfile. Do not use unofficial or third-party images. [Details](#container-hardening)
+
+13. **Pin to a specific release version and validate updates before deploying.** Use a tagged release rather than `:main` or `:latest`. Review changelogs before upgrading. Validate new versions in a staging environment before rolling them out to production, and maintain the ability to roll back. Do not auto-update production deployments. [Details](#keeping-open-webui-updated)
+
+### Container and Infrastructure
+
+14. **Run as non-root with minimal capabilities on a segmented network.** Use a non-root UID/GID, read-only filesystem mounts where possible, drop all unnecessary Linux capabilities, and set `--security-opt=no-new-privileges`. Apply restrictive permissions (e.g., `0700`) to the data directory. Use PostgreSQL with strong credentials on a separate network segment, not accessible from the public internet. [Details](#non-root-execution)
+
+### Observability and Incident Response
+
+15. **Enable audit logging at METADATA level or higher and forward to your SIEM.** Always audit authentication endpoints. Configure retention and forward logs to your organization's log aggregation infrastructure. Use JSON log format and enable OpenTelemetry for distributed tracing if supported. [Details](#audit-logging)
+
+16. **Monitor for anomalies.** Track CPU, memory, network, and disk usage. Integrate with your alerting infrastructure to detect unexpected compute usage, outbound network activity, or storage consumption early. [Details](#observability)
+
+17. **Maintain an incident response plan.** Define procedures for compromised accounts, unauthorized access, and unexpected resource consumption. Know how to disable user accounts, sign users out of all devices, reset a user's two-factor sign-in, rotate the secret key and review audit logs.
