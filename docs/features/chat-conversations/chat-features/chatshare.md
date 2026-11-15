@@ -99,7 +99,7 @@ In a chat with replies allowed:
 
 - In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
 - A line above the message input shows who is typing.
-- The chat's top bar shows the other people who have the chat open right now, up to three profile pictures followed by a count such as **+2**. Click the count for the **Collaborators** list, and hover or click a picture to open that person's profile card.
+- The chat's top bar shows the other people who have the chat open right now. Click there for the **Collaborators** list.
 - Anyone who can write into the chat and has the **Allow Regenerate Response** permission can **Regenerate** any reply. The new version belongs to the person who generated it. Each person continues, stops and rates only the reply versions they generated.
 - Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt. The editor offers **Send**, which adds the edited prompt as a new branch with a new reply and leaves the original as it was. Other people in the chat stay on the branch they had selected.
 - Only the owner can edit replies and save an edit in place, and only on their own messages and the reply versions they generated. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.

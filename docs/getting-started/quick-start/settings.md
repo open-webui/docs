@@ -116,7 +116,7 @@ It means you have never changed that option, so it is following the instance-wid
 Raise **UI Scale** at the top of the **UI** section in **Settings > Interface**. It enlarges the whole application and is stored with your account.
 
 **"Can I change the font?"**
-**Font Family**, just under UI Scale in **Settings > Interface**. Click **Default** to get a text box, then type the name of a font, such as `Aptos`. The interface changes as you type so you can see it before you commit.
+**Font Family**, just under UI Scale in **Settings > Interface**. Click **Default** to get a text box, then type the name of a font, such as `Aptos`.
 
 The font has to already be installed on the computer you are sitting at. Nothing is downloaded, so a name that is not installed leaves you with the standard font and no error. Clearing the box puts everything back. Preformatted blocks are left on the standard font either way.
 

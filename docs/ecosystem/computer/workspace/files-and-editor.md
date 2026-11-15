@@ -5,7 +5,7 @@ sidebar_position: 3
 
 # Files and editor
 
-The file browser shows the workspace folder as it exists on disk. Browse the tree, type in the filter to narrow it, and use the breadcrumb to move back up. Files show recognizable icons by type and their sizes at a glance.
+The file browser shows the workspace folder as it exists on disk. Browse the tree, type in the filter to narrow it, and use the breadcrumb to move back up.
 
 ## Work with files
 

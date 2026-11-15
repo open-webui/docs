@@ -72,7 +72,7 @@ Click **Create** in the **Workspace** header while the **Models** tab is selecte
 
 The editor opens on a banner header: the background image fills the banner, with the model's picture, name and ID set over its lower edge. Below it come the description, the base model, the tags and the system prompt. A saved system prompt opens folded to a short preview; click it or **Show more** to edit it. **Compare revision** beside the system prompt opens it next to an empty **Proposed revision** pane. Paste the revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the system prompt, so drop a change you do not want with **Original →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the model afterwards.
 
-Everything else sits in rows, one per setting. Each row shows a short summary of what is set, such as **Default**, **3 modified**, **Custom · 4** or **Vision, File Upload, Web Search +2**, and opens when you click it. Hover a setting's name to see what it does.
+Everything else sits in rows, one per setting, and a row opens when you click it.
 
 - **Switches**: **Capabilities**, **Default Features** and **Builtin Tools** open into switches. Hover over a switch label to see what it does.
 - **Pickers**: **Knowledge**, **Tools**, **Skills**, **Filters** and **Actions** open a searchable picker. **Clear** removes every selected item and **Manage** opens the workspace page where those items are created. **Enable all** selects every item matching the search (Knowledge has **Upload Files** in its place). Items marked **Global** are always on. Tools, Skills, Filters, Actions and Sub-agents show each item's description under its name. When the list is empty, the picker names the workspace page where items are added.
@@ -80,7 +80,7 @@ Everything else sits in rows, one per setting. Each row shows a short summary of
 - **Prompts** holds the model's prompt suggestions.
 - **Voice** holds the realtime voice, the voice avatar and the TTS voice.
 
-**Save & Update** (**Save & Create** for a new model) stays pinned at the bottom of the editor while you scroll. When you edit an existing model, the **Describe this change** field sits beside it. **Save & Create** is always active; **Save & Update** becomes active once something has changed.
+The editor saves with **Save & Update** (**Save & Create** for a new model). When you edit an existing model, the **Describe this change** field sits beside it. **Save & Create** is always active; **Save & Update** becomes active once something has changed.
 
 ### Core configuration
 

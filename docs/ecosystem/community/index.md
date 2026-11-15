@@ -63,7 +63,7 @@ Both links search the site's [Models](https://openwebui.com/models) catalog for 
 
 The [Leaderboard](https://openwebui.com/leaderboard) ranks models by how many messages people actually send them. Syncing your usage adds the models you rely on to that count, and your openwebui.com profile then shows your top models and a heatmap of your messages through the year.
 
-1. Sign in on openwebui.com, open **Leaderboard** and click **Sync Stats**. The sync buttons on your profile and above your name at the bottom of the sidebar do the same.
+1. Sign in on openwebui.com, open **Leaderboard** and click **Sync Stats**.
 2. In **Sync Open WebUI Stats**, enter your Open WebUI URL and click **Sync**. Your instance needs Open WebUI v0.7.0 or later.
 3. Your instance opens in a new tab with a **Sync Usage Stats** dialog that lists what is and isn't shared. **Download as JSON** saves the data so you can read it first.
 4. Click **Sync**.

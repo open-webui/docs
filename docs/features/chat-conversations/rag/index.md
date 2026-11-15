@@ -27,7 +27,7 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 ## Local and Remote RAG Integration
 
-To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input. Once selected, a document icon appears above `Send a message`, indicating that the document has been attached for retrieval.
+To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input.
 
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
@@ -89,7 +89,7 @@ Because Open WebUI embeds the query and searches your database by vector, the ve
 **To Fix This:** Navigate to **Settings > Models** (admin section), click the pencil (**Edit**) on your Ollama model, open **Advanced Params** and **increase the context length to 8192+ (or rather, more than 16000) tokens**. This setting specifically applies to Ollama models. For OpenAI and other integrated models, ensure you're using a model with sufficient built-in context length (e.g., GPT-5.6 with a 1M-token context window).
 :::
 
-For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Once selected, a document icon appears above `Send a message`, indicating successful retrieval. Open WebUI fetches and parses information from the URL if it can. A link to a file, such as a PDF, is read with document extraction. If it cannot read the URL, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
+For web content integration, start a query in a chat with `#`, followed by the target URL. Click on the formatted URL in the box that appears above the chat box. Open WebUI fetches and parses information from the URL if it can. A link to a file, such as a PDF, is read with document extraction. If it cannot read the URL, the attempt fails with a message naming the link that could not be read, see [Attaching a link or a YouTube video fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 
 :::tip
 
