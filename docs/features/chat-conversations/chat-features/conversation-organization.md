@@ -98,6 +98,8 @@ Open **Display options** (the sliders icon beside search and filter) to pick a *
 
 The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags. Active filters show as chips above the list, and **Clear filters** removes them. Pressing `c` jumps into the message box to start a new chat in the folder.
 
+Each chat in the list or on the board has the same three-dot menu as in the sidebar, with rename, move, clone, share, archive, delete and mark as unread. In a chat someone else started, the menu is shorter.
+
 ### Statuses
 
 A status says where a chat stands, for example **In progress** or **Done**. Every folder starts with **Backlog**, **To do**, **In progress**, **Waiting** and **Done**, and chats without a status show as **No status**.
@@ -108,7 +110,7 @@ Anyone who can edit the folder can change its statuses with **Edit statuses…**
 
 ### Tags
 
-Tags label chats by topic and feed the grouping, board and filter options above. A chat's owner adds them with the **Tag** button that appears on hover in the chat's row (or by clicking its existing tags), or from the **Tags** submenu in the chat's top-bar menu. Both open the same picker: type to find a tag and tick it to add or remove it. To make a new one, choose **Create “name”**. The colored dot beside a ticked tag opens the color choices, and the color applies to that tag wherever it is used. Chats made by someone else show their tags without the picker.
+Tags label chats by topic and feed the grouping, board and filter options above. A chat's owner adds them, and in a shared folder so does anyone who can edit the folder, with the **Tag** button that appears on hover in the chat's row (or by clicking its existing tags), or, for your own chats, from the **Tags** submenu in the chat's top-bar menu. Both open the same picker: type to find a tag and tick it to add or remove it. To make a new one, choose **Create “name”**. The colored dot beside a ticked tag opens the color choices, and the color applies to that tag wherever it is used. Tags a folder editor adds, removes or recolors on someone else's chat belong to the chat owner, so they show up in the owner's own tag list. Anyone without edit access sees the tags without the picker.
 
 ### Automations
 

@@ -257,7 +257,7 @@ Switching chats opens the Files tab at that chat's working folder. Picking anoth
 :::
 
 :::tip Live updates
-On a terminal server that reports live events, the Git panel and the **Ports** list of the [Browser tab](./use-cases/web-development.md#the-browser-tab) update live. Otherwise the Git panel refreshes when expanded and the **Ports** list has a **Refresh** button.
+On a terminal server that reports live events, the Git panel and the **Ports** list of the [Browser tab](./use-cases/web-development.md#the-browser-tab) update live, and so does the **Files** tab: the folders it shows refresh in the background without a loading spinner, including after commands run outside the chat. The Files tab pauses this while a file is open in it. Otherwise the Git panel refreshes when expanded and the **Ports** list has a **Refresh** button.
 :::
 
 :::tip The terminal sits below it
