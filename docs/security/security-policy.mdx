@@ -9,11 +9,11 @@ This page is the authoritative version of the Open WebUI security policy. The [G
 
 :::
 
+**This is Open WebUI's policy for security vulnerability reports: what counts as a vulnerability, how to report one and how we handle, credit and publish reports.**
+
 Our goal is to protect Open WebUI's users and their data, and to handle security reports with a clear, consistent, and publicly documented process.
 We want to operate a transparent security process, in which accepted vulnerabilities are published openly as advisories so anyone can see what was found, how it was resolved and most importantly, which version contains a patch for it.
 Our stance: a visible advisory history is evidence of active scrutiny and a disclosure process that works, not a measure of how fragile the software is.
-
-Our technical architecture and development processes are designed to minimize vulnerabilities and uphold the trust our stakeholders place in us. We employ a mixture of automated and manual techniques to keep up with evolving threats, with a focus on proactive risk management and responsible handling of any vulnerabilities reported.
 
 ## Supported Versions
 
@@ -23,7 +23,7 @@ Our technical architecture and development processes are designed to minimize vu
 | dev              | No                |
 | others           | No                |
 
-**If an issue is already fixed, or already being fixed in the open, at the time you file, the report will not be accepted.** It did not contribute to discovering or remediating the issue, and we will not publish an advisory for it.
+**If an issue is already fixed, or already being fixed in the open, at the time you file, the report will not be accepted.** It did not contribute to discovering or remediating the issue, and we will not publish an advisory for it. The fix is listed in the changelog of the release that contains it.
 
 A fix counts as already-existing regardless of which branch it lives on (including `dev`) and regardless of whether it was silently resolved in an earlier version. Branch support status (see table above) governs where a vulnerability must be _reproducible_, not whether a fix already exists: a bug live in a supported branch but already fixed in `dev` is still an already-fixed issue under this rule.
 
@@ -32,7 +32,7 @@ Two specific patterns this covers, both of which we reject:
 - Filing a report for a bug found in an **older version** that was already resolved by the time of the current supported version.
 - **Monitoring our public commits or pull requests** and filing a report for an issue they already address or fix. We have observed automated monitoring of our public commits and PRs that produced reports against fixes others had already authored; this rule exists to reject that pattern.
 
-We need not decide whether you discovered the issue independently; we cannot, and it makes no difference. On the provable facts your report duplicates work that is already public and already fixed or being fixed; you filed strictly last, and there is no way to distinguish independent discovery from scraping. Credit for the issue belongs to whoever found or fixed it, and they in turn forfeit their own claim to it by disclosing publicly instead of reporting it to us confidentially first. A publicly-disclosed fix therefore earns no advisory, and no credit for anyone.
+Whether you found the issue independently makes no difference, and we cannot tell independent discovery from scraping. On the provable facts, your report arrived after the fix was already public. Whoever found or fixed the issue first disclosed it publicly without reporting it to us confidentially, so they receive no credit either. A publicly disclosed fix earns no advisory and no credit for anyone.
 
 :::tip
 
@@ -56,7 +56,7 @@ If your report describes a real vulnerability under this policy, here's what you
 
 - **Credit on the advisory.** You're named as the reporter on the published advisory. Where multiple reporters each demonstrated a distinct vector, every one of you is credited (see [Report Handling](#report-handling)).
 - **Coordinated disclosure.** We won't publish out from under you while you're still working the issue with us. Status moves visibly on the advisory itself (including the CVE request), and GitHub notifies you of those updates, so you can follow it through to publication.
-- **A real fix, handled responsibly.** For findings with broad or severe real-world impact, we may hold publication for up to ~2 weeks after the patched release so administrators can update before details are public.
+- **A real fix, handled responsibly.** Details stay unpublished until the CVE ID is assigned, currently about four weeks or longer after the patched release, so administrators can update first (see [Expected Timeframe](#expected-timeframe)).
 
 What we _can't_ offer is a bounty or a guaranteed turnaround. What you get is a serious fix, honest credit, and a process that treats your work as the contribution it is.
 
@@ -79,6 +79,15 @@ We accept vulnerability reports **only** through [GitHub Security Advisories](ht
 Our security process is built around the same transparency as the rest of our work, and GitHub Security Advisories is the single authoritative channel where that process lives. We do not and cannot monitor or engage with external reporting platforms, and reports arriving through them will be closed without review.
 
 A report filed on another platform has no standing here: it confers no priority, establishes no filing date, and creates no obligation for us to triage, publish, or otherwise consider it. Only the GitHub Security Advisory record exists for the purposes of this policy, including for determining who filed first.
+
+## Threat Model
+
+Open WebUI is a **self-hosted, single-tenant, authenticated, role-based** application. Reports are assessed inside this model:
+
+- **Users are authenticated** before they reach any user data or product functionality. The endpoints a browser needs before sign-in (sign-in, registration and the public configuration the login screen reads) are reachable without an account by design.
+- **Administrators are trusted** and have full system control. Administrators of one instance share a single trust boundary.
+- **Security settings are at their defaults or tighter.**
+- **Tools, Functions and Pipelines execute arbitrary code by design.** Administrators control who can create them.
 
 ## Reporting Guidelines
 
@@ -108,21 +117,7 @@ A PoC (Proof of Concept) is a **demonstration of exploitation of a vulnerability
 
 :::
 
-5. **Remediation is required**:
-
-Along with the PoC, you must provide **either**:
-
-1. **a remediation plan** (i.e. "actionable steps" that a maintainer can apply), **or**
-2. **a patch/PR**
-
-Your remediation guidance can include, for example:
-
-- The **likely root cause** (what's wrong and where)
-- The **location(s)** to change (file/module/function names if known)
-- The **recommended fix approach** (validation/sanitization rules, auth checks, safe defaults, etc.)
-- Any **security tradeoffs** or potential regressions to watch for
-
-6. **Default Configuration Testing**: Vulnerability reports must be tested and reproducible using Open WebUI's out-of-the-box default configuration. Claims of vulnerabilities that only manifest with explicitly weakened security settings may be discarded, unless they are covered by the following exception:
+5. **Default Configuration Testing**: Vulnerability reports must be tested and reproducible using Open WebUI's out-of-the-box default configuration. Claims of vulnerabilities that only manifest with explicitly weakened security settings may be discarded, unless they are covered by the following exception:
 
 :::note
 
@@ -134,11 +129,11 @@ If you believe you have found a security issue that
 
 :::
 
-7. **Threat Model Understanding Required**: Reports must demonstrate understanding of Open WebUI's self-hosted, single-tenant, authenticated, extensible, role-based access control architecture. Comparing Open WebUI to services with fundamentally different security models without acknowledging the architectural differences may result in report rejection.
+6. **Threat Model Understanding Required**: Reports must demonstrate understanding of Open WebUI's self-hosted, single-tenant, authenticated, extensible, role-based access control architecture. Comparing Open WebUI to services with fundamentally different security models without acknowledging the architectural differences may result in report rejection.
 
-8. **CVSS Scoring Accuracy:** You do not have to include a CVSS score in your report. If you leave the CVSS section empty, we will fill it out for you prior to publishing. If you include a CVSS score with your report, it must accurately reflect the vulnerability according to CVSS methodology. In case of inaccurate CVSS, we will adjust the CVSS score of your report. If you cite other CVEs to support your report, ensure they are **genuinely comparable** in vulnerability type, threat model, and attack vector.
+7. **CVSS Scoring Accuracy:** You do not have to include a CVSS score in your report. If you leave the CVSS section empty, we will fill it out for you prior to publishing. If you include a CVSS score with your report, it must accurately reflect the vulnerability according to CVSS methodology. In case of inaccurate CVSS, we will adjust the CVSS score of your report. If you cite other CVEs to support your report, ensure they are **genuinely comparable** in vulnerability type, threat model, and attack vector.
 
-9. **Admin Actions Are Out of Scope:** Vulnerabilities that require an administrator to actively perform unsafe actions are **not considered valid vulnerabilities**. **Admins have full system control and are expected to understand the security implications of their actions and configurations**. This includes but is not limited to: adding malicious external servers (models, tools, webhooks, apps, functions), pasting untrusted code into Functions/Tools, or intentionally weakening security settings. **Reports requiring admin negligence or social engineering of admins may be rejected.**
+8. **Admin Actions Are Out of Scope:** Vulnerabilities that require an administrator to actively perform unsafe actions are **not considered valid vulnerabilities**. **Admins have full system control and are expected to understand the security implications of their actions and configurations**. This includes but is not limited to: adding malicious external servers (models, tools, webhooks, apps, functions), pasting untrusted code into Functions/Tools, or intentionally weakening security settings. **Reports requiring admin negligence or social engineering of admins may be rejected.**
 
 :::note
 
@@ -147,9 +142,9 @@ Similar to rule "Default Configuration Testing": If you believe you have found a
 
 :::
 
-10. **Tools & Functions Code Execution Is Intended Behavior:** Tools and Functions execute user-provided Python code on the server with the same access as the Open WebUI backend. This is core, intended functionality (see 'Threat Model Understanding'). Only administrators can create Functions. Creating Tools needs the `workspace.tools` permission, which is off by default for non-admin users. <ins>**Granting it is equivalent to giving shell access to the server**</ins>, so granting it to an untrusted user is a misconfiguration covered by 'Admin Actions Are Out of Scope'. **Reports describing any attack chain through Tools or Functions (code execution, file access, network requests, environment variable access, frontmatter `pip install` and the like) are closed as intended behavior.** Deployments that do not need them can switch them off with [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) and the related switches.
+9. **Tools & Functions Code Execution Is Intended Behavior:** Tools and Functions execute user-provided Python code on the server with the same access as the Open WebUI backend. This is core, intended functionality (see 'Threat Model Understanding'). Only administrators can create Functions. Creating Tools needs the `workspace.tools` permission, which is off by default for non-admin users. <ins>**Granting it is equivalent to giving shell access to the server**</ins>, so granting it to an untrusted user is a misconfiguration covered by 'Admin Actions Are Out of Scope'. **Reports describing any attack chain through Tools or Functions (code execution, file access, network requests, environment variable access, frontmatter `pip install` and the like) are closed as intended behavior.** Deployments that do not need them can switch them off with [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) and the related switches.
 
-11. **Legacy Code Paths Are Out of Scope:** Open WebUI maintains some code paths that are explicitly marked as legacy in the official documentation, which is authoritative as to what is legacy. Legacy paths remain available (sometimes still the default) purely for backwards-compatibility reasons, not because they are the supported or maintained surface. The supported replacement is the migration target, and security and functional work happens on the replacement, not the legacy path. Reports describing a security boundary issue on a legacy code path that does not also reproduce on the supported replacement are usually out of scope under this rule.
+10. **Legacy Code Paths Are Out of Scope:** Open WebUI maintains some code paths that are explicitly marked as legacy in the official documentation, which is authoritative as to what is legacy. Legacy paths remain available (sometimes still the default) purely for backwards-compatibility reasons, not because they are the supported or maintained surface. The supported replacement is the migration target, and security and functional work happens on the replacement, not the legacy path. Reports describing a security boundary issue on a legacy code path that does not also reproduce on the supported replacement are usually out of scope under this rule.
 
 :::note
 
@@ -162,9 +157,9 @@ we still want to hear about it. This rule is intended to filter reports that tar
 
 :::
 
-12. **AI report transparency:** Tell us if AI helped in any way: finding the vulnerability, writing the report or building the PoC. AI-assisted reports are handled exactly like every other report; we just want to know.
+11. **AI report transparency:** Tell us if AI helped in any way: finding the vulnerability, writing the report or building the PoC. AI-assisted reports are handled exactly like every other report; we just want to know.
 
-13. **Self-Affecting Issues Are Not Vulnerabilities:** A vulnerability requires crossing a security boundary that affects **a party other than the reporter**. Crossing one of the security boundaries only against the reporter's own data, account, session, or environment is **not a vulnerability**; it is a bug, and belongs in the [Issue Tracker](https://github.com/open-webui/open-webui/issues), not in a security report.
+12. **Self-Affecting Issues Are Not Vulnerabilities:** A vulnerability requires crossing a security boundary that affects **a party other than the reporter**. Crossing one of the security boundaries only against the reporter's own data, account, session, or environment is **not a vulnerability**; it is a bug, and belongs in the [Issue Tracker](https://github.com/open-webui/open-webui/issues), not in a security report.
 
 :::note
 
@@ -181,7 +176,7 @@ If you want to report something that does not fulfill our rules and guidelines l
 
 Security reports are prioritized alongside all other project work, and report volume is very high. **Expect several weeks** before a report is seen, analyzed, triaged and fixed, with stretches of silence along the way. **Silence does not mean your report was ignored**; it has not been picked up yet. If you think it was lost, feel free to post a follow-up comment on the advisory.
 
-Once the fix is released, we request the CVE ID from GitHub and publish the advisory as soon as it is assigned. GitHub currently takes **about four weeks or longer** to assign an ID; see [CVE Assignment Before Publication](#cve-assignment-before-publication) for why we wait. For findings with broad or severe real-world impact (regardless of CVSS score), we may hold publication until about two weeks after the patched release so administrators can update.
+Once the fix is released, we request the CVE ID from GitHub and publish the advisory as soon as it is assigned. GitHub currently takes **about four weeks or longer** to assign an ID; see [CVE Assignment Before Publication](#cve-assignment-before-publication) for why we wait. Should GitHub assign faster, findings with broad or severe real-world impact (regardless of CVSS score) are still held until about two weeks after the patched release so administrators can update.
 
 **All durations on this page are estimates.** A report can move faster when things line up, or slower when something gets in the way.
 
@@ -193,7 +188,7 @@ Once the fix is released, we request the CVE ID from GitHub and publish the advi
 
 **Before this rule** we requested the CVE and published the advisory right away. The issue was already fixed in a release, and publishing is what tells administrators which versions are affected: the advisory feeds the GitHub Advisory Database and Dependabot alerts. GitHub attached the CVE ID later.
 
-**What happened.** On 27 and 28 September 2026 we published 19 advisories this way, and the CVE requests sat pending at GitHub for weeks. On 2026-10-12 VulnCheck, another CNA, published its own CVE records for all 19, and GitHub then declined our requests as duplicates. We read a CVE requested by the code owner through GitHub Security Advisories as within GitHub's scope; GitHub and VulnCheck read GitHub's scope as covering it only when no other CNA's scope does. Either way, **nobody contacted us before the records were assigned.** Coordinated disclosure depends on a CNA contacting the vendor before it assigns, and VulnCheck did not. Its records replaced the titles of our advisories with VulnCheck's own, which they still carry, and listed the wrong credits on 16 of the 19 and wrong weakness types or scores on several until VulnCheck corrected them after we disputed them. The copies that entered the GitHub Advisory Database were worse: unreviewed entries whose title is the description cut off mid-sentence, with no ecosystem, no affected package and no affected or patched versions. A month after publication not one of them had triggered a Dependabot alert, so administrators running an affected version had not been warned at all.
+**What happened.** On 27 and 28 September 2026 we published 19 advisories this way, and the CVE requests sat pending at GitHub for weeks. On 2026-10-12 VulnCheck, another CNA, published its own CVE records for all 19, and GitHub then declined our requests as duplicates. We read a CVE requested by the code owner through GitHub Security Advisories as within GitHub's scope; GitHub and VulnCheck read GitHub's scope as covering it only when no other CNA's scope does. Either way, **nobody contacted us before the records were assigned.** Coordinated disclosure depends on a CNA contacting the vendor before it assigns, and VulnCheck did not. Its records replaced the titles of our advisories with VulnCheck's own, which they still carry, and listed the wrong credits on 16 of the 19 and wrong weakness types or scores on several until VulnCheck corrected them after we disputed them. The copies that entered the GitHub Advisory Database were worse: unreviewed entries whose title is the description cut off mid-sentence, with no ecosystem, no affected package and no affected or patched versions. Not one of them has ever triggered a Dependabot alert, so administrators running an affected version have never been warned by one.
 
 **We do not accept other CNAs minting CVEs for Open WebUI**, because we cannot rely on them to get the records right: our [Vendor Dispositions](./vendor-dispositions/) list the records other CNAs minted that had to be rejected, and VulnCheck's 19 records were wrong as described above. A CVE assigned by GitHub is built from the advisory we wrote and enters the GitHub Advisory Database as a reviewed entry with the affected package and versions, so Dependabot can warn every affected deployment from the day the advisory is published. Holding publication until GitHub has assigned the ID leaves no window for another CNA to mint first. An advisory reaches administrators a few weeks later, but complete, with no missing information and with correct data and metadata, written and verified by us, the reporter and GitHub as the CNA.
 
@@ -253,13 +248,11 @@ You can use the following channels:
 - **Bugs:** Report bugs to our [Issue Tracker](https://github.com/open-webui/open-webui/issues)
 - **Best-practice guidance:** Help expand the [Documentation](https://github.com/open-webui/docs).
 
-We regularly audit our internal processes and system architecture for vulnerabilities using a combination of automated and manual testing techniques.
-
 For any other immediate concerns and questions, please create an issue in our [issue tracker](https://github.com/open-webui/open-webui/issues) or contact our team on [Discord](https://discord.gg/5rJgQTnV4s).
 
 ## Tools, Functions, and Pipelines Security
 
-**Tools, Functions and Pipelines execute arbitrary Python code on your server** with the same access as the Open WebUI backend: files, network, subprocesses, environment variables and the database. This is intentional. Reports about them are handled under rule 10 of the [Reporting Guidelines](#reporting-guidelines). An attacker who can already write to the data volume, where installed plugins are stored, is outside the threat model too. For safe use, see the [Plugin Security](/features/extensibility/plugin/) warning and the [Hardening Guide](/getting-started/advanced-topics/hardening#tools-functions-and-pipelines).
+**Tools, Functions and Pipelines execute arbitrary Python code on your server** with the same access as the Open WebUI backend: files, network, subprocesses, environment variables and the database. This is intentional. Reports about them are handled under rule 9 of the [Reporting Guidelines](#reporting-guidelines). An attacker who can already write to the data volume, where installed plugins are stored, is outside the threat model too. For safe use, see the [Plugin Security](/features/extensibility/plugin/) warning and the [Hardening Guide](/getting-started/advanced-topics/hardening#tools-functions-and-pipelines).
 
 ## Production Deployment Security
 
@@ -272,10 +265,9 @@ A key consideration: **without Redis, signing out does not revoke the JWT token 
 - Internal and periodic external reviews of our architecture and pipelines
 - Automated and manual testing for both front-end and back-end
 - Proactive risk management and code reviews as part of ongoing development
-- Continuous improvements and integration of advanced tooling for static/dynamic analysis
 
-If you have an immediate and actionable security concern, please create a report in our [security advisory portal](https://github.com/open-webui/open-webui/security/advisories) or [issue tracker](https://github.com/open-webui/open-webui/issues).
+If you have an immediate and actionable security concern, please create a report in our [security advisory portal](https://github.com/open-webui/open-webui/security/advisories).
 
 ---
 
-_Last updated on **2026-11-07**._
+_Last updated on **2026-11-15**._
