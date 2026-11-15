@@ -170,7 +170,6 @@ If the same action also affects another user, the operator, the host system, or 
 :::
 
 Submissions that do not follow these guidelines may be closed. Only reporters who repeatedly or deliberately ignore them may be barred from submitting reports; honest mistakes and good-faith reports never count toward this. Our goal is to foster a constructive reporting environment where quality submissions promote better security for all users.
-If you want to report something that does not fulfill our rules and guidelines laid out here, you can still report it and we will handle it, [see our good faith reporting section for more information](#good-faith-reports-that-arent-vulnerabilities).
 
 ## Expected Timeframe
 
@@ -259,14 +258,6 @@ For any other immediate concerns and questions, please create an issue in our [i
 Open WebUI is designed for private, trusted networks and ships with defaults optimized for ease of setup. Production deployments handling sensitive data should review the [Hardening Guide](../getting-started/advanced-topics/hardening.md) for a comprehensive checklist.
 
 A key consideration: **without Redis, signing out does not revoke the JWT token of that session**. It remains valid until it expires (default: 4 weeks). Password changes and an administrator's **Sign out all devices** end every session of an account with or without Redis. For production deployments, either configure [Redis](../tutorials/integrations/redis.md) or shorten `JWT_EXPIRES_IN` to limit the window of exposure. See [Token Revocation](../getting-started/advanced-topics/hardening.md#token-revocation) for details.
-
-## Product Security Process
-
-- Internal and periodic external reviews of our architecture and pipelines
-- Automated and manual testing for both front-end and back-end
-- Proactive risk management and code reviews as part of ongoing development
-
-If you have an immediate and actionable security concern, please create a report in our [security advisory portal](https://github.com/open-webui/open-webui/security/advisories).
 
 ---
 
