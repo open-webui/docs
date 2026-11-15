@@ -211,8 +211,118 @@ If ComfyUI stalls or gives a validation error, consult the log and the JSON stru
 | `Value not in list: ckpt_name: 'xyz.safetensors'` | You mapped the correct node ID (e.g., 37), but the value being passed (e.g., `xyz.safetensors`) is not a valid model name for that node type (e.g., accidentally sending a VAE model to a checkpoint loader). | Correct the model name set in Open WebUI for either image generation or editing, ensuring both model names match the type of model the ComfyUI node is expecting. |
 | `Missing input <key>` | Your workflow requires an input (e.g., `cfg` or `sampler_name`), but Open WebUI did not send a value because the field was not mapped. | Either hardcode the value in the workflow JSON, or map the required input key to the correct node ID. |
 
+By meticulously matching the Node ID and the specific Key, you ensure Open WebUI correctly overwrites the default values in your workflow JSON before submitting the prompt to ComfyUI.
 
-Model files and folders are ComfyUI-side setup; see the [ComfyUI documentation](https://docs.comfy.org/) for downloading and placing models.
+## Example Setup: Qwen Image Generation and Editing
+
+This section provides a supplementary guide on setting up the Qwen models for both image generation and editing.
+
+### Qwen Image Generation
+
+#### Model Download
+
+- **Diffusion Model**: [qwen_image_fp8_e4m3fn.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_fp8_e4m3fn.safetensors)
+- **Text Encoder**: [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
+- **VAE**: [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)
+
+#### Model Storage Location
+
+```
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
+│   │   └── qwen_image_fp8_e4m3fn.safetensors
+│   ├── vae/
+│   │   └── qwen_image_vae.safetensors
+│   └── text_encoders/
+│       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
+```
+
+#### Workflow Node Mapping for Qwen Generation
+
+| Parameter | Key | Node Ids |
+|-----------|-----|----------|
+| Prompt | `prompt` | (depends on your workflow) |
+| Model | `ckpt_name` | (checkpoint loader node ID) |
+
+### Qwen Image Editing
+
+#### Model Download
+
+- **Diffusion Model**: [qwen_image_edit_fp8_e4m3fn.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image-Edit_ComfyUI/resolve/main/split_files/diffusion_models/qwen_image_edit_fp8_e4m3fn.safetensors)
+- **Text Encoder**: [qwen_2.5_vl_7b_fp8_scaled.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors)
+- **VAE**: [qwen_image_vae.safetensors](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/resolve/main/split_files/vae/qwen_image_vae.safetensors)
+
+#### Model Storage Location
+
+```
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
+│   │   └── qwen_image_edit_fp8_e4m3fn.safetensors
+│   ├── vae/
+│   │   └── qwen_image_vae.safetensors
+│   └── text_encoders/
+│       └── qwen_2.5_vl_7b_fp8_scaled.safetensors
+```
+
+#### Workflow Node Mapping for Qwen Editing
+
+| Parameter | Key | Node Ids |
+|-----------|-----|----------|
+| Image | `image` | (load image node ID) |
+| Prompt | `prompt` | (text encoder node ID) |
+| Model | `unet_name` | (UNET loader node ID) |
+
+## Example Setup: FLUX.1 Image Generation
+
+This section provides a supplementary guide on setting up the FLUX.1 models for image generation.
+
+### FLUX.1 Dev
+
+#### Model Download
+
+- **Diffusion Model**: [flux1-dev.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-dev/resolve/main/flux1-dev.safetensors)
+- **Text Encoder 1**: [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true)
+- **Text Encoder 2**: [t5xxl_fp16.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp16.safetensors?download=true) (Recommended when your VRAM is greater than 32GB)
+- **VAE**: [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true)
+
+#### Model Storage Location
+
+```
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
+│   │   └── flux1-dev.safetensors
+│   ├── vae/
+│   │   └── ae.safetensors
+│   └── text_encoders/
+│       ├── clip_l.safetensors
+│       └── t5xxl_fp16.safetensors
+```
+
+### FLUX.1 Schnell
+
+#### Model Download
+
+- **Diffusion Model**: [flux1-schnell.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/flux1-schnell.safetensors)
+- **Text Encoder 1**: [clip_l.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors?download=true)
+- **Text Encoder 2**: [t5xxl_fp8_e4m3fn.safetensors](https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/t5xxl_fp8_e4m3fn.safetensors?download=true) (Recommended when your VRAM is greater than 32GB)
+- **VAE**: [ae.safetensors](https://huggingface.co/black-forest-labs/FLUX.1-schnell/resolve/main/ae.safetensors?download=true)
+
+#### Model Storage Location
+
+```
+ComfyUI/
+├── models/
+│   ├── diffusion_models/
+│   │   └── flux1-schnell.safetensors
+│   ├── vae/
+│   │   └── ae.safetensors
+│   └── text_encoders/
+│       ├── clip_l.safetensors
+│       └── t5xxl_fp8_e4m3fn.safetensors
+```
 
 ## Configuring with SwarmUI
 

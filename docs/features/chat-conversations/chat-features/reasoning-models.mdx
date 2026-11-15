@@ -118,7 +118,9 @@ During a multi-step tool calling turn, Open WebUI keeps the model's reasoning an
 
 ### How Reasoning Is Sent Back
 
-Reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Connections → OpenAI → Advanced → Provider** (admin section), see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically), the same within a turn and across turns. See [Provider Compatibility](#provider-compatibility). Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning text is left out there.
+Open WebUI stores reasoning separately from the answer, whether the model wrote it as `<think>`-style tags or sent it in a separate field. When a message is replayed, within a tool-call loop or on the next turn, the reasoning is sent back in the format of the connection's `Provider` setting (**Settings → Connections → OpenAI → Advanced → Provider** (admin section), see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting); Ollama connections are detected automatically). The same rules apply within a turn and across turns. See [Provider Compatibility](#provider-compatibility). With **Stream Chat Response** off, `<think>` tags a model writes inside its reply are stored as reply text, so they go back to the model with it.
+
+Most Chat Completions APIs reject unknown fields on assistant messages, so reasoning text is left out there. Pipe functions and filters can add it back in a provider-specific shape.
 
 Reasoning details that a provider returns in a `reasoning_details` field (as OpenRouter does) are sent back unchanged in that field, within a tool-call loop and on later turns. They are dropped when another model continues the chat.
 
@@ -253,6 +255,16 @@ Ensure you're running the latest version of Open WebUI, as reasoning model suppo
 ```bash
 docker pull ghcr.io/open-webui/open-webui:main
 ```
+
+#### 5. Verify the Model Response Format
+
+Use the Ollama CLI directly to check what format your model outputs:
+
+```bash
+ollama run your-model:tag "Explain step by step: What is 15 + 27?"
+```
+
+Look for `<think>` tags in the output. If they're not present, the model may require specific system prompts to enable thinking mode.
 
 ### Reasoning Lost Between Tool Calls
 

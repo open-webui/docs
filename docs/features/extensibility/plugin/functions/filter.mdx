@@ -189,11 +189,24 @@ class Filter:
 
 #### What `self.toggle = True` actually does
 
-The filter runs only while the user has it switched on, so `self.toggle` is always `True` inside a handler. Do not branch on it; it is not a live on/off signal.
+It is a **visibility / gating flag**, read once at request-dispatch time, **not** a runtime state the UI flips on your Python object. Specifically:
+
+- **Visibility:** the filter only appears in the chat UI (the **+** menu entry and its chip) when `self.toggle = True` **and** it is either a global filter or attached to the selected model. Without `self.toggle`, the filter still runs (if active and in scope) but has no UI surface, so users can't turn it off.
+- **Gating:** at request time the backend checks the user's current `filter_ids` selection. If the filter is in that list, `inlet()` / `request()` / `stream()` / `outlet()` run. If not, the filter is **not invoked at all**.
+- **`self.toggle` is never mutated by the UI.** Inside `inlet()` it is always whatever you set in `__init__`, which will be `True` for every call that actually runs, because if the user had disabled the filter, `inlet()` wouldn't be running. Don't build logic that reads `self.toggle` at runtime; it's not a live on/off signal.
+
+:::warning Upgrading from pre-0.9.0 filters
+Some older filters used a pattern like `if self.toggle: enable_feature() else: disable_feature()` inside `inlet()`, hoping to read the UI state back on every request. **That pattern was never reliable and is effectively dead on 0.9.0+.** `inlet()` simply isn't called when the filter is disabled in the UI, so there is no "else" branch to hit. The correct migration is to stop branching on `self.toggle` entirely and just do the work unconditionally. The user controls whether `inlet()` runs by switching the filter on or off. If you need user-driven config (a numeric threshold, a target language, etc.), expose it through [`UserValves`](#filter-administration--configuration) instead; the user opens it from the filter's **Valves** button.
+:::
 
 #### How users interact with a toggleable filter
 
-Toggleable filters appear in the chat input's **+** menu, where users switch them on or off. A filter whose switch is on runs on the next request.
+When a toggleable filter is in scope for the current chat, it shows up in two places:
+
+- **The + menu in the chat input.** Lists every toggleable filter in scope with its `self.icon`, name and an on/off **Switch**. A filter that defines a `UserValves` class also gets a **Valves** button there.
+- **A chip beside the + button**, only while the user has **Show Input Selections** on in **Settings > Interface** (off by default). It shows for each selected filter. Clicking it opens the user-valves modal if the filter defines `UserValves`, otherwise it removes the filter from the selection; the **x** on hover always removes it.
+
+A filter whose switch is on runs on the next request.
 
 #### Where the selection lives
 
@@ -754,7 +767,8 @@ class Filter:
 Behavior:
 
 - **Native function calling** (the default). Filter-injected tools are appended to the server-resolved tool list before the chat completion is sent. Both sets of tools are visible to the model on the same request.
-- **Tools provided by the original API caller.** If the request already carries its own `tools` array, Open WebUI skips server-side tool resolution, so filter inlets should append their tools additively.
+- **Tools provided by the original API caller.** If the request that *entered* the filter pipeline already had `body["tools"]` (e.g. an external client called `/api/chat/completions` with its own `tools` array), those caller-provided tools take precedence and Open WebUI **skips server-side tool resolution entirely**. Filter inlets should additively append in that case too; the caller's tools and yours both go to the LLM.
+- **Non-native function calling.** Server-side tool resolution still runs through Open WebUI's prompt-driven tool handler; filter-injected tools are forwarded to the LLM but the runtime executor for them is up to whatever you wired into the upstream call.
 
 Use this for tools that don't have a corresponding registered Tool in the workspace, for example transient per-request capabilities you want the model to know about on a specific user's chats only.
 
@@ -805,6 +819,36 @@ Filters can declare any of these parameters in their function signature to recei
 Only parameters you declare in your function signature are injected. Open WebUI inspects the signature at runtime to determine what to pass.
 
 `request()` is handed the same set as `inlet()` on the first call of a turn, so `__model__` resolves workspace models there exactly as shown above, plus `__features__`, which carries the `features` dict after the pipeline has popped it off the body. On the later tool-loop hops `__features__` is absent, so give it a default.
+
+---
+
+### UI Indicators & Visual Feedback
+
+#### In the Admin Functions Panel
+
+| Indicator | Meaning |
+|-----------|---------|
+| Green toggle | Filter is active (`is_active=True`) |
+| Grey toggle | Filter is inactive (`is_active=False`) |
+| **Global** switch in the ⋮ menu | Filter is global (`is_global=True`) when on |
+
+#### In Model Settings (FiltersSelector)
+
+| State | Picker entry | Description |
+|-------|--------------|-------------|
+| Global Filter | ✓ Marked **Global**, not clickable | "This filter is globally enabled" |
+| Selected Filter | ✓ Checkmark, clickable | "This filter is selected for this model" |
+| Unselected Filter | No checkmark, clickable | "Click to include this filter" |
+
+Each selected or global toggleable filter shows a **Start enabled in new chats** switch below its entry.
+
+#### In the Chat Input's + Menu
+
+| Element | Description |
+|---------|-------------|
+| Filter name | Shows the filter's display name |
+| Custom icon | SVG icon from `self.icon` (if provided) |
+| Toggle switch | Enable/disable the filter for this chat |
 
 ---
 
@@ -1093,6 +1137,11 @@ async def stream(self, event: dict) -> dict:
 
 If `stream()` raises, Open WebUI drops that whole event, and losing `response.completed` costs the reply its token usage figures and its response id.
 
+:::note Valves are resolved once per response, not once per chunk
+
+`stream()` runs for every fragment, so its valves are read from the database once when the response starts and reused for the rest of it, rather than being re-read thousands of times. Both `self.valves` and `__user__["valves"]` are therefore stable for the whole of one streamed reply: a valve edited while a reply is streaming takes effect on the next reply, not partway through the current one. `inlet()` and `outlet()` are unaffected, as each runs once anyway.
+
+:::
 
 ---
 

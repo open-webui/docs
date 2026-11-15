@@ -110,7 +110,13 @@ This sets a 30-minute timeout. Adjust as needed for your use case.
 
 :::tip Caching Best Practice
 
-The default NPM caching is correct, so leave it alone unless you add custom caching rules. Never cache authentication paths such as `/api/`, `/auth/`, `/sso/`, `/oauth/`, `/login/` and `/logout/`.
+While Nginx Proxy Manager handles most configuration automatically, be aware that:
+
+- **Static assets** (CSS, JS, images) are cached by default for better performance
+- **Authentication endpoints** should never be cached
+- If you add custom caching rules in NPM's "Advanced" tab, ensure you exclude paths like `/api/`, `/auth/`, `/signup/` , `/signin/`, `/sso/`, `/admin/`, `/signout/`, `/oauth/`, `/login/`, and `/logout/`
+
+The default NPM configuration handles this correctly - only modify caching if you know what you're doing.
 
 :::
 

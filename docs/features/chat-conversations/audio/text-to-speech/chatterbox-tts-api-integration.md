@@ -114,8 +114,19 @@ cp .env.example.docker .env  # Docker-specific paths, ready to use
 
 # Or: cp .env.example .env    # Local development paths, needs customization
 
-# Start the API (the default compose file; the repository also ships GPU, uv and CPU variants)
-docker compose -f docker/docker-compose.yml up -d
+# Choose your deployment method:
+
+# API Only (default)
+docker compose -f docker/docker-compose.yml up -d             # Standard (pip-based)
+docker compose -f docker/docker-compose.uv.yml up -d          # uv-optimized (faster builds)
+docker compose -f docker/docker-compose.gpu.yml up -d         # Standard + GPU
+docker compose -f docker/docker-compose.uv.gpu.yml up -d      # uv + GPU (recommended for GPU users)
+docker compose -f docker/docker-compose.cpu.yml up -d         # CPU-only
+
+# API + Frontend (add --profile frontend to any of the above)
+docker compose -f docker/docker-compose.yml --profile frontend up -d             # Standard + Frontend
+docker compose -f docker/docker-compose.gpu.yml --profile frontend up -d         # GPU + Frontend
+docker compose -f docker/docker-compose.uv.gpu.yml --profile frontend up -d      # uv + GPU + Frontend
 
 # Watch the logs as it initializes (the first use of TTS takes the longest)
 docker logs chatterbox-tts-api -f

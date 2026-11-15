@@ -45,6 +45,25 @@ For knowledge search, document extraction or voice, slim connects to services th
 
 Slim used **about 300 MiB of RAM at idle** in our October 16, 2026 test of Open WebUI 0.12.3 on Linux/arm64 in Docker Desktop. This is the Open WebUI container alone; your browser, Docker's VM and any model server or external services need their own memory. Allow extra memory for startup and active workloads: this idle measurement is not a minimum RAM requirement or a container memory limit.
 
+<details>
+<summary>How we measured</summary>
+
+We ran three fresh containers with the default SQLite database and one Uvicorn worker, with no configured provider, users, chats, uploads or plugins. Each run used a new data directory and no memory limit. Docker's Linux VM had 16 CPUs and 7.65 GiB RAM available; other containers remained running.
+
+After `/health` returned HTTP 200, we waited 30 seconds, then took 12 readings with five seconds between calls:
+
+```bash
+docker stats --no-stream --format '{{.MemUsage}}' <container-name>
+```
+
+Across all 36 samples, memory usage ranged from **291.8 to 292.6 MiB**, with a median of **292.2 MiB**.
+
+On Linux, [Docker's reported memory usage](https://docs.docker.com/reference/cli/docker/container/stats/) excludes inactive file cache. These samples cover an idle instance, not model inference or concurrent chat traffic. Results vary with version, architecture, configuration and workload.
+
+The pinned image was `ghcr.io/open-webui/open-webui@sha256:abd02d41e522d41be389d28d1a73752cd2afc4aa46f980b60d490ecc9379c16b` (Linux/arm64, commit `91ea4e3421d1d8069f13d4a463fcb5986d94ea60`).
+
+</details>
+
 #### Moving an existing deployment to slim
 
 Check your database and file storage before switching:

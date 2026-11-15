@@ -107,7 +107,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 
 Note: the `alembic_version` table, which records the applied migration, is not related to Open-WebUI's core functionality and is excluded from this list.
 
-Note on the `document` table: it is a **legacy** table from before the Knowledge feature. Nothing writes to it anymore.
+Note on the `document` table: it is a **legacy** table from before the Knowledge feature. Its rows were migrated into the `knowledge` table (migration `6a39f3d8e55c`) and nothing writes to it anymore, but no migration drops it, so it may still be present (empty) in databases that predate the Knowledge feature. There is no backing model for it in current code.
 
 Now that we have all the tables, let's understand the structure of each table.
 
@@ -239,7 +239,7 @@ Things to know about the channel table:
 - Case-insensitive channel names (stored lowercase)
 - `type` was added in migration `3781e22d8b01`. `is_private`, `updated_by`, `archived_at`, `archived_by`, `deleted_at` and `deleted_by` were added in migration `90ef40d4714e`.
 - Channel listing and member queries return only rows where both `archived_at` and `deleted_at` are null, so the schema is shaped for archiving and soft deletion.
-- Those five columns are unused: deleting a channel removes the row outright.
+- No code path writes `archived_at`, `archived_by`, `deleted_at`, `deleted_by` or `updated_by`. Deleting a channel removes the row outright, so a deleted channel leaves nothing behind for the `deleted_at` filter to exclude. Anyone querying this table directly will find those five columns null on every row.
 - The `access_control` column that this table was created with was dropped in migration `f1e2d3c4b5a6`. Channel access is managed through the `access_grant` table with `resource_type = 'channel'`.
 
 ## Channel Member Table
@@ -298,7 +298,7 @@ Things to know about the channel_webhook table:
 - Deleting a channel cascades to delete its webhooks.
 - `token` is a URL-safe random token carrying 32 bytes of entropy, generated with `secrets.token_urlsafe(32)`, stored in plain text and carried in the request path. `POST /api/v1/channels/webhooks/{webhook_id}/{token}` takes no authentication and matches the `id` and `token` pair against this table, so anyone holding the pair can post to the channel.
 - `last_used_at` is stamped on each accepted post.
-- Listing and creating webhooks require the caller to be an instance admin or the channel's own creator.
+- Listing and creating webhooks require the caller to be an instance admin or the channel's own creator. See the `role` note on the [Channel Member Table](#channel-member-table) for why the membership-based manager branch of that check never matches.
 - The webhook's `id` and `name` are copied into the posted message's `meta.webhook`, which is what the interface renders in place of an author account.
 
 ## Channel File Table
@@ -555,7 +555,7 @@ Things to know about the chat_file table:
 | user_id         | String        | nullable        | Reference to user  |
 | timestamp       | BigInteger    | nullable        | Creation timestamp |
 
-Note on the `chatidtag` table: it is a **legacy** table and nothing writes to it anymore. Chat tags now live in the `tag` table.
+Note on the `chatidtag` table: it is a **legacy** table from before chat tags moved onto the chat record. Its rows were read out into the `chat` table (migration `1af9b942657b`), which wrote each tag into `chat.meta.tags` and turned the `pinned` tag into `chat.pinned`, and nothing writes to it anymore. That migration leaves the rows where they are and no migration drops the table, so an older database may still hold stale rows in it. There is no backing model for it in current code. Chat tags now live in the `tag` table.
 
 ## Comment Table
 
@@ -1118,6 +1118,7 @@ Things to know about the user table:
 - One-to-One relationship with `auth` table (shared id)
 - One-to-Many relationship with `oauth_session` table (via `user_id` foreign key), one row per sign-in
 - `email` is unique case-insensitively, enforced by the partial unique index `uq_user_email_lower` on `lower(email)` where `email` is not null (migration `f0bd01a18a3d`). An upgrade onto a database that already holds two accounts differing only in capitalisation stops and names them rather than choosing between them; see [Duplicate Emails](/troubleshooting/manual-database-migration#duplicate-emails-migration-failure).
+- The `email` column carries no plain `UNIQUE` constraint in the database, which is why the row above shows none. The SQLAlchemy model declares `unique=True` on it, but the schema is built only from the migrations and none of them creates that constraint, so the index above is the whole of the enforcement.
 - `variables` was added by migration `b0018471bbbe`. It holds the user's own [user variables](/features/chat-conversations/chat-features/chat-params#user-variables) as a flat map of string keys to string values, substituted into system prompts at request time. It is excluded from user API responses and is read through its own endpoints instead.
 - `oauth` stores `{"<provider>": {"sub": "<subject>"}}`, so one account can hold a subject from several identity providers at once. See [Existing accounts cannot sign in after a long-delayed upgrade](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade).
 - API keys are rows in the [API Key Table](#api-key-table).

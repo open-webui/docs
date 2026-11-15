@@ -27,6 +27,22 @@ Use it when a chat needs more than a text answer: analyze a spreadsheet, write a
 
 [Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate instances per user, chat or model, controlled images, resource limits, storage, environment variables, sharing and idle cleanup.
 
+## The Familiar Words
+
+If you have heard people talk about agent harnesses, agentic workflows, tool use, computer use, runtimes, guardrails, and orchestration, this is where Open Terminal and Terminals fit.
+
+| Term people use | What it means here |
+| :--- | :--- |
+| **Agent harness** | Open WebUI plus Open Terminal: control/context/tooling from Open WebUI, real action and observation in Open Terminal |
+| **Agentic workflow** | The model plans, takes an action, observes the result, and keeps going instead of returning one static answer |
+| **Tool use / function calling** | Open WebUI lets the model call tools; Open Terminal gives those tools a real filesystem, shell, and process environment |
+| **Computer use** | The agent works inside a computer-like workspace: files, commands, packages, previews, and generated artifacts |
+| **Agent runtime** | The loop and state around the model; Open Terminal supplies the OS-level action workspace inside it |
+| **Stateful session** | The workspace keeps files, output, processes, and task context around long enough for multi-step work |
+| **Guardrails / human review** | Open WebUI controls the user, model, tool and approval layer; Terminals controls the workspace boundary per terminal |
+| **Orchestration** | Terminals provisions, routes, isolates and cleans up Open Terminal workspaces for teams |
+| **Observability / auditability** | Admins can reason about which user, terminal, workspace, image, limits and lifecycle produced a result |
+
 ## Start With Open Terminal
 
 | I want to... | Go to |

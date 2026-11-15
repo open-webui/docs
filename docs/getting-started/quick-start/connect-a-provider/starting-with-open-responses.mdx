@@ -122,7 +122,9 @@ Tool calls, re-invocations, and streaming are supported for Responses API connec
 
 ### Providers that deviate from the Responses format
 
-Open WebUI cannot recover content the provider never sent.
+Not every endpoint that advertises the Responses format emits it exactly, and Open WebUI absorbs the common deviations rather than losing the reply over them. A stream that closes reporting no content keeps whatever was already streamed. A fragment arriving before the item it belongs to is skipped without truncating the rest of the answer. A provider that hands over its finished message only at the very end has that message applied, so the reply and its citations are stored and carry into the next turn.
+
+Open WebUI cannot recover content the provider never sent. If replies are consistently short or empty, compare the same prompt against the provider's own API before reporting it here.
 
 ### Stateful sessions
 

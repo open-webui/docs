@@ -39,6 +39,13 @@ Set this in the terminal's **Environment variables** to opt out entirely:
 
 With the value `filesystem`, the file browser shows the full filesystem.
 
+## Client Behavior
+
+- Opens at the root.
+- Shows the first breadcrumb as the root's label.
+- Hides parent folders above the root.
+- Keeps the user inside the root when they try to navigate above it.
+- Shows the full filesystem when the value is `filesystem`.
 
 ## What This Does Not Do
 

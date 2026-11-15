@@ -18,9 +18,20 @@ The **Centralized File Manager** provides a unified interface to view, search, a
 
 ### Key Features
 
-The File Manager lists your files with search and sorting. Click a file to open its details and preview, tick files to download or delete them (several files download as one `files.zip`).
+The File Manager modal offers several powerful tools for maintaining your data:
 
-- **Safe Deletion**: Deleting asks for confirmation.
+- **Universal Search**: Quickly find any file by its filename using the integrated search bar.
+- **Advanced Sorting**: Organize your file list by:
+  - **Filename**: Sort alphabetically to find specific documents.
+  - **Created At**: See your most recent uploads or find older files.
+- **File Details**: View important information at a glance, including:
+  - **File Size**: See how much space each document occupies (e.g., KB, MB).
+  - **Upload Date**: Track when each file was added to your instance.
+- **Built-in Viewer**: Click on any file to open the **File Item Viewer**, which displays the file's metadata and specific details (such as size and type).
+  - **Preview tab**: Word documents, presentations, spreadsheets, PDFs, audio, code and Markdown open on a **Content** tab showing the extracted text, with a **Preview** tab beside it that renders the file itself. Word documents (`.docx`) render as pages, keeping headers, footers, footnotes and embedded images, and presentations (`.pptx`) open in a slide viewer with a numbered thumbnail strip. Single bar, line, pie and doughnut charts are drawn. Stacked and combined charts and other chart types show **Chart preview unavailable**. Both can be zoomed from the small toolbar that floats over the preview. The same viewer opens when you click a file attached in a chat or on a note.
+- **Selection**: Tick files to select them, or use **Select all matching files** to select every file that matches the search.
+- **Download**: **Download** in a file's menu, or in the **Actions** menu for a selection. Several files download as one `files.zip`.
+- **Safe Deletion**: Delete a file from its menu, or a selection from the **Actions** menu, after a confirmation. Shift-click **Delete** to skip it. A **Stop** button ends a running delete or download.
   - :::info **Knowledge Base Cleanup**
     When you delete a file through the File Manager, Open WebUI automatically performs a deep cleanup. It removes the file from all associated Knowledge Bases and deletes its corresponding vector embeddings, ensuring your database stays clean and efficient.
     :::

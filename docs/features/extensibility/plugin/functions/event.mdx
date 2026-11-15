@@ -253,7 +253,24 @@ Because the account already exists when the event fires, gating means *holding o
 
 ### Compliance and audit
 
-Fan out an alert (channel, email or SIEM) on a high-signal event, such as `user.role_updated` when someone becomes **admin**, or ship every event to an append-only audit store.
+- **Event-driven alerting.** Fan out a loud multi-sink alert (channel + email + SIEM) on a high-signal event. Flagship: scream when someone becomes **admin**. `user.role_updated` fires however the role was set, and the event's `source` names the route: `api` for the admin panel, `scim` for a directory sync, `oauth` for an identity provider login that maps roles, `trusted_header` for the trusted role header. A role change never hides inside `user.updated`. Same pattern for `config.*` changes.
+- **Immutable audit sink.** Ship every event to an append-only store or SIEM. Tamper-evident audit logging, for free.
+- **Content flagging.** Scan `message.created` for secrets and PII and flag it. (To block in-band, use a [Filter](./filter.mdx).)
+- **Access recertification.** Periodically ask resource owners to re-approve who can access their stuff. Automated access reviews.
+
+### Instance-as-code and fleet ops
+
+- **Bootstrap from manifest.** Provision a whole instance to spec from a Valve manifest. New deployment, paste manifest, done.
+- **GitOps sync.** Pull prompts, models, groups, and config from a central git repo so a fleet stays in lockstep.
+- **Backup on change.** Snapshot config on every `config.updated`, to external storage or the persisted `/data` directory.
+- **Model retirement with reassignment.** Point a retiring model at a destination, and auto-rewrite every model and automation that referenced it.
+
+### Operations and integrations
+
+- **Self-healing connectors.** Health-check connectors, auto-disable a dead one and alert, so the model picker stays clean.
+- **Notify-anything bridge.** Forward selected events to external services, making Open WebUI a node in an automation graph.
+- **Usage metering.** Accumulate per-user token usage and export it. (A real currency budget also needs an external price source.)
+- **Honeypot / intrusion detection.** Register decoy admin routes, then log and auto-deactivate anyone who probes them.
 
 :::warning One-time work runs once per replica
 Several of these (provisioning, welcome chat, scheduled jobs) must happen once globally, but `system.startup.completed` fires on **every** replica and request-scoped handlers can run concurrently. Guard at-most-once side effects with a distributed lock, see [Concurrency, multiple replicas, and exactly-once](#concurrency-multiple-replicas-and-exactly-once).

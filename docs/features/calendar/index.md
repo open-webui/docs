@@ -153,6 +153,8 @@ An event cannot repeat more often than once a day. Saving a rule that comes back
 
 Anything faster than daily is a job rather than an appointment, and it belongs in [Automations](/features/chat-conversations/chat-features/automations), which are built to run on that kind of schedule.
 
+Sub-daily events saved before the limit existed keep running as they are. They cannot be saved again until their repeat rule is changed, so editing anything else about such an event means fixing the rule at the same time.
+
 ---
 
 ## Automation Integration

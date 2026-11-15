@@ -39,3 +39,14 @@ If you would like to reach the Ollama service from another machine, make sure yo
 
 Set the **Ollama Base URL** under **Settings -> Connections** (it defaults to http://localhost:11434) and click the **Refresh** button to confirm the connection; a successful check shows `Service Connection Verified`.
 
+![Open WebUI Ollama Setting Failure](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings_0.png)
+
+If the connection is successful, you will see a message stating `Service Connection Verified`, as illustrated below.
+
+![Open WebUI Ollama Setting Success](https://llm-assets.readthedocs.io/en/latest/_images/open_webui_settings.png)
+
+:::tip
+
+If you want to use an Ollama server hosted at a different URL, simply update the **Ollama Base URL** to the new URL and press the **Refresh** button to re-confirm the connection to Ollama.
+
+:::

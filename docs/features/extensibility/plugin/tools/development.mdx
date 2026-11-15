@@ -737,6 +737,7 @@ await __event_emitter__({
 ```
 
 :::info `self.citation` no longer does anything
+Older guides tell you to set `self.citation = False` to stop automatic citations overriding your custom ones. The flag is still read off the module, but nothing acts on it any more. In Legacy mode every tool result becomes a source regardless of the flag; in Native mode only a fixed set of builtin tools produces sources, and a Python tool's result never does. Setting it is harmless and leaving it out changes nothing.
 :::
 
 <details>

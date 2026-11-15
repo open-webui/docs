@@ -35,7 +35,33 @@ Go to **Settings > Integrations** (admin section) and click **+** to add a new c
 
 Click **Register Client**, then **Save**. Use `OAuth 2.1 (Static)` if you have pre-created OAuth client credentials.
 
-![External Tools modal with the Notion MCP configuration.](/images/mcp-notion/notion-setup-step5.png)
+<details>
+<summary>Alternative: Import JSON</summary>
+
+You can also click **Import** in the modal and paste this configuration:
+
+```json
+[
+  {
+    "type": "mcp",
+    "url": "https://mcp.notion.com/mcp",
+    "spec_type": "url",
+    "spec": "",
+    "path": "openapi.json",
+    "auth_type": "oauth_2.1",
+    "key": "",
+    "info": {
+      "id": "ntn",
+      "name": "Notion",
+      "description": "Search, read, create, and manage Notion pages and databases."
+    }
+  }
+]
+```
+
+</details>
+
+![External Tools modal with the Notion MCP configuration imported.](/images/mcp-notion/notion-setup-step5.png)
 
 ### 2. Authorize
 

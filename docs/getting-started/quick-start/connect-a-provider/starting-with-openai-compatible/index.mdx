@@ -562,8 +562,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   | **Model IDs** | Auto-detected from your LiteLLM configuration |
   | **Provider** | `LiteLLM` (optional, see below) |
 
-  Setting **Provider** to `LiteLLM` under **Advanced** only matters for requests to Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api). See the [Provider Setting](#the-provider-setting) section.
-
+  Setting **Provider** to `LiteLLM` under **Advanced** only matters when something calls Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api), for example an Anthropic SDK or a coding agent pointed at Open WebUI. With it set, such a request is handed to LiteLLM untouched instead of being translated into Chat Completions and back, so Anthropic-only fields survive the trip. The trade is that the request goes straight to LiteLLM and skips the Open WebUI chat pipeline, so filters, tools and knowledge do not run on it. Normal chatting in the Open WebUI interface is unaffected either way.
 
   **Quick setup:**
 

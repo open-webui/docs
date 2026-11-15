@@ -90,6 +90,13 @@ From the Automations list, click an automation to open its dedicated editor page
 
 Open an automation to edit it: its name, instructions and properties (status, schedule, model, destination, terminal) can be changed in place, and **Save** appears when something differs from the saved automation. **Run now**, **Duplicate** and **Delete** sit in the header, and **Activity** lists the runs with a link to each run's chat.
 
+The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
+
+Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. Runs load incrementally as you scroll.
+
+### Quick delete
+
+Hold **Shift** while the Automations list is open and each automation's menu button and on/off switch turn into a delete button. Clicking it deletes that automation straight away, without asking. Release **Shift** and the menu and switch come back. Deleting from the menu still asks you to confirm.
 
 ## Export and Import
 
@@ -138,9 +145,10 @@ Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are re
 A few rules about how a custom rule is read:
 
 - **Sub-daily rules snap to the clock.** A `SECONDLY`, `MINUTELY` or `HOURLY` rule with no `DTSTART` is anchored to the clock, so every 5 minutes means `:00`, `:05`, `:10` rather than five minutes after you happened to save it.
-- **A `DTSTART` is honored where it is still meaningful.** Give the rule a start time and the schedule counts from there, keeping any phase you intended.
+- **A `DTSTART` is honored where it is still meaningful.** Give the rule a start time and the schedule counts from there, keeping any phase you intended. If that start lies so far in the past that following it literally would mean walking through more than 100,000 occurrences to reach now, the rule falls back to clock alignment instead of stalling.
 - **`INTERVAL` must be a positive whole number.** Zero or a negative value is rejected rather than quietly treated as one.
 - **One rule per schedule.** Multiple `RRULE` lines are rejected, and `EXRULE` is not supported at all; build the exclusion into the rule itself.
+- Property names are read case-insensitively, so `freq=daily` behaves like `FREQ=DAILY`.
 
 ## Notes
 
