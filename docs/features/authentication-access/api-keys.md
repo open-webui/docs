@@ -93,8 +93,6 @@ Create a dedicated "API Users" or "Monitoring" group and add only the accounts t
 Once a key exists, the menu beside it holds **Create new key**, which replaces it, and **Delete**, which removes it after a confirmation. Deleting leaves the account with no key until you create another, and anything still presenting the old one is refused from that moment.
 
 :::info
-The **API keys** section is collapsed by default and shows nothing but a **Show** button until you click it. If you see the heading and no key field, that is the collapsed state, not a permission problem.
-
 Admins see their current **JWT Token** in the same block. That is the browser session token, not an API key, and it expires with the session.
 :::
 

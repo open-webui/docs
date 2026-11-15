@@ -123,7 +123,7 @@ You can restrict access to specific objects (like a proprietary Model or sensiti
 1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**. On resources you can edit, **Access** in the **⋯** menu of the **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists opens the same settings. Non-admins see the **Access** button and menu entry only with the matching [sharing permission](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once. A grant to a group also reaches the members of its subgroups.
 
-The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.** instead of leaving a **Users** heading above an empty list.
+The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time.
 
 Their row in the **Access List** is where you change what someone already has. Each row carries the level (a **Read**/**Write** selector on resources that accept write grants, a **Read** badge on the ones that do not) and an **✕** that removes the grant.
 

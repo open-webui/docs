@@ -74,11 +74,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 
 ### Read-only OAuth settings in the Admin Panel
 
-`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only:
-
-- All values remain visible, and the section is dimmed with every field and switch inert, including the **OAuth / OIDC** master toggle.
-- A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.
-- Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
+`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only. Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
 
 Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. Changes to the provider connection settings (such as the provider URL, client ID and secret, redirect URI and scopes) take effect once every Open WebUI instance has been restarted. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
 
