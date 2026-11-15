@@ -119,8 +119,8 @@ Controls the features available to the user inside the chat interface.
 | **Allow Regenerate Response**| Ability to regenerate an AI response. |
 | **Allow Rate Response** | Ability to thumbs up/down responses. |
 | **Allow Chat Share** | Ability to generate a share link for a chat ([`USER_PERMISSIONS_CHAT_SHARE`](/reference/env-configuration#user_permissions_chat_share)). See [Allowing Replies](/features/chat-conversations/chat-features/chatshare#allowing-replies) for letting the people you share with reply. |
-| **Allow Chat Export** | Ability to export chats ([`USER_PERMISSIONS_CHAT_EXPORT`](/reference/env-configuration#user_permissions_chat_export)). On by default. When disabled, every option that downloads or copies whole chats is hidden, including folder **Export** and **Export Chats**. |
-| **Allow Chat Import** | Ability to import chats (upload a previously exported chat back into Open WebUI) and to [fork a chat](/features/chat-conversations/chat-features/) or [clone one shared with you](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat), which copies an existing conversation into a new one ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. When disabled, **Import Chats** in **Settings > Data Controls**, the **Clone Chat** button on a shared chat, the **Fork chat** action under an assistant response and the `/fork` entry in the chat input's `/` menu are all hidden from non-admins. Admins are always exempt. |
+| **Allow Chat Export** | Ability to export chats ([`USER_PERMISSIONS_CHAT_EXPORT`](/reference/env-configuration#user_permissions_chat_export)). On by default. |
+| **Allow Chat Import** | Ability to import chats and to fork or [clone](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat) conversations ([`USER_PERMISSIONS_CHAT_IMPORT`](/reference/env-configuration#user_permissions_chat_import)). On by default. Admins are always exempt. |
 | **Allow Speech to Text** | Ability to use voice input. |
 | **Allow Text to Speech** | Ability to use voice output. |
 | **Allow Call** | Ability to start a [Voice Mode](/features/chat-conversations/chat-features/voice-mode) call, in both Standard and Realtime call mode. |
@@ -194,11 +194,7 @@ Controls access to user settings areas.
 
 Taking this permission away hides the **Interface** page, so the people affected stay on whatever [Default Interface Settings](/features/administration/interface-defaults) you have configured. Leave it on, and those defaults are only a starting point that each person can change. Admins are exempt.
 
-It reaches no further than that. Interface fields in a save from such a user are dropped and the rest is saved, so a system prompt, pinned models, audio, notifications and shortcuts still save. **Allow Chat System Prompt** works the same way for the system prompt.
-
-The one exception is the **default model** a person saves with **Set as default** in the model selector. It is stored as an Interface field, so it stops being saved when this permission is off.
-
-There is no permission that locks personal settings as a whole. This one hides a page and filters that page's fields, nothing more.
+Turning this off hides the **Interface** page; users keep the instance defaults. **Allow Chat System Prompt** controls the system prompt separately.
 
 :::
 

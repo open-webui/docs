@@ -687,7 +687,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admins can open other users' chats inside Open WebUI. It hides chats in the product and does not keep an admin away from the data; see [Chat Data Privacy](/security/chat-data-privacy-and-encryption#admin-users). When enabled, an admin can read any user's chat, which opens read-only. Through the API the admin can also edit or delete its messages, delete the chat, change its share settings and clone it. Replying, regenerating, stopping replies and approving tool calls stay with the owner and anyone the chat is shared with through [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). When disabled, the admin panel hides other users' chats, the **Sessions** view in [Analytics](/features/administration/analytics#sessions) is hidden and its endpoints return `403`, and the chat endpoints give an admin only what a share gives them. The admin-only `GET /api/tasks` and `POST /api/tasks/stop/{task_id}` endpoints still list and stop any running task, whatever this setting says. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats. The toggle covers the product surface only: an admin can still reach every chat through the database, the server itself or a Function or Tool. See the admin-posture-toggles note above.
+- Description: Controls whether admins can open other users' chats inside Open WebUI. It hides chats in the product and does not keep an admin away from the data; see [Chat Data Privacy](/security/chat-data-privacy-and-encryption#admin-users). When enabled, an admin can read any user's chat, which opens read-only. When disabled, the admin panel hides other users' chats and the **Sessions** view in [Analytics](/features/administration/analytics#sessions). If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats. The toggle covers the product surface only: an admin can still reach every chat through the database, the server itself or a Function or Tool. See the admin-posture-toggles note above.
 
   **Exception for internal chats:** admins can still retrieve a chat marked internal even when this is `False`. Internal chats are the ones Open WebUI creates on a user's behalf without the user opening them: [sub-agent](/features/chat-conversations/chat-features/subagents) chats, [timer](/features/chat-conversations/chat-features/timers) chats and note-attached chats. This carve-out is what lets an admin retrieve one at all, because internal chats are **excluded from the chat listing surfaces**: they do not appear in chat lists, search, counts, exports or the admin chat list. Apart from the **Sessions** view in Analytics, which lists them with every other chat, they are reachable only by id.
 
@@ -705,7 +705,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 - Default: `True`
 - Description: Controls whether admin users see other users' workspace items in **list and selector UI surfaces** (workspace tabs for models / knowledge / prompts / tools / notes / skills, the chat model selector, the **Attach Files** list in the chat input, etc.). When set to `True` (default), those surfaces show every item from every user, convenient for single-admin / small-team deployments. When set to `False`, those same surfaces show only the admin's own items plus items explicitly shared with them, matching what a regular user would see. **Settings > Data Controls > Manage Files** always lists only the admin's own files, whatever this flag is set to.
 
-  Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
+  Direct per-ID endpoints are not affected by this flag. See the admin-posture-toggles note above.
 
   The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers, Open Terminal connections, and arena models. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
 
@@ -727,17 +727,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 :::info The name is only a setting name
 
-"Watermark" is the name of this setting and nothing more. What it produces is a plain, visible line of text added to the copy, and it is **not a watermark in the sense of the EU AI Act**. The Act's marking of AI-generated output (Article 50(2)) means a machine-readable marking built into the output itself, which this setting **does not produce**.
-
-What the setting covers:
-
-- **Only the Copy button on assistant replies.** The reply shown in the chat, the saved chat, exports, shared chats, API responses and text a user selects and copies by hand stay as they are.
-- **Only the text in the clipboard.** The line is added at copy time. The model never sees it, and anyone can delete it after pasting.
-- **Nothing inside the generated text.** Some model providers embed a statistical watermark in the text their model writes, such as SynthID Text. It lives in the model's word choice, and this setting neither adds one nor removes one.
-
-To show a notice inside the chat itself, a [Filter function](/features/extensibility/plugin/functions/filter) can append it to every reply in its `outlet()` and strip it again in its `inlet()`, so the model does not see it in the history.
-
-Whether a deployment has to mark or disclose AI-generated content, and in what form, depends on who operates it, for whom and for what purpose. This page describes what the setting does and is not legal advice. For your own obligations, consult your legal counsel.
+"Watermark" is only the name of this setting. It appends this text to the Copy button output and is not a machine-readable AI-content marking such as the EU AI Act describes. To show a notice inside the chat itself, a [Filter function](/features/extensibility/plugin/functions/filter) can append it in its `outlet()`. For your own legal obligations, consult your legal counsel.
 
 :::
 
@@ -888,8 +878,8 @@ With `*`, any client that reaches the backend directly can set its own address i
 
 - Type: `bool`
 - Default: `False`
-- Description: Lets the text of a streamed response grow in place as chunks arrive, instead of copying the whole answer so far on every chunk. The text that reaches the user is identical either way, and enabling it lowers peak memory, since the copy needs the old and the new string alive at the same time. The saving is worth having once answers get long: the copying cost grows with the square of the length, so a normal answer is sub-millisecond either way, while an answer of a few hundred thousand characters runs several times faster. That makes it a setting for busy instances and long outputs (agent transcripts, large code dumps, long tool output), where the work lands on the event loop and holds up every other stream on the worker. Turning it on is the faster option in every deployment that streams answers of that size; see [Scaling](/getting-started/advanced-topics/scaling) and [Performance](/troubleshooting/performance#high-concurrency--network-optimization).
-- Downside: the field is emptied while the chunk is attached and filled back in straight after, so an append that fails part way leaves that one message empty rather than holding the text so far. Reaching it means an allocation being refused rather than the kernel killing the process, which a container memory limit does not do, and the copying path needs more memory at that moment anyway, so it would fail first. No other code can observe the response mid-update.
+- Description: Appends streamed text in place instead of copying the full answer per chunk, lowering peak memory on long answers; see [Scaling](/getting-started/advanced-topics/scaling) and [Performance](/troubleshooting/performance#high-concurrency--network-optimization).
+- Downside: a failed append can leave that one message empty.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `ENABLE_IMAGE_CONTENT_TYPE_EXTENSION_FALLBACK`
@@ -972,7 +962,7 @@ A continuation request that fails outright (the provider errors while the loop f
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls how RAG retrieval treats a collection name that matches no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). Names are matched with letter case ignored and hyphens and underscores treated alike, so `File_abc` is checked as `file-abc`. A name that starts with a digit is also checked with a leading `c`, and a name of `c` plus a digit also without it, since Weaviate adds that `C` to collection names that start with a digit. Each of these spellings that names a known collection must pass the access check. A denied spelling always wins, over an allowed spelling and over this setting. By default (`false`), such unknown names are denied for non-admin users, which closes the legacy "unscoped" collection namespace. Set `true` to let them through as legacy or ephemeral collections, restoring the older behavior. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
+- Description: Lets non-admin users query collection names that match no known collection (not a `file-*`, `user-memory-*` or `web-search-*` name and not an existing knowledge base). The default `false` denies them. Like `BYPASS_RETRIEVAL_ACCESS_CONTROL`, the default is the safe choice and you should not need to change it.
 
 #### `WEBUI_BUILD_HASH`
 
@@ -1096,7 +1086,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
 - Type: `bool`
 - Default: `True`
-- Description: Swaps the application-wide JSON encoder and decoder from the standard library's `json` module to [orjson](https://pypi.org/project/orjson/), covering HTTP request and response bodies, saving and opening chats, reading settings, the requests sent to model providers, upstream provider responses including streamed chunks, built-in tool results, the output a Jupyter server returns for code run in chat, signing in and signing up, Socket.IO payloads and the stored chunk details read back during knowledge base searches on the Valkey and Oracle 23ai vector stores. orjson is stricter about what it accepts, but rejected payloads fall back to the standard library automatically, as does anything encoded with a request orjson has no equivalent for, such as indented output or a custom rule for converting values before they are written. Set it to `False` to go back to the standard library. Read once at startup, so a restart is required.
+- Description: Uses [orjson](https://pypi.org/project/orjson/) for JSON encoding across the app for speed and falls back to the standard library when needed. Set it to `False` to use the standard library. Requires a restart.
 - Details: [Multi-Replica → Use the Faster JSON Encoder](/troubleshooting/multi-replica#use-the-faster-json-encoder) for the full behaviour and trade-offs, [Scaling](/getting-started/advanced-topics/scaling#switch-the-json-encoder-to-orjson) for where it sits in a scaled rollout, and [Performance & RAM](/troubleshooting/performance#json-encoder) for how it compares to the other tuning knobs.
 
 #### `DEFAULT_PROMPT_SUGGESTIONS`
@@ -1365,7 +1355,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the reported token counts in a `usage` field, linked to the request's entry through `extra.request_id`; see [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Entries carry a `model_id` field for chat and completion requests; see [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1636,7 +1626,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `int`
 - Default: `40`
-- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. At the start of a turn compaction splits on a user message, so the retained portion begins at a turn boundary; between tool rounds of a long tool loop it splits at the start of a tool round, keeping each tool call with its results. Can also be set in **Settings > Interface** (admin section) (**Retained Messages**).
+- Description: The percentage of the most recent messages kept verbatim when context compaction runs; everything older than that is replaced by the summary. Values are clamped to the range `10` to `50`, so at least a tenth and at most half of the conversation is retained in full. Can also be set in **Settings > Interface** (admin section) (**Retained Messages**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `CONTEXT_COMPACTION_PROMPT_TEMPLATE`
@@ -2186,15 +2176,7 @@ Output:
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether users can share content with the Open WebUI Community and access community resources. When enabled, this setting shows the following UI elements across the application:
-  - **Prompts Workspace**: "Made by Open WebUI Community" section with a link to discover community prompts, and a "Share" button in the prompt menu dropdown
-  - **Tools Workspace**: "Made by Open WebUI Community" section with a link to discover community tools, and a "Share" button in the tool menu dropdown
-  - **Models Workspace**: "Made by Open WebUI Community" section with a link to discover community model presets, and a "Share" button in the model menu dropdown
-  - **Skills Workspace**: **Discover a skill** and **Share** in the skill menu (see [Community skills](/features/workspace/skills#community-skills))
-  - **Functions Admin**: "Made by Open WebUI Community" section with a link to discover community functions, and a "Share" button in the function menu dropdown
-  - **Share Chat Modal**: "Share to Open WebUI Community" button when sharing a chat conversation
-  - **Stats Sync Modal**: Enables syncing usage statistics with the community
-  - **New chat screen**: The "By @user" author link to openwebui.com on models imported from openwebui.com
+- Description: Shows or hides community sharing and discovery buttons and sections across the workspaces. When off, users can still export locally.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -2858,7 +2840,7 @@ Encryption derives its key from [`WEBUI_SECRET_KEY`](#webui_secret_key). A key o
 
 - Type: `bool`
 - Default: `True`
-- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks. If the check cannot reach GitHub within one second, **Settings > General** (admin section) and **Settings > About** show **Could not check for updates** and the server logs `Version update check failed` as a warning.
+- Description: When enabled, the application makes automatic update checks and notifies you about version updates. Only release builds check: the official images built from `main` or a release tag, and the pip package. Images built from `dev` and builds whose origin is unknown never check. A Docker image gets its channel from the `BUILD_CHANNEL` build argument (`main`, `dev` or `unknown`, default `unknown`), so build your own release images with `--build-arg BUILD_CHANNEL=main` to keep update checks.
 
 :::info
 
@@ -3192,8 +3174,6 @@ If you want to use Milvus, be careful when upgrading Open WebUI (crate backups a
 :::warning Do not set this to a file path
 Leave this variable unset if you want the embedded database (Milvus Lite). The default above already points at it, and setting the variable to that same path breaks startup.
 
-The Milvus client library reads this variable from the environment itself, before Open WebUI is involved, and parses it as a network address. A file path fails that parse and the process exits during import with `Illegal uri`, naming the expected form `http[s]://[user:password@]example.com[:12345]`. Set the variable only when you are connecting to a Milvus server.
-
 The parent directory must also exist before startup. The client opens the database file but does not create the directory holding it, and reports `Open local milvus failed, dir: ... not exists` if it is missing. This matters after any operation that clears the data directory, since the directory is not recreated for you.
 
 Milvus Lite is embedded, so the file is held by a single process. A second process cannot open it while Open WebUI is running, which includes any attempt to inspect the database from a separate shell.
@@ -3288,31 +3268,10 @@ Set this to `true` before the first start of a new Milvus deployment. Standard m
 
 :::info
 
-**Benefits of multitenancy mode:**
-- Significantly reduced RAM consumption (5 collections vs potentially hundreds)
-- Lower computational overhead from collection management
-- Faster cold-start times
-- Reduced index maintenance burden
-
-**Technical implementation:**
-
-- All memories go into `{prefix}_memories`
-- All knowledge bases go into `{prefix}_knowledge`
-- All uploaded files go into `{prefix}_files`
-- Web search results go into `{prefix}_web_search`
-- Hash-based collections go into `{prefix}_hash_based`
-- Each entry includes a resource_id field matching the original collection name
-- Queries automatically filter by resource_id to maintain data isolation
+In multitenancy mode, memories, knowledge bases, files, web search results and hash-based collections each share one collection, which reduces RAM use and collection management overhead.
 
 :::
 
-| Collection Variable | Default Name (Suffix) | Trigger / Routing Logic in the Code | Purpose |
-| :--- | :--- | :--- | :--- |
-| `HASH_BASED_COLLECTION` | `_hash_based` | Collection name is a **63-char hex string** (SHA256 hash). | Caching direct URL fetches (Websites) with the `#` feature. |
-| `MEMORY_COLLECTION` | `_memories` | Collection name starts with **`user-memory-`**. | Storing user-specific long-term memories of the experimental memory system. |
-| `FILE_COLLECTION` | `_files` | Collection name starts with **`file-`**. | Storing uploaded documents (PDFs, DOCX, etc.). |
-| `WEB_SEARCH_COLLECTION`| `_web_search` | Collection name starts with **`web-search-`**. | Storing transient results from search engine queries. |
-| `KNOWLEDGE_COLLECTION` | `_knowledge` | **Everything else** (Default fallback). | Storing explicitly created Knowledge Bases. |
 
 :::info
 
@@ -3371,17 +3330,6 @@ For fresh installations, no migration concerns exist
 - Set `ENABLE_MILVUS_MULTITENANCY_MODE=true`
 - Restart Open WebUI
 - Re-upload/re-create knowledge bases from scratch
-
-:::
-
-:::warning
-
-The mapping of multitenancy relies on current Open WebUI naming conventions for collection names.
-
-If Open WebUI changes how it generates collection names (e.g., "user-memory-" prefix, "file-" prefix, web search patterns, or hash formats), this mapping will break and route data to incorrect collections.
-POTENTIALLY CAUSING HUGE DATA CORRUPTION, DATA CONSISTENCY ISSUES AND INCORRECT DATA MAPPING INSIDE THE DATABASE.
-
-If you use Multitenancy Mode, you should always check for any changes to the collection names and data mapping before upgrading, and upgrade carefully (snapshots and backups for rollbacks)!
 
 :::
 
@@ -3581,15 +3529,11 @@ When choosing an index method, consider your dataset size and query patterns. HN
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::info IVFFlat waits for rows before it builds
-IVFFlat decides where its clusters sit by looking at the rows present when the index is built, and it needs 50 rows per list to place them, so 5,000 rows at the default of `100` lists. Open WebUI now waits for the `document_chunk` table to hold that many before creating the index, and logs that it is waiting. Searches run as an exact scan until then, which is correct and fast at that size.
-
-An instance created on an earlier version built the index straight after the table, when it was empty, so its clusters were placed on nothing and every chunk added afterwards was filed against them. On a 20,000-row table that returns fewer than half the right chunks, recall at 10 of 0.480 against 1.000 once the index is built on real rows, at the same query time of about 5 ms. Repair it once with:
+Open WebUI waits until the `document_chunk` table holds 50 rows per list (5,000 rows at the default of `100` lists) before creating the IVFFlat index, and logs that it is waiting. Searches run as an exact scan until then. If an older instance built the index while the table was empty, repair it once with:
 
 ```sql
 REINDEX INDEX idx_document_chunk_vector;
 ```
-
-The build itself now happens on whichever startup crosses the threshold, so an instance that filled up in the meantime pays that cost once. `hnsw` builds as it always did and needs none of this.
 :::
 
 :::info
@@ -3603,7 +3547,7 @@ For IVFFlat indexes, choosing the right number of lists is crucial for query per
 - Type: `str`
 - Options: `relaxed_order`, `strict_order`, `off`
 - Default: `relaxed_order`
-- Description: Tells pgvector to keep walking the index when a search has not yet found enough rows that match the filter. Every collection's chunks live in one table under one vector index, and the collection is filtered after the index walk, so without this a knowledge base holding a small share of the rows gets almost none of its real neighbours back: the index returns its globally nearest rows, and the filter throws nearly all of them away. On a 101,500-row table where the collection held 1.5% of the rows, recall at 10 measured **0.070 at 4.9 ms** with the scan off and **0.970 at 7.2 ms** with it on (hnsw, `m=16`). `strict_order` keeps results in exact distance order at more cost; `off` returns to the old behaviour.
+- Description: Tells pgvector to keep walking the index when a search has not yet found enough rows that match the collection filter, which keeps results complete for knowledge bases holding a small share of the rows. `strict_order` keeps results in exact distance order at more cost; `off` disables it.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::info Applies only on pgvector 0.8 and newer
@@ -4009,7 +3953,6 @@ The Valkey backend is a non-core, independently maintained integration. Fixes co
 :::info Requirements
 Valkey is **opt-in**. Install the client yourself, in the Docker image too (`pip install --upgrade "valkey-glide-sync>=2.5.2"`), and run **Valkey core 9.0.1+ with the valkey-search module 1.2.0+ loaded**. Open WebUI verifies both versions at startup (on the slim image, at the first upload or knowledge search) and refuses to work with an older server.
 
-Open WebUI's connections report the library name `GlidePySync(open-webui)` in `CLIENT LIST` and `CLIENT INFO`, so its traffic can be told apart on a shared Valkey or ElastiCache server.
 :::
 
 :::warning Valkey needs valkey-glide-sync 2.5.2 or newer
@@ -4086,7 +4029,7 @@ In a custom Docker image, change the version in the line that installs it and re
 
 - Type: `str` (comma-separated MIME types, wildcards allowed)
 - Default: unset
-- Description: Which uploaded **images and videos** are handed to the content extraction engine. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. It takes effect only with a content extraction engine selected. When unset, media goes to the extraction engine only when the engine is `external`. Media that is not handed over is stored without text extraction: an image then fails processing and a video is kept for vision models. An empty list disables media extraction for every engine, `external` included. `video/*` sends video uploads to the engine if yours can handle them. Audio follows the speech-to-text settings instead. Also set in **Settings > Documents** (admin section) (**Supported Media MIME Types**).
+- Description: Which uploaded **images and videos** are handed to the content extraction engine. Set it to something like `image/*` to let an OCR-capable engine read images, or name individual types (`image/png, image/jpeg`) to be selective. It takes effect only with a content extraction engine selected. When unset, media goes to the extraction engine only when the engine is `external`. Audio follows the speech-to-text settings instead. Also set in **Settings > Documents** (admin section) (**Supported Media MIME Types**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MISTRAL_OCR_API_KEY`
@@ -4269,10 +4212,6 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 - Description: Base URL of the Marker API. Point it at a self-hosted Marker server, or leave it empty for Datalab's hosted endpoint.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-:::info
-Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now marks as deprecated in favor of `/convert`. The `/convert` reference no longer lists `use_llm`, `force_ocr`, `strip_existing_ocr` or `format_lines`, but Open WebUI still sends the four settings below.
-:::
-
 #### `DATALAB_MARKER_ADDITIONAL_CONFIG`
 
 - Type: `str`
@@ -4377,7 +4316,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 - Default: unset, in which case the limit follows `RAG_FILE_MAX_SIZE`, or no limit at all if that is unset too
 - Description: Drops a metadata field from what is stored alongside a document chunk when the field is a list or an object whose text runs longer than this many characters. Extraction can attach large structures to a document, and those travel into the vector store with every chunk, where they cost memory and space without helping retrieval.
 
-  Left entirely unbounded this is also a way to exhaust a server: an Office document is an archive, and one crafted to expand during extraction can turn a few hundred kilobytes into gigabytes of metadata held in memory, so a handful of uploads is enough to take an instance down. When this is unset the bound therefore follows the upload size limit, on the reasoning that a document cannot legitimately carry more metadata than the file itself is permitted to weigh. Set this explicitly to override that, and note that a deployment with no upload limit configured has no metadata limit either.
+  Unset, the limit follows `RAG_FILE_MAX_SIZE`; set it to override.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 #### `MINERU_MAX_MARKDOWN_BYTES`
@@ -4494,7 +4433,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
   - `view_note`, when notes are attached to the model
   - `query_knowledge_bases` and `search_knowledge_bases`, when no knowledge is attached, so the model can still discover KBs by name/description
 
-  **Recommended for an enhanced, agentic RAG experience.** The shell-style interface lets a capable model explore a knowledge base (list, grep, read by line range) the way it would a local filesystem, which it tends to chain more reliably than a fan-out of separate search tools, so it lands on the right passage more often. It only takes effect with **native function calling** (the default; it is a native-mode builtin tool); for models set to Legacy it has no effect. Still experimental, and best paired with capable frontier models that handle shell-style tool chaining well. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
+  It only takes effect with **native function calling** (the default; for models set to Legacy it has no effect). Still experimental. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 
 #### `KB_EXEC_MAX_OUTPUT_CHARS`
 
@@ -4556,36 +4495,6 @@ Enabling this feature increases the text volume indexed by BM25, which may impac
 - Type: `str`
 - Default: The built-in template shown below. (`DEFAULT_RAG_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Persistence: This environment variable is a `ConfigVar` variable.
-
-`DEFAULT_RAG_TEMPLATE`:
-
-```
-
-### Task:
-Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id="1">).
-
-### Guidelines:
-- If you don't know the answer, clearly state that.
-- If uncertain, ask the user for clarification.
-- Respond in the same language as the user's query.
-- If the context is unreadable or of poor quality, inform the user and provide the best possible answer.
-- If the answer isn't present in the context but you possess the knowledge, explain this to the user and provide the answer using your own understanding.
-- **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**
-- Do not cite if the <source> tag does not contain an id attribute.
-- Do not use XML tags in your response.
-- Ensure citations are concise and directly related to the information provided.
-
-### Example of Citation:
-If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:
-* "According to the study, the proposed method increases efficiency by 20% [1]."
-
-### Output:
-Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context.
-
-<context>
-{{CONTEXT}}
-</context>
-```
 
 - Description: Template to use when injecting RAG documents into chat completion. The template wraps the retrieved context (use the `{{CONTEXT}}` placeholder); the user's query is appended automatically, so do **not** add a `{{QUERY}}` / `[query]` placeholder or the query will appear twice in the final prompt. See [RAG Template Customization](/features/chat-conversations/rag#rag-template-customization).
 - Persistence: This environment variable is a `ConfigVar` variable.
@@ -4701,7 +4610,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. Office and EPUB documents are checked a second time against their contents, since those formats are archives: a file whose contents unpack to far more than the file itself is refused rather than extracted, which stops a small upload from consuming the whole machine's memory. This value doubles as the default ceiling on extracted metadata, so leaving it unset removes that protection as well; see [`RAG_METADATA_MAX_VALUE_CHARS`](#rag_metadata_max_value_chars).
+- Description: Sets the maximum size of a file in megabytes that can be uploaded for document ingestion. The limit applies to documents Open WebUI fetches itself as well, so a page or file retrieved from a URL is rejected once it exceeds the same size. See also [`RAG_METADATA_MAX_VALUE_CHARS`](#rag_metadata_max_value_chars).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FILE_MAX_COUNT`
@@ -4752,12 +4661,6 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 - Default: `None`
 - Description: Sets the maximum height, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured height limit is applied.
 - Persistence: This environment variable is a `ConfigVar` variable.
-
-:::note
-
-These values are exposed through app config and consumed by the frontend chat upload flow for image files. Compression happens client-side with aspect ratio preserved. Non-image file uploads are not affected.
-
-:::
 
 #### `RAG_ALLOWED_FILE_EXTENSIONS`
 
@@ -4837,12 +4740,6 @@ If you are hitting rate limits from your embedding provider (e.g., 429 errors), 
 - Type: `int` (seconds)
 - Default: `None` (no timeout)
 - Description: Sets an optional timeout in seconds for embedding operations during document upload. When set, embedding requests that exceed this duration will be aborted with a timeout error. When unset (default), embedding operations run without a time limit. This setting is primarily relevant for deployments using the default **SentenceTransformers** embedding engine, where embeddings run locally and can take longer on slower hardware. External embedding engines (Ollama, OpenAI, Azure OpenAI) have their own timeout mechanisms and are generally not affected by this setting.
-
-:::info
-
-This variable was introduced alongside a fix for **uvicorn worker death during document uploads**. Previously, local embedding operations could block the worker thread long enough to trigger uvicorn's health check timeout (default: 5 seconds), causing the worker process to be killed. The underlying fix uses `run_coroutine_threadsafe` to keep the main event loop responsive to health checks regardless of this timeout setting. The timeout is purely a safety net for aborting abnormally long embedding operations; it does not affect worker health check behavior.
-
-:::
 
 #### `RAG_EMBEDDING_CONTENT_PREFIX`
 
@@ -5010,37 +4907,7 @@ You **MUST** provide the full URL, including the endpoint path (e.g., `https://a
 #### `QUERY_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-`DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE`:
-
-```
-
-### Task:
-Analyze the chat history to determine the necessity of generating search queries, in the given language. By default, **prioritize generating 1-3 broad and relevant search queries** unless it is absolutely certain that no additional information is required. The aim is to retrieve comprehensive, updated, and valuable information even with minimal uncertainty. If no search is unequivocally needed, return an empty list.
-
-### Guidelines:
-- Respond **EXCLUSIVELY** with a JSON object. Any form of extra commentary, explanation, or additional text is strictly prohibited.
-- When generating search queries, respond in the format: { "queries": ["query1", "query2"] }, ensuring each query is distinct, concise, and relevant to the topic.
-- If and only if it is entirely certain that no useful results can be retrieved by a search, return: { "queries": [] }.
-- Err on the side of suggesting search queries if there is **any chance** they might provide useful or updated information.
-- Be concise and focused on composing high-quality search queries, avoiding unnecessary elaboration, commentary, or assumptions.
-- Today's date is: {{CURRENT_DATE}}.
-- Always prioritize providing actionable and broad queries that maximize informational coverage.
-
-### Output:
-Strictly return in JSON format:
-{
-  "queries": ["query1", "query2"]
-}
-
-### Chat History:
-<chat_history>
-{{MESSAGES:END:6}}
-</chat_history>
-```
-
+- Default: Empty string, which falls back to the built-in template. (`DEFAULT_QUERY_GENERATION_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 - Description: Sets the prompt template for query generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -5121,7 +4988,7 @@ When disabled (default), Open WebUI blocks web fetch requests to URLs that resol
 
 - IPv4 private ranges (`10.x.x.x`, `172.16.x.x`-`172.31.x.x`, `192.168.x.x`, `127.x.x.x`)
 - IPv6 private ranges
-- IPv6 addresses that carry a private IPv4 address inside them, whatever the wrapper: IPv4-mapped (`::ffff:127.0.0.1`), IPv4-compatible (`::10.0.0.1`), 6to4 (`2002::/16`), Teredo (`2001::/32`), and NAT64 (`64:ff9b::/96` and `64:ff9b:1::/48`). These forms are globally routable as IPv6 while pointing at a loopback, RFC 1918 or metadata address, so each embedded address is extracted and checked on its own
+- IPv6 addresses that embed a private IPv4 address, which are checked on their embedded address too
 
 This is a **Server-Side Request Forgery (SSRF) protection**. Without this safeguard, a malicious user could provide URLs that appear external but resolve to internal addresses, potentially exposing internal services, cloud metadata endpoints, or other sensitive resources.
 
@@ -5272,7 +5139,7 @@ This Tenant ID (also known as Directory ID) is required for the work/school inte
 
 - Type: `string` (comma-separated list)
 - Default: `""` (empty, but default blocklist is always applied)
-- Description: Configures additional URL filtering rules for web fetch operations to prevent Server-Side Request Forgery (SSRF) attacks. The system includes a default blocklist that protects against access to cloud metadata endpoints (AWS, Google Cloud, Azure, Alibaba Cloud). Entries without a ! prefix are treated as an allow list (only these domains are permitted), while entries with a ! prefix are added to the block list (these domains are always denied). The default blocklist covers the cloud metadata addresses (`!169.254.169.254`, `!fd00:ec2::254`, `!metadata.google.internal`, `!metadata.azure.com`, `!100.100.100.200`) and, alongside them, a set of addresses that are never a legitimate destination for a fetch: the Azure platform channel reachable from every virtual machine, multicast ranges, the deprecated 6to4 relay and IPv6 site-local ranges, the anycast addresses answered by the local network's own edge device, and several prefixes reserved by specification but never routed. Custom entries are merged with it.
+- Description: Configures additional URL filtering rules for web fetch operations to prevent Server-Side Request Forgery (SSRF) attacks. The system includes a default blocklist that protects against access to cloud metadata endpoints (AWS, Google Cloud, Azure, Alibaba Cloud). Entries without a ! prefix are treated as an allow list (only these domains are permitted), while entries with a ! prefix are added to the block list (these domains are always denied). The default blocklist covers the cloud metadata addresses (`!169.254.169.254`, `!fd00:ec2::254`, `!metadata.google.internal`, `!metadata.azure.com`, `!100.100.100.200`) plus other never-valid destinations. Custom entries are merged with it.
 
 :::info
 Example:
@@ -6363,32 +6230,9 @@ When `AUDIO_TTS_ENGINE=mistral`, Open WebUI uses `voxtral-mini-tts-2603` when `A
 #### `IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Default: Empty string (the built-in prompt below is used)
+- Default: Empty string (the built-in prompt is used)
 - Description: Specifies the template to use for generating image prompts.
 - Persistence: This environment variable is a `ConfigVar` variable.
-
-`DEFAULT_IMAGE_PROMPT_GENERATION_PROMPT_TEMPLATE`:
-```
-### Task:
-Generate a detailed prompt for an image generation task based on the given language and context. Describe the image as if you were explaining it to someone who cannot see it. Include relevant details, colors, shapes, and any other important elements.
-
-### Guidelines:
-- Be descriptive and detailed, focusing on the most important aspects of the image.
-- Avoid making assumptions or adding information not present in the image.
-- Use the chat's primary language; default to English if multilingual.
-- If the image is too complex, focus on the most prominent elements.
-
-### Output:
-Strictly return in JSON format:
-{
-    "prompt": "Your detailed description here."
-}
-
-### Chat History:
-<chat_history>
-{{MESSAGES:END:6}}
-</chat_history>
-```
 
 ---
 
@@ -6627,90 +6471,7 @@ For a detailed setup guide and example configuration, please refer to the [Gemin
 ##### `COMFYUI_WORKFLOW`
 
 - Type: `str` (JSON)
-- Default:
-```json
-{
-  "3": {
-    "inputs": {
-      "seed": 0,
-      "steps": 20,
-      "cfg": 8,
-      "sampler_name": "euler",
-      "scheduler": "normal",
-      "denoise": 1,
-      "model": ["4", 0],
-      "positive": ["6", 0],
-      "negative": ["7", 0],
-      "latent_image": ["5", 0]
-    },
-    "class_type": "KSampler",
-    "_meta": {
-      "title": "KSampler"
-    }
-  },
-  "4": {
-    "inputs": {
-      "ckpt_name": "model.safetensors"
-    },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Load Checkpoint"
-    }
-  },
-  "5": {
-    "inputs": {
-      "width": 512,
-      "height": 512,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage",
-    "_meta": {
-      "title": "Empty Latent Image"
-    }
-  },
-  "6": {
-    "inputs": {
-      "text": "Prompt",
-      "clip": ["4", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "7": {
-    "inputs": {
-      "text": "",
-      "clip": ["4", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "8": {
-    "inputs": {
-      "samples": ["3", 0],
-      "vae": ["4", 2]
-    },
-    "class_type": "VAEDecode",
-    "_meta": {
-      "title": "VAE Decode"
-    }
-  },
-  "9": {
-    "inputs": {
-      "filename_prefix": "ComfyUI",
-      "images": ["8", 0]
-    },
-    "class_type": "SaveImage",
-    "_meta": {
-      "title": "Save Image"
-    }
-  }
-}
-```
-
+- Default: A built-in KSampler workflow; export your own from ComfyUI with Save (API Format).
 - Description: Defines the ComfyUI workflow configuration in JSON format. Export from ComfyUI using "Save (API Format)" to ensure compatibility.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -6827,7 +6588,7 @@ Set this variable to `True` to persist OAuth settings in the database and manage
 
 :::info Read-only Admin Panel while this is `False`
 
-The environment is authoritative, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only: values stay visible, no control accepts input, and saving the page leaves them untouched. Change them in the environment and restart, or set this to `True` to manage them in the Admin Panel.
+While this is `False`, the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is read-only. Change the values in the environment and restart, or set this to `True` to manage them in the Admin Panel.
 
 [`ENABLE_PERSISTENT_CONFIG`](#enable_persistent_config) is the one in charge. While it is `False` nothing is saved whatever this variable says, so both have to be `True` for an edit to last.
 
@@ -7683,7 +7444,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to delete chats. When `False`, the delete controls are hidden from non-admins rather than offered and refused, in the sidebar, the chat menu, search, archived chats and data controls, and the **Delete chat** shortcut stops doing anything. Archiving is unaffected. Deleting a folder with **Delete all contents inside this folder** ticked needs the same permission and is refused rather than hidden. With the box unticked, the folder is deleted and its chats are kept. Configurable per-group as **Allow Chat Delete**.
+- Description: Enables or disables user permission to delete chats. When `False`, delete controls are hidden from non-admins. Archiving is unaffected. Configurable per-group as **Allow Chat Delete**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_EDIT`
@@ -7704,7 +7465,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot download a conversation as a file, and the export items are hidden for them: **Download** in the chat menus, **Copy** in the chat's top-bar menu, **Export** in a folder's menu, **Export** in **Settings > Archived Chats** and **Export Chats** in **Settings > Data Controls**. When the top-bar menu has no other entry left, its button is hidden too. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
+- Description: Enables or disables user permission to export chats. When disabled, non-admins cannot export chats, and the export items are hidden. Also configurable per-group in **Admin Panel > Users > Groups > Permissions > Chat Permissions > Allow Chat Export**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_CHAT_IMPORT`
@@ -8816,9 +8577,6 @@ This leaves normal clients unchanged and allows Pub/Sub clients to buffer up to 
 - `redis.exceptions.ConnectionError: max number of clients reached` in logs
 - Problem appears to "fix itself" temporarily, then returns
 
-**Why this happens:**
-With `timeout 0`, every Redis connection stays open indefinitely. Over days or weeks, connections from token checks, WebSocket events, and session validations accumulate. Once `maxclients` is reached, no new connections can be made, and authentication fails completely.
-
 **To check your current connection count:**
 ```bash
 redis-cli INFO clients | grep connected_clients
@@ -8972,17 +8730,6 @@ Set `REDIS_HEALTH_CHECK_INTERVAL` to a value **shorter** than both:
 - Any firewall or load balancer idle timeout on the path to Redis
 
 A typical value is `60` (seconds). This keeps actively-used pooled connections warm (the PING resets the server's idle timer) while still allowing the Redis server to reap truly orphaned connections via its `timeout` setting.
-
-:::
-
-:::info How it works
-
-When enabled, redis-py performs a lightweight `PING` on checkout for any connection that has been idle longer than the configured interval. This serves two purposes:
-
-1. **Detects dead connections**: stale sockets are identified and replaced before your application code runs a command on them
-2. **Keeps active connections alive**: the PING resets the Redis server's per-connection idle timer, preventing the server from reaping connections that are still in the pool
-
-Without this setting, if your Redis server has a `timeout` configured (recommended to prevent connection exhaustion), the first request that grabs a reaped socket from the pool will fail with a `ConnectionError`.
 
 :::
 
@@ -9170,7 +8917,7 @@ Each worker is a full Open WebUI process that holds its own copy of any local mo
 
 - Type: `bool`
 - Default: `True`
-- Description: Whether the websocket server negotiates per-message compression with the browser. Chat responses arrive as one very small frame per token, and compressing each of them costs CPU for every subscriber while saving almost nothing. Setting this to `false` declines the compression extension, so frames go out uncompressed. The large frames that did benefit, a finished message or a set of sources, are only a few hundred kilobytes even for a very long reply, which any network carries without a noticeable delay. Worth turning off on instances under heavy streaming load.
+- Description: Set to `false` to skip per-message websocket compression on instances under heavy streaming load.
 - Persistence: No
 
 ### Cache Settings
@@ -9239,7 +8986,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections, including the terminals of [Tether computers](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections, including the terminals of [Tether computers](/ecosystem/tether). Set to `False`, no external tool connection is loaded or called. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 

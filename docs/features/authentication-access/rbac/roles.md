@@ -68,21 +68,10 @@ Administrators can change a user's role at any time via **Admin Panel > Users**.
 
 ### When a Role Change Takes Effect
 
-A role change ends that account's live WebSocket connections straight away, whichever route the change arrived by:
-
-*   **Admin Panel > Users**, or the user update API behind it.
-*   A SCIM directory sync, including the `active` flag that maps to the `user` and `pending` roles (see [SCIM 2.0](/features/authentication-access/auth/scim)).
-*   An OAuth or OIDC sign-in with [OAuth Role Management](/features/authentication-access/auth/sso#oauth-role-management) enabled.
-*   A sign-in carrying the [trusted role header](/features/authentication-access/auth/sso#role-management).
-
-Deleting an account ends its live connections in the same way.
-
-In a multi-replica deployment with [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager), connections are found through the shared session pool and dropped on whichever replica is holding them, not only on the replica that handled the change.
-
-The browser reconnects on its own and re-authenticates, so the features that run over that connection (channels, collaborative note editing) act on the new role instead of the one cached when the connection opened. REST API calls read the account from the database on every request, so a demoted admin loses the admin-only endpoints on their very next call regardless.
+A role change takes effect on the next request, whichever route it arrived by (Admin Panel, SCIM sync, OAuth role management or the trusted role header).
 
 :::note A role change does not revoke the person's token
-They stay signed in and keep browsing under the new role. Demotion to `pending` does lock them out, because `pending` accounts are refused on every API request and on the WebSocket handshake. To end their sessions as well, use [Sign out all devices](#signing-a-user-out-of-every-device).
+They stay signed in and keep browsing under the new role. Demotion to `pending` locks them out, because `pending` accounts are refused on every request. To end their sessions as well, use [Sign out all devices](#signing-a-user-out-of-every-device).
 :::
 
 ## Signing a User Out of Every Device
@@ -105,11 +94,6 @@ The primary administrator has one small piece of extra protection. The interface
 
 This is a convenience safeguard, not a security boundary. All administrators share full control of the system, so any administrator can still change or remove any account, including the primary one, at the data layer.
 
-### Swapping the Primary Administrator
-
-Sometimes the primary administrator legitimately needs to change, for example when the person who first set up the deployment leaves the organization. Because the role is decided purely by creation timestamp, the primary administrator is whichever administrator account is oldest, so reorganizing or removing accounts at the database level changes which one is treated as primary.
-
-This is deliberately a data-layer operation rather than a one-click button, so that changing the founding account stays an intentional, considered action. Back up your database before making the change, and perform it while the instance is idle. We do not list exact queries here because the database schema evolves between releases; work against your current schema, and reach out on our community channels if you need guidance for your version.
 
 ## Headless Admin Account Creation
 

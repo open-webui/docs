@@ -45,7 +45,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 | `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`       | `false`            | Merge OAuth logins based on matching email (caution: can be insecure if provider doesn't verify emails). |
 | `OAUTH_UPDATE_PICTURE_ON_LOGIN`       | `false`             | Update user profile pictures from OAuth provider with each login. |
 | `OAUTH_PICTURE_CLAIM`                 | `picture`          | Field in the claim containing the profile picture. Set to empty string to disable picture updates (users receive default icon). A picture the provider serves compressed also falls back to the default icon.|
-| `ENABLE_PROFILE_IMAGE_URL_FORWARDING` | `true`             | Does not affect SSO avatars: the OAuth flow downloads the IdP picture and stores it as a `data:` URI (or `/user.png`), so no IdP URL lands in `profile_image_url`. It governs URLs users set themselves. When `true`, the backend issues a `302` redirect from `/api/v1/users/{id}/profile/image` to an external URL stored in `profile_image_url`. Each browser then loads the avatar directly from that origin, leaking client IP, User-Agent, and Referer headers. Set to `false` to suppress the redirect; the IdP-supplied URL is still stored, but Open WebUI serves the bundled default image instead. **Recommendation:** disable unless your IdP returns avatars as `data:` URIs (which Open WebUI persists locally and is unaffected) or you accept the leak in exchange for showing IdP-hosted avatars. See [`ENABLE_PROFILE_IMAGE_URL_FORWARDING`](/reference/env-configuration#enable_profile_image_url_forwarding) for full semantics. |
+| `ENABLE_PROFILE_IMAGE_URL_FORWARDING` | `true`             | When `true`, each browser loads user-set external avatar URLs directly from that origin, leaking client IP, User-Agent and Referer headers. Set to `false` to serve the bundled default image instead. SSO avatars are unaffected. See [`ENABLE_PROFILE_IMAGE_URL_FORWARDING`](/reference/env-configuration#enable_profile_image_url_forwarding) for full semantics. |
 | `WEBUI_AUTH_SIGNOUT_REDIRECT_URL`     | *empty*            | Redirect users to this URL after signout. E.g., `https://your-company.com/logout-success`                                      |
 | `WEBUI_SECRET_KEY`                    | *empty*            | MUST be set, especially in clustered environments. Otherwise session issues and weird OAuth issues will occur                 |
 | `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`  | `WEBUI_SECRET_KEY` | A secret key for encrypting OAuth tokens stored on the server. Must be shared across all instances in a cluster. |
@@ -74,11 +74,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 
 ### Read-only OAuth settings in the Admin Panel
 
-`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only:
-
-- All values remain visible, and the section is dimmed with every field and switch inert, including the **OAuth / OIDC** master toggle.
-- A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.
-- Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
+`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only, and saving the Authentication page leaves the OAuth settings untouched.
 
 Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. Changes to the provider connection settings (such as the provider URL, client ID and secret, redirect URI and scopes) take effect once every Open WebUI instance has been restarted. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
 
@@ -86,17 +82,9 @@ Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have 
 
 ### Server-Side OAuth Session Management
 
-To solve issues related to large tokens (e.g., with AD FS group claims exceeding cookie size limits) and to enable automatic token refreshing, Open WebUI now supports a robust server-side session management system.
+To solve issues related to large tokens (for example AD FS group claims exceeding cookie size limits) and to enable automatic token refreshing, Open WebUI stores the encrypted token payload server-side and gives the browser a single small `httponly` session cookie. Multiple concurrent sessions are supported per user per provider, limited by `OAUTH_MAX_SESSIONS_PER_USER` (default: 10). When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), Open WebUI automatically refreshes expired tokens with the stored `refresh_token`.
 
-**How It Works:**
-
-1. **Server-Side Storage:** Instead of storing large `access_token` and `id_token` values in browser cookies, the entire token payload is now encrypted and stored securely in the Open WebUI database in a new `oauth_session` table.
-2. **Secure Session Cookie:** The user's browser is sent a single, small, and secure `httponly` cookie named `oauth_session_id`. This cookie acts as an opaque identifier, containing no sensitive information itself.
-3. **Multi-Device Support:** Multiple concurrent sessions are supported per user per provider. Logging in from a second device (e.g., mobile) does **not** invalidate the first device's session. To prevent unbounded session growth, a configurable limit (`OAUTH_MAX_SESSIONS_PER_USER`, default: 10) prunes the oldest sessions when exceeded.
-4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures. When several requests hit an expiring token at once, it is refreshed only once: with Redis configured, a per-session lock covers every worker and replica, and without Redis the lock covers one process. This keeps sessions working with providers that rotate refresh tokens, which reject the second refresh.
-5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
-
-**When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning is logged. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
+**When a provider does not say when the token expires:** the token is assumed to last an hour if the response includes a refresh token, and is treated as non-expiring otherwise.
 
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
@@ -253,20 +241,13 @@ The following environment variables are used:
 
 :::
 
-:::info Providers that add their own parameters to the ID token
-
-Some providers add a vendor-specific parameter of their own to the header of the ID token they issue. Open WebUI ignores parameters it does not recognize there, so sign-in through such a provider completes normally, and the token's signature and signing algorithm are still verified as before.
-
-Earlier versions rejected the whole token instead, so the login ended at the callback with `The email or password provided is incorrect` in the browser and `Unsupported {'app_id'} in header` in the server log. If you see that pair, update Open WebUI.
-
-:::
 
 :::tip Community Workaround: Multi-Provider OAuth
 If you need to support both Microsoft and Google simultaneously, check out our **[Dual OAuth Configuration Tutorial](/tutorials/auth-sso/dual-oauth-configuration)**. 
 :::
 ### OAuth Role Management
 
-Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. On the [token exchange endpoint](/reference/env-configuration#enable_oauth_token_exchange), once the provider's userinfo endpoint has accepted the presented access token, Open WebUI decodes that token without verifying its signature and reads the roles claim from it when userinfo lacks one. If `OAUTH_ALLOWED_ROLES` restricts roles (no `*`) and neither source has a readable roles claim, the exchange is refused with `403`.
+Any OAuth provider that can be configured to return roles in the ID token or the userinfo response can be used to manage roles in Open WebUI. Open WebUI reads the ID token claims merged with the userinfo response. On the [token exchange endpoint](/reference/env-configuration#enable_oauth_token_exchange), Open WebUI also reads the roles claim from the presented access token when userinfo lacks one. If `OAUTH_ALLOWED_ROLES` restricts roles (no `*`) and neither source has a roles claim, the exchange is refused with `403`.
 To use this feature set `ENABLE_OAUTH_ROLE_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the roles returned by the OAuth provider:
 
@@ -342,7 +323,6 @@ For example, setting `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` and passing 
 Optionally, you can also define the `WEBUI_AUTH_TRUSTED_NAME_HEADER` to determine the name of any user being created using trusted headers. This has no effect if the user already exists.
 If `WEBUI_AUTH_TRUSTED_NAME_HEADER` is not set, the email address is used as user name.
 
-The account created on a person's first request is protected by the unique email constraint, so several requests arriving together for someone who has never signed in before all resolve to the same account: the request that loses the race re-reads the account by email instead of failing. Previously each of those requests could create its own, leaving duplicate users for the same person, which is a realistic way for a first visit to begin when a page loads several resources at once.
 
 #### Group Management
 

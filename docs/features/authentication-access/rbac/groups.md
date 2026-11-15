@@ -70,8 +70,6 @@ Inheritance applies everywhere Open WebUI checks group membership: resource acce
 
 *   **Parent group**: In the group editor's **General** tab, pick a parent from the **Parent group** dropdown, or **No parent** for a top-level group. You can also choose the parent when creating a group.
 *   **Drag and drop**: In **Admin Panel > Users > Groups**, the list shows the hierarchy as a tree. Drag a group onto another to make it a subgroup, or onto **Move to top level** to take it out of its parent. Each group with subgroups has an arrow to expand or collapse them.
-*   **Search**: The search box matches the full path (for example `Engineering / Backend`) and keeps the parents of every match visible.
-*   **Loops are blocked**: The **Parent group** dropdown and the drag targets offer only groups outside the group's own branch, and the server rejects a move under the group itself or one of its subgroups.
 
 ![The groups list showing the hierarchy as a tree: Staff with Engineering and Sales inside it, and Platform inside Engineering](/images/features/auth/nested-groups-tree.webp)
 
@@ -80,7 +78,7 @@ Inheritance applies everywhere Open WebUI checks group membership: resource acce
 The member count in the group list counts **direct members**, the people added to that group itself. A **Direct** / **Inherited** dropdown in the group editor's **Users** tab switches between two member tables:
 
 *   **Direct**: the people added to this group. Add and remove them here.
-*   **Inherited**: the people in its subgroups, who share this group's access. The **Inherited via** column names the subgroup each person comes through, with a link to it, and the table is searchable and paged at 30 people. Manage these people in the subgroup they were added to.
+*   **Inherited**: the people in its subgroups, who share this group's access. Manage them in the subgroup they were added to.
 
 ![The Users tab of the Engineering group set to Inherited, listing a member with the Inherited via path Staff / Engineering / Platform](/images/features/auth/group-inherited-members.webp)
 
@@ -98,7 +96,7 @@ Changing a group's members, permissions, parent or default models, or deleting i
 
 ## Default Models per Group
 
-The **Default models** field in the group editor's **General** tab sets the models the group's members start a new chat with. For those members they replace the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin). Leave the field empty, or click **Inherit**, to keep what applies above: the editor then shows the default models of the nearest parent group that sets some, or the global defaults, and where they come from.
+The **Default models** field in the group editor's **General** tab sets the models the group's members start a new chat with. For those members they replace the instance's [Selected Models](/features/workspace/models#selected-and-pinned-models-admin). Leave it empty to inherit from the parent group or the global defaults.
 
 ![The General tab of the Platform group, with Engineering as its parent group and its own default model set next to Inherit](/images/features/auth/group-default-models.webp)
 
@@ -107,27 +105,23 @@ When a user's groups set different default models, including groups they inherit
 *   The group deepest in the hierarchy wins, so a subgroup's choice beats its parent's.
 *   Between groups at the same depth, the group created first wins.
 
-A user's own default model, saved with **Set as default** in the model selector, still comes first. Hidden models and models the user cannot access are dropped from the winning group's list, and when none remain the user gets the instance's Selected Models. Group default models also decide the starting model in Notes and the Playground. The full order is listed in [How a selected model resolves for a user](/features/workspace/models#how-a-selected-model-resolves-for-a-user).
+A user's own default model, saved with **Set as default** in the model selector, still comes first. The full order is listed in [How a selected model resolves for a user](/features/workspace/models#how-a-selected-model-resolves-for-a-user).
 
 ## Assigning Permissions to Groups
 
 When editing a group, you can toggle specific permissions.
 *   **Default State**: By default, a group grants *no* extra permissions; members rely on the global defaults.
 *   **Granting Access**: Toggling a permission (e.g., "Web Search") to **ON** for a group means all members get that feature, even if it's disabled globally. Members of its subgroups get it too.
-*   **Instance-wide features**: Toggles such as Web Search, Channels, Notes, API Keys and Allow Rate Response only show while that feature is on for the whole instance. A hidden toggle keeps its saved value and applies again once the feature is back on (see [Permissions](./permissions.md#permission-categories)).
+*   **Instance-wide features**: Toggles for features that are switched off instance-wide are hidden (see [Permissions](./permissions.md#permission-categories)).
 
 ## Resource Access (RBAC)
 
 You can restrict access to specific objects (like a proprietary Model or sensitive Knowledge Base) using Groups or individual user grants.
 
-1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**. On resources you can edit, **Access** in the **⋯** menu of the **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists opens the same settings. Non-admins see the **Access** button and menu entry only with the matching [sharing permission](/features/authentication-access/rbac/permissions#2-sharing-permissions).
+1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**, then open **Access** to grant groups or users. Non-admins see **Access** only with the matching [sharing permission](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once. A grant to a group also reaches the members of its subgroups.
 
-The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.** instead of leaving a **Users** heading above an empty list.
-
-Their row in the **Access List** is where you change what someone already has. Each row carries the level (a **Read**/**Write** selector on resources that accept write grants, a **Read** badge on the ones that do not) and an **✕** that removes the grant.
-
-Deleting a group deletes its access grants. Grants left behind by groups deleted on earlier versions show in the access list under the group's ID, with no member count, so you can remove them with **✕**.
+Deleting a group deletes its access grants.
 
 Deleting a user in **Admin Panel > Users** (or through [SCIM](/features/authentication-access/auth/scim)) removes that user from every access list they were on, so the list shows no leftover rows for the deleted account.
 
@@ -145,24 +139,12 @@ Two kinds of resource share the same access control dropdown, and **Private** wi
 
 ### Combining Public with the Access List
 
-**Public** is stored as one more grant: read access for every signed-in user. Choosing Public or Private in the dropdown adds or removes only that grant. Rows in the access list stay where they are, so switching a resource back to Private later makes the rows take effect again at once.
-
-The rows behave like this on a Public resource:
-
-*   A **Read** row adds nothing while the resource stays Public, since everyone already has read access. It matters again the moment you switch back to Private.
-*   A **Write** row is the useful combination: everyone can view and use the resource, and that user or group can also update or delete it. Choosing Write on a row stores read and write together.
-*   **Allow public write access**, on resources that offer it, stores write access for every signed-in user. With it on, the rows add nothing, but they stay for the day you switch it off.
+**Public** adds read access for every signed-in user. Existing access list rows stay and apply again when the resource is switched back to Private. A **Write** row on a Public resource lets that user or group also update or delete it, and **Allow public write access**, on resources that offer it, grants write access to every signed-in user.
 
 Public means every signed-in user. It does not open the resource to visitors without an account.
 
 ### Access Grant System
-At a deeper level, resource access is managed through normalized **access grants** stored in the database. Each grant specifies:
-
-*   **Resource**: The type and ID of the resource (e.g., a specific model or knowledge base).
-*   **Principal**: Who receives access, either a **group** or an **individual user**.
-*   **Permission**: The level of access, `read` or `write`.
-
-For example, granting the "Marketing" group read access and a specific editor user write access to a model would create two separate grant entries. Public access is represented by a user grant with a wildcard (`*`) principal.
+Each grant gives a group or an individual user one of two levels of access to a resource:
 
 *   **Read**: Users can view and use the resource.
 *   **Write**: Owner-equivalent access to that resource. Users can update or delete it, and manage its access list, which includes sharing it onward with other users and groups. Sharing onward is still limited by that user's own [sharing permissions](/features/authentication-access/rbac/permissions#2-sharing-permissions). Channels, calendars and folders are the exception: only their owner or an admin changes who has access. Grant write only to people you would trust with the resource as if it were their own.

@@ -81,11 +81,7 @@ Open WebUI's SCIM implementation supports the following operations:
 
 #### PATCH operations
 
-`add`, `replace` and `remove` are all applied. An operation either names a `path`, or carries an attribute object with no path, in which case every attribute in that object is applied in turn. `remove` requires a path and covers `externalId`, which it clears.
-
-The paths Open WebUI acts on are `userName`, `displayName`, `name.formatted`, `emails[primary eq true].value`, `active` and `externalId`.
-
-A request that asks for something outside that surface is answered with a SCIM error and changes nothing, since every operation is validated before anything is written: `invalidValue` for a value of the wrong type, `invalidPath` for an attribute that is not listed above, `mutability` for removing anything other than `externalId`, and `noTarget` for a `remove` with no path.
+`add`, `replace` and `remove` are applied to these attributes (`userName`, `displayName`, `name.formatted`, `emails[primary eq true].value`, `active` and `externalId`, which `remove` clears). Anything else is rejected with a SCIM error and changes nothing.
 
 :::info Only externally provisioned accounts are visible over SCIM
 Every user operation is scoped to accounts that arrived through an identity provider, meaning those created by SCIM itself or by an OAuth or OIDC sign-in. An account created locally, such as the first administrator or anyone added by hand, is not returned by a listing and is not addressable by id, so a read, update or delete against it answers `404`.
@@ -96,7 +92,7 @@ This keeps the identity provider's view limited to the accounts it owns. A local
 
 :::info Deprovisioning ends live sessions
 
-The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `pending`, `active: true` sets it back to `user`. Because that is a role change, Open WebUI ends the account's live WebSocket connections as soon as the SCIM update lands, and a `pending` account is then refused on both the API and the WebSocket handshake. Deleting a user through SCIM ends their live connections the same way. An admin account keeps its role whatever `active` says, so a sync cannot demote it. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
+The `active` flag maps onto Open WebUI roles: `active: false` sets the role to `pending`, `active: true` sets it back to `user`, and a `pending` account is refused on the API. An admin account keeps its role whatever `active` says, so a sync cannot demote it. See [When a Role Change Takes Effect](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect).
 
 :::
 
@@ -134,34 +130,11 @@ GET /api/v1/scim/v2/Users?filter=externalId eq "abc-123"
 GET /api/v1/scim/v2/Groups?filter=displayName eq "Engineering"
 ```
 
-Supported filter operators:
-- `eq`: Equals
-- `ne`: Not equals
-- `co`: Contains
-- `sw`: Starts with
-- `ew`: Ends with
-- `pr`: Present (has value)
-- `gt`: Greater than
-- `ge`: Greater than or equal
-- `lt`: Less than
-- `le`: Less than or equal
+Standard SCIM filter operators are supported.
 
 ## externalId and Account Linking
 
-When `SCIM_AUTH_PROVIDER` is configured, Open WebUI stores `externalId` values in a per-provider structure within the user's `scim` JSON field:
-
-```json
-{
-  "microsoft": { "external_id": "abc-123" },
-  "okta": { "external_id": "def-456" }
-}
-```
-
-This enables several behaviors:
-
-- **User lookup by externalId**: When an identity provider sends a `filter=externalId eq "..."` request, Open WebUI searches the `scim` field for a matching entry under the configured provider.
-- **OAuth fallback**: If no user is found by `externalId`, Open WebUI falls back to matching against OAuth `sub` values, automatically linking SCIM-provisioned accounts with existing OAuth-authenticated users.
-- **Create and update**: When creating or updating users via SCIM, the `externalId` is stored in the `scim` field and returned in subsequent responses.
+When `SCIM_AUTH_PROVIDER` is configured, Open WebUI stores `externalId` values per provider, looks users up by `externalId` and falls back to matching OAuth `sub` values, which links SCIM-provisioned accounts with existing OAuth-authenticated users.
 
 :::warning
 
