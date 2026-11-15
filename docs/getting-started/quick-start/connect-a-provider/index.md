@@ -52,6 +52,43 @@ You need a running Open WebUI instance, administrator access, a reachable local 
 
 The selected endpoint determines where inference happens. Selecting a cloud model sends the prompt and included context to that provider; comparing models sends the prompt to each selected endpoint. Local inference does not make separately configured cloud tools, extraction, or embedding services local. See [Chat Data Privacy & Encryption](/security/chat-data-privacy-and-encryption) when choosing providers for sensitive content.
 
+## Choose the Right Connection Settings
+
+Most providers work with a URL and an API key. A few need one extra choice in the connection dialog so Open WebUI knows what sits on the other end. Add Ollama servers under **Manage Ollama API Connections** and everything else under **Manage OpenAI API Connections** in **Admin Settings > Connections**, then use the table to see which settings your provider needs.
+
+![Add Connection dialog with a URL and an API key filled in](/images/getting-started/quick-start/connection-dialog.png)
+
+| You connect | Add it under | Settings to change |
+|---|---|---|
+| **Ollama** | Ollama connections | URL only. Open WebUI recognises Ollama on its own. See [Starting with Ollama](/getting-started/quick-start/connect-a-provider/starting-with-ollama). |
+| **OpenAI, Anthropic, Gemini, Mistral, Groq, OpenRouter, xAI, vLLM and other OpenAI-format servers** | OpenAI connections | URL and API key. Leave **Provider** on **Default**. |
+| **DeepSeek (hosted API)** | OpenAI connections | URL and API key, then **Advanced > Provider > llama.cpp**. DeepSeek's thinking mode needs its earlier reasoning sent back with every tool turn, and the llama.cpp setting is the one that sends it. |
+| **Azure OpenAI** | OpenAI connections | **Provider > Azure OpenAI**, an **API Version** and your deployment names under **Model IDs**. Open WebUI also switches to Azure mode on its own for Azure-looking URLs. |
+| **llama.cpp server** | OpenAI connections | **Provider > llama.cpp** to manage models from Open WebUI. See [Starting with llama.cpp](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp). |
+| **LM Studio** | OpenAI connections | **Provider > LM Studio** to manage models from Open WebUI. |
+| **LiteLLM proxy** | OpenAI connections | **Provider > LiteLLM**, which passes requests that arrive at Open WebUI's own Anthropic Messages endpoint straight on to LiteLLM. |
+| **A provider that offers the Responses API** | OpenAI connections | **API Type > Responses**. See [Open Responses](/getting-started/quick-start/connect-a-provider/starting-with-open-responses). |
+
+The **Provider** setting names the format of the requests Open WebUI sends. The llama.cpp option carries that name because llama.cpp introduced the format, and any server that speaks it can use the option, including DeepSeek's hosted API. **Default** sends plain OpenAI format, which every OpenAI-compatible server accepts. The [Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting) section lists everything each option switches on, and [How Reasoning Is Sent Back](/features/chat-conversations/chat-features/reasoning-models#how-reasoning-is-sent-back) shows which provider sends reasoning back in which field.
+
+To change it, open **Admin Settings > Connections**, click the gear icon next to the connection (or **+** for a new one), expand **Advanced** and pick the option from **Provider**. Save the dialog and the connection list. The dropdown shows on OpenAI connections only.
+
+![The Advanced section of a connection with Provider set to llama.cpp](/images/getting-started/quick-start/connection-provider-setting.png)
+
+The other settings in the dialog:
+
+| Setting | What it does |
+|---|---|
+| **Connection Type** | Labels the connection **Local** or **External**. The model selector uses the label for its Local and External filters. |
+| **Auth** | **Bearer** sends your API key. **None** calls the server without a key. **Session**, **OAuth** and **Entra ID** forward the signed-in user's credentials or an Azure identity. |
+| **API Type** | **Chat Completions** is the default. **Responses** switches the connection to the Responses API. |
+| **Forward cookies** | Sends the cookies of the Open WebUI request on to this server. |
+| **Headers** | Extra request headers in JSON format. |
+| **Prefix ID** | Adds a prefix to every model ID of this connection, so two connections that offer the same model name stay apart. |
+| **Model IDs** | A list of the models to show. Leave it empty to show every model the server reports. |
+
+---
+
 ## Cloud Providers
 
 Hosted APIs that require an account and API key. No hardware needed.
