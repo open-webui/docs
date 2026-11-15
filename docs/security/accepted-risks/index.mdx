@@ -17,15 +17,16 @@ Each entry records what the risk is, what we changed to shrink it, why the remai
 
 ## Why we accept these
 
-Accepting a residual risk is a deliberate engineering decision, not an oversight. A weakness is listed here only when both of the following hold:
+Accepting a residual risk is a deliberate engineering decision, not an oversight. A weakness is listed here only when all of the following hold:
 
-- The **exploitable portion has been addressed**, either as far as application-level code allows or through a control the operator can apply, and the **residual that remains is bounded**, either because it is not reliably exploitable in practice, or because it exists only where an operator has deliberately enabled the affected feature, leaving default deployments unaffected.
+- The **exploitable portion has been addressed**, as far as application-level code allows or through a control the operator can apply.
+- The **residual that remains is bounded**: it is not reliably exploitable in practice, or it exists only where an operator has deliberately enabled the affected feature, so default deployments are unaffected.
 - **Eliminating that residual is not warranted**, for at least one of the following reasons:
   - it is **not technically fixable** by us, arising from the language, runtime, operating system, CPU or network rather than from Open WebUI's own logic; or
   - a further fix would carry a **real and disproportionate cost**, degrading or removing functionality that users legitimately depend on, or harming performance or correctness, in exchange for a marginal or illusory security benefit; or
   - a further fix would bring **no security benefit**, because the residual already fails closed and grants nothing to anyone.
 
-In either case we document the residual and its limit explicitly, rather than implying a guarantee that cannot, or should not, be made.
+In every case we document the residual and its limit explicitly, rather than implying a guarantee that cannot, or should not, be made.
 
 ---
 
