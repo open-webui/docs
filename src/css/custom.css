@@ -32,8 +32,8 @@
 		"IBM Plex Sans", -apple-system, blinkmacsystemfont, "Segoe UI", roboto,
 		"Helvetica Neue", arial, sans-serif;
 	--ifm-font-family-monospace:
-		"IBM Plex Mono", ui-monospace, "SFMono-Regular", "Menlo", "Monaco", "Consolas",
-		monospace;
+		"IBM Plex Mono", ui-monospace, "SFMono-Regular", "Menlo", "Monaco",
+		"Consolas", monospace;
 	--ifm-heading-font-family: var(--ifm-font-family-base);
 	--ifm-font-size-base: 15px;
 	--ifm-line-height-base: 1.65;
