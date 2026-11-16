@@ -657,7 +657,7 @@ ENABLE_FUNCTIONS=false
 ENABLE_TOOL_SERVERS=false
 ```
 
-This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers and Open Terminal connections from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers, Open Terminal connections, Tether terminals and Tether tool servers from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
 
 ### Code execution
 
