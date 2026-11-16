@@ -25,7 +25,7 @@ Users often encounter the term "Tools" in different contexts. Here is how to dis
 | :--- | :--- | :--- | :--- |
 | **Native Features** | Admin/Settings | Core platform functionality (these are the [built-in system tools](#built-in-system-tools-nativeagentic-mode)) | Built-in to Open WebUI |
 | **Workspace Tools** | `Workspace > Tools` | User-created or community Python scripts, **the most powerful, least restricted option** | [Community Library](https://openwebui.com/search) |
-| **Native MCP (HTTP)** | `Settings > Integrations` (admin section) | Standard MCP servers reachable via HTTP/SSE | External tool server |
+| **Native MCP (HTTP)** | `Settings > Integrations` (admin section) | Standard MCP servers reachable via Streamable HTTP | External tool server |
 | **MCP via Proxy (MCPO)** | `Settings > Integrations` (admin section) | Local stdio-based MCP servers (e.g., Claude Desktop tools) | External tool server (via [MCPO Adapter](https://github.com/open-webui/mcpo)) |
 | **OpenAPI Servers** | `Settings > Integrations` (admin section) | Standard REST/OpenAPI web services | External tool server |
 
@@ -51,7 +51,8 @@ These are **Python scripts** that run directly within the Open WebUI environment
 ### 3. MCP (Model Context Protocol)
 
 MCP is an open standard that allows LLMs to interact with external data and tools.
-- **Native HTTP MCP**: Open WebUI can connect directly to any MCP server that exposes an HTTP/SSE endpoint.
+- **Native HTTP MCP**: Open WebUI can connect directly to any MCP server that exposes a Streamable HTTP endpoint.
+- **Tether**: users can connect their own MCP servers through the [Tether](/ecosystem/tether#your-own-connections) app.
 - **MCPO (Proxy)**: Most community MCP servers use `stdio` (local command line). To use these in Open WebUI, you use the [**MCPO Proxy**](../../plugin/tools/openapi-servers/mcp.mdx) to bridge the connection.
 
 ### 4. OpenAPI / Function Calling Servers

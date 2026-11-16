@@ -55,7 +55,7 @@ If you have heard people talk about agent harnesses, agentic workflows, tool use
 | Work on software projects | [Software development](/features/open-terminal/use-cases/software-development) |
 | Analyze documents and data | [Document and data analysis](/features/open-terminal/use-cases/file-analysis) |
 | Build and preview web apps | [Web development](/features/open-terminal/use-cases/web-development) |
-| Use Claude Code, Codex or Pi as chat models | [Coding agents](/features/open-terminal/coding-agents) |
+| Use Claude Code, Codex, Pi, Goose or other coding agents as chat models | [Coding agents](/features/open-terminal/coding-agents) |
 | Automate folders and system tasks | [System automation](/features/open-terminal/use-cases/system-automation) |
 | See more complete workflows | [Advanced workflows](/features/open-terminal/use-cases/advanced-workflows) |
 

@@ -43,15 +43,15 @@ A [note](/features/notes) reaches the model as its full text, while a knowledge 
 
 ## Attaching knowledge and notes
 
-Knowledge bases, notes and single files can be attached to a chat, to a [folder](/features/chat-conversations/chat-features/conversation-organization#attached-knowledge) (for every chat in it) or to a [model](/features/workspace/models). Some pickers label knowledge bases **Collections** (or **Collection** on a single item); that label means a knowledge base.
+Knowledge bases, notes and single files can be attached to a chat, to a [folder](/features/chat-conversations/chat-features/conversation-organization#attached-knowledge) (for every chat in it) or to a [model](/features/workspace/models).
 
 **In a chat:**
 
-- Type `#` in the message input. The list offers **Folders**, **Collections** (knowledge bases) and **Files** (single files from knowledge bases), and accepts a web or YouTube URL.
-- Or click **+** (**More**) and open **Add Context**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**.
+- Type `#` in the message input. The list offers **Folders**, **Knowledge** (knowledge bases) and **Files** (single files from knowledge bases), and accepts a web or YouTube URL.
+- Or click **+** (**More**) and open **Attachments**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**.
 - Or drag a note, folder or chat from the sidebar into the message input.
 
-**On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Models > Edit** (admin section)) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Collections** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
+**On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Models > Edit** (admin section)) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Knowledge** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
 
 **Workspace > Knowledge** lists knowledge bases only. Notes live in [Notes](/features/notes).
 
@@ -316,7 +316,7 @@ While you have unsaved edits, opening another file, closing the preview, deletin
 
 **Search, filter and sort**
 
-The **Search Collection** box above the tree searches the whole knowledge base by file name, and results inside a folder show the folder path next to the name. The filter button next to it offers:
+The **Search Files** box above the tree searches the whole knowledge base by file name, and results inside a folder show the folder path next to the name. The filter button next to it offers:
 
 - **Search file content**: also match the indexed text inside files. Very large files are searched up to a character limit ([`RAG_FILE_CONTENT_SEARCH_MAX_CHARS`](/reference/env-configuration#rag_file_content_search_max_chars)).
 - **All**, **Created by you** or **Shared with you**: limit the list by who added the file.
