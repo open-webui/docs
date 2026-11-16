@@ -207,7 +207,7 @@ Things to know about the auth table:
 
 Things to know about the auth_session table:
 
-- Created by migration `8bc7e5a902d1`. A row is either a session created by a signed-in user or a pending sign-in request that becomes a session once the app completes the sign-in. See [Tether](/ecosystem/tether) for the flow.
+- Created by migration `8bc7e5a902d1`. A row is either a session created by a signed-in user or a pending sign-in request that becomes a session once the app completes the sign-in. See [Tether Client Protocol](/reference/tether-client-protocol) for the sign-in flow.
 - `user_id` carries no foreign key. The relationship to `user` is one-to-many: a user can hold several sessions, one per signed-in app.
 - Indexed on `user_id` and on `expires_at` (`idx_auth_session_user`, `idx_auth_session_expires`).
 - `expires_at` of a pending request is 10 minutes after its creation. Of a session it is [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) after its creation or last token refresh. Expired rows are deleted whenever a new row is created.
