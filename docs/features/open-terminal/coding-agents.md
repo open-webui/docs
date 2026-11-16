@@ -5,9 +5,47 @@ title: "Coding Agents"
 
 # Coding Agents
 
-When the selected Open Terminal lists coding agents, they show up in the model picker next to your regular models. Pick one and the agent works in the terminal's workspace, using the files and tools of that environment. Open WebUI runs Claude Code, Codex, Cursor, Grok, OpenCode, Cline, Gemini CLI and Pi.
+When the selected Open Terminal lists coding agents, they show up in the model picker next to your regular models. Pick one and the agent works in the terminal's workspace, using the files and tools of that environment.
 
 Which agents and models appear depends on the Open Terminal you select. Agents the terminal reports as unavailable are not listed.
+
+For installation, login, and connection steps, start with [Connect an Agent](/getting-started/quick-start/connect-an-agent#quick-start-with-open-terminal).
+
+## Supported Agents
+
+Open Terminal starts the installed CLI through the interface below. Install and authenticate the CLI as the user running the terminal; support for an agent does not mean its executable or credentials are included in every terminal image. The `:agents` Docker image includes Codex and Claude Code.
+
+| Agent | Interface | Executable |
+| :--- | :--- | :--- |
+| **Codex** | Native app-server protocol | `codex` |
+| **Claude Code** | Native streaming JSON protocol | `claude` |
+| **Pi** | Native RPC protocol | `pi` |
+| **Cursor** | ACP | `agent` |
+| **Grok** | ACP | `grok` |
+| **OpenCode** | ACP | `opencode` |
+| **Cline** | ACP | `cline` |
+| **Gemini CLI** | ACP | `gemini` |
+| **Hermes** | ACP | `hermes` |
+| **Antigravity** | ACP | `agy` |
+| **GitHub Copilot** | ACP | `copilot` |
+| **Goose** | ACP | `goose` |
+| **Qwen Code** | ACP | `qwen` |
+
+[Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/introduction) standardizes communication between an agent and its client. These integrations use ACP v1. Open Terminal launches the agent process, while Open WebUI handles its protocol messages for chat output, tool approvals, and session continuation. The other three agents have dedicated protocol adapters.
+
+The available models come from each CLI's discovery response. Features such as reasoning controls and session restoration depend on the agent and its version. Use versions of Open WebUI, Open Terminal, and the CLI that support the desired integration. The [Open Terminal agent reference](https://github.com/open-webui/open-terminal#coding-agents-in-chat) lists launch commands and executable overrides.
+
+## Add Another ACP Agent
+
+Install and configure the agent in the terminal environment first. Then set `OPEN_TERMINAL_ACP_AGENTS` on the **Open Terminal server** to a JSON object containing an ID, display name, and launch command. For example, for an installed Kiro CLI:
+
+```bash
+export OPEN_TERMINAL_ACP_AGENTS='{"kiro":{"name":"Kiro","command":"kiro-cli acp"}}'
+```
+
+Pass the same variable through your container environment if using Docker. Restart Open Terminal to load it, then select the terminal in Open WebUI. Discovered models appear as `acp-kiro/<model>`.
+
+The command must start an ACP v1 agent over standard input/output. It runs with the terminal user's files, environment, and credentials. This setting registers the command; it does not install the agent or complete interactive login. The agent must successfully report models during discovery to appear in the picker.
 
 ## Picking an Agent
 
