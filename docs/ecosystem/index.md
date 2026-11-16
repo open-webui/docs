@@ -27,7 +27,3 @@ Open WebUI is the core AI interface and agent control layer. The ecosystem is th
 - [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync): mirror folders, repos, buckets, wikis, and other sources into Open WebUI Knowledge Bases with incremental sync.
 - [**Open WebUI Tether**](/ecosystem/tether): the desktop companion that connects your own computer to Open WebUI as a terminal and shows desktop notifications.
 - [**Open WebUI Community**](/ecosystem/community): the community platform at openwebui.com, where people share models, prompts, tools, functions, and chats, review models, and rank them by real usage. Models, prompts, tools, and functions import into your instance straight from their posts.
-
-## Being phased out
-
-[Open WebUI Computer](/ecosystem/computer) is being gradually deprecated. Its documentation remains available for existing installations.
