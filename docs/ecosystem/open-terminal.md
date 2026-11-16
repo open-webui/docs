@@ -1,118 +1,61 @@
 ---
 title: "Open Terminal & Terminals"
+description: "Build apps, produce reports, and run coding agents in Open WebUI. Open Terminal gives your AI a computer; Terminals gives each person or project a workspace."
 sidebar_position: 2
 ---
 
-import ThemedImage from '@theme/ThemedImage';
-import useBaseUrl from '@docusaurus/useBaseUrl';
-
 # Open Terminal & Terminals
 
-<ThemedImage
-  alt="Terminal: a screen block with a cursor"
-  sources={{
-    light: useBaseUrl('/images/banners/terminal-light.svg'),
-    dark: useBaseUrl('/images/banners/terminal-dark.svg'),
-  }}
-  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
-/>
+**Give your AI a computer. Get work done in chat.**
 
-**Turn Open WebUI into a full agent harness: the control layer, the action layer, and the feedback loop between them.**
+Ask for a dashboard and open a working app beside your conversation. Give your AI a spreadsheet and get back a report you can send. Bring a codebase and have it make changes, run tests, and fix what fails.
 
-[Open Terminal](/features/open-terminal) is the action layer that completes Open WebUI's harness. Open WebUI already has the model, chat, prompts, knowledge, tools, MCP connections, memory, users, permissions, automations, and workflow controls. Open Terminal adds the computer substrate: files, shell, package manager, running processes, document and data handling, generated artifacts, and live previews.
+**Open Terminal** gives your AI the files, software, browser, and command line to do that work. **Terminals** makes those environments available on demand, with separate workspaces for people and projects or shared ones for collaboration. Both connect directly to Open WebUI.
 
-It gives the model a stateful workspace where it can create, run, inspect, repair, and hand back something usable.
+**[Install Open Terminal](/features/open-terminal/setup/installation)** · **[Deploy Terminals](https://github.com/open-webui/terminals#quick-start)**
 
-Use it when a chat needs more than a text answer: analyze a spreadsheet, write a script, build a small app, render a report, inspect logs, run tests, organize files, or start a server and preview the result. Open WebUI stays the interface; Open Terminal gives the agent a workspace where those results can actually be produced.
+## From an Idea to Something You Can Open
 
-[Terminals](/features/open-terminal/terminals/) is the enterprise orchestrator for Open Terminal. It turns one agent workspace into a managed fleet: separate instances per user, chat or model, controlled images, resource limits, storage, environment variables, sharing and idle cleanup.
+> Build a small dashboard from this CSV. Let me filter by date and category, then start it so I can preview it here.
 
-## The Familiar Words
+Your AI can install dependencies, write the app, start its server, and inspect the output. Open WebUI puts the files, terminal, and preview beside the conversation, so you can try the result and ask for changes where you're already working.
 
-If you have heard people talk about agent harnesses, agentic workflows, tool use, computer use, runtimes, guardrails, and orchestration, this is where Open Terminal and Terminals fit.
+The same loop works for a presentation, a batch of edited images, or an analysis of thousands of rows. The scripts and deliverables are real files: inspect them, download them, and build on them. A persistent workspace lets the next task start with the work you've already done.
 
-| Term people use | What it means here |
-| :--- | :--- |
-| **Agent harness** | Open WebUI plus Open Terminal: control/context/tooling from Open WebUI, real action and observation in Open Terminal |
-| **Agentic workflow** | The model plans, takes an action, observes the result, and keeps going instead of returning one static answer |
-| **Tool use / function calling** | Open WebUI lets the model call tools; Open Terminal gives those tools a real filesystem, shell, and process environment |
-| **Computer use** | The agent works inside a computer-like workspace: files, commands, packages, previews, and generated artifacts |
-| **Agent runtime** | The loop and state around the model; Open Terminal supplies the OS-level action workspace inside it |
-| **Stateful session** | The workspace keeps files, output, processes, and task context around long enough for multi-step work |
-| **Guardrails / human review** | Open WebUI controls the user, model, tool and approval layer; Terminals controls the workspace boundary per terminal |
-| **Orchestration** | Terminals provisions, routes, isolates and cleans up Open Terminal workspaces for teams |
-| **Observability / auditability** | Admins can reason about which user, terminal, workspace, image, limits and lifecycle produced a result |
+![Open WebUI with an Open Terminal workspace and its file browser beside the chat](/images/open-terminal-file-browser.png)
 
-## Start With Open Terminal
+## Use the AI You Want to Work With
 
-| I want to... | Go to |
-| :--- | :--- |
-| Understand the product positioning | [Open Terminal overview](/features/open-terminal) |
-| Install Open Terminal | [Installation](/features/open-terminal/setup/installation) |
-| Connect it to Open WebUI | [Connecting](/features/open-terminal/setup/connecting) |
-| Browse, upload, preview, and edit files | [File browser](/features/open-terminal/file-browser) |
-| Run code and debug scripts | [Code execution](/features/open-terminal/use-cases/code-execution) |
-| Work on software projects | [Software development](/features/open-terminal/use-cases/software-development) |
-| Analyze documents and data | [Document and data analysis](/features/open-terminal/use-cases/file-analysis) |
-| Build and preview web apps | [Web development](/features/open-terminal/use-cases/web-development) |
-| Use Claude Code, Codex, Pi, Goose or other coding agents as chat models | [Coding agents](/features/open-terminal/coding-agents) |
-| Automate folders and system tasks | [System automation](/features/open-terminal/use-cases/system-automation) |
-| See more complete workflows | [Advanced workflows](/features/open-terminal/use-cases/advanced-workflows) |
+Connect a capable local or cloud model through Open WebUI and enable [native tool calling](/features/open-terminal/setup/connecting#8-enable-native-function-calling). Open Terminal gives it somewhere to act on your request, check its work, and try again.
 
-## Scale With Terminals
+Prefer **Claude Code, Codex, Cursor, or Gemini CLI**? Install and authenticate the agent in the terminal environment, then select it in Open WebUI's model picker. Its own agent software runs against your project, with streaming responses, approvals, and conversation continuation in chat. [Connect an Agent](/getting-started/quick-start/connect-an-agent) covers the supported agents and adding others through ACP.
 
-Use Terminals when agent workspaces need to be provisioned, isolated, reused and reset from shared terminals.
+Host the workspace on your own machine or a server and use it through your browser.
 
-| I want to... | Go to |
-| :--- | :--- |
-| Read the Terminals overview | [Terminals overview](/features/open-terminal/terminals/) |
-| Understand the provisioning flow | [Orchestration](/features/open-terminal/terminals/orchestration) |
-| Create and share terminals with their own image, resources, storage and env vars | [Creating terminals](/features/open-terminal/terminals/orchestration/creating-terminals) |
-| Understand env var forwarding and reserved keys | [Environment variables](/features/open-terminal/terminals/orchestration/environment-variables) |
-| Build and roll out custom workspace images | [Custom images](/features/open-terminal/terminals/orchestration/custom-images) |
-| Run on OpenShift | [OpenShift](/features/open-terminal/terminals/orchestration/openshift) |
-| Tune generated system prompts | [System prompts](/features/open-terminal/terminals/orchestration/system-prompts) |
-| Expose a clean file-browser root | [File browser root](/features/open-terminal/terminals/orchestration/file-browser-home-boundary) |
-| Debug APIs and support issues | [API and troubleshooting](/features/open-terminal/terminals/orchestration/api-troubleshooting) |
+## Give Every Project a Place to Work
 
-## How To Think About It
+**Terminals** lets you create and share configured workspaces from Open WebUI. Choose the software, starting folder, and setup script once; Terminals starts the Open Terminal containers as they're needed, on Docker or Kubernetes.
 
-Open WebUI is the control side of the harness: models, chats, prompts, knowledge, users, permissions, automations, tools, approvals, and shared workflows. Open Terminal supplies the missing operating-system-shaped action layer behind the chat.
+For your own work, keep a personal environment across conversations, or give each saved chat its own environment so separate projects have separate files and processes.
 
-That one addition changes what Open WebUI can be used for. A model can move from explaining the next step to taking the next step: create the file, run the command, inspect the failure, fix it, and return the finished artifact.
+For collaborative work, a chat-scoped environment gives authorized collaborators the same files and running environment. Someone can ask for a change and another can inspect the result, with the work and its discussion together.
 
-The agent loop becomes concrete:
+For a team, prepare an analysis environment with your packages and reporting scripts, then share its template with a group. With user scope, each person gets a separate container and persistent files from that setup. Pair the terminal with a model preset's **Default terminal**, and people can select a reporting assistant that already has a place to work. You can also dedicate an environment to a model preset or share one across everyone granted access.
 
-1. Inspect the workspace.
-2. Choose an action.
-3. Create or edit files.
-4. Run code, commands, tools, or servers.
-5. Read the output.
-6. Fix what failed.
-7. Return the artifact.
+People get to work through Open WebUI; operators maintain the templates, access, and resource limits centrally. You can offer a useful assistant to a whole team without setting up a development environment on every laptop.
 
-That is the difference between an answer about the work and an agent doing the work.
+## Make Useful Work Repeatable
 
-For teams, the same model becomes infrastructure:
+Build a reporting script in a personal or shared workspace, then give an Open WebUI [automation](/features/chat-conversations/chat-features/automations) that terminal and working folder. Schedule a prompt to run it against new data and summarize the results. The workspace can serve both interactive work and recurring jobs, using a model or a supported coding agent.
 
-| Layer | Role |
-| :--- | :--- |
-| Open WebUI | Chat, users, permissions, model selection, tools, and the visible workflow |
-| Terminals | Auth, routing, provisioning, lifecycle and cleanup |
-| Open Terminal workspace | Files, shell, processes, packages, code execution, previews, and artifacts |
-| Terminal | Image, limits, storage, env vars, start directory, setup script and instance scope |
+Terminals can stop idle environments while retaining their persisted files, then start them again on demand. Set CPU and memory limits for each template. A workspace can stay available for the next task without keeping its container running all day.
 
-In harness-engineering terms: Open WebUI plus Open Terminal is the full harness, Open Terminal is the computer substrate inside it, and Terminals is the fleet manager for those substrates.
+## Start with One Real Task
 
-## Operate It Safely
+1. **[Install Open Terminal](/features/open-terminal/setup/installation).** Docker gives it a separate container environment; a host installation works with that machine's files and software under the operating-system user's permissions.
+2. **[Connect it to Open WebUI](/features/open-terminal/setup/connecting).** Add its address and API key under **Settings > Admin > Integrations > Open Terminal**.
+3. **Select the terminal in chat and put it to work.** Choose a capable model or installed agent, bring a file or project, and ask for a result you can use.
 
-Open Terminal can run isolated in Docker or directly on a host, depending on how much access the agent should have. Terminals adds shared terminals, lifecycle and separate instances per user, chat or model for shared deployments. Start with the security and configuration pages before giving agents broad filesystem, process or network access.
+For workspaces created on demand, **[deploy Terminals](https://github.com/open-webui/terminals#quick-start)** and create your first template from Open WebUI's **New terminal** menu. For a desktop app that connects your own computer, use [Open WebUI Tether](/ecosystem/tether).
 
-| Need | Go to |
-| :--- | :--- |
-| Security model and deployment boundaries | [Security](/features/open-terminal/advanced/security) |
-| Configuration options | [Configuration](/features/open-terminal/advanced/configuration) |
-| Multi-user setup choices | [Multi-user](/features/open-terminal/advanced/multi-user) |
-| Terminals troubleshooting | [Troubleshooting](/features/open-terminal/terminals/#troubleshooting) |
-
-Terminals requires an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise) for production use. The project lives at [github.com/open-webui/terminals](https://github.com/open-webui/terminals).
+Open Terminal is [MIT licensed](https://github.com/open-webui/open-terminal/blob/main/LICENSE) and also works with your own applications through its REST API. [Terminals](https://github.com/open-webui/terminals/blob/main/LICENSE) is free for personal, non-commercial use; commercial or organizational production use requires an [Open WebUI Enterprise License](/enterprise) with Terminals access.

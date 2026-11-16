@@ -35,7 +35,7 @@ The prompt is appended to the original chat as a message, the chat reloads on it
 
 The system prompt is built again when the timer fires, from the same pieces the original message used: the chat's own system prompt (from **Model controls > Controls** or your **Settings**), the model's system prompt, the chat's variables and the full text of any skills mentioned in the message. The folder's system prompt, tool server and terminal instructions are applied as for any message in the chat.
 
-Tool servers travel with the chat's tool ids, along with the attached files, the terminal connection and the prompt variables. A tool server you added in [Tether](/ecosystem/tether#your-own-connections) resolves only if the Tether device is connected when the timer fires, so keep that in mind for a prompt whose whole job depends on it.
+Tool servers travel with the chat's tool ids, along with the attached files, the terminal connection and the prompt variables. A tool server you added in [Tether](/ecosystem/tether#bring-your-own-models-and-tools) resolves only if the Tether device is connected when the timer fires, so keep that in mind for a prompt whose whole job depends on it.
 
 A timer never interrupts you: if the chat is busy generating when the timer comes due, it waits and fires once the chat is free.
 

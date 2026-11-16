@@ -115,7 +115,7 @@ For Docker deployments, you can configure terminal connections automatically usi
 
 ## Your own terminal (Tether)
 
-Without admin access, add a terminal in the Tether app. It is yours alone and its URL and key stay on your computer. See [Your Own Connections](/ecosystem/tether#your-own-connections).
+Without admin access, add a terminal in the Tether app. It is yours alone and its URL and key stay on your computer. See [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
 
 ---
 

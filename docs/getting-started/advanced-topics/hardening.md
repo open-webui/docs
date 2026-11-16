@@ -144,7 +144,7 @@ JWT_EXPIRES_IN=24h
 
 Setting `JWT_EXPIRES_IN=-1` disables token expiration entirely. Open WebUI will log a warning if this is set.
 
-Native apps such as [Tether](/ecosystem/tether) use renewable sessions instead, which end after [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) without use (default `90d`). Signing out of the app, deleting the session through the API and every account-wide sign-out below revoke such a session at once, with or without Redis.
+Native apps such as [Tether](/ecosystem/tether) use renewable sessions instead, which end after [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) without use (default `90d`). Signing out of the app, deleting the session through the [Session API](/reference/tether-client-protocol#session-api) and every account-wide sign-out below revoke such a session at once, with or without Redis.
 
 ### Token revocation
 

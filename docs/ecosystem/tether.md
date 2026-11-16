@@ -1,78 +1,86 @@
 ---
-title: "Tether"
+title: "Open WebUI Tether"
+description: "Put AI to work on your computer, check the results from your phone, and bring your own models and tools. Download Tether for macOS, Windows, and Linux."
 sidebar_position: 3
 ---
 
-# Tether
+# Open WebUI Tether
 
-Tether is the desktop companion app for Open WebUI, available for macOS, Windows and Linux. It links your own computer to your Open WebUI account, so a chat can work on that computer and your own connections stay private to you.
+**Put your AI to work on your computer, even when you're away.**
 
-Ask a chat to read your files, run commands or build a small project on your machine. The chat can be open in a browser on any device, such as your phone or a work laptop, while the work happens on the computer that runs Tether. In the app you can also add your own OpenAI-compatible connections, tool servers (OpenAPI and MCP) and terminals. Only you see them. The app shows a desktop notification when a chat finishes or fails, a calendar alert fires or a channel message arrives.
+Ask it to turn a folder of exports into a report, fix a bug in your project, or organize your files. Check the result from your phone. Come back to the files it created on your computer.
 
-Use Tether when the AI should work with files or tools on your own computer and Open WebUI runs somewhere else, for example on a server. Every user can set it up for their own account, and the instance needs no extra setup from an admin if it meets the [requirements](#requirements). Terminals that an admin sets up for the whole instance are covered under [Open Terminal](/features/open-terminal).
+Tether is the desktop app that connects your computer to your Open WebUI. It brings your files, tools, and local models into chat, with an optional workspace sandbox to choose where the AI can work.
 
-The project lives at [github.com/open-webui/tether](https://github.com/open-webui/tether). It is free for personal non-commercial use. Commercial or organizational production use needs an [Open WebUI Enterprise License](https://docs.openwebui.com/enterprise).
+**[Download for macOS, Windows, and Linux](https://github.com/open-webui/tether/releases/latest)** · **[Get started](#get-started)**
 
-## Connecting
+## Your Workspace, Within Reach
 
-Everything is set up in the Tether app, on the computer you want to use from your chats.
+Your project already has its dependencies, your documents are in their folders, and your tools are installed. Tether lets your AI work in that environment through **Open Terminal**. Follow the commands, inspect the files, and ask for changes in Open WebUI. You can also use [supported agents such as Claude Code and Codex](/getting-started/quick-start/connect-an-agent) after installing and signing in to them in the terminal environment.
 
-1. Install Tether on that computer from the [releases page](https://github.com/open-webui/tether/releases/latest).
-2. In Tether, enter the address of your Open WebUI instance. For a further instance or account, click **Add connection**. Enter the address the instance ends up on: if `http://` redirects to `https://`, enter the `https://` address.
-3. Tether opens your browser at `/auth/sessions/<id>` on that instance. If you are not signed in yet, you sign in first, with the account you chat with. After sign-in the page returns you to Tether.
-4. Tether offers to install Open Terminal, the part that lets chats work on this computer. Accept it. After **Not now**, you install it later in Tether under **Settings > Open Terminal**.
-5. The terminal indicator in Tether reads **Connected to WebUI**. Tether stays signed in and renews its session in the background.
+Open the same Open WebUI instance on another device, sign in with the same account, and select your computer under **Your devices** in the terminal menu. The work runs on the connected computer. For a team, each person's devices connect to their own account on the shared Open WebUI instance.
 
-## Using Your Computer in a Chat
+Tether connects outward, so you need no inbound port or router forwarding. Keep the computer awake, online, and running Tether. Enable **Run in background** to stay connected when you close its window, and **Browser Notifications** in Open WebUI to hear when a chat finishes or fails. Allow notifications in your operating system too.
 
-Open your instance in any browser, on any device, signed in to the same account as Tether. Click the **terminal button** (cloud icon) in the chat input and pick your computer under **Your devices**. It is listed by its computer name, or by the **Device name** you set in Tether's settings. From there it works like any other terminal, see [Select a terminal in chat](/features/open-terminal/setup/connecting#7-select-a-terminal-in-chat).
+## Ask About What's on Your Screen
 
-The terminal button is shown as soon as you have at least one terminal. If Tether is your only one, the button appears the moment Tether connects and leaves when Tether disconnects.
+An error you don't recognize. A chart you want explained. Something you would otherwise have to describe from scratch.
 
-Each signed-in app is a separate session. Signing out from the app ends its session. A session also ends when it is deleted through the API or when nobody uses it for [`SESSION_EXPIRES_IN`](/reference/env-configuration#session_expires_in) (default `90d`). Access tokens last 15 minutes and every renewal replaces the refresh token.
+Press **Cmd+Shift+I** on macOS or **Ctrl+Shift+I** on Windows and Linux to open **Spotlight** over your current app. Capture a screen region or attach a clipboard image, ask your question, and send it to Open WebUI. Use an image-capable model for screenshots; customize the shortcut in **Tether Settings > General**.
 
-## Your Own Connections
+## Give It a Folder to Work In
 
-In the Tether app you add your own OpenAI-compatible connections, OpenAPI and MCP tool servers and terminals. Open WebUI reaches them through the app, so their commands, URLs and keys stay on your computer and never reach the server. They are listed for your account only and only while Tether is connected.
+Tether's optional **workspace sandbox** lets you start with a defined set of files. Operating-system restrictions limit Open Terminal and its commands to the chosen workspace, temporary storage, and required program files. Sandboxed commands have network access off by default; enable it when the task needs it.
 
-- **Models.** Models from an OpenAI-compatible connection show in your model list and nowhere else, tagged `device name · connection name`. If a shared model has the same id, the shared model is used.
-- **OpenAPI tool servers.** They show under **Your devices** in the **Tools** list of the **+** menu in the chat input.
-- **MCP tool servers.** In the Tether app, under **Settings > Integrations > Tools**, choose **MCP** and connect a server by its web address (Streamable HTTP, the default) or start it as a local command (stdio). A new connection starts off, so enable it. Enabled servers show for you in the **Tools** list of the **+** menu under **Tool Servers**.
-- **Terminals.** They show under **Your devices** in the terminal menu, see [Using Your Computer in a Chat](#using-your-computer-in-a-chat).
+The sandbox runs natively on **macOS and supported Windows devices**, without Docker or a VM. It is **unavailable on Linux**. Under **Tether Settings > Open Terminal > Sandbox**, choose **Restrict file access**, select a folder, and **Apply and restart**. Tether checks the restrictions before starting; wait for **Sandbox active**.
 
-:::warning
-A local command (stdio) MCP server runs with your own account's access on your computer, outside Open Terminal's workspace sandbox. Add only servers you trust.
-:::
+<details>
+<summary>Sandbox scope</summary>
 
-## What the App Gets
+Files inside the workspace can still be changed or deleted. All WebUI connections in that Tether installation share the selected folder. Browser control, desktop control, and direct HTTP access are disabled while sandboxing is active.
 
-- **Your computer as a terminal.** While Tether is connected, your computer appears in your terminal list as `tether:<connection id>`. Only you see it, and only when Tether offers the `open_terminal` service. If the connection drops, an open terminal shows "Connection interrupted. Reconnecting to the same terminal…" and resumes the same terminal once Tether is back. Each connection handles up to 64 active operations at a time.
-- **Notifications.** When a chat finishes or fails, a calendar alert fires or a channel message arrives, the server sends a notification to your connected apps that opted in. They are sent only if you turned on **Browser Notifications** in **Settings > Notifications**.
+Local MCP commands, separately connected terminals, and **Host shell (unrestricted)** are outside this sandbox. A file-browser starting folder alone does not restrict access. See the [sandbox guide](https://github.com/open-webui/tether/blob/main/docs/sandbox.md) for platform and process-lifetime details.
 
-## Requirements
+</details>
 
-- [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is on.
-- Open WebUI runs with one worker, or with [Redis](/reference/env-configuration#redis_url) when [`UVICORN_WORKERS`](/reference/env-configuration#uvicorn_workers) is above 1. Without Redis, a multi-worker instance refuses Tether connections and requests to a Tether terminal fail with "Tether requires Redis with multiple WebUI workers."
-- [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is on, which is the default. It is the switch for every terminal and tool server on the instance, Tether computers included.
-- For your own connections, Open WebUI 0.13.4 or later and Tether 0.1.14 or later. For MCP tool servers, Tether 0.1.16 or later.
-- The computer running Tether reaches the instance's address. Tether opens the connection from the computer to the instance, so the computer needs no open port and no address the instance can reach.
+## Bring Your Own Models and Tools
 
-Access follows the account: every user who can sign in can connect their own computer, and it is listed for that account only.
+Use the model running in Ollama or LM Studio from your Open WebUI. Bring an installed MCP server's tools into chat, or connect an internal service through OpenAPI. Add them in **Tether Settings > Integrations**; Tether reaches them from your computer through its existing connection. Local MCP commands need no separate HTTP bridge. See [MCP setup](https://github.com/open-webui/tether/blob/main/docs/mcp.md).
 
-## Troubleshooting
+For browser work, Open Terminal can use a separate Chrome profile or, with remote debugging enabled and your approval, your running Chrome session. Desktop control is available on supported systems. Both require workspace sandboxing to be off.
 
-If the terminal button or your computer is missing in the chat input, check these in order:
+Integration keys stay on the Tether computer. Prompts, file content, and tool results used in chat still pass through Open WebUI and the model services involved.
 
-| Check | Fix |
-| --- | --- |
-| Tether shows **Running locally · Not connected to WebUI** | Tether is not connected to this instance. Add the instance's address as a connection and sign in. |
-| The browser is signed in to a different account than Tether | Sign in to the same account in both. |
-| Open Terminal is not installed in Tether | Install it in Tether under **Settings > Open Terminal**. |
-| The instance does not offer Tether | An admin brings the instance in line with the [requirements](#requirements). |
-| The **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out | An admin removes `ENABLE_TOOL_SERVERS=False` and `ENABLE_PLUGINS=False` from the instance's environment and restarts it. |
+## Get Started
 
-If the computer is selected and the model does not use it, the model's **Terminal** capability is off. Turn it on in the model editor, see [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
+You need an existing Open WebUI instance and an account.
 
-## For Developers
+1. **[Install Tether](https://github.com/open-webui/tether/releases/latest)** on the computer you want to use.
+2. **Enter your Open WebUI address** and sign in.
+3. **Choose Install and connect** to enable local files and commands. Tether installs Open Terminal for you. Choose **Not now** to use desktop chat without local execution.
+4. **Set your access preferences**, then select the computer under **Your devices** in chat. Choose a capable tool-calling model and open your folder in the [file browser](/features/open-terminal/file-browser).
 
-The sign-in and connection endpoints change often, so they are not documented here. To build a native client, point an AI agent at the Open WebUI backend and the [Tether source](https://github.com/open-webui/tether) and let it read the latest endpoints and specs.
+![Tether connection screen with the Open WebUI address and optional connection name](/images/tether-connect.png)
+
+Try this with a few text documents in your workspace:
+
+> Read these files and create summary.md with a short summary of each one. Include the source filenames and leave the originals unchanged.
+
+Open the result, check it, and ask for the next change.
+
+Personal, non-commercial use is free under the [personal-use exception](https://github.com/open-webui/tether/blob/main/LICENSE). Commercial or organizational production use requires an [Open WebUI Enterprise License](/enterprise).
+
+## Requirements and Help {#requirements}
+
+<details>
+<summary>Connection requirements and troubleshooting</summary>
+
+Use compatible versions of Tether, Open WebUI, and Open Terminal. The instance needs [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) and, for terminal access, [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers). More than one [`UVICORN_WORKERS`](/reference/env-configuration#uvicorn_workers) worker requires [Redis](/reference/env-configuration#redis_url).
+
+If your computer is missing, check that Tether and Open Terminal are running and connected, and that both devices use the same instance and account. If the model does not use it, check its [Terminal capability](/features/workspace/models#capabilities-and-bindings) and [native tool-calling mode](/features/open-terminal/setup/connecting#8-enable-native-function-calling).
+
+For missing models or tools, enable their connections in Tether and confirm the services are reachable from that computer. MCP requires matching relay support and external tools enabled in Open WebUI.
+
+</details>
+
+[GitHub](https://github.com/open-webui/tether) · [Client protocol reference](/reference/tether-client-protocol) · [Report an issue](https://github.com/open-webui/tether/issues)

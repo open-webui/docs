@@ -48,7 +48,7 @@ MCP servers can only be added to the instance by **administrators**, under **Set
 
 An MCP server is far more powerful than an OpenAPI server, which is a stateless HTTP URL exposing a fixed set of declared endpoints. It is stateful and capability-rich (sampling, elicitation, persistent sessions and arbitrary host command execution over stdio transports), and it runs inside Open WebUI's trust boundary with the connecting user's full scope. In practice a malicious or compromised MCP server could execute code and read or exfiltrate data with that user's access, so the capability stays admin-gated. Open WebUI's own MCP support is Streamable HTTP only, but the protocol's privileged nature is why adding one is reserved for admins.
 
-To give users an MCP-backed capability without server-configuration rights, an admin adds the server once and scopes it with **Access Control** to the right users or groups. Users can also add MCP servers for themselves in the [Tether](/ecosystem/tether#your-own-connections) app.
+To give users an MCP-backed capability without server-configuration rights, an admin adds the server once and scopes it with **Access Control** to the right users or groups. Users can also add MCP servers for themselves in the [Tether](/ecosystem/tether#bring-your-own-models-and-tools) app.
 
 ## When to use MCP vs OpenAPI
 
@@ -267,7 +267,7 @@ Native MCP support in Open WebUI is **Streamable HTTP only**. This design choice
 
 Browsers operate within strict **sandboxed and event-driven HTTP constraints**, making long-lived stdio or SSE connections difficult to maintain securely across users and sessions.
 
-Users who run Tether can start a stdio MCP server as a local command on their own computer, see [Tether](/ecosystem/tether#your-own-connections). To bridge those other MCP transports for the whole instance, check out [**mcpo**](https://github.com/open-webui/mcpo), an open-source proxy that translates **stdio or SSE-based MCP servers into OpenAPI-compatible endpoints**. It effectively lets you run traditional MCP tools inside Open WebUI without modifying their transport layer.
+Users who run Tether can start a stdio MCP server as a local command on their own computer, see [Tether](/ecosystem/tether#bring-your-own-models-and-tools). To bridge those other MCP transports for the whole instance, check out [**mcpo**](https://github.com/open-webui/mcpo), an open-source proxy that translates **stdio or SSE-based MCP servers into OpenAPI-compatible endpoints**. It effectively lets you run traditional MCP tools inside Open WebUI without modifying their transport layer.
 
 **Is MCP considered stable here?**
 
@@ -279,4 +279,4 @@ Yes. Many deployments do both.
 
 **Can users add their own MCP servers?**
 
-Only for themselves, through the Tether app, see [Your Own Connections](/ecosystem/tether#your-own-connections). Adding MCP servers to the instance is admin-only (**Settings > Integrations** (admin section)). See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.
+Only for themselves, through the Tether app, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools). Adding MCP servers to the instance is admin-only (**Settings > Integrations** (admin section)). See [MCP servers are admin-only](#mcp-servers-are-admin-only) for the reasoning.

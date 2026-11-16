@@ -74,7 +74,7 @@ Treat that generated value as a starting point, not a password. Replace it with 
 
 Add the Open Terminal connection as an admin. The API key stays hidden on the server, requests go through Open WebUI's backend and you control who has access.
 
-A terminal a user adds in Tether is reached through that user's own computer, see [Your Own Connections](/ecosystem/tether#your-own-connections).
+A terminal a user adds in Tether is reached through that user's own computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
 
 ![The Open Terminal connection in admin settings with the API key masked](/images/open-terminal-connection-masked-key.png)
 

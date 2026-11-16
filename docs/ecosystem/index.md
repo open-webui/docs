@@ -23,11 +23,7 @@ Open WebUI is the core AI interface and agent control layer. The ecosystem is th
 
 ## Projects
 
-- [**Open Terminal & Terminals**](/ecosystem/open-terminal): the action layer that lets the AI work on real files and run commands, plus the enterprise orchestrator that provisions governed workspaces with terminals for images, resources, storage, sharing and cleanup.
+- [**Open Terminal & Terminals**](/ecosystem/open-terminal): build apps, produce reports, and run coding agents in chat. Give people and projects their own persistent workspaces, or share an environment to work together.
 - [**Knowledge Base Sync (oikb)**](/ecosystem/knowledge-base-sync): mirror folders, repos, buckets, wikis, and other sources into Open WebUI Knowledge Bases with incremental sync.
-- [**Tether**](/ecosystem/tether): the desktop companion that connects your own computer to Open WebUI as a terminal, adds your own connections and shows desktop notifications.
+- [**Open WebUI Tether**](/ecosystem/tether): put AI to work with the files and tools on your own computer, choose a workspace sandbox on supported devices, and keep working from another device.
 - [**Open WebUI Community**](/ecosystem/community): the community platform at openwebui.com, where people share models, prompts, tools, functions, and chats, review models, and rank them by real usage. Models, prompts, tools, and functions import into your instance straight from their posts.
-
-## Being phased out
-
-[Open WebUI Computer](/ecosystem/computer) is being gradually deprecated. Its documentation remains available for existing installations.
