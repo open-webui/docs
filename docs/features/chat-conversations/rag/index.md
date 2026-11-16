@@ -43,7 +43,7 @@ This feature is experimental, and its configuration may change between releases.
 
 Instead of uploading and embedding documents inside Open WebUI, you can point a knowledge base at an **external vector database** you already maintain. Open WebUI queries it directly at chat time, so your documents, embeddings and indexing stay in your own store and are never re-ingested.
 
-Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Python client must be present in your Open WebUI image (for example `qdrant-client` or `pymilvus`).
+Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Python client must be present in your Open WebUI image (for example `qdrant-client` or `pymilvus`). Supported Qdrant server versions are listed in the [Qdrant settings](/reference/env-configuration#qdrant).
 
 ### Adding an external knowledge source
 

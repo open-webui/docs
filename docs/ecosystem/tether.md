@@ -7,7 +7,7 @@ sidebar_position: 3
 
 Tether is the desktop companion app for Open WebUI, available for macOS, Windows and Linux. It links your own computer to your Open WebUI account, so a chat can work on that computer and your own connections stay private to you.
 
-Ask a chat to read your files, run commands or build a small project on your machine. The chat can be open in a browser on any device, such as your phone or a work laptop, while the work happens on the computer that runs Tether. In the app you can also add your own OpenAI-compatible connections, tool servers and terminals. Only you see them, and their addresses and keys stay on your computer. The app shows a desktop notification when a chat finishes or fails, a calendar alert fires or a channel message arrives.
+Ask a chat to read your files, run commands or build a small project on your machine. The chat can be open in a browser on any device, such as your phone or a work laptop, while the work happens on the computer that runs Tether. In the app you can also add your own OpenAI-compatible connections, tool servers (OpenAPI and MCP) and terminals. Only you see them. The app shows a desktop notification when a chat finishes or fails, a calendar alert fires or a channel message arrives.
 
 Use Tether when the AI should work with files or tools on your own computer and Open WebUI runs somewhere else, for example on a server. Every user can set it up for their own account, and the instance needs no extra setup from an admin if it meets the [requirements](#requirements). Terminals that an admin sets up for the whole instance are covered under [Open Terminal](/features/open-terminal).
 
@@ -33,26 +33,28 @@ Each signed-in app is a separate session. Signing out from the app ends its sess
 
 ## Your Own Connections
 
-In the Tether app you add your own OpenAI-compatible connections, OpenAPI tool servers and terminals. Open WebUI reaches them through the app, so their URLs and keys stay on your computer and never reach the server. They are listed for your account only and only while Tether is connected.
+In the Tether app you add your own OpenAI-compatible connections, OpenAPI and MCP tool servers and terminals. Open WebUI reaches them through the app, so their commands, URLs and keys stay on your computer and never reach the server. They are listed for your account only and only while Tether is connected.
 
 - **Models.** Models from an OpenAI-compatible connection show in your model list and nowhere else, tagged `device name · connection name`. If a shared model has the same id, the shared model is used.
-- **Tool servers.** They show under **Your devices** in the **Tools** list of the **+** menu in the chat input.
+- **OpenAPI tool servers.** They show under **Your devices** in the **Tools** list of the **+** menu in the chat input.
+- **MCP tool servers.** In the Tether app, under **Settings > Integrations > Tools**, choose **MCP** and connect a server by its web address (Streamable HTTP, the default) or start it as a local command (stdio). A new connection starts off, so enable it. Enabled servers show for you in the **Tools** list of the **+** menu under **Tool Servers**.
 - **Terminals.** They show under **Your devices** in the terminal menu, see [Using Your Computer in a Chat](#using-your-computer-in-a-chat).
 
-:::note
-The public Tether app does not send your own connections to Open WebUI. The computer terminal described above works with it.
+:::warning
+A local command (stdio) MCP server runs with your own account's access on your computer, outside Open Terminal's workspace sandbox. Add only servers you trust.
 :::
 
 ## What the App Gets
 
-- **Your computer as a terminal.** While Tether is connected, your computer appears in your terminal list as `tether:<connection id>`. Only you see it, and only when Tether offers the `open_terminal` service. If the connection drops, an open terminal shows "Connection interrupted. Reconnecting to the same terminal…" and resumes the same terminal once Tether is back. Each connection handles up to 16 active operations at a time.
+- **Your computer as a terminal.** While Tether is connected, your computer appears in your terminal list as `tether:<connection id>`. Only you see it, and only when Tether offers the `open_terminal` service. If the connection drops, an open terminal shows "Connection interrupted. Reconnecting to the same terminal…" and resumes the same terminal once Tether is back. Each connection handles up to 64 active operations at a time.
 - **Notifications.** When a chat finishes or fails, a calendar alert fires or a channel message arrives, the server sends a notification to your connected apps that opted in. They are sent only if you turned on **Browser Notifications** in **Settings > Notifications**.
 
 ## Requirements
 
 - [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is on.
 - Open WebUI runs with one worker, or with [Redis](/reference/env-configuration#redis_url) when [`UVICORN_WORKERS`](/reference/env-configuration#uvicorn_workers) is above 1. Without Redis, a multi-worker instance refuses Tether connections and requests to a Tether terminal fail with "Tether requires Redis with multiple WebUI workers."
-- [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is on, which is the default. It is the switch for every terminal on the instance, Tether computers included.
+- [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is on, which is the default. It is the switch for every terminal and tool server on the instance, Tether computers included.
+- For your own connections, Open WebUI 0.13.4 or later and Tether 0.1.14 or later. For MCP tool servers, Tether 0.1.16 or later.
 - The computer running Tether reaches the instance's address. Tether opens the connection from the computer to the instance, so the computer needs no open port and no address the instance can reach.
 
 Access follows the account: every user who can sign in can connect their own computer, and it is listed for that account only.
@@ -67,7 +69,7 @@ If the terminal button or your computer is missing in the chat input, check thes
 | The browser is signed in to a different account than Tether | Sign in to the same account in both. |
 | Open Terminal is not installed in Tether | Install it in Tether under **Settings > Open Terminal**. |
 | The instance does not offer Tether | An admin brings the instance in line with the [requirements](#requirements). |
-| The **Tools** and **Open Terminal** sections of **Settings > Integrations** (admin section) are greyed out | An admin removes `ENABLE_TOOL_SERVERS=False` and `ENABLE_PLUGINS=False` from the instance's environment and restarts it. |
+| The **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out | An admin removes `ENABLE_TOOL_SERVERS=False` and `ENABLE_PLUGINS=False` from the instance's environment and restarts it. |
 
 If the computer is selected and the model does not use it, the model's **Terminal** capability is off. Turn it on in the model editor, see [Capabilities and bindings](/features/workspace/models#capabilities-and-bindings).
 
