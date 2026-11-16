@@ -26,7 +26,11 @@ With **Native Tool Calling**, the model manages this memory itself as an active 
 
 ## How it Works
 
-The memory system stores snippets of information about you (e.g., "I prefer Python for backend tasks" or "I live in Vienna"). There are two ways these memories are used:
+The memory system stores snippets of information about you (e.g., "I prefer Python for backend tasks" or "I live in Vienna"). Memory records are stored in the Open WebUI database, and their content is also indexed in vector storage using the configured embedding model. Adding a memory or changing its content requires a working embedding model and vector database.
+
+The slim image requires an external embedding engine and PostgreSQL with pgvector for vector storage. If adding or editing a memory returns `Configure PGVECTOR_DB_URL for remote vector storage`, configure the vector database connection. See [What Slim Leaves Out](/getting-started/quick-start#what-slim-leaves-out) and [Switch to an External Vector Database](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database).
+
+There are two ways these memories are used:
 
 ### 1. Manual Management (Settings)
 
