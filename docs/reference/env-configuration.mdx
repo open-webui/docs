@@ -2593,7 +2593,7 @@ Custom headers are honored by OpenAI and Ollama connections, tool servers (OpenA
 
 - Type: `bool`
 - Default: `True`
-- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates.
+- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates. With verification on, the Playwright, Tavily and Microsoft Web IQ loaders skip a site that does not answer within 10 seconds, like a site with an invalid certificate.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
@@ -3720,6 +3720,8 @@ Qdrant is a non-core integration, not maintained by the core Open WebUI team. Fi
 If you want to use Qdrant, be careful when upgrading Open WebUI (crate backups and snapshots for rollbacks) in case internal changes in Open WebUI lead to breakage.
 
 :::
+
+Open WebUI's Qdrant client is compatible with Qdrant servers 1.19 to 1.21. Servers outside that range show a client version warning.
 
 #### `QDRANT_API_KEY`
 
@@ -9219,7 +9221,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
+- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections, Tether terminals and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
 - Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) and the code interpreter, since those are part of Open WebUI itself.
 - Note: this decides whether plugins and tool servers *run*. Some management endpoints stay reachable while it is off, for example deleting a tool or function and saving the tool server list, so treat it as an execution switch, and keep the permission to create Tools and Functions limited to people you trust.
 
@@ -9239,7 +9241,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections, including the terminals of [Tether computers](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections and the terminals and tool servers (OpenAPI and MCP) users add through [Tether](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 
