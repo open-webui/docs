@@ -142,7 +142,8 @@ Controls access to broad platform capabilities.
 | **Encrypted Channels** | Ability to use [encrypted chats](/features/channels/encrypted-chats) in direct messages and private group channels ([`USER_PERMISSIONS_FEATURES_ENCRYPTED_CHANNELS`](/reference/env-configuration#user_permissions_features_encrypted_channels)). Also needs **Channels**. Off by default. |
 | **Folders** | Ability to use folders for organizing chats. |
 | **Web Search** | Ability to use Web Search integration. |
-| **Image Generation** | Ability to use Image Generation tools. On backends that keep only one image model loaded at a time, this also allows changing the instance's active image model; see the note below. |
+| **Image Generation** | Ability to use Image Generation tools. With Model IDs set on an AUTOMATIC1111 connection, this also allows switching the server's loaded model for everyone; see the note below. |
+| **Video Generation** | Ability to use [video generation](/features/chat-conversations/image-generation-and-editing/video-generation) ([`USER_PERMISSIONS_FEATURES_VIDEO_GENERATION`](/reference/env-configuration#user_permissions_features_video_generation)). Off by default. Admins always have it. The switch shows while video generation is enabled. |
 | **Code Interpreter** | Ability to use the Python Code Interpreter. Manual code execution (the **Run** button on code blocks) has no permission of its own; it follows [`ENABLE_CODE_EXECUTION`](/reference/env-configuration#enable_code_execution) for everyone. See [Manual Code Execution](/features/chat-conversations/chat-features/code-execution/python#manual-code-execution-pyodide). |
 | **Memories** | Access to the Memories feature for persistent user context. Taking it away hides the **Personalization** settings tab, blocks the memory API endpoints, withholds the memory tools from the model and stops stored memories being injected into the chat's system context. The injection check runs server-side on every chat request, so a client that still asks for memory does not get it. Admins are always exempt. |
 | **Automations** | Ability for non-admin users to access the Automations page and create, edit, run, pause, or delete their own scheduled automations. Anyone who can edit a folder can also pause the automations that post into it. See [Folders](/features/chat-conversations/chat-features/automations#folders). |
@@ -152,11 +153,9 @@ Controls access to broad platform capabilities.
 
 :::info Image Generation and the Active Model
 
-Some image backends, such as Automatic1111, keep a single image model loaded and generate with whichever one is active, so selecting a model is the same action as switching the loaded one.
+AUTOMATIC1111 keeps a single checkpoint loaded and generates with whichever one is active. When an AUTOMATIC1111 connection has **Model IDs** set, a user who has access to the connection and picks a model that is not the loaded one switches the loaded checkpoint for everyone using that server until it is switched again. Leave **Model IDs** empty to prevent this.
 
-On Automatic1111 that switch is restricted to administrators. A non-admin with **Features > Image Generation** cannot change the instance-wide model: their model selection is ignored and the image is generated on the currently configured checkpoint. Only an administrator's request changes the active model, and when it does, it changes it for everyone until it is changed again.
-
-Backends that accept a model with each request are not affected: a user's choice applies only to their own generation.
+Other connection types accept a model with each request, so a user's choice applies only to their own generation. Which connections a user can use is set by the connection's **Access Control** in [Image Generation](/features/chat-conversations/image-generation-and-editing#set-up-a-connection).
 
 :::
 
