@@ -24,7 +24,7 @@ Add the connection in **Settings > Integrations** (admin section) as described i
 
 ## Create a Terminal
 
-1. Open the terminal menu in the message input (the cloud icon).
+1. Open the terminal menu in the message input (the cloud icon). With **Write** access it shows even before you have a terminal.
 2. Under **Terminals**, click **New terminal**.
 3. Fill in the dialog and click **Create**.
 
@@ -38,6 +38,10 @@ Add the connection in **Settings > Integrations** (admin section) as described i
 | **Advanced** | **Start directory**, **Setup script**, **Image**, **CPU**, **Memory**, **Storage**, **Network** and **Environment variables**. Empty fields use the server default. Values are checked against the server maximums |
 
 A new terminal is private. After creating it, open **Terminal settings** from the terminal menu and click the **Private** button at the top of the dialog to open **Access**, where you can share the terminal with chosen users and groups. Shared access is for use only.
+
+:::warning Write access reaches other people's instances
+A person with **Write** access to a Terminals connection can open **System info** and the files of any running instance on it, with full access to those files. Give **Write** only to people you trust with everyone's workspaces.
+:::
 
 See [Environment Variables](/features/open-terminal/terminals/orchestration/environment-variables) for raw values and reserved keys and [Custom Images](/features/open-terminal/terminals/orchestration/custom-images) for the **Image** field.
 
@@ -61,7 +65,7 @@ People with access to a terminal can run commands in it. With **Separate instanc
 
 ## Manage Machines
 
-The **Instances** list in the dialog shows every instance of the terminal with its name and whether it is running or stopped. Open the **More options** menu of a row to act on it. A running instance offers **Restart** and **Stop**, plus **System info** and **View files** unless it belongs to another user. A stopped one offers **Start**. Every instance offers **Delete instance**. While an action runs, the row shows what is happening (**Restarting...**, **Stopping...**, **Starting...** or **Deleting...**) with a spinner. **Delete terminal** removes the terminal and its instances and files.
+The **Instances** list in the dialog shows every instance of the terminal with its name and whether it is running or stopped. Open the **More options** menu of a row to act on it. A running instance offers **Restart** and **Stop**, plus **System info** and **View files**. A stopped one offers **Start**. Every instance offers **Delete instance**. While an action runs, the row shows what is happening (**Restarting...**, **Stopping...**, **Starting...** or **Deleting...**) with a spinner. **Delete terminal** removes the terminal and its instances and files.
 
 ## Terminal Menu
 
