@@ -334,9 +334,9 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `chat.compare` | Compare text | **Compare text** in the **+** menu and the `/compare` command |
 | `chat.attach_webpage` | Attach Webpage | **Attach Webpage** in the **+** menu |
 | `chat.attach_files` | Attach Files | **Attach Files** in the **+** menu |
-| `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu |
+| `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu under **Attachments** |
 | `chat.attach_knowledge` | Attach Knowledge | **Attach Knowledge** in the **+** menu |
-| `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu |
+| `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu under **Attachments** |
 | `chat.selected_tools` | Selected Tools | The selected tools indicator in the chat input |
 | `chat.selected_skills` | Selected Skills | The selected skills indicator in the chat input |
 | `chat.selected_filters` | Selected Filters | The indicators for toggled-on filters in the chat input |
@@ -2593,7 +2593,7 @@ Custom headers are honored by OpenAI and Ollama connections, tool servers (OpenA
 
 - Type: `bool`
 - Default: `True`
-- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates. With verification on, the Playwright, Tavily and Microsoft Web IQ loaders skip a site that does not answer within 10 seconds, like a site with an invalid certificate.
+- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates. With verification on, the Playwright, Tavily and Microsoft Web IQ loaders check each site's certificate against the certificate authority set through [`AIOHTTP_CLIENT_SESSION_SSL`](#aiohttp_client_session_ssl), so an internal authority works there, and skip a site that does not answer within 10 seconds, like a site with an invalid certificate.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
@@ -7881,7 +7881,7 @@ See [Sub-agents](/features/chat-conversations/chat-features/subagents#enable-sub
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the visibility of the Notes feature to users. Without it, non-admins also do not see **Attach Notes** in the chat input's **+** menu.
+- Description: Enables or disables the visibility of the Notes feature to users. Without it, non-admins also do not see **Attach Notes** in the chat input's **+** menu under **Attachments**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CHANNELS`
