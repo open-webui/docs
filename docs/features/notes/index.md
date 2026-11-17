@@ -137,7 +137,7 @@ All AI changes are tracked by **Undo/Redo** (top right), so you can always rever
 
 1. Go to the **Chat Input** bar
 2. Click the **+ (More)** button
-3. Open **Add Context** and select **Attach Notes**
+3. Open **Attachments** and select **Attach Notes**
 4. Choose the note(s) to attach
 
 **Attach Notes** needs Notes enabled and the **Notes** permission.

@@ -13,7 +13,7 @@ When Open Terminal is connected, the **Files** tab of the [**Tabs**](/features/c
 
 ## Browsing
 
-Click folders to navigate, and click files to preview them. A breadcrumb bar at the top shows where you are.
+Click folders to navigate, and click files to preview them. A breadcrumb bar at the top shows where you are. Click the path to type a folder to open.
 
 **Files** in the **+** menu of the Tabs opens another Files tab, so you can keep several folders open side by side. Each Files tab is named after the folder it shows.
 
@@ -57,21 +57,21 @@ Data files render as **formatted tables** with headers and clean rows, much easi
 ![CSV data rendered as a clean table](/images/open-terminal-preview-csv.png)
 
 ### Excel workbooks (XLSX, XLS)
-`.xlsx` and `.xls` files open as a table, one sheet at a time. A workbook with several sheets shows a picker to switch between them. The formula bar above the sheet shows the value or formula of the selected cell. Drag a column edge to resize it, or double-click the edge to fit the content.
+`.xlsx` and `.xls` files open as a table, one sheet at a time. A workbook with several sheets shows a picker to switch between them.
 
 An `.xlsx` file you can write to is editable in the preview. Double-click a cell or start typing to change it, or paste a range of cells. **Save** writes the workbook back to the file. Formula cells, table headers and protected sheets stay read-only. If the file changed on the terminal since you opened it, saving stops and asks you to reload it, and your edits stay in the editor.
 
 ### Word documents (DOCX)
 `.docx` files are laid out by the terminal itself, using the same engine an office suite uses, and the preview shows the finished document. What you see is what the file prints: real pagination, headers, footers, footnotes and endnotes, embedded images, fonts and spacing.
 
-A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. The page is scaled to fit the width of the panel. A small toolbar floats at the bottom of the preview to zoom in and out, and clicking the zoom level puts it back to where it started. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
+A numbered **thumbnail strip** of the pages runs alongside the document; click a page to jump to it. The page is scaled to fit the width of the panel. Holding **Ctrl** (**Cmd** on macOS) while scrolling zooms around the pointer.
 
 Where the terminal cannot lay the document out, the browser draws it instead and the preview says that it may differ from the download. That rendering keeps the text, tables and images without matching the exact layout. Only when that fails too does it report an error and suggest downloading the file instead.
 
 ### Presentations (PPTX)
 `.pptx` files open in a **slide viewer**, one slide at a time. The terminal renders the deck the same way it renders Word documents, so each slide arrives as the finished thing: backgrounds, fills, fonts, spacing and the position every placeholder takes from the layout or master.
 
-A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. The floating toolbar at the bottom steps between slides, shows which slide you are on and zooms. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around. **Reset view** in the toolbar above the preview, or the zoom level in the floating toolbar, puts the slide back to its fitted position.
+A numbered **thumbnail strip** of the slides runs down the left side; click a thumbnail to jump to that slide. It is hidden on a narrow panel. Scrolling pans the slide; **Ctrl** (**Cmd** on macOS) and scroll zooms; once you are zoomed in you can drag the slide around.
 
 Where the terminal cannot render the deck, the browser draws an approximation of each slide instead and the preview says that it may differ from the download. That approximation draws single bar, line, pie and doughnut charts, negative values included. Stacked and combined charts and other chart types show **Chart preview unavailable**. Open the file in its own application when the exact rendering matters.
 
@@ -120,7 +120,7 @@ Uploading is switched off in a folder marked **Read-only**, and dropping files o
 
 ### From the chat input
 
-Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. An administrator can point them at the terminal instead, by setting the connection's **Chat Uploads** to `Filesystem`. Attachments then land in the folder open in the file browser and show up here like anything else. The model opens them with the terminal's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. With the connection's **Chat Uploads** set to `Filesystem`, they go to the terminal instead. Attachments then land in the chat's working folder (the terminal's default folder when none is set) and show up here like anything else. The model opens them with the terminal's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 ### Attaching terminal files to a message
 
@@ -216,7 +216,7 @@ Being read-only limits changes, nothing else. You can still browse, preview and 
 
 ## Working directory
 
-With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a Per chat terminal, the button appears once the chat is saved, and temporary chats offer only the other terminals. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in.
+With a terminal selected, the **Working Directory** button (folder icon) next to it in the message input picks the folder the chat works in. You can change it at any time except while a reply is generating, in temporary chats too. With a terminal that has a separate instance per chat, the button appears once the chat is saved and temporary chats offer only the other terminals. Each chat saves its working folder and restores it when reopened. The menu has a search box, **No folder** for the terminal's own default, your **Recently Used** folders and **Open folder**, which opens a dialog to browse the terminal. In the dialog, **Use this directory** picks the folder you are in. The folder icon on a **Recently Used** row, also labelled **Open folder**, shows that folder in the Files tab.
 
 **Recently Used** lists your last eight folders on that terminal. They are stored as files on the terminal, under `.open-webui/users/<user id>/folders` in its home folder, so they follow you to other browsers. Anyone who can read that home folder can see them.
 
@@ -228,16 +228,21 @@ When the terminal supports Git, the **Open folder** dialog and the folder picker
 
 ## Git
 
+The Git panel lets you review, commit and publish what the AI changed in a project, and, for GitHub repositories, work through issues and pull requests without leaving the chat. Use it when the AI works on a code project in your terminal: check its changes, commit them, then hand it the next issue in one click that fills the message input for you to review and send. Anyone who uses a terminal with a Git repository can use it.
+
 When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
 
 - **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
-  **Discard changes** works for staged, unstaged and new files. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
+  **Discard changes** works for staged, unstaged and new files. Pick several changed files with **Ctrl** or **Shift**-click (**Cmd** on macOS) to discard them together, or use **Discard all changes** in the Changes menu. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
 - **History**: past commits and their diffs.
-- **Pull requests**, for GitHub repositories when the terminal supports them: list, search, create, edit, comment, approve, request changes, merge, close, reopen, check out and mark ready.
+- **Issues**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed** or **All**, create, edit, comment, close as completed or not planned and reopen.
+- **Pull requests**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed**, **Merged** or **All**, create, edit, comment, approve, request changes, close, reopen, check out, update the branch and mark ready. A pull request has **Summary**, **Code**, **Checks** and **Activity** views and shows whether it has conflicts. The merge button has a **Merge method** menu with **Squash and merge**, **Create a merge commit** and **Rebase and merge**.
+
+**Work on this** on an issue, **Fix** on a failing check, **Address feedback** on a pull request and **Resolve conflicts in chat** on a conflicting one write a request into the message input. **Add to chat** on a comment or review (in a pull request's **Activity** or on an issue) writes that comment's text there. Review it and send it to hand the work to the AI.
 
 The branch menu switches, creates, renames and deletes branches and manages worktrees. The sync button publishes, pulls, pushes or fetches, whichever the branch needs. Staging, pushing, pulling and fetching show their progress. Drag the divider next to the file list to resize it. A file with changes gets **Show diff** in the file browser toolbar.
 
-The file list marks changes too. A changed file is colored by its status and shows how many lines were added and removed. A changed binary file shows a status letter such as `M` (modified) or `U` (untracked). A folder with changes inside gets a colored dot. Rest the pointer on a mark to see the status and whether the changes are staged.
+The file list marks changes too. A changed file is colored by its status and shows how many lines were added and removed. A changed binary file shows a status letter such as `M` (modified) or `U` (untracked).
 
 ---
 
@@ -252,7 +257,7 @@ Switching chats opens the Files tab at that chat's working folder. Picking anoth
 :::
 
 :::tip Live updates
-On a terminal server that reports live events, the Git panel and the **Ports** list of the [Browser tab](./use-cases/web-development.md#the-browser-tab) update live. Otherwise the Git panel refreshes when expanded and the **Ports** list has a **Refresh** button.
+On a terminal server that reports live events, the Git panel and the **Ports** list of the [Browser tab](./use-cases/web-development.md#the-browser-tab) update live, and so does the **Files** tab: the folders it shows refresh in the background without a loading spinner, including after commands run outside the chat. The Files tab pauses this while a file is open in it. Otherwise the Git panel refreshes when expanded and the **Ports** list has a **Refresh** button.
 :::
 
 :::tip The terminal sits below it
@@ -264,7 +269,7 @@ If you have more than one terminal connected, switching between them in the drop
 :::
 
 :::info Terminals that give each chat its own files
-An administrator can set an orchestrated terminal to give every conversation a workspace of its own, so the files you see in one chat are not the files you see in another. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and the terminal is not offered in temporary chats at all. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts).
+A terminal can give every conversation an instance of its own, so each chat has its own files. Such a terminal needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a terminal but its files and details open once the chat is saved. Temporary chats do not list it. To browse a terminal's files without selecting it, use **View files** in its **More** menu. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
 :::
 
 ## More things to try

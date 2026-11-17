@@ -123,11 +123,13 @@ You can restrict access to specific objects (like a proprietary Model or sensiti
 1.  **Tag the Resource**: When creating/editing a Model or Knowledge Base, set its visibility to **Private**. On resources you can edit, **Access** in the **⋯** menu of the **Models**, **Knowledge**, **Prompts**, **Skills** and **Tools** lists opens the same settings. Non-admins see the **Access** button and menu entry only with the matching [sharing permission](/features/authentication-access/rbac/permissions#2-sharing-permissions).
 2.  **Grant Access**: Select the specific **Groups** or **individual users** that should have "Read" or "Write" access. The redesigned access control UI makes it easy to add multiple groups or users at once. A grant to a group also reaches the members of its subgroups.
 
-The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time. When there is nothing left to offer it says **No users were found.** instead of leaving a **Users** heading above an empty list.
+The **Add Access** picker offers only the people and groups that do not have access yet, so the list gets shorter as you grant access and nobody can be added a second time.
 
 Their row in the **Access List** is where you change what someone already has. Each row carries the level (a **Read**/**Write** selector on resources that accept write grants, a **Read** badge on the ones that do not) and an **✕** that removes the grant.
 
 Deleting a group deletes its access grants. Grants left behind by groups deleted on earlier versions show in the access list under the group's ID, with no member count, so you can remove them with **✕**.
+
+Deleting a user in **Admin Panel > Users** (or through [SCIM](/features/authentication-access/auth/scim)) removes that user from every access list they were on, so the list shows no leftover rows for the deleted account.
 
 :::tip Knowledge Scoping for Models
 Beyond visibility, knowledge access is also scoped by model configuration. When a model has **attached knowledge bases**, it can only access those specific KBs (not all user-accessible KBs). See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for details.
@@ -139,7 +141,7 @@ Two kinds of resource share the same access control dropdown, and **Private** wi
 
 **Workspace items have an owner.** Every model, knowledge base, prompt, tool, skill, note, folder, and shared chat has an owner, the account that created it. Private with no grants means only the owner can see and use the item. Other admins are not let in on role alone: they see the item when `BYPASS_ADMIN_ACCESS_CONTROL` is on (the default) or when a grant names them or one of their groups. The **No access grants. Private to you.** message in the modal describes this case.
 
-**Admin-configured resources have no owner.** External tool servers, MCP servers, Open Terminal connections, and arena models are instance configuration, added and edited only by admins. Private with no grants means admin-only: every admin can see and use the resource, and no regular user can, until you grant a group or a user. Turning `BYPASS_ADMIN_ACCESS_CONTROL` off does not change this, because there is no owner to fall back to.
+**Admin-configured resources have no owner.** External tool servers, MCP servers, Open Terminal connections and arena models that an admin adds to the instance are instance configuration, added and edited only by admins. Private with no grants means admin-only: every admin can see and use the resource, and no regular user can, until you grant a group or a user. Turning `BYPASS_ADMIN_ACCESS_CONTROL` off does not change this, because there is no owner to fall back to.
 
 ### Combining Public with the Access List
 

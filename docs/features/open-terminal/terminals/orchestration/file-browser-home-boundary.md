@@ -5,26 +5,11 @@ title: "File Browser Root"
 
 # File Browser Root
 
-Open Terminal reports a file-browser root through `GET /files/cwd`:
-
-```json
-{
-  "cwd": "/home/user/project",
-  "home": "/home/user",
-  "root": {
-    "path": "/home/user",
-    "label": "Home"
-  }
-}
-```
-
-Clients such as Open WebUI should use this metadata to start the file browser inside `root.path`, render the first breadcrumb as `root.label`, and hide parent navigation above that root.
-
-This prevents confusing support cases where non-technical users accidentally browse into system folders such as `/etc` and think they have accessed another user's files.
+Open Terminal tells clients such as Open WebUI which folder the file browser starts in and treats as its top. By default that is the home folder, shown as `Home`, and the file browser hides the folders above it. This keeps non-technical users out of system folders such as `/etc`, where they could think they have reached another user's files.
 
 ## Configure The Root
 
-The default value is `home`, which reports the user's home directory as `Home`.
+The default value is `home`, which uses the user's home directory and shows it as `Home`.
 
 Set an explicit path to visually root the file browser somewhere else:
 
@@ -34,7 +19,7 @@ Set an explicit path to visually root the file browser somewhere else:
 }
 ```
 
-Open Terminal resolves the path for the current user and reports it as `root.path`. The root label is `Home` for the user's home directory, otherwise it uses the final path segment.
+Open Terminal resolves the path for the current user. The first breadcrumb shows `Home` for the user's home directory, otherwise the final path segment.
 
 You can also use `{{home}}` or `~` for paths under the current user's home:
 
@@ -44,7 +29,7 @@ You can also use `{{home}}` or `~` for paths under the current user's home:
 }
 ```
 
-Set this in policy `env` to opt out entirely:
+Set this in the terminal's **Environment variables** to opt out entirely:
 
 ```json
 {
@@ -52,18 +37,16 @@ Set this in policy `env` to opt out entirely:
 }
 ```
 
-When this value is `filesystem`, Open Terminal does not report `root` metadata from `GET /files/cwd`, so clients keep full filesystem browsing.
+With the value `filesystem`, the file browser shows the full filesystem.
 
 ## Client Behavior
 
-- Open at the reported root when `root` is present.
-- Show the first breadcrumb as `root.label`.
-- Hide parent folders above the root.
-- Handle attempts to navigate above the root in the client UI.
-- Keep full filesystem browsing when `root` is absent.
+- Opens at the root.
+- Shows the first breadcrumb as the root's label.
+- Hides parent folders above the root.
+- Keeps the user inside the root when they try to navigate above it.
+- Shows the full filesystem when the value is `filesystem`.
 
 ## What This Does Not Do
 
-This is not a security boundary.
-
-Terminal commands and model tools still operate with the permissions of the terminal container. Use container isolation, filesystem permissions, Kubernetes security context, network policy, and per-user storage for security.
+The root shapes what the file browser shows. Terminal commands and model tools operate with the permissions of the terminal container, so use container isolation, filesystem permissions, Kubernetes security context, network policy and per-user storage to restrict access.

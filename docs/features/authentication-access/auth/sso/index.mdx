@@ -74,11 +74,7 @@ Check out our [troubleshooting guide](https://docs.openwebui.com/troubleshooting
 
 ### Read-only OAuth settings in the Admin Panel
 
-`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only:
-
-- All values remain visible, and the section is dimmed with every field and switch inert, including the **OAuth / OIDC** master toggle.
-- A note above the section explains that the settings are read from environment variables and names `ENABLE_OAUTH_PERSISTENT_CONFIG`.
-- Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
+`ENABLE_OAUTH_PERSISTENT_CONFIG` decides where the OAuth settings live, and the Admin Panel follows it. With the default `false`, they are read from your environment variables on every start, so the **OAuth / OIDC** section of **Settings > Authentication** (admin section) is shown read-only. Saving the Authentication page leaves the OAuth settings untouched. Other sections on that page, such as LDAP, save as usual.
 
 Set `ENABLE_OAUTH_PERSISTENT_CONFIG=true` to make the section editable and have saved values persist in the database. Changes to the provider connection settings (such as the provider URL, client ID and secret, redirect URI and scopes) take effect once every Open WebUI instance has been restarted. To keep the environment authoritative, leave it at `false` and change your environment variables instead, then restart.
 
@@ -92,7 +88,7 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 
 1. **Server-Side Storage:** Instead of storing large `access_token` and `id_token` values in browser cookies, the entire token payload is now encrypted and stored securely in the Open WebUI database in a new `oauth_session` table.
 2. **Secure Session Cookie:** The user's browser is sent a single, small, and secure `httponly` cookie named `oauth_session_id`. This cookie acts as an opaque identifier, containing no sensitive information itself.
-3. **Multi-Device Support:** Multiple concurrent sessions are supported per user per provider. Logging in from a second device (e.g., mobile) does **not** invalidate the first device's session. To prevent unbounded session growth, a configurable limit (`OAUTH_MAX_SESSIONS_PER_USER`, default: 10) prunes the oldest sessions when exceeded.
+3. **Multi-Device Support:** Multiple concurrent sessions are supported per user per provider. Logging in from a second device (e.g., mobile) does **not** invalidate the first device's session. To prevent unbounded session growth, a configurable limit (`OAUTH_MAX_SESSIONS_PER_USER`, default: 10) removes the oldest sessions, by last sign-in or token refresh, when exceeded. Signing out removes the stored session of that browser, unless it is the person's only one for that provider.
 4. **Automatic Refresh:** When a token is required by a downstream service (like a tool or an OpenAI-compatible endpoint), the backend uses the `oauth_session_id` to retrieve the tokens. If the tokens are expired or close to expiring, the system automatically uses the stored `refresh_token` to fetch new ones from the provider before forwarding them. This ensures services always receive a valid token and prevents silent failures. When several requests hit an expiring token at once, it is refreshed only once: with Redis configured, a per-session lock covers every worker and replica, and without Redis the lock covers one process. This keeps sessions working with providers that rotate refresh tokens, which reject the second refresh.
 5. **Clean Token Access:** This architecture provides a clean and reliable way for internal tools and other services to access user tokens without fragile cookie-scraping.
 

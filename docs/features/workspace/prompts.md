@@ -74,7 +74,7 @@ Navigate to **Workspace > Prompts** and click **Create** in the Workspace header
 | **Prompt Content** | The actual text sent to the model, with variables |
 | **Commit Message** | Optional description of changes for version tracking |
 
-**Compare revision**, above the prompt content, opens the content next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the editor, so drop a change you do not want with **Original →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the prompt afterwards.
+**Compare revision**, above the prompt content, opens the content next to an empty **Proposed revision** pane. Paste a revised version there, for example one a model wrote, and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the editor. Save the prompt afterwards.
 
 Use clear variable names (`{{your_name}}` not `{{var1}}`), add descriptive `placeholder` text, provide `default` values where sensible, and mark only truly essential fields as `:required`. Public prompts appear in every user's `/` suggestions, so be selective about what you make public. Use the enable/disable toggle to shelve prompts you're not actively using.
 
@@ -209,7 +209,7 @@ With 20 messages, `{{MESSAGES:MIDDLETRUNCATE:6}}` keeps messages 1-3 and 18-20, 
 
 Every save that changes the prompt's content creates a new version. When editing a prompt, the history menu above the prompt content starts on **Live**, the active production version. Open it to list the versions newest first, each with its commit message and author (hover for the date), and **Load more** for older ones.
 
-- **Preview** any version by clicking it. Its content opens read-only, with the version ID and date underneath.
+- **Preview** any version by clicking it. Its content opens read-only.
 - **Compare to current** shows what differs between that version and the live one: the name and tags side by side, then the prompt content as a diff. The layout menu switches between **Split** and **Unified**, and the browser remembers the choice. A change that touches only line endings is reported as **Only line endings changed**. Content longer than 5000 lines in either version cannot be compared (`Diff is limited to 5000 lines per version`).
 - **Edit as new version** makes the previewed content editable. Saving creates a new version from it. The **Set as Production** checkbox beside **Save** starts unticked here, so the live prompt stays as it is until you tick it.
 - **Set as Production** restores that version as the active one.

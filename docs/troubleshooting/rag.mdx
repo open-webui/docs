@@ -459,7 +459,7 @@ If you want to prevent a model from accessing **any** knowledge base in native m
    - Go to **Settings > Models** (admin section) and open **Model Defaults**
    - Expand **Model Parameters** and check if **Function Calling** is set to `native`
    - Models without an explicit per-model value inherit this setting. Keep the effective value set to `native` and check that the selected model supports tool calling
-   - Also check the **Model Capabilities** section: **Preload files** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access
+   - Also check the **Features** section of the model editor: **Preload files** controls file processing, while **Builtin Tools** and its **Knowledge Base** category control native knowledge-tool access
 
 :::info Check the effective model settings
 Per-model settings in **Settings > Models > Edit > Advanced Params** (admin section) (or **Workspace > Models** for your own model) override the global default when explicitly set. A model without its own `function_calling` value inherits the global setting. Check both places when the model's behavior differs from what you expect.

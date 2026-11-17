@@ -296,20 +296,22 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 | Control ID | Label in **Visible controls** | What it hides |
 | :--- | :--- | :--- |
-| `model_editor.capabilities.vision` | Vision | **Vision** under **Capabilities** in the model editor |
-| `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Capabilities** in the model editor |
-| `model_editor.capabilities.file_context` | Preload files | **Preload files** under **Capabilities** in the model editor |
-| `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Capabilities** in the model editor |
-| `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Capabilities** in the model editor |
-| `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Capabilities** in the model editor |
-| `model_editor.capabilities.terminal` | Terminal | **Terminal** under **Capabilities** in the model editor |
-| `model_editor.capabilities.usage` | Usage | **Usage** under **Capabilities** in the model editor |
-| `model_editor.capabilities.citations` | Citations | **Citations** under **Capabilities** in the model editor |
-| `model_editor.capabilities.status_updates` | Status Updates | **Status Updates** under **Capabilities** in the model editor |
-| `model_editor.capabilities.memory` | Memory | **Memory** under **Capabilities** in the model editor |
-| `model_editor.capabilities.builtin_tools` | Builtin Tools | **Builtin Tools** under **Capabilities** in the model editor |
+| `model_editor.capabilities.vision` | Vision | **Vision** under **Features** in the model editor |
+| `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Features** in the model editor |
+| `model_editor.capabilities.file_context` | Preload files | **Preload files** under **Features** in the model editor |
+| `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Features** in the model editor |
+| `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Features** in the model editor |
+| `model_editor.capabilities.video_generation` | Video Generation | **Video Generation** under **Features** in the model editor |
+| `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Features** in the model editor |
+| `model_editor.capabilities.terminal` | Terminal | **Terminal** under **Features** in the model editor |
+| `model_editor.capabilities.usage` | Usage | **Usage** under **Features** in the model editor |
+| `model_editor.capabilities.citations` | Citations | **Citations** under **Features** in the model editor |
+| `model_editor.capabilities.status_updates` | Status Updates | **Status Updates** under **Features** in the model editor |
+| `model_editor.capabilities.memory` | Memory | **Memory** under **Features** in the model editor |
+| `model_editor.capabilities.builtin_tools` | Builtin Tools | **Builtin Tools** under **Features** in the model editor |
 | `model_editor.defaults.web_search` | Web Search | **Web Search** under **Default Features** in the model editor |
 | `model_editor.defaults.image_generation` | Image Generation | **Image Generation** under **Default Features** in the model editor |
+| `model_editor.defaults.video_generation` | Video Generation | **Video Generation** under **Default Features** in the model editor |
 | `model_editor.defaults.code_interpreter` | Code Interpreter | **Code Interpreter** under **Default Features** in the model editor |
 | `model_editor.tools.time` | Time & Calculation | **Time & Calculation** under **Builtin Tools** in the model editor |
 | `model_editor.tools.user_input` | Ask User | **Ask User** under **Builtin Tools** in the model editor |
@@ -322,25 +324,28 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.notifications` | Notifications | **Notifications** under **Builtin Tools** in the model editor |
 | `model_editor.tools.web_search` | Web Search | **Web Search** under **Builtin Tools** in the model editor |
 | `model_editor.tools.image_generation` | Image Generation | **Image Generation** under **Builtin Tools** in the model editor |
+| `model_editor.tools.video_generation` | Video Generation | **Video Generation** under **Builtin Tools** in the model editor |
 | `model_editor.tools.code_interpreter` | Code Interpreter | **Code Interpreter** under **Builtin Tools** in the model editor |
 | `model_editor.tools.tasks` | Task Management | **Task Management** under **Builtin Tools** in the model editor |
 | `model_editor.tools.automations` | Automations | **Automations** under **Builtin Tools** in the model editor |
 | `model_editor.tools.calendar` | Calendar | **Calendar** under **Builtin Tools** in the model editor |
 | `model_editor.tools.subagents` | Sub-agents | **Sub-agents** under **Builtin Tools** in the model editor |
+| `model_editor.tools.visualizations` | Visualizations | **Visualizations** under **Builtin Tools** in the model editor |
 | `model_editor.tools.skills` | Skills | **Skills** under **Builtin Tools** in the model editor |
 | `model_editor.tools.tools` | Tool Creation | **Tool Creation** under **Builtin Tools** in the model editor |
 | `chat.capture` | Capture | **Capture** in the chat input's **+** menu |
 | `chat.compare` | Compare text | **Compare text** in the **+** menu and the `/compare` command |
 | `chat.attach_webpage` | Attach Webpage | **Attach Webpage** in the **+** menu |
 | `chat.attach_files` | Attach Files | **Attach Files** in the **+** menu |
-| `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu |
+| `chat.attach_notes` | Attach Notes | **Attach Notes** in the **+** menu under **Attachments** |
 | `chat.attach_knowledge` | Attach Knowledge | **Attach Knowledge** in the **+** menu |
-| `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu |
+| `chat.reference_chats` | Reference Chats | **Reference Chats** in the **+** menu under **Attachments** |
 | `chat.selected_tools` | Selected Tools | The selected tools indicator in the chat input |
 | `chat.selected_skills` | Selected Skills | The selected skills indicator in the chat input |
 | `chat.selected_filters` | Selected Filters | The indicators for toggled-on filters in the chat input |
 | `chat.selected_web_search` | Selected Web Search | The **Web Search** indicator in the chat input while web search is on |
 | `chat.selected_image_generation` | Selected Image Generation | The **Image** indicator in the chat input while image generation is on |
+| `chat.selected_video_generation` | Selected Video Generation | The **Video** indicator in the chat input while video generation is on |
 | `chat.selected_code_interpreter` | Selected Code Interpreter | The **Code Interpreter** indicator in the chat input while it is on |
 | `chat.status` | /status | The `/status` command |
 | `chat.model_command` | /model | The `/model` command |
@@ -349,7 +354,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `chat.merge` | Merge Responses | **Merge Responses** under multi-model responses |
 | `chat.code_preview` | Preview | **Preview** on code blocks |
 | `chat.fork` | Fork chat | **Fork chat** under a response and the `/fork` command |
-| `chat.artifacts` | Artifacts | **Artifacts** in the chat's top-bar menu |
+| `chat.artifacts` | Artifacts | **Artifacts** in the **+** menu of the tab bar and the **Artifacts** tab |
 | `chat.archive` | Archive | **Archive** in the chat menus and for chats selected in the sidebar, **Unarchive Chat** and **Unarchive All** in **Settings > Archived Chats** and **Archive All Chats** in **Settings > Data Controls** |
 | `chat.tags` | Tags | **Tags** in the chat's top-bar menu |
 | `models.set_default` | Set as default | **Set as default** in the model selector |
@@ -494,6 +499,13 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Default: empty, which means no limit
 - Description: The most characters of message text the `view_chat` tool returns when a model reads a previous chat. The newest messages are kept, and the result tells the model it was cut and how many messages it holds. Must be a positive integer, or Open WebUI stops at startup. See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > General > Chat Read Limit** (admin section). Leave the field empty for no limit.
+
+#### `VISUALIZATION_PROMPT_TEMPLATE`
+
+- Type: `str`
+- Default: Empty string, which falls back to the built-in instructions.
+- Description: The instructions the model receives for the `render_visualization` tool, which decide when and how it draws. See [Visualizations](/features/chat-conversations/chat-features/visualizations).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.visualizations.prompt_template`. It can be configured in **Settings > Interface > Visualization Prompt** (admin section).
 
 #### `ENABLE_AUTOMATIONS`
 
@@ -737,13 +749,13 @@ Whether a deployment has to mark or disclose AI-generated content, and in what f
 
 - Type: `str`
 - Default: Empty string (no CSP injected)
-- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, citation modals and MCP Apps. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset for sandbox-only.
+- Description: Sets a Content-Security-Policy applied to all `srcdoc` iframes rendered in the UI: Artifacts, code/HTML previews, file previews, citation modals, MCP Apps and Visualizations. When set, a `<meta http-equiv="Content-Security-Policy">` tag is injected at the top of the iframe document, restricting what LLM-generated or user-uploaded HTML can load and execute (network connections, scripts, styles, fonts, frames). The `sandbox` attribute on the iframe still provides the baseline isolation; this CSP is an additional defense-in-depth layer for deployments that need to constrain outbound network requests from rendered HTML. Example value: `default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'`. Leave unset for sandbox-only.
 
 #### `THREAD_POOL_SIZE`
 
 - Type: `int`
 - Default: unset (the AnyIO limit of `40` and Python's default executor size apply)
-- Description: Sets the maximum number of **concurrent** blocking operations (file I/O, sync route handlers, some library calls) that may run in worker threads at once. A positive value sets both the AnyIO thread limit and the size of the event loop's default thread pool. It is a concurrency ceiling, not a count of pre-spawned threads: threads are created lazily and reused, so a high value costs nothing while idle.
+- Description: Sets the maximum number of **concurrent** blocking operations (file I/O, sync route handlers, some library calls) that may run in worker threads at once. A positive value sets both the AnyIO thread limit and the size of the event loop's default thread pool. It is a concurrency ceiling, not a count of pre-spawned threads: threads are created lazily and reused, so a high value costs nothing while idle. Knowledge base uploads use at most half of the pool, so chat attachments are not stuck behind them.
 
 :::warning Set this to 2000 or higher on any real server; never lower it
 The default of `40` is far too low for production. When more than `THREAD_POOL_SIZE` blocking operations are needed at once, every further request waits for a free slot and the whole app appears to hang while CPU and memory look fine. `2000` is a lower bound for large multi-user instances; going higher is fine.
@@ -1951,21 +1963,7 @@ The code interpreter runs on the same **legacy** `pyodide` and `jupyter` engines
 - Description: Specifies the timeout for the Jupyter code interpreter.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-### Direct Connections (OpenAPI/MCPO Tool Servers)
-
-#### `ENABLE_DIRECT_CONNECTIONS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables direct connections.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `ENABLE_DIRECT_INTEGRATIONS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Controls whether users reach their personal **Integrations** tab in **Settings**, where they add their own tool servers and Open Terminal connections. Off by default, so the tab is out of sight until an admin turns it on under **Settings > Integrations** (admin section), in the **User Connections** section. Turning it on shows the tab to admins and to users holding the `direct_tool_servers` permission; the permission alone is not enough. While it is off, the tool servers and Open Terminal connections that users and admins saved in that tab are not used in chats, and the server ignores them even when a request still includes them. They stay saved and apply again once it is turned on. The **Direct Tool Servers** toggle in the group and default permissions only shows while it is on.
-- Persistence: This environment variable is a `ConfigVar` variable.
+### Tool Servers
 
 #### `TOOL_SERVER_CONNECTIONS`
 
@@ -2014,7 +2012,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). Unlike user-level tool server connections, these are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). These are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
 - Example (direct Open Terminal connection):
 ```json
 [
@@ -2039,28 +2037,21 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
     "key": "your-api-key",
     "name": "Terminals",
     "auth_type": "bearer",
-    "policy_id": "ai-computer",
     "config": {
       "access_grants": [
         {"principal_type": "user", "principal_id": "*", "permission": "read"}
-      ],
-      "contexts": {
-        "chat": {"context_id": "chat_id"},
-        "automation": false
-      }
+      ]
     }
   }
 ]
 ```
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-For an orchestrator connection, set `policy_id` to route every terminal request through that named policy. Omitting it intentionally uses the orchestrator's service defaults through its backward-compatible unscoped route.
+`config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
 
-`config.contexts` gives an orchestrator connection a separate workspace per chat or per automation, or withholds it from either, with the keys `chat` and `automation`. It is ignored on connections that are not orchestrator ones. See [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts) for the values, the admin controls and the capacity trade-off.
+`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
-`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. The default, `default`, uploads it to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's current working directory instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
-
-`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. Use `session` for an orchestrator connection when the orchestrator runs with `TERMINALS_OPEN_WEBUI_URL` set, so it validates each request against the identity of the user who made it.
+`auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. An orchestrator connection needs `key` set to the orchestrator's `TERMINALS_API_KEY`.
 
 :::tip Helm chart auto-configuration
 When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
@@ -2076,7 +2067,7 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
 
 - Type: `str` (JSON object)
 - Default: `{}`
-- Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward and take precedence on conflicts, so admins can set deployment-specific headers on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added.
+- Description: Custom HTTP response headers to inject into responses returned by the terminal proxy. The terminal proxy strips a fixed set of hop-by-hop and security-sensitive headers from the upstream response; entries in this object are merged in afterward. Names match regardless of letter case and replace the terminal's own header of that name. Repeated headers from the terminal, such as several `Set-Cookie`, are all passed on. Entries here take precedence on conflicts, so admins can set deployment-specific headers on proxied terminal content without touching the application. Invalid JSON falls back to `{}` with no headers added.
 
   **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional: many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
 
@@ -2600,13 +2591,13 @@ Available placeholders, substituted at request time (any placeholder that has no
 
 The two group placeholders cost a database lookup, so it is only performed when a header value actually contains one of them; every other request skips it. A user in no groups, or a lookup that fails, expands them to an empty string rather than failing the request.
 
-Custom headers are honored by OpenAI, Ollama and direct model connections, tool servers (OpenAPI and MCP), and external document-processing connections.
+Custom headers are honored by OpenAI and Ollama connections, tool servers (OpenAPI and MCP) and external document-processing connections.
 
 #### `ENABLE_WEB_LOADER_SSL_VERIFICATION`
 
 - Type: `bool`
 - Default: `True`
-- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates.
+- Description: Verifies SSL certificates when the web loader fetches websites, and on the first request the `fetch_url` tool sends to check whether a URL is a web page or a file. Set to `False` to skip the check, for example for sites with self-signed certificates. With verification on, the Playwright, Tavily and Microsoft Web IQ loaders check each site's certificate against the certificate authority set through [`AIOHTTP_CLIENT_SESSION_SSL`](#aiohttp_client_session_ssl), so an internal authority works there, and skip a site that does not answer within 10 seconds, like a site with an invalid certificate.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEBUI_SESSION_COOKIE_SAME_SITE`
@@ -3734,6 +3725,8 @@ If you want to use Qdrant, be careful when upgrading Open WebUI (crate backups a
 
 :::
 
+Open WebUI's Qdrant client is compatible with Qdrant servers 1.19 to 1.21. Servers outside that range show a client version warning.
+
 #### `QDRANT_API_KEY`
 
 - Type: `str`
@@ -3788,13 +3781,13 @@ If set to `True`, and `QDRANT_URI` points to a self-hosted server with TLS enabl
 
 :::info
 
-This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to `Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` (admin section) to migrate existing knowledge bases and memories.
+This will disconect all Qdrant collections created in the previous pattern, which is non-multitenancy. Go to `Admin Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` to migrate existing knowledge bases and memories.
 
 The Qdrant collections created in the previous pattern will still consume resources.
 
 Currently, there is no button in the UI to only reset the vector DB. If you want to migrate knowledge to multitenancy:
 - Remove all collections with the `open_webui-knowledge` prefix (or `open_webui` prefix to remove all collections related to Open WebUI) using the native Qdrant client
-- Go to `Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` (admin section) to migrate existing knowledge bases and memories
+- Go to `Admin Settings` > `Documents` > `Reindex Knowledge and Memory Vectors` to migrate existing knowledge bases and memories
 
 `Reindex Knowledge and Memory Vectors` migrates knowledge bases, the per-file vectors of the files inside them and user memories. Files that were never added to a knowledge base and cached web search results stay in the old collections.
 
@@ -3802,7 +3795,7 @@ Currently, there is no button in the UI to only reset the vector DB. If you want
 
 :::danger
 
-If you decide to use the multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Settings` > `Documents` (admin section) to reset vector and knowledge, which will delete all collections with the `open_webui` prefix and all stored knowledge.
+If you decide to use the multitenancy pattern as your default and you don't need to migrate old knowledge, go to `Admin Settings` > `Documents` to reset vector and knowledge, which will delete all collections with the `open_webui` prefix and all stored knowledge.
 
 :::
 
@@ -5850,7 +5843,7 @@ If you use `perplexity`, this variable is not relevant to you.
 - Description: Specifies the loader to use for retrieving and processing web content.
 - Options:
   - `safe_web` (default): Uses internal fetching with enhanced error handling.
-  - `playwright`: Uses Playwright for rendering pages with JavaScript support.
+  - `playwright`: Uses Playwright for rendering pages with JavaScript support. The loaded text includes definition lists and figures with their captions.
   - `firecrawl`: Uses Firecrawl service.
   - `tavily`: Uses Tavily service.
   - `exa`: Uses the [Exa](/features/chat-conversations/web-search/providers/exa#4-optional-use-exa-to-read-pages) Contents API with [`EXA_API_KEY`](#exa_api_key). Exa fetches the pages and returns their text and title. Requests time out after [`WEB_LOADER_TIMEOUT`](#web_loader_timeout) seconds, or 60 seconds when that is unset. A rejected key or a billing problem stops the load with an error; pages Exa cannot read are skipped. Exa returns the full page text, and the `fetch_url` tool still cuts it to [`WEB_FETCH_MAX_CONTENT_LENGTH`](#web_fetch_max_content_length). [`EXA_MAX_CONTENT_LENGTH`](#exa_max_content_length) applies to search results only.
@@ -6407,50 +6400,19 @@ Strictly return in JSON format:
 
 ### Image Creation
 
-#### `IMAGE_GENERATION_ENGINE`
-
-- Type: `str`
-- Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image generation.
-  - `comfyui`: Uses ComfyUI engine for image generation.
-  - `automatic1111`: Uses AUTOMATIC1111 engine for image generation.
-  - `gemini`: Uses Gemini for image generation.
-- Default: `openai`
-- Description: Specifies the engine to use for image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_GENERATION_MODEL`
-
-- Type: `str`
-- Default: ``
-- Description: Default model to use for image generation (e.g., `gpt-image-2`, `gemini-3.1-flash-image`). With no model set, the `openai` engine uses `gpt-image-2` and the `gemini` engine uses `imagen-3.0-generate-002`.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_SIZE`
-
-- Type: `str`
-- Default: `512x512`
-- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`). Set to `auto` to let the model determine the appropriate size (only supported by models matching `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`).
-- Persistence: This environment variable is a `ConfigVar` variable.
+Image backends are image connections in **Admin Settings > Images**, see [Image Generation and Editing](/features/chat-conversations/image-generation-and-editing#set-up-a-connection).
 
 #### `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`
 
 - Type: `str`
 - Default: `^gpt-image`
-- Description: A regex pattern to match model names that support `IMAGE_SIZE = "auto"`. When a model matches this pattern, the `auto` size option becomes available, allowing the model to determine the appropriate output dimensions. By default, only models starting with `gpt-image` (e.g., `gpt-image-1`) are matched.
+- Description: A regex pattern for OpenAI-compatible image models that choose their own output size. For these models the default `512x512` size is replaced by `auto`, unless the request sets a size.
 
 #### `IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN`
 
 - Type: `str`
 - Default: `^gpt-image`
-- Description: A regex pattern to match model names that return image URLs directly instead of base64-encoded data. Models matching this pattern will not include `response_format: b64_json` in API requests. By default, only models starting with `gpt-image` are matched. For other models, Open WebUI requests base64 responses and handles the conversion internally.
-
-#### `IMAGE_STEPS`
-
-- Type: `int`
-- Default: `50`
-- Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111 engines.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Description: A regex pattern for OpenAI-compatible image models that return image URLs directly instead of base64-encoded data. Requests to matching models do not include `response_format: b64_json`.
 
 ---
 
@@ -6460,334 +6422,64 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: When disabled, Image Editing will not be used and instead, images will be created only using the image generation engine.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_EDIT_ENGINE`
-
-- Type: `str`
-- Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image editing.
-  - `gemini`: Uses Gemini for image editing.
-  - `comfyui`: Uses ComfyUI engine for image editing.
-- Default: `openai`
-- Description: Configures the engine used for image editing operations, enabling modification of existing images using text prompts.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_EDIT_MODEL`
-
-- Type: `str`
-- Default: ``
-- Description: Specifies the model to use for image editing operations within the selected engine (e.g., `gpt-image-2`, `gemini-3.1-flash-image`).
+- Description: Enables or disables image editing. When disabled, images are only created from scratch.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OPENAI_IMAGE_EDIT_NORMALIZATION`
 
 - Type: `bool`
 - Default: `True`
-- Description: When `IMAGE_EDIT_ENGINE=openai`, normalizes the input image (re-encoding it to a format/shape the OpenAI image-edit API accepts) before sending the edit request. Disable only if your input images are already in a compatible format and you want to skip the conversion.
+- Description: Re-encodes JPEG and MPO input images that have an EXIF rotation, several frames or a colour mode other than RGB or greyscale before an edit request goes to an OpenAI-compatible image connection. Disable only if your input images are already in a compatible format.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
-
-#### `IMAGE_EDIT_SIZE`
-
-- Type: `str`
-- Default: ``
-- Description: Defines the output dimensions for edited images in WIDTHxHEIGHT format (e.g., `1024x1024`). Leave empty to preserve original dimensions.
-- Persistence: This environment variable is a `ConfigVar` variable.
 
 ---
 
 ### OpenAI DALL-E
 
-#### Image Generation
-
-##### `IMAGES_OPENAI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for OpenAI image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_OPENAI_API_VERSION`
-
-- Type: `str`
-- Default: Empty string (`""`)
-- Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation endpoint. Required for Azure OpenAI deployments.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_OPENAI_API_KEY`
-
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Sets the API key to use for OpenAI image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_OPENAI_API_PARAMS`
-
-- Type: `str` (JSON)
-- Default: `{}`
-- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters (e.g., `{"quality": "high"}` for GPT-Image models).
-- Example: `{"quality": "high"}`
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### Image Editing
-
-##### `IMAGES_EDIT_OPENAI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Configures the OpenAI API base URL specifically for image editing operations, allowing separate endpoints from image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_OPENAI_API_VERSION`
-
-- Type: `str`
-- Default: ``
-- Description: Specifies the OpenAI API version for image editing, enabling support for Azure OpenAI deployments with versioned endpoints.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_OPENAI_API_KEY`
-
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Provides authentication for OpenAI image editing API requests, with support for separate keys from image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
+Set up as an OpenAI compatible image connection, see [OpenAI](/features/chat-conversations/image-generation-and-editing/openai).
 
 ---
 
 ### Gemini
 
-:::tip
-
-For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/chat-conversations/image-generation-and-editing/gemini).
-
-:::
-
-#### Image Generation
-
-##### `GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: Empty string
-- Description: Base URL that [`IMAGES_GEMINI_API_BASE_URL`](#images_gemini_api_base_url) and [`IMAGES_EDIT_GEMINI_API_BASE_URL`](#images_edit_gemini_api_base_url) fall back to when they are unset. Nothing else reads it.
-
-##### `GEMINI_API_KEY`
-
-- Type: `str`
-- Default: Empty string
-- Description: API key that [`IMAGES_GEMINI_API_KEY`](#images_gemini_api_key) and [`IMAGES_EDIT_GEMINI_API_KEY`](#images_edit_gemini_api_key) fall back to when they are unset. Nothing else reads it.
-
-##### `IMAGES_GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${GEMINI_API_BASE_URL}`
-- Description: Specifies the URL to Gemini's image generation API.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_GEMINI_API_KEY`
-
-- Type: `str`
-- Default: `${GEMINI_API_KEY}`
-- Description: Sets the Gemini API key for image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_GEMINI_ENDPOINT_METHOD`
-
-- Type: `str`
-- Options:
-  - `predict`: Uses the predict endpoint (default for Imagen models).
-  - `generateContent`: Uses the generateContent endpoint (for Gemini 2.5 Flash Image and all newer Gemini image models).
-- Default: ``
-- Description: Specifies the Gemini API endpoint method for image generation, supporting both legacy Imagen models and newer Gemini models with image generation capabilities.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### Image Editing
-
-##### `IMAGES_EDIT_GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${GEMINI_API_BASE_URL}`
-- Description: Configures the Gemini API base URL for image editing operations with Gemini models.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_GEMINI_API_KEY`
-
-- Type: `str`
-- Default: `${GEMINI_API_KEY}`
-- Description: Provides authentication for Gemini image editing API requests.
-- Persistence: This environment variable is a `ConfigVar` variable.
+Set up as a Gemini image connection, see [Gemini Image Generation Guide](/features/chat-conversations/image-generation-and-editing/gemini).
 
 ---
 
 ### ComfyUI
 
-#### Image Generation
-
-##### `COMFYUI_BASE_URL`
-
-- Type: `str`
-- Default: ``
-- Description: Specifies the URL to the ComfyUI image generation API (e.g., `http://127.0.0.1:8188`).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `COMFYUI_API_KEY`
-
-- Type: `str`
-- Default: ``
-- Description: Sets the API key for ComfyUI authentication.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `COMFYUI_WORKFLOW`
-
-- Type: `str` (JSON)
-- Default:
-```json
-{
-  "3": {
-    "inputs": {
-      "seed": 0,
-      "steps": 20,
-      "cfg": 8,
-      "sampler_name": "euler",
-      "scheduler": "normal",
-      "denoise": 1,
-      "model": ["4", 0],
-      "positive": ["6", 0],
-      "negative": ["7", 0],
-      "latent_image": ["5", 0]
-    },
-    "class_type": "KSampler",
-    "_meta": {
-      "title": "KSampler"
-    }
-  },
-  "4": {
-    "inputs": {
-      "ckpt_name": "model.safetensors"
-    },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Load Checkpoint"
-    }
-  },
-  "5": {
-    "inputs": {
-      "width": 512,
-      "height": 512,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage",
-    "_meta": {
-      "title": "Empty Latent Image"
-    }
-  },
-  "6": {
-    "inputs": {
-      "text": "Prompt",
-      "clip": ["4", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "7": {
-    "inputs": {
-      "text": "",
-      "clip": ["4", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "8": {
-    "inputs": {
-      "samples": ["3", 0],
-      "vae": ["4", 2]
-    },
-    "class_type": "VAEDecode",
-    "_meta": {
-      "title": "VAE Decode"
-    }
-  },
-  "9": {
-    "inputs": {
-      "filename_prefix": "ComfyUI",
-      "images": ["8", 0]
-    },
-    "class_type": "SaveImage",
-    "_meta": {
-      "title": "Save Image"
-    }
-  }
-}
-```
-
-- Description: Defines the ComfyUI workflow configuration in JSON format. Export from ComfyUI using "Save (API Format)" to ensure compatibility.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `COMFYUI_WORKFLOW_NODES`
-
-- Type: `list[dict]`
-- Default: `[]`
-- Description: Specifies the ComfyUI workflow node mappings for image generation, defining which nodes handle prompt, model, dimensions, and other parameters. Configured automatically via the admin UI.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### Image Editing
-
-##### `IMAGES_EDIT_COMFYUI_BASE_URL`
-
-- Type: `str`
-- Default: ``
-- Description: Configures the ComfyUI base URL for image editing operations, enabling self-hosted ComfyUI workflows for image manipulation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_COMFYUI_API_KEY`
-
-- Type: `str`
-- Default: ``
-- Description: Provides authentication for ComfyUI image editing API requests when the ComfyUI instance requires API key authentication.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_COMFYUI_WORKFLOW`
-
-- Type: `str` (JSON)
-- Default: ``
-- Description: Defines the ComfyUI workflow configuration in JSON format for image editing operations. Must include nodes for image input, prompt, and output. Export from ComfyUI using "Save (API Format)".
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_COMFYUI_WORKFLOW_NODES`
-
-- Type: `list[dict]`
-- Default: `[]`
-- Description: Specifies the ComfyUI workflow node mappings for image editing, defining which nodes handle image input, prompt, model, dimensions, and other parameters. Configured automatically via the admin UI.
-- Persistence: This environment variable is a `ConfigVar` variable.
+Set up as a ComfyUI image connection, see [ComfyUI](/features/chat-conversations/image-generation-and-editing/comfyui).
 
 ---
 
 ### AUTOMATIC1111
 
-#### `AUTOMATIC1111_BASE_URL`
+Set up as an AUTOMATIC1111 image connection, see [AUTOMATIC1111](/features/chat-conversations/image-generation-and-editing/automatic1111).
 
-- Type: `str`
-- Default: ``
-- Description: Specifies the URL to AUTOMATIC1111's Stable Diffusion API (e.g., `http://127.0.0.1:7860`).
+---
+
+## Video Generation
+
+#### `ENABLE_VIDEO_GENERATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables video generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-#### `AUTOMATIC1111_API_AUTH`
+#### `VIDEO_GENERATION_TIMEOUT`
 
-- Type: `str`
-- Default: ``
-- Description: Sets the AUTOMATIC1111 API authentication credentials if required.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Type: `int`
+- Default: `900`
+- Description: How many seconds to wait for a video job to finish.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
-#### `AUTOMATIC1111_PARAMS`
+#### `VIDEO_GENERATION_POLL_INTERVAL`
 
-- Type: `str` (JSON)
-- Default: `{}`
-- Description: Additional parameters in JSON format to pass to AUTOMATIC1111 API requests (e.g., `{"cfg_scale": 7, "sampler_name": "Euler a", "scheduler": "normal"}`).
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Type: `float`
+- Default: `5`
+- Description: How many seconds to wait between checks on a running video job.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ## OAuth
 
@@ -7039,7 +6731,7 @@ In any production environment running more than one instance of Open WebUI (e.g.
 
 - Type: `int`
 - Default: `10`
-- Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions are pruned to make room for the new one. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
+- Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions, by last sign-in or token refresh, are removed to make room for the new one. Signing out removes the stored session of that browser, unless it is the user's only session for that provider. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
 
 #### `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE`
 
@@ -7802,13 +7494,6 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 ### Feature Permissions
 
-#### `USER_PERMISSIONS_FEATURES_DIRECT_TOOL_SERVERS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables user permission to access direct tool servers.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
 #### `USER_PERMISSIONS_FEATURES_WEB_SEARCH`
 
 - Type: `bool`
@@ -7821,6 +7506,13 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use the image generation feature.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_FEATURES_VIDEO_GENERATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to use the video generation feature.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`
@@ -7873,6 +7565,21 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 :::
 
+#### `USER_PERMISSIONS_FEATURES_SUBAGENTS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Enables or disables Sub-agents access for non-admin users. Users without it get neither the `delegate_task` tool nor the `timer` tool.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+:::info
+
+This setting maps to **Features > Sub-agents** in RBAC permissions. The switch shows while [`ENABLE_SUBAGENTS`](#enable_subagents) is on, and admin users are exempt from this permission check.
+
+See [Sub-agents](/features/chat-conversations/chat-features/subagents#enable-sub-agents) for details.
+
+:::
+
 #### `USER_PERMISSIONS_FEATURES_FOLDERS`
 
 - Type: `bool`
@@ -7884,7 +7591,7 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables the visibility of the Notes feature to users. Without it, non-admins also do not see **Attach Notes** in the chat input's **+** menu.
+- Description: Enables or disables the visibility of the Notes feature to users. Without it, non-admins also do not see **Attach Notes** in the chat input's **+** menu under **Attachments**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CHANNELS`
@@ -9224,8 +8931,8 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections and users' own direct tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
-- Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest), the code interpreter and direct model connections, since those are part of Open WebUI itself.
+- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections, Tether terminals and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
+- Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) and the code interpreter, since those are part of Open WebUI itself.
 - Note: this decides whether plugins and tool servers *run*. Some management endpoints stay reachable while it is off, for example deleting a tool or function and saving the tool server list, so treat it as an execution switch, and keep the permission to create Tools and Functions limited to people you trust.
 
 #### `ENABLE_TOOLS`
@@ -9244,7 +8951,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections (admin and personal) and the direct tool servers users add themselves. Set to `False`, none of them is loaded or called, the **Tools** and **Open Terminal** sections of **Settings > Integrations** (admin section) are greyed out, the terminal picker leaves the chat, and [`ENABLE_DIRECT_INTEGRATIONS`](#enable_direct_integrations) counts as off. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections and the terminals and tool servers (OpenAPI and MCP) users add through [Tether](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 

@@ -17,7 +17,9 @@ When you send a message while the AI is generating a response:
 
 1. **Your message is queued** - It appears in a compact queue area just above the input box
 2. **You can continue working** - Add more messages, edit queued messages, or delete them
-3. **Automatic processing** - Once the current response finishes, all queued messages are combined and sent together
+3. **Automatic processing** - Your queued messages are sent once the current response ends
+
+With **Enable Message Queue** on, the queue of your own saved chats is held on the server: the running reply stops at its next step and your queued message is answered right after. In a temporary chat, or when a message has a terminal file attached, the queue stays in the browser and works as described below.
 
 This creates a seamless workflow where you can capture thoughts as they come without waiting for the AI to finish.
 
@@ -35,7 +37,7 @@ Each queued message shows three action buttons:
 
 ### Combining Messages
 
-When the AI finishes generating, all queued messages are **combined into a single prompt** (separated by blank lines) and sent together. This means:
+In the browser-side queue, when the AI finishes generating, all queued messages are **combined into a single prompt** (separated by blank lines) and sent together. This means:
 
 - Multiple quick thoughts become one coherent message
 - Context flows naturally between your queued inputs
@@ -57,7 +59,9 @@ A queued message whose attachment failed is labeled **Upload failed** and holds 
 
 ## Persistence
 
-The message queue is preserved when you navigate between chats within the same browser session:
+With **Enable Message Queue** on, messages queued in your own saved chats are held on the server, so they are kept if you leave the page, reload or close the tab.
+
+The browser-side queue (temporary chats, terminal files, attachments still uploading) is preserved when you navigate between chats within the same browser session:
 
 - **Switching chats in the same tab** - The queue stays in memory, keyed by chat id, and is there when you come back
 - **Returning to the chat** - Queue is restored and processed
@@ -81,7 +85,7 @@ When disabled, sending a message while the AI is generating will:
 
 :::tip Default Behavior
 Message Queue is **enabled by default**. The toggle allows you to choose between:
-- **Queue mode** (default) - Messages queue up until generation completes
+- **Queue mode** (default) - Messages queue up until generation ends
 - **Interrupt mode** - New messages stop current generation immediately
 
 Either way, a message with an attachment that is still uploading is queued until the upload settles. See [Attachments Still Uploading](#attachments-still-uploading).
@@ -98,7 +102,7 @@ You're reading an AI response and have follow-up questions. Instead of waiting:
 - Queue a clarification
 - Queue another thought
 
-All are sent together when the AI finishes.
+They are sent when the AI finishes.
 
 ### 2. Adding Context
 
@@ -119,11 +123,11 @@ You're in a long conversation and need to capture quick notes:
 
 | Feature | Behavior |
 |---------|----------|
-| **Enabled** | Messages queue during generation, sent together when complete |
+| **Enabled** | Messages queue during generation and are sent when it ends |
 | **Disabled** | New messages interrupt current generation immediately |
 | **Pending uploads** | Message is queued until its attachments finish, then sent, whether the toggle is on or off |
 | **Failed upload** | Queued message is marked **Upload failed** and holds the queue until you edit or delete it |
-| **Persistence** | Queue survives navigation within session |
+| **Persistence** | Queues of saved chats are held on the server; the browser-side queue survives navigation within the session |
 | **Actions** | Send now, Edit, Delete for each queued item |
 
 The Message Queue helps you maintain your flow of thought without the friction of waiting for AI responses to complete.

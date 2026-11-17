@@ -152,11 +152,11 @@ Open Terminal needs a model that performs tool calling at agentic quality, not j
 - **[Web development](/features/open-terminal/use-cases/web-development)**: build and preview websites in the Browser tab
 - **[System automation](/features/open-terminal/use-cases/system-automation)**: file management, backups, batch operations
 - **[Advanced workflows](/features/open-terminal/use-cases/advanced-workflows)**: skills for data reports, research, code review, and more
-- **[Coding agents](/features/open-terminal/coding-agents)**: agents such as Claude Code or Codex in the model picker
+- **[Coding agents](/features/open-terminal/coding-agents)**: agents such as Claude Code, Codex or Goose in the model picker
 - **[File browser](/features/open-terminal/file-browser)**: uploading, previewing, editing files, Git
 
 ---
 
 ## Enterprise Multi-User
 
-Need isolated, per-user agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It provisions a dedicated computer substrate for every user and policy, with automatic lifecycle management, resource limits, custom images, persistent storage, scheduled resets, and policy-controlled environments.
+Need separate agent workspaces for your team? **[Terminals](/features/open-terminal/terminals/)** is the orchestrator for Open Terminal. It starts a separate instance per user, chat or model, with automatic lifecycle management, resource limits, custom images, persistent storage and shareable terminals with their own environments.

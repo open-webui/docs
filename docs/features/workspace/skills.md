@@ -74,7 +74,7 @@ Type `$` in the chat input, or use the `/` menu, and pick a skill. With the [ski
 
 ### Per-chat skills
 
-The **+** menu > **Skills** turns skills on for the current chat. A badge shows how many are on. Selected skills load like skills mentioned with `$`.
+The **+** menu > **Skills** turns skills on for the current chat. The list is grouped into **Workspace** and the selected terminal server, named after it, see [Skills from a terminal server](#skills-from-a-terminal-server). A badge shows how many are on. Selected skills load like skills mentioned with `$`.
 
 ### Model-attached skills
 
@@ -119,16 +119,7 @@ Leave a field empty for the default, or set [`SKILL_CONTENT_MAX_CHARS`](/referen
 
 A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the terminal, and the model opens them with the terminal's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
 
-Writing a terminal server of your own means answering two endpoints:
-
-| Endpoint | Returns |
-| :--- | :--- |
-| `GET /skills` | A JSON array, one entry per skill, each with `id` (prefixed `terminal:`, the name url-encoded), `name`, `description` and `location` (or `path`). |
-| `GET /skills/read?name=<name>` | One skill: `name`, `description`, `content` (the Markdown instructions), `location` (or `path`) and `resources`, an array of file paths shipped with the skill. |
-
-Open Terminal serves both from v0.13.0.
-
-A terminal an admin configured is called by the Open WebUI server, with the connection's auth, `Accept: application/json`, `X-User-Id`, `X-Session-Id` (the chat id) and `X-Terminal-Context-Id`, the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs. Redirects are not followed. A terminal a user added in their own settings is called from that user's browser, with the bearer key and `X-Session-Id`. It only has to be reachable from the browser, so a terminal on the user's own machine, such as `http://127.0.0.1:8000`, works with Open WebUI hosted elsewhere.
+A terminal an admin configured is called by the Open WebUI server, with the connection's auth, `Accept: application/json`, `X-User-Id`, `X-Session-Id` (the chat id) and, for orchestrated terminals, the [`X-Terminal-*` headers](/features/open-terminal/terminals/orchestration/api-troubleshooting#headers-sent-to-the-terminals-server), the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs. Redirects are not followed. A terminal a user added in the [Tether app](/ecosystem/tether#bring-your-own-models-and-tools) is called through Tether from the user's computer, so a terminal on that machine works with Open WebUI hosted elsewhere while Tether is connected.
 
 ---
 
@@ -151,7 +142,7 @@ Add a short note in **Describe this change** beside **Save** to label the versio
 
 ### Supporting files
 
-A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. A text file also has **Copy**, which copies its content, and, when you can edit the skill, **Compare revision**: it opens the file next to an empty **Proposed revision** pane. Paste a revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the file, so drop a change you do not want with **Original →**, which copies the original text of that change into the right-hand pane. For a change that replaces text, **Keep both** puts the original text followed by the proposed text into the right-hand pane. Save the skill afterwards. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
+A skill is a small folder: `SKILL.md` at its root, plus any files the instructions refer to, such as scripts in `scripts/`, detailed docs in `references/`, reusable outputs in `templates/` and images or other assets in `assets/`. The file panel in the editor lists them as a tree. Its **...** menu offers **New File**, **New Folder**, **Upload** and **Upload Folder**. Entries can be renamed, deleted or dragged into another folder, and the open file has a **Download** button. A text file also has **Copy**, which copies its content, and, when you can edit the skill, **Compare revision**: it opens the file next to an empty **Proposed revision** pane. Paste a revised version there and click **Compare** to mark the changes, then step through them with the arrows. **Apply to draft** puts the right-hand pane into the file. Save the skill afterwards. Markdown files have a **Preview**, images and PDFs open in place and other binary files are offered for download.
 
 | Limit | Value |
 | :--- | :--- |

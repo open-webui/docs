@@ -26,17 +26,17 @@ To use artifacts in Open WebUI, a model must provide content that triggers the r
 
 ## How do I use Artifacts in Open WebUI?
 
-When Open WebUI creates an Artifact, you'll see the content displayed in a dedicated Artifacts window to the right side of the main chat. Here's how to interact with Artifacts:
+When Open WebUI creates an Artifact, you'll see the content displayed in a dedicated Artifacts window to the right side of the main chat. Open it again at any time from **Artifacts** in the **+** menu of the [tab bar](/features/chat-conversations/chat-features/#tabs-side-panel). Here's how to interact with Artifacts:
 
 - **Editing and iterating**: Ask an LLM within the chat to edit or iterate on the content, and these updates will be displayed directly in the Artifact window. You can switch between versions using the version selector at the bottom left of the Artifact. Each edit creates a new version, allowing you to track changes using the version selector.
 - **Updates**: Open WebUI may update an existing Artifact based on your messages. The Artifact window will display the latest content.
-- **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen, located in the lower right corner of the Artifact.
+- **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen.
 
 ## Securing artifact previews with a CSP
 
 Artifact previews render inside a sandboxed `srcdoc` iframe. For tighter control over what that generated HTML can do (outbound network calls, scripts, styles), inject a dedicated Content Security Policy into the preview with the [`IFRAME_CSP`](/reference/env-configuration#iframe_csp) environment variable, separate from the main app's `CONTENT_SECURITY_POLICY`.
 
-It is empty by default (the iframe `sandbox` already provides baseline isolation) and applies to **every** `srcdoc` iframe in the UI: Artifacts, code/HTML previews, file previews and citation modals. When set, Open WebUI prepends a `<meta http-equiv="Content-Security-Policy">` tag to the iframe document, and per the CSP spec the first policy wins, so it overrides any CSP the generated HTML already declares. A reasonable starting point:
+It is empty by default (the iframe `sandbox` already provides baseline isolation) and applies to **every** `srcdoc` iframe in the UI: Artifacts, code/HTML previews, file previews, citation modals, MCP Apps and Visualizations. When set, Open WebUI prepends a `<meta http-equiv="Content-Security-Policy">` tag to the iframe document, and per the CSP spec the first policy wins, so it overrides any CSP the generated HTML already declares. A reasonable starting point:
 
 ```bash
 IFRAME_CSP=default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; connect-src 'none'

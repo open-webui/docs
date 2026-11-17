@@ -326,6 +326,18 @@ environment:
 - **CUDA mode:** The `:cuda` image defaults to `int8` like every other image, which can cause errors on older GPUs. Set `float16` explicitly for GPUs.
 :::
 
+### Local Whisper Fails on a pip Install
+
+**Symptoms:** every local transcription fails with `open() got an unexpected keyword argument 'metadata_errors'`.
+
+**Cause:** the audio library PyAV (`av`) is on version 19 or newer, which local Whisper cannot use. Open WebUI pins `av` to 14.0.1, and the Docker images ship that version.
+
+**Solutions:** in the Python environment that runs Open WebUI, install the pinned version and restart:
+
+```bash
+pip install av==14.0.1
+```
+
 ### STT Not Recognizing Speech Correctly
 
 **Tips for better recognition:**

@@ -57,7 +57,7 @@ Saving a connection does not test it. Clicking the **Verify Connection** button 
 | Mistral | Yes | Auto-detection works |
 | Groq | Yes | Auto-detection works |
 
-**How to add models manually**: In the connection settings, find **Model IDs**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error. Each ID goes on the list once; typing one that is already there is refused with **Model ID is already added**, and any spaces around what you type are stripped off first.
+**How to add models manually**: In the connection settings, find **Model IDs**, type the model ID, and click the **+** icon, then save. The models will then appear in your model selector even though the connection verification showed an error.
 
 :::
 
@@ -407,7 +407,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   Open WebUI is configured via environment variables, and you can also set the same values from the Open WebUI admin panel.
 
-  Use the same stdapi.ai key for all `*_OPENAI_API_KEY` entries.
+  Use the same stdapi.ai key for all `*_OPENAI_API_KEY` entries and in the image connection.
 
   Core connection (chat + background tasks):
 
@@ -427,25 +427,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   RAG_EMBEDDING_MODEL=cohere.embed-v4:0
   ```
 
-  Image generation:
-
-  ```bash
-  ENABLE_IMAGE_GENERATION=true
-  IMAGE_GENERATION_ENGINE=openai
-  IMAGES_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
-  IMAGES_OPENAI_API_KEY=YOUR_STDAPI_KEY
-  IMAGE_GENERATION_MODEL=stability.stable-image-core-v1:1
-  ```
-
-  Image editing:
-
-  ```bash
-  ENABLE_IMAGE_EDIT=true
-  IMAGE_EDIT_ENGINE=openai
-  IMAGES_EDIT_OPENAI_API_BASE_URL=YOUR_STDAPI_URL/v1
-  IMAGES_EDIT_OPENAI_API_KEY=YOUR_STDAPI_KEY
-  IMAGE_EDIT_MODEL=stability.stable-image-control-structure-v1:0
-  ```
+  Image generation and editing: in **Settings** > **Images** (admin section), add an **OpenAI compatible** [image connection](/features/chat-conversations/image-generation-and-editing#set-up-a-connection) with the URL `YOUR_STDAPI_URL/v1` and your stdapi.ai key. Under **Model IDs**, add `stability.stable-image-core-v1:1` for generation and `stability.stable-image-control-structure-v1:0` for editing. Both models sit on one connection, so pick `stability.stable-image-control-structure-v1:0` as **Default Edit Model** under **Default Models**.
 
   Speech to text (STT):
 
@@ -696,7 +678,7 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 :::info Forward cookies
 
-**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default and applies to admin-configured connections; a user's own direct connections never forward cookies.
+**Advanced > Forward cookies** decides whether the cookies from the browser request are sent on to this server. It is off by default.
 
 Turn it on only for a server you control that authenticates the person behind the request by cookie, typically one sitting inside your own network behind the same sign-on. Everything the browser holds for your Open WebUI domain goes with the request, session cookie included, so a third-party endpoint should never have this on.
 
@@ -720,12 +702,12 @@ Leaving it at **Default** is always safe. Chatting works the same with every opt
 | :--- | :--- |
 | **Default** | Nothing. The connection is treated as a plain OpenAI-compatible endpoint. |
 | **Azure OpenAI** | Requests are rewritten into Azure's deployment-based URL form with an `api-version` parameter, so the connection needs an **API Version** and the deployment names listed under **Model IDs**. Also switched on automatically for Azure-looking URLs, see the Azure OpenAI tab under [Cloud Providers](#cloud-providers). |
-| **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
+| **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. The option names the request format, so hosted servers that speak it, such as DeepSeek's API (whose thinking mode needs the reasoning sent back), use it too. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
 | **LM Studio** | Unlocks the same [model management panel](#managing-local-models-from-open-webui), loaded markers and model details, minus deleting models and minus the **Eject** button. |
 | **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
 
 :::info Where the dropdown is not shown
-The **Provider** dropdown belongs to OpenAI connections only. Ollama connections are recognised on their own, and the personal **Direct Connections** users add in their own settings do not offer it.
+The **Provider** dropdown belongs to OpenAI connections only. Ollama connections are recognised on their own, and the [connections users add in Tether](/ecosystem/tether#bring-your-own-models-and-tools) do not offer it.
 :::
 
 ---
@@ -734,7 +716,7 @@ The **Provider** dropdown belongs to OpenAI connections only. Ollama connections
 
 Two provider types go beyond plain chat completions: setting **Provider** on the connection tells Open WebUI which management API the server speaks, which unlocks a model management panel for admins.
 
-Open it from **Settings > Models** (admin section), the **⋯** menu, then **Manage**. When you have both Ollama and a managed provider connection, a picker at the top of the dialog switches between them; a second picker lists every managed connection by URL.
+Open it from **Settings > Models** (admin section), the **⋯** menu, then **Manage**.
 
 | | `llama.cpp` | `LM Studio` |
 | :--- | :---: | :---: |
@@ -750,8 +732,6 @@ The connection URL you already use for chat is the right one here: Open WebUI st
 ### From the model selector
 
 Admins do not have to open the panel to pull a model. Type a model ref into the model selector's search box and Open WebUI offers one **Download** row per target: Ollama if it is connected, plus every `llama.cpp` and LM Studio connection, each labelled with the provider it would download from. Arrow keys reach the rows and **Enter** starts the download. A row in progress shows a percentage and an ✕ to cancel it, and up to three downloads can run at once across all targets.
-
-Model rows for these two providers also carry their parameter size, quantization and file size next to the name, taken from whatever the server reports.
 
 ### Loaded models and eject
 

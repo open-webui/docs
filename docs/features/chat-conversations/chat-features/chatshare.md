@@ -99,12 +99,13 @@ In a chat with replies allowed:
 
 - In the bubble layout, messages from other people sit on the left with their name and profile picture, and your own sit on the right without them. With **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
 - A line above the message input shows who is typing.
-- The chat's top bar shows the other people who have the chat open right now, up to three profile pictures followed by a count such as **+2**. Click the count for the **Collaborators** list, and hover or click a picture to open that person's profile card.
+- The chat's top bar shows the other people who have the chat open right now. Click there for the **Collaborators** list.
 - Anyone who can write into the chat and has the **Allow Regenerate Response** permission can **Regenerate** any reply. The new version belongs to the person who generated it. Each person continues, stops and rates only the reply versions they generated.
 - Anyone who can write into the chat and has the [**Allow Chat Edit**](/features/authentication-access/rbac/permissions#3-chat-permissions) permission can edit any prompt. The editor offers **Send**, which adds the edited prompt as a new branch with a new reply and leaves the original as it was. Other people in the chat stay on the branch they had selected.
 - Only the owner can edit replies and save an edit in place, and only on their own messages and the reply versions they generated. Opening the editor on someone else's message offers **Send** on a prompt and **Save As Copy** on a reply, which add a new message and leave the original as it was.
 - **Delete** on a reply shows only to the owner, on reply versions the owner generated, once the reply has more than one version.
-- Only the owner's messages generate titles and tags or change the chat's selected models, attached files and chat variables. Other people's turns run without the chat's variables.
+- Anyone who can write into the chat can change and save the chat's model, terminal and working folder. Everyone who can write into the chat can also use the chat's own terminal.
+- Only the owner's messages generate titles and tags or change the chat's attached files and chat variables. Other people's turns run without the chat's variables.
 - Someone who reaches the chat only through an **Open** link, with no access by name, group or **Public**, sees the snapshot.
 - When someone loses access, the chat closes for them at once and they stop getting its updates.
 
@@ -121,7 +122,7 @@ To view a shared chat:
 3. The chat will be displayed in a read-only format. With [Allow replies](#allowing-replies), you are taken to the chat itself and can write into it.
 4. If the Admin of the Open WebUI instance from which the shared link was shared has Text-to-Speech set up, there may be an audio button for messages to be read aloud to you (situational).
 
-A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** window labels its message nodes the same way.
+A chat that belongs to someone else is shown under its author: each message carries the name and profile picture of the person who sent it. This holds wherever you opened it, whether through the share link, from a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) or as an admin from **Admin Panel > Users**. Opened inside the app, the chat's **Overview** tab labels its message nodes the same way.
 
 Anyone other than the owner gets the conversation only: the owner's advanced parameters, selected tools, tool servers and filters, chat variables and per-message settings stay with the owner.
 

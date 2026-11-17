@@ -130,7 +130,7 @@ Things to know about the access_grant table:
 - `principal_type` of `user` with `principal_id` of `*` represents public access, meaning every signed-in user. It does not reach visitors who are not logged in
 - `principal_type` of `anyone` is the no-sign-in grant behind [open share links](/features/chat-conversations/chat-features/chatshare#open-links-no-sign-in). It is only ever stored as `anyone` / `*` / `read`, any other combination is rejected, and it is only honoured for the `shared_chat` resource type. Every other resource strips it
 - Supports both group-level and individual user-level access grants
-- A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants
+- A group-level grant also applies to the members of that group's subgroups. Deleting a group deletes its grants, and deleting a user deletes the grants made to that user
 
 ## API Key Table
 
@@ -975,7 +975,7 @@ Things to know about the notification table:
 
 Things to know about the oauth_session table:
 
-- The relationship to `user` is one-to-many. Each sign-in inserts a new row, so several rows can exist for the same user and the same provider. `OAUTH_MAX_SESSIONS_PER_USER` (default 10) caps how many a user may hold per provider; on sign-in the oldest rows above the cap are deleted.
+- The relationship to `user` is one-to-many. Each sign-in inserts a new row, so several rows can exist for the same user and the same provider. `OAUTH_MAX_SESSIONS_PER_USER` (default 10) caps how many a user may hold per provider; on sign-in the oldest rows above the cap, by last sign-in or token refresh, are deleted.
 - Indexed on `user_id`, on `expires_at` and on (`user_id`, `provider`) (`idx_oauth_session_user_id`, `idx_oauth_session_expires_at`, `idx_oauth_session_user_provider`, all from migration `38d63c18f30f`).
 - Deleting a user cascades to delete their sessions.
 - `token` holds the provider's token set (access token, ID token and refresh token) as JSON, encrypted at rest with Fernet before it is written and decrypted on read. The key comes from `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`, which falls back to `WEBUI_SECRET_KEY`. A key that is not already 44 characters is hashed with SHA-256 and base64-encoded to the length Fernet requires.

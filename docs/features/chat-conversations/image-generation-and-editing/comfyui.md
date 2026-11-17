@@ -17,67 +17,39 @@ Once running, the ComfyUI interface will be available at `http://<your_comfyui_i
 
 ## Connecting ComfyUI to Open WebUI
 
-Since Open WebUI typically runs inside Docker, you must ensure the container can reach the host-based ComfyUI application via `host.docker.internal`.
+Since Open WebUI typically runs inside Docker, the container has to reach the host-based ComfyUI application via `host.docker.internal`.
 
-1. **Host Binding Check:** Ensure ComfyUI is running with the `--listen 0.0.0.0` flag (Step 5).
+1. **Host Binding Check:** Ensure ComfyUI is running with the `--listen` flag so it binds to `0.0.0.0`.
 2. **Firewall Check:** If the host firewall (UFW) is active, ensure port 8188 is allowed (`sudo ufw allow 8188/tcp`).
+3. **Linux native Docker:** Without Docker Desktop, map the host gateway when you start the Open WebUI container by adding `--add-host=host.docker.internal:host-gateway` to the `docker run` command.
 
-3. **Docker Run Command (Linux Native Docker):**
-For Linux users not running Docker Desktop, you must explicitly map the host gateway when running the Open WebUI container.
-
-```docker
-docker run -d -p 3000:8080 \
-  --add-host=host.docker.internal:host-gateway \
-  -e COMFYUI_BASE_URL=http://host.docker.internal:8188/ \
-  -e ENABLE_IMAGE_GENERATION=True \
-  -v open-webui:/app/backend/data \
-  --name open-webui \
-  --restart always \
-  ghcr.io/open-webui/open-webui:main
-```
-
-Once you have ComfyUI installed and running, you can connect it to Open WebUI from the admin settings.
+A ComfyUI connection holds one workflow for generating images and one for editing them. Under **Capabilities** in the connection, **Generate** becomes available once a generation workflow is uploaded and **Edit** once an edit workflow is uploaded.
 
 ## Image Prompt Generation
 
 This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results. It only applies to Legacy function calling; in the default Native mode the model writes the prompt itself when it calls the tool.
 
-The **Image Prompt Generation** toggle is located in the **Create Image** section of **Settings > Images** (admin section).
+The **Image Prompt Generation** toggle is in the **Legacy** section of **Settings > Images** (admin section).
 
 To customize the prompt template used for generation, go to **Settings > Interface** (admin section), in the **Generation** section.
 
-![Screenshot showing the Image Prompt Generation toggle location in Images settings](/images/image-generation-and-editing/image-prompt-generation-toggle.png)
-
 ## Create Image (Image Generation)
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Images** (admin section).
-
-2. **Enable and Configure ComfyUI:**
-    - Ensure the **Image Generation** toggle at the top of the page is enabled.
-    - Under the **Create Image** section, set the **Image Generation Engine** to `ComfyUI`.
-    - **Model**: Select the base model to be used for generating the image.
-    - **Image Size**: Defines the resolution of the generated image (e.g., 512x512, 1024x1024).
-    - **Steps**: The number of sampling steps; higher values can improve image quality but take longer to process.
-    - In the **Base URL** field, enter the address of your running ComfyUI instance (e.g., `http://host.docker.internal:8188/`).
-    - Click the **refresh icon** next to the URL field to verify the connection. A success message should appear.
-    - If your ComfyUI instance requires an API key, enter it in the **API Key** field.
-
-    ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image generation.](/images/image-generation-and-editing/comfyui-generation-settings.png)
-
-3. **Upload Your ComfyUI Workflow:**
-    - First, you need to export a workflow from ComfyUI in the correct format. In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Then search for and toggle on the **"Dev Mode"** option with a description that states **"Enable dev mode options (API save, etc.)"**.
+1. In Open WebUI, go to **Settings** > **Images** (admin section) and switch on **Image Generation**.
+2. Add a connection and set **Connection Type** to **ComfyUI**.
+3. In **URL**, enter the address of your running ComfyUI instance (for example `http://host.docker.internal:8188/`) and click the verify icon next to it. A success message should appear.
+4. If your ComfyUI instance requires an API key, enter it in the key field.
+5. **Export the workflow from ComfyUI.** In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Search for and toggle on the **"Dev Mode"** option with a description that states **"Enable dev mode options (API save, etc.)"**.
 
     ![Screenshot of the ComfyUI settings with the "Dev Mode" toggle highlighted.](/images/image-generation-and-editing/comfyui-dev-mode.png)
 
-    - While still in ComfyUI, load the **image generation** workflow you want to use, and then click the **"Export (API)"** button found in the **File** sub-menu after clicking on the ComfyUI logo. This will prompt you to name the file. Name it something memorable and download it.
+    Load the **image generation** workflow you want to use, then click the **"Export (API)"** button in the **File** sub-menu after clicking the ComfyUI logo, name the file and download it.
 
     ![Screenshot of the "Export (API)" entry in the ComfyUI File menu.](/images/image-generation-and-editing/comfyui-save-api-format.png)
-    - Back in Open WebUI, under the **ComfyUI Workflow** section, click **Upload**. Select the JSON workflow file you just downloaded.
 
-    ![Screenshot of the ComfyUI Workflow section in Open WebUI, showing the upload button.](/images/image-generation-and-editing/comfyui-workflow-upload.png)
+6. **Upload it.** In Open WebUI, click **Upload** in the **Generation Workflow** section and select the JSON file you just downloaded.
 
-4. **Map Workflow Nodes:**
-    After the workflow is imported, you must map the node IDs from your workflow to the corresponding fields in Open WebUI. Each parameter has two fields:
+7. **Map the workflow nodes.** After the workflow is imported, map the node IDs from your workflow to the corresponding fields in Open WebUI. Each parameter has two fields:
 
     - **Key (left field):** The input parameter name in the workflow (e.g., `text`, `ckpt_name`, `seed`)
     - **Node Ids (right field):** The comma-separated node ID(s) that contain this input
@@ -93,24 +65,20 @@ To customize the prompt template used for generation, go to **Settings > Interfa
     | Steps | `steps` | No | Sampling steps |
     | Seed | `seed` | No | Random seed for reproducibility |
 
-    **Note:** Required parameters are marked with an asterisk (*). Only the prompt node ID is strictly required.
-
-    You can find the node ID by clicking on a node in ComfyUI and viewing its details.
+    Only the prompt node ID is required. You can find the node ID by clicking on a node in ComfyUI and viewing its details.
 
     Open WebUI returns the images from the workflow's **Save Image**, **Save Image (Advanced)**, **Save Animated WEBP**, **Save Animated PNG** and **Preview Image** nodes. Animated images stay animated in the chat.
 
-    ![Screenshot of the ComfyUI Workflow Nodes section in Open WebUI, showing the mapping fields.](/images/image-generation-and-editing/comfyui-node-mapping.png)
-
     :::info
-    You may need to adjust a `Key` within Open WebUI's `ComfyUI Workflow Nodes` section to match a node in your workflow. For example, the default `seed` key might need to be changed to `noise_seed` depending on your workflow's structure.
+    You may need to adjust a `Key` to match a node in your workflow. For example, the default `seed` key might need to be changed to `noise_seed` depending on your workflow's structure.
     :::
 
     :::tip
-    Some workflows, such as ones that use any of the Flux models, may utilize multiple node IDs that are necessary to fill in for their node entry fields within Open WebUI. If a node entry field requires multiple IDs, the node IDs should be comma separated (e.g., `1` or `1, 2`).
+    Some workflows, such as ones that use any of the Flux models, need several node IDs for one entry. Separate them with commas (e.g., `1` or `1, 2`).
     :::
 
-5. **Save Configuration:**
-    - Click the **Save** button at the bottom of the page to finalize the configuration. You can now use ComfyUI for image generation in Open WebUI.
+8. Leave **Model IDs** empty to use the model set in the workflow, or add model names to offer them. Under **Advanced**, **Image Size** and **Steps** are optional defaults.
+9. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
 
 ![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
 
@@ -122,16 +90,9 @@ Messages have no "Generate Image" button. Generation happens from the chat itsel
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
-1. **Navigate to Image Settings:** In Open WebUI, go to the **Settings** > **Images** (admin section).
-
-2. **Configure Image Editing:**
-    - Under the **Edit Image** section, switch **Image Edit** on. It is off by default, and without it the edit engine is never used.
-    - Set the **Image Edit Engine** to `ComfyUI`.
-    - **Model**: Select the model to be used for the editing task.
-    - **Image Size**: Specify the desired resolution for the output image.
-    - **Base URL** and **API Key**: The **Edit Image** section has its own fields for these. They do not fall back to the generation settings, so fill them in even when the same ComfyUI instance serves both.
-    - **ComfyUI Workflow**: Upload a separate workflow file specifically designed for image editing tasks. The process is the same as for image generation.
-    - **Map Workflow Nodes**: Image editing has five configurable parameters with different defaults than generation:
+1. In **Settings** > **Images** (admin section), switch **Image Edit** on.
+2. In the **Edit Workflow** section of the same connection, upload a workflow designed for image editing, exported the same way as the generation workflow.
+3. Map the workflow nodes. Image editing has five parameters with different defaults than generation:
 
     | Parameter | Default Key | Required | Description |
     |-----------|-------------|----------|-------------|
@@ -141,9 +102,7 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
     | Width | `width` | No | Output image width |
     | Height | `height` | No | Output image height |
 
-    **Note:** Unlike image generation, editing does not support negative prompts, steps, seed, or batch size parameters.
-
-    ![Screenshot of the Open WebUI Images settings page with ComfyUI selected for image editing.](/images/image-generation-and-editing/comfyui-editing-settings.png)
+    **Edit Image Size** under **Advanced** sets the output size.
 
 ![Screenshot of an image being edited in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-edit-image-in-chat.png)
 
@@ -153,7 +112,7 @@ Understanding the node ID mapping is often the biggest hurdle in integrating Com
 
 #### Mapping Workflow Nodes to Open WebUI
 
-Open WebUI's **ComfyUI Workflow Nodes** section lets you map generic controls to specific node inputs in your static ComfyUI workflow JSON. Each row has two fields:
+The node mapping under each workflow lets you map generic controls to specific node inputs in your static ComfyUI workflow JSON. Each row has two fields:
 
 | Field | Description | Example |
 |-------|-------------|---------|
@@ -163,8 +122,6 @@ Open WebUI's **ComfyUI Workflow Nodes** section lets you map generic controls to
 #### Identifying Node IDs and Input Keys in ComfyUI
 
 Before configuring Open WebUI, you must examine your exported workflow JSON files directly in a text editor. The Node ID is the unique number ComfyUI uses to identify the node in the JSON structure. The top-level keys in the JSON object are the node IDs.
-
-![Screenshot of the ComfyUI Workflow Nodes list in Open WebUI, pairing each input key such as text, unet_name, width, height, steps and seed with its node ID.](/images/image-generation-and-editing/comfyui-node-mapping.png)
 
 **Identify the Input Key (The Parameter Name)**
 
@@ -207,8 +164,6 @@ The Key is the exact parameter name within that node's JSON structure that you n
 },
 ```
 
-![Screenshot of the Images page in Open WebUI's admin settings with ComfyUI as the engine, showing the base URL, API key, workflow upload and the Workflow Nodes mapping.](/images/image-generation-and-editing/comfyui-unet-name-node.png)
-
 #### Default Key Values by Task Type
 
 **Image Generation:**
@@ -228,7 +183,7 @@ The Key is the exact parameter name within that node's JSON structure that you n
 
 #### Example: Mapping KSampler Seed
 
-Let's say you want to control the `seed` in your KSampler node, which has an ID of `3`. In the `Seed` section of the Open WebUI settings:
+Let's say you want to control the `seed` in your KSampler node, which has an ID of `3`. In the `seed` row of the node mapping:
 
 | Key | Node Ids |
 |-----|----------|
@@ -377,9 +332,9 @@ ComfyUI/
 
 ## Configuring with SwarmUI
 
-SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the `Base URL`. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for ComfyUI image generation outlined above.
+SwarmUI utilizes ComfyUI as its backend. In order to get Open WebUI to work with SwarmUI you will have to append `ComfyBackendDirect` to the connection's **URL**. Additionally, you will want to setup SwarmUI with LAN access. After aforementioned adjustments, setting up SwarmUI to work with Open WebUI will be the same as the steps for ComfyUI image generation outlined above.
 ![Install SwarmUI with LAN Access](https://github.com/user-attachments/assets/a6567e13-1ced-4743-8d8e-be526207f9f6)
 
 ### SwarmUI API URL
 
-The address you will input as the **Base URL** will look like: `http://<your_swarmui_address>:7801/ComfyBackendDirect`
+The address you will input as the **URL** will look like: `http://<your_swarmui_address>:7801/ComfyBackendDirect`

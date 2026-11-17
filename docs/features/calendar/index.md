@@ -105,6 +105,8 @@ Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Calendar ad
 
 Click the small **+** button next to the **Calendars** heading in the calendar sidebar to open the **New Calendar** modal. Enter a name and pick a color from the preset palette (blue, red, green, amber, violet, pink, cyan, orange) and click **Create**. The new calendar appears in the sidebar immediately and shows up in the calendar picker when creating or editing events. Each calendar belongs to its creator and can be shared via [Sharing Calendars](#sharing-calendars).
 
+To rename or recolor your Personal calendar or one you created, hover it in the sidebar and click the pencil (**Edit**), change the name or color and click **Save**.
+
 ### Create an Event
 
 1. Click **New Event** (sidebar or top bar) or click any day/hour cell on the calendar grid
@@ -133,7 +135,7 @@ Switch between views using the dropdown in the top bar:
 
 | View | Description |
 |------|-------------|
-| **Month** | Full month grid with event chips. Events that overflow show a "+N more" link to the day view. |
+| **Month** | Full month grid with event chips. |
 | **Week** | 7-day time grid with hourly slots. Scroll vertically through the day. |
 | **Day** | Single-day time grid with hourly slots for detailed scheduling. |
 

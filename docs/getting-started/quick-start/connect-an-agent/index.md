@@ -66,7 +66,7 @@ Start a saved chat, click the **terminal button** (cloud icon), and select your 
 - **A regular model** with capable native tool calling. Open WebUI gives it terminal tools to run commands and work with files. Check the model's [Terminal capability and bindings](/features/workspace/models#capabilities-and-bindings) if the tools are missing.
 - **An agent model** named `<agent>/<model>`. Open WebUI discovers the agents and models available in the selected terminal. Only agents that successfully report their models appear.
 
-Agent conversations support one agent at a time and require a saved chat. Continue with new messages; regeneration, editing and resending earlier messages, and branching are not supported. See [Coding Agents](/features/open-terminal/coding-agents) for the full chat behavior.
+Agent conversations support one agent at a time and require a saved chat. See [Coding Agents](/features/open-terminal/coding-agents) for how regenerating, editing and forking work.
 
 ### 5. Try a task
 

@@ -7,10 +7,10 @@ title: "Multi-User Setup"
 
 When multiple people on your team need terminal access through Open WebUI, you have two options.
 
-| | Single Container | Per-User Containers |
+| | Single Container | Terminals |
 | :--- | :--- | :--- |
-| **How** | One container, separate accounts inside | Each user gets their own container |
-| **Isolation** | Separate workspaces inside one shared container | A separate container per user, with its own files, processes, and resources. On the Docker backend the containers share one network |
+| **How** | One container, separate accounts inside | Each user, chat or model can get its own instance |
+| **Isolation** | Separate workspaces inside one shared container | A separate instance per user, chat or model, with its own files, processes, and resources. On the Docker backend the containers share one network |
 | **Setup** | One extra setting | Additional orchestration service |
 | **Best for** | Small teams where everyone is trusted equally | Production, larger teams, untrusted users |
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
@@ -96,15 +96,15 @@ flowchart LR
 
 ## Option 2: Per-user containers with Terminals
 
-For larger deployments or when you need real isolation, [**Terminals**](../terminals/) gives each user their own container, with files, processes, and resources separate from everyone else's.
+For larger deployments or when you need real isolation, [**Terminals**](../terminals/) can give each user their own instance, with files, processes and resources separate from everyone else's.
 
-- **Full isolation**: each user's container is independent with its own files, processes, and resources
-- **On-demand provisioning**: containers are created when users start a session and cleaned up when idle
-- **Resource controls**: set CPU, memory, and storage limits per user or per environment
-- **Multiple environments**: different setups for different teams (e.g., data science, development)
-- **Kubernetes support**: works with Docker, Kubernetes, and k3s
-- **Scoped workspaces**: optionally give each saved chat or each automation its own workspace instead of one per user, via [Terminal Contexts](/features/open-terminal/terminals/orchestration/contexts)
-- **One network on the Docker backend**: every workspace sits on the same Docker network so the orchestrator can reach each one by name, which also lets a workspace reach a port another user's workspace has opened. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
+- **Full isolation**: with a separate instance per user, each instance has its own files, processes and resources
+- **On-demand provisioning**: instances are created when users start a session and cleaned up when idle
+- **Resource controls**: set CPU, memory and storage limits per terminal, within the server maximums
+- **Multiple environments**: users with write access create terminals with different setups for different teams (e.g., data science, development) and share them with users and groups
+- **Backends**: Docker, Kubernetes or the Kubernetes Operator
+- **Scoped instances**: a terminal can run one instance per user, saved chat or model, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
+- **Network on the Docker backend**: with `TERMINALS_DOCKER_NETWORK` set, instances share that Docker network, the orchestrator reaches each one by name and an instance can reach a port another user's instance has opened. Without it, the orchestrator reaches instances through their published ports on the Docker host. A terminal's **Network** setting picks one of the network profiles an admin defined in `TERMINALS_NETWORK_PROFILES`, which can place it on another Docker network. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
 
 ```mermaid
 flowchart LR
@@ -122,9 +122,10 @@ flowchart LR
     style CC fill:#27ae60,color:#fff
 ```
 
-Two deployment backends are available:
+Three deployment backends are available:
 
 - **[Docker Backend](../terminals/#deployment)**: runs on a single Docker host. Best for small-to-medium teams or environments without Kubernetes.
+- **Kubernetes**: the orchestrator creates the pods, volumes and services itself, with no operator or CRD. Set `TERMINALS_BACKEND=kubernetes`.
 - **[Kubernetes Operator](../terminals/#deployment)**: production-grade deployment using a CRD-based operator. Deploys alongside Open WebUI via the Helm chart.
 
 :::info Enterprise license required
