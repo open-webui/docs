@@ -74,7 +74,7 @@ The editor opens on a banner header: the background image fills the banner, with
 
 Everything else sits in rows, one per setting, and a row opens when you click it.
 
-- **Switches**: **Capabilities**, **Default Features** and **Builtin Tools** open into switches. Hover over a switch label to see what it does.
+- **Switches**: **Features**, **Default Features** and **Builtin Tools** open into switches. Hover over a switch label to see what it does.
 - **Pickers**: **Knowledge**, **Tools**, **Skills**, **Filters** and **Actions** open a searchable picker. **Clear** removes every selected item and **Manage** opens the workspace page where those items are created. **Enable all** selects every item matching the search (Knowledge has **Upload Files** in its place). Items marked **Global** are always on. Tools, Skills, Filters, Actions and Sub-agents show each item's description under its name. When the list is empty, the picker names the workspace page where items are added.
 - **Advanced Params** shows how many parameters you changed (**N modified**), or **Default** when none.
 - **Prompts** holds the model's prompt suggestions.
@@ -146,11 +146,11 @@ Bind resources in the picker rows:
 | **Filters** | Attach pipeline filters (e.g., PII redaction). Each attached [toggleable filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) has a **Start enabled in new chats** switch in the picker, which sets the model's default filters. The row appears once the instance has at least one filter function |
 | **Actions** | Attach action scripts (e.g., "Add to Memories"). The row appears once the instance has at least one action function |
 
-Toggle what the model can do in the **Capabilities** row and the two rows that follow it:
+Toggle what the model can do in the **Features** row and the two rows that follow it:
 
 The editor shows only the options that can work on this instance, for example **Web Search** only while web search is on. A hidden option keeps its saved value.
 
-![Capabilities and built-in tool categories in the model editor](/images/workspace/model-editor-capabilities.png)
+![Features and built-in tool categories in the model editor](/images/workspace/model-editor-capabilities.png)
 
 | Setting | What it controls |
 | :--- | :--- |
@@ -158,16 +158,17 @@ The editor shows only the options that can work on this instance, for example **
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
 | **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
-| **Image Generation** | Enable image generation |
+| **Image Generation** | Enable image generation. With it on and more than one [image model](/features/chat-conversations/image-generation-and-editing) available, a **Default image model** row appears for choosing the image model this model's chats use unless the user picks another |
+| **Video Generation** | Enable [video generation](/features/chat-conversations/image-generation-and-editing/video-generation). With it on and more than one video model available, a **Default video model** row appears for choosing the video model this model's chats use unless the user picks another |
 | **Usage** | Ask the provider to report token counts on streamed replies (`stream_options.include_usage`). Off by default. Most OpenAI-compatible providers report nothing unless asked, so without it a response has no token figures to show and none to aggregate in [Analytics](/features/administration/analytics) |
 | **Citations** | Show the sources behind a reply, from knowledge, file retrieval and the builtin tools that return them. On by default; with it off no sources are shown. Web search hits are not sources in Native mode, see [Agentic Search](/features/chat-conversations/web-search/agentic-search) |
 | **Status Updates** | Show the progress lines a reply emits while it works, web search steps for example. On by default |
 | **Memory** | Whether the user's stored memories are injected into this model's context (on by default). Turn it off for a model that should answer without personal context; it does not delete anything, and it is separate from the **Memory** builtin tool category, which is about the model reading and writing memories itself |
-| **Builtin Tools** | The capability switches the built-in tools on as a whole. While it is on, a **Builtin Tools** row below **Capabilities** controls which tool categories are available: Time & Calculation, Ask User, Memory, Chat History, Notes, Knowledge Base, Files, Channels, Notifications, Web Search, Image Generation, Code Interpreter, Task Management, Automations, Calendar, Sub-agents, Skills, Tool Creation, [Visualizations](/features/chat-conversations/chat-features/visualizations) (off by default). A category shows only while its feature is on |
+| **Builtin Tools** | The capability switches the built-in tools on as a whole. While it is on, a **Builtin Tools** row below **Features** controls which tool categories are available, see [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode). A category shows only while its feature is on |
 | **Sub-agents** | Shown while the **Sub-agents** builtin tool category is on: the models this model can hand [sub-agent](/features/chat-conversations/chat-features/subagents) work to. Users only get the listed models they have access to. Left empty, sub-agents run on the current model |
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **Preload files** disappears from this editor since there is nothing to extract |
 | **Preload files** | When enabled, attached files are processed via RAG and injected into the conversation. When disabled, nothing is injected and the model reads attached files with the builtin **Files** tools. Off by default with Native function calling and on with Legacy; the editor and **Model Defaults** show the effective value |
-| **Default Features** | The row right below **Capabilities** lists **Web Search**, **Image Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |
+| **Default Features** | The row right below **Features** lists **Web Search**, **Image Generation**, **Video Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |
 | **Default terminal** | Shown while **Terminal** is on: the [Open Terminal](/features/open-terminal) server or [terminal](/features/open-terminal/terminals/orchestration/creating-terminals) selected by default for chats with this model. A terminal with a separate instance per model needs access to the model |
 | **TTS Voice** | In the **Voice** row: a specific voice for this model's responses |
 
@@ -312,7 +313,7 @@ To download new base models, go to **Settings > Connections** (admin section) an
 
 ## Global Model Defaults (Admin)
 
-Administrators can set baseline capabilities and parameters that apply to all models in **Settings > Models** (admin section). Click **Model Defaults** at the top of the list to open it, and save with the page's **Save** button. It uses the same rows as the model editor: **Model Capabilities** holds the **Capabilities**, **Default Features** and **Builtin Tools** rows, a **Tools** picker sets the default tools, **Model Parameters** holds the advanced parameters and **Prompt Suggestions** the starter chips.
+Administrators can set baseline capabilities and parameters that apply to all models in **Settings > Models** (admin section). Click **Model Defaults** at the top of the list to open it, and save with the page's **Save** button. It uses the same rows as the model editor: **Model Capabilities** holds the **Features**, **Default Features** and **Builtin Tools** rows, a **Tools** picker sets the default tools, **Model Parameters** holds the advanced parameters and **Prompt Suggestions** the starter chips.
 
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, preload files, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.

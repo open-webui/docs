@@ -11,16 +11,21 @@ title: "Image Generation"
     - Check the **Images** settings in **Settings** > **Images** (admin section). Ensure "Image Generation" is toggled **ON**.
     - Ensure the **Image** toggle is on in the **+** menu of the message input. Nothing image-related happens without it, in any function calling mode.
     - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
-    - Verify your **API Key** and **Base URL** (for OpenAI, ComfyUI, Automatic1111) are correct.
+    - Open the connection in **Settings** > **Images** (admin section), check its **URL** and key, and click the verify icon next to the URL.
+    - Ensure the connection is enabled, has the **Generate** capability on and that **Access Control** includes the user. Non-admin users outside the connection's access list never see its models.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
 
-- **Images settings refuse to save** (saving **Settings** > **Images** (admin section) shows an error such as `OpenAI API Key is required.`):
-    - Keys and URLs are only required while their feature is on. Fill in the field, or switch the feature off, and save again.
-    - Invalid JSON in **Additional Parameters** is refused with `Invalid JSON format for Parameters`. Fix or clear it and save again.
+- **A connection refuses to save** (saving it shows an error such as `URL is required`):
+    - Fill in the **URL**, then save again.
+    - Invalid JSON in **Additional Parameters** or **Headers** is refused with `Invalid JSON format for Parameters` or `Headers must be a valid JSON object`. Fix or clear it and save again.
 
-- **Engine settings are missing** (**Settings** > **Images** (admin section) shows only the **Image Generation** switch):
-    - The **Create Image** and **Edit Image** sections, with the engines, their keys, **Image Prompt Generation** and **Image Edit**, show only while **Image Generation** is on. Their saved values are kept while hidden.
+- **Connections are missing** (**Settings** > **Images** (admin section) shows only the **Image Generation** and **Image Edit** switches):
+    - **Manage Image Connections** and **Default Models** show while **Image Generation** or **Image Edit** is on.
+
+- **Only one image model is offered, or the wrong one is used**:
+    - A connection with empty **Model IDs** offers every image model that an OpenAI compatible server labels as one (LiteLLM does), and a single default model for everything else: `gpt-image-2` on OpenAI, the loaded checkpoint on AUTOMATIC1111, the workflow's model on ComfyUI and `imagen-3.0-generate-002` on Gemini. Add the model IDs you want to offer.
+    - **Default Models** sets which model is used when the chat does not pick one. Users pick a model from the **Image** entry in the **+** menu.
 
 - **"Image unavailable" in place of a picture** (a small dashed box with a photo icon where the image used to be):
     - The browser could not load the image from the address stored on the message. This covers any image in a chat, uploaded or generated.
@@ -30,7 +35,7 @@ title: "Image Generation"
 
 ### ComfyUI Issues
 
-- **Incompatible Workflow / JSON Errors** (you see `Invalid workflow` or JSON parse errors after uploading a workflow):
+- **Incompatible Workflow / JSON Errors** (you see `Invalid JSON format for ComfyUI Workflow.` after uploading a workflow):
     - **API Format Required**: Open WebUI requires workflows to be in the **API Format**. 
     - In ComfyUI:
         1. Click the "Settings" (gear icon).
@@ -43,11 +48,11 @@ title: "Image Generation"
 
 - **Image Editing / Image Variation Fails** (generating from text works, but editing or image-to-image fails silently):
     - If you are using Image Editing or Image+Image generation, your custom workflow **must** have nodes configured to accept an input image (usually a `LoadImage` node replaced/linked effectively).
-    - Check the default "Image Editing" workflow in the Open WebUI settings for the required node structure to ensure compatibility.
+    - Check that the connection has an **Edit Workflow** uploaded with the **Image** and **Prompt** nodes mapped, and that **Edit** is on under **Capabilities**.
 
 - **Generation/editing fails when ComfyUI is on a private/internal address** (e.g. `10.x`, `192.168.x`, `172.16–31.x`, or `localhost`), often only after the workflow runs:
-    - Open WebUI applies SSRF protection to outbound fetches and trusts image URLs only when they are same-origin with the admin-configured `COMFYUI_BASE_URL` (a strict scheme + host + port match).
-    - Ensure `COMFYUI_BASE_URL` (and, for image editing, `IMAGES_EDIT_COMFYUI_BASE_URL`, which is empty by default and is the only origin the edit path trusts) is set to the **exact** origin ComfyUI serves images from (matching scheme, host, and port). If ComfyUI returns image URLs on a different host/port than `COMFYUI_BASE_URL`, those fetches are still SSRF-validated and may be blocked. On older versions, upgrade rather than disabling SSRF protection.
+    - Open WebUI applies SSRF protection to outbound fetches and trusts image URLs only when they are same-origin with the connection's **URL** (a strict scheme + host + port match).
+    - Set the connection's **URL** to the **exact** origin ComfyUI serves images from. If ComfyUI returns image URLs on a different host or port, those fetches are still SSRF-validated and may be blocked.
 
 ### Automatic1111 Issues
 
@@ -56,38 +61,18 @@ title: "Image Generation"
     
 - **Docker Connectivity** (Open WebUI can't reach Automatic1111 on `localhost`):
     - If Open WebUI is running in Docker and Automatic1111 is on your host machine:
-        - Use `http://host.docker.internal:7860` as the Base URL.
+        - Use `http://host.docker.internal:7860` as the connection's **URL**.
         - Ensure `host.docker.internal` is resolvable (added via `--add-host=host.docker.internal:host-gateway` in your Docker run command).
 
 ### Environment Variables & Configuration
 
-For advanced configuration, you can set the following environment variables.
+The image connections are managed in **Settings** > **Images** (admin section).
 
 #### General Image Generation
+
 - `ENABLE_IMAGE_GENERATION`: Set to `true` to enable image generation.
-- `IMAGE_GENERATION_ENGINE`: The engine to use (e.g., `openai`, `comfyui`, `automatic1111`, `gemini`).
-- `IMAGE_GENERATION_MODEL`: The model ID to use for generation.
-- `IMAGE_SIZE`: Default image size (e.g., `512x512`).
+- `ENABLE_IMAGE_EDIT`: Set to `true` to enable image editing. Both are listed in the [Environment Configuration Guide](/reference/env-configuration).
 
 #### Engine Specifics
 
-**OpenAI / Compatible**
-- `IMAGES_OPENAI_API_BASE_URL`: Base URL for OpenAI-compatible image generation API.
-- `IMAGES_OPENAI_API_KEY`: API Key for the image generation service.
-
-**ComfyUI**
-- `COMFYUI_BASE_URL`: Base URL for your ComfyUI instance.
-- `COMFYUI_API_KEY`: API Key (if authentication is enabled).
-- `COMFYUI_WORKFLOW`: Custom workflow JSON (must be API format).
-
-**Automatic1111**
-- `AUTOMATIC1111_BASE_URL`: Base URL for your Automatic1111 instance.
-- `AUTOMATIC1111_API_AUTH`: Authentication credentials (username:password).
-
-**Gemini**
-- `IMAGES_GEMINI_API_KEY`: API Key for Gemini.
-- [View Gemini Configuration Guide](/features/chat-conversations/image-generation-and-editing/gemini)
-
-:::tip
-For a complete list of environment variables and detailed configuration options, please refer to the [Environment Configuration Guide](/reference/env-configuration).
-:::
+Each engine is a connection of its own type, see [Image Generation and Editing](/features/chat-conversations/image-generation-and-editing#set-up-a-connection).

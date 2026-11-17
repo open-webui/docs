@@ -18,22 +18,21 @@ Open WebUI supports image generation through the **AUTOMATIC1111** [API](https:/
 /webui.sh --api --listen
 ```
 
-3. For Docker installation of WebUI with the environment variables preset, use the following command:
-
-```docker
-docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -e AUTOMATIC1111_BASE_URL=http://host.docker.internal:7860/ -e ENABLE_IMAGE_GENERATION=True -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
-```
-
 ### Setting Up Open WebUI with AUTOMATIC1111
 
-1. In Open WebUI, navigate to the **Settings** > **Images** (admin section) menu.
-2. Set the `Image Generation Engine` field to `Automatic1111`.
-3. In the `Base URL` field, enter the address where AUTOMATIC1111's API is accessible:
-
-![Screenshot of the Open WebUI Images settings page configured for AUTOMATIC1111.](/images/image-generation-and-editing/automatic1111-settings.png)
+1. In Open WebUI, go to **Settings** > **Images** (admin section), switch on **Image Generation** and add a connection.
+2. Set **Connection Type** to **AUTOMATIC1111**.
+3. In **URL**, enter the address where AUTOMATIC1111's API is accessible:
 
 ```txt
 http://<your_automatic1111_address>:7860/
 ```
 
-If you're running a Docker installation of Open WebUI and AUTOMATIC1111 on the same host, use `http://host.docker.internal:7860/` as your address.
+If you run Open WebUI in Docker and AUTOMATIC1111 on the same host, use `http://host.docker.internal:7860/` as the address.
+
+4. If AUTOMATIC1111 requires authentication, choose the **Basic** auth type and enter `username:password`.
+5. Leave **Model IDs** empty to use the checkpoint that is loaded, or add checkpoint names to offer them. Picking another listed model switches the loaded checkpoint for everyone using that server.
+6. Optionally open **Advanced** to add extra parameters such as `{"cfg_scale": 7, "sampler_name": "Euler a"}`.
+7. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
+
+AUTOMATIC1111 connections handle image generation. For editing, add a ComfyUI or OpenAI compatible connection.

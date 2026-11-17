@@ -195,7 +195,7 @@ In every case the requirement is the same: **don't rewrite the beginning of the 
 
 ## Summary checklist
 
-Set on the model, under **Settings > Models** (admin section), click the pencil (**Edit**), then **Capabilities** and **Builtin Tools**:
+Set on the model, under **Settings > Models** (admin section), click the pencil (**Edit**), then **Features** and **Builtin Tools**:
 
 - [ ] Static system prompt (no per-turn regeneration)
 - [ ] **File Upload** on, **Preload files** off, no automatic content injection (this also disables "Using Entire Document") **and** it is what injects the Files tools

@@ -16,25 +16,15 @@ Open WebUI also supports image generation through [Lumenfall](https://lumenfall.
 
 ### Configuring Image Generation
 
-1. In Open WebUI, navigate to the **Settings** > **Images** (admin section) menu.
-2. Set the `Image Generation Engine` field to `Default (Open AI)` (Lumenfall uses the same syntax as OpenAI).
-3. Change the `API Base URL` to `https://api.lumenfall.ai/openai/v1`.
-4. Enter your Lumenfall API key.
-5. The API version can be left blank.
-6. Enter the model you wish to use. For example: `gemini-3.1-flash-image`, `gpt-image-2`, or `flux.2-max`. See all available models at [lumenfall.ai/models](https://lumenfall.ai/models).
-7. Set the image size (e.g. `1024x1024`). Supported sizes depend on the model - if unsure, `1024x1024` works with most models.
-
-![Screenshot of the Open WebUI Images settings page configured with Lumenfall.](/images/image-generation-and-editing/lumenfall-settings.png)
+1. In Open WebUI, go to **Settings** > **Images** (admin section) and add a connection.
+2. Set **Connection Type** to **OpenAI compatible** (Lumenfall uses the same syntax as OpenAI).
+3. Set **URL** to `https://api.lumenfall.ai/openai/v1` and enter your Lumenfall API key.
+4. Under **Model IDs**, add the models you wish to use. For example: `gemini-3.1-flash-image`, `gpt-image-2` or `flux.2-max`. See all available models at [lumenfall.ai/models](https://lumenfall.ai/models).
+5. Optionally open **Advanced** and set **Image Size** (for example `1024x1024`). Supported sizes depend on the model.
+6. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
 
 ### Configuring Image Editing
 
-Lumenfall also supports image editing through the same API:
-
-1. On the same **Images** settings page, scroll to the **Edit Image** section.
-2. Toggle **Image Edit** to on.
-3. Set the `Image Edit Engine` to `Default (Open AI)`.
-4. Enter the same `API Base URL`: `https://api.lumenfall.ai/openai/v1`.
-5. Enter your Lumenfall API key.
-6. Choose a model that supports editing (e.g. `gpt-image-2`).
+Lumenfall also supports image editing through the same connection. Add a model that supports editing to **Model IDs**, such as `gpt-image-2`.
 
 For more details, see the [Lumenfall documentation](https://docs.lumenfall.ai/integrations/openwebui).

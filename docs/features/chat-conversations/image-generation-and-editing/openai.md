@@ -7,7 +7,7 @@ title: "OpenAI"
 This tutorial is a community contribution and is not supported by the Open WebUI team. It serves only as a demonstration on how to customize Open WebUI for your specific use case. Want to contribute? Check out the contributing tutorial.
 :::
 
-Open WebUI also supports image generation through the **OpenAI APIs**. This option includes a selector for choosing between the GPT-Image models (`gpt-image-1`, `gpt-image-1.5` and `gpt-image-2`). `gpt-image-2` is the default model.
+Open WebUI supports image generation and editing through the **OpenAI APIs**, and through any server with an OpenAI compatible images API such as Azure OpenAI or LiteLLM. All of them use the **OpenAI compatible** connection type.
 
 ### Initial Setup
 
@@ -15,56 +15,40 @@ Open WebUI also supports image generation through the **OpenAI APIs**. This opti
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, navigate to the **Settings** > **Images** (admin section) menu.
-2. Set the `Image Generation Engine` field to `Default (Open AI)`.
-3. Enter your OpenAI API key.
-4. Choose the model you wish to use. **GPT-Image** models support `auto`, `1024x1024`, `1536x1024`, or `1024x1536` images.
-
-![Screenshot of the Open WebUI Images settings page with Open AI selected and the API key, model, and image size fields highlighted.](/images/image-generation-and-editing/openai-settings.png)
+1. In Open WebUI, go to **Settings** > **Images** (admin section) and add a connection.
+2. Set **Connection Type** to **OpenAI compatible**, **URL** to `https://api.openai.com/v1`, and enter your API key.
+3. Leave **Model IDs** empty to use `gpt-image-2`, or add the models you want to offer, such as `gpt-image-1.5`.
+4. Optionally open **Advanced** and set **Image Size**. GPT-Image models accept `auto`, `1024x1024`, `1536x1024` or `1024x1536`.
+5. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
 
 ### Azure OpenAI
 
-Image generation with Azure OpenAI is supported. Configure the Image Generation as follows:
+Azure OpenAI uses the same connection type. Add a connection and set:
 
-1. In Open WebUI, navigate to the **Settings** > **Images** (admin section) menu.
-2. Set the `Image Generation Engine` field to `Default (Open AI)` (Azure OpenAI uses the same syntax as OpenAI).
-3. Change the `API Base URL` to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Set the instance and model id as you find it in the settings of the Azure AI Foundry.
-4. Configure the API version to the value you find in the settings of the Azure AI Foundry.
-5. Enter your Azure OpenAI API key.
+1. **URL** to `https://<instance-id>.cognitiveservices.azure.com/openai/deployments/<model>/`. Take the instance and model from the settings of the Azure AI Foundry.
+2. The API key from the Azure AI Foundry.
+3. **Model IDs** to the name of your deployed model.
+4. **API Version** under **Advanced** to the value shown in the Azure AI Foundry.
 
-![Screenshot of the Open WebUI Images settings page with Open AI selected and the API Base URL, API version and API key fields highlighted for Azure OpenAI configuration.](/images/image-generation-and-editing/azure-openai-settings.png)
-
-:::tip Azure GPT-Image-1.5 Configuration
-For Azure OpenAI **gpt-image-1.5**, use the following settings for successful generation:
-- **Model**: `gpt-image-1.5`
+:::tip Azure GPT-Image-1.5 configuration
+For Azure OpenAI **gpt-image-1.5**, use these settings:
+- **Model IDs**: `gpt-image-1.5`
 - **Image Size**: `1024x1024`
 - **API Version**: `2025-04-01-preview`
-- **API Endpoint URL**: `https://<your-resource-name>.openai.azure.com/openai/deployments/<your-deployment-name>/` (ensure the trailing slash is included)
-
-If you encounter the error `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, double-check that your API Version is set to `2025-04-01-preview` or later.
+- **URL**: `https://<your-resource-name>.openai.azure.com/openai/deployments/<your-deployment-name>/`
 :::
 
 :::tip
-Alternative `API Base URL` tutorial: `https://<endpoint name>.openai.azure.com/openai/deployments/<model name>/` - you can find your endpoint name on https://ai.azure.com/resource/overview, and model name on https://ai.azure.com/resource/deployments.
-You can also copy Target URI from your deployment detailed page, but remember to delete strings after model name.
-For example, if your Target URI is `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview`, the `API Base URL` in Open WebUI should be `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
+You can also copy the Target URI from your deployment page, but delete everything after the model name. For example, the Target URI `https://test.openai.azure.com/openai/deployments/gpt-image-1/images/generations?api-version=2025-04-01-preview` becomes the URL `https://test.openai.azure.com/openai/deployments/gpt-image-1/`.
 :::
 
 ### LiteLLM Proxy with OpenAI Endpoints
 
-Image generation with a LiteLLM proxy using OpenAI endpoints is supported with Open WebUI. Configure the Image Generation as follows:
-
-1. In Open WebUI, navigate to the **Settings** > **Images** (admin section) menu.
-2. Set the `Image Generation Engine` field to `Default (Open AI)`.
-3. Change the `API Base URL` to `https://<your-litellm-url>:<port>/v1`.
-4. Enter your LiteLLM API key.
-5. The API version can be left blank.
-6. Enter the image model name as it appears in your LiteLLM configuration.
-7. Set the image size to one of the available sizes for the selected model.
+1. Add a connection of type **OpenAI compatible**.
+2. Set **URL** to `https://<your-litellm-url>:<port>/v1` and enter your LiteLLM API key.
+3. Leave **Model IDs** empty. The connection lists the image models of your LiteLLM server by itself. Add model IDs only to offer a subset.
+4. Leave **API Version** empty.
 
 :::tip
-
-To find your LiteLLM connection information, navigate to the **Settings** > **Connections** (admin section) menu.
-Your connection information will be listed under the OpenAI API connection.
-
+You can find your LiteLLM connection details under **Settings** > **Connections** (admin section), in the OpenAI API connection.
 :::
