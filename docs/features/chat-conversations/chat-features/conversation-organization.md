@@ -102,7 +102,7 @@ Each chat in the list or on the board has the same three-dot menu as in the side
 
 ### Statuses
 
-A status says where a chat stands, for example **In progress** or **Done**. Every folder starts with **Backlog**, **To do**, **In progress**, **Waiting** and **Done**, and chats without a status show as **No status**.
+A status says where a chat stands, for example **In progress** or **Done**. Folders start with no statuses, and chats without a status show as **No status**. Add your own under **Edit statuses…**, where **Backlog**, **To do**, **In progress**, **Waiting** and **Done** are offered as suggestions until the folder has a status of its own.
 
 Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Earlier time spent in the same status counts toward it.
 
@@ -114,7 +114,7 @@ Tags label chats by topic and feed the grouping, board and filter options above.
 
 ### Automations
 
-The page header has a **Chats** and **Automations** switch for users who have the [Automations](/features/chat-conversations/chat-features/automations) feature. It lists the folder's automations and has a **New automation** button; see [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page for who can do what.
+The page header has a **Chats**, **Automations** and **Knowledge** switch; **Automations** is there for users who have the [Automations](/features/chat-conversations/chat-features/automations) feature. It lists the folder's automations and has a **New automation** button; see [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page for who can do what.
 
 ### Renaming from the Tab
 
@@ -167,6 +167,8 @@ The System Prompt field is only visible if you have permission to set system pro
 :::
 
 ### Attached Knowledge
+
+The folder page also has a **Knowledge** section that lists what new chats in the folder use.
 
 Attach **knowledge bases, notes and files** in the folder's **Knowledge** field (under **Advanced**), the same picker as in the model editor ([Attaching knowledge and notes](/features/workspace/knowledge#attaching-knowledge-and-notes)):
 

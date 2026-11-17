@@ -54,9 +54,13 @@ The command must start an ACP v1 agent over standard input/output. It runs with 
 Select a terminal in the chat, then open the model picker. Each agent model is named `<agent>/<model>`.
 
 - **One agent per conversation.** Add only one agent model to a chat. Agents cannot be combined with other models in a multi-model chat.
-- **New messages only.** Continue an agent conversation by sending a new message. Agent chats cannot be regenerated, continued or edited and resent, and you cannot branch from an earlier message; start a new chat instead.
+- **Regenerate, edit and fork.** You can regenerate a reply, edit an earlier message, and fork or clone the chat. Codex and Claude Code continue their own conversation from that point. Claude Code needs an up-to-date [Open Terminal](/features/open-terminal/setup/updating) for it and Codex needs an up-to-date Codex CLI on the terminal. Other agents start over from the chat so far. File changes the agent already made stay in the terminal.
 - **Missing agents.** When the terminal or its agent model is unavailable, the agent is removed from the selection and the default model is used.
 - **Saved chats only.** Agent conversations need a saved chat, so they are not available in temporary chats.
+
+## Reading the Steps
+
+Agent steps and the terminal tool calls of regular models show as readable cards, such as a command with its output or a diff per edited file.
 
 ## Model IDs
 
