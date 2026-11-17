@@ -317,6 +317,7 @@ Administrators can set baseline capabilities and parameters that apply to all mo
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, preload files, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
 - **Tools**: tools that start enabled in new chats for every model without a tool list of its own. A model with its own tool list keeps it. The new model form starts with these tools selected.
+- **Default terminal**: the terminal new chats start with for every model that has no terminal of its own.
 - **Prompt suggestions**: the starter chips shown when a model has none of its own. The globe selector translates them per language, the same way a model's own suggestions are translated. See [Translations](#translations).
 
 These cover chat completions. Background task requests (titles, tags, follow-ups, search queries, autocomplete, context compaction summaries) do not go through them; their parameters are set separately, in [Task Models](/features/administration/task-models).

@@ -43,11 +43,17 @@ This feature is experimental, and its configuration may change between releases.
 
 Instead of uploading and embedding documents inside Open WebUI, you can point a knowledge base at an **external vector database** you already maintain. Open WebUI queries it directly at chat time, so your documents, embeddings and indexing stay in your own store and are never re-ingested.
 
-Supported providers: **Qdrant**, **Milvus** and **pgvector**. The provider's Python client must be present in your Open WebUI image (for example `qdrant-client` or `pymilvus`). Supported Qdrant server versions are listed in the [Qdrant settings](/reference/env-configuration#qdrant).
+Supported providers: **OpenAI-compatible** (OpenAI vector stores, Azure OpenAI v1 and LiteLLM), **Qdrant**, **Milvus** and **pgvector**. For Qdrant, Milvus and pgvector, the provider's Python client must be present in your Open WebUI image (for example `qdrant-client` or `pymilvus`). Supported Qdrant server versions are listed in the [Qdrant settings](/reference/env-configuration#qdrant).
+
+### Using OpenAI-compatible vector stores
+
+The server runs the search itself with the embedding model the store was built with. Enter the **Endpoint** (for Azure OpenAI, the `/openai/v1` URL) and an **API Key / Token**, then click **Verify Connection** to load the store list. A knowledge base can use one or more of the loaded stores.
+
+To expose every store of the endpoint without creating knowledge bases one by one, turn on **List stores as knowledge bases** when you add the connection. The stores named in **Store IDs** (empty means all stores) then show up in **Workspace > Knowledge** as read-only knowledge bases, read live from the endpoint. Access is set on the connection and applies to all of its stores. With the switch off, creating a knowledge base needs a successful **Test Query** that returns documents.
 
 ### Adding an external knowledge source
 
-Configure these under **Settings > Integrations > External Knowledge Sources** (admin section):
+The steps below apply to Qdrant, Milvus and pgvector. Configure these under **Settings > Integrations > External Knowledge Sources** (admin section):
 
 1. **Create a connection** to your vector database:
    - **Provider** (Qdrant / Milvus / pgvector)
@@ -71,14 +77,14 @@ Configure these under **Settings > Integrations > External Knowledge Sources** (
    Dotted paths are supported for nested fields (for example `payload.text`).
 3. **Test the query** with a sample question. Open WebUI runs a live retrieval against the source and shows the results. A successful test is required before you can create or save the source.
 
-Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. At chat time, Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
+Once created, the external source appears in **Workspace > Knowledge** like any other knowledge base and can be attached to models or chats. For Qdrant, Milvus and pgvector, at chat time Open WebUI embeds the user's query with its configured RAG embedding model, searches the external database by vector, and feeds the top matches into the prompt. No copy of the documents is stored in Open WebUI.
 
 With [Retrieval Query Generation](/reference/env-configuration#enable_retrieval_query_generation) on, all generated queries run at the same time. Their results are merged by rank (the top result of each query, then the second of each, and so on), duplicates are dropped and the list is cut to the result count.
 
-In the sources under an answer, each result is listed by its title. When a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
+In the sources under an answer, each result is listed by its title. For Qdrant, Milvus and pgvector, when a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
 
 :::info Embedding model must match
-Because Open WebUI embeds the query and searches your database by vector, the vectors stored in your external database must come from the **same embedding model** Open WebUI uses (matching model and dimensions). Mismatched embeddings produce poor or meaningless results.
+For Qdrant, Milvus and pgvector, Open WebUI embeds the query and searches your database by vector, so the vectors stored in your external database must come from the **same embedding model** Open WebUI uses (matching model and dimensions). Mismatched embeddings produce poor or meaningless results.
 :::
 
 ## Web Search for RAG

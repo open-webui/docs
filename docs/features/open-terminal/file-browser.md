@@ -13,7 +13,7 @@ When Open Terminal is connected, the **Files** tab of the [**Tabs**](/features/c
 
 ## Browsing
 
-Click folders to navigate, and click files to preview them. A breadcrumb bar at the top shows where you are.
+Click folders to navigate, and click files to preview them. A breadcrumb bar at the top shows where you are. Click the path to type a folder to open.
 
 **Files** in the **+** menu of the Tabs opens another Files tab, so you can keep several folders open side by side. Each Files tab is named after the folder it shows.
 
@@ -233,7 +233,7 @@ The Git panel lets you review, commit and publish what the AI changed in a proje
 When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
 
 - **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
-  **Discard changes** works for staged, unstaged and new files. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
+  **Discard changes** works for staged, unstaged and new files. Pick several changed files with **Ctrl** or **Shift**-click (**Cmd** on macOS) to discard them together, or use **Discard all changes** in the Changes menu. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.
 - **History**: past commits and their diffs.
 - **Issues**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed** or **All**, create, edit, comment, close as completed or not planned and reopen.
 - **Pull requests**, for GitHub repositories when the terminal supports them: search, filter by **Open**, **Closed**, **Merged** or **All**, create, edit, comment, approve, request changes, close, reopen, check out, update the branch and mark ready. A pull request has **Summary**, **Code**, **Checks** and **Activity** views and shows whether it has conflicts. The merge button has a **Merge method** menu with **Squash and merge**, **Create a merge commit** and **Rebase and merge**.
