@@ -19,8 +19,42 @@ import DocCardList from '@theme/DocCardList';
   style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
 />
 
-![Image generation settings](/images/admin/admin-images.png)
+Generate and edit images from a prompt without leaving the chat, using a local or hosted image model. An administrator sets up one connection per image backend, and users pick from the models those connections offer. For videos, see [Generate Videos](/features/chat-conversations/image-generation-and-editing/video-generation).
 
-Generate and edit images from a prompt without leaving the chat, using a local or hosted image model.
+## Set up a connection
+
+1. Open **Admin Panel** > **Settings** > **Images** and switch on **Image Generation**, **Image Edit** or both.
+2. Under **Manage Image Connections**, click **+** (Add Connection).
+3. Pick the **Connection Type**, enter a **Name** and the **URL** (plus the key if the backend needs one), and click the verify icon next to the URL to check the server.
+4. Under **Capabilities**, keep **Generate**, **Edit** or both on. Only capabilities the backend supports can be switched on: AUTOMATIC1111 handles generation only, and a ComfyUI connection needs the matching workflow.
+5. Set **Access Control** to the users who may use the connection, then click **Save**.
+
+| Connection Type | Use it for | Edit support |
+|---|---|---|
+| OpenAI compatible | [OpenAI](/features/chat-conversations/image-generation-and-editing/openai), Azure OpenAI, LiteLLM, [Lumenfall](/features/chat-conversations/image-generation-and-editing/lumenfall), [Image Router](/features/chat-conversations/image-generation-and-editing/image-router) and any other server with an OpenAI style images API | Yes |
+| Gemini | [Imagen and Gemini image models](/features/chat-conversations/image-generation-and-editing/gemini) | Yes |
+| ComfyUI | [Your own ComfyUI workflows](/features/chat-conversations/image-generation-and-editing/comfyui) | Yes, with an edit workflow |
+| AUTOMATIC1111 | [A local Stable Diffusion server](/features/chat-conversations/image-generation-and-editing/automatic1111) | No |
+
+A server that offers both generating and editing needs only one connection. OpenAI compatible connections have the same authentication choices as model connections, plus custom **Headers**.
+
+:::warning Access Control decides who can use a connection
+A new connection is private to administrators until you share it. Set **Access Control** to the users or groups that may use its models, or make it public for everyone. Users without access never see its models.
+:::
+
+## Models
+
+**Model IDs** lists the models a connection offers. Leave it empty and the connection offers its default model:
+
+- OpenAI compatible: every image model a LiteLLM server lists, otherwise `gpt-image-2`.
+- Gemini: `imagen-3.0-generate-002`.
+- ComfyUI: the model set in the workflow.
+- AUTOMATIC1111: the checkpoint that is loaded.
+
+Add model IDs when the server offers several, such as `gpt-image-1.5` next to `gpt-image-2`. With Model IDs set on an AUTOMATIC1111 connection, picking a model that is not loaded switches the checkpoint for everyone using that server.
+
+Under **Default Models** you choose the **Default Generation Model** and **Default Edit Model** used when neither the chat nor the model picks one. A model can also carry its own **Default image model** in the model editor, under **Workspace** > **Models** > **Edit**.
+
+**Advanced** holds optional settings that depend on the backend; each engine page names the ones it needs.
 
 <DocCardList />

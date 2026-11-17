@@ -35,7 +35,7 @@ The last three (**MCP HTTP**, **MCPO**, **OpenAPI**) are all **external tool ser
 These are deeply integrated into Open WebUI and generally don't require external scripts.
 - **Web Search**: Integrated via engines like SearXNG, Google, or Tavily.
 - **URL Fetching**: Extract text content directly from websites using `#` or native tools.
-- **Image Generation**: Integrated with the OpenAI images API, ComfyUI, or Automatic1111.
+- **Image Generation**: Integrated with OpenAI compatible image APIs, Gemini, ComfyUI, or Automatic1111 through [image connections](/features/chat-conversations/image-generation-and-editing).
 - **Memory**: The ability for models to remember facts about you across chats.
 - **RAG (Knowledge)**: The ability to query uploaded documents (`#`).
 
@@ -679,7 +679,7 @@ See [Knowledge Scoping with Native Function Calling](/features/workspace/knowled
 
 #### Disabling Builtin Tools (Per-Model)
 
-The **Builtin Tools** capability can be toggled on or off for each model in the **Workspace > Models** editor under **Capabilities**. When enabled (the default), all the system tools listed above are automatically injected when using Native Mode.
+The **Builtin Tools** capability can be toggled on or off for each model in the **Workspace > Models** editor under **Features**. When enabled (the default), all the system tools listed above are automatically injected when using Native Mode.
 
 **When to disable Builtin Tools:**
 

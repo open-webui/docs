@@ -57,6 +57,10 @@ The first new message in a coding agent chat started before this update begins a
 Direct Connections and the personal tool servers and terminals in user settings are removed. Connections added in the Tether app keep URLs and keys on your computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools). Shared connections are added by an admin under **Settings > Admin**.
 :::
 
+:::info Image settings become image connections
+The image environment variables for engines, models, API URLs, keys, ComfyUI workflows and AUTOMATIC1111 (`IMAGE_GENERATION_ENGINE`, `IMAGES_OPENAI_API_*`, `COMFYUI_*`, `IMAGE_EDIT_*` and the rest) are only read on the first start. That start converts your existing image generation and editing settings and these variables into image connections named OpenAI, Gemini, ComfyUI or AUTOMATIC1111, with ` (edit)` added for a separate editing backend, and leaves them open to all users. Afterwards the variables are no longer read, unless `ENABLE_PERSISTENT_CONFIG=false`, which repeats the conversion on every start. Manage the connections in **Settings > Images** (admin section), see [Image Generation and Editing](/features/chat-conversations/image-generation-and-editing). `ENABLE_IMAGE_GENERATION`, `ENABLE_IMAGE_EDIT` and `ENABLE_IMAGE_PROMPT_GENERATION` still work.
+:::
+
 :::info v0.12.1 adds sign-in records for SCIM users
 This release runs a database migration that adds a sign-in record to every account that lacks one, in practice the accounts created through [SCIM](/features/authentication-access/auth/scim#integration-with-sso). It changes data only. Back up first. The added records carry no usable password, so these users keep signing in through SSO.
 :::
