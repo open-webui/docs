@@ -296,20 +296,22 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 | Control ID | Label in **Visible controls** | What it hides |
 | :--- | :--- | :--- |
-| `model_editor.capabilities.vision` | Vision | **Vision** under **Capabilities** in the model editor |
-| `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Capabilities** in the model editor |
-| `model_editor.capabilities.file_context` | Preload files | **Preload files** under **Capabilities** in the model editor |
-| `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Capabilities** in the model editor |
-| `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Capabilities** in the model editor |
-| `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Capabilities** in the model editor |
-| `model_editor.capabilities.terminal` | Terminal | **Terminal** under **Capabilities** in the model editor |
-| `model_editor.capabilities.usage` | Usage | **Usage** under **Capabilities** in the model editor |
-| `model_editor.capabilities.citations` | Citations | **Citations** under **Capabilities** in the model editor |
-| `model_editor.capabilities.status_updates` | Status Updates | **Status Updates** under **Capabilities** in the model editor |
-| `model_editor.capabilities.memory` | Memory | **Memory** under **Capabilities** in the model editor |
-| `model_editor.capabilities.builtin_tools` | Builtin Tools | **Builtin Tools** under **Capabilities** in the model editor |
+| `model_editor.capabilities.vision` | Vision | **Vision** under **Features** in the model editor |
+| `model_editor.capabilities.file_upload` | File Upload | **File Upload** under **Features** in the model editor |
+| `model_editor.capabilities.file_context` | Preload files | **Preload files** under **Features** in the model editor |
+| `model_editor.capabilities.web_search` | Web Search | **Web Search** under **Features** in the model editor |
+| `model_editor.capabilities.image_generation` | Image Generation | **Image Generation** under **Features** in the model editor |
+| `model_editor.capabilities.video_generation` | Video Generation | **Video Generation** under **Features** in the model editor |
+| `model_editor.capabilities.code_interpreter` | Code Interpreter | **Code Interpreter** under **Features** in the model editor |
+| `model_editor.capabilities.terminal` | Terminal | **Terminal** under **Features** in the model editor |
+| `model_editor.capabilities.usage` | Usage | **Usage** under **Features** in the model editor |
+| `model_editor.capabilities.citations` | Citations | **Citations** under **Features** in the model editor |
+| `model_editor.capabilities.status_updates` | Status Updates | **Status Updates** under **Features** in the model editor |
+| `model_editor.capabilities.memory` | Memory | **Memory** under **Features** in the model editor |
+| `model_editor.capabilities.builtin_tools` | Builtin Tools | **Builtin Tools** under **Features** in the model editor |
 | `model_editor.defaults.web_search` | Web Search | **Web Search** under **Default Features** in the model editor |
 | `model_editor.defaults.image_generation` | Image Generation | **Image Generation** under **Default Features** in the model editor |
+| `model_editor.defaults.video_generation` | Video Generation | **Video Generation** under **Default Features** in the model editor |
 | `model_editor.defaults.code_interpreter` | Code Interpreter | **Code Interpreter** under **Default Features** in the model editor |
 | `model_editor.tools.time` | Time & Calculation | **Time & Calculation** under **Builtin Tools** in the model editor |
 | `model_editor.tools.user_input` | Ask User | **Ask User** under **Builtin Tools** in the model editor |
@@ -322,6 +324,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.notifications` | Notifications | **Notifications** under **Builtin Tools** in the model editor |
 | `model_editor.tools.web_search` | Web Search | **Web Search** under **Builtin Tools** in the model editor |
 | `model_editor.tools.image_generation` | Image Generation | **Image Generation** under **Builtin Tools** in the model editor |
+| `model_editor.tools.video_generation` | Video Generation | **Video Generation** under **Builtin Tools** in the model editor |
 | `model_editor.tools.code_interpreter` | Code Interpreter | **Code Interpreter** under **Builtin Tools** in the model editor |
 | `model_editor.tools.tasks` | Task Management | **Task Management** under **Builtin Tools** in the model editor |
 | `model_editor.tools.automations` | Automations | **Automations** under **Builtin Tools** in the model editor |
@@ -342,6 +345,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `chat.selected_filters` | Selected Filters | The indicators for toggled-on filters in the chat input |
 | `chat.selected_web_search` | Selected Web Search | The **Web Search** indicator in the chat input while web search is on |
 | `chat.selected_image_generation` | Selected Image Generation | The **Image** indicator in the chat input while image generation is on |
+| `chat.selected_video_generation` | Selected Video Generation | The **Video** indicator in the chat input while video generation is on |
 | `chat.selected_code_interpreter` | Selected Code Interpreter | The **Code Interpreter** indicator in the chat input while it is on |
 | `chat.status` | /status | The `/status` command |
 | `chat.model_command` | /model | The `/model` command |
@@ -751,7 +755,7 @@ Whether a deployment has to mark or disclose AI-generated content, and in what f
 
 - Type: `int`
 - Default: unset (the AnyIO limit of `40` and Python's default executor size apply)
-- Description: Sets the maximum number of **concurrent** blocking operations (file I/O, sync route handlers, some library calls) that may run in worker threads at once. A positive value sets both the AnyIO thread limit and the size of the event loop's default thread pool. It is a concurrency ceiling, not a count of pre-spawned threads: threads are created lazily and reused, so a high value costs nothing while idle.
+- Description: Sets the maximum number of **concurrent** blocking operations (file I/O, sync route handlers, some library calls) that may run in worker threads at once. A positive value sets both the AnyIO thread limit and the size of the event loop's default thread pool. It is a concurrency ceiling, not a count of pre-spawned threads: threads are created lazily and reused, so a high value costs nothing while idle. Knowledge base uploads use at most half of the pool, so chat attachments are not stuck behind them.
 
 :::warning Set this to 2000 or higher on any real server; never lower it
 The default of `40` is far too low for production. When more than `THREAD_POOL_SIZE` blocking operations are needed at once, every further request waits for a free slot and the whole app appears to hang while CPU and memory look fine. `2000` is a lower bound for large multi-user instances; going higher is fine.
@@ -6396,50 +6400,19 @@ Strictly return in JSON format:
 
 ### Image Creation
 
-#### `IMAGE_GENERATION_ENGINE`
-
-- Type: `str`
-- Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image generation.
-  - `comfyui`: Uses ComfyUI engine for image generation.
-  - `automatic1111`: Uses AUTOMATIC1111 engine for image generation.
-  - `gemini`: Uses Gemini for image generation.
-- Default: `openai`
-- Description: Specifies the engine to use for image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_GENERATION_MODEL`
-
-- Type: `str`
-- Default: ``
-- Description: Default model to use for image generation (e.g., `gpt-image-2`, `gemini-3.1-flash-image`). With no model set, the `openai` engine uses `gpt-image-2` and the `gemini` engine uses `imagen-3.0-generate-002`.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_SIZE`
-
-- Type: `str`
-- Default: `512x512`
-- Description: Sets the default output dimensions for generated images in WIDTHxHEIGHT format (e.g., `1024x1024`). Set to `auto` to let the model determine the appropriate size (only supported by models matching `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`).
-- Persistence: This environment variable is a `ConfigVar` variable.
+Image backends are image connections in **Admin Settings > Images**, see [Image Generation and Editing](/features/chat-conversations/image-generation-and-editing#set-up-a-connection).
 
 #### `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`
 
 - Type: `str`
 - Default: `^gpt-image`
-- Description: A regex pattern to match model names that support `IMAGE_SIZE = "auto"`. When a model matches this pattern, the `auto` size option becomes available, allowing the model to determine the appropriate output dimensions. By default, only models starting with `gpt-image` (e.g., `gpt-image-1`) are matched.
+- Description: A regex pattern for OpenAI-compatible image models that choose their own output size. For these models the default `512x512` size is replaced by `auto`, unless the request sets a size.
 
 #### `IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN`
 
 - Type: `str`
 - Default: `^gpt-image`
-- Description: A regex pattern to match model names that return image URLs directly instead of base64-encoded data. Models matching this pattern will not include `response_format: b64_json` in API requests. By default, only models starting with `gpt-image` are matched. For other models, Open WebUI requests base64 responses and handles the conversion internally.
-
-#### `IMAGE_STEPS`
-
-- Type: `int`
-- Default: `50`
-- Description: Sets the default iteration steps for image generation. Used for ComfyUI and AUTOMATIC1111 engines.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Description: A regex pattern for OpenAI-compatible image models that return image URLs directly instead of base64-encoded data. Requests to matching models do not include `response_format: b64_json`.
 
 ---
 
@@ -6449,334 +6422,64 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: When disabled, Image Editing will not be used and instead, images will be created only using the image generation engine.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_EDIT_ENGINE`
-
-- Type: `str`
-- Options:
-  - `openai`: Uses the OpenAI images API (`gpt-image-2`, `gpt-image-1.5`, `gpt-image-1`) for image editing.
-  - `gemini`: Uses Gemini for image editing.
-  - `comfyui`: Uses ComfyUI engine for image editing.
-- Default: `openai`
-- Description: Configures the engine used for image editing operations, enabling modification of existing images using text prompts.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `IMAGE_EDIT_MODEL`
-
-- Type: `str`
-- Default: ``
-- Description: Specifies the model to use for image editing operations within the selected engine (e.g., `gpt-image-2`, `gemini-3.1-flash-image`).
+- Description: Enables or disables image editing. When disabled, images are only created from scratch.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OPENAI_IMAGE_EDIT_NORMALIZATION`
 
 - Type: `bool`
 - Default: `True`
-- Description: When `IMAGE_EDIT_ENGINE=openai`, normalizes the input image (re-encoding it to a format/shape the OpenAI image-edit API accepts) before sending the edit request. Disable only if your input images are already in a compatible format and you want to skip the conversion.
+- Description: Re-encodes JPEG and MPO input images that have an EXIF rotation, several frames or a colour mode other than RGB or greyscale before an edit request goes to an OpenAI-compatible image connection. Disable only if your input images are already in a compatible format.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
-
-#### `IMAGE_EDIT_SIZE`
-
-- Type: `str`
-- Default: ``
-- Description: Defines the output dimensions for edited images in WIDTHxHEIGHT format (e.g., `1024x1024`). Leave empty to preserve original dimensions.
-- Persistence: This environment variable is a `ConfigVar` variable.
 
 ---
 
 ### OpenAI DALL-E
 
-#### Image Generation
-
-##### `IMAGES_OPENAI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Sets the OpenAI-compatible base URL to use for OpenAI image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_OPENAI_API_VERSION`
-
-- Type: `str`
-- Default: Empty string (`""`)
-- Description: Optional setting. If provided it sets the `api-version` query parameter when calling the image generation endpoint. Required for Azure OpenAI deployments.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_OPENAI_API_KEY`
-
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Sets the API key to use for OpenAI image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_OPENAI_API_PARAMS`
-
-- Type: `str` (JSON)
-- Default: `{}`
-- Description: The environment variable is `IMAGES_OPENAI_PARAMS`. `IMAGES_OPENAI_API_PARAMS` is the key the admin config API uses for the same setting. Additional parameters for OpenAI image generation API in JSON format. Allows customization of API-specific settings such as quality parameters (e.g., `{"quality": "high"}` for GPT-Image models).
-- Example: `{"quality": "high"}`
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### Image Editing
-
-##### `IMAGES_EDIT_OPENAI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${OPENAI_API_BASE_URL}`
-- Description: Configures the OpenAI API base URL specifically for image editing operations, allowing separate endpoints from image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_OPENAI_API_VERSION`
-
-- Type: `str`
-- Default: ``
-- Description: Specifies the OpenAI API version for image editing, enabling support for Azure OpenAI deployments with versioned endpoints.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_OPENAI_API_KEY`
-
-- Type: `str`
-- Default: `${OPENAI_API_KEY}`
-- Description: Provides authentication for OpenAI image editing API requests, with support for separate keys from image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
+Set up as an OpenAI compatible image connection, see [OpenAI](/features/chat-conversations/image-generation-and-editing/openai).
 
 ---
 
 ### Gemini
 
-:::tip
-
-For a detailed setup guide and example configuration, please refer to the [Gemini Image Generation Guide](/features/chat-conversations/image-generation-and-editing/gemini).
-
-:::
-
-#### Image Generation
-
-##### `GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: Empty string
-- Description: Base URL that [`IMAGES_GEMINI_API_BASE_URL`](#images_gemini_api_base_url) and [`IMAGES_EDIT_GEMINI_API_BASE_URL`](#images_edit_gemini_api_base_url) fall back to when they are unset. Nothing else reads it.
-
-##### `GEMINI_API_KEY`
-
-- Type: `str`
-- Default: Empty string
-- Description: API key that [`IMAGES_GEMINI_API_KEY`](#images_gemini_api_key) and [`IMAGES_EDIT_GEMINI_API_KEY`](#images_edit_gemini_api_key) fall back to when they are unset. Nothing else reads it.
-
-##### `IMAGES_GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${GEMINI_API_BASE_URL}`
-- Description: Specifies the URL to Gemini's image generation API.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_GEMINI_API_KEY`
-
-- Type: `str`
-- Default: `${GEMINI_API_KEY}`
-- Description: Sets the Gemini API key for image generation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_GEMINI_ENDPOINT_METHOD`
-
-- Type: `str`
-- Options:
-  - `predict`: Uses the predict endpoint (default for Imagen models).
-  - `generateContent`: Uses the generateContent endpoint (for Gemini 2.5 Flash Image and all newer Gemini image models).
-- Default: ``
-- Description: Specifies the Gemini API endpoint method for image generation, supporting both legacy Imagen models and newer Gemini models with image generation capabilities.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### Image Editing
-
-##### `IMAGES_EDIT_GEMINI_API_BASE_URL`
-
-- Type: `str`
-- Default: `${GEMINI_API_BASE_URL}`
-- Description: Configures the Gemini API base URL for image editing operations with Gemini models.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_GEMINI_API_KEY`
-
-- Type: `str`
-- Default: `${GEMINI_API_KEY}`
-- Description: Provides authentication for Gemini image editing API requests.
-- Persistence: This environment variable is a `ConfigVar` variable.
+Set up as a Gemini image connection, see [Gemini Image Generation Guide](/features/chat-conversations/image-generation-and-editing/gemini).
 
 ---
 
 ### ComfyUI
 
-#### Image Generation
-
-##### `COMFYUI_BASE_URL`
-
-- Type: `str`
-- Default: ``
-- Description: Specifies the URL to the ComfyUI image generation API (e.g., `http://127.0.0.1:8188`).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `COMFYUI_API_KEY`
-
-- Type: `str`
-- Default: ``
-- Description: Sets the API key for ComfyUI authentication.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `COMFYUI_WORKFLOW`
-
-- Type: `str` (JSON)
-- Default:
-```json
-{
-  "3": {
-    "inputs": {
-      "seed": 0,
-      "steps": 20,
-      "cfg": 8,
-      "sampler_name": "euler",
-      "scheduler": "normal",
-      "denoise": 1,
-      "model": ["4", 0],
-      "positive": ["6", 0],
-      "negative": ["7", 0],
-      "latent_image": ["5", 0]
-    },
-    "class_type": "KSampler",
-    "_meta": {
-      "title": "KSampler"
-    }
-  },
-  "4": {
-    "inputs": {
-      "ckpt_name": "model.safetensors"
-    },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Load Checkpoint"
-    }
-  },
-  "5": {
-    "inputs": {
-      "width": 512,
-      "height": 512,
-      "batch_size": 1
-    },
-    "class_type": "EmptyLatentImage",
-    "_meta": {
-      "title": "Empty Latent Image"
-    }
-  },
-  "6": {
-    "inputs": {
-      "text": "Prompt",
-      "clip": ["4", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "7": {
-    "inputs": {
-      "text": "",
-      "clip": ["4", 1]
-    },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "CLIP Text Encode (Prompt)"
-    }
-  },
-  "8": {
-    "inputs": {
-      "samples": ["3", 0],
-      "vae": ["4", 2]
-    },
-    "class_type": "VAEDecode",
-    "_meta": {
-      "title": "VAE Decode"
-    }
-  },
-  "9": {
-    "inputs": {
-      "filename_prefix": "ComfyUI",
-      "images": ["8", 0]
-    },
-    "class_type": "SaveImage",
-    "_meta": {
-      "title": "Save Image"
-    }
-  }
-}
-```
-
-- Description: Defines the ComfyUI workflow configuration in JSON format. Export from ComfyUI using "Save (API Format)" to ensure compatibility.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `COMFYUI_WORKFLOW_NODES`
-
-- Type: `list[dict]`
-- Default: `[]`
-- Description: Specifies the ComfyUI workflow node mappings for image generation, defining which nodes handle prompt, model, dimensions, and other parameters. Configured automatically via the admin UI.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### Image Editing
-
-##### `IMAGES_EDIT_COMFYUI_BASE_URL`
-
-- Type: `str`
-- Default: ``
-- Description: Configures the ComfyUI base URL for image editing operations, enabling self-hosted ComfyUI workflows for image manipulation.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_COMFYUI_API_KEY`
-
-- Type: `str`
-- Default: ``
-- Description: Provides authentication for ComfyUI image editing API requests when the ComfyUI instance requires API key authentication.
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_COMFYUI_WORKFLOW`
-
-- Type: `str` (JSON)
-- Default: ``
-- Description: Defines the ComfyUI workflow configuration in JSON format for image editing operations. Must include nodes for image input, prompt, and output. Export from ComfyUI using "Save (API Format)".
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-##### `IMAGES_EDIT_COMFYUI_WORKFLOW_NODES`
-
-- Type: `list[dict]`
-- Default: `[]`
-- Description: Specifies the ComfyUI workflow node mappings for image editing, defining which nodes handle image input, prompt, model, dimensions, and other parameters. Configured automatically via the admin UI.
-- Persistence: This environment variable is a `ConfigVar` variable.
+Set up as a ComfyUI image connection, see [ComfyUI](/features/chat-conversations/image-generation-and-editing/comfyui).
 
 ---
 
 ### AUTOMATIC1111
 
-#### `AUTOMATIC1111_BASE_URL`
+Set up as an AUTOMATIC1111 image connection, see [AUTOMATIC1111](/features/chat-conversations/image-generation-and-editing/automatic1111).
 
-- Type: `str`
-- Default: ``
-- Description: Specifies the URL to AUTOMATIC1111's Stable Diffusion API (e.g., `http://127.0.0.1:7860`).
+---
+
+## Video Generation
+
+#### `ENABLE_VIDEO_GENERATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables video generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-#### `AUTOMATIC1111_API_AUTH`
+#### `VIDEO_GENERATION_TIMEOUT`
 
-- Type: `str`
-- Default: ``
-- Description: Sets the AUTOMATIC1111 API authentication credentials if required.
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Type: `int`
+- Default: `900`
+- Description: How many seconds to wait for a video job to finish.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
-#### `AUTOMATIC1111_PARAMS`
+#### `VIDEO_GENERATION_POLL_INTERVAL`
 
-- Type: `str` (JSON)
-- Default: `{}`
-- Description: Additional parameters in JSON format to pass to AUTOMATIC1111 API requests (e.g., `{"cfg_scale": 7, "sampler_name": "Euler a", "scheduler": "normal"}`).
-- Persistence: This environment variable is a `ConfigVar` variable.
+- Type: `float`
+- Default: `5`
+- Description: How many seconds to wait between checks on a running video job.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 ## OAuth
 
@@ -7028,7 +6731,7 @@ In any production environment running more than one instance of Open WebUI (e.g.
 
 - Type: `int`
 - Default: `10`
-- Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions are pruned to make room for the new one. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
+- Description: Maximum number of concurrent OAuth sessions allowed per user per provider. When a user logs in and the number of existing sessions for that user/provider combination meets or exceeds this limit, the oldest sessions, by last sign-in or token refresh, are removed to make room for the new one. Signing out removes the stored session of that browser, unless it is the user's only session for that provider. This prevents unbounded session growth while allowing multi-device usage (e.g., logging in from a desktop and a mobile device without invalidating either session).
 
 #### `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE`
 
@@ -7803,6 +7506,13 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 - Type: `bool`
 - Default: `True`
 - Description: Enables or disables user permission to use the image generation feature.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_FEATURES_VIDEO_GENERATION`
+
+- Type: `bool`
+- Default: `False`
+- Description: Enables or disables user permission to use the video generation feature.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_FEATURES_CODE_INTERPRETER`
