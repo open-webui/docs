@@ -147,4 +147,5 @@ docker run -d --name open-webui \
 **Authentication required?**
 
 - Set `OTEL_BASIC_AUTH_USERNAME` and `OTEL_BASIC_AUTH_PASSWORD` for auth-protected collectors
+- Set the standard OpenTelemetry variable `OTEL_EXPORTER_OTLP_HEADERS` to comma-separated `key=value` pairs (for example `x-api-key=your-key,x-team-id=your-team`) for backends that expect other headers, such as an API key. It is ignored while the basic auth variables are set.
 - If using SSL/TLS, adjust or remove `OTEL_EXPORTER_OTLP_INSECURE` as appropriate
