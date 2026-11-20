@@ -9,6 +9,8 @@ Open WebUI can automatically suggest follow-up messages after each model respons
 
 With the built-in prompt, each suggestion is written as a message you might send next, a question or a request, and the strongest one comes first. Admins can replace it with **Follow Up Generation Prompt** in **Settings > Interface** (admin section) or with [`FOLLOW_UP_GENERATION_PROMPT_TEMPLATE`](/reference/env-configuration#follow_up_generation_prompt_template).
 
+With the built-in prompt, the task model sees the first user message of the chat plus the last four messages of the current branch, the last being the reply the suggestions are for. Each of these messages that is longer than 1,000 characters is cut to 1,000: its start and its end, joined by `...`. A custom **Follow Up Generation Prompt** receives the whole branch uncut, and the `{{MESSAGES}}` variable in your template decides what the model sees. For example, `{{MESSAGES:END:6|middletruncate:1000}}` passes the last six messages and shortens each to 1,000 characters.
+
 ## Settings
 
 Configure follow-up prompt behavior in **Settings > Interface** under the **Chat** section:
