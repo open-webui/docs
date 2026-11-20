@@ -284,6 +284,35 @@ Look for `<think>` tags in the output. If they're not present, the model may req
 - Structured delta fields (`reasoning_content`, `reasoning`, `thinking`)
 - Text-based tags that Open WebUI detects (ensure reasoning tag detection is enabled)
 
+### DeepSeek: `reasoning_content` Must Be Passed Back
+
+**Symptom:** A DeepSeek model in thinking mode fails with the error below, which can happen even on the first message of a chat:
+
+```
+The `reasoning_content` in the thinking mode must be passed back to the API.
+```
+
+**Cause:** The error comes from DeepSeek, which wants the earlier reasoning sent back with the request. With the connection's **Provider** at **Default**, Open WebUI leaves reasoning out of the history it sends (see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back)). Available skills, attached knowledge and recalled memories reach the model as tool calls in the history, so a chat that uses any of them has tool-call turns even when you never called a tool.
+
+**Fix:**
+
+1. Edit the DeepSeek connection in **Settings → Connections → OpenAI** (admin section), open **Advanced** and set **Provider** to **llama.cpp**. Open WebUI then sends stored reasoning back as `reasoning_content`, and gives tool-call turns that have no reasoning an empty `reasoning_content`.
+2. If the error remains, for example on a DeepSeek model reached through another service, turn thinking off for that model: under **Advanced Params**, switch **Reasoning Effort** to **Custom** and enter `none`. Open WebUI forwards it as `reasoning_effort: "none"`.
+
+On a connection with **API Type** set to **Responses**, the same requirement shows up as ``The `reasoning_text` in the thinking mode must be passed back to the API.`` Switch **API Type** to **Chat Completions** and **Provider** to **llama.cpp**, or set **Reasoning Effort** to `none`.
+
+### Encrypted Reasoning Produced Under a Different Model
+
+**Symptom:** A reasoning model reached through OpenRouter or another service that returns `reasoning_details` fails with:
+
+```
+Your request contains encrypted reasoning or compaction content that was produced under a different model.
+```
+
+**Cause:** Open WebUI sends `reasoning_details` back on later turns whatever the **Provider** setting is. It removes them from replies written by another model, and it tells models apart by their Open WebUI model ID. A model ID that now reaches a different upstream model, such as a workspace model whose base model was changed, still gets the reasoning details of the earlier replies.
+
+**Fix:** Start a new chat, or continue the chat with the upstream model that wrote the earlier replies. Changing **Provider** does not change this.
+
 ### Anthropic Extended Thinking Not Working with Tool Calls
 
 **Symptom:** Using Anthropic's Claude models with extended thinking enabled, but tool calls fail with errors like:
