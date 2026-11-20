@@ -223,7 +223,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Models** (admin section), see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Comma-separated list of model IDs to pin by default for users who have never pinned, unpinned or reordered a model. This gives new accounts a ready-made set of model shortcuts in the sidebar. Those users follow the list as it changes. The first time a user pins, unpins or reorders a model, the current list is saved as their own and later changes to this setting no longer reach them. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Models** (admin section), see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Example: `gpt-5.6-sol,claude-opus-5,muse-glimmer:30b-q4_K_M`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
