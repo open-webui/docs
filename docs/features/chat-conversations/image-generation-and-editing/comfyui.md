@@ -37,7 +37,7 @@ To customize the prompt template used for generation, go to **Settings > Interfa
 
 1. In Open WebUI, go to **Settings** > **Images** (admin section) and switch on **Image Generation**.
 2. Add a connection and set **Connection Type** to **ComfyUI**.
-3. In **URL**, enter the address of your running ComfyUI instance (for example `http://host.docker.internal:8188/`) and click the verify icon next to it. A success message should appear.
+3. In **URL**, enter the address of your running ComfyUI instance (for example `http://host.docker.internal:8188/`) and click the verify icon next to it. A success message should appear. Open WebUI also opens a WebSocket to `/ws` on this address, so any proxy in front of ComfyUI must pass WebSocket upgrades.
 4. If your ComfyUI instance requires an API key, enter it in the key field.
 5. **Export the workflow from ComfyUI.** In the ComfyUI interface, click the ComfyUI logo at the top left and click **Settings**. Search for and toggle on the **"Dev Mode"** option with a description that states **"Enable dev mode options (API save, etc.)"**.
 
@@ -77,7 +77,7 @@ To customize the prompt template used for generation, go to **Settings > Interfa
     Some workflows, such as ones that use any of the Flux models, need several node IDs for one entry. Separate them with commas (e.g., `1` or `1, 2`).
     :::
 
-8. Leave **Model IDs** empty to use the model set in the workflow, or add model names to offer them. Under **Advanced**, **Image Size** and **Steps** are optional defaults.
+8. Leave **Model IDs** empty to use the model set in the workflow, or add model names to offer them. The suggested names come from the last verify: from the node mapped as Model (its first input whose name contains `_name`, such as `ckpt_name` or `unet_name`), or from the CheckpointLoaderSimple checkpoints when no Model node is mapped, so verify again after mapping the nodes. Under **Advanced**, **Image Size** and **Steps** are optional defaults. Without an Image Size, ComfyUI receives 512x512. A mapped Seed node gets a new random seed on every request.
 9. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
 
 ![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
@@ -101,6 +101,8 @@ Open WebUI also supports image editing through ComfyUI, allowing you to modify e
     | Model | `unet_name` | No | Diffusion model name |
     | Width | `width` | No | Output image width |
     | Height | `height` | No | Output image height |
+
+    For edits with several input images, list one LoadImage node ID per image in the Image row, separated by commas. Each image goes to one node ID in order, and images beyond the number of IDs are dropped.
 
     **Edit Image Size** under **Advanced** sets the output size.
 
