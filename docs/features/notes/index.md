@@ -214,6 +214,10 @@ Saving a note never changes who it is shared with.
 
 People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. Each user can have up to 20 note pages open for live editing at once, counted across all their browser tabs and devices. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
 
+Pages you open with read access count toward the 20 as well. A page you can edit, opened past the limit, shows an empty editor, and anything you type in it is ignored, so none of it is saved. Switching pages, downloading the note or leaving the page shows `Tab is not connected. Reconnect before leaving this tab.` Close notes you have open in other tabs or on other devices, then reload the page. The server log records `is at the open-document limit. Rejecting join.` for each refused page.
+
+Live editing on one page holds at most 16 MiB of edit history. Past that, your edits still save to the note, but other people with the page open stop receiving them as you type. The server log shows `is invalid or over the size limit. Rejecting update.` To start over, have everyone close the page. The history is cleared when the last person leaves, and the page reopens from the saved note.
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the **Access** button and menu entry, and the access list in the **Access Control** panel (default `False`)
