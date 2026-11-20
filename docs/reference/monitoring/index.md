@@ -46,7 +46,7 @@ The `/health` endpoint is publicly accessible (no authentication required) and r
 curl http://your-open-webui-instance:8080/health
 ```
 
-This verifies web server availability, application initialization, and basic database connectivity.
+This only verifies that the web server is answering: `/health` returns `{"status": true}` unconditionally. `GET /health/db` pings the database, and `GET /ready` returns 503 until startup has completed and the database (and Redis, when configured) answer, so use `/ready` for readiness probes.
 
 ### Uptime Kuma Setup
 
