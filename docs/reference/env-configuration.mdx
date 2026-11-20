@@ -3027,7 +3027,7 @@ modeling files for reranking.
 
 - Type: `bool`
 - Default: `True`
-- Description: Toggles automatic update of the Sentence-Transformer model.
+- Description: Toggles automatic update of the Sentence-Transformer model. While `True`, every start with the **Default (SentenceTransformers)** embedding engine contacts Hugging Face to check [`RAG_EMBEDDING_MODEL`](#rag_embedding_model) and download missing files, even when a copy is cached, and the server does not accept connections until that finishes. With Hugging Face slow or blocked, startup looks frozen, see [Startup & Docker Failures](/troubleshooting/startup#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked). Set to `False`, Open WebUI loads the cached copy without contacting Hugging Face; a model that is not cached yet is still loaded from Hugging Face by name. Forced to `False` when [`OFFLINE_MODE`](#offline_mode) is `True`.
 
 #### `RAG_RERANKING_MODEL_AUTO_UPDATE`
 
