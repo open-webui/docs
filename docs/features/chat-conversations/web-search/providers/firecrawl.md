@@ -64,6 +64,7 @@ See the [Environment Configuration reference](/reference/env-configuration#web-s
 - **Invalid API Key**: Confirm the key is copied without extra spaces, and that it matches the endpoint (a hosted key for `api.firecrawl.dev`, an instance key for self-hosted).
 - **No Results**: Make sure the web search toggle (`+`) is on and the instance can reach the Firecrawl endpoint.
 - **Timeouts**: `FIRECRAWL_TIMEOUT` applies to the web loader only. The search call uses a fixed budget of 3 seconds per requested result, so lower **Search Result Count** if searches time out.
+- **Firecrawl Timeout (s)**: this field shows with the search engine settings, but it sets `FIRECRAWL_TIMEOUT`, so it has an effect only while **Web Loader Engine** is `firecrawl`. Enter a whole number of seconds. An empty or non-numeric value sends no timeout to Firecrawl. Open WebUI waits 10 seconds longer than this value for each scrape, or 70 seconds when it is empty. A scrape that returns HTTP 429, 500, 502, 503 or 504, times out or cannot connect is retried twice. After that the page is skipped and logged as `Error extracting content from <url> with Firecrawl: <error>`, and the other pages still load.
 - **Self-hosted connection errors**: Verify `FIRECRAWL_API_BASE_URL` is reachable from the Open WebUI container or host.
 
 ## Additional Resources

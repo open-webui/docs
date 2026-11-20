@@ -71,6 +71,7 @@ Ensure you have:
 
 - **Search Parameters**: Open WebUI sends `query`, `max_results` and `search_depth` to Tavily. Set the depth under **Tavily Search Depth** (`ultra-fast`, `fast`, `basic` or `advanced`, default `basic`) or with [`TAVILY_SEARCH_DEPTH`](/reference/env-configuration#tavily_search_depth). Domain filtering is applied by Open WebUI's own **Domain Filter List** after the results return.
 - **Endpoint**: Requests go to `TAVILY_API_BASE_URL` plus `/search`, default `https://api.tavily.com`. The variable is read from the environment only and has no admin field.
+- **Tavily as the web loader**: set **Web Loader Engine** to `tavily` to read pages through Tavily's `/extract` endpoint. The key is the one in **Tavily API Key**, which the loader section shows when Tavily is not also the search engine. **Tavily Extract Depth** (`TAVILY_EXTRACT_DEPTH`, default `basic`) is sent as `extract_depth`, with up to 20 URLs per request. Open WebUI's loader expects `basic` or `advanced` and passes the text as typed without checking it. A URL Tavily lists as failed is skipped and logged as `Failed to extract content from <url>: <error>`, and one returned without text is logged as `No content extracted from <url>`.
 - **Environment Variables**: Set the `TAVILY_API_KEY` in your `.env` file or Docker command:
 
   ```bash
