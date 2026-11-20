@@ -339,7 +339,7 @@ kubectl -n openwebui get pods,ingress
 
 This disables migrations on all replicas, applies the desired replica count, and enables ingress. Expect a brief restart. Point DNS at your ingress controller, then open your HTTPS hostname.
 
-Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. See [connection troubleshooting](/troubleshooting/connection-error).
+Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Socket.IO is served under `/ws/socket.io/`, so a path-based ingress must forward that prefix with upgrade headers. See [connection troubleshooting](/troubleshooting/connection-error).
 
 Session affinity is optional with WebSockets on and required with [`ENABLE_WEBSOCKET_SUPPORT=false`](/reference/env-configuration#enable_websocket_support); see [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Affinity does not replace Redis. On the NGINX Ingress Controller, add these annotations to the Ingress resource:
 
@@ -486,7 +486,7 @@ spec:
       app.kubernetes.io/name: open-webui
 ```
 
-Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count and prevent GitOps from fighting HPA changes to `spec.replicas`. Helm upgrades can also reset the replica count.
+Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count and prevent GitOps from fighting HPA changes to `spec.replicas`. Each worker process has a sync and an async database engine, and each can open `DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW` connections (SQLAlchemy's 5 + 10 when `DATABASE_POOL_SIZE` is unset). With `VECTOR_DB=pgvector`, PGVector opens its own pool of `PGVECTOR_POOL_SIZE` + `PGVECTOR_POOL_MAX_OVERFLOW` (also 5 + 10 when unset), even when it uses `DATABASE_URL`. Helm upgrades can also reset the replica count.
 
 Before updates, remove this HPA with `kubectl -n openwebui delete hpa openwebui` and pause any controller that would recreate it. Reapply it only after verifying the restored deployment. A PDB limits voluntary evictions such as node drains; it does not prevent Deployment scale-down or the maintenance outage described above.
 
