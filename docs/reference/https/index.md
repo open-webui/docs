@@ -27,6 +27,7 @@ The `{{CLIPBOARD}}` and `{{USER_LOCATION}}` [prompt variables](/features/workspa
 | [**Nginx**](/reference/https/nginx) | Self-hosted production with full control | Manual or Let's Encrypt |
 | [**Caddy**](/reference/https/caddy) | Self-hosted production, minimal config | Automatic (Let's Encrypt) |
 | [**HAProxy**](/reference/https/haproxy) | High-availability / load balancing | Manual or Let's Encrypt |
+| [**Apache, Synology DSM, IIS**](/reference/https/apache) | A web server or NAS you already run | Manual |
 | **Cloud load balancers** | AWS ALB, GCP LB, Azure App Gateway | Managed by cloud provider |
 
 ---
