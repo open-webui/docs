@@ -30,7 +30,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 1. Go to [SerpApi](https://serpapi.com/), and log on or create a new account.
 2. Go to `Dashboard` and copy the API key.
 3. With `API key`, open `Open WebUI Admin panel` and click `Settings` tab, and then click `Web Search`.
-4. Enable `Web search` and set `Web Search Engine` to `serpapi`.
+4. Enable `Web Search` and set `Web Search Engine` to `serpapi`.
 5. Fill `SerpApi API Key` with the `API key` that you copied in step 2 from [SerpApi](https://serpapi.com/) dashboard.
 6. [Optional] Enter the `SerpApi engine` name you want to query. Example, `google`, `bing`, `baidu`, `google_news`, `google_videos`, `google_scholar` and `google_patents.` By default, it is set to `google`. Find more options at [SerpApi documentation](https://serpapi.com/dashboard).
 7. Click `Save`.

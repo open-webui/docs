@@ -63,9 +63,9 @@ Ensure you have:
 1. Save your settings.
 2. Start a chat session in Open WebUI.
 3. Click the **plus (+)** button in the prompt field to enable web search.
-4. Enter a query (e.g., `+latest AI news`) and confirm Tavily returns real-time results.
+4. Enter a query (e.g., `latest AI news`) and confirm Tavily returns real-time results.
 
-> **Example**: `+latest AI news` triggers a Tavily search, embedding results in the response.
+> **Example**: with **Web Search** on, `latest AI news` triggers a Tavily search, embedding results in the response.
 
 ## Optional Configurations
 

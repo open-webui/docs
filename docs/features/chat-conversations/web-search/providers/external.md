@@ -33,7 +33,7 @@ This option allows you to connect Open WebUI to your own self-hosted web search 
 
 1. Navigate to the Open WebUI `Admin Panel`.
 2. Go to the `Settings` tab and then select `Web Search`.
-3. Toggle `Enable Web Search` to the on position.
+3. Toggle `Web Search` to the on position.
 4. Set `Web Search Engine` from the dropdown menu to `external`.
 5. Fill **External Web Search URL** (`EXTERNAL_WEB_SEARCH_URL`) with the full URL of your custom search API endpoint (e.g., `http://localhost:8000/search` or `https://my-search-api.example.com/api/search`).
 6. Fill **External Web Search API Key** (`EXTERNAL_WEB_SEARCH_API_KEY`) with the secret API key required to authenticate with your custom search endpoint. Leave blank if your endpoint doesn't require authentication (not recommended for public endpoints).

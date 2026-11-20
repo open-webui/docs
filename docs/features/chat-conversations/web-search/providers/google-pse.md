@@ -38,7 +38,7 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
 3. Enter a search engine name, set the other properties to suit your needs, verify you're not a robot and click `Create` button.
 4. Generate `API key` and get the `Search engine ID`. (Available after the engine is created)
 5. With `API key` and `Search engine ID`, open `Open WebUI Admin panel` and click `Settings` tab, and then click `Web Search`
-6. Enable `Web search` and Set `Web Search Engine` to `google_pse`
+6. Enable `Web Search` and Set `Web Search Engine` to `google_pse`
 7. Fill `Google PSE API Key` with the `API key` and `Google PSE Engine Id` (# 4)
 8. Click `Save`
 
