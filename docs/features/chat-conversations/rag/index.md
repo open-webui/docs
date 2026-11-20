@@ -213,6 +213,8 @@ Each remaining chunk carries meaningful semantic context instead of being a frag
 
 Change the RAG embedding model in **Settings** > **Documents** (admin section). The embedding engine is the built-in SentenceTransformers default, Ollama, OpenAI or Azure OpenAI.
 
+If your embedding model's documentation asks for a prefix on search queries and another on stored text, enter them as **Query Prefix** and **Content Prefix** under **Advanced** in the **Embedding** section of the same page. They match [`RAG_EMBEDDING_QUERY_PREFIX`](/reference/env-configuration#rag_embedding_query_prefix) and [`RAG_EMBEDDING_CONTENT_PREFIX`](/reference/env-configuration#rag_embedding_content_prefix). Include any trailing space the model expects. Ollama, OpenAI and Azure OpenAI get the prefix added to the front of each text, unless [`RAG_EMBEDDING_PREFIX_FIELD_NAME`](/reference/env-configuration#rag_embedding_prefix_field_name) sends it as a separate request field. The built-in engine passes it to SentenceTransformers as the `prompt`. Reindex existing documents after changing **Content Prefix**, because documents embedded before the change keep the old prefix.
+
 ## Changing RAG Settings After Initial Setup
 
 If you need to change your chunking configuration (chunk size, overlap) or embedding model after documents have already been indexed, it is important to understand what actions are required and what effects those changes will have.

@@ -111,6 +111,23 @@ If web searches are timing out:
 
 ---
 
+### 6. SearXNG Returns No Results Without an Error
+
+SearXNG can answer a search with an empty result list, for example when the upstream engines it queries block the instance with CAPTCHAs or rate limits. Open WebUI reads only the `results` list from the SearXNG response, so it treats this as a search that found nothing, not as a SearXNG failure.
+
+What you see depends on the **Function Calling** setting of the model:
+
+- **Legacy**: the web search status under the response shows `No results found from web search`, and the model answers without web content.
+- **Native** or **Default**: the `search_web` tool returns an empty list to the model. No error appears in the chat, and the model may say it found nothing.
+
+**Solutions:**
+
+- **Check the SearXNG log** for engine errors such as CAPTCHAs, timeouts or access denials.
+- **Run the same query in the SearXNG web interface** to see whether any engine returns results.
+- **Turn off the failing engines or enable others** in SearXNG's `settings.yml`, then restart SearXNG.
+
+---
+
 ## Environment Variables Reference
 
 For a comprehensive list of all web search environment variables, see the [Environment Configuration documentation](/reference/env-configuration#web-search).
