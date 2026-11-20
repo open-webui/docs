@@ -190,6 +190,15 @@ Increasing the chunk size buffers these updates, sending them to the client in l
 - **Env Var**: `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE=7`
   *   *Recommendation*: Set to **5-10** for high-concurrency instances.
 
+#### Replies Arrive in Bursts or Only When Finished
+Open WebUI reads the provider's stream line by line and sends each text update to the chat as soon as its line is complete. With the default settings it adds no batching of its own. If a reply appears in large bursts, or all at once when it is finished, check these in order:
+
+1.  **Stream Chat Response is off.** With it set to **Off**, Open WebUI asks the provider for the whole reply in one response and the chat shows it only when it is finished. It is set in the model's **Advanced Params** under **Workspace** > **Models**, in the chat's **Controls** > **Advanced Params**, and in **Settings** > **General** > **Advanced Parameters**. The model's value wins over the chat's, and the chat's wins over **Settings**.
+2.  **The chunk size is raised.** `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE` and the **Stream Delta Chunk Size** parameter group that many text updates into one before the chat receives it. Open WebUI uses the larger of the two, and a value set on the model replaces the one set in the chat. The parameter appears in the same **Advanced Params** sections, for admins only. Set the env var to `1` and the parameter to **Default** to see each update as it arrives.
+3.  **A reverse proxy buffers the stream.** See **[Streaming Troubleshooting](/troubleshooting/connection-error#garbled-markdown--streaming-response-corruption)**.
+4.  **The provider releases text in chunks.** The provider, a gateway in front of it, or a content filter on the provider side can hold text back and send it in larger pieces. Send the same prompt to the provider's API directly with streaming on. If the text arrives in the same bursts there, the cause is outside Open WebUI.
+5.  **Security software scans HTTP traffic.** Antivirus, endpoint protection or a network web filter on the user's machine or network can hold a streamed response while it scans it. Test from another network or another browser, or exclude the Open WebUI address from scanning, and compare.
+
 #### HTTP Response Compression
 By default, Open WebUI compresses HTTP responses (JSON API responses and the static JS/CSS assets of the web UI) with ZStd/Brotli/Gzip inside the application itself. This costs CPU on every worker: profiling (py-spy) of production deployments shows roughly **3–4% of worker CPU time** spent in the compression middleware. Disabling it frees that CPU and slightly reduces response latency.
 
