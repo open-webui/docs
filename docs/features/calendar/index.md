@@ -19,7 +19,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 **Schedule, track, and manage events, with AI that can plan for you.**
 
-Calendar is a built-in scheduling feature that gives every user a personal calendar. Create events, set recurring schedules, share calendars with teammates, and let AI models autonomously create and manage events through natural conversation.
+Calendar is a built-in scheduling feature that gives every user a personal calendar. Create events, set recurring schedules, share calendars with teammates through the API, and let AI models autonomously create and manage events through natural conversation.
 
 Active [Automations](/features/chat-conversations/chat-features/automations) are automatically surfaced on a dedicated **Scheduled Tasks** calendar, so you get a unified view of both manual events and automated workflows in one place.
 
@@ -43,7 +43,7 @@ Active [Automations](/features/chat-conversations/chat-features/automations) app
 
 ### Shared calendars
 
-Share calendars with specific users or groups via access grants. Team members see shared events alongside their own, with RSVP tracking (pending, accepted, declined, tentative) built in.
+Calendars can be shared with specific users or groups through the API, as described in [Sharing Calendars](#sharing-calendars). The calendar view has no share control. Team members see the events of a calendar shared with them alongside their own. Attendees and their RSVP status (pending, accepted, declined, tentative) are also set through the API.
 
 ### Multi-calendar organization
 
@@ -59,10 +59,10 @@ Organize events across multiple calendars (e.g., "Personal", "Team Meetings", "O
 | **Recurring events** | RRULE-based recurrence (daily, weekly, monthly, custom) |
 | **Agentic management** | Models can search, create, update, and delete events autonomously |
 | **Automation overlay** | Active automations and past runs surface as virtual calendar events |
-| **Calendar sharing** | Share calendars with users or groups via access grants |
+| **Calendar sharing** | Share calendars with users or groups through the API |
 | **Location & description** | Attach locations and rich descriptions to events |
 | **Color coding** | Per-calendar and per-event color customization |
-| **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status |
+| **RSVP / Attendees** | Invite users to events with pending/accepted/declined/tentative status through the API |
 | **Reminders** | Per-event alerts via toast, browser notification, and webhook |
 
 ---
@@ -103,7 +103,7 @@ Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Calendar ad
 
 ### Create a Calendar
 
-Click the small **+** button next to the **Calendars** heading in the calendar sidebar to open the **New Calendar** modal. Enter a name and pick a color from the preset palette (blue, red, green, amber, violet, pink, cyan, orange) and click **Create**. The new calendar appears in the sidebar immediately and shows up in the calendar picker when creating or editing events. Each calendar belongs to its creator and can be shared via [Sharing Calendars](#sharing-calendars).
+Click the small **+** button next to the **Calendars** heading in the calendar sidebar to open the **New Calendar** modal. Enter a name and pick a color from the preset palette (blue, red, green, amber, violet, pink, cyan, orange) and click **Create**. The new calendar appears in the sidebar immediately and shows up in the calendar picker when creating or editing events. Each calendar belongs to its creator and can be shared through the API, as described in [Sharing Calendars](#sharing-calendars).
 
 To rename or recolor your Personal calendar or one you created, hover it in the sidebar and click the pencil (**Edit**), change the name or color and click **Save**.
 
@@ -222,7 +222,7 @@ Calendars support the same access grant system used by knowledge bases, models, 
 
 ### Share a calendar
 
-Sharing is set through the API: send the calendar's full list of access grants to `POST /api/v1/calendars/{calendar_id}/access/update`, each grant naming a user or group with `read` or `write` permission.
+The calendar view has no share control. Sharing is set through the API: send the calendar's full list of access grants to `POST /api/v1/calendars/{calendar_id}/access/update`, each grant naming a user or group with `read` or `write` permission.
 
 ### What shared access provides
 
