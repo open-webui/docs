@@ -24,6 +24,12 @@ The **Tasks** section holds two pickers. Open WebUI picks between them based on 
 
 Both default to **Current Model**, which means background work runs on the chat's own model. If you name a model that is unavailable, background work falls back to the chat's model rather than failing.
 
+### Agent chats
+
+A chat with an [agent model](/features/open-terminal/agents) from Open Terminal cannot run background work on that agent. Chat titles and autocomplete use the **External Task Model** instead, or the **Local Task Model** when the external one is **Current Model**, unavailable or itself an agent. The connection type does not matter here.
+
+When neither picker names an available model that is not an agent, an agent chat is titled with the first 50 characters of its first message, and autocomplete offers nothing. Agent chats never get tags or follow-up suggestions, whatever the task model.
+
 :::tip What to pick
 Small, fast and **non-reasoning**. A reasoning model spends seconds thinking before producing a three-word title, and you pay for those thinking tokens.
 
