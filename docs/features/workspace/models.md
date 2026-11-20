@@ -40,6 +40,8 @@ Instead of manually attaching documents and enabling tools every chat, bind them
 
 Restrict models to specific users or groups. A finance team sees their models; engineering sees theirs. Admins control what's available instance-wide.
 
+Read access lets a user chat with a model, not see how it is built. In **Workspace > Models** such a model carries a **Read Only** badge, and opening its editor returns `You do not have permission to edit this model`. Its system prompt and other parameters are left out of what Open WebUI sends that user. Only the owner, admins (while `BYPASS_ADMIN_ACCESS_CONTROL` is on) and users with write access receive them.
+
 ### Dynamic system prompts
 
 Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt adapts to each user and session automatically. Write them without spaces inside the braces: the spaced form reaches the model as literal text. Only the chat and user variables (`{{ chat.variables.x }}`, `{{ user.variables.x }}`) tolerate spaces.
@@ -370,7 +372,7 @@ These are the two instance-wide settings that decide which model or models a use
 | Setting | Menu action | What it does | Config key |
 | :--- | :--- | :--- | :--- |
 | **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own and no [group default models](/features/authentication-access/rbac/groups#default-models-per-group) | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
-| **Pinned Model** | **Set as Pinned Model** | Pre-fills the model shortcuts in the sidebar for users who have not pinned any models themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
+| **Pinned Model** | **Set as Pinned Model** | Shows this model as a shortcut in the sidebar for users who have never pinned, unpinned or reordered a model themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
 
 Both accept more than one model, so you can hand users a small starting set rather than a single model.
 
@@ -407,18 +409,19 @@ For a new chat, Open WebUI takes the first of these that yields a model the user
 
 1. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params).
 2. The models bound to the folder the chat is started in, if any.
-3. The user's own default model, saved from the model selector in a chat with **Set as default**.
-4. The [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), taken from the group deepest in the group hierarchy that sets some (the earliest created group wins a tie). Groups the user inherits through a parent group count too.
-5. The instance's **Selected Models**.
-6. The first available model in the list.
+3. The models selected in the last saved chat the user had open in the same browser tab. Open WebUI keeps them for that tab only and uses them for one new chat, then clears them, so this step wins over **Set as default** once.
+4. The user's own default model, saved from the model selector in a chat with **Set as default**.
+5. The [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), taken from the group deepest in the group hierarchy that sets some (the earliest created group wins a tie). Groups the user inherits through a parent group count too.
+6. The instance's **Selected Models**.
+7. The first available model in the list.
 
-Steps 3 to 5 also pick the starting model in Notes and the Playground.
+Steps 4 to 6 also pick the starting model in Notes and the Playground.
 
 Models that have been hidden or removed are dropped at every step, so a user whose last-used model disappeared lands on a working one instead of an empty selector.
 
-Opening an existing chat follows the same rule. The chat's models that were removed, or that the user can no longer access, are dropped from the selector. If none are left, the chat falls back through steps 3 to 6: the user's own default model, then the group default models or the **Selected Models**, then the first available model. A model that was only hidden stays selected in that chat.
+Opening an existing chat follows the same rule. The chat's models that were removed, or that the user can no longer access, are dropped from the selector. If none are left, the chat falls back through steps 4 to 7: the user's own default model, then the group default models or the **Selected Models**, then the first available model. A model that was only hidden stays selected in that chat.
 
-**Pinned Models** work differently: they seed the user's sidebar shortcuts once, only when the user has no pinned models of their own. From then on the user's own pins win, and pins pointing at hidden or deleted models, or models the user cannot access, stay in the user's settings but are left out of the sidebar, so they come back if the model does.
+**Pinned Models** work differently: a user who has never pinned, unpinned or reordered a model follows the instance's **Pinned Models** in the sidebar, so later changes to them keep reaching that user. The first time the user pins, unpins or reorders a model, the current list becomes the user's own and admin changes stop reaching them. An own list emptied by unpinning everything stays empty. Pins pointing at hidden or deleted models, or models the user cannot access, stay in the user's settings but are left out of the sidebar, so they come back if the model does.
 
 :::warning Selected is a starting point, not a restriction
 Setting a model as Selected does not stop anyone from switching to another model they have access to. To control what a user can reach, use per-model access control or **Hide**, described in [Curated-Interface Deployments](#curated-interface-deployments).
