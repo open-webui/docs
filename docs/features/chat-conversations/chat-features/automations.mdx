@@ -29,6 +29,8 @@ Automations are permission-gated for non-admin users.
 
 Only the creator can open, edit or delete an automation, administrators included; every other request is answered as if the automation did not exist. One exception covers automations that post into a folder: anyone who can edit that folder can also pause it, run it and read its run history (see [Folders](#folders)). The **Features > Automations** permission decides whether someone may have automations at all.
 
+An administrator cannot pause or delete another user's automation from the interface. To stop a user's automations, set their role to **Pending** or remove their **Features > Automations** permission. Each run then ends as failed with `Owner no longer permitted to run automations`, and the schedule keeps advancing, so runs resume once the role or permission is back.
+
 See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
 
 To grant user access:
@@ -115,7 +117,7 @@ What import does and does not do:
 
 ## Folders
 
-An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose and **Folder** lists your own folders.
+An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose, **Folder** lists your own folders and **Channel** posts into a channel instead (see [Channels](#channels)).
 
 A folder's own page works as a home for its automations. Its header has a **Chats** and **Automations** switch (visible to users who have the Automations permission). The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
 
@@ -126,6 +128,17 @@ A folder's own page works as a home for its automations. Its header has a **Chat
 - Clearing the folder is a normal edit. Future chats go back to the ungrouped list; chats already created stay where they are.
 - Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running.
 - Imported automations keep their folder only if a folder with that ID exists in your account; otherwise they are imported without one.
+
+## Channels
+
+With **Destination** set to **Channel**, a run posts into a [channel](/features/channels) instead of creating a chat. The list shows your channels without direct messages.
+
+- Saving needs write access to a standard channel or membership in a group channel. Users who are not admins also need the **Channels** permission.
+- Each run posts the instructions into the channel as a message from you. The model's reply goes into a thread under that message, or into the timeline when the admin **Model Response Mode** is set to **Channel**.
+- The model receives only the instructions, not earlier messages from the channel.
+- Clicking a run in **Activity** opens the channel.
+- Agent automations need a chat destination. Saving one with **Channel** is refused with `Agent automations require a chat destination.`, or with `This terminal requires a chat destination.` when the terminal comes from a template. That second message also refuses a template terminal limited to chats.
+- A run fails with `Channel not found` when channels are turned off for the instance, and with `Owner no longer permitted to use channels` when its creator has lost the **Channels** permission.
 
 ## Scheduling
 
