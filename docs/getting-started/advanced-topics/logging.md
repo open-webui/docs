@@ -13,7 +13,7 @@ Open WebUI has two logging surfaces: the **browser console** for frontend debugg
 
 ## Frontend Logging
 
-The frontend uses standard browser `console.log()` calls. Open your browser's developer tools (**F12** or **Cmd+Option+I** on macOS), navigate to the **Console** tab, and you'll see informational messages, warnings, and errors from the client application.
+The frontend uses standard browser `console` calls. Open your browser's developer tools (**F12** or **Cmd+Option+I** on macOS) and navigate to the **Console** tab. Production builds, the Docker image included, strip `console.log`, `console.debug` and `console.error` calls at build time unless the frontend was built with `ENV=dev`, so there you mainly see `console.warn` and `console.info` output plus the browser's own errors.
 
 Browser-specific documentation:
 
@@ -60,6 +60,8 @@ environment:
 Use `DEBUG` for development and troubleshooting. For production, stick with `INFO` or `WARNING` to keep log volume manageable.
 :::
 
+A value Python's `logging` module does not recognize (for example `TRACE`) falls back to `INFO`. Use one of the level names in the table above: the aliases `WARN` and `FATAL` pass that check, but Loguru rejects them and the backend fails to start.
+
 ---
 
 ### What the Log Level Costs
@@ -94,8 +96,8 @@ environment:
 | `msg` | Log message |
 | `caller` | Source location (`module:function:line`) |
 | `extra` | Additional context data (if any) |
-| `error` | Error details (if applicable) |
-| `stacktrace` | Stack trace (if applicable) |
+| `error` | Error details (if applicable): an object with `type`, `message` and `stacktrace`, or a plain string on early startup lines |
+| `stacktrace` | Stack trace, only on early startup lines logged with `stack_info=True` |
 
 **Example output:**
 

@@ -40,7 +40,7 @@ Testing it and reporting what you find is the lowest-effort way to help, and it 
 | Requirement | Version |
 |-------------|---------|
 | **Python** | 3.11 or 3.12 (see note below; 3.13 not supported yet) |
-| **Node.js** | 22.10+ |
+| **Node.js** | 20.19+ or 22.13+ (`package.json` allows up to 22.x; the Docker image builds on Node 22) |
 | **Git** | Any recent version |
 
 :::info Python version compatibility
@@ -79,7 +79,7 @@ npm run build
 npm run dev
 ```
 
-`npm run build` compiles the frontend and catches build-time errors early. It runs Vite with a 12 GB Node.js heap limit. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). It will show a waiting screen until the backend is running.
+`npm run build` compiles the frontend and catches build-time errors early. It runs Vite with a 12 GB Node.js heap limit. `npm run dev` then starts the dev server at [http://localhost:5173](http://localhost:5173). Until the backend is running it shows a "Backend Required" page; click **Check Again** once the backend is up.
 
 :::tip
 If `npm install` fails with compatibility warnings, run `npm install --force`.
@@ -114,7 +114,7 @@ pip install -r requirements.txt -U
 sh dev.sh
 ```
 
-The backend starts at [http://localhost:8080](http://localhost:8080). API docs are available at [http://localhost:8080/docs](http://localhost:8080/docs).
+`dev.sh` does not generate a secret key, so set `WEBUI_SECRET_KEY` to a long random value (exported in your shell or in the root `.env`) first; without it the backend exits at startup. The backend starts at [http://localhost:8080](http://localhost:8080). API docs are available at [http://localhost:8080/docs](http://localhost:8080/docs). The `/docs` page is served only when `ENV=dev`, the default when running from source; the Docker image sets `ENV=prod` and does not serve it.
 
 Refresh the frontend at [http://localhost:5173](http://localhost:5173) and you should see the full application.
 
@@ -132,6 +132,8 @@ export CORS_ALLOW_ORIGIN="http://localhost:5173;http://localhost:8080;http://192
 ```
 
 3. Restart the backend and browse to `http://192.168.1.42:5173`
+
+`npm run dev` runs `vite dev --host`, so the dev server already listens on every interface and proxies `/api`, `/ollama`, `/openai`, `/oauth` and `/ws` to the backend. The CORS entry is still needed because Socket.IO checks the browser's `Origin` header against `CORS_ALLOW_ORIGIN`. If the backend runs on another machine, point the proxy at it with `WEBUI_BACKEND_URL=http://<host>:8080 npm run dev`.
 
 ---
 
@@ -160,11 +162,11 @@ lsof -i :5173
 Get-Process -Id (Get-NetTCPConnection -LocalPort 5173).OwningProcess
 ```
 
-Terminate the process or change the port in `vite.config.js` (frontend) or `dev.sh` (backend).
+Terminate the process, or start on another port: `PORT=9000 sh dev.sh` for the backend (then start the frontend with `WEBUI_BACKEND_URL=http://localhost:9000 npm run dev`), and `npm run dev:5050` for the frontend (add `http://localhost:5050` to `CORS_ALLOW_ORIGIN` in `backend/dev.sh` first).
 
-### Icons not loading (CORS)
+### Icons not loading
 
-If static assets fail to load, configure `CORS_ALLOW_ORIGIN` in `backend/dev.sh` to include your frontend URL. See [CORS configuration](/reference/env-configuration#cors_allow_origin) for details.
+Static assets come from the Vite dev server, and API requests go through its proxy on the same origin, so `CORS_ALLOW_ORIGIN` does not affect them. Check the dev server's terminal and the browser's Network tab for the failing request instead.
 
 ### Hot reload not working
 
