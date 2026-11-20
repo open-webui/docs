@@ -26,7 +26,7 @@ The **Archived Chats** view provides tools to manage your archived conversations
 From the Data Controls tab, you can also perform bulk operations:
 
 - **Archive All Chats**: Move all your current conversations to the archive at once. This is useful for periodic cleanup.
-- **Delete All Chats**: Permanently remove all conversations (both active and archived), along with every share link you created. 
+- **Delete All Chats**: Permanently remove all conversations (both active and archived), along with every share link you created. Files uploaded to those chats and images generated in them are not deleted; remove them in **Manage Files**.
   - :::warning
     This action cannot be undone. All chat history will be permanently deleted.
     :::
