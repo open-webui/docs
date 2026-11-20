@@ -14,6 +14,7 @@ If you're experiencing connectivity problems with Open WebUI, especially when us
 You might be experiencing these issues if you see:
 - Empty responses like `"{}"` in the chat
 - Errors like `"Unexpected token 'd', "data: {"id"... is not valid JSON"`
+- Errors like `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`, see [`Unexpected token '<'`](#unexpected-token--doctype--is-not-valid-json)
 - Garbled markdown (visible `##`, `**`, broken formatting) during streaming, see [Streaming Response Corruption](#garbled-markdown--streaming-response-corruption)
 - WebSocket connection failures in browser console
 - WebSocket connection failures in CLI logs
@@ -236,6 +237,17 @@ Two causes account for almost all of these:
 2. **A stale service worker serving a cached page.** Open WebUI registers no service worker and unregisters any it finds on load, so a stale shell comes from the browser's HTTP cache or from a worker left by another app on the same origin while the live `/api/config` call fails, which produces this exact error. A normal hard refresh does not unregister the service worker. Clear it from **DevTools > Application > Service Workers > Unregister** for that origin, or open the instance in a fresh private/incognito window.
 
 This is a deployment and networking condition, not an Open WebUI bug.
+
+## `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`
+
+**Symptom:** an error toast or the browser console shows `SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON`. When the model list is the request that failed, the console line starts with `Failed to load models:`.
+
+**What it actually means:** the browser asked an Open WebUI API path for JSON and got an HTML page back. The error does not come from the model or the provider. Two things return HTML there:
+
+1. **Open WebUI itself.** Open WebUI answers a `GET` request for any path it has no route for with its own web page, `index.html`, and status `200`. A reverse proxy that adds or strips a path prefix sends API calls to paths that do not exist, so they come back as the web page. This is the usual result of putting Open WebUI under a subpath, which is [not supported](/faq#q-can-i-serve-open-webui-under-a-subpath-such-as-examplecomopenwebui).
+2. **Something in front of Open WebUI.** The request never reached it, and a proxy, a sign-in gateway or another site on the same domain answered with its own page, such as an error page for a request that was too large or took too long.
+
+To tell them apart, open **DevTools > Network**, select the failing request and read its response. Open WebUI's own page has the title `Open WebUI`. Any other page names the proxy or site that answered. Then serve Open WebUI from the root of its own hostname and route every path to it unchanged, as described in [HTTPS & Reverse Proxies](/reference/https).
 
 ## Connection to Ollama Server
 

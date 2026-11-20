@@ -53,6 +53,7 @@ If you are using **OpenRouter** or any provider with hundreds/thousands of model
 - **Admin Panel**: `Settings > Connections > Cache Base Model List` (admin section)
 - **Env Var**: `ENABLE_BASE_MODELS_CACHE=True`
   *   *Note*: Caches the base model list, in Redis when Redis is configured (shared by all replicas), otherwise in each replica's memory. It refreshes when you click **Save** in Connections settings or use the refresh button next to the toggle. Without Redis it also refreshes on restart.
+  *   *Stale model selector*: while the cache is on, the model selector shows the cached list. Models added to or removed from a provider do not appear or disappear, and the **Loaded** label on llama.cpp and LM Studio models keeps the state it had when the list was cached, so a model the provider loaded or unloaded by itself shows its old state. Loading, unloading, downloading or deleting a model from Open WebUI refreshes the list. Otherwise click **Refresh** next to **Cache Base Model List**.
 
 - **Env Var**: `MODELS_CACHE_TTL=300`
   *   *Note*: Caches the model list responses from each OpenAI and Ollama connection for 5 minutes. The default is `1` second.
