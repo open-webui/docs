@@ -40,6 +40,10 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 *   **Docker Users**: If Ollama is running on your host machine, use `http://host.docker.internal:11434` as the URL.
 *   **Load Balancing**: You can add **multiple** Ollama instances. Open WebUI will distribute requests between them using a **random selection** strategy, providing basic load balancing for concurrent users.
     *   **Note**: To enable this, ensure the **Model IDs match exactly** across instances. If you use **Prefix IDs**, they must be identical (or empty) for the models to merge into a single entry.
+    *   **Pull the same tag on every server**: Models are merged by name only. Open WebUI does not compare versions or digests, so two servers holding different builds under the same name still show as one model, and a chat can land on either. The parameter size, quantization and file size shown in the model selector come from the first connection in the list that has the model. After an update, run **Update All Models** on each connection.
+    *   **Each request picks a server**: Open WebUI picks one of the servers that has the model at random for every request, so messages in the same chat can go to different servers.
+    *   **Several users on one server**: Open WebUI sends each request to Ollama as it arrives and keeps no queue of its own. Whether one Ollama server answers several requests for the same model at once or makes them wait is set on the Ollama server by `OLLAMA_NUM_PARALLEL`, which defaults to `1`. Memory use grows with it. See Ollama's [concurrent requests FAQ](https://docs.ollama.com/faq#how-does-ollama-handle-concurrent-requests).
+    *   **Two Ollama containers on one host**: Ollama listens on port `11434` inside its container, so map a different host port to it for the second one, for example `docker run -d -v ollama2:/root/.ollama -p 11435:11434 --name ollama2 ollama/ollama`, and add it as `http://host.docker.internal:11435`.
 
 ### Advanced Configuration
 
@@ -132,6 +136,15 @@ Ollama uses the model's own system prompt only when a chat sends none. A system 
 Open WebUI shows a green "Loaded" indicator next to any Ollama model that is currently kept warm by the runtime, and admins see an **Eject** button on the model row to unload it without restarting the server. Behind the scenes, Open WebUI calls `POST /api/models/unload` (admin-only), which forwards a `keep_alive=0` generate call to every Ollama node serving that model.
 
 This is useful for freeing GPU/VRAM when juggling multiple large models, or for forcing a fresh load after pulling a new revision. Trying to unload a model that the connected provider does not support unloading returns an error rather than silently failing.
+
+### Slow First Reply After a Pause
+
+When the first reply after a quiet period takes much longer than the replies after it, Ollama is loading the model into memory again. Ollama unloads a model that has not been used for 5 minutes by default. Two settings change how long it stays loaded:
+
+- **`OLLAMA_KEEP_ALIVE`**, set on the **Ollama server**, applies to all models. It takes a duration such as `10m` or `24h`, a number of seconds, or a negative number to keep the model loaded. See Ollama's [keep-alive FAQ](https://docs.ollama.com/faq#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately).
+- **keep_alive (Ollama)**, an Open WebUI advanced parameter, is sent to Ollama as `keep_alive` with each chat request and takes the place of `OLLAMA_KEEP_ALIVE` for that request. Set it per model in **Workspace** > **Models**, or in a chat's **Controls** or **Settings > General**, where only admin accounts see it (see [Chat Parameters](/features/chat-conversations/chat-features/chat-params)). Switching it from **Default** to **Custom** fills in `5m`. On **Default**, Open WebUI sends nothing and `OLLAMA_KEEP_ALIVE` applies.
+
+A model stays in memory for as long as the keep-alive says, so a longer value keeps that memory in use between chats.
 
 ---
 
