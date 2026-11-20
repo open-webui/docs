@@ -999,7 +999,7 @@ This does **not** affect Tools, Actions, or Filters, where events supplement the
 | `notification` | Toast popup, Socket.IO only |
 
 :::tip Alternative for Streaming LLM Output
-If your pipe or tool needs to call an LLM and have the result persist even when the browser is closed, you can import and use `generate_chat_completion` from Open WebUI's internals instead of emitting `chat:completion` events. The completion flows through the normal chat pipeline and its result is saved to the database like any other assistant message.
+If your pipe needs to call an LLM and have the result persist even when the browser is closed, return the result from `pipe()` instead of emitting `chat:completion` events. `generate_chat_completion` from `open_webui.utils.chat` sends the request straight to the model's connection and returns the response to your code. It skips the chat pipeline and saves nothing itself, so the result is saved only when your `pipe()` returns it. See [Using Internal Open WebUI Functions](/features/extensibility/plugin/functions/pipe#using-internal-open-webui-functions).
 :::
 
 #### Requires live connection (errors on tab close)
