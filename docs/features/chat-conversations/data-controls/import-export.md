@@ -20,6 +20,12 @@ Click the **Export Chats** button to download all your conversations as a JSON f
 - Model information used in each conversation
 - Timestamps and conversation structure
 
+:::warning Images and attached files are not in the export
+In a saved chat, images and other files you attach are uploaded to the server as files. The chat, and so the export, keeps only each file's ID and name, and Open WebUI loads the image from `/api/v1/files/<id>/content` when it shows the message. Import the chat on another Open WebUI instance and those images do not load and those files cannot be opened, because that instance has no file with that ID. Keep the original files if you need them after a migration.
+
+A temporary chat is the exception. Images stay inside the chat as base64 data and other files as their extracted text, so **Download** > **Export chat (.json)** in the chat menu of a temporary chat carries them.
+:::
+
 :::tip Regular Backups
 It's a good practice to periodically export your chats, especially before major updates or migrations.
 :::
