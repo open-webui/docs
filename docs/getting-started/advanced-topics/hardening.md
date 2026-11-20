@@ -685,7 +685,7 @@ If a Function causes problems at startup, you can deactivate all Functions by st
 SAFE_MODE=true
 ```
 
-This lets you access the admin panel and disable the problematic function.
+This lets you access the admin panel and disable the problematic function. Safe Mode sets every Function to inactive in the database, so after you remove `SAFE_MODE` and restart, turn each Function you need back on in **Admin Panel > Functions**.
 
 ### Dependency installation
 
