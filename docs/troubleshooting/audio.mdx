@@ -349,6 +349,14 @@ environment:
 pip install av==14.0.1
 ```
 
+### ffmpeg Missing on a pip Install
+
+**Symptoms:** the server log shows `Couldn't find ffmpeg or avconv - defaulting to ffmpeg, but may not work`, and speech-to-text or text-to-speech requests that need audio converted fail.
+
+**Cause:** Open WebUI converts, compresses and splits audio for speech-to-text, and converts non-MP3 replies from an OpenAI-compatible text-to-speech engine to MP3, with ffmpeg. The standard Docker image installs it. A pip, uv, Conda or venv install does not.
+
+**Solutions:** install ffmpeg with your operating system's package manager, make sure `ffmpeg` is on the `PATH` of the process that runs Open WebUI, and restart. To skip this processing instead, set [`BYPASS_PYDUB_PREPROCESSING`](/reference/env-configuration#bypass_pydub_preprocessing) to `True`; audio then goes to the engine unconverted.
+
 ### STT Not Recognizing Speech Correctly
 
 **Tips for better recognition:**

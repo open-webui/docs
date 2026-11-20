@@ -5,6 +5,10 @@ Open WebUI supports **Python 3.11 and 3.12**. **Python 3.13 is not supported**: 
 - **Python 3.11 also works** for a pip install.
 :::
 
+:::info System packages
+A Python install does not bring ffmpeg, which the standard Docker image includes. Install it with your operating system's package manager and make sure `ffmpeg` is on the `PATH` of the shell that runs `open-webui serve`. Speech-to-text uses it to convert, compress and split audio, and text-to-speech uses it to convert replies from an OpenAI-compatible engine that are not MP3. Without it the server log shows `Couldn't find ffmpeg or avconv` and those steps fail. See [Audio Troubleshooting](/troubleshooting/audio#ffmpeg-missing-on-a-pip-install).
+:::
+
 :::tip No NVIDIA GPU?
 On Linux x86_64, installing `open-webui` from PyPI pulls in the default PyTorch build, which brings the NVIDIA CUDA libraries along whatever GPU the machine has. On a machine without an NVIDIA GPU, install the CPU build of PyTorch first, in the same environment, and the Open WebUI install leaves them out:
 
