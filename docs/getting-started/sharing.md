@@ -63,6 +63,14 @@ If your team is on the same local network or VPN, they can reach Open WebUI usin
 
 > `http://192.168.1.100:3000`
 
+Open WebUI listens on every network interface (`0.0.0.0`) unless [`HOST`](/reference/env-configuration#host) or `--host` says otherwise. If a teammate cannot load the page, check these first:
+
+- On the teammate's device, use the host's LAN IP address. `localhost` there points to the teammate's own device.
+- Use the host port: `3000` with the Docker quick start (`-p 3000:8080`), `8080` with `open-webui serve`.
+- A port published as `-p 127.0.0.1:3000:8080` accepts connections only from the host itself. Publish it as `-p 3000:8080` for LAN access. See [Docker port publishing](https://docs.docker.com/engine/network/port-publishing/).
+- Allow inbound connections on that port in the host's firewall. On Windows, check the rule for the network profile in use, Private or Public.
+- If Open WebUI runs inside WSL 2, other devices cannot reach it by default. Turn on mirrored networking mode or add a `netsh interface portproxy` rule, as described in [Accessing network applications with WSL](https://learn.microsoft.com/en-us/windows/wsl/networking#accessing-a-wsl-2-distribution-from-your-local-area-network-lan).
+
 ### 2. Secure Private Networks (Recommended)
 
 For remote teams that don't need public internet exposure. Overlay networks and secure tunnels provide encrypted access without opening firewall ports.

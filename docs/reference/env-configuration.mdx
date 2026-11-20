@@ -862,6 +862,17 @@ On weak hardware (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or
 - Default: A random UUID generated at each start
 - Description: Identifies the backend process. It is stamped as `instance_id` on every event envelope Open WebUI emits, so a multi-replica deployment can see which replica produced an event. Set it explicitly to keep the value stable across restarts.
 
+#### `HOST`
+
+- Type: `str`
+- Default: `0.0.0.0`
+- Description: Sets the address Open WebUI listens on. `0.0.0.0` accepts connections on every network interface. `127.0.0.1` accepts connections only from the same machine, for example when a reverse proxy on that machine fronts Open WebUI. Read at startup by the Docker image and the Windows start script. The `open-webui serve` and `open-webui dev` commands ignore it; use `--host` instead, for example `open-webui serve --host 127.0.0.1`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::warning
+In Docker, `HOST=127.0.0.1` makes Open WebUI accept connections only from inside the container, so the published port stops answering. To keep it on the host's loopback, leave `HOST` unset and publish the port as `-p 127.0.0.1:3000:8080`.
+:::
+
 #### `PORT`
 
 - Type: `int`
