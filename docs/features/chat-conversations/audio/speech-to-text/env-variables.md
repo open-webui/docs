@@ -14,7 +14,7 @@ For a complete list of all Open WebUI environment variables, see the [Environmen
 The following is a summary of the environment variables for speech to text (STT) and text to speech (TTS).
 
 :::tip UI Configuration
-Most of these settings can also be configured in the **Settings → Audio** (admin section) tab. Environment variables take precedence on startup but can be overridden in the UI.
+Most of these settings can also be configured in the **Settings → Audio** (admin section) tab. Environment variables only set the starting values: Open WebUI stores them on the first start, and from then on the stored values, including any saved in the UI, are used and changes to the variables are ignored, unless `ENABLE_PERSISTENT_CONFIG=false`.
 :::
 
 ## Speech To Text (STT) Environment Variables
@@ -32,7 +32,7 @@ Most of these settings can also be configured in the **Settings → Audio** (adm
 | `WHISPER_MODEL` | Whisper model size | `base` |
 | `WHISPER_MODEL_DIR` | Directory to store Whisper model files | `{CACHE_DIR}/whisper/models` |
 | `WHISPER_COMPUTE_TYPE` | Compute type for inference (see note below) | `int8` |
-| `WHISPER_LANGUAGE` | ISO 639-1 language code (empty = auto-detect) | empty |
+| `WHISPER_LANGUAGE` | ISO 639-1 language code forced for the Local Whisper, OpenAI and Deepgram engines (empty = the user's Settings > Audio language, else auto-detect) | empty |
 | `WHISPER_MULTILINGUAL` | Use the multilingual Whisper model | `false` |
 | `WHISPER_MODEL_AUTO_UPDATE` | Auto-download model updates | `false` |
 | `WHISPER_VAD_FILTER` | Enable Voice Activity Detection filter | `false` |
@@ -50,10 +50,11 @@ If using the `:cuda` Docker image with an older GPU, set `WHISPER_COMPUTE_TYPE=f
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `azure`, `deepgram`, `mistral` | empty |
+| `AUDIO_STT_ENGINE` | STT engine: empty (local Whisper), `openai`, `web` (speech recognition in the browser, no server call), `azure`, `deepgram`, `mistral` | empty |
 | `AUDIO_STT_MODEL` | STT model for external providers | empty |
 | `AUDIO_STT_OPENAI_API_BASE_URL` | OpenAI-compatible API base URL | `https://api.openai.com/v1` |
-| `AUDIO_STT_OPENAI_API_KEY` | OpenAI API key | empty |
+| `AUDIO_STT_OPENAI_API_KEY` | OpenAI API key | the `OPENAI_API_KEY` paired with `https://api.openai.com/v1`, else empty |
+| `AUDIO_STT_OPENAI_API_REQUEST_FORMAT` | `multipart` (file upload) or `json` (base64 audio in a JSON body); the admin field is Request Format | `multipart` |
 | `AUDIO_STT_SUPPORTED_CONTENT_TYPES` | Comma-separated list of supported audio MIME types | empty |
 
 ### Azure STT
@@ -88,7 +89,7 @@ See the [Azure AI Speech STT guide](/features/chat-conversations/audio/speech-to
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `AUDIO_TTS_ENGINE` | TTS engine: empty (disabled), `openai`, `openai-realtime`, `mistral`, `elevenlabs`, `azure`, `transformers` | empty |
+| `AUDIO_TTS_ENGINE` | TTS engine: empty (speech synthesis in the browser via the Web Speech API), `openai`, `openai-realtime`, `mistral`, `elevenlabs`, `azure`, `transformers` | empty |
 | `AUDIO_TTS_MODEL` | TTS model | `tts-1` |
 | `AUDIO_TTS_VOICE` | Default voice | `alloy` |
 | `AUDIO_TTS_SPLIT_ON` | Split text on: `punctuation`, `paragraphs`, or `none` | `punctuation` |
@@ -99,7 +100,7 @@ See the [Azure AI Speech STT guide](/features/chat-conversations/audio/speech-to
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `AUDIO_TTS_OPENAI_API_BASE_URL` | OpenAI-compatible TTS API base URL | `https://api.openai.com/v1` |
-| `AUDIO_TTS_OPENAI_API_KEY` | OpenAI TTS API key | empty |
+| `AUDIO_TTS_OPENAI_API_KEY` | OpenAI TTS API key | the `OPENAI_API_KEY` paired with `https://api.openai.com/v1`, else empty |
 | `AUDIO_TTS_OPENAI_PARAMS` | Additional JSON params for OpenAI TTS | empty |
 | `REALTIME_TTS_PROMPT_TEMPLATE` | Instructions for the model when `AUDIO_TTS_ENGINE` is `openai-realtime` | empty (built-in prompt) |
 

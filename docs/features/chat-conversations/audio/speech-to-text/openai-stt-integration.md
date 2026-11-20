@@ -29,7 +29,7 @@ See the companion guide: [Using OpenAI for Text-to-Speech](/features/chat-conver
 | **API Base URL** | `https://api.openai.com/v1` |
 | **API Key** | Your OpenAI API key |
 | **STT Model** | `gpt-transcribe` |
-| **Supported Content Types** | Leave empty for defaults, or set `audio/wav,audio/mpeg,audio/webm` |
+| **Supported MIME Types** | Leave empty for the runtime default of `audio/*,video/webm`, or set `audio/wav,audio/mpeg,audio/webm` |
 
 5. Click **Save**
 
@@ -130,7 +130,7 @@ Choose **Local Whisper** if:
 
 ### Language Issues
 
-OpenAI's Whisper API automatically detects language. If you need to force a specific language, consider using Local Whisper with the `WHISPER_LANGUAGE` environment variable.
+Open WebUI sends the language from Settings > Audio > Language, or from `WHISPER_LANGUAGE` if that is set (it also applies to Local Whisper and Deepgram), and retries the request without a language if it fails. Leave both empty to let OpenAI detect the language.
 
 For more troubleshooting, see the [Audio Troubleshooting Guide](/troubleshooting/audio).
 

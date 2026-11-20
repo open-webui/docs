@@ -67,8 +67,8 @@ services:
 | `AUDIO_TTS_ENGINE` | Set to `mistral` | empty (uses browser-only TTS) |
 | `AUDIO_TTS_MISTRAL_API_KEY` | Your Mistral API key | empty |
 | `AUDIO_TTS_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
-| `AUDIO_TTS_MODEL` | TTS model | `voxtral-mini-tts-2603` (built-in fallback) |
-| `AUDIO_TTS_VOICE` | Voice ID | empty |
+| `AUDIO_TTS_MODEL` | TTS model | `tts-1` (shared with the OpenAI engine, so set a Mistral model; `voxtral-mini-tts-2603` is used only when the value is empty) |
+| `AUDIO_TTS_VOICE` | Voice ID | `alloy` (set a Mistral voice ID, or the request goes out with `alloy`) |
 
 ## Choosing Voices
 
