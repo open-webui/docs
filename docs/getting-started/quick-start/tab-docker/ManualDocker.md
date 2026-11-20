@@ -21,7 +21,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
 | `:slim`, `:main-slim` | About **197 MB instead of 1.62 GB** to download, **88% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
-| `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
+| `:cuda` | Runs Open WebUI's own local models (embeddings, reranking, local Whisper) on an Nvidia GPU, CUDA 12.8 (add `--gpus all` to `docker run`). Chat replies are not faster; see [GPU support](#gpu-support-nvidia) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
 
@@ -152,6 +152,10 @@ The same images are mirrored to Docker Hub as `openwebui/open-webui`, but only a
 ```bash
 docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
 ```
+
+The `:cuda` image runs the local embedding model, the local reranking model and local Whisper speech-to-text on the GPU. Chat replies come from Ollama or your provider, so their speed depends on where that model runs: give the GPU to Ollama. If the container cannot use CUDA, Open WebUI logs `CUDA unavailable (USE_CUDA_DOCKER=true), falling back to CPU` and runs those models on the CPU.
+
+There is no ROCm image of Open WebUI. With an AMD GPU, run the `:main` image and give the GPU to Ollama's `rocm` image, as shown in [Ollama's Docker guide](https://docs.ollama.com/docker).
 
 ### Bundled with Ollama
 
