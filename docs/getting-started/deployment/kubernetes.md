@@ -38,7 +38,7 @@ helm repo update
 
 **Expected result:** your nodes are ready and the `openwebui` namespace exists. If it already exists, reuse it.
 
-This guide pins **chart 18.0.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-17.5.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
+This guide pins **chart 18.0.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-18.0.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
 
 ## 2. Configure the Application
 
