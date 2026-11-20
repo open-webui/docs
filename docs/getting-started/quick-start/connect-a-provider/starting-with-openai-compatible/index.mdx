@@ -756,6 +756,19 @@ To ensure full compatibility with Open WebUI, your server should implement the f
 
 Open WebUI passes standard OpenAI parameters such as `temperature`, `top_p`, `max_tokens` (or `max_completion_tokens`), `stop`, `seed`, and `logit_bias`. It also supports **Tool Use** (Function Calling) if your model and server support the `tools` and `tool_choice` parameters.
 
+#### How the model ID changes the request
+
+Before it sends a chat request on any OpenAI-compatible connection, Open WebUI checks the model ID it is about to send. That is the ID after the connection's **Prefix ID** is removed, and for a custom model it is the base model's ID. The check ignores case and first removes a leading `openai.` or `<region>.openai.` (Amazon Bedrock style, for example `us.openai.gpt-5`). The ID counts as an OpenAI reasoning model when it starts with `o` followed by a digit (`o1`, `o3-mini`, `o4-mini`) or with `gpt-` followed by a number of 5 or higher (`gpt-5`, `gpt-5.2`, `gpt-6`).
+
+- **Matching IDs:** `max_tokens` is renamed to `max_completion_tokens`. If the first message has the `system` role, it is sent with the `developer` role instead, or with the `user` role for IDs starting with `o1-mini` or `o1-preview`.
+- **Other IDs, on a URL that does not contain `api.openai.com`:** `max_completion_tokens` is renamed to `max_tokens`.
+
+This applies to every server, not only OpenAI, so it explains these cases:
+
+- **Your server returns an error about the `developer` role, or the model does not follow the system prompt, for a model named like `gpt-5` or `o3`.** The model ID matches the rule even though the server behind it is not OpenAI. Give the model a different ID on the server or proxy (for example in your LiteLLM config) so it no longer starts with `o<digit>` or `gpt-<5 or higher>`.
+- **The token limit has no effect for a reasoning model behind a proxy.** For a matching ID, the **max_tokens** value from **Advanced Params** is sent as `max_completion_tokens`. Check that your server or proxy accepts that parameter.
+- **A proxy model such as `openai/gpt-5` gets `max_tokens` and a `system` message.** Only the `openai.` form of the provider prefix is removed, so an ID with `openai/` does not match. If the upstream API requires `max_completion_tokens` or the `developer` role, expose the model under an ID without that prefix.
+
 ---
 
 ## Step 2: Start Chatting!
