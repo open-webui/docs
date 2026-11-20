@@ -106,7 +106,7 @@ Try uploading a document and preview the extracted content. If it's blank or mis
 
 ### 2. Only a Small Part of the Document is Being Used
 
-Open WebUI is designed to work with models that have limited context windows by default. For instance, Ollama picks a model's default context length from available VRAM, and on GPUs with less than 24 GiB that is 4096 tokens (see [Ollama's context length documentation](https://docs.ollama.com/context-length)), well below what most models support. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
+Open WebUI is designed to work with models that have limited context windows by default. For instance, Ollama picks a model's default context length from available VRAM, and on GPUs with less than 24 GiB that is 4096 tokens (see [Ollama's context length documentation](https://docs.ollama.com/context-length)), well below what most models support. Open WebUI does not measure the model's context or trim retrieved content to fit it. It injects the Top K retrieved chunks (default 10), so only those parts of the document reach the model, and a small context window can cut off even those.
 
 **Solutions:**
 
@@ -204,7 +204,7 @@ Open WebUI implements various limits to ensure system stability and prevent abus
     *   **Office and EPUB documents** are additionally checked against what they contain, because those formats are archives. One that unpacks to far more than its own size is refused with a message about the archive being too large after decompression, even though the file itself is small. A genuine document rarely trips this; one that does is either corrupt or built to exhaust memory on whatever opens it.
     *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Documents > Files > Max Upload Count** (admin section).
     *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Documents > Files > Allowed File Extensions** (admin section).
-*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
+*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (no limit by default; only the browser enforces it). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to `RAG_FILE_MAX_SIZE` and the knowledge base [file limits](/features/workspace/knowledge#file-limits).
     *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used with **Using Entire Document** (click the attachment in a chat), which feeds the full document content to the model instead of using vector search retrieval.
@@ -330,7 +330,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
    Set `CUDA_VISIBLE_DEVICES` to pin embedding to a specific GPU separate from your chat model.
 
 2. **Reduce Embedding Batch Size**:
-   Lower `RAG_EMBEDDING_BATCH_SIZE` (e.g., from 32 to 8 or 4) to reduce peak memory usage.
+   If you raised `RAG_EMBEDDING_BATCH_SIZE` (the default is 1; 32 is the default of `RAG_RERANKING_BATCH_SIZE`), lower it again to reduce peak memory usage.
 
 3. **Enable Expandable Segments**:
    Set the environment variable to reduce fragmentation:
@@ -354,7 +354,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 When using a **remote/external embedding provider** (OpenAI, Azure OpenAI, etc.) with [`ENABLE_ASYNC_EMBEDDING`](/reference/env-configuration#enable_async_embedding) enabled, you may see HTTP 429 "Too Many Requests" errors in the logs during bulk document ingestion:
 
 ```
-Error generating embeddings: 429 Rate limit reached
+aiohttp.client_exceptions.ClientResponseError: 429, message='Too Many Requests', url='https://api.openai.com/v1/embeddings'
 ```
 
 **The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits, especially on free-tier or lower-tier plans.
@@ -368,7 +368,7 @@ Error generating embeddings: 429 Rate limit reached
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
-   Or configure it in the **Settings > Documents > Embedding Concurrent Requests** (admin section) field. The default of `0` means unlimited concurrency.
+   Or configure it in the **Settings > Documents > Embedding Concurrent Requests** (admin section) field, shown for the Ollama, OpenAI and Azure OpenAI embedding engines. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
    Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
@@ -393,7 +393,7 @@ If PDFs containing images with text are returning empty content:
    - OCR uses one processor thread per upload. On an idle many-core server, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster.
 
 3. **Update pypdf** (if using the default engine):
-   Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
+   Recent pypdf releases (6.0.0+) have improved handling of various PDF formats. Each Open WebUI release pins its pypdf version, so updating pypdf means updating Open WebUI
 
 4. **Check for Corrupted PDFs**:
    Verify the PDF opens correctly in a standard PDF viewer before uploading
