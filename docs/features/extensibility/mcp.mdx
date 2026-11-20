@@ -245,6 +245,16 @@ The server log records each failure at error level as `Failed to connect to MCP 
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
 4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, connecting, listing its tools or reading a resource can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds). Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server) instead.
 
+### "Maximum tools limit reached"
+
+The error `Maximum tools limit reached. <n> tools have been provided but the maximum is <m>` comes from the model provider or a proxy in front of it, not from Open WebUI. The request held more tool definitions than that endpoint accepts. Open WebUI sends every tool of each MCP server enabled for the chat that passes its **Function Name Filter List**, plus the built-in tools in Native Mode.
+
+To send fewer tools:
+
+- **Turn on [Tool Search](/features/extensibility/plugin/tools#tool-search).** Deferred tools are left out of the tool list sent to the provider, which then holds the tools that stay loaded plus `search_tools` and `call_tool`. Only tools whose definition is longer than the **Deferral Threshold (characters)** are deferred. Set it to `0` to defer every tool.
+- **List only the tools you need** in each server's [Function Name Filter List](#function-name-filter-list).
+- **Enable fewer MCP servers** in the chat, or turn off the [Builtin Tools categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) the model does not need.
+
 ### Infinite loading screen after adding External Tool
 
 **Symptom**: 
