@@ -8,7 +8,7 @@ Create short videos from a text prompt, or from a starting image, without leavin
 
 ## Set up video generation (admin)
 
-1. Open **Settings** > **Videos** (admin section) and switch **Video Generation** on.
+1. Open **Settings** > **Images & Videos** (admin section), scroll to **Videos** and switch **Video Generation** on.
 2. Add a connection with the **+** button under **Manage Video Connections**, fill it in and save.
 3. Optionally pick a **Default Video Model**. It is used when neither the chat nor the model picks one.
 4. Give people access. In **Users** > **Groups** (or the default permissions), turn on the **Video Generation** permission under **Features**. It is off by default, see [Permissions](/features/authentication-access/rbac/permissions). Admins always have it.
@@ -40,4 +40,4 @@ Open WebUI waits up to 15 minutes for a video and checks its progress every 5 se
 
 Videos are created through a built-in tool, so the chat model needs **Native** [function calling](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native). Keep your normal chat model selected, as described for [images](/features/chat-conversations/image-generation-and-editing/usage).
 
-If **Video** is missing from the **+** menu, check that video generation is on in **Settings** > **Videos**, that your role has the **Video Generation** permission and that the model has the **Video Generation** feature on.
+If **Video** is missing from the **+** menu, check that video generation is on under **Videos** in **Settings** > **Images & Videos**, that your role has the **Video Generation** permission and that the model has the **Video Generation** feature on.
