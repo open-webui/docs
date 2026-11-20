@@ -12,6 +12,7 @@ Open WebUI offers an **AI-powered Autocomplete** feature that suggests text comp
 When enabled, Open WebUI monitors your input in the chat box. When you pause typing, it sends your current text to a lightweight **Task Model**. This model predicts the likely next words or sentences, which appear as "ghost text" overlaying your input.
 
 - **Accept Suggestion**: Press `Tab` to accept the suggestion. Right Arrow only moves the caret.
+- **Accept on a Touch Screen**: Swipe right across the chat input by more than 50 pixels. A swipe that moves farther up or down than sideways does not count.
 - **Reject/Ignore**: Simply keep typing to overwrite the suggestion.
 
 :::info
