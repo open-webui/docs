@@ -110,7 +110,7 @@ The key covers every call from Open WebUI: **Verify Connection**, the terminals 
 1. **Check orchestrator logs.** The orchestrator logs the full provisioning flow, including image pull and workspace creation. Look for errors related to image availability, terminal settings or resource limits.
 2. **Verify the API key.** Ensure `TERMINALS_API_KEY` matches between Open WebUI and the orchestrator. A mismatch makes the connection fail with a `401` error.
 3. **Check image pull access.** If using a private container registry, make sure the orchestrator (Docker) or cluster (Kubernetes) has pull credentials configured.
-4. **Raise the timeout.** If a request fails with `Terminal '<name>' timed out. It may still be starting.`, raise [`AIOHTTP_CLIENT_TIMEOUT_TERMINAL`](/reference/env-configuration#aiohttp_client_timeout_terminal).
+4. **Raise the timeout.** If a request fails with `Terminal '<name>' timed out. It may still be starting. Please try again.`, raise [`AIOHTTP_CLIENT_TIMEOUT_TERMINAL`](/reference/env-configuration#aiohttp_client_timeout_terminal).
 
 ### Authentication failures
 
