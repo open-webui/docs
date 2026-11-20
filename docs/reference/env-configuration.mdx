@@ -4296,14 +4296,14 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `use_llm`, which asks Marker to run an LLM pass for higher accuracy on tables, forms and math at higher cost and latency.
+- Description: Sends `use_llm`, which asks Marker to run an LLM pass for higher accuracy on tables, forms and math at higher cost and latency. Also set as **Use LLM** in **Settings > Documents** (admin section). Each chunk records the setting in its `processed_with_llm` metadata field.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_SKIP_CACHE`
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `skip_cache`, which makes Datalab re-run the conversion instead of returning a cached result for a file it has seen before.
+- Description: Sends `skip_cache`, which makes Datalab re-run the conversion instead of returning a cached result for a file it has seen before. Also set as **Skip Cache** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_FORCE_OCR`
@@ -4324,28 +4324,28 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `strip_existing_ocr`, which discards a document's existing OCR text layer and OCRs it again.
+- Description: Sends `strip_existing_ocr`, which discards a document's existing OCR text layer and OCRs it again. Also set as **Strip Existing OCR** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_DISABLE_IMAGE_EXTRACTION`
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `disable_image_extraction`, which skips image extraction from the document.
+- Description: Sends `disable_image_extraction`, which skips image extraction from the document. Also set as **Disable Image Extraction** in **Settings > Documents** (admin section). Open WebUI never stores the images Marker returns: it keeps only their count and names in each chunk's `image_count` and `images` metadata fields.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_FORMAT_LINES`
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `format_lines`, which reformats lines with an OCR pass to improve inline math and text formatting.
+- Description: Sends `format_lines`, which reformats lines with an OCR pass to improve inline math and text formatting. Also set as **Format Lines** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_OUTPUT_FORMAT`
 
 - Type: `str`
 - Default: `markdown`
-- Description: Output format requested from Marker. Datalab accepts `markdown`, `html`, `json` and `chunks`. Open WebUI ingests the returned text, so keep `markdown` unless you have a reason not to.
+- Description: Output format requested from Marker. Open WebUI accepts `markdown`, `html` and `json`; any other value, `chunks` included, fails the upload with `Unsupported output format: <value>`. Open WebUI ingests the returned text, so keep `markdown` unless you have a reason not to.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_MODE`
@@ -4452,7 +4452,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `str`
 - Default: `sentence-transformers/all-MiniLM-L6-v2`
-- Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
+- Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used. Also set as **Embedding Model** in **Settings > Documents** (admin section). With the default (SentenceTransformers) engine, the download icon next to the field (**Update embedding model**) applies the embedding settings right away, without **Save**: it unloads the old model, loads the new one (downloading it from Hugging Face when [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](#rag_embedding_model_auto_update) is on) and stores the name. **Save** runs the same step. If the model fails to load, the name is still stored and the server log shows `Error loading SentenceTransformer`; uploads then fail with `No embedding model is loaded. Set RAG_EMBEDDING_MODEL to a valid SentenceTransformer model name, or configure an external RAG_EMBEDDING_ENGINE (ollama, openai, azure_openai).` Neither step touches existing vectors: run **Reindex Knowledge and Memory Vectors** afterward so stored documents are embedded with the new model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SENTENCE_TRANSFORMERS_BACKEND`
@@ -4547,7 +4547,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `float`
 - Default: `0.5`
-- Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword search, 0 means only vector search.
+- Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword search, 0 means only vector search. Also set as **BM25 Weight** in **Settings > Documents** (admin section), where the slider runs from **semantic** (0) to **lexical** (1). It is read only while **Hybrid Search** ([`ENABLE_RAG_HYBRID_SEARCH`](#enable_rag_hybrid_search)) is on, and the field is hidden otherwise. Values in between run both searches and blend their results with weights `BM25 Weight` and `1 - BM25 Weight`. Whatever the weight, the merged results then go through the reranking step. Choosing **Default** next to the field only hides the slider and does not reset a saved weight; set the slider to `0.5` to return to the default.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`
@@ -4647,7 +4647,7 @@ Provide a clear and direct response to the user's query, including inline citati
 
 - Type: `str`
 - Default: `(empty)`
-- Description: When `RAG_TEXT_SPLITTER=token_transformers`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Leave empty to use Tiktoken. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`); use it to match chunk boundaries to your embedding model's own tokenizer.
+- Description: When `RAG_TEXT_SPLITTER=token_transformers`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Also set as **Tokenizer Model** in **Settings > Documents** (admin section), shown when **Text Splitter** is **Token (Transformers)**. A name without a `/` that is not a local path gets the `sentence-transformers/` prefix. Left empty, Open WebUI uses the tokenizer of the loaded local embedding model, which exists only with the default (SentenceTransformers) embedding engine; with Ollama, OpenAI or Azure OpenAI embeddings an empty value makes processing fail with `Tokenizer model required for Token (Transformers) text splitter`, and the admin panel requires the field. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`) only while [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](#rag_embedding_model_auto_update) is on; otherwise it must already be in the cache. Use it to match chunk boundaries to your embedding model's own tokenizer.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
@@ -4699,7 +4699,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
   - `page`: Creates one document per page (default).
   - `single`: Combines all pages into one document for better chunking across page boundaries.
 - Default: `page`
-- Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
+- Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic. Also set as **PDF Loader Mode** in **Settings > Documents** (admin section), shown only with the default engine. In `page` mode the text splitter works on each page separately, so no chunk spans a page break, and each chunk keeps its page number: the citation shows `(page N)` and its link opens the PDF at that page. In `single` mode pages are joined into one text, chunks can run across page breaks, and chunks carry no page number, so citations show neither. The mode is applied when a file is extracted; existing knowledge files change only after **Reindex Knowledge and Memory Vectors**, which extracts them again.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_CSV_SUMMARY`
@@ -4755,19 +4755,21 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `int`
 - Default: `None`
-- Description: Sets the maximum width, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured width limit is applied.
+- Description: Sets the maximum width, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured width limit is applied. Also set as **Image Compression Width** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `FILE_IMAGE_COMPRESSION_HEIGHT`
 
 - Type: `int`
 - Default: `None`
-- Description: Sets the maximum height, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured height limit is applied.
+- Description: Sets the maximum height, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured height limit is applied. Also set as **Image Compression Height** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::note
 
 These values are exposed through app config and consumed by the frontend chat upload flow for image files. Compression happens client-side with aspect ratio preserved. Non-image file uploads are not affected.
+
+The same limits apply to images added in channels and in notes. Images are only scaled down, never up. The limits act as a ceiling on each user's own **Image Compression** setting: a user can pick a smaller size but not a larger one, and with only these limits set, every image is held to them even when the user has compression turned off.
 
 :::
 
@@ -4813,7 +4815,7 @@ Only increase this variable's value if it does. Otherwise you might run into une
 
 - Type: `bool`
 - Default: `true`
-- Description: Runs embedding tasks asynchronously (parallelized) for maximum performance. Only works for Ollama, OpenAI and Azure OpenAI, does not affect sentence transformer setups.
+- Description: Runs embedding tasks asynchronously (parallelized) for maximum performance. Only works for Ollama, OpenAI and Azure OpenAI, does not affect sentence transformer setups. Also set as **Async Embedding Processing** in **Settings > Documents** (admin section), shown only for those three engines. When on, all batches of a document's processing step (up to [`RAG_EMBEDDING_BUFFER_SIZE`](#rag_embedding_buffer_size) chunks, split by **Embedding Batch Size**) are sent at the same time; with the default batch size of `1`, that is one request per chunk, up to 1,000 at once. When off, the batches are sent one after another. Either way the embeddings are stored in the original chunk order, so search results do not change.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip
@@ -4835,7 +4837,7 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 - Type: `int`
 - Default: `0`
-- Description: Limits the number of concurrent embedding API requests when async embedding is enabled. Uses an asyncio semaphore to throttle parallel requests. Set to `0` for unlimited concurrency (default behavior), or set to a positive integer to cap simultaneous requests. Useful for respecting rate limits on external embedding APIs or reducing load on local embedding servers.
+- Description: Limits the number of concurrent embedding API requests when async embedding is enabled. Uses an asyncio semaphore to throttle parallel requests. Set to `0` for unlimited concurrency (default behavior), or set to a positive integer to cap simultaneous requests. Useful for respecting rate limits on external embedding APIs or reducing load on local embedding servers. Also set as **Embedding Concurrent Requests** in **Settings > Documents** (admin section). The cap counts requests per document being embedded, not across the server: two documents processed at the same time can each send that many requests.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip
@@ -4956,7 +4958,7 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `int`
 - Default: `32`
-- Description: Controls how many query-document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call.
+- Description: Controls how many query-document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call. Also set as **Reranking Batch Size** in **Settings > Documents** (admin section). It has no effect with the `external` reranking engine, which sends all results for a query to the reranker in one request.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND`
@@ -5076,7 +5078,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `prebuilt-layout`
-- Description: Specifies the model for document intelligence.
+- Description: Specifies the model for document intelligence. Also set as **Document Intelligence Model** in **Settings > Documents** (admin section). The value is sent to Azure as the model ID for each analysis, and Open WebUI asks for Markdown output. Only PDF, DOCX, PPT and PPTX files go to Document Intelligence; other files use the built-in loaders. Each file becomes one document, so citations carry no page number.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Advanced Settings
