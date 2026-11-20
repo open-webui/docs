@@ -113,7 +113,7 @@ On most Linux systems, your volume data is physically stored at: `/var/lib/docke
 
 ### Q: Should I use the distro-packaged Docker or the official Docker package?
 
-**A:** We recommend using the official Docker package over distro-packaged versions for running Open WebUI. The official Docker package is frequently updated with the latest features, bug fixes, and security patches, ensuring optimal performance and security. Additionally, it supports important functionalities like `host.docker.internal`, which may not be available in distro-packaged versions. This feature is essential for proper network configurations and connectivity within Docker containers.
+**A:** We recommend using the official Docker package over distro-packaged versions for running Open WebUI. The official Docker package is frequently updated with the latest features, bug fixes, and security patches, ensuring optimal performance and security. On Linux, `host.docker.internal` resolves inside the container only when you start it with `--add-host=host.docker.internal:host-gateway`, or `extra_hosts` in Compose, as the [Quick Start](/getting-started/quick-start) commands do. Docker Engine supports this since [version 20.10](https://docs.docker.com/engine/release-notes/20.10/), whoever packaged it, so check `docker version` if the flag is rejected.
 
 By choosing the official Docker package, you benefit from consistent behavior across different environments, more reliable troubleshooting support, and access to the latest Docker advancements. The broader Docker community and resources are also more aligned with the official package, providing you with a wealth of information and support for any issues you might encounter.
 
