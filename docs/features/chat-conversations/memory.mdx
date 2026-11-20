@@ -33,6 +33,12 @@ The memory system stores snippets of information about you (e.g., "I prefer Pyth
 Users can manually add, edit, or delete memories by navigating to:
 **Settings > Personalization > Memory**
 
+**Saved Memories** is listed only while the **Memory** switch is on. Turning the switch off hides the list and stops memories being added to your chats, but it deletes nothing; turn it back on and the same memories return.
+
+**Add Memory** asks for a **Type**. A **User** memory is a fact, preference, or instruction about you, and all of them are given to the model on every reply, up to the [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) budget. A **Context** memory is given only when it relates to the chat: Open WebUI searches your memories with your last seven messages and adds the closest matches, up to the [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) budget. Memories are listed in alphabetical order, with the path first when there is one, and text past a budget is cut off without a warning. With many **User** memories, the ones that sort last never reach the model.
+
+**Clear memory**, in the **Actions** menu above the list, deletes every memory on your account, including any hidden by the search box. After you confirm the **Clear Memory** dialog (`Are you sure you want to clear all memories? This action cannot be undone.`) Open WebUI deletes the memories from the database and drops their search index, and you see `Memory cleared successfully`. There is no undo or trash. To remove only some memories, delete them one at a time from the list instead.
+
 ### 2. Native Memory Tools (Agentic Mode)
 
 When using a model with **Native Function Calling (Agentic Mode)** enabled, quality models can manage your memory autonomously using built-in tools. For a detailed breakdown of how administrators can configure and manage these system-level tools, see the [**Central Tool Calling Guide**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
