@@ -37,8 +37,8 @@ Having issues with web search? Check out the [Web Search Troubleshooting Guide](
    - **Hosted**: sign up at [firecrawl.dev](https://firecrawl.dev) and copy the key from your dashboard.
    - **Self-hosted**: use the key from your own Firecrawl instance.
 2. In Open WebUI, open **Settings > Web Search** (admin section).
-3. Toggle **Enable Web Search** on.
-4. Select **Firecrawl** from the **Web Search Engine** dropdown (engine value `firecrawl`).
+3. Toggle **Web Search** on.
+4. Select `firecrawl` from the **Web Search Engine** dropdown.
 5. Paste your key into the **Firecrawl API Key** field.
 6. (Self-hosted only) Set the **Firecrawl API Base URL** to your instance's origin, for example `https://firecrawl.example.com`. Open WebUI appends `/v2/search` and `/v2/scrape` itself, so do not include a version path unless it is `/v2`. The default is `https://api.firecrawl.dev`.
 7. Save.
