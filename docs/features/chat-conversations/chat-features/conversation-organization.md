@@ -156,7 +156,7 @@ Under **Advanced**, **Default terminal** picks the terminal new chats in this fo
 
 Assign a dedicated **System Prompt** to the folder that automatically applies to all conversations within it:
 
-- The system prompt is **prepended to every new conversation** created in the folder.
+- The system prompt is **added to every chat in the folder**, including chats moved into it later. It is sent after the model's system prompt and before the chat's or account's ([order](/features/chat-conversations/chat-features/chat-params#how-system-prompts-combine)).
 - This tailors the AI's behavior for specific tasks or personas.
 - System prompts are optional. You can use folders purely for organization without one.
 
