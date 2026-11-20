@@ -5147,10 +5147,10 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Deprecated alias of [`ENABLE_LOCAL_WEB_FETCH`](#enable_local_web_fetch), still honored when the new name is unset. Controls whether outbound fetches can access URLs that resolve to private/local network IP addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading, OAuth profile-picture fetches and skill [**Import from URL**](/features/workspace/skills#importing-from-a-url).
+- Description: Deprecated alias of [`ENABLE_LOCAL_WEB_FETCH`](#enable_local_web_fetch), still honored when the new name is unset. Controls whether outbound fetches can access URLs that resolve to addresses that are not globally routable, such as private, loopback and link-local addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading, OAuth profile-picture fetches and skill [**Import from URL**](/features/workspace/skills#importing-from-a-url).
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
-When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to private IP addresses, including:
+When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to any address that is not globally routable, and logs `Blocked non-global address:`. This includes the shared address range `100.64.0.0/10`, which Tailscale uses, as well as:
 
 - IPv4 private ranges (`10.x.x.x`, `172.16.x.x`-`172.31.x.x`, `192.168.x.x`, `127.x.x.x`)
 - IPv6 private ranges
