@@ -1577,7 +1577,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `str`
 - Default: Empty string (use the built-in approval policy)
-- Description: Approval policy that describes which tool calls need approval. Used by both engines. Can also be set in **Settings > Interface** (admin section) (**Approval policy**).
+- Description: Approval policy that describes which tool calls need approval in **Auto**. Used by both engines. An empty or whitespace-only value uses the built-in policy. A custom value replaces the built-in policy in full. See [Auto](/features/extensibility/plugin/tools#auto) for the built-in text and how each engine uses it. Can also be set in **Settings > Interface** (admin section) (**Approval policy prompt**, shown once **Auto permissions** is on).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.prompt`.
 
 #### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`
@@ -1800,7 +1800,7 @@ With the built-in template, the chat history it receives is the first user messa
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Description: Prompt to use when calling tools.
+- Description: System prompt for the tool-selection request that [Legacy Mode](/features/extensibility/plugin/tools#how-legacy-mode-picks-tools) sends to the task model before each reply. Not used in Native Mode. `{{TOOLS}}` is replaced with the JSON list of the chat's tool definitions, and no other placeholder is filled. The reply must contain a JSON object with a `tool_calls` array of `{"name": ..., "parameters": {...}}` entries. Can also be set in **Settings > Interface** (admin section) (**Tools Function Calling Prompt**, under **Generation**).
 - Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 
 `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`:
