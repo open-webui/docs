@@ -48,6 +48,8 @@ User Settings control personal preferences: your default model, interface theme,
 - Interface theme and language
 - Per-feature toggles like autocomplete or rich text input
 
+**Theme** and **Language** under **Settings > General** are saved in the browser, not in your account, so they do not follow you to another browser or device. A browser that has not opened Open WebUI before starts on the **System** theme and on the language set by [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale), or the browser's own language when the admin has not set one.
+
 ---
 
 ## How They Work Together
