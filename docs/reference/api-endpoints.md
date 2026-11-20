@@ -917,6 +917,15 @@ Leverage a knowledge base to enhance the response when the inquiry may benefit f
       return response.json()
   ```
 
+##### Reading the Citations in the Response
+
+When retrieval finds content, the response carries the retrieved sources so you can show citations. This applies to a plain API request, sent without `session_id` and `chat_id`.
+
+- **Non-streaming** (`"stream": false`): the JSON response has a top-level `sources` key next to `choices`.
+- **Streaming** (`"stream": true`): the first event is `data: {"sources": [...]}`, sent before the model's first chunk. It has no `choices` key, so a client that reads `choices[0].delta.content` from every event must skip it.
+
+Each entry in `sources` holds `source` (the file or collection it came from), `document` (the retrieved text chunks), `metadata` (one object per chunk) and, when the vector database returns them, `distances`. The key is left out when nothing was retrieved.
+
 These methods enable effective utilization of external knowledge via uploaded files and curated knowledge bases, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within knowledge bases, you can customize the integration based on your specific needs.
 
 ## Advantages of Using Open WebUI as a Unified LLM Provider
