@@ -227,6 +227,10 @@ When reading long responses, Open WebUI can split text into chunks before sendin
 **Punctuation** mode is recommended for most use cases. It provides the best balance of streaming performance (audio starts quickly) and natural speech pacing.
 :::
 
+Each chunk is cleaned before it goes to the engine. Open WebUI drops code blocks, table rows, emoji, reasoning and tool-call details, and footnote markers such as `[^1]`. It removes Markdown syntax such as `**`, `_`, `#`, list markers and `>` but keeps the words they mark. A link is reduced to its text, without the URL. Citation markers such as `[1]` are not removed, so the engine receives them and the number can be read out. Two markers in a row, such as `[1][2]`, are treated as a link and become `1`.
+
+This cleanup and splitting apply to every engine except one case: when the admin **Text-to-Speech Engine** is **Web API** and your own engine is not **Kokoro.js (Browser)**, **Read Aloud** hands the whole response to the browser's voice unchanged. Voice calls clean and split the text with every engine.
+
 ## Troubleshooting
 
 ### No Audio Plays
