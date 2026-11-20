@@ -40,13 +40,13 @@ The default state for new sign-ups (if configured) or deactivated users.
 *   **Approval Required**: Must be promoted to `user` or `admin` by an existing Administrator.
 
 :::note
-The `admin` role effectively has `check_permission() == True` for everything. Granular permissions (like disabling "Web Search") generally do **not** apply to admins.
+Permission checks are skipped for the `admin` role: the code tests the role before it looks up a permission. Granular permissions (like disabling "Web Search") generally do **not** apply to admins.
 :::
 
 ## Role Assignment
 
 ### Initial Setup
-*   **First User:** The very first account created on a fresh installation is automatically assigned the **Admin** role.
+*   **First User:** The very first account created on a fresh installation is automatically assigned the **Admin** role. That first sign-up ignores `ENABLE_SIGNUP` but is refused while the login form is disabled unless `ENABLE_INITIAL_ADMIN_SIGNUP=true`, and it turns sign-up off once it succeeds.
 *   **Headless Admin Creation:** For automated/containerized deployments, you can create the admin account automatically using environment variables (see below).
 *   **Subsequent Users:** New sign-ups are assigned the **Default User Role**.
 
@@ -55,14 +55,14 @@ You can control the default role for new users via the `DEFAULT_USER_ROLE` envir
 
 ```bash
 DEFAULT_USER_ROLE=pending
-# Options: 'pending', 'user', 'admin'
+# Options: 'pending' (default), 'user', 'admin'
 ```
-*   **pending (Recommended for public/shared instances):** New users cannot log in until an Admin explicitly activates them in the Admin Panel.
+*   **pending (Recommended for public/shared instances):** New users can sign in but see only the pending screen; every API request and the WebSocket handshake refuses them until an admin changes their role.
 *   **user:** New users get immediate access with default permissions.
 *   **admin:** (Use with caution) New users become full administrators.
 
 ## Changing Roles
-Administrators can change a user's role at any time via **Admin Panel > Users**.
+Administrators can change a user's role at any time via **Admin Panel > Users**, with three exceptions: the primary administrator cannot be edited or demoted by another admin and cannot demote itself, no admin can change their own role in the interface, and no admin can delete their own account.
 *   Promoting a user to `admin` grants them full control.
 *   Demoting an admin to `user` subjects them to the permission system again.
 
@@ -101,13 +101,13 @@ Setting a new password for the user in the same dialog signs them out everywhere
 
 The first account created on an instance (see [Initial Setup](#initial-setup)) is the **primary administrator**. There is no special flag for it: internally it is simply the earliest-created account, determined by its creation timestamp.
 
-The primary administrator has one small piece of extra protection. The interface does not show a delete control for it, and the backend refuses to delete it through the user API. This exists purely to prevent the original bootstrap account from being removed by accident, which could otherwise leave an instance without its founding administrator or trigger an unwanted role reassignment.
+The primary administrator has one small piece of extra protection. The interface hides the delete control for every admin account, and the backend refuses to delete the primary one through the user API; it also refuses any change to that account (role, name, email or password) by another admin, and refuses the account demoting itself. This exists purely to prevent the original bootstrap account from being removed by accident, which could otherwise leave an instance without its founding administrator or trigger an unwanted role reassignment.
 
 This is a convenience safeguard, not a security boundary. All administrators share full control of the system, so any administrator can still change or remove any account, including the primary one, at the data layer.
 
 ### Swapping the Primary Administrator
 
-Sometimes the primary administrator legitimately needs to change, for example when the person who first set up the deployment leaves the organization. Because the role is decided purely by creation timestamp, the primary administrator is whichever administrator account is oldest, so reorganizing or removing accounts at the database level changes which one is treated as primary.
+Sometimes the primary administrator legitimately needs to change, for example when the person who first set up the deployment leaves the organization. Because the role is decided purely by creation timestamp, the primary administrator is whichever account is oldest, whatever its current role, so reorganizing or removing accounts at the database level changes which one is treated as primary.
 
 This is deliberately a data-layer operation rather than a one-click button, so that changing the founding account stays an intentional, considered action. Back up your database before making the change, and perform it while the instance is idle. We do not list exact queries here because the database schema evolves between releases; work against your current schema, and reach out on our community channels if you need guidance for your version.
 
