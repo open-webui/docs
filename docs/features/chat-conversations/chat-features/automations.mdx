@@ -18,7 +18,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into a [folder](/features/chat-conversations/chat-features/conversation-organization#the-folder-page) you can edit, shared folders included, so a team sees every run in one place
-- Give runs a terminal and working folder, and run a [coding agent](/features/open-terminal/coding-agents) from that terminal
+- Give runs a terminal and working folder, and run an [agent](/features/open-terminal/agents) from that terminal
 
 ## Access Control
 
@@ -80,9 +80,9 @@ Without a terminal in the editor, a run uses the terminal configured on its mode
 Terminals, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 :::
 
-### Running a Coding Agent
+### Running an Agent {#running-a-coding-agent}
 
-With a terminal picked, the **Model** list also offers the coding agents that terminal reports, named `<agent>/<model>`. Changing the terminal or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a terminal before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the terminal and the agent are still available and the run fails if either is gone.
+With a terminal picked, the **Model** list also offers the agents that terminal reports, named `<agent>/<model>`. Changing the terminal or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a terminal before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the terminal and the agent are still available and the run fails if either is gone.
 
 ## Edit and Manage
 

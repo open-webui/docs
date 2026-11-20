@@ -1,6 +1,6 @@
 ---
 title: "Open Terminal & Terminals"
-description: "Build apps, produce reports, and run coding agents in Open WebUI. Open Terminal gives your AI a computer; Terminals gives each person or project a workspace."
+description: "Build apps, produce reports, and run agents in Open WebUI. Open Terminal gives your AI a computer; Terminals gives each person or project a workspace."
 sidebar_position: 2
 ---
 
@@ -46,7 +46,7 @@ People get to work through Open WebUI; operators maintain the templates, access,
 
 ## Make Useful Work Repeatable
 
-Build a reporting script in a personal or shared workspace, then give an Open WebUI [automation](/features/chat-conversations/chat-features/automations) that terminal and working folder. Schedule a prompt to run it against new data and summarize the results. The workspace can serve both interactive work and recurring jobs, using a model or a supported coding agent.
+Build a reporting script in a personal or shared workspace, then give an Open WebUI [automation](/features/chat-conversations/chat-features/automations) that terminal and working folder. Schedule a prompt to run it against new data and summarize the results. The workspace can serve both interactive work and recurring jobs, using a model or a supported agent.
 
 Terminals can stop idle environments while retaining their persisted files, then start them again on demand. Set CPU and memory limits for each template. A workspace can stay available for the next task without keeping its container running all day.
 
