@@ -1330,8 +1330,8 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 #### `STATIC_DIR`
 
 - Type: `str`
-- Default: `./static`
-- Description: Specifies the directory for static files, such as the favicon.
+- Default: `backend/open_webui/static` (in the Docker image, `/app/backend/open_webui/static`)
+- Description: Specifies the directory Open WebUI serves its bundled static assets from. At every startup Open WebUI deletes the files at the top level of this directory, copies the bundled assets back in, and overwrites `favicon.png`, `splash.png` and `loader.js`, so files you place or replace there do not survive a restart. The logo and favicon are covered by the [Open WebUI License](/license).
 
 ### Logging
 
