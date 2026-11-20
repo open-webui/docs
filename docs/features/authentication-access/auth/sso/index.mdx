@@ -94,6 +94,14 @@ To solve issues related to large tokens (e.g., with AD FS group claims exceeding
 
 **When a provider does not say when the token expires:** most return `expires_in` or `expires_at`, and Open WebUI trusts whichever it gets. If neither is present, what happens next depends on whether the response included a refresh token. With one, the token is assumed to last an hour and is refreshed on that basis, and a warning is logged. Without one there is nothing to refresh with, so inventing a short expiry would only end the session for no reason; the token is treated as non-expiring instead and the session survives. This is why a provider that issues long-lived tokens and no refresh token no longer drops its users after an hour.
 
+**What stays stored after signing out:** the last stored session for a provider is kept on sign-out because requests that carry no `oauth_session_id` cookie still use it. Automations and API-key calls are such requests: Open WebUI picks the person's most recently updated stored session, skipping MCP tool server sessions, and refreshes it when needed. So after the person signs out, connections and tool servers set to **OAuth** authentication, and tools or functions that read the user's OAuth token, still receive that person's provider token when an automation or API key acts for them. Changing the password and **Sign out all devices** leave stored OAuth sessions in place.
+
+To remove stored sessions completely:
+
+- The person can call `DELETE /api/v1/auths/oauth/sessions/{provider}`, where `{provider}` is the provider name (`google`, `microsoft`, `github`, `oidc` or `feishu`). This removes all of their stored sessions for that provider. The **Disconnect OAuth** button next to a connected MCP tool server calls the same endpoint for that server only.
+- An admin can list a user's stored sessions with `GET /api/v1/users/{user_id}/oauth/sessions`. No endpoint lets an admin delete another user's sessions. [OIDC Back-Channel Logout](#oidc-back-channel-logout) deletes all of them when the provider sends a logout token.
+- Revoking the user's refresh token at the provider ends the stored session the next time Open WebUI needs a new token: the refresh fails and the session is deleted. Until then, the stored access token is still sent until it is within five minutes of expiring. A network error or timeout during the refresh keeps the session.
+
 This system is enabled by default but can be fine-tuned with the environment variables detailed above.
 
 For more information, check out the [environment variable docs page](https://docs.openwebui.com/reference/env-configuration/).
