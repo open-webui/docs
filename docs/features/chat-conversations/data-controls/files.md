@@ -62,7 +62,7 @@ Every file carries metadata that helps both you and the AI understand its contex
 **A:** Yes, from a file's menu, or **Actions** > **Download** for several files at once.
 
 **Q: Are there limits on the number of files I can manage?**  
-**A:** There is no hard-coded limit in Open WebUI. The scalability depends on your storage (disk/S3) and your Vector Database (e.g., ChromaDB, PGVector).
+**A:** No limit applies by default. An admin can set a maximum upload size in MB (`RAG_FILE_MAX_SIZE`, enforced on upload) and a maximum number of files attached at once in the chat input (`RAG_FILE_MAX_COUNT`) under **Settings > Admin > Documents**. Beyond that, the scalability depends on your storage (disk/S3) and your Vector Database (e.g., ChromaDB, PGVector).
 
 **Q: Does managing files require Admin privileges?**  
 **A:** No. The File Manager lists only your *own* uploaded files, for administrators too.
