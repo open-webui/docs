@@ -175,6 +175,14 @@ A context that is too small silently truncates the prompt. This is most visible 
 
 ---
 
+## Text Written Before a Tool Call
+
+When a model writes a sentence and calls a tool in the same reply, such as "Let me check the calendar." followed by a tool call, the chat shows both. For a model from a connection under **Manage Ollama API Connections**, every later request sends that assistant turn to Ollama with empty text and only the tool call. This applies to the follow-up request after the tool result and to every later message in the chat. The model's thinking and the tool call are kept, and the chat itself still stores and shows the text.
+
+Open WebUI does this on purpose for every assistant turn that carries a tool call, so the model does not see that sentence in later turns.
+
+---
+
 ## All Set!
 
 That’s it! Once your connection is configured and your models are downloaded, you’re ready to start using Ollama with Open WebUI. Whether you’re exploring new models or running your existing ones, Open WebUI makes everything simple and efficient.

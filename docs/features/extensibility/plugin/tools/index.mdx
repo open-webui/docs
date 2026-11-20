@@ -281,7 +281,7 @@ Open WebUI repairs common argument mistakes before it runs a call:
 - Text values are converted to the types in the tool's schema, for example `"5"` to `5` or `"true"` to `true`.
 - Parameters that a non-MCP tool does not declare are dropped.
 - Several calls glued together in one set of arguments are split into separate calls.
-- A reply that consists only of `<tool_call>` or `<function=...>` blocks for available tools runs as tool calls. Such markup mixed with other text stays plain text.
+- A reply that consists only of `<tool_call>` or `<function=...>` blocks for available tools runs as tool calls. Such markup mixed with other text stays plain text. See [Tool calls written as text](#tool-calls-written-as-text).
 
 The loop stops in these cases:
 
@@ -290,6 +290,26 @@ The loop stops in these cases:
 - The iteration limit ([`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations)) is reached. The model writes a final answer without tools.
 
 Earlier tool calls in the chat history whose arguments cannot be read are sent to Ollama with empty arguments.
+
+#### Tool calls written as text
+
+Open WebUI runs the structured tool calls that the model server returns. Some models, often local ones, sometimes write a call into the reply text instead, and it reaches Open WebUI as plain text. Open WebUI turns that text into a real tool call only when all of these hold:
+
+- The whole reply is made of complete blocks in one of two forms, with only whitespace between them:
+  - `<tool_call>{"name": "get_weather", "arguments": {"city": "Paris"}}</tool_call>`, a JSON object inside `<tool_call>` tags. The arguments can also be under `parameters` or `args`, and the object can be wrapped in a `function` key.
+  - `<function=get_weather><parameter=city>Paris</parameter></function>`, with nothing but `<parameter=...>` blocks inside.
+- Every tool it names was sent to the model in that request. When the request forces one tool, only that tool counts.
+- The reply has no structured tool call and was not cut off.
+- The request does not set `tool_choice` to `none` and does not ask for a structured `response_format`.
+
+The recovered calls then run like any other tool call, and the text is replaced by the tool call in the chat. In every other case the text stays in the chat as written and no tool runs. Common cases:
+
+- A sentence before or after the blocks, such as "Let me check the weather."
+- A `<function=...>` block nested inside `<tool_call>` tags, as in `<tool_call><function=get_weather><parameter=city>Paris</parameter></function></tool_call>`.
+- A block that is not closed, names a tool that was not sent, repeats a parameter name or holds arguments that cannot be read as an object.
+- A reply longer than 65,536 characters.
+
+If a model keeps writing calls as text, check whether the model server has a tool call parser setting for that model, or use a model whose calls the server returns as structured tool calls.
 
 ### Tool Approval
 
