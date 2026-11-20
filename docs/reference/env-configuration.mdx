@@ -4276,7 +4276,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `str`
 - Default: Empty string
-- Description: API key for the Datalab Marker service. Required when [`CONTENT_EXTRACTION_ENGINE`](#content_extraction_engine) is `datalab_marker`.
+- Description: API key for the Datalab Marker service. Required when [`CONTENT_EXTRACTION_ENGINE`](#content_extraction_engine) is `datalab_marker`. Marker runs only while a key is set. Without one, files are read by the default loader even with `datalab_marker` selected.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_API_BASE_URL`
@@ -5677,7 +5677,7 @@ The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and th
 
 - Type: `str`
 - Default: `basic`
-- Description: Specifies the extract depth for Tavily search results.
+- Description: Specifies the extract depth for Tavily search results. Set under **Tavily Extract Depth** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `tavily`. See [Tavily as the web loader](/features/chat-conversations/web-search/providers/tavily#optional-configurations) for the accepted values and the errors it logs.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TAVILY_SEARCH_DEPTH`
@@ -5721,13 +5721,13 @@ The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and th
 #### `EXTERNAL_WEB_LOADER_URL`
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Specifies the URL of an external web content loader service for fetching and processing web pages.
+- Description: Specifies the URL of an external web content loader service for fetching and processing web pages. Set under **External Web Loader URL** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `external`. See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for the request and response format the service must use.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXTERNAL_WEB_LOADER_API_KEY`
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets the API key for authenticating with the external web loader service.
+- Description: Sets the API key for authenticating with the external web loader service. Set under **External Web Loader API Key** in **Settings > Web Search** (admin section). See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for how it is sent.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `YANDEX_WEB_SEARCH_URL`
@@ -5880,7 +5880,7 @@ When using `playwright`, you have two options:
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`
+- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`. Set under **Playwright WebSocket URL** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `playwright`. See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for when the container installs Chromium itself.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip
@@ -5911,14 +5911,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `int`
 - Default: `None`
-- Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Firecrawl Timeout** (admin section).
+- Description: Timeout in seconds for Firecrawl requests. Open WebUI sends it to Firecrawl in milliseconds, kept between 1 and 300 seconds, and waits 10 seconds longer itself. If not set or not a positive number, no timeout is sent and Open WebUI waits 70 seconds. See the [Firecrawl page](/features/chat-conversations/web-search/providers/firecrawl) for retries.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Web Search > Firecrawl Timeout (s)** (admin section).
 
 #### `PLAYWRIGHT_TIMEOUT`
 
 - Type: `int`
 - Default: `10000` (milliseconds)
-- Description: Specifies the timeout for Playwright requests.
+- Description: Specifies the timeout for Playwright requests. Set under **Playwright Timeout (ms)** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `playwright`. See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for what it limits and the errors a timeout produces.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEB_LOADER_TIMEOUT`
