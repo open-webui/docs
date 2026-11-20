@@ -13,8 +13,14 @@ title: "Development"
 
 Toolkits are defined in a single Python file, with a top level docstring with metadata and a `Tools` class.
 
-:::warning Use Async Functions for Future Compatibility
-Tool methods should generally be defined as `async` to ensure compatibility with future Open WebUI versions. The backend is progressively moving toward fully async execution, and synchronous functions may block execution or cause issues in future releases.
+:::warning Define tool methods with `async def`
+Open WebUI runs a tool method that is not `async def` directly on its event loop. While it runs, that Open WebUI worker serves no other request, so a slow or blocking tool stalls the chats of every user on the worker. A sync tool that calls Open WebUI's own HTTP API with `requests` can end up waiting on the worker it blocks, and the call hangs until the request times out. A blocking call inside an `async def` method stalls the worker the same way.
+
+- Define tool methods with `async def`, and use an async HTTP client such as `httpx.AsyncClient` or `aiohttp` instead of `requests`. Both ship with Open WebUI.
+- Run blocking work you cannot avoid in a worker thread with `await anyio.to_thread.run_sync(...)`.
+- To read or change Open WebUI data, call the internal models, such as `from open_webui.models.chats import Chats`, instead of Open WebUI's HTTP API.
+
+See [Third-party libraries that don't yet support async](/features/extensibility/plugin/migration/to-0.9.0#7-third-party-libraries-that-dont-yet-support-async) for an example.
 :::
 
 ### Example Top-Level Docstring
@@ -1371,6 +1377,17 @@ RUN pip install --no-cache-dir python-docx requests beautifulsoup4
 ```
 
 Runtime installation is only suitable for **development or homelab environments** where you're experimenting with new functions and tools. For any deployment serving multiple users, bake your dependencies into the container image.
+
+:::
+
+:::warning Save fails while installing requirements
+
+Open WebUI installs the `requirements:` line by running `python -m pip install` with the same Python that runs Open WebUI. When that install fails, the save fails too. Creating a tool or function shows `[ERROR: Error creating tool]` or `[ERROR: Error creating function]`. Saving an existing one fails with an error too. The server log shows `Error installing packages:` followed by the listed packages, with pip's own output just before it.
+
+Two causes are common:
+
+- **A standard-library module is listed.** Modules such as `smtplib`, `json` and `datetime` come with Python and are not pip packages. Remove them from `requirements:` and keep the `import`.
+- **pip is missing** from the Python environment Open WebUI runs in, as in some environments set up with uv. Install the packages into that environment yourself and set [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements), which skips the install.
 
 :::
 

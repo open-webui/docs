@@ -118,3 +118,20 @@ The script reads the key from `.webui_secret_key` and generates one only when th
 Setting `WEBUI_SECRET_KEY` yourself also works, and is the right configuration for anything beyond a personal machine. With it set, the script skips key generation entirely.
 
 See [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) for how each start method generates and persists the key.
+
+---
+
+## A Function stops Open WebUI loading
+
+### Symptom
+
+Open WebUI does not start, or its interface does not load, after you added or updated a Function.
+
+### Fix
+
+1. Restart Open WebUI with [`SAFE_MODE=true`](/reference/env-configuration#safe_mode). At startup it turns off every Function in the database, so none of them load.
+2. Open **Admin Panel > Functions** and delete or fix the Function that caused the problem.
+3. Remove `SAFE_MODE` and restart. While it is set, every restart turns all Functions off again.
+4. Turn each Function you still need back on in **Admin Panel > Functions**. Removing `SAFE_MODE` does not turn them back on.
+
+See [Safe Mode](/getting-started/advanced-topics/hardening#safe-mode).
