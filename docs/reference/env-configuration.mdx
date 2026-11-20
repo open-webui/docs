@@ -3100,7 +3100,7 @@ For multi-replica setups, you **must** configure `CHROMA_HTTP_HOST` and `CHROMA_
 #### `CHROMA_HTTP_HOST`
 
 - Type: `str`
-- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-replica deployments**: it switches ChromaDB from the embedded, SQLite-backed `PersistentClient` to an `HttpClient` that talks to a separate ChromaDB server.
+- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-replica deployments**: it switches ChromaDB from the embedded, SQLite-backed `PersistentClient` to an `HttpClient` that talks to a separate ChromaDB server. Run that server at the same version as the bundled `chromadb` client, which each Open WebUI release pins in `pyproject.toml`. If uploads fail with errors raised from the Chroma client after you switch, compare the two versions first.
 
 #### `CHROMA_HTTP_PORT`
 
@@ -4814,7 +4814,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 - Type: `int`
 - Default: `1`
-- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000 (not recommended)) may process documents faster by sending less, but larger API requests. Some external APIs do not support batching or sending more than 1 chunk per request. In such casey you must leave this at `1`. Default is 1 (safest option if the API does not support batching / more than 1 chunk per request). This setting only applies to external embedding engines, not the default SentenceTransformers engine. 
+- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000 (not recommended)) may process documents faster by sending less, but larger API requests. Some external APIs do not support batching or sending more than 1 chunk per request. In such casey you must leave this at `1`. Default is 1 (safest option if the API does not support batching / more than 1 chunk per request). With the default SentenceTransformers engine, the value is the batch size passed to the local model, so the default of `1` embeds one chunk at a time and makes large uploads slow; raise it if memory allows. Also set as **Embedding Batch Size** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -4970,7 +4970,7 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
-- Description: Sets a model for reranking results. Locally, the model is loaded as a Sentence-Transformer CrossEncoder, with one exception: `jinaai/jina-colbert-v2` is loaded as a ColBERT model, and that takes precedence over `RAG_RERANKING_ENGINE`, so it runs locally even when the engine is set to `external`.
+- Description: Sets a model for reranking results. Locally, the model is loaded as a Sentence-Transformer CrossEncoder, with one exception: `jinaai/jina-colbert-v2` is loaded as a ColBERT model, and that takes precedence over `RAG_RERANKING_ENGINE`, so it runs locally even when the engine is set to `external`. For the local engine, use a Hugging Face model ID such as `BAAI/bge-reranker-v2-m3` or a local path; an Ollama model tag cannot be loaded. If the model fails to load when the settings are saved, Open WebUI logs `Error loading reranking model:` and turns hybrid search off. With the `external` engine, the value is sent as `model` in the rerank request.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_RERANKING_BATCH_SIZE`
@@ -5009,7 +5009,7 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets the **full URL** for the external reranking API.
+- Description: Sets the **full URL** for the external reranking API. Open WebUI sends a `POST` with a JSON body of `model`, `query`, `documents` and `top_n`, and a `Bearer` token from [`RAG_EXTERNAL_RERANKER_API_KEY`](#rag_external_reranker_api_key). The response must contain `results`, each with `index` and `relevance_score`. On any other response or a failed request, the log shows `Error in external reranking:` or `No results found in external reranking response`, and results are returned without reranking.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning

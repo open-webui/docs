@@ -341,6 +341,8 @@ This disables migrations on all replicas, applies the desired replica count, and
 
 Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Socket.IO is served under `/ws/socket.io/`, so a path-based ingress must forward that prefix with upgrade headers. See [connection troubleshooting](/troubleshooting/connection-error).
 
+Open WebUI has no upload size limit until **Max Upload Size** (`RAG_FILE_MAX_SIZE`) or a knowledge base file limit is set, and its own `413` carries the message `Oops! The file you're trying to upload is too large.` Any other `413` on a knowledge upload comes from the ingress controller or another proxy in front of it, such as a service mesh or CDN. Raise its body size limit as described under [Key configuration notes](/reference/https#key-configuration-notes). On the NGINX Ingress Controller, that is the [`nginx.ingress.kubernetes.io/proxy-body-size`](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#custom-max-body-size) annotation, or `proxy-body-size` in its ConfigMap for all Ingress rules.
+
 Session affinity is optional with WebSockets on and required with [`ENABLE_WEBSOCKET_SUPPORT=false`](/reference/env-configuration#enable_websocket_support); see [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Affinity does not replace Redis. On the NGINX Ingress Controller, add these annotations to the Ingress resource:
 
 ```yaml

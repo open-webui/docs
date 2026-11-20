@@ -152,6 +152,7 @@ The **default SentenceTransformers** embedding engine (all-MiniLM-L6-v2) loads P
 
 -   **Recommended**: `RAG_EMBEDDING_ENGINE=openai` (OpenAI or compatible APIs), `azure_openai`, or `ollama` (self-hosted, with models like `nomic-embed-text`).
 -   **Effect**: No embedding model is loaded into the Open WebUI process.
+-   **Keeping the local engine**: raise **Embedding Batch Size** in **Settings > Documents** (admin section) or [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size). The default of `1` makes the local model embed one chunk at a time, which makes large CSV, XLSX and multi-file uploads slow. Larger batches use more memory.
 
 ### Optimizing Document Chunking
 
