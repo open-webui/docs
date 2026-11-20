@@ -244,6 +244,17 @@ services:
     restart: unless-stopped
 ```
 
+### Kokoro.js (Browser) Stuck on "Loading Kokoro.js..."
+
+**Symptom:** With **Kokoro.js (Browser)** as the **Text-to-Speech Engine** in **Settings → Audio**, the **Voice** section keeps showing `Loading Kokoro.js...` after the model download reaches 100%, and no voice list appears.
+
+**Cause:** Open WebUI runs Kokoro.js on WebGPU whenever the browser reports a WebGPU adapter, and on WebAssembly only when it reports none. If loading on WebGPU fails, Open WebUI does not retry on WebAssembly. The settings page keeps the loading message, and the error shows only in the browser console.
+
+**Options to try:**
+- Choose another **Kokoro.js Dtype** in the same section. Open WebUI loads the model again with each change.
+- Use another browser.
+- Turn WebGPU off in the browser, so Open WebUI loads Kokoro.js on WebAssembly.
+
 ### TTS Voice Not Found / No Audio Output
 
 **Checklist:**
