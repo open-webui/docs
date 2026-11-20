@@ -4378,7 +4378,10 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `300`
-- Description: Sets the timeout in seconds for MinerU API requests during document processing.
+- Description: Sets the timeout in seconds for MinerU API requests during document processing. Also set as **API Timeout** in **Settings > Documents** (admin section). What it covers depends on [`MINERU_API_MODE`](#mineru_api_mode):
+  - `local` with a MinerU 3.x server: the whole parse request. A slower parse fails with `MinerU Local API request timed out`.
+  - `local` with a MinerU 4.x server: the total wait for the parse job, and each request that uploads the file or checks the job. A slower job fails with `MinerU processing timed out after <seconds> seconds`.
+  - `cloud`: only the upload of the file. Open WebUI then checks the batch status up to 300 times, two seconds apart, and fails with `MinerU processing timed out after 10 minutes` if the file is still not done. This limit is fixed, and raising `MINERU_API_TIMEOUT` does not extend it. For a large PDF that hits it, split the PDF into smaller files or use `local` mode with a higher timeout.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_FILE_EXTENSIONS`
