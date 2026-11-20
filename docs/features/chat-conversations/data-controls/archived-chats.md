@@ -18,7 +18,7 @@ Archived chats used to sit behind a **Manage** button on the **Data Controls** t
 The **Archived Chats** view provides tools to manage your archived conversations:
 
 - **Search**: Quickly find archived chats by title using the search bar.
-- **Restore**: Bring an archived chat back to your main sidebar.
+- **Restore**: Bring an archived chat back to your main sidebar. Archiving a single chat removes it from its folder and stops any response still generating; restoring does not put it back in the folder.
 - **Delete**: Permanently remove an archived chat from your account.
 
 ## Bulk Operations
@@ -26,7 +26,7 @@ The **Archived Chats** view provides tools to manage your archived conversations
 From the Data Controls tab, you can also perform bulk operations:
 
 - **Archive All Chats**: Move all your current conversations to the archive at once. This is useful for periodic cleanup.
-- **Delete All Chats**: Permanently remove all conversations (both active and archived). 
+- **Delete All Chats**: Permanently remove all conversations (both active and archived), along with every share link you created. 
   - :::warning
     This action cannot be undone. All chat history will be permanently deleted.
     :::
