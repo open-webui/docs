@@ -261,6 +261,28 @@ If Open WebUI cannot reach Ollama, it's likely because Ollama is only listening 
 
 Verify connectivity by accessing the WebUI interface after restarting. For detailed instructions, see the [Ollama documentation](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#setting-environment-variables-on-linux).
 
+**Check that the change applied.** Ollama binds `127.0.0.1` port `11434` by default ([Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-can-i-expose-ollama-on-my-network)). On the machine that runs Ollama, see which address port `11434` listens on. On Linux:
+
+```bash
+ss -tlnp | grep 11434
+```
+
+On Windows:
+
+```powershell
+netstat -an | findstr 11434
+```
+
+`127.0.0.1:11434` in the output means Ollama still listens only on loopback and the new `OLLAMA_HOST` did not apply. `0.0.0.0:11434`, `*:11434` or `[::]:11434` means it listens on all interfaces. When the setting did not apply, compare your steps with [Ollama's FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-do-i-configure-ollama-server):
+
+- **Linux with systemd:** run `systemctl edit ollama.service` and put `Environment="OLLAMA_HOST=0.0.0.0:11434"` on a line under `[Service]`. Then run `systemctl daemon-reload` and `systemctl restart ollama`. A missing `[Service]` line, a skipped `daemon-reload` or a skipped restart are the usual reasons the address stays at `127.0.0.1`.
+- **Windows:** quit Ollama from the taskbar, set `OLLAMA_HOST` in your user environment variables, then start Ollama again from the Start menu.
+- **macOS app:** run `launchctl setenv OLLAMA_HOST "0.0.0.0:11434"`, then restart the Ollama application.
+
+:::warning Keep port 11434 off your network
+Open WebUI calls Ollama from its backend, never from the browser, so your users' browsers do not need to reach port `11434`. Ollama's local API does not require authentication ([Ollama API docs](https://github.com/ollama/ollama/blob/main/docs/api/authentication.mdx)), so with `OLLAMA_HOST=0.0.0.0` any device that can reach the host on port `11434` can use it. Block port `11434` at the host firewall for everything except the Open WebUI host, or run Ollama in the same Docker network as Open WebUI without publishing its port. The repository's [`docker-compose.yaml`](https://github.com/open-webui/open-webui/blob/main/docker-compose.yaml) does the latter: the `ollama` service has no `ports` entry, and Open WebUI reaches it at `OLLAMA_BASE_URL=http://ollama:11434`.
+:::
+
 ### Docker Connection Error
 
 If Open WebUI in Docker cannot connect to Ollama running on the host machine:
@@ -272,6 +294,22 @@ Use the `--network=host` flag in your Docker command. This links your container 
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 After running the above, your WebUI should be available at `http://localhost:8080`.
+
+With `--network=host`:
+
+- Docker ignores `-p` and `--publish` and prints `WARNING: Published ports are discarded when using host network mode.` ([Docker docs](https://docs.docker.com/engine/network/drivers/host/)). Open WebUI listens on the port in `PORT`, `8080` by default. Add `-e PORT=3000` to move it.
+- On Docker Desktop, host networking works only from version 4.34 and only after you turn on **Settings > Resources > Network > Enable host networking**. Without it, the container shares the network of Docker Desktop's Linux VM and your browser cannot connect, as shown in [Network Diagrams](/reference/network-diagrams). Publish the port with `-p 3000:8080` and use `OLLAMA_BASE_URL=http://host.docker.internal:11434` instead.
+- Other machines reach Open WebUI on that port of the host directly, so the host firewall must allow it.
+
+### Models Missing or Different from `ollama list`
+
+Open WebUI lists only the models that the Ollama URLs in **Admin Panel > Settings > Connections** return. It asks every enabled URL for `/api/tags` and merges the answers. A URL that does not answer adds no models and logs `Connection error:`. When the list differs from `ollama list`, Open WebUI and your terminal are usually talking to different Ollama servers or different model storage:
+
+- **Two Ollama installs**, such as a native install plus an Ollama container, or one in WSL plus one on Windows. Each has its own models. Run `ollama list` inside the install the URL points to, for example `docker exec ollama ollama list` for a container named `ollama`.
+- **A renamed or missing Docker volume.** Ollama keeps models in the volume mounted at `/root/.ollama`. A container started with a different volume name starts with an empty model list.
+- **The bundled `:ollama` image run without `-v ollama:/root/.ollama`.** Models pulled into it are gone after the container is recreated.
+
+To spot a stale second server, open **Settings > About**. **Ollama Version** shows the lowest version reported by all enabled Ollama connections. A version older than the one you installed means one of the configured URLs points to a different Ollama server.
 
 ### `does not support tools` {#ollama-does-not-support-tools}
 
