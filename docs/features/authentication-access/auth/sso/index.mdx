@@ -317,6 +317,18 @@ If a user's groups change in the OAuth provider, they will need to log out of Op
 
 :::
 
+#### What OAuth Group Sync Changes
+
+With **Group Mapping** (`ENABLE_OAUTH_GROUP_MANAGEMENT`) on, the sync runs at every sign-in through the provider, for new and existing accounts, and at every [token exchange](#oauth-token-exchange-for-external-applications). It compares the names in the **Group Claim** (`OAUTH_GROUP_CLAIM`) with Open WebUI group names. A claim sent as one string is split on [`OAUTH_GROUPS_SEPARATOR`](/reference/env-configuration#oauth_groups_separator) (default `;`).
+
+When the claim lists at least one group:
+
+- Groups an admin added the user to by hand are removed at the user's next sign-in, unless their name is in the claim or matches **Blocked Groups**.
+- The **Default Group** set for new users is removed the same way. A new user leaves it at their first sign-in, unless its name is in the claim or matches **Blocked Groups**.
+- With **Auto-Create Groups** (`ENABLE_OAUTH_GROUP_CREATION`) on, a group in the claim that has no Open WebUI group of the same name is created with the default user permissions and the description `Group '<name>' created automatically via OAuth.`, then the user is added to it. With it off, those claim entries are skipped.
+
+**Blocked Groups** (`OAUTH_BLOCKED_GROUPS`) does not block sign-in, although its Admin Panel description reads "Provider groups blocked from signing in." A group whose name matches an entry is skipped by the sync: it is never created, and users are never added to it or removed from it. In the Admin Panel, enter a comma-separated list. Each entry matches exactly, as a shell-style wildcard (`*`, `?`) or as a regular expression. To keep a group that admins manage by hand, add its name to **Blocked Groups**.
+
 ## Trusted Header
 
 Open WebUI is able to delegate authentication to an authenticating reverse proxy that passes in the user's details in HTTP headers.

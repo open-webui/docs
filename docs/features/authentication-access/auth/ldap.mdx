@@ -164,7 +164,29 @@ Open a new incognito browser window and navigate to your Open WebUI instance.
 
 Upon successful login, a new user account is created automatically in Open WebUI with the instance's default role, which is `pending` unless an administrator changed it under **Settings** > **Authentication**. The very first account on an instance becomes an administrator. An administrator can later change the user's role if needed.
 
-## 6. Troubleshooting Common Errors
+## 6. Syncing Groups from LDAP
+
+With **Group Mapping** (`ENABLE_LDAP_GROUP_MANAGEMENT`) turned on in the **LDAP** section, Open WebUI reads the user's groups at every LDAP sign-in from the attribute set in **Group Attribute** (`LDAP_ATTRIBUTE_FOR_GROUPS`, default `memberOf`). Each value is a group DN, and Open WebUI uses its first `CN` as the group name.
+
+:::warning Manual group assignments do not survive the next sign-in
+
+When the user's entry lists at least one group, the sync makes their Open WebUI groups match their LDAP groups:
+
+- The user is added to every Open WebUI group whose name matches one of their LDAP group names.
+- The user is removed from every other Open WebUI group, including groups an admin added them to by hand.
+- The **Default Group** set for new users is removed too. A new user who has LDAP groups leaves it at their first sign-in, unless its name matches one of their LDAP groups.
+- Admin accounts are synced the same way.
+
+To keep a user in a group, add them to an LDAP group of the same name in the directory. LDAP has no setting that exempts a group from the sync.
+
+:::
+
+- With **Auto-Create Groups** (`ENABLE_LDAP_GROUP_CREATION`) on, Open WebUI creates any of the user's LDAP groups that has no Open WebUI group of the same name, then adds the user to it. With it off, those LDAP groups are skipped.
+- When the user's entry has no group attribute, or it is empty, the sync does not run and the user's Open WebUI groups stay as they are.
+- A change in the directory takes effect at the user's next LDAP sign-in.
+- If the sync fails, the sign-in still succeeds and the server log shows `Failed to sync groups for user`.
+
+## 7. Troubleshooting Common Errors
 
 Here are solutions to common errors encountered during LDAP integration.
 
