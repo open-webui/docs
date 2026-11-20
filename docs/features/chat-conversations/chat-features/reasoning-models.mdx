@@ -102,6 +102,19 @@ For models that support variable reasoning depth (like some API providers), this
 Reasoning Effort is only applicable to models from specific providers that support this parameter. It is not forwarded on native Ollama connections, where the `think` setting above covers the same ground. Ollama's OpenAI-compatible endpoint does accept `reasoning_effort` when Ollama is added as an OpenAI connection instead.
 :::
 
+### Turning Thinking Off on vLLM and llama.cpp
+
+Models served by vLLM or llama.cpp `llama-server` often switch thinking on or off through their chat template, which reads `chat_template_kwargs` from the request. Open WebUI has no setting for it, so send it as a custom parameter on an OpenAI connection:
+
+1. Go to **Workspace → Models** and edit the model.
+2. Expand **Advanced Params**.
+3. At the bottom, click **Add Custom Parameter** and set:
+   - **Name**: `chat_template_kwargs`
+   - **Value**: `{"enable_thinking": false}`
+4. Save the model.
+
+The **Add Custom Parameter** button is shown to administrators. Open WebUI parses the value as JSON and adds it to the top level of the request body. The key the template reads depends on the model. `enable_thinking` is the one Qwen3 uses, while some other models read `thinking`. Check the model card or the [vLLM reasoning outputs page](https://docs.vllm.ai/en/latest/features/reasoning_outputs.html), and see `chat_template_kwargs` in the [llama.cpp server README](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md). To turn thinking off for every request instead, vLLM also accepts `--default-chat-template-kwargs` at startup.
+
 ---
 
 ## Interleaved Thinking with Tool Calls
