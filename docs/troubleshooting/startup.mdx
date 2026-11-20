@@ -64,6 +64,27 @@ docker run --rm --entrypoint python ghcr.io/open-webui/open-webui:main \
 
 ---
 
+## Startup stops after the banner while Hugging Face is slow or blocked
+
+### Symptom
+
+The log prints the Open WebUI banner and then nothing new for minutes. `Application startup complete.` does not appear and the page does not load. It happens when the server cannot reach Hugging Face quickly, for example behind a corporate proxy or firewall, or with no internet access.
+
+### Cause
+
+With the **Default (SentenceTransformers)** embedding engine, every start loads the local embedding model ([`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model), `sentence-transformers/all-MiniLM-L6-v2` by default) before the server accepts connections. While [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](/reference/env-configuration#rag_embedding_model_auto_update) is `True`, its default, that step contacts Hugging Face to check the model and download missing files, even when a copy is already cached. Startup waits until the request finishes or fails. When hybrid search is on, the reranking model goes through the same step under `RAG_RERANKING_MODEL_AUTO_UPDATE`. If the model is not cached and the request fails, the log shows `Cannot determine model snapshot path`.
+
+### Fix
+
+Pick one:
+
+- **Skip the check once the model is cached.** Set `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false`. Open WebUI then loads the cached copy without contacting Hugging Face. If the model is not cached yet, it logs `Cannot determine model snapshot path` and loads the model by its Hugging Face name, so the first start still needs the network.
+- **Go fully offline.** Set [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode), which also sets `HF_HUB_OFFLINE=1` and turns off both auto-update variables. The model must already be cached, see the next section.
+- **Send the download through your proxy.** The Hugging Face client reads the [standard proxy variables](https://www.python-httpx.org/environment_variables/) `HTTPS_PROXY` (or `https_proxy`) and `NO_PROXY` from the environment of the Open WebUI process. Set them where you set the other Open WebUI variables, such as `-e` for `docker run` or an export in the shell.
+- **Use an external embedding engine.** Set **Embedding Model Engine** in **Settings > Documents** (admin section) to **Ollama**, **OpenAI** or **Azure OpenAI**, or set [`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine). No local embedding model loads at startup then.
+
+---
+
 ## `ValueError: No embedding model is loaded` with offline mode on a fresh install
 
 ### Symptom
