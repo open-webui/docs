@@ -6,13 +6,13 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 
 | Flag | What it does |
 |---|---|
-| `-p 3000:8080` | The UI is on port 3000 of your machine. Change the left number if 3000 is taken. |
-| `-v open-webui:/app/backend/data` | Your chats, users and settings live in this volume. It survives updates; never run without it. |
+| `-p 3000:8080` | The UI is on port 3000 of your machine. Change the left number if 3000 is taken. Keep the right number at 8080, the port Open WebUI listens on inside the container unless you set `PORT`. With `-p 3000:3000` the page never loads. |
+| `-v open-webui:/app/backend/data` | Your chats, users and settings live in this volume. It survives updates; never run without it. Mount it at `/app/backend/data`, not `/app/backend`: a mount at `/app/backend` [covers](https://docs.docker.com/engine/storage/volumes/) the application code in the image, so the container runs whatever the mount holds and updates seem to change nothing. |
 | `--add-host=host.docker.internal:host-gateway` | Lets the container reach Ollama, or anything else, running on your machine. |
 | `--restart always` | Comes back after a reboot. |
 | `-e WEBUI_SECRET_KEY=your-secret-key` | Set it once and keep it. Without a fixed key, every recreated container logs everyone out. Generate one with `openssl rand -hex 32`. |
 
-
+The log line `Waiting for application startup.` appears on every normal start. Open WebUI accepts connections once the log shows `Uvicorn running on http://0.0.0.0:8080`.
 
 ## Image Variants
 
