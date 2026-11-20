@@ -14,3 +14,7 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 
 With uv, run the same command as `uv pip install`. For GPU acceleration on AMD, install the ROCm build from [PyTorch's install page](https://pytorch.org/get-started/locally/) instead.
 :::
+
+:::warning `.env` in your start folder is not read
+A pip, uv or Conda install ignores a `.env` file in the folder you run `open-webui serve` from. It reads only `<env>/lib/python3.12/.env` with Python 3.12 (`<env>\Lib\.env` on Windows). Export your variables in the shell or service unit, or set them on the command line as in the examples below. See [`.env` file ignored by pip, uv and Conda installs](/reference/env-configuration#env-file-ignored-by-pip-uv-and-conda-installs) for how to print the exact path.
+:::
