@@ -17,7 +17,7 @@ If you're running Open WebUI behind an HTTP proxy, you might notice that web sea
 - `Connection timeout to host`
 - `None of the web search results could be loaded`
 
-This happens because the web content fetcher doesn't use your `http_proxy`/`https_proxy` environment variables by default.
+Proxy trust is on by default (`WEB_SEARCH_TRUST_ENV`), so on a default install this usually means **Trust Proxy Environment** was turned off and saved in **Settings > Web Search** (admin section), where the saved value wins over the variable. Every result URL is also resolved locally before it is fetched. Where only the proxy can resolve names, the log shows `Could not resolve host`, and you also need `ENABLE_LOCAL_WEB_FETCH=True`, which also allows fetching private network addresses.
 
 **Solution:**
 
@@ -92,7 +92,7 @@ In Native/Agentic mode, Open WebUI exposes web search as the `search_web` tool. 
 
 - **Use a modern, high-quality tool-calling model** for web-search workflows. Frontier models or large recent open-weight models are much more reliable than older/smaller models for deciding when to search and formatting tool calls correctly. See [Tool Calling Modes: Native vs. Legacy](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for model requirements and recommendations.
 - **Confirm Native Function Calling is active** in **Settings > Models > Edit** (admin section) the model **> Advanced Params > Function Calling**. Built-in web search tools are Native-mode tools.
-- **Check all three web-search gates**: Web Search is enabled globally, Web Search is enabled on the model, and the Web Search toggle is enabled in the chat.
+- **Check all five web-search gates**: Web Search is enabled globally, Web Search is enabled on the model, the model's Builtin Tools include the Web Search category, the Web Search toggle is enabled in the chat, and the user's group holds the `features.web_search` permission.
 - **For DDGS/DuckDuckGo setups**, verify the provider configuration separately using the [DDGS provider guide](/features/chat-conversations/web-search/providers/ddgs), but switch models if DDGS returns results in logs while the assistant never calls `search_web`.
 
 ---
@@ -103,7 +103,7 @@ If web searches are timing out:
 
 **Solutions:**
 
-- **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (required for Brave free tier).
+- **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (recommended for the Brave free tier; the Brave client already retries once after a 429).
 
 - **Adjust loader concurrency**: Lower `WEB_LOADER_CONCURRENT_REQUESTS` if fetching many pages simultaneously.
 
@@ -121,8 +121,8 @@ Key variables:
 |----------|-------------|
 | `WEB_SEARCH_TRUST_ENV` | Enable proxy support for content fetching |
 | `WEB_SEARCH_RESULT_COUNT` | Number of search results to fetch |
-| `WEB_SEARCH_CONCURRENT_REQUESTS` | Concurrent requests to search engine |
-| `WEB_LOADER_CONCURRENT_REQUESTS` | Concurrent page fetches |
+| `WEB_SEARCH_CONCURRENT_REQUESTS` | Concurrent requests to search engine (the Concurrent Requests field beside Search Result Count; `0` means unlimited) |
+| `WEB_LOADER_CONCURRENT_REQUESTS` | Concurrent page fetches (the Concurrent Requests field in the Loader section; default 10) |
 | `WEB_LOADER_ENGINE` | Content extraction engine |
 
 All of these are persisted settings, so **Settings > Web Search** (admin section) is the live source of truth for them. The page fetcher reads proxy trust, loader concurrency and SSL verification from that saved configuration on each search, so a change you save there applies to the next search without a restart, and matches what the same settings do elsewhere. If a change you made in the admin panel appears not to have taken effect, re-check it there rather than assuming the environment variable is still in charge: the variable seeds the initial value, and the saved setting wins afterwards.
