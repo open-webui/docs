@@ -261,6 +261,16 @@ docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=
 ```
 After running the above, your WebUI should be available at `http://localhost:8080`.
 
+### `does not support tools` {#ollama-does-not-support-tools}
+
+If every chat with an Ollama model fails with `registry.ollama.ai/library/<model> does not support tools`, Ollama is refusing the tool definitions in the request. With **Function Calling** on Native, the default, and the model's **Builtin Tools** capability on, also the default, Open WebUI adds its built-in tools to every request sent from the chat interface. The request carries tools even when you did not turn on any tool in the chat.
+
+**Solutions:**
+
+1. **Set the model to Legacy.** In the model's **Advanced Params** in **Settings > Models** (admin section), set **Function Calling** to **Legacy**. Built-in tools are not sent in Legacy mode.
+2. **Turn off Builtin Tools on the model.** Disable the **Builtin Tools** capability in the model editor. Workspace tools or MCP tools you enable for a chat are still sent in Native mode and cause the same error.
+3. **Use a model that supports tool calling** if you want the built-in tools.
+
 ## Intermittent Name Lookup Failures (Often Reported as "Model not found")
 
 ### Common Symptoms

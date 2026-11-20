@@ -681,6 +681,8 @@ See [Knowledge Scoping with Native Function Calling](/features/workspace/knowled
 
 The **Builtin Tools** capability can be toggled on or off for each model in the **Workspace > Models** editor under **Features**. When enabled (the default), all the system tools listed above are automatically injected when using Native Mode.
 
+In Native Mode, every request sent from the chat interface carries the definitions of all enabled built-in tools, whether or not the model calls one. They add to the input of every message, including a plain question that uses no tool. Requests sent through the API without a `session_id` get no built-in tools. To send fewer definitions, turn off the [categories](#granular-builtin-tool-categories-per-model) the model does not need, turn on [Tool Search](#tool-search) with **Defer Built-in Tools**, or set the model's **Function Calling** to **Legacy**, which sends no built-in tools.
+
 **When to disable Builtin Tools:**
 
 | Scenario | Reason to Disable |
