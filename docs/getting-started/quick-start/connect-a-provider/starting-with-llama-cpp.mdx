@@ -104,7 +104,7 @@ To control and query your locally running model directly from Open WebUI:
 4. Set the following:
    - **URL**: `http://127.0.0.1:10000/v1`
      (Or use `http://host.docker.internal:10000/v1` if running WebUI inside Docker. **Note the `/v1` at the end!**)
-   - **Auth**: **None** for a keyless server. With **Bearer** and an empty key, Open WebUI sends an empty bearer token, which some servers reject
+   - **Auth**: **None** for a keyless server. With **Bearer** and an empty key, Open WebUI sends no `Authorization` header, the same as **None**
    - **Provider**: expand **Advanced** and pick `llama.cpp` from the **Provider** dropdown. This unlocks the loaded-model indicator and the admin **Eject** button in the model selector, plus the admin model management panel described in [Managing Local Models from Open WebUI](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#managing-local-models-from-open-webui). See [Unloading Loaded Models](#unloading-loaded-models) below. With it set, **Continue Response** also sends the llama.cpp fields for continuing the last reply, see [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting). Leave at `Default` if you do not need those features.
 
 Once saved, Open WebUI will begin using your local Llama.cpp server as a backend!
