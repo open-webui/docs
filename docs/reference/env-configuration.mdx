@@ -4493,7 +4493,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `float`
 - Default: `0.0`
-- Description: Sets the relevance threshold to consider for documents when used with reranking. Only chunks scoring at or above this value are kept. `0` means no threshold. Negative values are valid for rerankers that return raw scores outside the 0 to 1 range.
+- Description: Sets the relevance threshold to consider for documents when used with reranking. Only chunks scoring at or above this value are kept. `0` means no threshold. Negative values are valid for rerankers that return raw scores outside the 0 to 1 range. A value above `0` also filters [Context memories](/features/chat-conversations/memory#1-manual-management-settings) by their vector similarity score, without a reranker and even while hybrid search is off, so a value tuned for reranker scores can stop them from reaching the model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_HYBRID_SEARCH`
