@@ -218,7 +218,7 @@ curl -X POST http://localhost:5050/v1/audio/speech \
 
 The `/v1` is now optional.
 
-Additionally, there are endpoints for **Azure AI Speech** and **ElevenLabs** for potential future support if custom API endpoints are allowed for these options in Open WebUI.
+Open WebUI also accepts a custom endpoint for **Azure AI Speech** (`AUDIO_TTS_AZURE_SPEECH_BASE_URL`, the Endpoint URL field) and for **ElevenLabs** (`ELEVENLABS_API_BASE_URL`, environment only), so those engines can be pointed at a compatible server as well.
 
 These can be disabled by setting the environment variable `EXPAND_API=False`.
 

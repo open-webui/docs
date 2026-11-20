@@ -27,7 +27,7 @@ See the companion guide: [Using Mistral for Text-to-Speech](/features/chat-conve
 |---------|-------|
 | **Speech-to-Text Engine** | `MistralAI` |
 | **API Key** | Your Mistral API key |
-| **STT Model** | `voxtral-mini-2602` (or leave empty for the built-in default) |
+| **STT Model** | `voxtral-mini-2602` (empty falls back to `voxtral-mini-latest`, an alias Mistral may no longer serve, so set it) |
 
 5. Click **Save**
 
@@ -64,7 +64,7 @@ services:
 | `AUDIO_STT_MISTRAL_API_KEY` | Your Mistral API key | empty |
 | `AUDIO_STT_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
 | `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS` | Use chat completions endpoint | `false` |
-| `AUDIO_STT_MODEL` | STT model | `voxtral-mini-2602` |
+| `AUDIO_STT_MODEL` | STT model | empty (`voxtral-mini-latest` is used at request time) |
 
 ## Transcription Methods
 

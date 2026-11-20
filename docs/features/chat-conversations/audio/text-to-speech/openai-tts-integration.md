@@ -220,7 +220,7 @@ When reading long responses, Open WebUI can split text into chunks before sendin
 | Option | Description |
 |--------|-------------|
 | **Punctuation** (default) | Splits at sentence boundaries: periods (`.`), exclamation marks (`!`), question marks (`?`), and newlines. Best for natural pacing. |
-| **Paragraphs** | Splits only at paragraph breaks (double newlines). Results in longer audio chunks. |
+| **Paragraphs** | Splits at every newline, single or double, keeping code blocks intact. Results in longer audio chunks. |
 | **None** | Sends the entire response as one chunk. May cause delays before audio starts on long responses. |
 
 :::tip
