@@ -369,6 +369,22 @@ If your STT or TTS engine is hosted behind a self-signed certificate or an inter
 - Text-to-speech and speech-to-text both honor this setting.
 - Prefer installing the internal CA into the container's trust store where possible; disabling verification removes protection against man-in-the-middle interception on that connection.
 
+### OpenAI-Compatible STT Fails Behind a Proxy
+
+**Symptoms:** every transcription fails with an error that starts with `Error transcribing chunk: External:`, and the rest of the message says the server does not support a `response_format` value.
+
+**Cause:** with the **OpenAI** **Speech-to-Text Engine**, Open WebUI posts to `<API Base URL>/audio/transcriptions` and never sends `response_format`:
+
+- With **Request Format** set to **Multipart Upload** (the default), the form has a `model` field (the **STT Model**), a `language` field when a language is set, and the `file`.
+- With **JSON Base64**, the JSON body has `model`, `language` when a language is set, and `input_audio` with the base64 audio and its `format`.
+
+Open WebUI reads the reply as JSON and uses only its `text` field. If the error names a `response_format`, something between Open WebUI and the transcription server added it, such as a proxy like LiteLLM.
+
+**Solutions:**
+
+- Configure the proxy to request `json` for that model. In LiteLLM, set `response_format: json` in the model's `litellm_params`.
+- Or point **API Base URL** straight at the transcription server, if it accepts requests without `response_format`.
+
 ---
 
 ## ElevenLabs Integration
