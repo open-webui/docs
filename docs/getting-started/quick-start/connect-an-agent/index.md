@@ -7,29 +7,29 @@ description: "Connect Claude Code, Codex, Gemini CLI, or another agent to Open W
 
 # Run Claude Code, Codex, and Other Agents in Open WebUI
 
-To use a agent in Open WebUI, select the **terminal where its CLI is installed**, then select the **agent in the model picker**. You send messages and review its work in chat. The agent reads files, runs commands, and makes edits in the terminal's workspace using its own tools and model provider.
+To use an agent in Open WebUI, select the **terminal where its CLI is installed**, then select the **agent in the model picker**. You send messages and review its work in chat. The agent reads files, runs commands, and makes edits in the terminal's workspace using its own tools and model provider.
 
 Already have a connected terminal and a working agent CLI? [Start your first agent chat](#start-your-first-agent-chat). If you already run a Hermes or OpenClaw gateway, you can also [connect its API directly](#connect-an-existing-agent-gateway).
 
 ## Which agents does Open Terminal support?
 
-Open Terminal has built-in integrations for the 13 agents below. The `:agents` Docker image comes with **Claude Code and Codex**. Install any other CLI you want in the same terminal environment. Each agent's name links to its setup instructions.
+Open Terminal has built-in integrations for the 13 agents below. The `:agents` Docker image comes with **Claude Code and Codex**. Install any other CLI you want in the same terminal environment. Choose your agent below for installation, sign-in, and model selection.
 
 | Agent | CLI executable | Model picker prefix |
 | :--- | :--- | :--- |
-| [Claude Code](https://code.claude.com/docs/en/quickstart) | `claude` | `claude-code/` |
-| [OpenAI Codex CLI](https://developers.openai.com/codex/cli/) | `codex` | `codex/` |
-| [Cline CLI](https://docs.cline.bot/usage/cli-overview) | `cline` | `cline/` |
-| [Cursor CLI](https://cursor.com/docs/cli/installation) | `agent` | `cursor/` |
-| [Gemini CLI](https://geminicli.com/docs/get-started/installation/) | `gemini` | `gemini/` |
-| [GitHub Copilot CLI](https://docs.github.com/en/copilot/how-tos/copilot-cli/set-up-copilot-cli/install-copilot-cli) | `copilot` | `copilot/` |
-| [Google Antigravity CLI](https://antigravity.google/docs/overview?tab=cli) | `agy` | `antigravity/` |
-| [Goose](https://github.com/aaif-goose/goose/blob/main/documentation/docs/getting-started/installation.md) | `goose` | `goose/` |
-| [Grok Build](https://docs.x.ai/build/overview) | `grok` | `grok/` |
-| [Hermes Agent](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart) | `hermes` | `hermes/` |
-| [OpenCode](https://opencode.ai/docs/) | `opencode` | `opencode/` |
-| [Pi](https://pi.dev/) | `pi` | `pi/` |
-| [Qwen Code](https://github.com/QwenLM/qwen-code) | `qwen` | `qwen/` |
+| [Claude Code](/getting-started/quick-start/connect-an-agent/claude-code) | `claude` | `claude-code/` |
+| [OpenAI Codex CLI](/getting-started/quick-start/connect-an-agent/codex-cli) | `codex` | `codex/` |
+| [Cline CLI](/getting-started/quick-start/connect-an-agent/cline) | `cline` | `cline/` |
+| [Cursor CLI](/getting-started/quick-start/connect-an-agent/cursor-cli) | `agent` | `cursor/` |
+| [Gemini CLI](/getting-started/quick-start/connect-an-agent/gemini-cli) | `gemini` | `gemini/` |
+| [GitHub Copilot CLI](/getting-started/quick-start/connect-an-agent/github-copilot) | `copilot` | `copilot/` |
+| [Google Antigravity CLI](/getting-started/quick-start/connect-an-agent/antigravity) | `agy` | `antigravity/` |
+| [Goose](/getting-started/quick-start/connect-an-agent/goose) | `goose` | `goose/` |
+| [Grok Build](/getting-started/quick-start/connect-an-agent/grok-build) | `grok` | `grok/` |
+| [Hermes Agent](/getting-started/quick-start/connect-an-agent/hermes-agent) | `hermes` | `hermes/` |
+| [OpenCode](/getting-started/quick-start/connect-an-agent/opencode) | `opencode` | `opencode/` |
+| [Pi](/getting-started/quick-start/connect-an-agent/pi) | `pi` | `pi/` |
+| [Qwen Code](/getting-started/quick-start/connect-an-agent/qwen-code) | `qwen` | `qwen/` |
 
 Open Terminal starts each CLI when needed. Codex uses its app server, Claude Code uses streaming JSON, and Pi uses RPC. The other built-in agents use the **Agent Client Protocol (ACP)**. For another ACP v1 agent, such as **Kiro CLI** or **Factory Droid**, install and configure the CLI, register its launch command in `OPEN_TERMINAL_ACP_AGENTS`, and restart Open Terminal. [Custom ACP agent setup](/features/open-terminal/agents#add-another-acp-agent) · [Agent launch commands](https://github.com/open-webui/open-terminal#coding-agents-in-chat)
 
@@ -105,5 +105,5 @@ To give an existing model shell and file access, select the terminal and keep yo
 
 If your agent already runs as a service with an OpenAI-compatible API, add its endpoint under **Settings > Admin > Connections > OpenAI**. The gateway manages its own workspace, tools, and conversation handling.
 
-- **Hermes Agent** supports both routes. Choose the terminal integration above to use Hermes in a selected project folder, or connect the API of a running Hermes gateway. [Hermes gateway setup](/getting-started/quick-start/connect-an-agent/hermes-agent)
+- **Hermes Agent** supports both routes. Choose the terminal integration above to use Hermes in a selected project folder, or connect the API of a running Hermes gateway. [Hermes gateway setup](/getting-started/quick-start/connect-an-agent/hermes-agent#connect-the-hermes-gateway)
 - **OpenClaw** exposes a gateway that you can select as a model in chat. [OpenClaw gateway setup](/getting-started/quick-start/connect-an-agent/openclaw)

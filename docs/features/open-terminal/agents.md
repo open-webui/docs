@@ -19,19 +19,19 @@ Open Terminal starts the installed CLI through the interface below. Install and 
 
 | Agent | Interface | Executable |
 | :--- | :--- | :--- |
-| **Codex** | Native app-server protocol | `codex` |
-| **Claude Code** | Native streaming JSON protocol | `claude` |
-| **Pi** | Native RPC protocol | `pi` |
-| **Cursor** | ACP | `agent` |
-| **Grok** | ACP | `grok` |
-| **OpenCode** | ACP | `opencode` |
-| **Cline** | ACP | `cline` |
-| **Gemini CLI** | ACP | `gemini` |
-| **Hermes** | ACP | `hermes` |
-| **Antigravity** | ACP | `agy` |
-| **GitHub Copilot** | ACP | `copilot` |
-| **Goose** | ACP | `goose` |
-| **Qwen Code** | ACP | `qwen` |
+| [Codex](/getting-started/quick-start/connect-an-agent/codex-cli) | Native app-server protocol | `codex` |
+| [Claude Code](/getting-started/quick-start/connect-an-agent/claude-code) | Native streaming JSON protocol | `claude` |
+| [Pi](/getting-started/quick-start/connect-an-agent/pi) | Native RPC protocol | `pi` |
+| [Cursor](/getting-started/quick-start/connect-an-agent/cursor-cli) | ACP | `agent` |
+| [Grok](/getting-started/quick-start/connect-an-agent/grok-build) | ACP | `grok` |
+| [OpenCode](/getting-started/quick-start/connect-an-agent/opencode) | ACP | `opencode` |
+| [Cline](/getting-started/quick-start/connect-an-agent/cline) | ACP | `cline` |
+| [Gemini CLI](/getting-started/quick-start/connect-an-agent/gemini-cli) | ACP | `gemini` |
+| [Hermes](/getting-started/quick-start/connect-an-agent/hermes-agent) | ACP | `hermes` |
+| [Antigravity](/getting-started/quick-start/connect-an-agent/antigravity) | ACP | `agy` |
+| [GitHub Copilot](/getting-started/quick-start/connect-an-agent/github-copilot) | ACP | `copilot` |
+| [Goose](/getting-started/quick-start/connect-an-agent/goose) | ACP | `goose` |
+| [Qwen Code](/getting-started/quick-start/connect-an-agent/qwen-code) | ACP | `qwen` |
 
 [Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/introduction) standardizes communication between an agent and its client. These integrations use ACP v1. Open Terminal launches the agent process, while Open WebUI handles its protocol messages for chat output, tool approvals, and session continuation. The other three agents have dedicated protocol adapters.
 
