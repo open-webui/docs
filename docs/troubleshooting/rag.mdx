@@ -251,6 +251,8 @@ If your initial response is fast but follow-up questions become increasingly slo
 | Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
 | API returns "empty content" | Wait for file processing to complete before adding to knowledge base |
 | CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
+| Large uploads slow to embed | Raise **Embedding Batch Size**, use an external embedding engine, or bypass embedding |
+| Hybrid search changes nothing | Set `GLOBAL_LOG_LEVEL=DEBUG` and check the reranker model and endpoint |
 | PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
 | Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
 | Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
@@ -524,6 +526,36 @@ An image attached in a chat is sent to the model as an image. It never goes thro
 
 1. **Use a vision model** for chats with images, and turn off **Vision** in **Settings > Models > Edit** (admin section) for models that cannot take images, so users get the Open WebUI message instead of a model server error.
 2. **Extract the text with OCR** by uploading the image to a knowledge base. This needs **Content Extraction Engine** in **Settings > Documents** (admin section) set to an engine other than **Default**, and **Supported Media MIME Types** listing the image type, for example `image/*`. The **External** engine also accepts images while that field has never been set. Otherwise the upload shows the warning `File type image/png is not supported for processing`, with the image's own type.
+
+### 17. Large Uploads Take a Long Time to Embed
+
+A large CSV or XLSX file, or many PDFs uploaded at once, stays in processing for a long time on the **Default (SentenceTransformers)** embedding engine. Every chunk must be embedded before the file is searchable.
+
+**The Problem**: **Embedding Batch Size** in **Settings > Documents** (admin section), set by [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size), defaults to `1`. The local engine passes it to the model as its batch size, so it embeds one chunk at a time.
+
+**Solutions:**
+
+1. **Raise Embedding Batch Size**, for example to `32`. Larger batches use more memory. If you then see CUDA out of memory errors, lower it again (see [section 10](#10-cuda-out-of-memory-during-embedding)).
+2. **Use an external embedding engine**: set **Embedding Model Engine** to **Ollama**, **OpenAI** or **Azure OpenAI** ([`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine)). The same batch size then sets how many chunks go into one request, so raise it only if the provider accepts several inputs per request.
+3. **Skip embedding**: turn on **Bypass Embedding and Retrieval** ([`BYPASS_EMBEDDING_AND_RETRIEVAL`](/reference/env-configuration#bypass_embedding_and_retrieval)). Uploads are stored as extracted text without embeddings, and the full text goes to the model, so each document must fit in its context window.
+
+### 18. Hybrid Search or the Reranker Has No Visible Effect
+
+With **Hybrid Search** on, answers look the same as plain vector search, and no error appears in the chat.
+
+**The Problem**: hybrid search falls back to vector search on its own.
+
+- If the hybrid search query raises an error, Open WebUI runs vector search instead and logs `Hybrid search failed, falling back to vector search:` only at the `DEBUG` level.
+- A knowledge base whose hybrid query fails is dropped from the results while the others are still searched. The log shows `query_collection_with_hybrid_search: <n> collection(s) had failing queries:` followed by the collection names at the `ERROR` level.
+- If the external reranker request fails or its response has no `results`, the log shows `Error in external reranking:` or `No results found in external reranking response`, then `No valid scores found, check your reranking function. Returning original documents.` The documents are passed on without reranking.
+- If the local reranking model cannot be loaded when you save the settings, the log shows `Error loading reranking model:` and Open WebUI turns **Hybrid Search** off again.
+
+**Solutions:**
+
+1. **Read the debug log**: set [`GLOBAL_LOG_LEVEL=DEBUG`](/reference/env-configuration#global_log_level), restart, ask a question about a document, and search the log for the lines above.
+2. **Check the reranking model**: with **Reranking Engine** set to **Default (SentenceTransformers)**, **Reranking Model** must be a Hugging Face model ID such as `BAAI/bge-reranker-v2-m3`, or a local path to one. Open WebUI loads it as a SentenceTransformers CrossEncoder, so an Ollama model tag does not work there.
+3. **Check the external reranker**: with **Reranking Engine** set to **External**, **API Base URL** must be the full rerank endpoint. Open WebUI posts JSON with `model`, `query`, `documents` and `top_n`, and reads `results[].index` and `results[].relevance_score` from the response. A chat completions or embeddings endpoint does not answer in that shape.
+4. **Turn Hybrid Search off** to isolate the problem. If retrieval improves or changes, the fault is in the hybrid or reranker setup, not in the embeddings.
 
 ---
 
