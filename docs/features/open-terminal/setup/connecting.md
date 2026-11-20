@@ -43,7 +43,7 @@ Open Terminal has its **own section** under Integrations. Don't add it under "Ex
 | :--- | :--- |
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
-| **Auth** | Leave as `Bearer` (the default) |
+| **Auth** | Leave as `Bearer` (the default). [Auth](#auth) covers why the other options break the interactive terminal |
 | **Chat Uploads** | Starts on `Filesystem` for a new connection. [Chat Uploads](#chat-uploads) covers what each option does |
 | **Working Directory Context** | Under **Advanced**, on by default. [Working Directory Context](#working-directory-context) covers when to turn it off |
 | **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
@@ -116,6 +116,23 @@ For Docker deployments, you can configure terminal connections automatically usi
 ## Your own terminal (Tether)
 
 Without admin access, add a terminal in the Tether app. It is yours alone and its URL and key stay on your computer. See [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
+
+---
+
+## Auth
+
+**Auth** on the connection form decides what Open WebUI sends the terminal server as credentials. The model's tools and the file browser's listings, reads and uploads go over HTTP. The shell in a **New Terminal** tab, the file browser's live refresh and listening ports, the **Desktop** tab and the streamed output of running commands go over a websocket. The two paths send different things:
+
+| Auth | HTTP requests | Websocket connections |
+| :--- | :--- | :--- |
+| `Bearer` | The **API Key** as a bearer token | The **API Key** |
+| `None` | No key | An empty token |
+| `Session` | The user's own Open WebUI token as a bearer token | An empty token |
+| `OAuth` | The user's OAuth access token as a bearer token, when they have an OAuth sign-in session | An empty token |
+
+`Bearer` is the only option that sends the **API Key**, and the only one that authenticates both paths. With `Session` or `OAuth` the model's tools and the file browser can work against a terminal server that accepts that token, while every websocket feature reaches the server with an empty token. Those features work only if the terminal server accepts a connection with no key. Open Terminal is set up with an API key, so keep `Bearer` for it.
+
+Terminals created from a [Terminals orchestrator](/features/open-terminal/terminals/) connection always use `Bearer` with the connection's **API Key**, whatever **Auth** is set to.
 
 ---
 
