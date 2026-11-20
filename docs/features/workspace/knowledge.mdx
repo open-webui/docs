@@ -48,7 +48,7 @@ Knowledge bases, notes and single files can be attached to a chat, to a [folder]
 **In a chat:**
 
 - Type `#` in the message input. The list offers **Folders**, **Knowledge** (knowledge bases) and **Files** (single files from knowledge bases), and accepts a web or YouTube URL.
-- Or click **+** (**More**) and open **Attachments**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**.
+- Or click **+** (**More**) and open **Attachments**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**. **Attach Webpage** refuses private and loopback addresses unless [`ENABLE_LOCAL_WEB_FETCH`](/reference/env-configuration#enable_local_web_fetch) is on; see [Attaching a Link Fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 - Or drag a note, folder or chat from the sidebar into the message input.
 
 **On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Models > Edit** (admin section)) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Knowledge** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
