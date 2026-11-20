@@ -59,7 +59,7 @@ Click **Save**. The connection appears under **Open Terminal** with its toggle s
 
 ### 6. (Optional) Restrict access to specific groups
 
-Limit terminal access to specific user groups via the access control button.
+Limit terminal access to specific user groups in the **Access** section of the connection form.
 
 ![The access control panel listing user groups with checkboxes](/images/open-terminal-access-grants.png)
 
@@ -75,7 +75,7 @@ In the chat input area, click the **terminal button** (cloud icon). Your termina
 
 The selected terminal name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another terminal at any time except while a reply is generating.
 
-Hover over a terminal in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a terminal with a separate instance per chat, the button appears once the chat is saved.
+Hover over a terminal in the menu, click its **More** button and choose **System info** to see the CPU, memory, disk and network use, the uptime and the top processes the terminal server reports. The view refreshes every 5 seconds while it is open. For a terminal with a separate instance per chat, **System info** appears once the chat is saved.
 
 ### 8. Enable native function calling
 
@@ -83,7 +83,7 @@ Native function calling is the default tool-calling mode, so it is already activ
 
 1. Go to **Workspace → Models**
 2. Click the edit button on the model you're using
-3. Make sure **Function Calling** is set to **Native** (the default), not **Legacy**
+3. Make sure **Function Calling** is set to **Default** or **Native**, not **Legacy**
 4. Save
 
 ![Model capabilities showing Builtin Tools enabled](/images/open-terminal-model-capabilities.png)
@@ -157,7 +157,7 @@ Four things change with it:
 
 On a terminal with a [separate instance per chat](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope), a file attached to a new chat's first message uploads into that chat's instance when you send it.
 
-The field is on every terminal connection an administrator adds. [Tether](/ecosystem/tether) terminals always use **Automatic**.
+The field is on every terminal connection an administrator adds. [Tether](/ecosystem/tether) terminals always use `Filesystem`.
 
 ![The connection form with Chat Uploads set to Filesystem](/images/open-terminal-chat-uploads-filesystem.png)
 
@@ -173,7 +173,7 @@ Tool instructions are part of the cached prefix of every request, so each change
 
 A **New Terminal** tab, from the **+** menu of the **Tabs**, is your own shell. Two tools let the model read that shell's recent output and send input to it. **User Shell Tools**, under **Advanced**, decides when the model gets them:
 
-- `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks your browser whether it is.
+- `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks the terminal server whether it is.
 - `Always Include`: on every message, open shell or not. The tool list stays the same from message to message, which keeps the [prompt cache](/features/chat-conversations/prompt-caching) intact when you open and close the shell.
 
 Automations and sub-agents never get the two tools. The field is on every terminal connection an administrator adds. [Tether](/ecosystem/tether) terminals always use **Automatic**.
