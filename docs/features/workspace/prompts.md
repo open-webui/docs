@@ -227,6 +227,18 @@ Prompts created before the versioning update were automatically migrated with th
 
 ---
 
+## Import and Export
+
+**Export JSON** in the Workspace header of **Workspace > Prompts** saves every prompt you can read to one JSON file. **Export** in a prompt's **⋯** menu saves only that prompt. Both need the [**Export Prompts**](/features/authentication-access/rbac/permissions) permission, and **Import JSON** needs **Import Prompts**. Admins always see all three.
+
+The export file holds each prompt's command, name, content, tags, `is_active`, `data`, `meta`, owner, timestamps and access grants. It holds no version history.
+
+**Import JSON** reads only the `command`, `name` and `content` of each prompt in the file and ignores everything else. An imported prompt has no tags, is enabled and is private to you. Add the tags and sharing again after the import.
+
+A prompt whose command already exists on the instance, for any user, is skipped with `Uh-oh! This command is already registered. Please choose another command string.`, and the rest of the file is still imported.
+
+---
+
 ## Examples
 
 ### Bug report generator (`/bug_report`)
