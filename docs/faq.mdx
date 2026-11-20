@@ -26,7 +26,7 @@ All community participants are expected to follow our **[Code of Conduct](https:
 
 ### Q: How do I customize the logo and branding?
 
-**A:** You can customize the theme, logo, and branding with our **[Enterprise License](https://docs.openwebui.com/enterprise)**, which unlocks exclusive enterprise features.
+**A:** You can customize the theme, logo, and branding with our **[Enterprise License](https://docs.openwebui.com/enterprise)**, which unlocks exclusive enterprise features. The Open WebUI license also permits changing the branding in deployments with at most 50 end users in any rolling 30-day period, or with written permission. A custom `WEBUI_NAME` is shown with an " (Open WebUI)" suffix.
 
 For more details on enterprise solutions and branding customizations, [click here](https://docs.openwebui.com/enterprise).
 
@@ -54,7 +54,7 @@ For the full write-up with examples, see [Context Window / Prompt Too Long](/tro
 
 ### Q: Can I use Open WebUI offline, in air-gapped networks, or in extreme environments like outer space?
 
-**A:** **Yes.** Open WebUI is a self-hosted, **internet-independent AI platform** designed to work in **air-gapped networks**, **remote deployments**, and any environment where cloud-based systems are impractical or impossible. Whether you need to **run an LLM without internet**, deploy a **private AI with no cloud dependency**, or operate a **local AI chatbot offline**, Open WebUI supports all of these out of the box. It runs entirely on local hardware and does not make external calls by default.
+**A:** **Yes.** Open WebUI is a self-hosted, **internet-independent AI platform** designed to work in **air-gapped networks**, **remote deployments**, and any environment where cloud-based systems are impractical or impossible. Whether you need to **run an LLM without internet**, deploy a **private AI with no cloud dependency**, or operate a **local AI chatbot offline**, Open WebUI supports all of these out of the box. It runs entirely on local hardware. By default it makes two kinds of outbound call: a release check against GitHub, made when an admin loads the app or opens Settings > About or the admin General page, and Hugging Face model downloads and updates. `OFFLINE_MODE=true` turns both off. No chat or user data is sent either way.
 
 This **Earth-independent architecture** is well suited as an **AI interface for space exploration** (spacecraft, the ISS, lunar bases, Mars habitats, and deep-space missions) where communication delays or total network isolation make cloud AI unworkable. Whether you need **self-hosted AI for remote locations** or need to **run AI in a disconnected environment**, Open WebUI's **offline-first design** keeps models, tools, and data local and predictable even under extreme latency or complete disconnection.
 
@@ -62,7 +62,7 @@ The same principles apply to harsh terrestrial settings: submarines, polar resea
 
 ### Q: Why am I asked to sign up? Where are my data being sent to?
 
-**A:** We require you to sign up to become the admin user for enhanced security. This helps protect your instance if it is ever exposed to external access. Open WebUI does not collect your data. When you sign up, all information is stored locally on your server and is not sent to Open WebUI or any third party by default.
+**A:** We require you to sign up to become the admin user for enhanced security (headless deployments can pre-create the admin with `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` instead). This helps protect your instance if it is ever exposed to external access. Open WebUI does not collect your data. When you sign up, all information is stored locally on your server and is not sent to Open WebUI or any third party by default.
 
 ### Q: Why can't my Docker container connect to services on the host using `localhost`?
 
@@ -142,7 +142,7 @@ Everything you need to run Open WebUI, including your data, remains within your 
 ### Q: I updated/restarted and now I'm being logged out, or getting "Error decrypting tokens" for my tools?
 
 **A:** This happens because you haven't set a persistent `WEBUI_SECRET_KEY` in your environment variables.
-*   **Logouts:** Without this key, Open WebUI generates a random one every time it starts. This invalidates your previous session cookies (JWTs), forcing you to log in again.
+*   **Logouts:** Without this key, the start script generates one and saves it to `.webui_secret_key` in `/app/backend`, outside the data volume. It survives a restart but not a container recreation, and each new key invalidates every session cookie (JWT), forcing everyone to log in again. Set the variable, or point `WEBUI_SECRET_KEY_FILE` at a path inside the data volume.
 *   **Decryption Errors:** Essential secrets (like OAuth tokens for MCP tools or API keys) are encrypted using this key. If the key changes on restart, Open WebUI cannot decrypt them, leading to errors.
 
 **Fix:** Set `WEBUI_SECRET_KEY` to a constant, secure string in your Docker Compose or environment config.
@@ -181,7 +181,7 @@ To do this, configure your **Ollama model params** to allow a larger context win
 
 If you immediately try to add the file to a knowledge base before processing completes, the system sees empty content and returns a `400` error.
 
-**Solution:** Poll the file status endpoint until processing is complete:
+**Solution:** Poll the file status endpoint until processing is complete, or request it with `?stream=true` to receive a server-sent event stream that ends on `completed` or `failed`:
 
 ```python
 import requests
@@ -235,13 +235,14 @@ This is also why the same model accessed through different interfaces might give
 - **Tag Generation**: Auto-tagging chats for organization
 - **Query Generation**: Creating optimized search queries for RAG (when you attach files or knowledge)
 - **Web Search Queries**: Generating search terms when web search is enabled
+- **Follow-up Suggestions**: Suggesting follow-up questions after each response (on by default)
 - **Autocomplete Suggestions**: If enabled
 
 By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-5.6 Sol or Claude Opus 5), this can significantly increase your costs.
 
 **To reduce API costs:**
 1. Go to **Settings > Interface** (admin section) (for title/tag generation settings)
-2. Configure a **Task Model** under **Settings > Interface > Tasks** (admin section) to use a smaller, cheaper model (like GPT-5.6 Luna) or a local model for background tasks
+2. Configure a **Task Model** under **Settings > Interface > Tasks** (admin section) to use a smaller, cheaper model (like GPT-5.6 Luna) or a local model for background tasks. There are two fields, **Local Task Model** for chats with a local (Ollama) model and **External Task Model** for other models; set the one that matches your chat model, or both
 3. Disable features you don't need (auto-title, auto-tags, etc.)
 4. Cap what those requests can spend by setting `max_tokens` under **Task Model Parameters** in the same **Tasks** section. Tag, follow-up and search query generation otherwise send no output limit at all. See [Task Models](/features/administration/task-models#task-model-parameters)
 
