@@ -20,11 +20,12 @@ Open WebUI allows you to integrate directly into your web browser. This tutorial
 Before you begin, ensure that:
 
 - You have Chrome or another supported browser installed.
-- The `WEBUI_URL` environment variable is set correctly, either using Docker environment variables or in the `.env` file as specified in the [Getting Started](https://docs.openwebui.com/reference/env-configuration) guide.
+- Your Open WebUI instance is reachable from the browser at a stable URL.
+- If you will use Firefox's one-click option, the `WEBUI_URL` environment variable is set to that URL, either using Docker environment variables or in the `.env` file as specified in the [Getting Started](https://docs.openwebui.com/reference/env-configuration) guide.
 
-### Step 1: Set the WEBUI_URL Environment Variable
+### Step 1: Set the WEBUI_URL Environment Variable (Firefox only)
 
-Setting the `WEBUI_URL` environment variable ensures your browser knows where to direct queries.
+The Chrome setup below does not need `WEBUI_URL`: the browser opens `<your-open-webui-url>/?q=%s` itself. Firefox's one-click option reads Open WebUI's `/opensearch.xml`, which builds its search URL from `WEBUI_URL` (the **WebUI URL** field in **Admin Panel > Settings > General**), so set it to the address you use to reach Open WebUI.
 
 #### Using Docker Environment Variables
 
@@ -105,6 +106,7 @@ This opens Open WebUI with your query in the message input. Press Enter to send 
 
 If you encounter any issues, check the following:
 
-- Ensure the `WEBUI_URL` is correctly configured and points to a valid Open WebUI instance.
+- Ensure the URL in your browser's search engine settings points to a running Open WebUI instance.
+- For Firefox's one-click option, ensure `WEBUI_URL` is set to the address you use to reach Open WebUI.
 - Double-check that the search engine URL format is correctly entered in your browser settings.
 - Confirm your internet connection is active and that the Open WebUI service is running smoothly.
