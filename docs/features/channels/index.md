@@ -129,7 +129,7 @@ The **...** menu of a channel or direct message, in the sidebar or in the channe
 
 ### Apps
 
-External services can also join a channel as [Apps](/features/channels/apps). An admin installs them in **Settings > Apps** (admin section); the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.
+External services can also join a channel as [Apps](/features/channels/apps). An admin installs them under **Apps** in **Settings > Integrations** (admin section); the channel's creator or an admin then adds them to the channel. They show up in the member list with an **App** badge, answer when you `@mention` them and can post messages with buttons.
 
 ### Direct messages
 
