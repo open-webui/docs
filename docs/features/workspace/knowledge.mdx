@@ -371,6 +371,8 @@ Behavior to be aware of:
 - Files modified locally upload with a new content hash; the old file entry is removed from the KB and replaced.
 - Files removed locally are deleted from the KB during the cleanup step.
 - The action is **non-destructive** for unchanged files.
+- A file still marked **Processing** in the knowledge base, for example because Open WebUI restarted before it finished processing, is not uploaded again for one hour after its original upload, as long as its path, name and content are unchanged. During that hour a sync counts it under **unmodified** in the `Sync complete` message. After the hour, the next sync uploads it again.
+- A **Processing** file has no item menu, so it cannot be removed from the knowledge base view. To retry it before the hour is up, find its ID with `GET /api/v1/knowledge/{id}/files/pending`, delete it with `DELETE /api/v1/files/{file_id}`, then sync again.
 
 For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
 
