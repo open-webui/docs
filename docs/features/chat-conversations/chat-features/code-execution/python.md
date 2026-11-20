@@ -60,6 +60,20 @@ For Jupyter configuration, see the [Jupyter Notebook Integration](/tutorials/int
 When the Pyodide engine is selected, Open WebUI automatically appends a filesystem-awareness prompt to the code interpreter instructions. This tells the model about `/mnt/uploads/` and how to discover user-uploaded files. When using Jupyter, this filesystem prompt is not appended (since Jupyter has its own filesystem). You do not need to include filesystem instructions in your custom `CODE_INTERPRETER_PROMPT_TEMPLATE`. They are added automatically.
 :::
 
+### Jupyter connection settings
+
+**Settings > Code Execution** (admin section) has two separate sections. **Code Execution**, switched by **Enable Code Execution**, drives the **Run** button on code blocks. **Code Interpreter**, switched by **Enable Code Interpreter**, drives the code a model runs on its own. Each section has its own engine, **Jupyter URL**, **Jupyter Auth**, credential and **Code Execution Timeout**, so setting up Jupyter in one does not configure the other. The Jupyter fields appear once a section is switched on and its engine is set to **jupyter (Legacy)**.
+
+**Jupyter Auth** offers **None**, **Token** and **Password**, and the field below it changes to match:
+
+| **Jupyter Auth** | Field | What Open WebUI sends to the Jupyter server |
+| --- | --- | --- |
+| **None** | None | No credentials |
+| **Token** | **Jupyter Token** | The token as a `token` query parameter on the kernel API calls and on the kernel WebSocket URL |
+| **Password** | **Jupyter Password** | A `GET login` to read the `_xsrf` cookie, then a `POST login` form with the password. The kernel API calls and the WebSocket then carry the session cookies and an `X-XSRFToken` header |
+
+Only the credential for the selected mode is sent. A token saved earlier stays unused while **Password** is selected. Each run starts a new Jupyter kernel and deletes it when the run ends, so variables and imports do not carry over from one run to the next.
+
 ### Native Function Calling (Native Mode)
 
 When using **Native function calling mode** with a current model (at minimum GPT-5.6 Luna, Gemini 3.5 Flash-Lite, MiniMax M3, or Muse Glimmer 30B locally), the code interpreter is available as a builtin tool called `execute_code`. This provides a more integrated experience:
