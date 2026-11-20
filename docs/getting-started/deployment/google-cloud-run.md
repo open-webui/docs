@@ -125,7 +125,7 @@ Open the approved HTTPS hostname and sign in with the initial administrator cred
 
 ## Verify Before Adding Users
 
-- Sign in with the initial administrator account and verify that open sign-up is disabled. Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
+- Sign in with the initial administrator account and verify that open sign-up is disabled (creating the administrator from `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` turns it off). Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
 - Select a model and stream a response. Reopen the saved conversation.
 - Upload a small document containing a distinctive fact. Confirm indexing completes and a question about that fact retrieves the source.
 - Replace an application instance and confirm the same account, conversation, and uploaded file remain available.
