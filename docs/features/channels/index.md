@@ -29,11 +29,11 @@ Open WebUI is where knowledge is found, created, and shared. Channels make that 
 
 ### AI as a participant, not a separate tool
 
-Tag `@gpt-5.6` to draft a plan, then tag `@claude` to critique it. Your whole team sees both responses in the same timeline with full context. No tab-switching, no copy-pasting between tools.
+Tag `@gpt-5.6` to draft a plan, then tag `@claude` to critique it. Your whole team sees both responses in the same channel. Ask in one thread and the second model reads the first one's answer. No tab-switching, no copy-pasting between tools.
 
-### Persistent shared context
+### Persistent shared record
 
-Every message becomes part of the record. When someone asks a question next week, the AI can draw on everything discussed before. Channels are living knowledge bases, not disposable threads.
+Every message becomes part of the record, so the team can search and reread it next week. A model you tag reads only the thread it answers in, as described under [What the model reads](#what-the-model-reads).
 
 ### Multiple models, one conversation
 
@@ -50,7 +50,7 @@ Instant updates, emoji reactions, threaded replies, pinned messages, and unread 
 | | |
 | :--- | :--- |
 | **`@model` tagging** | Summon any AI model into the conversation on demand |
-| **Shared context** | Every message, human or AI, builds the collective knowledge |
+| **Shared record** | Every message, human or AI, stays in the channel for the team to search and reread |
 | **Threads & reactions** | Keep discussions organized with replies, pins, and emoji reactions |
 | **File sharing** | Drop images, documents, and code. AI can see and process them |
 | **Message queue** | Keep sending while a message or file upload is still in progress: new messages queue above the input, can be edited or removed and go out in order |
@@ -88,6 +88,10 @@ This means your team can discuss freely without AI interrupting, and call on exa
 #### Where the reply appears
 
 By default a model answering a top-level mention replies **in a thread** under your message, so a long answer does not push the channel's conversation off the screen. An administrator can change this in **Settings > General** (admin section) (**Model Response Mode**, or [`CHANNEL_MODEL_RESPONSE_MODE`](/reference/env-configuration#channel_model_response_mode)): set it to **Channel** and the reply is posted into the timeline instead, where the team reads it without opening a thread. Mentioning a model from inside a thread always answers in that thread either way.
+
+#### What the model reads
+
+A tagged model does not read the channel's timeline. It receives the messages of the thread your message belongs to, up to the 50 most recent, with each one labeled by the name of the person or model who wrote it. A mention posted at the top level of the channel starts a new thread, so the model sees only that one message. **Model Response Mode** changes only where the reply is posted, not what the model reads. With **Channel**, the reply lands in the timeline, and a later top-level mention, even a reply to the model's own message, again carries no earlier messages. To give a model the earlier discussion, keep the conversation in one thread or paste what it needs into your message.
 
 ### Full chat-completion pipeline
 
@@ -183,15 +187,15 @@ A standard channel's **Access** sets who can read or write in it: specific users
 
 ### Team knowledge hub (`#engineering`)
 
-Your team discusses architecture decisions throughout the week. Someone tags `@claude` to evaluate tradeoffs. The AI's analysis becomes part of the permanent record: searchable, referenceable, and available to every future conversation in that channel.
+Your team discusses architecture decisions throughout the week. Someone tags `@claude` to evaluate tradeoffs. The AI's analysis becomes part of the permanent record: searchable, referenceable, and readable by everyone in that channel.
 
 ### Multi-model war room (`#incident-response`)
 
-Paste logs and error traces. Tag `@gpt-5.6` to analyze the stack trace. Tag `@qwen3.6` to suggest a fix. Tag `@claude` to draft the postmortem. Three models, one shared context, one timeline.
+Paste logs and error traces, then work in a thread under them. Tag `@gpt-5.6` to analyze the stack trace. Tag `@qwen3.6` to suggest a fix. Tag `@claude` to draft the postmortem. Three models, one thread, each reading what the others wrote.
 
 ### Project strategy (`#product-launch`)
 
-Twenty messages of human brainstorming. Then: `@gpt-5.6` Read the conversation above and create a prioritized action plan with owners and deadlines. The AI synthesizes everything discussed into a structured deliverable.
+Twenty messages of human brainstorming in one thread. Then, in that thread: `@gpt-5.6` Read this thread and create a prioritized action plan with owners and deadlines. The AI synthesizes everything discussed in the thread into a structured deliverable.
 
 ### Creative collaboration (`#story-mode`)
 
