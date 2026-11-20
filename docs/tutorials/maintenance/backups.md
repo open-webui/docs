@@ -101,6 +101,22 @@ However your instance is provisioned, it's worth inspecting the app's data store
 | `vector_db/` | Directory containing the ChromaDB vector database. |
 | `webui.db` | SQLite database for persistent storage of other instance data |
 
+## Exporting the admin configuration
+
+The **Config** section of **Settings > Database** (admin section) has **Export Config** and **Import Config**. They copy the admin settings only, so they do not replace a backup of the data store.
+
+**Export Config** downloads `config-<timestamp>.json`, a flat JSON object holding every row of the `config` table under dotted keys such as `openai.api_base_urls` or `ui.banners`.
+
+- The file holds secrets in plain text: connection API keys (`openai.api_keys`), web search API keys, Jupyter tokens and passwords, and OAuth client secrets. Store it like a password file.
+- It leaves out everything stored outside the `config` table: users, chats, models, knowledge, files, functions and tools. Settings that exist only as environment variables, such as `WEBUI_SECRET_KEY`, are not in it either.
+- With `ENABLE_PERSISTENT_CONFIG=False`, the file holds the values Open WebUI is running with, which start from the environment.
+
+**Import Config** reads a file in the same shape and writes every key in it as given, without checking key names or values. Keys missing from the file keep their current values, so an import merges into the existing settings and does not reset the rest. A successful import shows `Config imported successfully`.
+
+- With `ENABLE_PERSISTENT_CONFIG=False`, and for `oauth.*` keys while `ENABLE_OAUTH_PERSISTENT_CONFIG` is off, the imported values change the running instance only and are lost on restart.
+- A full export contains the MFA keys (`auth.mfa.enable`, `auth.mfa.allow_oauth_bypass`, `auth.mfa.allow_trusted_header_bypass`). An import that carries them must come from an admin signed in to the browser. Sent with an API key, it fails with `A human administrator session is required to change MFA settings.`
+- If the imported MFA values differ from the current ones, every user is signed out. If the file turns MFA on and the instance cannot run it (no authentication, no persistent config, or stored MFA secrets that no longer decrypt), the import fails with `Unable to update MFA policy. Check configuration and retry.` and nothing is written.
+
 # File Level Backup Approaches
 
 The first way to back up the application data is to take a file level backup approach ensuring that the persistent Open Web UI data is properly backed up.

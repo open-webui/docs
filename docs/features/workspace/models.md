@@ -357,6 +357,8 @@ Each model's ellipsis (**...**) menu starts with one of two actions, and both as
 
 Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Drag-to-reorder works in a filtered view too: the model you move lands next to the visible model you dropped it by, and every model the filter hides keeps its place.
 
+The menu labels these **Enable All**, **Disable All**, **Show All** and **Hide All**. **Hide All** marks every model in the current view as hidden, workspace models included, which takes them out of the model selector for everyone, admins too. Its toast reads `All models are now hidden` even when the view held only some models. **Show All** in the same view undoes it in one step, but it also shows models that were hidden before, so check the **Hidden** view first if some were hidden on purpose. **Hide All** does not change the **Selected** or **Pinned** model settings, but hidden models are skipped when a new chat picks its model. If every model is hidden, a new chat opens with no model selected.
+
 Each row shows **Public**, **Shared** or **Private** next to the model name. **Public** means every user has read access. **Shared** means specific users or groups have access. **Private** means the model has no access grants. **Make Public** and **Make Private** in the row's ellipsis (**...**) menu switch this without opening the model. **Make Private** removes every access grant, group and user shares included, not only public access. **Make Public** on a base model that has no saved settings saves an entry for it. The **Private** filter lists shared models too.
 
 ---
@@ -416,7 +418,7 @@ Models that have been hidden or removed are dropped at every step, so a user who
 
 Opening an existing chat follows the same rule. The chat's models that were removed, or that the user can no longer access, are dropped from the selector. If none are left, the chat falls back through steps 3 to 6: the user's own default model, then the group default models or the **Selected Models**, then the first available model. A model that was only hidden stays selected in that chat.
 
-**Pinned Models** work differently: they seed the user's sidebar shortcuts once, only when the user has no pinned models of their own. From then on the user's own pins win, and pins pointing at hidden or deleted models are cleaned up automatically.
+**Pinned Models** work differently: they seed the user's sidebar shortcuts once, only when the user has no pinned models of their own. From then on the user's own pins win, and pins pointing at hidden or deleted models, or models the user cannot access, stay in the user's settings but are left out of the sidebar, so they come back if the model does.
 
 :::warning Selected is a starting point, not a restriction
 Setting a model as Selected does not stop anyone from switching to another model they have access to. To control what a user can reach, use per-model access control or **Hide**, described in [Curated-Interface Deployments](#curated-interface-deployments).
