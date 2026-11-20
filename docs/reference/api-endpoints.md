@@ -43,6 +43,8 @@ Access detailed API documentation for different services provided by Open WebUI:
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
 
+**Hidden models are still listed.** Hiding a model with **Hide** in **Admin Panel > Settings > Models** or in **Workspace > Models** only sets `info.meta.hidden` to `true`. The chat model selector leaves such models out, but `GET /api/models` returns them to every caller with access, and `/api/chat/completions` still answers requests for them. To keep a model away from API users, remove their access to it instead. A script that should skip hidden models can drop entries where `info.meta.hidden` is `true`.
+
 ### Programmatic Model Management (Export / Import / Sync)
 
 Custom models are plain JSON, so you can manage them declaratively (in git, via scripts or from an AI agent) without the UI. These endpoints live under `/api/v1/models`:
@@ -84,6 +86,16 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models. A model on a Responses API connection also answers in Chat Completions format, streamed or not, with `finish_reason` set to `length` or `content_filter` when the reply was cut off.
+
+**Use this endpoint for workspace models.** Only `/api/chat/completions` (and its alias `/api/v1/chat/completions`) applies a workspace model in full: base model, system prompt, parameters, knowledge, tools and filters. The proxy routes under `/openai` skip most of that:
+
+| Route | Workspace model handling |
+| :--- | :--- |
+| `POST /api/chat/completions` | Base model, system prompt, parameters, knowledge, tools and filters all apply. |
+| `POST /openai/chat/completions` | Swaps in the base model and applies the workspace model's system prompt and parameters. Knowledge, tools and filters do not run. |
+| `POST /openai/responses` | Nothing applies. The `model` you send is forwarded to the provider as is, and a workspace model ID that no connection offers goes to the first OpenAI connection, which usually rejects it. |
+
+To use `/openai/responses`, send the provider's own model ID. On both `/openai` routes, a non-admin asking for a model that has no saved model record gets `403` with `Model not found`, unless [`BYPASS_MODEL_ACCESS_CONTROL`](/reference/env-configuration#bypass_model_access_control) is on.
 
 :::warning Reading `usage` from a reply that used tools
 
@@ -327,6 +339,22 @@ The count is obtained from the upstream provider behind the resolved connection,
 :::info Reported `input_tokens` are now real
 The Messages API previously always reported `input_tokens: 0` in the streaming `message_start` block. Input tokens are now counted up front and reported in both streaming and non-streaming responses. If counting fails the request still succeeds, so clients should treat the value as best-effort rather than guaranteed.
 :::
+
+### Image Generation and Editing
+
+- **Endpoints**: `POST /api/v1/images/generations` (body: `prompt`, optional `model`, `size`, `n`, `steps`, `negative_prompt`) and `POST /api/v1/images/edit` (body: `image` as one or more base64-encoded images or URLs, `prompt`, optional `model`, `size`, `n`, `negative_prompt`, `background`).
+- **Listing image models**: `GET /api/v1/images/models` returns the image models you can use. Each entry has an `id` of the form `<connection-id>:<model-id>`, the bare `model` ID, and `image_generation` and `image_edit` flags for what it can do.
+
+The `model` you send must be one of those image models, given as its `id` or its bare `model` ID, and it must be able to do the job: an edit needs a model with `image_edit` set. These routes do not fall back to another model. A model you cannot use, or one no connection offers, returns `400` with `Image model "<model>" was not found`. A model that cannot do the job returns `400` with `Image model "<model>" cannot be used for image generation` or `Image model "<model>" cannot be used for image edit`. Leave `model` out and the admin's default image model for that job runs, or else the first one you can use. With no usable model at all, the request fails with `400` and `[ERROR: No image model is available]` (`[ERROR: No image model that can edit images is available]` for edits).
+
+Image generation or image editing turned off by the admin, or a non-admin without the image generation permission, returns `403` with `You do not have permission to access this resource. Please contact your administrator for assistance.`
+
+```bash
+curl -X POST http://localhost:3000/api/v1/images/generations \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "gpt-image-2", "prompt": "A lighthouse at dusk"}'
+```
 
 ### `POST /api/v1/users/user/settings/update` patches, it does not replace
 
