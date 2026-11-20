@@ -127,6 +127,7 @@ Choose **Local Whisper** if:
 2. Verify the API Base URL is correct
 3. Check container logs for error messages
 4. If the API Base URL points to another OpenAI-compatible service, set **STT Model** to a model ID that service supports
+5. If the error names a `response_format`, see [OpenAI-compatible STT fails behind a proxy](/troubleshooting/audio#openai-compatible-stt-fails-behind-a-proxy)
 
 ### Language Issues
 
