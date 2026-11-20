@@ -76,4 +76,8 @@ Admins can require users to **confirm before a web search runs**, so a query is 
 The text goes in **Web Search Confirmation Content**, which shows below the switch while it is on. Users see it in a `Use Web Search?` dialog with **Continue** and **Cancel** when they turn on **Web Search** in the chat input, and when they send a message while web search is on and not yet confirmed. With the field empty, the dialog shows `Your query will be sent to the configured web search provider.` One confirmation covers the rest of the chat. Starting a new chat or turning web search off asks again. The check runs in the chat interface only, so requests sent straight to the API are not held for confirmation.
 :::
 
+:::info Web search runs with the chat toggle off
+**Web Search in Chat** in **Settings → Interface** switches between **Default** and **Always**. With **Always**, every message uses web search, even after you turn off **Web Search** in the chat input. The only exception is a selected model whose **Web Search** capability is off. To turn web search on and off per chat, set **Web Search in Chat** back to **Default**.
+:::
+
 <DocCardList />
