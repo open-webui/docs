@@ -382,6 +382,10 @@ If PDFs containing images with text are returning empty content:
 
 **The Problem**: The default "pypdf" content extractor may struggle with certain PDF formats, especially those containing primarily image-based content.
 
+The default extractor reads only the text layer of each page. **PDF Extract Images (OCR)** is off by default, so scanned pages produce no text. If every page is empty, the upload fails with `The content provided is empty. Please ensure that there is text or data present before proceeding.` If at least one page has text, the upload succeeds and the scanned pages are missing from search results without any error.
+
+With **PDF Extract Images (OCR)** on, an image the default extractor cannot decode is skipped, and the server log shows `Skipping unreadable PDF image` followed by the image name and the error. The rest of the file is still processed. For scanned PDFs that hit this, switch to a content extraction engine with its own OCR.
+
 **Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
@@ -508,6 +512,18 @@ Attaching one file with `#` retrieves nothing, while attaching the knowledge bas
 
 1. **Re-index** at **Settings > Documents > Reindex Knowledge and Memory Vectors** (admin section). This rebuilds each knowledge base, the per-file index of every file inside it and every user's memories. It extracts and re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
 2. **Re-upload the file** if it is not in any knowledge base, since re-indexing only covers knowledge bases.
+
+### 16. Text in an Attached Image Is Not Read
+
+An image attached in a chat is sent to the model as an image. It never goes through the content extraction engine, so no OCR runs on it, whichever engine is set in **Settings > Documents** (admin section). Only a vision model can read it.
+
+- If every selected model has the **Vision** capability turned off, Open WebUI refuses the image with `Selected model(s) do not support image inputs`.
+- A model with no capabilities set counts as vision capable, so the image is sent. A model server that cannot take images then returns its own error, for example `Multimodal data provided, but model does not support multimodal requests.` That text comes from the model server, not from Open WebUI.
+
+**Solutions:**
+
+1. **Use a vision model** for chats with images, and turn off **Vision** in **Settings > Models > Edit** (admin section) for models that cannot take images, so users get the Open WebUI message instead of a model server error.
+2. **Extract the text with OCR** by uploading the image to a knowledge base. This needs **Content Extraction Engine** in **Settings > Documents** (admin section) set to an engine other than **Default**, and **Supported Media MIME Types** listing the image type, for example `image/*`. The **External** engine also accepts images while that field has never been set. Otherwise the upload shows the warning `File type image/png is not supported for processing`, with the image's own type.
 
 ---
 
