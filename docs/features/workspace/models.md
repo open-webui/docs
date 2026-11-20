@@ -392,7 +392,7 @@ The **Model Defaults** panel at the top of the same page is a different feature:
 The change is saved immediately, no separate save step, and the row picks up a **Selected** or **Pinned** label next to the model name. Repeat on as many models as you want. To take one back out, open the same menu and choose **Remove Selected Model** or **Remove Pinned Model**.
 
 :::tip Faster toggling
-Hold **Shift** while the model list is open and every row exposes inline icon buttons for the same actions: the eye toggles visibility, the check toggles Selected, the pin toggles Pinned, the globe or lock toggles public access, and the pencil opens the model. A model that is already pinned shows a crossed-out pin, because clicking it removes the pin. Releasing Shift hides the icons again. While a button or link you reached with `Tab` has focus, holding Shift does not show the icons, so `Shift+Tab` moves back through the list as usual.
+Hold **Shift** while the model list is open and every row exposes inline icon buttons for the same actions: the eye toggles visibility, the check toggles Selected, the pin toggles Pinned, the globe or lock toggles public access, and the pencil opens the model. A model that is already pinned shows a crossed-out pin, because clicking it removes the pin. Releasing Shift hides the icons again. While a button or link you reached with `Tab` has focus, holding Shift does not show the inline quick-action icons, so `Shift+Tab` moves back through the list as usual.
 
 ![Inline quick-action icons revealed by holding Shift](/images/features/models/model-quick-actions.png)
 :::
