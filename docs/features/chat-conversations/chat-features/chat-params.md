@@ -79,6 +79,30 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 :::
 
+## Ollama Parameters in Advanced Params
+
+**Advanced Params** also lists parameters named after Ollama's own options. Each one starts at **Default**, which sends nothing. Clicking **Default** switches the row to **Custom** and fills in the starting value below, which is then sent with every request until you click **Custom** again.
+
+For a model from an Ollama connection, Open WebUI puts each of these into the request's `options` under the same name. For a model from an OpenAI-compatible connection, it sends them as top-level fields of the request body under the same name, and the provider decides whether to use or reject them.
+
+| Parameter | Sent to Ollama as | Starting value | Slider range | What it controls |
+| --- | --- | --- | --- | --- |
+| **mirostat** | `options.mirostat` | `0` | 0 to 2 | Turns on Mirostat sampling (`1` or `2`), for controlling perplexity. `0` leaves it off. |
+| **mirostat_eta** | `options.mirostat_eta` | `0.1` | 0 to 1 | How fast Mirostat reacts to the text generated so far. |
+| **mirostat_tau** | `options.mirostat_tau` | `5` | 0 to 10 | The balance between coherent and diverse output under Mirostat. Lower is more focused. |
+| **repeat_last_n** | `options.repeat_last_n` | `64` | -1 to 128 | How many recent tokens the repetition penalty looks back over. |
+| **tfs_z** | `options.tfs_z` | `1` | 0 to 2 | Tail free sampling. `1` leaves it off, higher values cut more low-probability tokens. |
+| **repeat_penalty** | `options.repeat_penalty` | `1.1` | -2 to 2 | How strongly repeated tokens are penalized. `1` leaves it off. |
+| **use_mmap** | `options.use_mmap` | Enabled | on or off | Whether the model file is memory-mapped when loaded. |
+| **use_mlock** | `options.use_mlock` | Enabled | on or off | Whether the model's memory is locked in RAM so it is not swapped to disk. |
+| **num_keep (Ollama)** | `options.num_keep` | `24` | -1 to 10240000 | How many tokens are kept when the context is refreshed. |
+| **num_batch (Ollama)** | `options.num_batch` | `512` | 256 to 8192 | How many tokens are processed together per batch. Higher needs more memory. |
+| **num_gpu (Ollama)** | `options.num_gpu` | `0` | 0 to 256 | How many model layers are offloaded to the GPU. |
+
+For what each option does on your Ollama version, see Ollama's [Modelfile parameters](https://docs.ollama.com/modelfile#valid-parameters-and-values) and the "Generate request (With options)" example in its [API reference](https://github.com/ollama/ollama/blob/main/docs/api.md). Neither page lists every option above.
+
+**use_mmap**, **use_mlock**, **num_thread (Ollama)**, **num_gpu (Ollama)** and **keep_alive (Ollama)** appear in **Settings > General** and in a chat's **Controls** only for admin accounts. The model editor in **Workspace > Models** and the admin [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) always show them. A value set at any level follows the [parameter precedence](#3-per-model-basis) described above.
+
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 
 :::tip
