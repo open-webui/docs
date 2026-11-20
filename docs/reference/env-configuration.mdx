@@ -47,10 +47,10 @@ Set `ENABLE_PERSISTENT_CONFIG=False` in your environment. This forces Open WebUI
 The simplest and safest way to change `ConfigVar` settings is directly through the **Admin Panel** within Open WebUI. Even if an environment variable is set, changes made in the UI will take precedence and be saved to the database.
 
 #### Option 3: Manual Database Update (Last Resort / Lock-out Recovery)
-If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker:
+If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker. The image has no `sqlite3` command, so this uses the SQLite shell built into Python:
 
 ```bash
-docker exec -it open-webui sqlite3 /app/backend/data/webui.db "UPDATE config SET value = json('true') WHERE key = 'ui.enable_signup';"
+docker exec -it open-webui python3 -m sqlite3 /app/backend/data/webui.db "UPDATE config SET value = json('true') WHERE key = 'ui.enable_signup';"
 ```
 *(Each setting is its own row, stored under an internal key that differs from the environment variable name. List the keys with `SELECT key FROM config;`, then replace `ui.enable_signup` and `true` with the setting and value needed.)*
 

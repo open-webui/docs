@@ -39,6 +39,8 @@ ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
 ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
 ```
 
+The `-ollama` images install Ollama when the image is built. The bundled Ollama changes only when you pull a newer Open WebUI image, and a pinned `vX.Y.Z-ollama` tag keeps the Ollama version it was built with. To update Ollama on its own schedule, run it as a separate container, as shown in [Ollama's Docker guide](https://docs.ollama.com/docker).
+
 Browse all available tags on the [GitHub releases page](https://github.com/open-webui/open-webui/releases).
 
 ---
@@ -94,7 +96,7 @@ docker run -d -p 3000:8080 \
   ghcr.io/open-webui/open-webui:main
 ```
 
-For NVIDIA GPU support, add `--gpus all` to the `docker run` command.
+For NVIDIA GPU support, add `--gpus all` to the `docker run` command and use the `:cuda` tag. Pull the same tag you run, in step 2 and step 3: a container started from `:cuda`, `:ollama` or a version tag starts its old version again after a pull of `:main`.
 
   </TabItem>
   <TabItem value="docker-compose" label="Docker Compose">
