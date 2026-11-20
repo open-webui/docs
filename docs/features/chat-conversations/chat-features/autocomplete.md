@@ -38,7 +38,7 @@ Admins control whether the autocomplete feature is available on the server.
 ### 1. Configuring Autocomplete (Global)
 
 **Admin Panel Settings:**
-Go to **Settings > Interface > Task Model** (admin section) and toggle **Autocomplete Generation**.
+Go to **Settings > Interface** (admin section) and toggle **Autocomplete Generation** under **Generation**.
 
 ### 2. User Configuration (Personal)
 
