@@ -47,6 +47,12 @@ With the default **Content Extraction Engine**, **PDF Loader Mode** in **Setting
 
 Pick **Single** when sentences or tables often continue onto the next page and you can do without page numbers in citations. The mode applies when a file is extracted. Files already in a knowledge base change only after **Reindex Knowledge and Memory Vectors** in the same settings page, which extracts them again.
 
+## Files Without a Dedicated Loader
+
+With the default **Content Extraction Engine**, a file whose extension has no loader of its own is read as plain text. Source code and configuration files, such as `.py`, `.js`, `.ts`, `.go`, `.sql`, `.json`, `.yaml` or `.toml`, work in RAG this way. A binary format with no loader, such as `.ods` or `.odp`, is read the same way and produces unreadable text instead of an error, so retrieval returns noise from it. On the slim image such a file fails with `This file type requires an external document extractor in slim. Configure one that supports it.` instead.
+
+To accept only the formats you know extract well, list them without the leading dot in **Allowed File Extensions** in **Settings > Documents** (admin section), or in [`RAG_ALLOWED_FILE_EXTENSIONS`](/reference/env-configuration#rag_allowed_file_extensions). Uploads with any other extension then fail with `File type <extension> is not allowed`.
+
 ## Available Extraction Methods
 
 Open WebUI supports multiple document extraction engines to accommodate different needs and document types. Each extraction method has its own strengths and is suitable for different scenarios.

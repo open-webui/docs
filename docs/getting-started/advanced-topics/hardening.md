@@ -630,7 +630,7 @@ RAG_FILE_MAX_SIZE=50
 RAG_FILE_MAX_COUNT=10
 
 # Restrict allowed file extensions (empty = all allowed)
-RAG_ALLOWED_FILE_EXTENSIONS=.pdf,.txt,.md,.docx,.csv
+RAG_ALLOWED_FILE_EXTENSIONS=pdf,txt,md,docx,csv
 ```
 
 ---
