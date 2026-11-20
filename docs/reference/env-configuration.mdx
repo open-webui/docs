@@ -64,6 +64,22 @@ If you are performing a clean installation and want to ensure all environment va
 **Warning:** Removing the volume will delete all user data, including chats and accounts.
 :::
 
+### `.env` File Ignored by pip, uv and Conda Installs
+
+An Open WebUI installed with pip, uv or Conda does not read a `.env` file from the folder you start `open-webui serve` in. It loads only the `.env` in the folder that holds the environment's `site-packages`: `<env>/lib/python3.12/` on Linux and macOS with Python 3.12, `<env>\Lib\` on Windows (the [Python install layout](https://docs.python.org/3/library/sysconfig.html#installation-paths)). The startup log does not say which `.env` file it read. To print the exact path, run this in the activated environment:
+
+```bash
+python -c "import open_webui, pathlib; print(pathlib.Path(open_webui.__file__).resolve().parents[2] / '.env')"
+```
+
+Set your variables in one of these ways:
+
+- Export them in the shell, or set them in the service unit that starts Open WebUI.
+- Set them on the command line: `DATA_DIR=~/.open-webui open-webui serve` on Linux and macOS, `$env:DATA_DIR="C:\open-webui\data"; open-webui serve` in PowerShell.
+- Put the `.env` file at the printed path. A variable already set in the shell takes precedence over the same variable in the file. With `uvx`, the environment sits in the uv cache that `uv cache clean` removes, so use the shell instead.
+
+`open-webui serve` reads `WEBUI_SECRET_KEY` before it loads the `.env` file, so a key set only in the file is not used. Set it in the shell, or let the command keep its `.webui_secret_key` file in the folder you start from.
+
 ## App/Backend
 
 The following environment variables are used by `backend/open_webui/config.py` to provide Open WebUI startup
