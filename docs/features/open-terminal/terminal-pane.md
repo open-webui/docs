@@ -18,8 +18,7 @@ Every command the AI runs appears as its own tab, labelled with the command itse
 | Dot | Meaning |
 | :--- | :--- |
 | Green | Still running |
-| Red | Finished with a non-zero exit code |
-| Grey | Finished normally, or the terminal no longer knows about it |
+| Grey | Finished, whatever the exit code, or the terminal no longer knows about it |
 
 Hovering a tab spells the same thing out in words, including the exit code. Select a tab to watch that command's output as it arrives. A command that has produced more output than the pane keeps starts with a line saying earlier output was omitted.
 
