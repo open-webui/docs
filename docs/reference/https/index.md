@@ -13,6 +13,8 @@ HTTPS encrypts all traffic between users and Open WebUI, protecting chat history
 Modern browsers block microphone access on non-HTTPS origins. **Voice Calls will not work** over plain `http://` unless you are on `localhost`.
 :::
 
+The `{{CLIPBOARD}}` and `{{USER_LOCATION}}` [prompt variables](/features/workspace/prompts#system-variables) also need a secure context. Over plain `http://` on any address other than `localhost`, Open WebUI shows `Failed to read clipboard contents` or `Location access not allowed`. `{{CLIPBOARD}}` then stays in the prompt as written, and `{{USER_LOCATION}}` becomes `LOCATION_UNKNOWN`. Copy buttons switch to a fallback when the browser's clipboard API is unavailable, so copying works without HTTPS.
+
 ---
 
 ## Choose your approach
