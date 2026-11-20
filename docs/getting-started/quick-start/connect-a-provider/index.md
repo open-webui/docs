@@ -84,7 +84,7 @@ The other settings in the dialog:
 | **API Type** | **Chat Completions** is the default. **Responses** switches the connection to the Responses API. |
 | **Forward cookies** | Sends the cookies of the Open WebUI request on to this server. |
 | **Headers** | Extra request headers in JSON format. |
-| **Prefix ID** | Adds a prefix to every model ID of this connection, so two connections that offer the same model name stay apart. |
+| **Prefix ID** | Adds a prefix and a dot to the ID and the display name of every model of this connection, for example `work.gpt-5.6`, so two connections that offer the same model stay apart. A name saved for the model in **Settings > Models** (admin section) replaces the prefixed name. |
 | **Model IDs** | A list of the models to show. Leave it empty to show every model the server reports. |
 
 ---

@@ -88,7 +88,7 @@ The editor saves with **Save & Update** (**Save & Create** for a new model). Whe
 | :--- | :--- |
 | **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
 | **Background** | An image shown in the editor's banner and behind the chat whenever this model is in use. Hover the banner and use **Add background**, **Change** or **Remove**. It has to be uploaded here, since only a file held by this instance is accepted: an external URL or a pasted data URI is refused outright. PNG, JPEG, WebP or GIF, at most 5 MiB and 25 megapixels |
-| **Name and ID** | Display name and unique identifier. An ID holds no spaces or tabs and is at most 256 characters |
+| **Name and ID** | Display name and unique identifier. An ID holds no whitespace (spaces, tabs or line breaks) and is at most 256 characters. The editor refuses whitespace with `Model ID cannot contain whitespace.`, and the API refuses both cases with `The model id is too long. Please make sure your model id is less than 256 characters long.` Import skips any model whose ID breaks these rules. On a new model the ID is filled from the name: lowercase, spaces turned into hyphens, other characters outside a to z, 0 to 9 and hyphens removed. Editing the name rewrites the ID, so change the ID last. The ID cannot be changed after the model is saved |
 | **Base Model (From)** | The actual model that powers this agent. Admins can pick hidden models here. Other users see them in this list only with the [**Hidden Models**](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission, which is off by default. Hidden models still stay out of their chat model selector. The permission changes only this list, not who can use a hidden model |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
@@ -293,7 +293,7 @@ The same actions are available over the API, each taking the model ID as `?id=`:
 
 Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Models** (admin section) alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **"Model not found"**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
 
-**Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it.
+**Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it. A hidden model still comes back from `/api/models` with `info.meta.hidden` set to `true`, and still answers API requests that name it.
 
 ### Import and export
 
@@ -357,6 +357,8 @@ Each model's ellipsis (**...**) menu starts with one of two actions, and both as
 
 Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Drag-to-reorder works in a filtered view too: the model you move lands next to the visible model you dropped it by, and every model the filter hides keeps its place.
 
+Each row shows **Public**, **Shared** or **Private** next to the model name. **Public** means every user has read access. **Shared** means specific users or groups have access. **Private** means the model has no access grants. **Make Public** and **Make Private** in the row's ellipsis (**...**) menu switch this without opening the model. **Make Private** removes every access grant, group and user shares included, not only public access. **Make Public** on a base model that has no saved settings saves an entry for it. The **Private** filter lists shared models too.
+
 ---
 
 ## Selected and Pinned Models (Admin)
@@ -412,6 +414,8 @@ Steps 3 to 5 also pick the starting model in Notes and the Playground.
 
 Models that have been hidden or removed are dropped at every step, so a user whose last-used model disappeared lands on a working one instead of an empty selector.
 
+Opening an existing chat follows the same rule. The chat's models that were removed, or that the user can no longer access, are dropped from the selector. If none are left, the chat falls back through steps 3 to 6: the user's own default model, then the group default models or the **Selected Models**, then the first available model. A model that was only hidden stays selected in that chat.
+
 **Pinned Models** work differently: they seed the user's sidebar shortcuts once, only when the user has no pinned models of their own. From then on the user's own pins win, and pins pointing at hidden or deleted models are cleaned up automatically.
 
 :::warning Selected is a starting point, not a restriction
@@ -459,6 +463,8 @@ Before picking an approach, understand the one rule that governs all of this.
 Every model you create under **Workspace > Models** is a *workspace model*: it points at a base model and stores a reference to it, rather than being a standalone copy of that base. Creating one never produces a second, independent base model. It always sits on top of an existing base.
 
 When a user runs a workspace model, Open WebUI checks access to **both** the workspace model **and** its underlying base model. If the user cannot access the base model, the request fails with **"Model not found"**, even when the workspace model itself is shared publicly with them.
+
+A base model counts as accessible to a non-admin only when it has a saved entry in **Settings > Models** (admin section). A base model that comes straight from a connection and was never saved there is admin-only. A workspace model built on it works for admins and still shows in other users' model selector, but fails for them with **"Model not found"**. The server log names the cause as `reason=base_model_unregistered`, or `reason=base_model_read_denied` when the base model has an entry the user cannot read. To fix it, choose **Make Public** in the base model's ellipsis (**...**) menu in **Settings > Models** (admin section). This saves an entry for the base model and gives every user read access. To limit it to some groups instead, change its **Access** afterward. Then **Hide** it if users should not pick it directly, as described below.
 
 This is by design. Without it, anyone could bypass a base model's access control by building a workspace model on a restricted base and sharing that wrapper publicly. A shared wrapper can never grant access that the base model withholds.
 
