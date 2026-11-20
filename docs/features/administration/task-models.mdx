@@ -86,4 +86,8 @@ Autocomplete is the first thing to turn off. It fires as users type, so a slow t
 
 Most tasks' prompts sit under **Generation**, each empty by default, meaning the built-in prompt is used. Retrieval and web search share one **Query Generation Prompt**, the **Image Prompt Generation Prompt** sits under Generation while its toggle is on the Images tab, and the **Context Compaction Prompt** is under **Chat**. The [Tasks section of the environment configuration reference](/reference/env-configuration#tasks) has the full text of each built-in prompt and the placeholders it accepts.
 
+A prompt saved in one of these fields is sent as is, and the built-in prompt is used only while the field is empty. Upgrading Open WebUI does not touch a saved prompt, so an instance that saved its own text, or set it through the matching environment variable such as `TITLE_GENERATION_PROMPT_TEMPLATE`, keeps sending that text after the built-in prompt changes.
+
+For titles this shows up as wrong chat names. Open WebUI reads the title from a JSON object such as `{ "title": "Stock Trends" }` in the task model's reply. When the reply has no such object, the chat is named after its first message, in full. If titles come out as the whole first message while **Title Generation Prompt** holds text, clear that field and click **Save** to go back to the built-in prompt, or rewrite your prompt to ask for that JSON object.
+
 [Prompt modifiers](/features/workspace/prompts) are worth knowing about here, since task prompts often have to cope with pasted documents and long code blocks.

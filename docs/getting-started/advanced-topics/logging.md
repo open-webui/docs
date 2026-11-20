@@ -70,6 +70,21 @@ Raising the level saves work as well as log volume, because a message the level 
 
 ---
 
+### Turning Off Access Logs
+
+Each HTTP request writes an access line from uvicorn's `uvicorn.access` logger at `INFO`. At startup Open WebUI takes over every logger named in `AUDIT_UVICORN_LOGGER_NAMES`, `uvicorn.access` by default: it replaces the logger's handlers with its own and sets its level to `GLOBAL_LOG_LEVEL`. That is why `UVICORN_ACCESS_LOG=false` on its own leaves the access lines in place.
+
+In the Docker image, which starts uvicorn from the command line, drop the access lines and keep `GLOBAL_LOG_LEVEL=INFO` by setting both:
+
+```bash
+UVICORN_ACCESS_LOG=false
+AUDIT_UVICORN_LOGGER_NAMES=
+```
+
+The empty `AUDIT_UVICORN_LOGGER_NAMES` stops the takeover, so uvicorn's own switch applies. `open-webui serve` starts uvicorn from Python and does not read `UVICORN_ACCESS_LOG`, so there the access lines follow `GLOBAL_LOG_LEVEL` and only a level above `INFO`, such as `WARNING`, hides them. The [audit log](/getting-started/advanced-topics/hardening#audit-logging) is written by Open WebUI itself, not by `uvicorn.access`, so it keeps working.
+
+---
+
 ### Structured JSON Logging
 
 For production environments using log aggregators, set `LOG_FORMAT=json` to switch all stdout output to single-line JSON objects.
