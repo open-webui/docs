@@ -184,8 +184,13 @@ If an OAuth 2.1 tool is set as a default and the user hasn't previously authenti
 
 ### Connection URLs
 
+The Open WebUI backend opens the connection, so the URL must be reachable from the backend, not from your browser. The URL must point at the server's Streamable HTTP endpoint. An SSE endpoint does not work, see [An SSE URL does not connect](#an-sse-url-does-not-connect).
+
 If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
-*   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/sse`) instead of `localhost`.
+*   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/mcp`) instead of `localhost`.
+
+If your MCP server runs in **another container on the same Docker network** as Open WebUI:
+*   Use the container's service name and the port the server listens on inside its container (e.g., `http://mcp-server:8000/mcp`). `localhost` and the port published on the host do not reach it from inside the Open WebUI container. See Docker's [Networking in Compose](https://docs.docker.com/compose/how-tos/networking/).
 
 ### Custom Headers
 
@@ -260,6 +265,18 @@ The server log records each failure at error level as `Failed to connect to MCP 
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
 4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, connecting, listing its tools or reading a resource can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds). Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server) instead.
+
+### An SSE URL does not connect
+
+**Symptom**:
+A connection whose URL points at a server's SSE endpoint, usually a URL ending in `/sse`, fails. The chat shows "Failed to connect to MCP server".
+
+**Cause**:
+Open WebUI connects to MCP servers over Streamable HTTP only. It never opens an SSE connection, so an SSE endpoint cannot answer its requests.
+
+**Solutions**:
+1.  **Use the Streamable HTTP path**: If the server also offers Streamable HTTP, enter that endpoint as the **URL**. The server's documentation names the path.
+2.  **Bridge SSE with mcpo**: If the server offers SSE only, run it behind [mcpo](https://github.com/open-webui/mcpo), for example `mcpo --port 8000 --server-type "sse" -- http://127.0.0.1:8001/sse`, and add the mcpo URL as an **OpenAPI** connection. See [MCP Support](/features/extensibility/plugin/tools/openapi-servers/mcp).
 
 ### "Maximum tools limit reached"
 
