@@ -703,6 +703,12 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 - Default: `True`
 - Description: Controls whether the admin-panel **Analytics** tab is visible and the analytics API router is mounted. When set to `False`, the tab is hidden and the corresponding endpoints are not registered. Disabling does not stop the underlying data being collected, and admin retains the ability to query that data directly from the database; this toggle controls the in-product surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
+#### `TZ`
+
+- Type: `str`
+- Default: Not set (the server's system time zone)
+- Description: Sets the time zone Open WebUI uses to split the usage chart in the admin **Analytics** tab into intervals, including the **Daily** interval. A day in the chart runs from midnight to midnight in the Open WebUI server's time zone, not in the viewer's browser time zone and not in the database server's time zone. Set it to an IANA zone name, such as `America/New_York`, to move the day boundaries to your own day. On PostgreSQL the daily totals are computed in the database in this zone. When `TZ` is not set, Open WebUI uses the zone that `/etc/localtime` points to, or UTC when the system has no UTC offset and no daylight saving time. If the zone found this way is not a valid IANA zone name, the daily totals are computed in Open WebUI with the server's local time instead.
+
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`
@@ -1362,7 +1368,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `uvicorn.access`
-- Description: Comma-separated list of logger names to capture for audit logging. Defaults to Uvicorn's access logger.
+- Description: Comma-separated list of Python logger names whose output Open WebUI takes over. Despite the name, it has nothing to do with the audit log: Open WebUI replaces each named logger's handlers with its own, sets the logger's level to [`GLOBAL_LOG_LEVEL`](#global_log_level), and writes its lines to stdout in the Open WebUI log format (see [`LOG_FORMAT`](#log_format)). Audit entries come only from the audit middleware, so these lines never reach the file at `AUDIT_LOGS_FILE_PATH`. The default covers Uvicorn's access log. Names are not trimmed, so do not put spaces after the commas. An empty value names no Uvicorn logger, and Open WebUI then leaves `uvicorn.access` as Uvicorn set it up.
 
 #### `AUDIT_LOG_LEVEL`
 
@@ -7053,11 +7059,11 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 :::
 
-#### `OAUTH_GROUP_CLAIM`
+#### `OAUTH_GROUPS_CLAIM`
 
 - Type: `str`
 - Default: `groups`
-- Description: Specifies the group claim for OAuth authentication. `OAUTH_GROUPS_CLAIM` is read as well and wins when both are set. The admin UI field and the persisted key keep the singular name.
+- Description: Specifies the group claim for OAuth authentication. This is the current name. The older `OAUTH_GROUP_CLAIM` is still read as a fallback when `OAUTH_GROUPS_CLAIM` is not set, and `OAUTH_GROUPS_CLAIM` wins when both are set. The admin config API field keeps the singular name `OAUTH_GROUP_CLAIM`, and the database stores the value under the key `oauth.group_claim`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_ROLE_MANAGEMENT`
