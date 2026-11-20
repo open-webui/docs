@@ -142,7 +142,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   </TabItem>
   <TabItem value="mistral" label="Mistral">
 
-  **Mistral AI** is fully OpenAI-compatible with working `/models` auto-detection.
+  **Mistral AI** offers an OpenAI-compatible API with working `/models` auto-detection. Reasoning replies are the exception, covered below.
 
   | Setting | Value |
   |---|---|
@@ -152,6 +152,10 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::caution No more `-latest` aliases
   Mistral no longer publishes `-latest` alias names such as `mistral-large-latest`. Use the dated model IDs from the [Mistral models overview](https://docs.mistral.ai/getting-started/models/models_overview/).
+  :::
+
+  :::caution Reasoning replies show raw `thinking` parts
+  With reasoning on, Mistral returns the reply `content` as a list of parts instead of text ([Mistral reasoning docs](https://docs.mistral.ai/inference/conversations/reasoning)). Open WebUI turns any `content` that is not text into text, so the chat shows the raw list, starting with `[{'type': 'thinking'`, instead of a thinking block. One option is to turn reasoning off for the model: under **Advanced Params**, switch **Reasoning Effort** to **Custom** and enter `none`. Mistral then returns plain text, without the reasoning.
   :::
 
   </TabItem>
