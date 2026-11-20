@@ -37,7 +37,7 @@ PUT {EXTERNAL_DOCUMENT_LOADER_URL}/process
 - **`Content-Type`**: the file's detected MIME type.
 - **`Authorization`**: `Bearer {EXTERNAL_DOCUMENT_LOADER_API_KEY}`, if an API key is configured.
 - **`X-Filename`**: the stored filename, `<file id>_<original name>`, URL-encoded. Use the `{{FILE_NAME}}` placeholder in a custom header to receive the original name on its own.
-- Any headers set in **Headers** / [`EXTERNAL_DOCUMENT_LOADER_HEADERS`](/reference/env-configuration#external_document_loader_headers), a JSON object of custom headers with placeholder templating: `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}`, `{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{USER_GROUPS}}`, `{{USER_GROUP_IDS}}`.
+- Any headers set in **Headers** / [`EXTERNAL_DOCUMENT_LOADER_HEADERS`](/reference/env-configuration#external_document_loader_headers), a JSON object of custom headers with placeholder templating: `{{FILE_ID}}`, `{{FILE_NAME}}`, `{{FILE_CONTENT_TYPE}}`, `{{USER_ID}}`, `{{USER_NAME}}`, `{{USER_EMAIL}}`, `{{USER_ROLE}}`, `{{USER_GROUPS}}`, `{{USER_GROUP_IDS}}`. The **Header variables** hint under the field lists only the three file placeholders, but the user placeholders are filled in as well. `{{USER_GROUPS}}` and `{{USER_GROUP_IDS}}` are comma-separated lists of the user's group names and IDs.
 - User identity, forwarded automatically: a signed JWT in `X-OpenWebUI-User-Jwt` if [`FORWARD_USER_INFO_HEADER_JWT_SECRET`](/reference/env-configuration#forward_user_info_header_jwt_secret) is set, otherwise plain `X-OpenWebUI-User-Name`, `X-OpenWebUI-User-Id`, `X-OpenWebUI-User-Email`, and `X-OpenWebUI-User-Role` headers.
 
 Your service replies `2xx` with a JSON body, either a single object or a list of objects:

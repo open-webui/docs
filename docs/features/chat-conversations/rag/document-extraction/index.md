@@ -35,6 +35,18 @@ An uploaded image or video is stored as-is for vision models to look at instead 
 
 :::
 
+## PDF Loader Mode
+
+With the default **Content Extraction Engine**, **PDF Loader Mode** in **Settings > Documents** (admin section), or [`PDF_LOADER_MODE`](/reference/env-configuration#pdf_loader_mode), decides how a PDF's pages are turned into text before chunking. Other engines ignore it.
+
+| | **Page** (default) | **Single** |
+| --- | --- | --- |
+| Text | One document per page | All pages joined into one document |
+| Chunks | Never span a page break | Can run across page breaks |
+| Citations | Show `(page N)` and open the PDF at that page | Show no page number |
+
+Pick **Single** when sentences or tables often continue onto the next page and you can do without page numbers in citations. The mode applies when a file is extracted. Files already in a knowledge base change only after **Reindex Knowledge and Memory Vectors** in the same settings page, which extracts them again.
+
 ## Available Extraction Methods
 
 Open WebUI supports multiple document extraction engines to accommodate different needs and document types. Each extraction method has its own strengths and is suitable for different scenarios.
