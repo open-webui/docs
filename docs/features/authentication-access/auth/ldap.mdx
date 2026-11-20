@@ -152,7 +152,7 @@ Alternatively, you can configure these settings directly in the UI:
 1. Log in as an administrator.
 2. Open the **Admin Panel**, go to **Settings** > **Authentication**, and find the **LDAP** section.
 3. Turn on the **LDAP** switch.
-4. Fill in the fields corresponding to the environment variables above.
+4. Fill in the fields corresponding to the environment variables above. Each field's label is listed with its variable under [LDAP](/reference/env-configuration#ldap). Do not copy the **Search Filters** placeholder, `(&(objectClass=inetOrgPerson)(uid=%s))`: Open WebUI does not replace `%s`, so that filter finds no user and sign-in fails with `User not found in the LDAP server`.
 5. Save the settings. They apply to the next login attempt, with no restart.
 
 ## 5. Logging In
