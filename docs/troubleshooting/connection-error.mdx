@@ -86,6 +86,17 @@ If WebSockets are not working:
 
 For multi-instance deployments, set `WEBSOCKET_MANAGER=redis` as shown above. For detailed Redis setup instructions, see [Redis WebSocket Support](/tutorials/integrations/redis). For a complete multi-instance scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). If you're seeing WebSocket 403 errors specifically in a multi-replica setup, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures).
 
+### Works in One Browser but Not Another
+
+With `ENABLE_WEBSOCKET_SUPPORT=true`, the default, the browser connects to Open WebUI only over a WebSocket at `/ws/socket.io`, with no HTTP long-polling fallback. Open WebUI sends chat replies and status updates to the browser over that connection. A browser that blocks the WebSocket can fail at chat while other browsers on the same server work. Each failed attempt logs `connect_error` in that browser's console.
+
+Before you change the server or the proxy:
+
+1. Open Open WebUI in a private window of the failing browser.
+2. Open it in another browser.
+3. If chat works in either one, the server is fine. In the failing browser, turn off privacy shields, ad or tracker blockers and strict tracking protection for your Open WebUI address. Then clear the site data for that address and sign in again.
+4. If chat fails in every browser, go through the WebSocket checks above.
+
 ### Testing Your Configuration
 
 To verify your setup is working:
@@ -320,6 +331,34 @@ If every chat with an Ollama model fails with `registry.ollama.ai/library/<model
 1. **Set the model to Legacy.** In the model's **Advanced Params** in **Settings > Models** (admin section), set **Function Calling** to **Legacy**. Built-in tools are not sent in Legacy mode.
 2. **Turn off Builtin Tools on the model.** Disable the **Builtin Tools** capability in the model editor. Workspace tools or MCP tools you enable for a chat are still sent in Native mode and cause the same error.
 3. **Use a model that supports tool calling** if you want the built-in tools.
+
+### Chat Fails While Verify Connection Works {#ollama-model-fails-to-load}
+
+**Symptom:** **Verify Connection** shows **Server connection verified** and the Ollama models appear in the model list, but chats with a model end in an error.
+
+**Cause:** neither check runs a model. **Verify Connection** requests only `/api/version`, and the model list comes from `/api/tags`. Only the chat request, sent to `/api/chat`, asks Ollama to run the model. When Ollama answers with an error, Open WebUI shows Ollama's own error text in the chat message and logs it as `Error processing chat payload: <text>`. When Ollama's error carries no message, the chat shows `Open WebUI: Server Connection Error`.
+
+**Fix:**
+
+1. On the machine that runs Ollama, run the same model in a terminal with `ollama run <model>`. For an Ollama container named `ollama`, run `docker exec -it ollama ollama run <model>`. If it fails there too, the problem is in Ollama, not in the connection.
+2. Read Ollama's server log for the reason. [Ollama's troubleshooting page](https://github.com/ollama/ollama/blob/main/docs/troubleshooting.mdx) lists where the log is on each system, such as `journalctl -u ollama` on Linux with systemd and `docker logs <container-name>` for a container.
+3. If the error mentions memory, the model does not fit in the RAM or VRAM that is free. Try a smaller model or a smaller variant of it. `ollama ps` shows the loaded models and whether each runs on the GPU or the CPU ([Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-can-i-tell-if-my-model-was-loaded-onto-the-gpu)).
+
+## `Network Problem` When You Verify a Connection URL
+
+**Symptom:** **Verify Connection** on a connection in **Admin Panel > Settings > Connections** shows `Ollama: Network Problem` or `OpenAI: Network Problem`, and no models from that URL appear.
+
+**Cause:** Open WebUI does not check the format of the URL. It removes one trailing slash and appends a fixed path. To verify, it requests `<url>/api/version` for an Ollama connection and `<url>/models` for an OpenAI connection. Chats go to `<url>/api/chat` for Ollama and `<url>/chat/completions` for OpenAI. Azure and Anthropic URLs follow their own rules. Any failure of the Ollama check shows `Ollama: Network Problem`. A failed OpenAI check shows `OpenAI: Network Problem`, or `OpenAI:` followed by the provider's message when the provider answers with a JSON error.
+
+| You entered | What Open WebUI requests to verify | Enter instead |
+| :--- | :--- | :--- |
+| `192.168.1.5:11434` | Nothing: the request fails before it is sent, since the URL has no `http://` | `http://192.168.1.5:11434` |
+| `http://192.168.1.5` | Port `80`, the default for `http://` | `http://192.168.1.5:11434` |
+| `http://localhost:11434/api` | `http://localhost:11434/api/api/version` | `http://localhost:11434` |
+| `https://api.openai.com/v1/chat/completions` | `https://api.openai.com/v1/chat/completions/models` | `https://api.openai.com/v1` |
+| `https://api.openai.com` | `https://api.openai.com/models` | `https://api.openai.com/v1` |
+
+An Ollama URL is `http://host:port` with nothing after the port. An OpenAI-compatible URL is the base URL that comes before `/models` and `/chat/completions`. For most providers it ends in `/v1`, as in the suggestions the **URL** field offers.
 
 ## Intermittent Name Lookup Failures (Often Reported as "Model not found")
 
