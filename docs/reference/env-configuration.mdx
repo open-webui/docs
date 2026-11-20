@@ -933,7 +933,7 @@ With `*`, any client that reaches the backend directly can set its own address i
 
 - Type: `int`
 - Default: `1`
-- Description: Sets a system-wide minimum value for the number of tokens to batch together before sending them to the client during a streaming response. This allows an administrator to enforce a baseline level of performance and stability across the entire system by preventing excessively small chunk sizes that can cause high CPU load. The final chunk size used for a response will be the highest value set among this global variable, the model's advanced parameters, or the per-chat settings. The default is 1, which applies no minimum batching at the global level.
+- Description: Sets a system-wide minimum for how many streamed text updates are batched together before they are sent to the client. This lets an administrator prevent very small batches, which can cause high CPU load. A model's **Stream Delta Chunk Size** replaces the per-chat value, and the larger of this variable and that value is used. The default is 1, which applies no minimum batching at the global level. See [Replies Arrive in Bursts or Only When Finished](/troubleshooting/performance#replies-arrive-in-bursts-or-only-when-finished).
 
 #### `CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE`
 
