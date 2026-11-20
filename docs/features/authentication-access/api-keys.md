@@ -7,7 +7,7 @@ title: "API Keys"
 
 **Programmatic access to Open WebUI, for scripts, bots, and integrations.**
 
-An API key is a personal access token that lets external code call the same endpoints the web UI uses. Anything you can do in a browser - chat completions, model listing, file uploads, RAG queries - your scripts can do with a single `Authorization: Bearer` header. The key acts as the user who created it, so there is no separate permission model to learn.
+An API key is a personal access token that lets external code call the same endpoints the web UI uses. Anything you can do in a browser - chat completions, model listing, file uploads, RAG queries - your scripts can do with a single `Authorization: Bearer` header, except the few account-security endpoints listed under [Endpoints that need a signed-in session](#endpoints-that-need-a-signed-in-session). The key acts as the user who created it, so there is no separate permission model to learn.
 
 Each account has exactly **one** API key. Creating a key when you already have one replaces it, and the previous key stops working immediately.
 
@@ -193,6 +193,7 @@ Retiring an integration for good is a **Delete** rather than a rotation, since t
 - The global **API Keys** toggle may have been turned off, which invalidates existing keys
 - The key's owner may have lost the **API Keys** feature permission
 - If endpoint restrictions are enabled, confirm the route you are calling is in the allowlist
+- If the response body reads `A human session is required.`, the route does not accept API keys at all. See [Endpoints that need a signed-in session](#endpoints-that-need-a-signed-in-session)
 
 ---
 
@@ -205,6 +206,24 @@ An account holds a single unnamed key. There is no way to run two keys side by s
 ### No per-key permissions
 
 A key inherits the full permissions of the user who created it. You cannot restrict a key to a subset of its owner's permissions, and endpoint restrictions apply instance-wide rather than per key.
+
+### Endpoints that need a signed-in session
+
+These routes accept only the token of a browser sign-in. An API key gets `403` with `A human session is required.`, whatever the owner's role or permissions:
+
+| Route | What it does |
+|-------|--------------|
+| `GET /api/v1/auths/` | Returns the signed-in user with its token and sets the `token` cookie |
+| `GET /api/v1/auths/mfa/status` | Two-factor status |
+| `POST /api/v1/auths/mfa/replace` | Starts replacing a two-factor method |
+| `POST /api/v1/auths/mfa/recovery/codes` | Creates new recovery codes |
+| `GET /api/v1/auths/sessions` | Lists your persistent sessions for native clients |
+| `POST /api/v1/auths/sessions` | Creates a persistent session for a native client |
+| `GET /api/v1/auths/sessions/{session_id}/request` | Reads a pending sign-in request from a native client |
+| `POST /api/v1/auths/sessions/{session_id}/authorize` | Approves that sign-in request |
+| `DELETE /api/v1/auths/sessions/{session_id}` | Revokes a persistent session |
+
+To read the key owner's own account with an API key, call `GET /api/v1/users/user/status`. It returns the user record, including `id`, `name`, `email` and `role`, and answers `403` when user status is turned off with [`ENABLE_USER_STATUS`](/reference/env-configuration#enable_user_status). `GET /api/v1/users/permissions` returns the owner's permissions.
 
 ### No automatic expiration
 
