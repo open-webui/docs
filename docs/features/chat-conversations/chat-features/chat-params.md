@@ -118,6 +118,12 @@ For what each option does on your Ollama version, see Ollama's [Modelfile parame
 
 :::
 
+:::note Models that reject a system message
+
+Open WebUI sends a system prompt, whether it comes from the chat, your account, a folder or the model, as a `system` message at the start of the conversation. Some models have a chat template that accepts only alternating user and assistant turns, and the model server rejects the request with an error such as `Conversation roles must alternate user/assistant`. Use a model or chat template that accepts a system role, or clear the system prompt at every level for that model. Features that add their own instructions to the system message, such as voice mode, skills and the code interpreter, trigger the same error with such a model.
+
+:::
+
 ## Chat Variables
 
 Chat variables turn a model's system prompt into a short form. An administrator writes placeholders into the system prompt, and Open WebUI asks whoever opens a chat with that model to fill them in. The answers are saved on that chat and reused for every message in it.
