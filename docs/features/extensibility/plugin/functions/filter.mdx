@@ -272,7 +272,7 @@ The flag is read exclusively on the `inlet` pass, and the file references are st
 
 #### The recipe
 
-1. Set `file_handler = True` at the top of your filter module.
+1. Set `self.file_handler = True` in your filter's `__init__`, or declare it as a class attribute.
 2. In `inlet()`, read the file references from `body["metadata"]["files"]` (and `body["files"]` for ad-hoc attachments).
 3. Retrieve chunks yourself. Two options:
    - **HTTP**: call `POST /api/v1/retrieval/query/doc` (single collection) or `POST /api/v1/retrieval/query/collection` (multiple), passing the user's last message as the query string and the inbound request's bearer token so permissions stay scoped to the user.
