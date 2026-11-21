@@ -74,7 +74,7 @@ Type `$` in the chat input, or use the `/` menu, and pick a skill. With the [ski
 
 ### Per-chat skills
 
-The **+** menu > **Skills** turns skills on for the current chat. The list is grouped into **Workspace** and the selected terminal server, named after it, see [Skills from a terminal server](#skills-from-a-terminal-server). A badge shows how many are on. Selected skills load like skills mentioned with `$`.
+The **+** menu > **Skills** turns skills on for the current chat. The list is grouped into **Workspace** and the selected machine, named after it, see [Skills from a machine](#skills-from-a-terminal-server). A badge shows how many are on. Selected skills load like skills mentioned with `$`.
 
 ### Model-attached skills
 
@@ -117,9 +117,9 @@ Leave a field empty for the default, or set [`SKILL_CONTENT_MAX_CHARS`](/referen
 
 ### Skills from a terminal server
 
-A connected [Open Terminal](/features/open-terminal) server can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the terminal, and the model opens them with the terminal's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
+A connected [Open Terminal](/features/open-terminal) machine can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the machine, and the model opens them with the machine's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
 
-A terminal an admin configured is called by the Open WebUI server, with the connection's auth, `Accept: application/json`, `X-User-Id`, `X-Session-Id` (the chat id) and, for orchestrated terminals, the [`X-Terminal-*` headers](/features/open-terminal/terminals/orchestration/api-troubleshooting#headers-sent-to-the-terminals-server), the same identity headers as every other terminal call, so a server that scopes skills per user or per chat has what it needs. Redirects are not followed. A terminal a user added in the [Tether app](/ecosystem/tether#bring-your-own-models-and-tools) is called through Tether from the user's computer, so a terminal on that machine works with Open WebUI hosted elsewhere while Tether is connected.
+A machine an admin configured is called by the Open WebUI server, with the connection's auth, `Accept: application/json`, `X-User-Id`, `X-Session-Id` (the chat id) and, for orchestrated machines, the [`X-Terminal-*` headers](/features/open-terminal/terminals/orchestration/api-troubleshooting#headers-sent-to-the-terminals-server), the same identity headers as every other machine call, so a server that scopes skills per user or per chat has what it needs. Redirects are not followed. A machine a user added in the [Tether app](/ecosystem/tether#bring-your-own-models-and-tools) is called through Tether from the user's computer, so the machine behind it works with Open WebUI hosted elsewhere while Tether is connected.
 
 ---
 

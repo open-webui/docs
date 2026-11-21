@@ -719,7 +719,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
   Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
-  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers, Open Terminal connections, and arena models. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
+  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers, Open Terminal machines, and arena models. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
 
   This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`, switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
@@ -2023,11 +2023,11 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 ### Terminal Server
 
-#### `TERMINAL_SERVER_CONNECTIONS`
+#### `MACHINE_CONNECTIONS`
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). These are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Description: Specifies a JSON array of machine configurations. Each machine defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). These are admin-configured and proxied through Open WebUI, which means the machine URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
 - Example (direct Open Terminal connection):
 ```json
 [
@@ -2064,19 +2064,23 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 `config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
 
-`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+`config.chat_uploads` decides where a file attached in the chat input goes while this machine is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the machine's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the machine's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 `auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. An orchestrator connection needs `key` set to the orchestrator's `TERMINALS_API_KEY`.
 
 :::tip Helm chart auto-configuration
-When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
+When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, the connection is set automatically and points at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
 :::
 
 :::warning
 
-The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time as new features are added.
+The JSON data structure of `MACHINE_CONNECTIONS` might evolve over time as new features are added.
 
 :::
+
+#### `TERMINAL_SERVER_CONNECTIONS`
+
+Older name of [`MACHINE_CONNECTIONS`](#machine_connections).
 
 #### `TERMINAL_PROXY_HEADERS`
 
@@ -8946,7 +8950,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections, Tether terminals and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
+- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal machines, Tether machines and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
 - Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) and the code interpreter, since those are part of Open WebUI itself.
 - Note: this decides whether plugins and tool servers *run*. Some management endpoints stay reachable while it is off, for example deleting a tool or function and saving the tool server list, so treat it as an execution switch, and keep the permission to create Tools and Functions limited to people you trust.
 

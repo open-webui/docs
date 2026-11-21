@@ -141,7 +141,7 @@ Two kinds of resource share the same access control dropdown, and **Private** wi
 
 **Workspace items have an owner.** Every model, knowledge base, prompt, tool, skill, note, folder, and shared chat has an owner, the account that created it. Private with no grants means only the owner can see and use the item. Other admins are not let in on role alone: they see the item when `BYPASS_ADMIN_ACCESS_CONTROL` is on (the default) or when a grant names them or one of their groups. The **No access grants. Private to you.** message in the modal describes this case.
 
-**Admin-configured resources have no owner.** External tool servers, MCP servers, Open Terminal connections and arena models that an admin adds to the instance are instance configuration, added and edited only by admins. Private with no grants means admin-only: every admin can see and use the resource, and no regular user can, until you grant a group or a user. Turning `BYPASS_ADMIN_ACCESS_CONTROL` off does not change this, because there is no owner to fall back to.
+**Admin-configured resources have no owner.** External tool servers, MCP servers, machines and arena models that an admin adds to the instance are instance configuration, added and edited only by admins. Private with no grants means admin-only: every admin can see and use the resource, and no regular user can, until you grant a group or a user. Turning `BYPASS_ADMIN_ACCESS_CONTROL` off does not change this, because there is no owner to fall back to.
 
 ### Combining Public with the Access List
 

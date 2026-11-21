@@ -98,7 +98,7 @@ With proper `timeout` configuration, this number should fluctuate naturally (ris
 Open WebUI uses Redis as a **stateful store, not a disposable cache**. Its keys fall into two groups:
 
 - **TTL'd security keys**: token-revocation entries (`{prefix}:auth:token:<jti>:revoked`, set to expire exactly when the token would) and distributed locks (set with an expiry).
-- **Persistent operational keys**: the websocket **session** and **usage** pools (Redis hashes with no expiry) and the cached tool server and terminal server lists.
+- **Persistent operational keys**: the websocket **session** and **usage** pools (Redis hashes with no expiry) and the cached tool server and machine lists.
 
 Under an `allkeys-lru`, `allkeys-lfu`, or `allkeys-random` policy, Redis evicts **any** key when memory fills, including the two groups above. That can:
 
@@ -111,7 +111,7 @@ Use **`noeviction`** (the safe default). When memory is exhausted, Redis rejects
 maxmemory-policy noeviction
 ```
 
-Open WebUI's Redis working set is small (websocket pools, revocations, locks, tasks, rate limits, model caches, collaborative-note documents and cached tool/terminal server lists), so with `maxmemory` left unset Redis simply uses what it needs and never evicts. Only set a `maxmemory` cap if you have a specific reason to, and if you do, alert on usage rather than relying on eviction.
+Open WebUI's Redis working set is small (websocket pools, revocations, locks, tasks, rate limits, model caches, collaborative-note documents and cached tool server and machine lists), so with `maxmemory` left unset Redis simply uses what it needs and never evicts. Only set a `maxmemory` cap if you have a specific reason to, and if you do, alert on usage rather than relying on eviction.
 
 If you genuinely must cap memory **with** eviction, the only acceptable policies are `volatile-ttl` or `volatile-lru`: these evict **only** keys that carry a TTL (locks and revocations) and never the persistent pools. Be aware this can still drop a revocation early, so prefer adding RAM over enabling eviction.
 
