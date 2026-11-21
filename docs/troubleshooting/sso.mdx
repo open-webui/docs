@@ -367,6 +367,10 @@ MICROSOFT_REDIRECT_URI=https://your-domain/oauth/microsoft/callback
 ENABLE_OAUTH_SIGNUP=true
 ```
 
+**Problem:** The sign-in fails at the callback with `Sign-in with your identity provider failed. Please contact your administrator for assistance.`, and the log line that starts with `OAuth callback error during authorize_access_token for provider microsoft` contains `AADSTS7000215`. Microsoft's [error code reference](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) describes that code as "Invalid client secret is provided."
+
+**Solution:** `MICROSOFT_CLIENT_SECRET` must hold the secret's **Value**, not the **Secret ID** listed next to it. In the Microsoft Entra admin center, open your app under **App registrations**, then **Certificates & secrets** > **Client secrets**. Microsoft shows the **Value** only once, when the secret is created, so if you no longer have it, create a new client secret and copy its **Value**. See [Add and manage app credentials](https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-credentials?tabs=client-secret).
+
 #### Authentik Common Issues:
 
 **Problem:** Incorrect provider URL format.
