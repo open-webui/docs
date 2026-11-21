@@ -138,6 +138,8 @@ Bulk rename, sort, deduplicate, convert, compress, and organize files. Manage di
 
 **[Installation →](/features/open-terminal/setup/installation)** · **[Connect to Open WebUI →](/features/open-terminal/setup/connecting)**
 
+To run Open Terminal on your own server or laptop without Docker, [add it as an SSH machine](/features/open-terminal/setup/ssh-machines).
+
 :::info Model requirements
 Open Terminal needs a model that performs tool calling at agentic quality, not just one that technically supports tools. Working inside a computer substrate is a multi-step loop: choose an action, observe files or output, decide what changed, recover from errors, and repeat across many turns. Small models often fail at that loop even when they can emit a valid tool call. Use a capable frontier model for complex software, data, and automation work. Native tool calling is the default; [check the model's tool-calling mode](/features/open-terminal/setup/connecting#8-enable-native-function-calling) if tools are not firing.
 :::
