@@ -410,6 +410,46 @@ The upgrade step that moves an account's identity provider subject into its curr
 
 ---
 
+### 13. First SSO Sign-In Is Pending or Refused
+
+**Problem:** A person signs in through the provider for the first time. They either land on the **Account Activation Pending** screen, or they return to the sign-in page with this error:
+
+```
+You do not have permission to access this resource. Please contact your administrator for assistance.
+```
+
+#### The new account is pending
+
+A new SSO account gets the **Default User Role** from the **User Access** section of **Settings > Authentication** (admin section), set by [`DEFAULT_USER_ROLE`](../reference/env-configuration.mdx#default_user_role). Its default is `pending`, so the account waits on the **Account Activation Pending** screen until an admin changes its role. With two-factor sign-in on, the sign-in page shows `Your account is awaiting administrator approval.` instead. The first account created on an empty instance becomes `admin`.
+
+**Solution:** Use one of these:
+- Change the account's role to `user` under **Admin Panel > Users**.
+- Set **Default User Role** to `user`, so new accounts can use Open WebUI right away. This also applies to new accounts from the sign-up form and from LDAP.
+- Turn on **Role Mapping** ([`ENABLE_OAUTH_ROLE_MANAGEMENT`](../reference/env-configuration.mdx#enable_oauth_role_management)), so the provider's roles decide between `user` and `admin`. See [OAuth Role Management](/features/authentication-access/auth/sso#oauth-role-management).
+
+#### The sign-in is refused
+
+At the callback, Open WebUI looks for an account already linked to that provider and the person's `sub`. When none exists:
+
+- With [`OAUTH_MERGE_ACCOUNTS_BY_EMAIL`](../reference/env-configuration.mdx#oauth_merge_accounts_by_email) on, an existing account with the same email is linked and signed in.
+- Otherwise, with [`ENABLE_OAUTH_SIGNUP`](../reference/env-configuration.mdx#enable_oauth_signup) off (the default), the sign-in is refused with the error above. This also happens when the person already has a local email and password account with the same email.
+- With `ENABLE_OAUTH_SIGNUP` on, a new account is created. If an account with that email already exists, the sign-in fails with `Uh-oh! This email is already registered. Sign in with your existing account or choose another email to start anew.`
+
+The same error also appears when **Role Mapping** is on and the provider's roles match neither **Allowed Roles** nor **Admin Roles**. See [`OAUTH_ALLOWED_ROLES`](../reference/env-configuration.mdx#oauth_allowed_roles).
+
+**Solution:**
+- To let SSO create accounts, set `ENABLE_OAUTH_SIGNUP=true` (**OAuth Signup** in the Admin Panel).
+- To let people who already have a local account sign in through SSO, set `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true` (**Merge Accounts by Email**). It links the sign-in to any account with that email, admin accounts included, and Open WebUI does not check whether the provider verified the address. Turn it on only for providers that verify email addresses.
+- While [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config) is `false` (the default), these two toggles are read-only in the Admin Panel. Set the environment variables and restart.
+
+#### The provider sends no `roles` claim
+
+With **Role Mapping** on, Open WebUI reads the claim named in **Roles Claim** ([`OAUTH_ROLES_CLAIM`](../reference/env-configuration.mdx#oauth_roles_claim), default `roles`) from the ID token claims merged with the userinfo response. When the claim is missing, a new account gets the **Default User Role** and an existing account keeps its role.
+
+**Solution:** If your provider sends the values you want to map under another claim, such as `groups`, set **Roles Claim** to that claim's name. Then list values from that claim in **Allowed Roles** and **Admin Roles**. The claim can be a list or a string, and a string is split on [`OAUTH_ROLES_SEPARATOR`](../reference/env-configuration.mdx#oauth_roles_separator) (default `,`). A dotted name such as `user.roles` reads a nested claim.
+
+---
+
 ## Advanced Troubleshooting Tips
 
 ### Check Token Storage Method
@@ -492,6 +532,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
 | Multi-instance problems    | Configure Redis and shared secrets                          |
 | SSO accounts locked out right after a long-delayed upgrade | Update Open WebUI; a repair migration fixes the stored identity data on startup |
+| First SSO sign-in pending or refused | Change **Default User Role**, or set `ENABLE_OAUTH_SIGNUP` or `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`. See [First SSO Sign-In Is Pending or Refused](#13-first-sso-sign-in-is-pending-or-refused) |
 | Still stuck? | Check debug logs, test without proxy, verify provider setup |
 
 ---
