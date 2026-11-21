@@ -81,7 +81,7 @@ deploy:
           capabilities: [gpu]
 ```
 
-This setup ensures that your application can leverage GPU resources when available. The `:cuda` image moves Open WebUI's own local models (embedding, reranking, and Whisper speech-to-text) to the GPU; Ollama's models use a GPU only if the Ollama container has one. If no GPU is visible, the image falls back to the CPU without an error. For the pre-release channel the tag is `:dev-cuda`.
+This setup ensures that your application can leverage GPU resources when available. The `:cuda` image moves Open WebUI's own local models (embedding, reranking, and Whisper speech-to-text) to the GPU; Ollama's models use a GPU only if the Ollama container has one. The `driver: nvidia` reservation needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on the host, the same as `--gpus all` in [GPU support](#gpu-support-nvidia). If no GPU is visible, the image falls back to the CPU and logs `CUDA unavailable (USE_CUDA_DOCKER=true), falling back to CPU`. For the pre-release channel the tag is `:dev-cuda`.
 
 ### Helper Scripts
 

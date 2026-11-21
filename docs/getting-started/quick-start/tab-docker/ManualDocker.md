@@ -153,7 +153,9 @@ The same images are mirrored to Docker Hub as `openwebui/open-webui`, but only a
 docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
 ```
 
-The `:cuda` image runs the local embedding model, the local reranking model and local Whisper speech-to-text on the GPU. Chat replies come from Ollama or your provider, so their speed depends on where that model runs: give the GPU to Ollama. If the container cannot use CUDA, Open WebUI logs `CUDA unavailable (USE_CUDA_DOCKER=true), falling back to CPU` and runs those models on the CPU.
+The `:cuda` image runs the local embedding model, the local reranking model and local Whisper speech-to-text on the GPU. Chat replies come from Ollama or your provider, so their speed depends on where that model runs: give the GPU to Ollama. If the container cannot use CUDA, Open WebUI logs `CUDA unavailable (USE_CUDA_DOCKER=true), falling back to CPU` followed by the reason, and runs those models on the CPU. Started without `--gpus all`, the line ends in `CUDA not available`.
+
+`--gpus all` needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on the host. Without it, `docker run` fails with `could not select device driver "" with capabilities: [[gpu]]` and no container starts. Install the toolkit, run `sudo nvidia-ctk runtime configure --runtime=docker`, restart Docker with `sudo systemctl restart docker`, then run the command again. Docker's [GPU access](https://docs.docker.com/engine/containers/gpu/) page lists the driver steps.
 
 There is no ROCm image of Open WebUI. With an AMD GPU, run the `:main` image and give the GPU to Ollama's `rocm` image, as shown in [Ollama's Docker guide](https://docs.ollama.com/docker).
 
@@ -161,7 +163,8 @@ There is no ROCm image of Open WebUI. With an AMD GPU, run the `:main` image and
 
 A single container with Open WebUI and Ollama together:
 
-**With GPU:**
+**With GPU:** `--gpus=all` passes an NVIDIA GPU and needs the NVIDIA Container Toolkit, as in [GPU support](#gpu-support-nvidia). For an AMD GPU, use the ROCm setup described there instead.
+
 ```bash
 docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
 ```
