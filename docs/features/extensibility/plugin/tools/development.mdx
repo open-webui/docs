@@ -1352,6 +1352,8 @@ Tools and Actions can return HTML content that renders as interactive iframes di
 
 In the Tools definition metadata you can specify custom packages. When you click `Save` the line will be parsed and `pip install` will be run on all requirements at once.
 
+Open WebUI also runs these installs again after every restart. At startup it installs the `requirements:` of every active Function and of every active Tool owned by an admin. A Tool owned by any other user is not part of that startup install. Its packages are installed the first time Open WebUI loads it after the restart, for example in the first chat that uses it, and that chat waits until pip finishes. Neither install runs when [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) is `False` or [`OFFLINE_MODE`](/reference/env-configuration#offline_mode) is `True`.
+
 :::warning
 
 **CRITICAL WARNING: Potential for Package Version Conflicts**
