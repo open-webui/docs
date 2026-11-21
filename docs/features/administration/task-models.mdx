@@ -9,6 +9,8 @@ Open WebUI makes small model calls in the background, separately from the answer
 
 By default all of that runs on the model the user is chatting with. On an expensive flagship model it is a bill nobody planned for, and on a slow local model it makes the whole interface feel sluggish. Pointing background work at a small, fast model is the highest-value change an administrator can make here.
 
+Background calls do not run [Filter Functions](/features/extensibility/plugin/functions/filter#filter-execution-flow), so a filter that logs, redacts or rewrites chat messages never sees them.
+
 The settings below are in **Settings > Interface** (admin section).
 
 ---
