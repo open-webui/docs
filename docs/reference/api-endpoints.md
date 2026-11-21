@@ -529,6 +529,29 @@ curl -X POST http://localhost:3000/ollama/v1/embeddings \
 
 A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The endpoint returns `503` if the Ollama integration is disabled.
 
+#### Chat Completions, Completions, Messages and Models (OpenAI-Compatible)
+
+Open WebUI also proxies Ollama's other `/v1` routes. Each one takes a `/{url_idx}` suffix to target one Ollama connection, for example `/ollama/v1/chat/completions/0`. On the `POST` routes, a non-admin needs read access to the workspace model they name, and the connection's **Prefix ID** is removed from the model ID before the request goes to Ollama.
+
+| Route | What Open WebUI applies |
+| :--- | :--- |
+| `POST /ollama/v1/chat/completions` | Swaps a workspace model ID for its base model and applies the workspace model's system prompt and parameters. Knowledge, tools and filters do not run. |
+| `POST /ollama/v1/completions` | Swaps in the base model and applies the workspace model's parameters. The system prompt is not added. |
+| `POST /ollama/v1/messages` | Takes the Anthropic Messages format. Swaps in the base model and forwards the rest of the request unchanged. Returns `503` if the Ollama integration is disabled. |
+| `GET /ollama/v1/models` | Lists models in the OpenAI format, from every enabled Ollama connection. A user with the `user` role sees only models with a saved model record they can read, unless [`BYPASS_MODEL_ACCESS_CONTROL`](/reference/env-configuration#bypass_model_access_control) is on. With `/{url_idx}` it lists that connection's models and is admin-only. Other users get `401`. |
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "qwen3.6:27b",
+  "messages": [{"role": "user", "content": "Why is the sky blue?"}]
+}'
+```
+
+For filters, tools and knowledge, use [`/api/chat/completions`](#chat-completions) instead.
+
 ### Retrieval Augmented Generation (RAG)
 
 The Retrieval Augmented Generation (RAG) feature allows you to enhance responses by incorporating data from external sources. Below, you will find the methods for managing files and knowledge bases via the API, and how to use them in chat completions effectively.
