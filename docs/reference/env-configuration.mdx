@@ -1115,7 +1115,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
 - Type: `list` of `dict`
 - Default: `null` (unset, which shows the built-in prompt suggestions)
-- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Leave it unset (or set it to `null`) to show the built-in suggestions; set it to `[]` to turn suggestions off. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
+- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured and the user has no chats yet; a user with chats sees their recent chats there. Leave it unset (or set it to `null`) to show the built-in suggestions; set it to `[]` to turn suggestions off. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
 
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
