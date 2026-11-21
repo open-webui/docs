@@ -75,6 +75,10 @@ When you pick a model in the browser, the frontend reads `meta.terminalId` off t
 You can read a model's configured terminal with `GET /api/v1/models/model?id=<model-id>` and use `meta.terminalId`, or just pick one from `/api/v1/terminals/`, which already lists only the terminals your user is allowed to use.
 :::
 
+:::warning The model's tools, default features and knowledge are UI defaults too
+The web UI also copies the model's **Tools** (`meta.toolIds`) into `tool_ids` and its **Default Features** into `features`. The backend does neither, so send them yourself. The model's **Knowledge** is searched only through the built-in tools, which need a `session_id`, or in legacy mode. A request with neither does not use the model's knowledge at all. See [Chat Completions](/reference/api-endpoints#chat-completions) for the full list.
+:::
+
 ### Terminal scope
 
 Terminals on a Terminals server carry a `scope`: `null`, `user`, `chat` or `model`. It decides what your request must carry to use the terminal:

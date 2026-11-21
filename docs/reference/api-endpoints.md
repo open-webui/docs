@@ -87,15 +87,22 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models. A model on a Responses API connection also answers in Chat Completions format, streamed or not, with `finish_reason` set to `length` or `content_filter` when the reply was cut off.
 
-**Use this endpoint for workspace models.** Only `/api/chat/completions` (and its alias `/api/v1/chat/completions`) applies a workspace model in full: base model, system prompt, parameters, knowledge, tools and filters. The proxy routes under `/openai` skip most of that:
+**Use this endpoint for workspace models.** Only `/api/chat/completions` (and its alias `/api/v1/chat/completions`) applies a workspace model's settings. On a plain API call it applies the base model, system prompt, parameters and filters, but not the model's tools, knowledge or default features, which need extra fields, as listed below the table. The proxy routes under `/openai` skip more:
 
 | Route | Workspace model handling |
 | :--- | :--- |
-| `POST /api/chat/completions` | Base model, system prompt, parameters, knowledge, tools and filters all apply. |
+| `POST /api/chat/completions` | Base model, system prompt, parameters and filters apply. Tools, knowledge and default features apply only when the request asks for them. |
 | `POST /openai/chat/completions` | Swaps in the base model and applies the workspace model's system prompt and parameters. Knowledge, tools and filters do not run. |
 | `POST /openai/responses` | Nothing applies. The `model` you send is forwarded to the provider as is, and a workspace model ID that no connection offers goes to the first OpenAI connection, which usually rejects it. |
 
 To use `/openai/responses`, send the provider's own model ID. On both `/openai` routes, a non-admin asking for a model that has no saved model record gets `403` with `Model not found`, unless [`BYPASS_MODEL_ACCESS_CONTROL`](/reference/env-configuration#bypass_model_access_control) is on.
+
+**What a plain API call leaves out.** The web UI fills in some of a model's settings itself when it builds the request, so an API caller has to send them:
+
+- **Tools.** The tools picked under **Tools** in the model editor are added to the request by the web UI, not by the server. Send their IDs in `tool_ids`. `GET /api/v1/models/model?id=<model-id>` lists them under `meta.toolIds`.
+- **Default features.** The features picked under **Default Features** are turned on by the web UI only. Send them yourself in `features`.
+- **Knowledge and web search.** Function calling runs in native mode unless the request sends `params.function_calling`, or the model's **Function Calling** parameter (or the one under **Model Defaults**) is set to `legacy`. In native mode, built-in tools, which include knowledge search and web search, are offered only to requests that carry a `session_id`. Without one, the model's **Knowledge** is not searched, and `features.web_search` and `features.image_generation` have no effect. Send `"params": {"function_calling": "legacy"}` and Open WebUI searches the model's knowledge, and runs the web search or image generation that `features` asks for, before the model answers. To stay in native mode with built-in tools, follow [Server-Side Tool Calling (API)](/reference/server-side-tool-calling). Files and knowledge bases you list in `files` are searched either way, unless the model has **Preload files** turned off (see [Using a Knowledge Collection in Chat Completions](#using-a-knowledge-collection-in-chat-completions)).
+- **Filters.** Global filters and the filters attached to the model run. A filter with a toggle runs only when its ID is in `filter_ids`, and the filters marked **Start enabled in new chats** are sent only by the web UI. `filter_ids` cannot add a filter that is neither global nor attached to the model.
 
 :::warning Reading `usage` from a reply that used tools
 
