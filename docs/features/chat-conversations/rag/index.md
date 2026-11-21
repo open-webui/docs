@@ -264,6 +264,17 @@ If you change the embedding model, those standalone chat file embeddings will st
 | **Chunk Size / Overlap** | Uses new settings | Old chunks still work, but quality may vary | Re-chunked with new settings | Old chunks, re-upload to update |
 | **Embedding Model** | Uses new model | Old embeddings, incompatible vector space | Re-embedded with new model | Old embeddings, re-upload to update |
 
+### Danger Zone Reset Buttons
+
+The **Danger Zone** at the bottom of **Settings** > **Documents** (admin section) has two reset buttons. Both apply to every user on the instance, and neither can be undone.
+
+| Button | What it deletes | What stays |
+|---|---|---|
+| **Reset Upload Directory** | Every file record, every stored file (the upload directory, or the S3, GCS or Azure storage in use), and the vector storage | Knowledge bases, now without files or vectors, and memories, without their vectors |
+| **Reset Vector Storage/Knowledge** | The vector storage and every knowledge base | Uploaded files and memories, without their vectors |
+
+With the default Chroma vector database, resetting the vector storage removes every collection: knowledge bases, single files, cached web search results and user memories. Memories keep their text, so **Reindex Knowledge and Memory Vectors** in the same section rebuilds their vectors with the current embedding model. Knowledge bases deleted by **Reset Vector Storage/Knowledge** are gone, so there is nothing left to reindex for them.
+
 ## Citations in RAG Feature
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
