@@ -45,7 +45,7 @@ Without Docker (bare metal mode), the AI can run any command with your user's pe
 
 ## Always set a password
 
-An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the terminal. The server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set, and the CLI generates one when you don't supply your own. Set a strong key of your own rather than relying on the generated one.
+An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the machine. The server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set, and the CLI generates one when you don't supply your own. Set a strong key of your own rather than relying on the generated one.
 
 ```bash
 -e OPEN_TERMINAL_API_KEY=a-strong-password-here
@@ -72,9 +72,9 @@ Treat that generated value as a starting point, not a password. Replace it with 
 
 ## Use admin connections
 
-Add the Open Terminal connection as an admin. The API key stays hidden on the server, requests go through Open WebUI's backend and you control who has access.
+Add the machine as an admin. The API key stays hidden on the server, requests go through Open WebUI's backend and you control who has access.
 
-A terminal a user adds in Tether is reached through that user's own computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
+A machine a user adds in Tether is listed under **Your devices** and is reached through that user's own computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
 
 ![The Open Terminal connection in admin settings with the API key masked](/images/open-terminal-connection-masked-key.png)
 
