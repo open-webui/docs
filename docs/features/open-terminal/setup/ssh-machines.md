@@ -29,7 +29,7 @@ Go to **Settings > Integrations**, scroll to **Machines** and click **+**, as in
 
 ### 2. Enter the address
 
-Type the machine into the URL field as `ssh://user@host` or `ssh://user@host:port` (the port defaults to 22). The form then asks how Open WebUI should sign in.
+Type the machine into the URL field as `ssh://user@host` or `ssh://user@host:port` (the port defaults to 22). Give the machine a **Name** (required). The form then asks how Open WebUI should sign in.
 
 ### 3. Choose how to sign in
 
@@ -52,7 +52,7 @@ Click **Install**. Open WebUI shows the host key fingerprint of the machine. Com
 A progress list shows the install. When it reaches **Ready**, the machine appears under **Machines** and works like any other machine. Open Terminal lives in `~/.open-webui/` in the home directory of the SSH user.
 
 :::warning Who can use it
-Everyone who has access to the machine can run commands and see every file the SSH user can. Use a dedicated user for machines you share, and set who gets access with the [access control settings](./connecting.md#6-optional-restrict-access-to-specific-groups).
+Everyone who has access to the machine can run commands and see every file the SSH user can. Use a dedicated user for machines you share, and set who gets access in the **Access** section of the machine, as in [Connecting Open Terminal](./connecting.md#6-optional-restrict-access-to-specific-groups).
 :::
 
 ---
@@ -66,6 +66,8 @@ Open the machine from the **Machines** list to see its Open Terminal version and
 | **Upgrade** | Installs the version in the version field. Empty means the newest release. Also repairs a broken install. |
 | **Restart** | Restarts Open Terminal on the machine. |
 | **Logs** | Shows the latest lines of the Open Terminal log. Start here when a machine shows an error. |
+
+**Folder** is where terminal sessions start, the home folder of the SSH user when empty. To start somewhere else, edit the machine, enter an absolute path that exists on the machine, such as `/home/user/project`, and save. Open Terminal restarts in the new folder.
 
 To remove the machine, delete it and confirm. Open WebUI uninstalls Open Terminal from the machine and forgets its own key. If the machine cannot be reached, Open WebUI offers to remove it from Open WebUI anyway, and the files under `~/.open-webui/` stay on the machine until you delete them yourself.
 
