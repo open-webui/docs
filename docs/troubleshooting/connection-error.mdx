@@ -500,7 +500,7 @@ docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host
 
 ## SSL Certificate Issues with Internal Tools
 
-If you are using external tools like Tika, Ollama (for embeddings), or an external reranker with self-signed certificates, you might encounter SSL verification errors.
+If Tika, Ollama (for embeddings), an external reranker, a model connection or a tool server uses a self-signed certificate or one from a private CA, you might encounter SSL verification errors.
 
 ### Common Symptoms
 
@@ -526,6 +526,22 @@ You can disable SSL verification for these internal tool connections using the f
 :::warning
 Disabling SSL verification reduces security. Only do this if you trust the network and the services you are connecting to (e.g., functioning within a secure internal network).
 :::
+
+### Trust a Private or Self-Signed CA Instead
+
+Model connections and tool servers can verify a certificate from your own CA, so verification stays on. Give Open WebUI the path to a CA bundle file (PEM) inside the container:
+
+| Variable | Connections it covers | Values |
+| :--- | :--- | :--- |
+| [`AIOHTTP_CLIENT_SSL_CERT_FILE`](/reference/env-configuration#aiohttp_client_ssl_cert_file) | Every connection below whose own variable is `true` | Path to a CA bundle file. Unset by default |
+| [`AIOHTTP_CLIENT_SESSION_SSL`](/reference/env-configuration#aiohttp_client_session_ssl) | Ollama and OpenAI connections (model lists, connection checks and chat), Ollama embeddings, speech-to-text and text-to-speech, image generation, and the OAuth 2.1 discovery, registration and token refresh requests of MCP tool servers | `true` (default), `false`, or a path to a CA bundle file |
+| [`AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`](/reference/env-configuration#aiohttp_client_session_tool_server_ssl) | OpenAPI tool servers (loading the spec and calling tools) and MCP tool server traffic | `true` (default), `false`, or a path to a CA bundle file |
+
+`true` and `false` are not case sensitive. Any other value is read as a file path, and that path wins over `AIOHTTP_CLIENT_SSL_CERT_FILE` for that variable's connections. To cover everything at once, set only `AIOHTTP_CLIENT_SSL_CERT_FILE` and leave the other two at `true`.
+
+A bundle replaces the default trust store for the connections that use it: they trust only the CAs in that file ([Python `ssl.create_default_context`](https://docs.python.org/3/library/ssl.html#ssl.create_default_context)). If the same connections also reach public endpoints, such as `api.openai.com`, put your CA and the public roots in one file, for example a copy of the container's `/etc/ssl/certs/ca-certificates.crt` with your CA appended.
+
+If the file does not exist, Open WebUI logs `SSL CA bundle path does not exist: '<path>', ignoring` and falls back to `AIOHTTP_CLIENT_SSL_CERT_FILE`, or to the default trust store when that is unset, so the `CERTIFICATE_VERIFY_FAILED` errors continue. These variables are read once at startup, so restart Open WebUI after you change them.
 
 For Milvus over TLS, point [`MILVUS_SERVER_PEM_PATH`](/reference/env-configuration#milvus_server_pem_path) at the CA or server certificate. Verification stays on.
 
