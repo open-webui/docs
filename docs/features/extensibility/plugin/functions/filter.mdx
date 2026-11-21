@@ -544,6 +544,12 @@ Here's the complete flow from admin configuration to filter execution:
 - Repeat request() and stream() for every further call the turn makes, such as after tool results come back
 - Execute outlet() filters (once, after the final response)
 
+:::note Background task calls skip Filter Functions
+Filters run only on chat requests. Open WebUI's background calls, such as title, tag, follow-up, query, autocomplete, emoji and image prompt generation on the [task model](/features/administration/task-models), context compaction, memory review and **Legacy** tool selection, run no Filter Function's `inlet()`, `request()`, `stream()` or `outlet()`, global filters included. A Filter cannot read or change those prompts or their replies.
+
+To act on a task call, make a [Pipe](/features/extensibility/plugin/functions/pipe) the task model. It reads the task name from `__task__`. A Pipelines filter is the other option: title, tag, follow-up, query, autocomplete, emoji and image prompt calls run Pipelines inlet filters for the task model, but no Pipelines outlet filters. Context compaction, memory review and **Legacy** tool selection run neither.
+:::
+
 ---
 
 ### Filter Behavior with API Requests

@@ -290,9 +290,7 @@ See the `body["messages"]` value above.
 
 The `str` of the `chat_id`, representing the unique identifier of the current chat/conversation.
 
-Pipes, Tools and a Filter's `inlet()` and `request()` receive it, for invocations that originate from a chat context, including:
-- Regular user messages
-- Internal task calls (title generation, query generation, tag generation, etc.)
+Pipes, Tools and a Filter's `inlet()` and `request()` receive it for invocations that originate from a chat context. A Pipe also receives it on internal task calls (title generation, query generation, tag generation, etc.) when its model is the [task model](/features/administration/task-models). Filters do not run on internal task calls at all.
 
 A Filter's `stream()` and `outlet()` do not get it, and neither do Actions. Read `body["chat_id"]` there instead.
 
