@@ -157,6 +157,7 @@ After updating, confirm everything is working:
 2. **Load the UI** at [http://localhost:3000](http://localhost:3000). You should see the login page.
 3. **If the UI looks broken**, clear your browser cache (`Ctrl+F5` / `Cmd+Shift+R`).
 4. **If you see migration errors** in the logs, check the [release notes](https://github.com/open-webui/open-webui/releases) for known issues and the [Connection Errors](/troubleshooting/connection-error) troubleshooting page.
+5. **If nothing changed after the update**, check where your volume is mounted. Mount it at `/app/backend/data`, never at `/app/backend`. The image keeps the application code in `/app/backend`, so a volume or bind mount there covers the new code and the container keeps running whatever code the mount holds. To fix a bind mount such as `./backend:/app/backend`, change it to `./backend/data:/app/backend/data`. If you never set `WEBUI_SECRET_KEY`, copy the value in `./backend/.webui_secret_key` into it first: the generated key is saved in `/app/backend/.webui_secret_key`, outside the data folder, so after the move Open WebUI generates a new key and everyone is signed out.
 
 ---
 
