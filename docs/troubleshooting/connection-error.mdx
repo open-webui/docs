@@ -260,6 +260,16 @@ This is a deployment and networking condition, not an Open WebUI bug.
 
 To tell them apart, open **DevTools > Network**, select the failing request and read its response. Open WebUI's own page has the title `Open WebUI`. Any other page names the proxy or site that answered. Then serve Open WebUI from the root of its own hostname and route every path to it unchanged, as described in [HTTPS & Reverse Proxies](/reference/https).
 
+## Edits and Ratings Lost After Reload in Long Chats
+
+**Symptom:** in a long chat, an edited message, a rating or a copy made with **Save As Copy** shows on screen but is gone after you reload the page. No error appears. New messages and replies in the same chat still save, and shorter chats keep every change.
+
+**What it actually means:** a reverse proxy in front of Open WebUI refused the save because the request was larger than its body size limit. Saving an edit with **Save**, **Save As Copy**, a rating and **Merge Responses** each send the whole chat in one `POST` to `/api/v1/chats/{id}`: every message in every branch, plus the messages of the branch on screen. That request grows with the chat. New messages do not go through it, because Open WebUI stores each turn on the server when the reply starts, so they keep saving after the chat outgrows the limit.
+
+To confirm it, open **DevTools > Network**, make the change again and select the `POST` request to `/api/v1/chats/<id>`. Status `413` means the proxy refused it.
+
+To fix it, raise the proxy's body size limit. In nginx that is [`client_max_body_size`](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size), which defaults to `1m`; `0` turns the check off. See [Header and Body Size Limits](/reference/https/nginx#header-and-body-size-limits) and, for other proxies, [Key configuration notes](/reference/https#key-configuration-notes). After a reload, changes the proxy refused are gone, so make them again.
+
 ## Connection to Ollama Server
 
 ### Accessing Ollama from Open WebUI

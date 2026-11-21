@@ -118,12 +118,14 @@ Prevent errors with large requests or OAuth tokens:
 
 ```nginx
 # In http {} or server {} block
-client_max_body_size 100M;           # Large file uploads
+client_max_body_size 100M;           # File uploads and saves of long chats
 proxy_buffer_size 128k;              # Large headers (OAuth tokens)
 proxy_buffers 4 256k;
 proxy_busy_buffers_size 256k;
 large_client_header_buffers 4 32k;
 ```
+
+`client_max_body_size` limits every request, not only uploads. Saving an edited message, a rating or **Save As Copy** sends the whole chat in one `POST` to `/api/v1/chats/{id}`, so that request grows with the chat. nginx's default is `1m`, and it answers a larger request with `413 (Request Entity Too Large)` ([`client_max_body_size`](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size)). Set it high enough for your longest chats as well as your largest uploads. See [Edits and Ratings Lost After Reload in Long Chats](/troubleshooting/connection-error#edits-and-ratings-lost-after-reload-in-long-chats).
 
 ### Common Streaming Mistakes
 
