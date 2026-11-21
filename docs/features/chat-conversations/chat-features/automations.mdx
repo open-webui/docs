@@ -70,14 +70,14 @@ Administrators can set global limits on automation usage for non-admin users. Th
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
 
-### Giving a Run a Terminal
+### Giving a Run a Machine
 
 The automation editor has a **Machine** list and, once one is picked, a **Working Directory** field. The run uses that machine and starts in that folder. With the field empty it starts in the machine's default folder. The list appears when at least one machine is available to you, and a machine picked here replaces the one configured on the model.
 
 Without a machine in the editor, a run uses the machine configured on its model. Set that in **Workspace > Models**: edit the model and pick the machine from the **Default machine** field. The list appears when at least one machine is available to you and the model's **Terminal** capability is on, which it is by default.
 
 :::info Terminal limits in automations
-Machines, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
+Machines, including the limits for channel automations, are described in [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 :::
 
 ### Running a Coding Agent

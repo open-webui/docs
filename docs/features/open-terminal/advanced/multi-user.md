@@ -103,7 +103,7 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 - **Resource controls**: set CPU, memory and storage limits per machine, within the server maximums
 - **Multiple environments**: users with write access create machines with different setups for different teams (e.g., data science, development) and share them with users and groups
 - **Backends**: Docker, Kubernetes or the Kubernetes Operator
-- **Scoped instances**: a machine can run one instance per user, saved chat or model, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
+- **Scoped instances**: a machine can run one instance per user, saved chat or model, see [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
 - **Network on the Docker backend**: with `TERMINALS_DOCKER_NETWORK` set, instances share that Docker network, the orchestrator reaches each one by name and an instance can reach a port another user's instance has opened. Without it, the orchestrator reaches instances through their published ports on the Docker host. A terminal's **Network** setting picks one of the network profiles an admin defined in `TERMINALS_NETWORK_PROFILES`, which can place it on another Docker network. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
 
 ```mermaid

@@ -41,7 +41,7 @@ helm upgrade --install open-webui open-webui/open-webui \
 ```
 
 :::tip Auto-configured connection
-When `terminals.enabled` is `true`, the chart sets `TERMINAL_SERVER_CONNECTIONS` to point at the in-cluster orchestrator. In **Settings > Integrations** (admin section), open the connection and save it once, so Open WebUI detects it as an orchestrator. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
+When `terminals.enabled` is `true`, the chart sets `TERMINAL_SERVER_CONNECTIONS` to point at the in-cluster orchestrator. In **Settings > Integrations** (admin section), open the connection and save it once, so Open WebUI detects it as an orchestrator. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals).
 :::
 
 The Terminal CRD must define `spec.templateId`. The CRD bundled with the Helm chart requires `spec.userId`, so install the CRD from the [Terminals repository](https://github.com/open-webui/terminals/blob/main/manifests/terminal-crd.yaml) for your Terminals version and set `terminals.crd.install: false`.

@@ -1,9 +1,9 @@
 ---
 sidebar_position: 1
-title: "Creating Terminals"
+title: "Creating Machines"
 ---
 
-# Creating Terminals
+# Creating Machines
 
 A **machine** is a ready-made workspace the AI can run commands and work with files in. You create it yourself from the chat, give it a name and decide who can use it. Each machine starts one or more **instances**, the containers where the commands run.
 
@@ -22,7 +22,7 @@ Add the connection in **Settings > Integrations** (admin section) as described i
 | **Read** | See and use the machines that are shared with them |
 | **Write** | Create and manage machines on this server, and see every machine on it |
 
-## Create a Terminal
+## Create a Machine
 
 1. Open the machine menu in the message input (the cloud icon). With **Write** access it shows even before you have a machine.
 2. Under **Machines**, click **New machine**.
@@ -67,7 +67,7 @@ People with access to a machine can run commands in it. With **Separate instance
 
 The **Instances** list in the dialog shows every instance of the machine with its name and whether it is running or stopped. Open the **More options** menu of a row to act on it. A running instance offers **Restart** and **Stop**, plus **System info** and **View files**. A stopped one offers **Start**. Every instance offers **Delete instance**. While an action runs, the row shows what is happening (**Restarting...**, **Stopping...**, **Starting...** or **Deleting...**) with a spinner. **Delete machine** removes the machine and its instances and files.
 
-## Terminal Menu
+## Machine Menu
 
 Each machine in the menu has a **More** menu with **Restart** and **Stop** while the instance runs or **Start** while it is stopped. While the instance runs it also lists **System info** and **View files**. **Machine settings** is always there. **View files** opens the [file browser](/features/open-terminal/file-browser) for that machine without selecting it for the chat. **System info** shows CPU, memory, disk and network use, uptime and top processes, and refreshes every 5 seconds while open.
 

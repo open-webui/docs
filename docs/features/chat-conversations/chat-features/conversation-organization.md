@@ -150,7 +150,7 @@ Customize the visual appearance of your folder by uploading a background image. 
 
 Pick the model new chats in this folder start with, or leave it on **Use default** to fall back to your usual default. Switching models inside one of the folder's chats leaves the folder's default as it is; change it here.
 
-### Default Terminal and Working Directory
+### Default Machine and Working Directory
 
 Under **Advanced**, **Default machine** picks the machine new chats in this folder start with. Once one is picked, **Working directory** sets the path on that machine where those chats start; leave it empty to use the machine's own default. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents). These settings apply to new chats only.
 

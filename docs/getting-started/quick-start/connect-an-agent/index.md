@@ -59,7 +59,7 @@ In Open WebUI, open **Settings > Integrations** in the **Admin** section. In the
 
 Use an address reachable from the Open WebUI server: for example, `http://open-terminal:8000` on a shared Docker Compose network, or `http://localhost:8000` when both processes run directly on the same machine. For separate containers, remote hosts, and access grants, follow the [connection guide](/features/open-terminal/setup/connecting).
 
-### 4. Select a terminal and model
+### 4. Select a machine and model
 
 Start a saved chat, click the cloud icon, which reads **Machine** until you pick one, and select your machine. Then choose either:
 

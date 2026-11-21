@@ -74,7 +74,7 @@ Type `$` in the chat input, or use the `/` menu, and pick a skill. With the [ski
 
 ### Per-chat skills
 
-The **+** menu > **Skills** turns skills on for the current chat. The list is grouped into **Workspace** and the selected machine, named after it, see [Skills from a machine](#skills-from-a-terminal-server). A badge shows how many are on. Selected skills load like skills mentioned with `$`.
+The **+** menu > **Skills** turns skills on for the current chat. The list is grouped into **Workspace** and the selected machine, named after it, see [Skills from a machine](#skills-from-a-machine). A badge shows how many are on. Selected skills load like skills mentioned with `$`.
 
 ### Model-attached skills
 
@@ -115,7 +115,7 @@ Two settings in **Settings > General** (admin section) set how much of a skill t
 
 Leave a field empty for the default, or set [`SKILL_CONTENT_MAX_CHARS`](/reference/env-configuration#skill_content_max_chars) and [`SKILL_PREVIEW_MAX_CHARS`](/reference/env-configuration#skill_preview_max_chars).
 
-### Skills from a terminal server
+### Skills from a machine
 
 A connected [Open Terminal](/features/open-terminal) machine can carry its own skills, kept in the workspace next to the files they describe. Open WebUI reads them from the server and offers them in the `$` picker beside your workspace skills, under ids of the form `terminal:<url-encoded name>`. They behave like any other skill: `$` mention injects the content, otherwise they sit in the same manifest and load through `view_skill`. What gets injected carries the skill's directory and the files it ships with, so the model knows where to read them from in the workspace. `read_skill_file` pages through a terminal skill's `SKILL.md` and `grep_skill_files` searches it; its other files stay on the machine, and the model opens them with the machine's own file tools. The skill editor, version history and `update_skill_files` work on workspace skills.
 
