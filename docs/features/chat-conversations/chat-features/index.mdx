@@ -148,6 +148,8 @@ Open WebUI provides a comprehensive set of chat features designed to enhance you
 
 - **Structured Response Editing**: Clicking the edit icon on an assistant response that contains tool calls, reasoning blocks, or code-interpreter output opens a structured editor instead of a plain textarea. Each output item (text, thought, tool call, code block, web/file/computer search) becomes its own collapsible field, and a **JSON** toggle exposes the underlying [OpenAI Responses API](https://platform.openai.com/docs/api-reference/responses) payload for direct editing. Reasoning/thinking blocks are editable here too. The previous textarea editor reduced them to a non-editable `<details>` placeholder. Plain text-only responses keep the original textarea behavior. Editing rewrites the message's `output` array; Open WebUI re-derives the displayed `content` (including `<details>` blocks for thoughts and tool calls) on save, so the rendered message stays consistent.
 
+- **Editing Code Blocks**: In your own chats, a code block in a response can be edited in place. Click **Save** on the block, or press `Ctrl+S` or `Cmd+S` while editing it, to write the new code into that response and save the chat. **Save** does not create or download a file; use **Copy** to take the code elsewhere. A temporary chat is never stored, so the edit is not kept. In a chat someone else owns, including one opened from a share link, code blocks cannot be edited.
+
 ## Tabs Side Panel
 
 The **Tabs** button (split panel icon) in the top bar opens the tabs. On a large screen the workspace is always full width and the chat is its first tab, which shows the chat title and its actions menu and cannot be closed. On a small screen the tabs open as a panel next to the chat.
