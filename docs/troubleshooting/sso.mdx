@@ -392,6 +392,18 @@ Some providers add a vendor-specific parameter to the ID token header, which old
 
 **Solution:** Update Open WebUI. Unrecognized parameters are ignored, so nothing changes on the provider side. The signature and signing algorithm are still verified.
 
+#### Providers that encrypt the ID token:
+
+**Problem:** The login fails at the callback with `Sign-in with your identity provider failed. Please contact your administrator for assistance.`, and the log records:
+
+```
+OAuth callback failed: decode_error: Invalid JSON Web Signature
+```
+
+The ID token is not a signed token in the three-part form Open WebUI verifies. The usual cause is a provider set to encrypt the ID token (JWE). Open WebUI has no setting for a decryption key, so it cannot read an encrypted ID token.
+
+**Solution:** At the provider, turn off ID token encryption for the Open WebUI client and keep the ID token signed.
+
 ---
 
 ### 12. Existing Accounts Cannot Sign In After a Long-Delayed Upgrade
@@ -472,6 +484,8 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 - `httpcore.ReadTimeout` → Network timeout issue
 - `Sign-in with your identity provider failed. Please contact your administrator for assistance.` → The sign-in failed at the callback, for example because the provider denied access, the account has no email or its email domain is not allowed. The text is the same for all of these, so read the backend log for the actual cause. A role mismatch or a signup-disabled case shows the access-prohibited text, a duplicate email shows the already-registered error, and other exceptions show `Error during OAuth process`
 - `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token and your version still rejects it. See [Providers that add their own parameters to the ID token](#providers-that-add-their-own-parameters-to-the-id-token)
+- `decode_error: Invalid JSON Web Signature` → The ID token is not a signed token, usually because the provider encrypts it. See [Providers that encrypt the ID token](#providers-that-encrypt-the-id-token)
+- `Username claim is missing, using email as name` → A new account was created with its email as its name, because the claim named in [`OAUTH_USERNAME_CLAIM`](../reference/env-configuration.mdx#oauth_username_claim) was missing or empty
 - `1 validation error for UserModel` on the `oauth` field → An old upgrade step stored the identity provider subject as text. See [Existing Accounts Cannot Sign In After a Long-Delayed Upgrade](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
 - `404` on callback URLs → Redirect URI misconfiguration
 
