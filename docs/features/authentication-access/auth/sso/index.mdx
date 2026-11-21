@@ -274,9 +274,9 @@ Any OAuth provider that can be configured to return roles in the ID token or the
 To use this feature set `ENABLE_OAUTH_ROLE_MANAGEMENT` to `true`.
 You can configure the following environment variables to match the roles returned by the OAuth provider:
 
-1. `OAUTH_ROLES_CLAIM`: The claim that contains the roles. Defaults to `roles`. Can also be nested, for example `user.roles`.
+1. `OAUTH_ROLES_CLAIM`: The claim that contains the roles. Defaults to `roles`. Can also be nested, for example `user.roles`. The claim can be a list or a string. If your provider sends no `roles` claim, name the claim that carries the values you want to map, such as `groups`.
 1. `OAUTH_ALLOWED_ROLES` (**Allowed Roles** in the Admin Panel): A comma-separated list of roles that are allowed to log in (receive open webui role `user`). Use `*` as a wildcard to allow any role.
-1. `OAUTH_ADMIN_ROLES` (**Admin Roles** in the Admin Panel): A comma-separated list of roles that are allowed to log in as an admin (receive open webui role `admin`). A role in this list lets the user sign in even when it is not in `OAUTH_ALLOWED_ROLES`, and `admin` wins when a user matches both lists. A user whose roles match neither list is refused. A user whose provider sends no roles keeps their current role.
+1. `OAUTH_ADMIN_ROLES` (**Admin Roles** in the Admin Panel): A comma-separated list of roles that are allowed to log in as an admin (receive open webui role `admin`). A role in this list lets the user sign in even when it is not in `OAUTH_ALLOWED_ROLES`, and `admin` wins when a user matches both lists. A user whose roles match neither list is refused. A user whose provider sends no roles keeps their current role, and a new account gets the **Default User Role** (`pending` by default). See [First SSO Sign-In Is Pending or Refused](/troubleshooting/sso#13-first-sso-sign-in-is-pending-or-refused).
 1. `OAUTH_ROLES_SEPARATOR`: Allows specifying an alternative separator for the `OAUTH_*_ROLES` variables. If the claim is a string and it contains the separator, it will be also split by that separator.
 
 :::info
