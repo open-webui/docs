@@ -7342,8 +7342,9 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 #### `LDAP_CA_CERT_FILE`
 
 - Type: `str`
-- Description: Sets the path to the LDAP CA certificate file.
+- Description: Sets the path to the LDAP CA certificate file. The path is read inside the Open WebUI container. If it names a file that does not exist there, LDAP sign-in fails with `Failed to configure TLS for LDAP connection.` See [LDAP troubleshooting](/features/authentication-access/auth/ldap#failed-to-configure-tls).
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Certificate Path** in the **LDAP** section of **Settings > Authentication** (admin section).
 
 #### `LDAP_VALIDATE_CERT`
 
