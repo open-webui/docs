@@ -18,7 +18,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into a [folder](/features/chat-conversations/chat-features/conversation-organization#the-folder-page) you can edit, shared folders included, so a team sees every run in one place
-- Give runs a terminal and working folder, and run a [coding agent](/features/open-terminal/coding-agents) from that terminal
+- Give runs a machine and working folder, and run a [coding agent](/features/open-terminal/coding-agents) from that machine
 
 ## Access Control
 
@@ -72,23 +72,23 @@ After creation, Open WebUI opens the dedicated automation editor page at `/autom
 
 ### Giving a Run a Terminal
 
-The automation editor has a **Terminal** list and, once one is picked, a **Working Directory** field. The run uses that terminal and starts in that folder; with the field empty it starts in the terminal's default folder. The list appears when at least one terminal is available to you, and a terminal picked here replaces the one configured on the model.
+The automation editor has a **Machine** list and, once one is picked, a **Working Directory** field. The run uses that machine and starts in that folder. With the field empty it starts in the machine's default folder. The list appears when at least one machine is available to you, and a machine picked here replaces the one configured on the model.
 
-Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models**: edit the model and pick the terminal from the **Default terminal** field. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default.
+Without a machine in the editor, a run uses the machine configured on its model. Set that in **Workspace > Models**: edit the model and pick the machine from the **Default machine** field. The list appears when at least one machine is available to you and the model's **Terminal** capability is on, which it is by default.
 
 :::info Terminal limits in automations
-Terminals, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
+Machines, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 :::
 
 ### Running a Coding Agent
 
-With a terminal picked, the **Model** list also offers the coding agents that terminal reports, named `<agent>/<model>`. Changing the terminal or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a terminal before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the terminal and the agent are still available and the run fails if either is gone.
+With a machine picked, the **Model** list also offers the coding agents that machine reports, named `<agent>/<model>`. Changing the machine or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a machine before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the machine and the agent are still available and the run fails if either is gone.
 
 ## Edit and Manage
 
 From the Automations list, click an automation to open its dedicated editor page.
 
-The page is the editor. Name and instructions sit at the top, followed by a **Properties** list with **Status**, **Schedule**, **Model**, **Destination**, **Terminal** and **Next run**. Click any value to change it in place. A **Save** button appears in the header as soon as something differs from the saved automation. The **Status** switch pauses or resumes the automation straight away without **Save**.
+The page is the editor. Name and instructions sit at the top, followed by a **Properties** list with **Status**, **Schedule**, **Model**, **Destination**, **Machine** and **Next run**. Click any value to change it in place. A **Save** button appears in the header as soon as something differs from the saved automation. The **Status** switch pauses or resumes the automation straight away without **Save**.
 
 The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
 

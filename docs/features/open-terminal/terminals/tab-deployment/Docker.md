@@ -16,7 +16,7 @@ services:
       - "3000:8080"
     environment:
       - >-
-        TERMINAL_SERVER_CONNECTIONS=[{
+        MACHINE_CONNECTIONS=[{
           "id": "terminals",
           "name": "Terminals",
           "enabled": true,

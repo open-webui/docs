@@ -14,7 +14,7 @@ An agent harness is the software around a model that manages tools, instructions
 | What you want | Setup | Where to connect |
 | :--- | :--- | :--- |
 | Give your existing model a workspace for commands, files, and code | **Open WebUI + Open Terminal**: Open WebUI manages the model's tool calls; Open Terminal executes them | The **Machines** section of **Settings > Integrations** (admin section) |
-| Use Claude Code, Codex, Cursor, Gemini CLI, Hermes, or another supported agent in chat | **Agent through Open Terminal**: the agent CLI runs in the terminal environment and supplies its own tools and agent loop | The same connection in the **Machines** section; select the terminal, then an agent model |
+| Use Claude Code, Codex, Cursor, Gemini CLI, Hermes, or another supported agent in chat | **Agent through Open Terminal**: the agent CLI runs in the terminal environment and supplies its own tools and agent loop | The same connection in the **Machines** section; select the machine, then an agent model |
 | Use an agent service you already operate | **Agent gateway**: Open WebUI sends chat requests to the service's OpenAI-compatible API | **Settings > Connections > OpenAI** (admin section) |
 
 For a new setup, start with **Open Terminal**. One connection gives you a workspace for regular models and access to the supported agent CLIs installed there.
@@ -51,20 +51,20 @@ docker exec -it open-terminal bash
 
 Run `codex` or `claude` and complete its setup. For other agents, follow their installation instructions in that same environment. Verify that the agent can answer a prompt there before connecting it to chat. See the [supported agents](/features/open-terminal/coding-agents#supported-agents) and [agent deployment guide](https://github.com/open-webui/open-terminal/blob/main/docs/deployment.md#coding-agents).
 
-The **Open Terminal API key** authenticates the connection to the terminal server. Each agent also needs its own login or model-provider credentials. Keep the home volume mounted so file-based agent settings and credentials survive container replacement.
+The Open Terminal **API Key** authenticates the connection to the machine. Each agent also needs its own login or model-provider credentials. Keep the home volume mounted so file-based agent settings and credentials survive container replacement.
 
 ### 3. Connect Open Terminal
 
-In Open WebUI, open **Settings > Integrations** in the **Admin** section. In the **Machines** section, add the terminal's URL and API key, save, and enable the connection.
+In Open WebUI, open **Settings > Integrations** in the **Admin** section. In the **Machines** section, add the machine's URL and API key, save, and enable the connection.
 
 Use an address reachable from the Open WebUI server: for example, `http://open-terminal:8000` on a shared Docker Compose network, or `http://localhost:8000` when both processes run directly on the same machine. For separate containers, remote hosts, and access grants, follow the [connection guide](/features/open-terminal/setup/connecting).
 
 ### 4. Select a terminal and model
 
-Start a saved chat, click the **terminal button** (cloud icon), and select your terminal. Then choose either:
+Start a saved chat, click the cloud icon, which reads **Machine** until you pick one, and select your machine. Then choose either:
 
 - **A regular model** with capable native tool calling. Open WebUI gives it terminal tools to run commands and work with files. Check the model's [Terminal capability and bindings](/features/workspace/models#capabilities-and-bindings) if the tools are missing.
-- **An agent model** named `<agent>/<model>`. Open WebUI discovers the agents and models available in the selected terminal. Only agents that successfully report their models appear.
+- **An agent model** named `<agent>/<model>`. Open WebUI discovers the agents and models available on the selected machine. Only agents that successfully report their models appear.
 
 Agent conversations support one agent at a time and require a saved chat. See [Coding Agents](/features/open-terminal/coding-agents) for how regenerating, editing and forking work.
 
@@ -74,7 +74,7 @@ Open your project directory in the [file browser](/features/open-terminal/file-b
 
 > Inspect this project, explain how to run it, and run its existing tests. Report any failures with the relevant output.
 
-The agent works in that terminal's workspace. Tool requests appear in chat and follow the selected [tool permission mode](/features/extensibility/plugin/tools#tool-approval). An existing agent conversation keeps its original working directory when you browse elsewhere.
+The agent works in that machine's workspace. Tool requests appear in chat and follow the selected [tool permission mode](/features/extensibility/plugin/tools#tool-approval). An existing agent conversation keeps its original working directory when you browse elsewhere.
 
 ## How Open Terminal Connects Different Harnesses
 

@@ -69,7 +69,7 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 1. Click on any folder in the sidebar to select it.
 2. The chat interface will show that folder is active.
 3. Any new chat you start will automatically be created inside this folder.
-4. New chats will **inherit the folder's settings** (default model, default terminal, working directory, system prompt and knowledge).
+4. New chats will **inherit the folder's settings** (default model, default machine, working directory, system prompt and knowledge).
 
 A folder's three-dot menu also has **New Chat**, which opens the folder the same way.
 
@@ -150,7 +150,7 @@ Pick the model new chats in this folder start with, or leave it on **Use default
 
 ### Default Terminal and Working Directory
 
-Under **Advanced**, **Default terminal** picks the terminal new chats in this folder start with. Once one is picked, **Working directory** sets the path on that terminal where those chats start; leave it empty to use the terminal's own default. Its folder button browses the terminal's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default terminal picked, **Default Model** also offers that terminal's [coding agents](/features/open-terminal/coding-agents). These settings apply to new chats only.
+Under **Advanced**, **Default machine** picks the machine new chats in this folder start with. Once one is picked, **Working directory** sets the path on that machine where those chats start; leave it empty to use the machine's own default. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents). These settings apply to new chats only.
 
 ### System Prompt
 

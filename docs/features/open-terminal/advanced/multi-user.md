@@ -5,7 +5,7 @@ title: "Multi-User Setup"
 
 # Setting Up Open Terminal for a Team
 
-When multiple people on your team need terminal access through Open WebUI, you have two options.
+When multiple people on your team need access to a machine through Open WebUI, you have two options.
 
 | | Single Container | Terminals |
 | :--- | :--- | :--- |
@@ -16,7 +16,7 @@ When multiple people on your team need terminal access through Open WebUI, you h
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
 
 :::danger Required for multi-user Open WebUI deployments
-If your Open WebUI instance has **more than one user account** and the same terminal-server connection is shared across users, you **must** use one of the two options below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
+If your Open WebUI instance has **more than one user account** and the same machine is shared across users, you **must** use one of the two options below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
 
 **Option 1 separates workspaces. It is not a security boundary between users.** Everyone still shares one kernel, one process list, one network namespace and one set of system resources, and provisioning the per-user accounts requires elevated privileges inside that container, so a user who sets out to reach root inside it will get there. Run it where every user on the instance is trusted at the same level.
 
@@ -41,7 +41,7 @@ docker run -d --name open-terminal -p 8000:8000 \
 
 ### What happens
 
-When someone uses the terminal through Open WebUI, Open Terminal automatically:
+When someone uses a machine through Open WebUI, Open Terminal automatically:
 
 1. Creates a personal account for that user (based on their Open WebUI user ID)
 2. Sets up a private home folder at `/home/{user-id}`
@@ -100,10 +100,10 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 
 - **Full isolation**: with a separate instance per user, each instance has its own files, processes and resources
 - **On-demand provisioning**: instances are created when users start a session and cleaned up when idle
-- **Resource controls**: set CPU, memory and storage limits per terminal, within the server maximums
-- **Multiple environments**: users with write access create terminals with different setups for different teams (e.g., data science, development) and share them with users and groups
+- **Resource controls**: set CPU, memory and storage limits per machine, within the server maximums
+- **Multiple environments**: users with write access create machines with different setups for different teams (e.g., data science, development) and share them with users and groups
 - **Backends**: Docker, Kubernetes or the Kubernetes Operator
-- **Scoped instances**: a terminal can run one instance per user, saved chat or model, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
+- **Scoped instances**: a machine can run one instance per user, saved chat or model, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
 - **Network on the Docker backend**: with `TERMINALS_DOCKER_NETWORK` set, instances share that Docker network, the orchestrator reaches each one by name and an instance can reach a port another user's instance has opened. Without it, the orchestrator reaches instances through their published ports on the Docker host. A terminal's **Network** setting picks one of the network profiles an admin defined in `TERMINALS_NETWORK_PROFILES`, which can place it on another Docker network. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
 
 ```mermaid
