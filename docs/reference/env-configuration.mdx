@@ -8228,7 +8228,7 @@ pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 
 - Type: `str`
 - Default: `sqlite:///${DATA_DIR}/webui.db`
-- Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. This variable takes precedence over individual database connection parameters if explicitly set.
+- Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. When `DATABASE_TYPE`, `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME` and at least one of `DATABASE_USER` or `DATABASE_PASSWORD` are all set, Open WebUI builds the URL from them and ignores `DATABASE_URL`. The SQLite default applies only when the variable is not set at all. An empty value, or a `DATABASE_URL` left in your shell from another project, replaces it; an empty value stops startup with `sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL string`. Unset the variable or give it a full URL.
 
 :::info
 
@@ -8334,7 +8334,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 :::info
 
-When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct it using a combination of `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, and `DATABASE_NAME`. For this automatic construction to occur, **all** of these individual parameters must be provided. If any are missing, the default `DATABASE_URL` (SQLite file) or any explicitly set `DATABASE_URL` will be used instead.
+Open WebUI builds the database URL from `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT` and `DATABASE_NAME` when `DATABASE_TYPE`, `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME` and at least one of `DATABASE_USER` or `DATABASE_PASSWORD` are set. The built URL replaces `DATABASE_URL`, even one you set explicitly. If any of them is missing, the explicitly set `DATABASE_URL` or the default SQLite file is used instead.
 
 :::
 
