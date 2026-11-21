@@ -157,7 +157,7 @@ The editor shows only the options that can work on this instance, for example **
 | **Vision** | Enable image analysis (requires a vision-capable base model). Raster images (PNG, JPEG, WebP, GIF) reach the model as image inputs; an SVG is read as a document, so it travels on **File Upload** and the model works from its source text. With Vision off, images returned by tools reach the model as a short `[image]` note. |
 | **Web Search** | Enable the configured search provider |
 | **Code Interpreter** | Enable Python code execution |
-| **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) server to run commands and work with files. On by default; with it off, a chat's terminal is never handed to the model |
+| **Terminal** | Let the model drive an attached [Open Terminal](/features/open-terminal) machine to run commands and work with files. On by default. With it off, a chat's machine is never handed to the model |
 | **Image Generation** | Enable image generation. With it on and more than one [image model](/features/chat-conversations/image-generation-and-editing) available, a **Default image model** row appears for choosing the image model this model's chats use unless the user picks another |
 | **Video Generation** | Enable [video generation](/features/chat-conversations/image-generation-and-editing/video-generation). With it on and more than one video model available, a **Default video model** row appears for choosing the video model this model's chats use unless the user picks another |
 | **Usage** | Ask the provider to report token counts on streamed replies (`stream_options.include_usage`). Off by default. Most OpenAI-compatible providers report nothing unless asked, so without it a response has no token figures to show and none to aggregate in [Analytics](/features/administration/analytics) |
@@ -169,7 +169,7 @@ The editor shows only the options that can work on this instance, for example **
 | **File Upload** | Whether files can be attached to a message at all. On by default; with it off an upload in a chat using this model is refused, and **Preload files** disappears from this editor since there is nothing to extract |
 | **Preload files** | When enabled, attached files are processed via RAG and injected into the conversation. When disabled, nothing is injected and the model reads attached files with the builtin **Files** tools. Off by default with Native function calling and on with Legacy; the editor and **Model Defaults** show the effective value |
 | **Default Features** | The row right below **Features** lists **Web Search**, **Image Generation**, **Video Generation** and **Code Interpreter**, each only while that capability is on. A feature switched on here starts enabled in every new chat with this model; users can still turn it off per chat |
-| **Default terminal** | Shown while **Terminal** is on: the [Open Terminal](/features/open-terminal) server or [terminal](/features/open-terminal/terminals/orchestration/creating-terminals) selected by default for chats with this model. A terminal with a separate instance per model needs access to the model |
+| **Default machine** | Shown while **Terminal** is on: the [machine](/features/open-terminal/setup/connecting) selected by default for chats with this model. A machine with a separate instance per model needs access to the model |
 | **TTS Voice** | In the **Voice** row: a specific voice for this model's responses |
 
 :::info Usage covers every chat the model runs
@@ -276,12 +276,12 @@ Every **Save & Update** that changes a model's configuration is kept as a versio
 - **Set as Production** makes the opened version the live configuration. If the editor holds unsaved changes, you are asked to confirm first, since they are discarded.
 - **Delete** in a version's **⋯** menu removes it. The Production version cannot be deleted. Versions saved on top of a deleted one are relinked to its parent, so the chain stays complete.
 
-A version holds the name, base model, system prompt, parameters and the rest of the editor's settings, such as the description, tags, capabilities, prompt suggestions and the bound knowledge, tools, skills, filters, actions and terminal. The access settings, **Hide Model** and the **Enabled** switch belong to the live model and keep their current values when you change versions. Every existing model starts with one version, created by the upgrade.
+A version holds the name, base model, system prompt, parameters and the rest of the editor's settings, such as the description, tags, capabilities, prompt suggestions and the bound knowledge, tools, skills, filters, actions and machine. The access settings, **Hide Model** and the **Enabled** switch belong to the live model and keep their current values when you change versions. Every existing model starts with one version, created by the upgrade.
 
 Setting a version as Production checks everything it points to, because an older version can reference things that have since been deleted or that you cannot reach. The live configuration stays as it was, and the switch is refused, when:
 
 - its base model is no longer available.
-- a knowledge base, knowledge file, note, skill, tool or terminal it binds is missing or not accessible to you.
+- a knowledge base, knowledge file, note, skill, tool or machine it binds is missing or not accessible to you.
 - a filter or action function it binds is missing or switched off.
 - its background image or voice avatar files are no longer accessible to you.
 
@@ -318,7 +318,7 @@ Administrators can set baseline capabilities and parameters that apply to all mo
 - **Default Model Metadata** (`DEFAULT_MODEL_METADATA`): Baseline capabilities (vision, web search, preload files, code interpreter, builtin tools). Per-model overrides always win on conflicts.
 - **Default Model Params** (`DEFAULT_MODEL_PARAMS`): Baseline inference parameters (temperature, top_p, max_tokens, function_calling). Per-model values take precedence when explicitly set. This value is loaded from the environment as JSON; invalid JSON is ignored and falls back to `{}`.
 - **Tools**: tools that start enabled in new chats for every model without a tool list of its own. A model with its own tool list keeps it. The new model form starts with these tools selected.
-- **Default terminal**: the terminal new chats start with for every model that has no terminal of its own.
+- **Default machine**: the machine new chats start with for every model that has no machine of its own.
 - **Prompt suggestions**: the starter chips shown when a model has none of its own. The globe selector translates them per language, the same way a model's own suggestions are translated. See [Translations](#translations).
 
 These cover chat completions. Background task requests (titles, tags, follow-ups, search queries, autocomplete, context compaction summaries) do not go through them; their parameters are set separately, in [Task Models](/features/administration/task-models).
@@ -428,7 +428,7 @@ Switch models mid-conversation without losing context. Select up to two models s
 
 You can also switch without opening the picker. Send `/model` followed by a model id, for example `/model gpt-5.1`, and the chat moves to that model; send `/model` on its own and it tells you which model the chat is on. The id has to match exactly, the display name will not do, and an id you cannot reach reports `Model not found`. Picking **Model** from the `/` menu opens the picker with its search box focused instead. See [Chat Features](/features/chat-conversations/chat-features/) for the other built-in slash commands.
 
-A model change is saved with the chat right away, so the chat reopens on that model. Switching applies the new model's default tools, skills, filters, features and terminal, and keeps anything you turned on or off yourself. Features and filters the new model cannot use are turned off. Sending a message to a model picked with `@` switches the chat to that model.
+A model change is saved with the chat right away, so the chat reopens on that model. Switching applies the new model's default tools, skills, filters, features and machine, and keeps anything you turned on or off yourself. Features and filters the new model cannot use are turned off. Sending a message to a model picked with `@` switches the chat to that model.
 
 ---
 
