@@ -242,6 +242,12 @@ Only terminals the user is allowed to use are listed, so check the connection's 
 
 For an orchestrator connection, a terminal is listed for you only when it is shared with you or you have **Write** access to the connection. A terminal with a separate instance per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 
+### Command output is empty
+
+The `run_command` result shows `"status": "running"` and an empty `output` list. `run_command` starts the command in the background and returns its command ID right away. It waits for the command only when the call sends a `wait` value (up to `300` seconds) or the server sets `OPEN_TERMINAL_EXECUTE_TIMEOUT`, which is unset by default. The model reads the output later by calling `get_process_status` with that ID, which accepts `wait` too.
+
+To get the output of short commands in the first result, set `OPEN_TERMINAL_EXECUTE_TIMEOUT` on the Open Terminal server, for example `OPEN_TERMINAL_EXECUTE_TIMEOUT=5`, and restart it. A command that finishes sooner returns as soon as it ends. A command that runs longer still returns status `running`, and its output comes from `get_process_status`. See [Configuration](/features/open-terminal/advanced/configuration).
+
 ### Wrong API key
 
 If you see "unauthorized" or "invalid key":
