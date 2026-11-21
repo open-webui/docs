@@ -7085,6 +7085,10 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 - Default: `name`
 - Description: Set username claim for OpenID.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Username Claim** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
+- Where it is read: from the ID token when the ID token carries both this claim and the [`OAUTH_EMAIL_CLAIM`](#oauth_email_claim) claim. Otherwise Open WebUI fetches the userinfo response and reads the claim there, with ID token claims filling in keys the userinfo response lacks. The value is a top-level claim name; a dotted name is not read as a nested path.
+- When the claim is missing or empty: a new account gets its email address as its name, and the server logs `Username claim is missing, using email as name`.
+- Existing accounts keep their name. Turn on [`OAUTH_UPDATE_NAME_ON_LOGIN`](#oauth_update_name_on_login) to replace it from this claim at every sign-in.
 
 #### `OAUTH_EMAIL_CLAIM`
 
