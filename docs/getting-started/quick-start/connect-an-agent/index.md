@@ -13,8 +13,8 @@ An agent harness is the software around a model that manages tools, instructions
 
 | What you want | Setup | Where to connect |
 | :--- | :--- | :--- |
-| Give your existing model a workspace for commands, files, and code | **Open WebUI + Open Terminal**: Open WebUI manages the model's tool calls; Open Terminal executes them | **Settings > Integrations > Open Terminal** (admin section) |
-| Use Claude Code, Codex, Cursor, Gemini CLI, Hermes, or another supported agent in chat | **Agent through Open Terminal**: the agent CLI runs in the terminal environment and supplies its own tools and agent loop | The same **Open Terminal** connection; select the terminal, then an agent model |
+| Give your existing model a workspace for commands, files, and code | **Open WebUI + Open Terminal**: Open WebUI manages the model's tool calls; Open Terminal executes them | The **Machines** section of **Settings > Integrations** (admin section) |
+| Use Claude Code, Codex, Cursor, Gemini CLI, Hermes, or another supported agent in chat | **Agent through Open Terminal**: the agent CLI runs in the terminal environment and supplies its own tools and agent loop | The same connection in the **Machines** section; select the terminal, then an agent model |
 | Use an agent service you already operate | **Agent gateway**: Open WebUI sends chat requests to the service's OpenAI-compatible API | **Settings > Connections > OpenAI** (admin section) |
 
 For a new setup, start with **Open Terminal**. One connection gives you a workspace for regular models and access to the supported agent CLIs installed there.
@@ -55,7 +55,7 @@ The **Open Terminal API key** authenticates the connection to the terminal serve
 
 ### 3. Connect Open Terminal
 
-In Open WebUI, open **Settings > Integrations** in the **Admin** section. Under **Open Terminal**, add the terminal's URL and API key, save, and enable the connection.
+In Open WebUI, open **Settings > Integrations** in the **Admin** section. In the **Machines** section, add the terminal's URL and API key, save, and enable the connection.
 
 Use an address reachable from the Open WebUI server: for example, `http://open-terminal:8000` on a shared Docker Compose network, or `http://localhost:8000` when both processes run directly on the same machine. For separate containers, remote hosts, and access grants, follow the [connection guide](/features/open-terminal/setup/connecting).
 

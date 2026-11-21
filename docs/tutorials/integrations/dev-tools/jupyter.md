@@ -86,7 +86,7 @@ When accessing the Jupyter service, you will need the `JUPYTER_TOKEN` defined ab
 
 # Step 2: Configure Code Execution for Jupyter
 
-Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI's Code Execution to use Jupyter under Settings > Code Execution (admin section). Since Open-WebUI is constantly releasing and improving this feature, I recommend always reviewing the possible configuraitons in the [`configs.py` file](https://github.com/open-webui/open-webui/blob/6fedd72e3973e1d13c9daf540350cd822826bf27/backend/open_webui/routers/configs.py#L72) for the latest and greatest. As of v0.5.16, this includes the following:
+Now that we have Open-WebUI and Jupyter running, we need to configure Open-WebUI's Code Execution to use Jupyter under Settings > Code Execution (admin section, under Legacy). Since Open-WebUI is constantly releasing and improving this feature, I recommend always reviewing the possible configurations in the [`configs.py` file](https://github.com/open-webui/open-webui/blob/6fedd72e3973e1d13c9daf540350cd822826bf27/backend/open_webui/routers/configs.py#L72) for the latest and greatest. It includes the following:
 
 | Open-WebUI Env Var | Value |
 | ------------------------------------- | -------------------------------- |
@@ -102,7 +102,7 @@ Now that we have Open-WebUI and Jupter running, we need to configure Open-WebUI'
 | `CODE_INTERPRETER_JUPYTER_AUTH_TOKEN` | 123456 |
 | `CODE_INTERPRETER_JUPYTER_TIMEOUT` | 60 |
 
-These are persisted Admin settings: an environment variable only takes effect on the very first start against a fresh database; after that the value saved in the database wins (change it under Settings > Code Execution (admin section)), unless `ENABLE_PERSISTENT_CONFIG=False`. `CODE_EXECUTION_JUPYTER_AUTH` accepts exactly `token` or `password`; any other value sends no credentials, and password mode logs in through Jupyter's `/login` form. The `CODE_INTERPRETER_JUPYTER_*` variables default to their `CODE_EXECUTION_JUPYTER_*` twins, but `CODE_INTERPRETER_ENGINE` does not (it defaults to `pyodide`), so set both engine variables.
+These are persisted Admin settings: an environment variable only takes effect on the very first start against a fresh database; after that the value saved in the database wins (change it in **Settings > Code Execution**, which is under **Legacy** in the admin section), unless `ENABLE_PERSISTENT_CONFIG=False`. `CODE_EXECUTION_JUPYTER_AUTH` accepts exactly `token` or `password`; any other value sends no credentials, and password mode logs in through Jupyter's `/login` form. The `CODE_INTERPRETER_JUPYTER_*` variables default to their `CODE_EXECUTION_JUPYTER_*` twins, but `CODE_INTERPRETER_ENGINE` does not (it defaults to `pyodide`), so set both engine variables.
 
 Once Jupyter is the engine, [`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson), on by default, gets the output of a run into the chat faster, which is most noticeable when the code prints a lot or generates images. Leave it at `True`; it is read once at startup, so restart after changing it.
 

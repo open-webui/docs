@@ -29,12 +29,12 @@ In the settings sidebar, find the **Admin** section and click **Integrations**.
 
 ### 3. Find the "Open Terminal" section
 
-Scroll down until you see the **Terminal** section with the **Open Terminal** connections. It is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
+Scroll down until you see the **Machines** section with the **Open Terminal** connections. It is greyed out when [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) is set to `False`.
 
-![The Open Terminal section under Integrations](/images/open-terminal-connected.png)
+![The Machines section under Integrations with an Open Terminal connection](/images/open-terminal-connected.png)
 
 :::warning Don't confuse it with "Tools"
-Open Terminal has its **own section** under Integrations. Don't add it under "External Tools" or "Tool Servers". Using the dedicated section gives you the built-in file browser and terminal sidebar.
+Add Open Terminal in the **Machines** section, not in the **Tools** section under **External Tool Servers**. Only the **Machines** section gives you the built-in file browser and terminal sidebar.
 :::
 
 ### 4. Click + and fill in the details
