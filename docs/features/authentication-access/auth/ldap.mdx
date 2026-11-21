@@ -145,6 +145,8 @@ Open WebUI needs an email address for every account. A user whose mail attribute
 
 :::
 
+`LDAP_ATTRIBUTE_FOR_USERNAME` is used only to find the user's entry from the name typed on the sign-in page. An account created by LDAP sign-in takes its name from the entry's `cn` attribute and its email from the mail attribute, and its Open WebUI username is left empty.
+
 ### UI Configuration
 
 Alternatively, you can configure these settings directly in the UI:
@@ -214,6 +216,14 @@ ERROR | LDAP authentication error: ("('socket ssl wrapping error: [SSL: UNEXPECT
 -   **If you don't intend to use TLS:** Set `LDAP_USE_TLS="false"` and connect to the standard plaintext port `389`.
 -   **If you intend to use LDAPS:** Ensure your LDAP server is configured for TLS and listening on port `636`. Set `LDAP_SERVER_PORT="636"` and `LDAP_USE_TLS="true"`.
 -   **StartTLS is not supported.** `LDAP_USE_TLS` opens an implicit TLS connection only, so `"true"` against a plain listener on port `389` fails. Use LDAPS on `636` or plaintext on `389`.
+
+### `Failed to configure TLS for LDAP connection.` {#failed-to-configure-tls}
+
+**Cause:** Open WebUI could not build the TLS settings for the LDAP connection, so sign-in stops before it contacts the LDAP server. A common reason is a **Certificate Path** ([`LDAP_CA_CERT_FILE`](/reference/env-configuration#ldap_ca_cert_file)) that points to a file that does not exist inside the Open WebUI container. The server log then shows `TLS configuration error: invalid CA public key file`.
+
+**Solution:**
+-   **If you use a custom CA:** Mount the CA certificate file into the container and set **Certificate Path** to its path inside the container, not its path on the host.
+-   **If you do not need a custom CA:** Clear **Certificate Path** in the **LDAP** section of **Settings > Authentication**.
 
 ### `err=49 text=` (Invalid Credentials)
 
