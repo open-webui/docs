@@ -17,7 +17,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
  This guide is intended to recommend some basic recommendations for how users might go about doing that.
 
- This guide assumes that the user has installed Open WebUI via Docker (or intends to do so)
+ This guide assumes that the user has installed Open WebUI via Docker (or intends to do so). For pip, uv and Conda installs, see [pip, uv and Conda installs](#pip-uv-and-conda-installs).
 
 ## Ensuring data persistence
 
@@ -78,6 +78,23 @@ services:
 ```
 
 If this is how you've deployed your instance, you'll want to note the paths on root.
+
+## pip, uv and Conda installs
+
+An instance started with `open-webui serve` keeps its data in the folder set by [`DATA_DIR`](/reference/env-configuration#data_dir). Without `DATA_DIR`, that folder is `open_webui/data` inside the Python environment's `site-packages`, so removing or recreating the environment deletes the data with it. To print the path, run this in the activated environment:
+
+```bash
+python -c "import open_webui, pathlib; print(pathlib.Path(open_webui.__file__).resolve().parent / 'data')"
+```
+
+Back up two things:
+
+- **The data directory.** It holds the same files as the Docker volume, listed in [Files in persistent data store](#files-in-persistent-data-store).
+- **The `.webui_secret_key` file**, unless you set [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) in the environment. `open-webui serve` creates it on first start in the folder you run the command from, not in the data directory, and prints its path at every start: `Loading WEBUI_SECRET_KEY from <path>`. A restored instance without it generates a new key, which signs everyone out.
+
+Stop Open WebUI before copying, so `webui.db` and its `webui.db-wal` file are copied in the same state.
+
+To move the data out of the environment, stop Open WebUI, copy the data directory to a folder of your own, and start with `DATA_DIR` pointing at it, for example `DATA_DIR=~/.open-webui open-webui serve`. Start from the folder that holds `.webui_secret_key`, or copy that file to the folder you start from.
 
 ## Scripting A Backup Job
 

@@ -1334,8 +1334,8 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 #### `DATA_DIR`
 
 - Type: `str`
-- Default: `./data`
-- Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc.
+- Default: `backend/data` in the source tree, which is `/app/backend/data` in the Docker image. For pip, uv and Conda installs started with `open-webui serve`, `open_webui/data` inside the environment's `site-packages`.
+- Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc. For pip, uv and Conda installs, set it to a folder outside the Python environment, because the default folder is deleted when you remove or recreate the environment. When `open-webui serve` starts without `DATA_DIR` and finds a `data` folder directly in `site-packages`, it copies that folder into `open_webui/data`, saves a copy as `site-packages/open_webui_data.zip` and deletes the original.
 
 #### `FRONTEND_BUILD_DIR`
 
