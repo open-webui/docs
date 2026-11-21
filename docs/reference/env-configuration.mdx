@@ -5047,7 +5047,7 @@ You **MUST** provide the full URL, including the endpoint path (e.g., `https://a
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables retrieval query generation.
+- Description: Enables or disables retrieval query generation. Also set as **Retrieval Query Generation** in **Settings > Interface** (admin section). When on, the task model writes the search queries for attached files and knowledge bases from the conversation, so the same question can retrieve different sources between runs. When off, the last user message is used as the query as written. See [The Same Question Retrieves Different Sources Each Time](/troubleshooting/rag#19-the-same-question-retrieves-different-sources-each-time).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_QUERIES_CACHE`

@@ -559,6 +559,21 @@ With **Hybrid Search** on, answers look the same as plain vector search, and no 
 3. **Check the external reranker**: with **Reranking Engine** set to **External**, **API Base URL** must be the full rerank endpoint. Open WebUI posts JSON with `model`, `query`, `documents` and `top_n`, and reads `results[].index` and `results[].relevance_score` from the response. A chat completions or embeddings endpoint does not answer in that shape.
 4. **Turn Hybrid Search off** to isolate the problem. If retrieval improves or changes, the fault is in the hybrid or reranker setup, not in the embeddings.
 
+### 19. The Same Question Retrieves Different Sources Each Time
+
+Asking the same question about the same files returns different sources or a different answer from one run to the next.
+
+**The Problem**: with **Retrieval Query Generation** on (the default), Open WebUI does not search with your message. The task model reads the conversation and writes the search queries, and those queries can change between runs. The chat shows them as chips under **Querying** while the response is generated.
+
+- If the task model's reply has no JSON object, the whole reply is used as one query.
+- If query generation fails, or **Retrieval Query Generation** is off, Open WebUI searches with your last message exactly as written.
+
+**Solutions:**
+
+1. **Compare the queries**: open the status history of each response and check the chips under **Querying**.
+2. **Turn off Retrieval Query Generation** in **Settings > Interface** (admin section), under **Generation**, or set [`ENABLE_RETRIEVAL_QUERY_GENERATION=False`](/reference/env-configuration#enable_retrieval_query_generation). Retrieval then uses your last message as is, so the same message searches the same way each time. Earlier messages are not used, so a follow-up such as "what about the second one?" is searched with those words alone.
+3. **Change the task model** under **Task Model** in the **Tasks** section of the same page, if you keep query generation on. The queries come from that model, not from the chat model.
+
 ---
 
 By optimizing these areas (extraction, embedding, retrieval, and model context) you can dramatically improve how accurately your LLM works with your documents.
