@@ -3534,13 +3534,13 @@ Your MariaDB server must support `VECTOR` and `VECTOR INDEX` features (MariaDB 1
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables SSL for OpenSearch.
+- Description: Enables or disables SSL for OpenSearch. When `True`, Open WebUI connects over HTTPS even if `OPENSEARCH_URI` starts with `http://`. Set it to `False` for an OpenSearch server that serves plain HTTP. A URI that starts with `https://` uses HTTPS either way.
 
 #### `OPENSEARCH_URI`
 
 - Type: `str`
 - Default: `https://localhost:9200`
-- Description: Sets the URI for OpenSearch.
+- Description: Sets the URI for OpenSearch. An `http://` URI alone does not turn off HTTPS. Also set `OPENSEARCH_SSL=False`.
 
 #### `OPENSEARCH_USERNAME`
 
