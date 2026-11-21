@@ -5,7 +5,7 @@ title: "Automations"
 
 # Automations
 
-Automations let you schedule prompts to run automatically at recurring times. Each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
+Automations let you schedule prompts to run automatically at recurring times. By default each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
 
 Runs use [memory](/features/chat-conversations/memory) the same way your chats do. When memory is on for you, a run gets the memory tools and, with **Memory System Context** on, your stored memories in its context, under the same model, permission and admin settings as a chat. Whether memory is on follows your **Memory** switch in **Settings > Personalization**; if you never set it, the [default interface settings](/features/administration/interface-defaults) decide, and without those, whether Memories is enabled for the instance.
 
@@ -93,6 +93,8 @@ The page is the editor. Name and instructions sit at the top, followed by a **Pr
 The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
 
 Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. Runs load incrementally as you scroll.
+
+The **Destination** menu has a **Start each run in new chat** switch (**Start each run in new thread** for a channel), on by default. Switch it off and every run continues one ongoing chat or channel thread, so each run sees the earlier runs.
 
 ### Quick delete
 
