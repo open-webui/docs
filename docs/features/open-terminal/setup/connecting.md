@@ -7,7 +7,7 @@ title: "Connecting to Open WebUI"
 
 Open Terminal is [installed and running](./installation.mdx). This guide covers connecting it to Open WebUI.
 
-To let Open WebUI install Open Terminal on a server or laptop for you, see [SSH Machines](./ssh-machines.md).
+To let Open WebUI install Open Terminal on a server or laptop for you, see [SSH Machines](./ssh-machines.md). To run it on the server Open WebUI itself runs on, see [Local Machine](./local-machine.md).
 
 ---
 
