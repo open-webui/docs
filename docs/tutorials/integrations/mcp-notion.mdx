@@ -33,7 +33,7 @@ Go to **Settings > Integrations** (admin section) and click **+** to add a new c
 | **Name** | `Notion` |
 | **Connection ID** | `ntn` (it fills in from the name, so overwrite it to match the import below) |
 
-Click **Register Client**, then **Save**. Use `OAuth 2.1 (Static)` if you have pre-created OAuth client credentials.
+Click **Register Client**, then **Save**. Use `OAuth 2.1 (Static)` if you have pre-created OAuth client credentials. Your OAuth client at Notion then needs the redirect URI `<WebUI URL>/oauth/clients/mcp:ntn/callback`, see [OAuth 2.1 (Static) Setup](/features/extensibility/mcp#oauth-21-static-setup).
 
 <details>
 <summary>Alternative: Import JSON</summary>

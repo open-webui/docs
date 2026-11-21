@@ -137,6 +137,18 @@ The provider returns the browser to the Open WebUI home page when the flow finis
 
 Use this when you already have a client ID/client secret from your identity provider.
 
+:::info Redirect URI
+The OAuth client at your identity provider must allow this redirect URI:
+
+```text
+<WebUI URL>/oauth/clients/mcp:<Connection ID>/callback
+```
+
+For an instance at `https://ai.example.com` and a connection whose **Connection ID** is `notion`, that is `https://ai.example.com/oauth/clients/mcp:notion/callback`. `<WebUI URL>` is the **WebUI URL** field in **Admin Panel > Settings > General** ([`WEBUI_URL`](/reference/env-configuration#webui_url)). Set it to the public address users reach Open WebUI at before you click **Register Client**. When it is empty, Open WebUI uses the address of the request that registered the client.
+
+**Register Client** builds the redirect URI from the **WebUI URL** and **Connection ID** it sees at that moment, and the saved connection keeps it. After you change **WebUI URL** or the **Connection ID**, click **Register Client** again, click **Save**, and update the redirect URI at your identity provider. **OAuth 2.1** sends the same redirect URI during dynamic client registration, so you do not enter it anywhere.
+:::
+
 1. Open **Settings > Integrations** (admin section).
 2. Under **External Tool Servers**, click **+ Add Connection**. The Integrations page holds several sections, so make sure it is that one.
 3. Set **Type** to **MCP (Streamable HTTP)**.
@@ -265,6 +277,14 @@ The server log records each failure at error level as `Failed to connect to MCP 
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
 4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, connecting, listing its tools or reading a resource can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds). Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server) instead.
+
+### `{"detail":"Not Found"}` after the OAuth sign-in
+
+**Symptom**: After you approve access at the provider, the browser lands on `/oauth/clients/mcp:<Connection ID>/callback` and shows only `{"detail":"Not Found"}`.
+
+**Cause**: Open WebUI has no OAuth client stored under the **Connection ID** in that URL. The redirect URI keeps the **Connection ID** it had when you clicked **Register Client**, so this happens when the **Connection ID** was changed afterwards, or when the connection was deleted or never saved.
+
+**Solution**: Open the connection under **Settings > Integrations** (admin section), click **Register Client** with the current **Connection ID**, and click **Save**. With **OAuth 2.1 (Static)**, update the redirect URI at your identity provider to match, see [OAuth 2.1 (Static) Setup](#oauth-21-static-setup). Then enable the tool in a chat again.
 
 ### An SSE URL does not connect
 
