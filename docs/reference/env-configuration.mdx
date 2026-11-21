@@ -317,6 +317,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.user_input` | Ask User | **Ask User** under **Builtin Tools** in the model editor |
 | `model_editor.tools.memory` | Memory | **Memory** under **Builtin Tools** in the model editor |
 | `model_editor.tools.chats` | Chat History | **Chat History** under **Builtin Tools** in the model editor |
+| `model_editor.tools.users` | Users | **Users** under **Builtin Tools** in the model editor |
 | `model_editor.tools.notes` | Notes | **Notes** under **Builtin Tools** in the model editor |
 | `model_editor.tools.knowledge` | Knowledge Base | **Knowledge Base** under **Builtin Tools** in the model editor |
 | `model_editor.tools.files` | Files | **Files** under **Builtin Tools** in the model editor |
@@ -440,7 +441,7 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** tab to the admin settings, where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > General** (admin section) (**Apps**).
+- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds an **Apps** section to **Settings > Integrations** (admin section). Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > General** (admin section) (**Apps**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `APP_ALLOWED_PRIVATE_ORIGINS`
@@ -499,6 +500,13 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Default: empty, which means no limit
 - Description: The most characters of message text the `view_chat` tool returns when a model reads a previous chat. The newest messages are kept, and the result tells the model it was cut and how many messages it holds. Must be a positive integer, or Open WebUI stops at startup. See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > General > Chat Read Limit** (admin section). Leave the field empty for no limit.
+
+#### `TOOL_OUTPUT_MAX_CHARS`
+
+- Type: `int`
+- Default: empty, which means no limit
+- Description: The most characters of a tool result that reach the model, see [Tools](/features/extensibility/plugin/tools). Must be a positive integer, or Open WebUI stops at startup.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `tools.output_max_chars`. It can be configured in **Settings > General > Tool Output Limit** (admin section). Leave the field empty for no limit.
 
 #### `VISUALIZATION_PROMPT_TEMPLATE`
 
@@ -1712,6 +1720,13 @@ Several parameters have no effect on background requests wherever you set them: 
 - Default: Empty string
 - Description: Tool names or glob patterns that are always sent in full when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on, for example `jira_create_issue,github_*`. Patterns match the tool names the model sees and are case-sensitive; MCP tools carry their server's ID as a prefix. Can also be set in **Settings > Interface** (admin section) (**Always Loaded Tools**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.always_loaded`.
+
+#### `TOOL_SEARCH_LIST_TOOLS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Lists the name and a short description of every deferred tool in the system prompt, so the model knows what to search for with [Tool Search](/features/extensibility/plugin/tools#tool-search). See [Prompt Caching](/features/chat-conversations/prompt-caching) for the effect on the provider's cache. Can also be toggled in **Settings > Interface** (admin section) (**List Deferred Tools**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.list_tools`.
 
 #### `TOOL_SEARCH_DEFER_BUILTIN_TOOLS`
 
@@ -8951,7 +8966,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections and the terminals and tool servers (OpenAPI and MCP) users add through [Tether](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections and the terminals and tool servers (OpenAPI and MCP) users add through [Tether](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Machines** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 

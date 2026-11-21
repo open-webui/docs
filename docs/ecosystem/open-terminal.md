@@ -53,7 +53,7 @@ Terminals can stop idle environments while retaining their persisted files, then
 ## Start with One Real Task
 
 1. **[Install Open Terminal](/features/open-terminal/setup/installation).** Docker gives it a separate container environment; a host installation works with that machine's files and software under the operating-system user's permissions.
-2. **[Connect it to Open WebUI](/features/open-terminal/setup/connecting).** Add its address and API key under **Settings > Admin > Integrations > Open Terminal**.
+2. **[Connect it to Open WebUI](/features/open-terminal/setup/connecting).** Add its address and API key in the **Machines** section of **Settings > Integrations** (admin section).
 3. **Select the terminal in chat and put it to work.** Choose a capable model or installed agent, bring a file or project, and ask for a result you can use.
 
 For workspaces created on demand, **[deploy Terminals](https://github.com/open-webui/terminals#quick-start)** and create your first template from Open WebUI's **New terminal** menu. For a desktop app that connects your own computer, use [Open WebUI Tether](/ecosystem/tether).

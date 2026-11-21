@@ -72,7 +72,7 @@ Notes uses a context-aware **floating toolbar** for formatting:
 * **Drag-and-drop** list items to reorder
 * **Drag the handle** (⋮⋮) beside any top-level block to move it, or click it for **Move up** and **Move down**
 
-The top bar shows real-time **word and character counts**. The **microphone icon** offers **Record**, **Capture Audio** and **Upload Audio**. The recording is saved to the note as soon as it is uploaded, and its transcription finishes on the server.
+The top bar shows real-time **word and character counts**. The note's chat input records audio like the [chat input](/features/chat-conversations/chat-features). If you can edit the note, the recording is saved to it as soon as it is uploaded, and its transcription finishes on the server.
 
 :::info Rich Text in Chats
 This editor can also be enabled for standard chats: **Settings > Interface > Rich Text Input for Chat** and **Show Formatting Toolbar**.
