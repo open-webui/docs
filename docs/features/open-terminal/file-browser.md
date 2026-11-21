@@ -120,7 +120,7 @@ Uploading is switched off in a folder marked **Read-only**, and dropping files o
 
 ### From the chat input
 
-Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. With the connection's **Chat Uploads** set to `Filesystem`, they go to the machine instead. Attachments then land in the chat's working folder (the machine's default folder when none is set) and show up here like anything else. The model opens them with the machine's own tools. See [Chat Uploads](/features/open-machine/setup/connecting#chat-uploads).
+Files attached in the chat input normally go to Open WebUI, where their text is extracted for the model to read. With the connection's **Chat Uploads** set to `Filesystem`, they go to the machine instead. Attachments then land in the chat's working folder (the machine's default folder when none is set) and show up here like anything else. The model opens them with the machine's own tools. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 ### Attaching terminal files to a message
 
@@ -269,7 +269,7 @@ If you have more than one machine connected, switching between them in the dropd
 :::
 
 :::info Terminals that give each chat its own files
-A machine can give every conversation an instance of its own, so each chat has its own files. Such a machine needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a machine but its files and details open once the chat is saved. Temporary chats do not list it. To browse a machine's files without selecting it, use **View files** in its **More** menu. See [Creating Machines](/features/open-machine/machines/orchestration/creating-machines).
+A machine can give every conversation an instance of its own, so each chat has its own files. Such a machine needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a machine but its files and details open once the chat is saved. Temporary chats do not list it. To browse a machine's files without selecting it, use **View files** in its **More** menu. See [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals).
 :::
 
 ## More things to try
