@@ -75,7 +75,7 @@ When you pick a model in the browser, the frontend reads `meta.terminalId` off t
 You can read a model's configured terminal with `GET /api/v1/models/model?id=<model-id>` and use `meta.terminalId`, or just pick one from `/api/v1/machines/`, which already lists only the machines your user is allowed to use.
 :::
 
-### Terminal scope
+### Machine scope
 
 Machines on a Terminals server carry a `scope`: `null`, `user`, `chat` or `model`. It decides what your request must carry to use the machine:
 
@@ -85,7 +85,7 @@ Machines on a Terminals server carry a `scope`: `null`, `user`, `chat` or `model
 | `chat` | A saved `chat_id`. Each chat gets its own instance |
 | `model` | A model you have access to |
 
-Read `scope` before choosing a machine. For a `chat` machine you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one. [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope) covers what each scope does.
+Read `scope` before choosing a machine. For a `chat` machine you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one. [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope) covers what each scope does.
 
 ---
 

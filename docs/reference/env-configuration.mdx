@@ -2021,7 +2021,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 :::
 
-### Terminal Server
+### Machines
 
 #### `MACHINE_CONNECTIONS`
 
@@ -2062,7 +2062,7 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 ```
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-`config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
+`config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals).
 
 `config.chat_uploads` decides where a file attached in the chat input goes while this machine is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the machine's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the machine's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 

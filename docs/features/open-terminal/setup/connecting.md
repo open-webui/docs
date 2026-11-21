@@ -51,7 +51,7 @@ Add Open Terminal in the **Machines** section, not in the **Tools** section unde
 | **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
 | **Forward cookies** | Under **Advanced**, off by default. Only turn it on for a machine that authenticates by cookie, since every cookie the browser holds for your Open WebUI domain travels with the request |
 
-![The form for adding an Open Terminal connection with the Name, URL, Chat Uploads and Auth fields still empty](/images/open-terminal-connection-form.png)
+![The Add Machine form with Name, URL and API Key still empty](/images/open-terminal-connection-form.png)
 
 ### 5. Save
 
@@ -66,14 +66,14 @@ Limit access to specific user groups via the access control button.
 ![The access control panel listing user groups with checkboxes](/images/open-terminal-access-grants.png)
 
 :::tip Orchestrator connections can be scoped further
-A connection to a [Terminals orchestrator](/features/open-terminal/terminals/) has **Read** and **Write** access. Users with **Write** create their own machines from the machine menu in the message input, each with its own image, resources, environment variables and sharing. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals). A direct Open Terminal connection has no machines to create and is available to everyone with access.
+A connection to a [Terminals orchestrator](/features/open-terminal/terminals/) has **Read** and **Write** access. Users with **Write** create their own machines from the machine menu in the message input, each with its own image, resources, environment variables and sharing. See [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals). A direct Open Terminal connection has no machines to create and is available to everyone with access.
 :::
 
-### 7. Select a terminal in chat
+### 7. Select a machine in chat
 
 In the chat input area, click the cloud icon. Your machines appear under **Machines**. Select one to activate it for the conversation.
 
-![The chat input menu listing Open Terminal as a connection](/images/open-terminal-chat-dropdown.png)
+![The machine menu in the chat input listing Open Terminal](/images/open-terminal-chat-dropdown.png)
 
 The selected machine name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another machine at any time except while a reply is generating.
 
@@ -115,7 +115,7 @@ For Docker deployments, you can configure machines automatically using the [`MAC
 
 ---
 
-## Your own terminal (Tether)
+## Your own machine (Tether)
 
 Without admin access, add a machine in the Tether app. It is yours alone and its URL and key stay on your computer. See [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
 
@@ -214,18 +214,18 @@ docker exec open-webui curl -s http://open-terminal:8000/health
 If it prints `{"status": "ok"}`, the connection works. If it errors, the containers can't see each other.
 :::
 
-### Terminal shows up but AI doesn't use it
+### Machine shows up but AI doesn't use it
 
 Make sure:
 - The toggle switch next to the connection is **turned on**. Turning it off takes the machine out of service completely: the model is not given its tools, the terminal and file browser refuse to connect, and any proxied request to it is rejected. It is a working off switch, not just a hint to the model, so use it to retire a machine without deleting the connection.
 - You've **refreshed the page** after adding the connection
 - Your model supports tool calling (most modern models do)
 
-### Terminal is missing from the picker
+### Machine is missing from the picker
 
 Only machines the user is allowed to use are listed, so check the connection's access grants and that the connection is enabled.
 
-For an orchestrator connection, a machine is listed for you only when it is shared with you or you have **Write** access to the connection. A machine with a separate instance per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
+For an orchestrator connection, a machine is listed for you only when it is shared with you or you have **Write** access to the connection. A machine with a separate instance per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 
 ### Wrong API key
 

@@ -222,7 +222,7 @@ With a machine selected, the **Working Directory** button (folder icon) next to 
 
 ### Cloning a repository
 
-When the machine supports Git, the **Open folder** dialog and the folder picker in the [folder settings](/features/chat-conversations/chat-features/conversation-organization#default-terminal-and-working-directory) have **Clone repository**. Enter an HTTP(S) or SSH repository URL and it is cloned into a new folder named after the repository, inside the folder you are in, which then becomes the chosen folder. The clone runs `git clone` on the terminal, so the terminal needs Git, network access to the remote and, for a private repository, credentials already set up on the terminal. Git does not prompt for a password, and an SSH host must already be in the terminal's known hosts.
+When the machine supports Git, the **Open folder** dialog and the folder picker in the [folder settings](/features/chat-conversations/chat-features/conversation-organization#default-machine-and-working-directory) have **Clone repository**. Enter an HTTP(S) or SSH repository URL and it is cloned into a new folder named after the repository, inside the folder you are in, which then becomes the chosen folder. The clone runs `git clone` on the terminal, so the terminal needs Git, network access to the remote and, for a private repository, credentials already set up on the terminal. Git does not prompt for a password, and an SSH host must already be in the terminal's known hosts.
 
 ---
 
@@ -269,7 +269,7 @@ If you have more than one machine connected, switching between them in the dropd
 :::
 
 :::info Terminals that give each chat its own files
-A machine can give every conversation an instance of its own, so each chat has its own files. Such a machine needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a machine but its files and details open once the chat is saved. Temporary chats do not list it. To browse a machine's files without selecting it, use **View files** in its **More** menu. See [Creating Terminals](/features/open-machine/machines/orchestration/creating-machines).
+A machine can give every conversation an instance of its own, so each chat has its own files. Such a machine needs the conversation to exist first: the file browser appears once you have sent the first message, and a new chat lists such a machine but its files and details open once the chat is saved. Temporary chats do not list it. To browse a machine's files without selecting it, use **View files** in its **More** menu. See [Creating Machines](/features/open-machine/machines/orchestration/creating-machines).
 :::
 
 ## More things to try

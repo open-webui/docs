@@ -76,7 +76,7 @@ Then start everything:
 docker compose up -d
 ```
 
-Open WebUI will be available at `http://localhost:3000`. The connection above gives every user **Read** access, so users can use terminals that are shared with them. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals). When a user opens a terminal, the orchestrator provisions the instance automatically.
+Open WebUI will be available at `http://localhost:3000`. The connection above gives every user **Read** access, so users can use terminals that are shared with them. Give the people who create terminals **Write** access in the connection's **Access** setting, see [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals). When a user opens a terminal, the orchestrator provisions the instance automatically.
 
 :::warning Docker socket access
 The orchestrator needs access to the Docker socket (`/var/run/docker.sock`) to manage containers. For production, use a Docker socket proxy like [Tecnativa/docker-socket-proxy](https://github.com/Tecnativa/docker-socket-proxy) to restrict the API calls it can make.
