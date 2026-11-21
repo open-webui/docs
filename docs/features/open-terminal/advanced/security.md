@@ -76,7 +76,7 @@ Add the machine as an admin. The API key stays hidden on the server, requests go
 
 A machine a user adds in Tether is listed under **Your devices** and is reached through that user's own computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
 
-![The Open Terminal connection in admin settings with the API key masked](/images/open-terminal-connection-masked-key.png)
+![Editing a machine in admin settings with its API key masked](/images/open-terminal-connection-masked-key.png)
 
 ---
 
