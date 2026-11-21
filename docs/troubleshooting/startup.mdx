@@ -142,6 +142,26 @@ See [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) for how 
 
 ---
 
+## `Could not parse SQLAlchemy URL from given URL string` at startup
+
+### Symptom
+
+Open WebUI stops while loading, and the traceback ends with:
+
+```text
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL string
+```
+
+### Cause
+
+`DATABASE_URL` is set to an empty value, such as a `DATABASE_URL=` line with nothing after the equals sign. Open WebUI uses its SQLite default only when the variable is not set at all, so the empty value is passed on as the database URL. A `DATABASE_URL` left in your shell from another project also replaces the default, and Open WebUI then connects to that project's database.
+
+### Fix
+
+Remove or unset `DATABASE_URL` (`unset DATABASE_URL` in the shell you start Open WebUI from) to use the SQLite database in [`DATA_DIR`](/reference/env-configuration#data_dir), or set it to a full URL. See [`DATABASE_URL`](/reference/env-configuration#database_url).
+
+---
+
 ## A Function stops Open WebUI loading
 
 ### Symptom
