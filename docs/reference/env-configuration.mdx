@@ -536,6 +536,20 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Description: Sets the minimum allowed interval in seconds between automation recurrences for non-admin users. When set, any automation schedule that recurs more frequently than this value will be rejected with a `400 Bad Request` error. One-time automations (`COUNT=1`) are exempt from this check. Admins bypass this limit.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `AUTOMATION_MAX_CONCURRENT`
+
+- Type: `int`
+- Default: `("") empty string` (unlimited)
+- Description: Maximum number of automation runs executing at once. Runs beyond the limit wait for a free slot. Empty means no limit. Applies to every run, admin automations included. Counted per worker process, so the effective ceiling is this value multiplied by the number of workers or replicas. A changed value takes effect after a restart.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_AUTOMATION_WEBHOOKS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Allows automations to be started by a webhook URL. Anyone with the URL can start the automation and send it text. When disabled, existing webhook URLs stop working. See [Webhooks](/features/chat-conversations/chat-features/automations#webhooks). Can also be set with **Automation Webhooks** in **Admin Settings > General**.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `AUTOMATION_AUTH_TOKEN_EXPIRES_IN`
 
 - Type: `str` (duration)
@@ -719,7 +733,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
   Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
-  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers, Open Terminal machines, and arena models. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
+  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers and Open Terminal machines. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
 
   This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`, switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
@@ -7741,6 +7755,13 @@ A sharing change the user may not make is refused with `403`. Admins are exempt,
 - Type: `bool`
 - Default: `False`
 - Description: Lets non-admins share workspace skills.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `USER_PERMISSIONS_AUTOMATIONS_ALLOW_SHARING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets non-admins share automations with specific users or groups. See [Sharing](/features/chat-conversations/chat-features/automations#sharing).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`

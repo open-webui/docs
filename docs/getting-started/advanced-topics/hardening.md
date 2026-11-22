@@ -19,6 +19,8 @@ For organizations where security is a priority, the recommended deployment place
 - A zero-trust access proxy (Cloudflare Access, Pomerium)
 - A reverse proxy with authentication and IP allowlisting
 
+Automation webhook URLs are reachable without signing in, because the secret in the URL is the credential. If a proxy in front requires authentication on every path, those calls need an exception. Set [`ENABLE_AUTOMATION_WEBHOOKS`](/reference/env-configuration#enable_automation_webhooks) to `false` if you do not use them.
+
 DDoS protection and brute-force prevention (rate limiting, connection throttling, fail2ban) should be handled at the proxy or network layer.
 
 ### Requests for paths that do not exist
