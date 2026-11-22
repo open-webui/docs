@@ -212,7 +212,7 @@ The controls are saved with the model and apply to everyone who can use it. Peop
 
 An option's parameters work like the ones added with **Add Custom Parameter** in **Advanced Params**: the parameter name goes to the provider exactly as written, and a value that reads as JSON (a number, `true`, an object) is sent as that type, anything else as text. When an option has several parameters, all of them are sent together. For an Ollama model they end up in Ollama's `options`, except `think`, `format` and `keep_alive`, which go at the top level of the request. A `think`, `format` or `keep_alive` the model sets itself still wins over a control; leave those three unset on the model if a control should drive them.
 
-Saving controls on a model backed by a pipe function or on an arena model fails with **Model controls require a server-managed provider model.**
+Saving controls on a model backed by a pipe function or on a router model fails with **Model controls require a server-managed provider model.**
 
 #### Using model controls in chat
 
@@ -244,7 +244,7 @@ The name, the description, the prompt suggestions and the names of [model contro
 
 Pick a language from the globe selector at the top right of the editor and the editor switches to editing that language, with the original shown as placeholder text. The **Model controls** row then lists every control name, description and option name for translation. A user gets the version matching their own interface language, and the original wherever you have not translated anything.
 
-The same works for tools, skills, functions, banners and arena models. See [Translations](/features/administration/translations) for the full picture, including how to translate valve labels.
+The same works for tools, skills, functions, banners and [router models](/features/administration/router-models). See [Translations](/features/administration/translations) for the full picture, including how to translate valve labels.
 
 ---
 
@@ -393,7 +393,7 @@ Hold **Shift** while the model list is open and every row exposes inline icon bu
 
 ### Reviewing what is configured
 
-Open the view filter (the dropdown next to **Actions**, which starts on **Available**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by All, Available, Unavailable, Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here. **Arena Models** lists the [arena models](/features/administration/evaluation#configuring-an-arena-model) an admin has set up.
+Open the view filter (the dropdown next to **Actions**, which starts on **Available**) and pick **Selected** or **Pinned** to list only the models currently configured as such. The same dropdown also filters by All, Available, Unavailable, Enabled, Disabled, Visible, Hidden, Public and Private, and by **Base Models** or **Workspace Models** to separate what your providers offer from the models built on top of them here. **Router Models** lists the [router models](/features/administration/router-models) an admin has set up.
 
 ![The view filter with the Selected and Pinned options](/images/features/models/model-view-filter.png)
 

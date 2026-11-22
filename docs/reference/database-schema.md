@@ -626,7 +626,7 @@ Things to know about the config table:
 | version         | BigInteger    | default=0       | Feedback version number         |
 | type            | Text          | -               | Type of feedback                |
 | data            | JSON          | nullable        | Feedback data including ratings |
-| meta            | JSON          | nullable        | Metadata (arena, chat_id, etc)  |
+| meta            | JSON          | nullable        | Metadata (chat_id, etc)         |
 | snapshot        | JSON          | nullable        | Associated chat snapshot        |
 | created_at      | BigInteger    | -               | Creation timestamp              |
 | updated_at      | BigInteger    | -               | Last update timestamp           |
