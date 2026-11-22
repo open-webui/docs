@@ -45,11 +45,13 @@ Open WebUI creates its own SSH key for the machine and needs it added to `~/.ssh
 
 Leave **Open Terminal version** empty to install the latest release, or enter a version such as `0.17.21` to pin one. `0.17.21` is the oldest version Open WebUI works with.
 
+Leave **Packages** empty, or list what to add on the machine, such as `desktop browser ffmpeg`. `desktop` adds a desktop and `browser` adds Chrome, which give you the [Desktop and Browser tabs](../use-cases/web-development.md). Any other name is installed as an apt package. This needs a user that can run `sudo` without a password.
+
 ### 5. Check the fingerprint and install
 
 Click **Install**. Open WebUI shows the host key fingerprint of the machine. Compare it with the fingerprint you expect, then click **Trust and install**. Open WebUI remembers this fingerprint and refuses to connect if it ever changes.
 
-A progress list shows the install. When it reaches **Ready**, the machine appears under **Machines** and works like any other machine. Open Terminal lives in `~/.open-webui/` in the home directory of the SSH user.
+A progress list shows the install. When it reaches **Ready**, the machine appears under **Machines** and works like any other machine. Open Terminal lives in `~/.open-webui/` in the home directory of the SSH user. If a package fails to install, the machine still works and shows a warning with the command to run on the machine yourself.
 
 :::warning Who can use it
 Everyone who has access to the machine can run commands and see every file the SSH user can. Use a dedicated user for machines you share, and set who gets access in the **Access** section of the machine, as in [Connecting Open Terminal](./connecting.md#6-optional-restrict-access-to-specific-groups).
@@ -63,7 +65,8 @@ Open the machine from the **Machines** list to see its Open Terminal version and
 
 | Button | What it does |
 | :--- | :--- |
-| **Upgrade** | Installs the version in the version field. Empty means the newest release. Also repairs a broken install. |
+| **Upgrade** | Installs the version in the version field. Empty means the newest release. Also repairs a broken install. Installs the names in **Packages** too. |
+| **Install** (next to **Packages**) | Installs the names in **Packages** on the machine without upgrading. |
 | **Restart** | Restarts Open Terminal on the machine. |
 | **Logs** | Shows the latest lines of the Open Terminal log. Start here when a machine shows an error. |
 
