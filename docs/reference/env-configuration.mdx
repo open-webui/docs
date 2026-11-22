@@ -713,7 +713,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admins can open other users' chats inside Open WebUI. It hides chats in the product and does not keep an admin away from the data; see [Chat Data Privacy](/security/chat-data-privacy-and-encryption#admin-users). When enabled, an admin can read any user's chat, which opens read-only. Through the API the admin can also edit or delete its messages, delete the chat, change its share settings and clone it. Replying, regenerating, stopping replies and approving tool calls stay with the owner and anyone the chat is shared with through [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). When disabled, the admin panel hides other users' chats, the **Sessions** view in [Analytics](/features/administration/analytics#sessions) is hidden and its endpoints return `403`, and the chat endpoints give an admin only what a share gives them. The admin-only `GET /api/tasks` and `POST /api/tasks/stop/{task_id}` endpoints still list and stop any running task, whatever this setting says. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats. The toggle covers the product surface only: an admin can still reach every chat through the database, the server itself or a Function or Tool. See the admin-posture-toggles note above.
+- Description: Controls whether admins can open other users' chats inside Open WebUI. It hides chats in the product and does not keep an admin away from the data; see [Chat Data Privacy](/security/chat-data-privacy-and-encryption#admin-users). When enabled, an admin can read any user's chat, which opens read-only. Through the API the admin can also edit or delete its messages, delete the chat, change its share settings and clone it. Replying, regenerating, stopping replies and approving tool calls stay with the owner and anyone the chat is shared with through [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). When disabled, the admin panel hides other users' chats, the **Sessions** view and the **Chats** tab of a model in [Analytics](/features/administration/analytics) are hidden and their endpoints return `403`, and the chat endpoints give an admin only what a share gives them. The admin-only `GET /api/tasks` and `POST /api/tasks/stop/{task_id}` endpoints still list and stop any running task, whatever this setting says. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats. The toggle covers the product surface only: an admin can still reach every chat through the database, the server itself or a Function or Tool. See the admin-posture-toggles note above.
 
   **Exception for internal chats:** admins can still retrieve a chat marked internal even when this is `False`. Internal chats are the ones Open WebUI creates on a user's behalf without the user opening them: [sub-agent](/features/chat-conversations/chat-features/subagents) chats, [timer](/features/chat-conversations/chat-features/timers) chats and note-attached chats. This carve-out is what lets an admin retrieve one at all, because internal chats are **excluded from the chat listing surfaces**: they do not appear in chat lists, search, counts, exports or the admin chat list. Apart from the **Sessions** view in Analytics, which lists them with every other chat, they are reachable only by id.
 
@@ -1395,7 +1395,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the reported token counts in a `usage` field, linked to the request's entry through `extra.request_id`; see [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its JSON body when the body has one. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks`, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the token counts the provider reports in a `usage` field (written only when the provider reports them), linked to the request's entry through `extra.request_id`. Background tasks such as title and tag generation write one too, with the task name in `extra.task`. See [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Other requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](#enable_audit_anonymous_requests) is on. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1407,19 +1407,25 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `int`
 - Default: `2048`
+#### `ENABLE_AUDIT_ANONYMOUS_REQUESTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Also audit requests that carry no credential at all. By default they are skipped, except the sign-in, sign-out, sign-up and MFA requests, which are always logged. Requests with a wrong key or token are logged either way. Has no effect while `AUDIT_LOG_LEVEL` is `NONE`.
+
 - Description: Sets the maximum size in bytes for request/response bodies in audit logs. Bodies larger than this are truncated.
 
 #### `AUDIT_EXCLUDED_PATHS`
 
 - Type: `str`
 - Default: `/chats,/chat,/folders`
-- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses. Remove it to record chat requests and the per-reply model usage entries described in [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging).
+- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without a leading slash, at the start of the request path with or without an `/api` or `/api/v1` prefix (for example `chats` matches `/api/v1/chats` and `/chats`). Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses. Remove it to record chat requests and the per-reply model usage entries described in [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging).
 
 #### `AUDIT_INCLUDED_PATHS`
 
 - Type: `str`
 - Default: Empty string (disabled)
-- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Auth endpoints (signin, signout, signup and the MFA endpoints) are always logged regardless of filtering mode.
+- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without a leading slash, at the start of the request path with or without an `/api` or `/api/v1` prefix (for example `chats` matches `/api/v1/chats` and `/chats`). List `openai` or `ollama` to audit those routes. Auth endpoints (signin, signout, signup and the MFA endpoints) are always logged regardless of filtering mode.
 
 :::tip Whitelist vs Blacklist
 By default, audit logging uses **blacklist mode**: all paths are logged except those in `AUDIT_EXCLUDED_PATHS`. If you set `AUDIT_INCLUDED_PATHS`, it switches to **whitelist mode**: only the specified paths are logged. If both are set, whitelist mode takes precedence and a warning is logged at startup.
@@ -2100,7 +2106,7 @@ The JSON data structure of `MACHINE_CONNECTIONS` might evolve over time as new f
 
 Older name of [`MACHINE_CONNECTIONS`](#machine_connections).
 
-#### `TERMINAL_PROXY_HEADERS`
+#### `MACHINE_PROXY_HEADERS`
 
 - Type: `str` (JSON object)
 - Default: `{}`
@@ -2109,7 +2115,7 @@ Older name of [`MACHINE_CONNECTIONS`](#machine_connections).
   **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional: many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
 
   ```bash
-  TERMINAL_PROXY_HEADERS='{"Content-Security-Policy": "sandbox allow-scripts; default-src '\''none'\''; img-src '\''self'\'' data:; style-src '\''unsafe-inline'\''", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"}'
+  MACHINE_PROXY_HEADERS='{"Content-Security-Policy": "sandbox allow-scripts; default-src '\''none'\''; img-src '\''self'\'' data:; style-src '\''unsafe-inline'\''", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"}'
   ```
 
   Note: do **not** add `allow-same-origin` to the `sandbox` directive. That keyword nullifies the origin-isolation that makes the sandbox effective against `localStorage` exfiltration. The example above intentionally omits it.
@@ -2117,6 +2123,10 @@ Older name of [`MACHINE_CONNECTIONS`](#machine_connections).
 ### Autocomplete
 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
+
+#### `TERMINAL_PROXY_HEADERS`
+
+Older name of [`MACHINE_PROXY_HEADERS`](#machine_proxy_headers).
 
 - Type: `bool`
 - Default: `False`
