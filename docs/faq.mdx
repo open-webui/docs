@@ -161,7 +161,7 @@ Everything you need to run Open WebUI, including your data, remains within your 
 docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 
-### Q: Why are my reasoning model's thinking blocks showing as raw text instead of being hidden?
+### Q: Why do my reasoning model's thinking blocks show up as raw text?
 
 **A:** This happens if the model's thinking tags are not recognized by Open WebUI. You can customize the tags in the model's Advanced Parameters. For more details, see the **[Reasoning & Thinking Models](/features/chat-conversations/chat-features/reasoning-models)** guide.
 
@@ -202,7 +202,7 @@ For complete workflow examples, see the **[API Endpoints documentation](/referen
 
 ### Q: I asked the model what it is and it gave the wrong answer. Is Open WebUI routing to the wrong model?
 
-**A:** No. **LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-5.6?", the response is text the model generates from patterns in its training data.
+**A:** No. **LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-6?", the response is text the model generates from patterns in its training data.
 
 Models frequently:
 - Claim to be a different model (e.g., an open-weight model claiming to be ChatGPT)
@@ -235,11 +235,11 @@ This is also why the same model accessed through different interfaces might give
 - **Web Search Queries**: Generating search terms when web search is enabled
 - **Autocomplete Suggestions**: If enabled
 
-By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-5.6 Sol or Claude Opus 5), this can significantly increase your costs.
+By default, these tasks use the **same model** you're chatting with. If you're using an expensive API model (like GPT-6.2 Sol or Claude Opus 5.5), this can significantly increase your costs.
 
 **To reduce API costs:**
 1. Go to **Settings > Interface** (admin section) (for title/tag generation settings)
-2. Configure a **Task Model** under **Settings > Interface > Tasks** (admin section) to use a smaller, cheaper model (like GPT-5.6 Luna) or a local model for background tasks
+2. Configure a **Task Model** under **Settings > Interface > Tasks** (admin section) to use a smaller, cheaper model (like GPT-6.2 Luna) or a local model for background tasks
 3. Disable features you don't need (auto-title, auto-tags, etc.)
 4. Cap what those requests can spend by setting `max_tokens` under **Task Model Parameters** in the same **Tasks** section. Tag, follow-up and search query generation otherwise send no output limit at all. See [Task Models](/features/administration/task-models#task-model-parameters)
 
