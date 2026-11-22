@@ -168,7 +168,7 @@ A presentation arrives the same way, with its slide rail, page controls and zoom
 
 The card header is a toggle, so a preview can be folded down to just the filename when it is taking up too much of the reply, and image and document previews carry a zoom control and a resize handle.
 
-By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Terminal File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message.
+By default the AI decides, and a file it shows opens in the file browser unless it asks for the card. **Settings > Interface > Machine File Display** changes which one you get when the AI does not say: leave it on **Sidebar** for the browser, or set it to **Inline** to have files arrive in the message.
 
 ![A Word report opened in the file viewer beside the chat](/images/open-terminal-display-file-report-viewer.png)
 

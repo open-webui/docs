@@ -42,6 +42,8 @@ Add one or more default models and pick a **Strategy**.
 
 Conditions need a service that scores them. Under **Decisions API**, set the **API Base URL**, **API Key**, **Model** and **Threshold** (a probability from 0 to 1, default 0.5). The service is the same kind used by [Tool Search](/features/extensibility/plugin/tools#tool-search). It is called at most once per request and only when no pattern matches. If the call fails, the router model falls back to its default models.
 
+The box below the **Threshold** has the placeholder "Leave empty to use the default prompt, or enter a custom prompt". Its text sets the input sent to the service, and the conditions are sent alongside it as separate questions, so the prompt does not need to repeat them. It accepts the [message and prompt modifiers](/features/workspace/prompts#message-and-prompt-modifiers) such as `{{MESSAGES:END:6|middletruncate:2000}}` and `{{prompt}}`. The default includes the recent chat history. A custom prompt without `{{MESSAGES}}` sends no chat history.
+
 In a saved chat, the patterns and conditions see the current branch of the conversation up to the new message.
 
 ## Set them up from the environment
@@ -66,7 +68,8 @@ In a saved chat, the patterns and conditions see the current branch of the conve
         "api_base_url": "https://decisions.example.com/v1",
         "api_key": "<your key>",
         "model": "example-decisions-model",
-        "threshold": 0.5
+        "threshold": 0.5,
+        "prompt": ""
       }
     }
   }

@@ -133,8 +133,8 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | `expandDetails` | Always Expand Details | `false` |
 | `chatHoverPreview` | Chat Hover Previews | `true` |
 | `displayMultiModelResponsesInTabs` | Display Multi-model Responses in Tabs | `false` |
-| `terminalFileDisplay` | Terminal File Display | `sidebar` |
-| `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
+| `machineFileDisplay` | Machine File Display | `sidebar` |
+| `machinePreviewAllowSameOrigin` | Machine Preview Allow Same Origin | `false` |
 | `stylizedPdfExport` | Stylized PDF Export | `true` |
 | `showFloatingActionButtons` | Floating Quick Actions | `true` |
 | `floatingActionButtons` | Floating Quick Actions > **Manage** | `null` |

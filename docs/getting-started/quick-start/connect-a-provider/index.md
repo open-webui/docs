@@ -61,7 +61,8 @@ Most providers work with a URL and an API key. A few need one extra choice in th
 | You connect | Add it under | Settings to change |
 |---|---|---|
 | **Ollama** | Ollama connections | URL only. Open WebUI recognises Ollama on its own. See [Starting with Ollama](/getting-started/quick-start/connect-a-provider/starting-with-ollama). |
-| **OpenAI, Anthropic, Gemini, Mistral, Groq, OpenRouter, xAI, vLLM and other OpenAI-format servers** | OpenAI connections | URL and API key. Leave **Provider** on **Default**. |
+| **OpenAI, Anthropic, Gemini, Mistral, Groq, xAI and other OpenAI-format servers** | OpenAI connections | URL and API key. Leave **Provider** on **Default**. |
+| **OpenRouter and vLLM** | OpenAI connections | URL and API key, then **Advanced > Provider > OpenRouter** or **vLLM**, which sends stored reasoning back to the model. |
 | **DeepSeek (hosted API)** | OpenAI connections | URL and API key, then **Advanced > Provider > llama.cpp**. DeepSeek's thinking mode needs its earlier reasoning sent back with every tool turn, and the llama.cpp setting is the one that sends it. |
 | **Azure OpenAI** | OpenAI connections | **Provider > Azure OpenAI**, an **API Version** and your deployment names under **Model IDs**. Open WebUI also switches to Azure mode on its own for Azure-looking URLs. |
 | **llama.cpp server** | OpenAI connections | **Provider > llama.cpp** to manage models from Open WebUI. See [Starting with llama.cpp](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp). |
