@@ -52,7 +52,7 @@ For the full write-up with examples, see [Context Window / Prompt Too Long](/tro
 
 ### Q: Can I use Open WebUI offline, in air-gapped networks, or in extreme environments like outer space?
 
-**A:** **Yes.** Open WebUI is a self-hosted, **internet-independent AI platform** designed to work in **air-gapped networks**, **remote deployments**, and any environment where cloud-based systems are impractical or impossible. Whether you need to **run an LLM without internet**, deploy a **private AI with no cloud dependency**, or operate a **local AI chatbot offline**, Open WebUI supports all of these out of the box. It runs entirely on local hardware and does not make external calls by default.
+**A:** **Yes.** Open WebUI is a self-hosted, **internet-independent AI platform** designed to work in **air-gapped networks**, **remote deployments**, and any environment where cloud-based systems are impractical or impossible. Whether you need to **run an LLM without internet**, deploy a **private AI with no cloud dependency**, or operate a **local AI chatbot offline**, Open WebUI supports all of these. It runs entirely on local hardware. Setting [`OFFLINE_MODE`](/reference/env-configuration#offline_mode) to `True` turns off the update check and the automatic model downloads, so download the embedding model for RAG before you enable it.
 
 This **Earth-independent architecture** is well suited as an **AI interface for space exploration** (spacecraft, the ISS, lunar bases, Mars habitats, and deep-space missions) where communication delays or total network isolation make cloud AI unworkable. Whether you need **self-hosted AI for remote locations** or need to **run AI in a disconnected environment**, Open WebUI's **offline-first design** keeps models, tools, and data local and predictable even under extreme latency or complete disconnection.
 
@@ -127,11 +127,11 @@ Everything you need to run Open WebUI, including your data, remains within your 
 
 ### Q: Why doesn't Speech-to-Text (STT) and Text-to-Speech (TTS) work in my deployment?
 
-**A:** The functionality of Speech-to-Text (STT) and Text-to-Speech (TTS) services in your deployment may require HTTPS to operate correctly. Modern browsers enforce security measures that restrict certain features, including STT and TTS, to only work under secure HTTPS connections. If your deployment is not configured to use HTTPS, these services might not function as expected. Ensuring your deployment is accessible over HTTPS can resolve these issues, enabling full functionality of STT/TTS features.
+**A:** The functionality of Speech-to-Text (STT) and Text-to-Speech (TTS) services in your deployment may require HTTPS to operate correctly. Browsers allow microphone access only on pages served over HTTPS or from `localhost`. Serving your deployment over HTTPS (see [HTTPS & Reverse Proxies](/reference/https)) enables voice input. See [Microphone Access Issues](/troubleshooting/audio#microphone-access-issues) for the details.
 
 ### Q: Why doesn't Open WebUI include built-in HTTPS support?
 
-**A:** While we understand the desire for an all-in-one solution that includes HTTPS support, we believe such an approach wouldn't adequately serve the diverse needs of our user base. Implementing HTTPS directly within the project could limit flexibility and may not align with the specific requirements or preferences of all users. To ensure that everyone can tailor their setup to their unique environment, we leave the implementation of HTTPS termination to the users for their production deployments. This decision allows for greater adaptability and customization. Though we don't offer official documentation on setting up HTTPS, community members may provide guidance upon request, sharing insights and suggestions based on their experiences.
+**A:** While we understand the desire for an all-in-one solution that includes HTTPS support, we believe such an approach wouldn't adequately serve the diverse needs of our user base. Implementing HTTPS directly within the project could limit flexibility and may not align with the specific requirements or preferences of all users. To ensure that everyone can tailor their setup to their unique environment, we leave the implementation of HTTPS termination to the users for their production deployments. This decision allows for greater adaptability and customization. The [HTTPS & Reverse Proxies](/reference/https) guide covers setups with Nginx, Caddy, HAProxy, Cloudflare Tunnel, ngrok and Tailscale.
 
 ### Q: I updated/restarted/installed some new software and now Open WebUI isn't working anymore!
 
@@ -140,7 +140,7 @@ Everything you need to run Open WebUI, including your data, remains within your 
 ### Q: I updated/restarted and now I'm being logged out, or getting "Error decrypting tokens" for my tools?
 
 **A:** This happens because you haven't set a persistent `WEBUI_SECRET_KEY` in your environment variables.
-*   **Logouts:** Without this key, Open WebUI generates a random one every time it starts. This invalidates your previous session cookies (JWTs), forcing you to log in again.
+*   **Logouts:** Without this variable, Open WebUI generates a key on first start and saves it in a `.webui_secret_key` file inside the container. A recreated container does not have that file and generates a new key. This invalidates your previous session cookies (JWTs), forcing you to log in again.
 *   **Decryption Errors:** Essential secrets (like OAuth tokens for MCP tools or API keys) are encrypted using this key. If the key changes on restart, Open WebUI cannot decrypt them, leading to errors.
 
 **Fix:** Set `WEBUI_SECRET_KEY` to a constant, secure string in your Docker Compose or environment config.
