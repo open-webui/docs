@@ -27,7 +27,7 @@ Open WebUI is built around **Standard Protocols**. Instead of building specific 
 
 This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
 
-- **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
+- **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also support **[Open Responses](https://www.openresponses.org/)**.
 - **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a [pipe](/features/extensibility/plugin/functions/pipe) or a middleware proxy like LiteLLM or OpenRouter to bridge them.
 
 For a detailed explanation of this architectural decision, see our **[FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**.
