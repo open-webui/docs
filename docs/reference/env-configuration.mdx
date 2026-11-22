@@ -2176,20 +2176,13 @@ Output:
 - Description: Sets the prompt template for autocomplete generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-### Evaluation Arena Model
+### Evaluation and Router Models
 
-#### `ENABLE_EVALUATION_ARENA_MODELS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Evaluations** (admin section).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `EVALUATION_ARENA_MODELS`
+#### `ROUTER_MODELS`
 
 - Type: `str` (JSON)
 - Default: `[]`
-- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) (admin section) and saving it collapses the duplicates.
+- Description: Defines [router models](/features/administration/router-models) as a JSON list, mirroring what can be set under **Settings > Models** (admin section). The JSON shape is shown in [Set them up from the environment](/features/administration/router-models#set-them-up-from-the-environment). The value holds the Decisions API key, so treat it as a secret.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUXILIARY_EMBEDDING_MODEL`
