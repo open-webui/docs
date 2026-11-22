@@ -268,7 +268,7 @@ When uploading files via the API and immediately adding them to a knowledge base
 400: The content provided is empty. Please ensure that there is text or data present before proceeding.
 ```
 
-**The Problem**: This is a **race condition**, not an actual empty file. By default, file uploads are processed asynchronously: the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
+**The Problem**: This is a **race condition**. The file has content, but the extraction has not finished yet. By default, file uploads are processed asynchronously: the upload endpoint returns immediately with a file ID while content extraction and embedding computation happen in the background. If you try to add the file to a knowledge base before processing completes, the system sees empty content.
 
 **Solution: Wait for Processing to Complete**
 

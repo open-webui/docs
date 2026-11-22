@@ -6,7 +6,7 @@ title: "FAQ"
 
 ### Q: How can I get support or ask for help?
 
-**A:** Community support for Open WebUI happens in public channels with help from contributors, volunteers, and members of the core team. These channels are best for shared troubleshooting, reproducible reports, and answers that benefit the wider project. For organizations that need dedicated, guaranteed support, check out our **[Enterprise offerings](https://docs.openwebui.com/enterprise)**.
+**A:** Community support for Open WebUI happens in public channels with help from contributors and members of the core team. These channels are best for shared troubleshooting, reproducible reports, and answers that benefit the wider project. For organizations that need dedicated, guaranteed support, check out our **[Enterprise offerings](https://docs.openwebui.com/enterprise)**.
 
 **To get the best help:**
 1. **Search first.** Check these docs, [Discord](https://discord.gg/5rJgQTnV4s), [Reddit](https://www.reddit.com/r/OpenWebUI/), [GitHub Discussions](https://github.com/open-webui/open-webui/discussions), and [Issues](https://github.com/open-webui/open-webui/issues). Your question may already be answered.
@@ -36,7 +36,7 @@ For more details on enterprise solutions and branding customizations, [click her
 
 ### Q: How can I see a list of all the chats I've ever shared?
 
-**A:** Open WebUI provides a centralized **Shared Chats** dashboard where you can see every link you've generated. This is available to all users via **Settings > Data Controls > Shared Chats > Manage**. From there, you can search through your shared history, re-copy links, or revoke (unshare) access to any conversation instantly.
+**A:** Open WebUI provides a centralized **Shared Chats** dashboard where you can see every link you've generated. This is available to all users via **Settings > Data Controls > Shared Chats > Manage**. From there, you can search through your shared history, revoke (unshare) access to any conversation instantly, or unshare all chats at once.
 
 ### Q: How can I manage or delete files I've uploaded?
 
@@ -44,11 +44,9 @@ For more details on enterprise solutions and branding customizations, [click her
 
 ### Q: I get "The prompt is too long" / "context length exceeded" after a while in a chat. How do I fix it?
 
-**A:** This error comes from the **model provider**, not from Open WebUI. The provider counts the tokens of everything you sent (system prompt + the *entire* chat history + attached files + tool calls + your new message) and rejects the request once it exceeds the model's context window. The "prompt" the model sees is the whole conversation, not just your latest message.
+**A:** The **model provider** returns this error. The provider counts the tokens of everything you sent (system prompt + the *entire* chat history + attached files + tool calls + your new message) and rejects the request once it exceeds the model's context window. The "prompt" the model sees is the whole conversation, including every earlier message.
 
-Open WebUI intentionally does **not** ship a built-in context trimmer. Every model has a different tokenizer and a different context window, and every deployment wants a different truncation policy (by tokens, by turns, by message count, file-attachments-first, summarize-and-replace, per-model budgets, and so on). There is no single policy that is correct for every user, so we expose the hook instead of choosing one for you.
-
-Context management is done with [filter Functions](/features/extensibility/plugin/functions/filter): `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.). Many published context filters are already available one-click on [openwebui.com](https://openwebui.com/): browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel > Functions** and edit it.
+Open WebUI includes an optional **Context Compaction** feature that summarizes older messages once a chat grows past a token threshold. An administrator enables it in **Settings > Interface** (admin section), see [Context Compaction](/troubleshooting/context-window#the-built-in-option-context-compaction). Every model has a different tokenizer and context window, and deployments differ in the trimming policy they need (by tokens, by turns, by message count, file attachments first, per-model budgets, and so on). [Filter Functions](/features/extensibility/plugin/functions/filter) cover those policies: `inlet()` receives the full `body["messages"]` on every request and can modify it freely (drop old turns, enforce a turn limit, summarize, trim attachments, etc.), so a filter covers any policy Context Compaction does not. Many published context filters are already available one-click on [openwebui.com](https://openwebui.com/): browse, install, and tune the valves. If none fits, copy the closest one into **Admin Panel > Functions** and edit it.
 
 For the full write-up with examples, see [Context Window / Prompt Too Long](/troubleshooting/context-window).
 
@@ -66,11 +64,11 @@ The same principles apply to harsh terrestrial settings: submarines, polar resea
 
 ### Q: Why can't my Docker container connect to services on the host using `localhost`?
 
-**A:** Inside a Docker container, `localhost` refers to the container itself, not the host machine. This distinction is crucial for networking. To establish a connection from your container to services running on the host, you should use the DNS name `host.docker.internal` instead of `localhost`. This DNS name is specially recognized by Docker to facilitate such connections, effectively treating the host as a reachable entity from within the container, thus bypassing the usual `localhost` scope limitation.
+**A:** Inside a Docker container, `localhost` refers to the container itself, not the host machine. This distinction is crucial for networking. To establish a connection from your container to services running on the host, you should use the DNS name `host.docker.internal` in place of `localhost`. Docker Desktop provides this name automatically. On Linux, start the container with `--add-host=host.docker.internal:host-gateway` (or `extra_hosts` in Docker Compose) so the name resolves to the host.
 
 ### Q: How do I make my host's services accessible to Docker containers?
 
-**A:** To make services running on the host accessible to Docker containers, configure these services to listen on all network interfaces, using the IP address `0.0.0.0`, instead of `127.0.0.1` which is limited to `localhost` only. This configuration allows the services to accept connections from any IP address, including Docker containers. It's important to be aware of the security implications of this setup, especially when operating in environments with potential external access. Implementing appropriate security measures, such as firewalls and authentication, can help mitigate risks.
+**A:** To make services running on the host accessible to Docker containers, configure these services to listen on all network interfaces, using the IP address `0.0.0.0`. The address `127.0.0.1` accepts connections from `localhost` only. This configuration allows the services to accept connections from any IP address, including Docker containers. It's important to be aware of the security implications of this setup, especially when operating in environments with potential external access. Implementing appropriate security measures, such as firewalls and authentication, can help mitigate risks.
 
 ### Q: Why isn't my Open WebUI updating? I've re-pulled/restarted the container, and nothing changed.
 
@@ -113,7 +111,7 @@ On most Linux systems, your volume data is physically stored at: `/var/lib/docke
 
 ### Q: Should I use the distro-packaged Docker or the official Docker package?
 
-**A:** We recommend using the official Docker package over distro-packaged versions for running Open WebUI. The official Docker package is frequently updated with the latest features, bug fixes, and security patches, ensuring optimal performance and security. Additionally, it supports important functionalities like `host.docker.internal`, which may not be available in distro-packaged versions. This feature is essential for proper network configurations and connectivity within Docker containers.
+**A:** We recommend using the official Docker package over distro-packaged versions for running Open WebUI. The official Docker package is frequently updated with the latest features, bug fixes, and security patches, ensuring optimal performance and security. Reaching the host from a container through `host.docker.internal` works on both once you add `--add-host=host.docker.internal:host-gateway` to the `docker run` command.
 
 By choosing the official Docker package, you benefit from consistent behavior across different environments, more reliable troubleshooting support, and access to the latest Docker advancements. The broader Docker community and resources are also more aligned with the official package, providing you with a wealth of information and support for any issues you might encounter.
 
@@ -177,7 +175,7 @@ To do this, configure your **Ollama model params** to allow a larger context win
 
 ### Q: I'm getting "The content provided is empty" when uploading files via the API. Why?
 
-**A:** This is a **race condition**, not an actual empty file. When you upload a file through the API, the endpoint returns immediately with a file ID, but content extraction and embedding computation happen **asynchronously in the background**.
+**A:** This is a **race condition**. The file has content, but the extraction has not finished yet. When you upload a file through the API, the endpoint returns immediately with a file ID, but content extraction and embedding computation happen **asynchronously in the background**.
 
 If you immediately try to add the file to a knowledge base before processing completes, the system sees empty content and returns a `400` error.
 
@@ -204,7 +202,7 @@ For complete workflow examples, see the **[API Endpoints documentation](/referen
 
 ### Q: I asked the model what it is and it gave the wrong answer. Is Open WebUI routing to the wrong model?
 
-**A:** No. **LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-5.6?", the response is not a system diagnostic. It's simply the model generating text based on patterns in its training data.
+**A:** No. **LLMs do not reliably know their own identity.** When you ask a model "What model are you?" or "Are you GPT-5.6?", the response is text the model generates from patterns in its training data.
 
 Models frequently:
 - Claim to be a different model (e.g., an open-weight model claiming to be ChatGPT)
@@ -217,13 +215,13 @@ Models frequently:
 2. Look at the **Settings > Connections** (admin section) to confirm your API endpoints
 3. Check your provider's dashboard/logs for the actual API calls being made
 
-Asking the model itself is **not** a valid way to diagnose routing issues. If you suspect a configuration problem, check your connection settings and API keys instead.
+To diagnose routing issues, use the interface, your connection settings and your provider's logs. If you suspect a configuration problem, check your connection settings and API keys instead.
 
 ### Q: But why can models on official chat interfaces (like ChatGPT or Claude.ai) correctly identify themselves?
 
 **A:** Because the provider **injects a system prompt** that explicitly tells the model what it is. When you use ChatGPT, OpenAI's interface includes a hidden system message like "You are ChatGPT, a large language model trained by OpenAI..." before your conversation begins.
 
-The model isn't "aware" of itself; it's simply been instructed to claim a specific identity. You can do the same thing in Open WebUI by adding a system prompt to your model configuration (e.g., "You are Qwen 3.6 27B..."). The model will then confidently repeat whatever identity you've told it to claim.
+The model has been instructed to claim a specific identity. You can do the same thing in Open WebUI by adding a system prompt to your model configuration (e.g., "You are Qwen 3.6 27B..."). The model will then confidently repeat whatever identity you've told it to claim.
 
 This is also why the same model accessed through different interfaces might give different answers about its identity; it depends entirely on what system prompt (if any) was provided.
 
@@ -253,18 +251,18 @@ For more optimization tips, see the **[Performance Tips Guide](troubleshooting/p
 
 ### Q: Is MCP (Model Context Protocol) supported in Open WebUI?
 
-**A:** Yes, Open WebUI includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
+**A:** Yes, Open WebUI includes **native support for MCP Streamable HTTP**, enabling direct, first-class integration with MCP tools that communicate over the standard HTTP transport. For any **other MCP transports or non-HTTP implementations**, you should use our official proxy adapter, **MCPO**, available at [https://github.com/open-webui/mcpo](https://github.com/open-webui/mcpo). MCPO provides a unified OpenAPI-compatible layer that bridges alternative MCP transports into Open WebUI safely and consistently. Users who run [Tether](/ecosystem/tether#bring-your-own-models-and-tools) can also start a stdio MCP server as a local command on their own computer. This architecture ensures maximum compatibility, strict security boundaries, and predictable tool behavior across different environments while keeping Open WebUI backend-agnostic and maintainable.
 
 ### Q: Why doesn't Open WebUI natively support [Provider X]'s proprietary API?
 
-**A:** Open WebUI is highly modular with a plugin system including tools, functions, and most notably **[pipes](/features/extensibility/plugin/functions/pipe)**. These modular pipes allow you to add support for virtually any provider you want: you can build your own or choose from the many [community-built](https://openwebui.com/) and usually well-maintained ones already available.
+**A:** Open WebUI is highly modular with a plugin system including tools, functions, and most notably **[pipes](/features/extensibility/plugin/functions/pipe)**. These modular pipes allow you to add support for virtually any provider you want: you can build your own or choose from the many community-built ones published on [openwebui.com](https://openwebui.com/).
 
-That said, Open WebUI's core is built around **universal protocols**, not specific providers. Our stance is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
+That said, Open WebUI's core is built around **universal protocols**. Our stance is to support standard, widely-adopted APIs like the **OpenAI Chat Completions protocol**. 
 
 This protocol-centric design ensures that Open WebUI remains backend-agnostic and compatible with dozens of providers simultaneously. We avoid implementing proprietary, provider-specific APIs in the core to prevent unsustainable architectural bloat and to maintain a truly open ecosystem.
 
 :::note Experimental: Open Responses
-As new standards emerge that gain broad adoption, we may add experimental support. Connections can now optionally be configured to use **[Open Responses](https://www.openresponses.org/)**, an open specification for multi-provider interoperability with consistent streaming events and tool use patterns.
+Open WebUI has experimental support for **[Open Responses](https://www.openresponses.org/)**, an open specification for multi-provider interoperability with consistent streaming events and tool use patterns. Set a connection's **API Type** to **Responses** to use it, see [Open Responses](/getting-started/quick-start/connect-a-provider/starting-with-open-responses).
 :::
 
 We understand this request comes up frequently, especially for major providers. Here's why we've made this deliberate architectural decision:
@@ -299,14 +297,14 @@ Open WebUI is used by major organizations worldwide. At this scale, stability is
 
 #### 5. Pipes are the Modular Solution
 
-The pipes architecture exists precisely to solve this problem. One-click install a community pipe and you get full provider API support. This is exactly the modularity that allows:
-- Community members to maintain provider-specific integrations
+The pipes architecture exists precisely to solve this problem. One-click install a community pipe and you get provider API support. This is exactly the modularity that allows:
+- Provider-specific integrations to be maintained independently
 - Users to choose only what they need
 - The core project to remain stable and maintainable
 
 :::tip The Recommended Path
 For providers that don't follow widely adopted API standards, use:
-- **[Open WebUI community](https://openwebui.com/)**: Community-maintained provider integrations (one-click install)
+- **[Open WebUI community](https://openwebui.com/)**: Independently maintained provider integrations (one-click install)
 - **Middleware proxies**: Tools like LiteLLM or OpenRouter can translate proprietary APIs to widely adopted API formats
 
 These solutions exist specifically to bridge the gap, and they're maintained by teams dedicated to that purpose.
@@ -314,7 +312,7 @@ These solutions exist specifically to bridge the gap, and they're maintained by 
 
 ### Q: Why is the frontend integrated into the same Docker image? Isn't this unscalable or problematic?
 
-The assumption that bundling the frontend with the backend is unscalable comes from a misunderstanding of how modern Single-Page Applications work. Open WebUI’s frontend is a static SPA, meaning it consists only of HTML, CSS, and JavaScript files with no runtime coupling to the backend. Because these files are static, lightweight, and require no separate server, including them in the same image has no impact on scalability. This approach simplifies deployment, ensures every replica serves the exact same assets, and eliminates unnecessary moving parts. If you prefer, you can still host the SPA on any CDN or static hosting service and point it to a remote backend, but packaging both together is the standard and most practical method for containerized SPAs.
+The assumption that bundling the frontend with the backend is unscalable comes from a misunderstanding of how modern Single-Page Applications work. Open WebUI’s frontend is a static SPA, meaning it consists only of HTML, CSS, and JavaScript files that call the backend on the same origin. Because these files are static, lightweight, and require no separate server, including them in the same image has no impact on scalability. This approach simplifies deployment, ensures every replica serves the exact same assets, and eliminates unnecessary moving parts. Frontend and backend are served from one address, and a reverse proxy can serve them under one domain. Packaging both together is the standard and most practical method for containerized SPAs.
 
 ### Q: Is Open WebUI scalable for large organizations or enterprise deployments?
 
@@ -338,7 +336,7 @@ If you’re planning a high-availability, enterprise-grade deployment, we recomm
 [The SRE's Guide to High Availability Open WebUI Deployment Architecture](http://taylorwilsdon.medium.com/the-sres-guide-to-high-availability-open-webui-deployment-architecture-2ee42654eced)
 *(This provides a strong technical overview and best practices for large-scale Open WebUI architecture.)*
 
-Open WebUI is designed from day one to not just handle, but thrive at scale, serving large organizations, universities, and enterprises worldwide.
+Open WebUI is designed from day one to thrive at scale, serving large organizations, universities, and enterprises worldwide.
 
 ### Q: How often is Open WebUI updated? (Release Schedule)
 
