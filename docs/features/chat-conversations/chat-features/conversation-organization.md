@@ -114,9 +114,18 @@ A chat can also get a priority (**Urgent**, **High**, **Medium** or **Low**) fro
 
 Tags label chats by topic and feed the grouping, board and filter options above. A chat's owner adds them, and in a shared folder so does anyone who can edit the folder, with the **Tag** button that appears on hover in the chat's row (or by clicking its existing tags), or, for your own chats, from the **Tags** submenu in the chat's top-bar menu. Both open the same picker: type to find a tag and tick it to add or remove it. To make a new one, choose **Create “name”**. The colored dot beside a ticked tag opens the color choices, and the color applies to that tag wherever it is used. Tags a folder editor adds, removes or recolors on someone else's chat belong to the chat owner, so they show up in the owner's own tag list. Anyone without edit access sees the tags without the picker.
 
+### Notes
+
+A folder can hold [notes](/features/notes) next to its chats, such as a project brief or meeting notes. Pick **Notes** in the switch at the top of the folder page to list the folder's notes, whoever wrote them. To add one:
+
+- Click **+** on the folder's **Notes** list, or **New Note** in the folder's **⋯** menu in the sidebar, to start a new note in the folder.
+- Drag a note from the Notes list onto the folder in the sidebar, or pick the folder under **Move** in the note's **⋯** menu. **Move > No folder** takes it out again.
+
+Adding notes needs write access to the folder. Deleting the folder with **Delete all contents inside this folder** ticked also deletes the owner's notes in it, and notes other people put there move out of the folder and stay theirs.
+
 ### Automations
 
-The page header has a **Chats**, **Automations** and **Knowledge** switch; **Automations** is there for users who have the [Automations](/features/chat-conversations/chat-features/automations) feature. It lists the folder's automations and has a **New automation** button; see [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page for who can do what.
+The page header has a **Chats**, **Notes**, **Automations** and **Knowledge** switch. **Notes** shows for users who have the Notes feature. **Automations** is there for users who have the [Automations](/features/chat-conversations/chat-features/automations) feature. It lists the folder's automations and has a **New automation** button; see [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page for who can do what.
 
 ### Renaming from the Tab
 
@@ -217,6 +226,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
 - **Write access covers the folder page.** People with write access can set the status and priority of every chat in the folder and change the folder's statuses, and people with read access can see the statuses. See [The Folder Page](#the-folder-page).
+- **Notes in a shared folder follow the folder's access.** Read access on the folder lets people read its notes, and write access lets them edit them. See [Notes](#notes).
 - **Automations can post into a shared folder.** Anyone with write access can create one there, and everyone who can write to the folder can pause it. See [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
 - **Folders cannot be shared publicly**, by admins either. Sharing is always to specific users or groups.
