@@ -143,6 +143,18 @@ OpenAI returns encrypted reasoning only when the request asks for it. To turn it
 
 To turn it on for every model, add the same parameter under **Model Defaults** in **Settings > Models** (admin section).
 
+Behind a [LiteLLM](https://docs.litellm.ai/) proxy, set `include` once per model in its `litellm_params` instead, and leave the custom parameter out of Open WebUI. A custom parameter sent by Open WebUI replaces LiteLLM's value, so if you set both, keep `reasoning.encrypted_content` in it.
+
+```yaml
+- model_name: gpt-5.5
+  litellm_params:
+    model: openai/gpt-5.5
+    api_key: os.environ/OPENAI_API_KEY
+    include: ["reasoning.encrypted_content"]
+```
+
+Anthropic models reached through LiteLLM's Responses endpoint need no setting: LiteLLM returns their thinking as encrypted reasoning by default.
+
 ### Provider Compatibility
 
 | Provider | Reasoning on replay |
