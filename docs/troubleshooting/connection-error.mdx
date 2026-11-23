@@ -405,6 +405,7 @@ If your Open WebUI takes a long time to load models, or the model selector spins
 ### Common Symptoms
 
 - Model selector shows a loading spinner for extended periods
+- After you click **Send**, there is a pause before the selected provider receives the request
 - `500 Internal Server Error` on `/api/models` endpoint
 - UI becomes unresponsive when opening Settings
 - Docker/server logs show: `Connection error: Cannot connect to host...`
@@ -414,6 +415,8 @@ If your Open WebUI takes a long time to load models, or the model selector spins
 When you configure multiple Ollama or OpenAI base URLs (for load balancing or redundancy), Open WebUI attempts to fetch models from **all** configured endpoints. If any endpoint is unreachable, the system waits for the full connection timeout before returning results.
 
 By default, Open WebUI waits **10 seconds** per unreachable endpoint when fetching the model list. Endpoints are queried concurrently, so the wait is the slowest one, not the sum.
+
+If the server has no model list loaded when it receives a chat request, it fetches models from enabled connections before forwarding the request. An offline endpoint can delay that first send even when the model you selected is on a working connection.
 
 ### Solution 1: Adjust the Timeout
 
