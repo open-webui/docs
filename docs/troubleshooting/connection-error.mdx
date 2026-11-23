@@ -308,7 +308,15 @@ Open WebUI calls Ollama from its backend, never from the browser, so your users'
 
 If Open WebUI in Docker cannot connect to Ollama running on the host machine:
 
-Use the `--network=host` flag in your Docker command. This links your container directly to your host's network.
+If you use bridge networking and set the Ollama URL to `http://host.docker.internal:11434`, test it from the Open WebUI container:
+
+```bash
+docker exec open-webui curl --fail --show-error --silent --max-time 5 http://host.docker.internal:11434/api/version
+```
+
+Use your container name if it differs. A version response confirms the container can reach Ollama. If the hostname does not resolve on Linux Docker Engine, add `--add-host=host.docker.internal:host-gateway` when creating the container, or the equivalent [`extra_hosts` entry in Compose](https://docs.docker.com/compose/how-tos/networking/#custom-dns-with-extra_hosts). If the hostname resolves but the request fails, check the Ollama listener as described above and check whether the host firewall allows traffic from the Docker network to port `11434`. Keep access to that port limited to clients that need it.
+
+You can also use the `--network=host` flag in your Docker command. This links your container directly to your host's network.
 
 **Example Docker Command**:
 ```bash
