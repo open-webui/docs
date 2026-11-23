@@ -347,6 +347,19 @@ The count is obtained from the upstream provider behind the resolved connection,
 The Messages API previously always reported `input_tokens: 0` in the streaming `message_start` block. Input tokens are now counted up front and reported in both streaming and non-streaming responses. If counting fails the request still succeeds, so clients should treat the value as best-effort rather than guaranteed.
 :::
 
+### Speech-to-text transcription
+
+Send recorded audio to `POST /api/v1/audio/transcriptions` with bearer authentication and a `multipart/form-data` body. Include the recording in the required `file` field. The optional `language` field supplies a language hint to transcription engines that use it. Non-admin callers need the speech-to-text permission (`chat.stt`).
+
+```bash
+curl https://open-webui.example.com/api/v1/audio/transcriptions \
+  -H "Authorization: Bearer $OPEN_WEBUI_TOKEN" \
+  -F "file=@recording.wav" \
+  -F "language=en"
+```
+
+Read the transcript from `text` in the JSON response. To ask a model about the recording, send that transcript as a user message in a separate [chat completions request](#chat-completions).
+
 ### Image Generation and Editing
 
 - **Endpoints**: `POST /api/v1/images/generations` (body: `prompt`, optional `model`, `size`, `n`, `steps`, `negative_prompt`) and `POST /api/v1/images/edit` (body: `image` as one or more base64-encoded images or URLs, `prompt`, optional `model`, `size`, `n`, `negative_prompt`, `background`).
