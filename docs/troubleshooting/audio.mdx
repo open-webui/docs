@@ -263,6 +263,14 @@ services:
 3. For external TTS services, verify the API Base URL is accessible from the Open WebUI container
 4. Check container logs for any error messages
 
+### SpeechT5 voice stays the same
+
+Local Transformers TTS uses the default speaker when the configured value does not match a speaker embedding filename. Short speaker names such as `bdl` and `slt` fall back to that same voice.
+
+1. In **Settings > Audio** (admin section), select **Transformers (Local)** as the **Text-to-Speech Engine**.
+2. Copy the full value from the `filename` column of the [CMU ARCTIC speaker embeddings dataset](https://huggingface.co/datasets/Matthijs/cmu-arctic-xvectors), for example `cmu_us_awb_arctic-wav-arctic_a0001`.
+3. Paste it into **TTS Model** and save. To hear the server's voice, leave your personal **Text-to-Speech Engine** set to **Default**.
+
 ### Docker Networking Issues with TTS
 
 If Open WebUI can't reach your TTS service:
