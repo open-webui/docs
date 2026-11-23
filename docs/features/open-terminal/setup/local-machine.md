@@ -40,7 +40,7 @@ Only one local machine can exist per Open WebUI instance, so **Type** is gone on
 
 ### 3. Choose a folder and a version
 
-**Folder** is where terminal sessions start. Leave it empty to start in the project folder, which is `/workspace` if that folder exists. Otherwise it is a `workspace` folder in the data volume when Open WebUI runs in Docker, or the folder Open WebUI was started from. To use another folder, enter an absolute path that exists, such as `/home/user/project`.
+**Start directory** is where terminal sessions start. Leave it empty to start in the project folder, which is `/workspace` if that folder exists. Otherwise it is a `workspace` folder in the data volume when Open WebUI runs in Docker, or the folder Open WebUI was started from. To use another folder, enter an absolute path that exists, such as `/home/user/project`.
 
 Leave **Open Terminal version** empty to install the latest release, or enter a version such as `0.17.21` to pin one. `0.17.21` is the oldest version Open WebUI works with.
 
@@ -54,6 +54,6 @@ Open Terminal is installed in `~/.open-webui/` in the home directory of the Open
 
 ## Manage the machine
 
-Open the machine from the **Machines** list to change **Folder** and to upgrade, restart or read the logs, as described in [SSH Machines](./ssh-machines.md#manage-the-machine). Changing **Folder** restarts Open Terminal in the new folder.
+Open the machine from the **Machines** list to change **Start directory** and to upgrade, restart or read the logs, as described in [SSH Machines](./ssh-machines.md#manage-the-machine). Changing **Start directory** restarts Open Terminal in the new directory.
 
 When you delete the machine, Open WebUI uninstalls Open Terminal. Your files in the session folder stay.
