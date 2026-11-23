@@ -130,6 +130,8 @@ Most Chat Completions APIs reject unknown fields on assistant messages, so reaso
 
 Reasoning details that a provider returns in a `reasoning_details` field (as OpenRouter does) are sent back unchanged in that field, within a tool-call loop and on later turns. They are dropped when another model continues the chat.
 
+On connections that use the Responses API, encrypted reasoning that the provider returns is sent back unchanged, within a tool-call loop and on later turns, so the model keeps its earlier reasoning. It is dropped when another model continues the chat.
+
 ### Provider Compatibility
 
 | Provider | Reasoning on replay |
