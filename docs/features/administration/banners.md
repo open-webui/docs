@@ -394,6 +394,7 @@ If you keep adding banners without removing old ones, users may ignore them. Rem
 - Ensure `WEBUI_BANNERS` is a valid JSON **array** of objects (not a single object).
 - Check the server logs for parsing errors related to `WEBUI_BANNERS`.
 - If using Admin Panel, confirm you clicked **Save**.
+- If changes to `WEBUI_BANNERS` have no effect after a restart, check **Banners** under **Settings > General** (admin section). When persistent configuration is enabled, the saved list takes precedence over the environment variable, even if the saved list is empty. Update the list there and click **Save**.
 
 ### Banner cannot be dismissed
 
