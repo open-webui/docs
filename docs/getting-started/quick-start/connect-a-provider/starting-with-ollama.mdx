@@ -48,6 +48,8 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 ### Advanced Configuration
 
 *   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote`) to distinguish them. Open WebUI joins the prefix and the model name with a dot, so `llama3` appears as `remote.llama3`.
+
+    After adding, changing, or removing a **Prefix ID**, check any workspace preset that uses a model from that connection. The preset stores the old model ID. In **Workspace > Models**, edit the preset, reselect **Base Model (From)** using the updated ID, and save.
 *   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all.
 
 :::tip Connection Timeout Configuration
