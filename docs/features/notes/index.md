@@ -57,6 +57,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | **Context injection** | Attach notes to any chat for full-fidelity context |
 | **Pages** | Split a note into pages and subpages |
 | **Attachments** | Files sit as blocks inside the page where you added them |
+| **Tags** | Tag notes in the notes list with the same tags as your chats, then filter the list by tag or show untagged notes |
 | **Pin to sidebar** | Pin frequently used notes for quick access from the sidebar |
 | **Agentic access** | Models can search, read, and update notes autonomously |
 | **Export** | Download as `.txt`, `.md`, or `.pdf` |
