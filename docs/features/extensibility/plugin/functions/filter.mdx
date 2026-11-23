@@ -1143,14 +1143,29 @@ Suppose the input from the user looks messy or includes unwanted symbols like `!
 
 ```python
 async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
-    # Clean the last user input (from the end of the 'messages' list)
-    last_message = body["messages"][-1]["content"]
-    body["messages"][-1]["content"] = last_message.replace("!!!", "").strip()
+    messages = body.get("messages", [])
+    if not messages or messages[-1].get("role") != "user":
+        return body
+
+    message = messages[-1]
+    content = message.get("content")
+    if isinstance(content, str):
+        message["content"] = content.replace("!!!", "").strip()
+    elif isinstance(content, list):
+        for part in content:
+            if (
+                isinstance(part, dict)
+                and part.get("type") == "text"
+                and isinstance(part.get("text"), str)
+            ):
+                part["text"] = part["text"].replace("!!!", "").strip()
     return body
 ```
 
 **What Happens?**
 - Before: `"How can I debug this issue!!!"` → Sent to the model as `"How can I debug this issue"`
+
+Image prompts send `content` as a list of parts. The filter edits the text parts and preserves the image parts. If a filter raises `expected string or bytes-like object, got 'list'` when you attach an image, disable it and retry the prompt to isolate the error.
 
 :::note
 
