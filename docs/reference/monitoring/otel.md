@@ -147,8 +147,13 @@ docker run -d --name open-webui \
 - Double-check `ENABLE_OTEL`, `ENABLE_OTEL_TRACES`, and `ENABLE_OTEL_METRICS` are all set to `true`
 - Is the endpoint correct? In the example Compose file it must be reachable as `http://lgtm:4317` from the Open WebUI container.
 - Inspect logs from Open WebUI (`docker logs open-webui-otel`) for OTLP errors
-- Collector's OTLP port (`4317`) should be open and reachable. Try:
-  `curl http://localhost:4317` (replace host as needed)
+- Check that the collector is reachable from the Open WebUI container. A plain HTTP `curl` request to port `4317` cannot verify that the collector accepts OTLP over gRPC.
+
+### OTLP reports UNAVAILABLE
+
+If the exporter logs `UNAVAILABLE` even though the port is reachable, check that the exporter protocol matches the listener on the collector. The default ports are `4317` for gRPC and `4318` for HTTP. With HTTP, check the path for the failing signal, such as `/v1/traces`, `/v1/metrics`, or `/v1/logs`. [OTLP protocol specification](https://opentelemetry.io/docs/specs/otlp/)
+
+Check `OTEL_OTLP_SPAN_EXPORTER` for traces. Metrics and logs can override that choice with `OTEL_METRICS_OTLP_SPAN_EXPORTER` and `OTEL_LOGS_OTLP_SPAN_EXPORTER`, respectively.
 
 **Authentication required?**
 
