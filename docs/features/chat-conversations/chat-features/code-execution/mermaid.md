@@ -24,6 +24,8 @@ When you request a MermaidJS visualization, the Large Language Model (LLM) will 
 
 If the model generates MermaidJS syntax, but the visualization does not render, it usually indicates a syntax error in the code. Don't worry, you'll be notified of any errors once the response has been fully generated. If this happens, try referencing the [MermaidJS documentation](https://mermaid.js.org/intro/) to identify the issue and revise the prompt accordingly.
 
+If a flowchart fails to render because a node label contains parentheses, put double quotes around the label inside the brackets. For example, change `A[Retry (manual)]` to `A["Retry (manual)"]`. If you can edit the assistant response, make that change in the Mermaid code block and save the message.
+
 ## Interacting with Your Visualization
 
 Once your visualization is displayed, you can:
