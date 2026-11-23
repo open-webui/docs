@@ -174,6 +174,15 @@ By following these steps, you can verify that Apache Tika is working correctly i
 - Check the Docker logs for any errors or issues related to the Apache Tika service.
 - Verify that **Tika Server URL** is correctly configured in Open WebUI.
 
+### Connection refused during upload
+
+Open WebUI sends documents to Tika from the backend. If a test from the Docker host succeeds but an upload fails with `Connection refused`, check the URL from the Open WebUI container.
+
+- On a shared Compose network, use the Tika service name and container port, for example `http://tika:9998`.
+- On Docker Desktop, when Tika is published on the host, use `http://host.docker.internal:9998` and replace `9998` with the published host port. [Docker Desktop networking](https://docs.docker.com/desktop/features/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host)
+
+Set **Tika Server URL** to the address the container can reach, then upload a PDF to a knowledge base to verify extraction.
+
 ## Benefits of Integration
 
 Integrating Apache Tika with Open WebUI provides several benefits, including:
