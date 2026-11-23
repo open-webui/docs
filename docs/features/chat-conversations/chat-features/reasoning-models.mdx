@@ -132,6 +132,17 @@ Reasoning details that a provider returns in a `reasoning_details` field (as Ope
 
 On connections that use the Responses API, encrypted reasoning that the provider returns is sent back unchanged, within a tool-call loop and on later turns, so the model keeps its earlier reasoning. It is dropped when another model continues the chat.
 
+OpenAI returns encrypted reasoning only when the request asks for it. To turn it on for a model:
+
+1. Go to **Workspace → Models** and edit the model.
+2. Expand **Advanced Params**.
+3. At the bottom, click **Add Custom Parameter** (shown to administrators) and set:
+   - **Name**: `include`
+   - **Value**: `["reasoning.encrypted_content"]`
+4. Save the model.
+
+To turn it on for every model, add the same parameter under **Model Defaults** in **Settings > Models** (admin section).
+
 ### Provider Compatibility
 
 | Provider | Reasoning on replay |
