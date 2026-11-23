@@ -7,6 +7,18 @@ sidebar_position: 1
 
 Open WebUI not coming up at all? Start here. For failures specifically about Alembic migrations (`no such table`, `Can't locate revision`), see [Database Migration](./manual-database-migration.md) instead.
 
+## Container keeps restarting
+
+A container can exist and publish a port while Open WebUI is still starting or repeatedly exiting. If the browser cannot connect, check the container state and recent logs before recreating it:
+
+```bash
+docker ps -a --filter name=open-webui
+docker inspect --format 'status={{.State.Status}} restarts={{.RestartCount}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}' open-webui
+docker logs --tail 100 --timestamps open-webui
+```
+
+Replace `open-webui` with your container name. A restart count that keeps increasing means the process is repeatedly exiting. If `oom=true`, check available memory and any memory limit on the container. Otherwise, look for the last error before each restart. If the logs stop at the Open WebUI banner while the container stays up, see [startup delays while reaching Hugging Face](#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked).
+
 ## Container hangs at startup on Apple Silicon (M1/M2/M3)
 
 ### Symptom
