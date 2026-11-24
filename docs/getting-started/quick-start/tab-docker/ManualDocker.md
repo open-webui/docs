@@ -174,6 +174,14 @@ docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app
 docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
 ```
 
+To check whether a chat model is using the GPU, send a message and run `ollama ps` while the model is still loaded. Check the `PROCESSOR` column for CPU, GPU, or a split between them.
+
+- For bundled Ollama, run `docker exec open-webui ollama ps`.
+- For a separate Ollama container, run `docker exec ollama ollama ps` or substitute its container name.
+- For a native install, run `ollama ps` on the machine serving the model.
+
+Match the instance to the Ollama URL in **Admin Panel > Settings > Connections**. A device check such as `nvidia-smi` can confirm GPU visibility, while `ollama ps` shows where Ollama loaded the specific model.
+
 ### Connecting to Ollama on a different server
 
 ```bash
