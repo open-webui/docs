@@ -3589,10 +3589,10 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
 
 - Type: `str`
 - Options:
-  - `ivfflat`: Uses inverted file with flat compression, better for datasets with many dimensions.
+  - `ivfflat`: Groups vectors into lists and searches a subset of those lists.
   - `hnsw`: Uses Hierarchical Navigable Small World graphs, generally provides better query performance.
-- Default: Not specified (pgvector will use its default)
-- Description: Specifies the index method for pgvector. The choice affects query performance and index build time.
+- Default: unset. Open WebUI selects `ivfflat` for `vector` columns and `hnsw` for `halfvec` columns.
+- Description: Specifies the index method for pgvector. If the existing `idx_document_chunk_vector` uses a different method, initialization fails and Open WebUI leaves the index in place. Plan a maintenance window to replace the index with one that uses the new method before restarting. Changing only the index method can reuse the stored embeddings.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::info
@@ -8411,23 +8411,13 @@ Each SQLite connection carries its own page cache (`DATABASE_SQLITE_PRAGMA_CACHE
 
 For deployments with many concurrent users, consider increasing both `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW`. A good starting point is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`.
 
-**Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database server's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keeping the combined total under 50-80 per Open WebUI instance is recommended to leave room for other clients and maintenance connections.
-
 :::
 
-:::warning Pool Size Multiplies with Concurrency
+:::warning PostgreSQL pools multiply with workers
 
-**Each Open WebUI process maintains its own independent connection pool.** This applies to every replica, whether Kubernetes pods, Docker Compose or Docker Swarm replicas, and to every Uvicorn worker inside one.
+Each Open WebUI worker has separate synchronous and asynchronous application engines. When pooling is enabled, each can open up to `DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW` connections. For example, a size of 15 and overflow of 20 across four replicas with one worker each gives an application pool capacity of 280 connections (2 × 35 × 4).
 
-The actual maximum number of database connections is:
-
-```
-Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Number of processes/instances
-```
-
-For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, and 4 replicas, you could open up to **140 connections** (35 × 4).
-
-When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation: connection pools cannot be shared across separate processes or containers.
+With `VECTOR_DB=pgvector`, an unset `PGVECTOR_DB_URL` defaults to `DATABASE_URL`. The nonempty URL gives pgvector a separate engine governed by [its own pool settings](#pgvector_pool_size), even when it points to the same server. Count that pool against the server it connects to. Leave room under each server's `max_connections` for clients outside Open WebUI. These limits describe configured pools. Disabling pooling does not set a connection cap.
 
 :::
 
