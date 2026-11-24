@@ -223,9 +223,7 @@ When reading long responses, Open WebUI can split text into chunks before sendin
 | **Paragraphs** | Splits at every newline, single or double, keeping code blocks intact. Results in longer audio chunks. |
 | **None** | Sends the entire response as one chunk. May cause delays before audio starts on long responses. |
 
-:::tip
-**Punctuation** mode is recommended for most use cases. It provides the best balance of streaming performance (audio starts quickly) and natural speech pacing.
-:::
+In regular chat, **Auto-Playback Response** in your personal **Settings > Audio** is off by default. When enabled, it triggers **Read Aloud** after the reply finishes. **Response Splitting** controls how that completed reply is chunked. In a Standard voice call, **Punctuation** and **Paragraphs** can queue completed chunks while the reply is still arriving. **None** waits for the full reply before queuing it.
 
 Each chunk is cleaned before it goes to the engine. Open WebUI drops code blocks, table rows, emoji, reasoning and tool-call details, and footnote markers such as `[^1]`. It removes Markdown syntax such as `**`, `_`, `#`, list markers and `>` but keeps the words they mark. A link is reduced to its text, without the URL. Citation markers such as `[1]` are not removed, so the engine receives them and the number can be read out. Two markers in a row, such as `[1][2]`, are treated as a link and become `1`.
 

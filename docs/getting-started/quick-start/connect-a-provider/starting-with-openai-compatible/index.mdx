@@ -36,11 +36,9 @@ For a detailed explanation of this architectural decision, see our **[FAQ on pro
 
 :::warning Important: Connection Verification May Fail for Some Providers
 
-Saving a connection does not test it. Clicking the **Verify Connection** button beside the URL field calls the provider's `/models` endpoint using a standard `Bearer` token and reports **Server connection verified**. **Some providers do not implement the `/models` endpoint** at all or use non-standard authentication for it. In these cases:
+For a standard OpenAI-compatible connection, **Verify Connection** beside the **URL** field requests the provider's `/models` endpoint even if you entered **Model IDs**. Some providers omit that endpoint or use a different path. In that case, you can still save the connection and test chat with a model ID your provider accepts.
 
-- The connection verification will **fail with an error** (e.g., 400, 401 or 403).
-- This does **not** mean the provider is incompatible: **chat completions will still work**.
-- You just need to **manually add model names** to the **Model IDs** allowlist in the connection settings.
+For an enabled admin-managed connection, an empty list uses provider discovery. If you add any entries under **Advanced > Model IDs**, Open WebUI uses those exact IDs as the connection's model list instead of fetching `/models` to populate it. Saving those IDs does not check that the provider accepts them.
 
 **Providers with known `/models` issues:**
 
@@ -69,7 +67,7 @@ Saving a connection does not test it. Clicking the **Verify Connection** button 
 2. Go to **Settings > Connections** (admin section) and find the **Manage OpenAI API Connections** list.
 3. Click **Add Connection**.
 4. Fill in the **URL** and **API Key** for your provider (see tabs below). The URL field will **suggest common provider endpoints** as you type.
-5. If your provider doesn't support `/models` auto-detection, add your model IDs to the **Model IDs** allowlist. After a successful **Verify Connection**, the **Model IDs** field suggests the provider's model IDs as you type.
+5. If your provider doesn't support model discovery, add your model IDs under **Advanced > Model IDs**. When **Verify Connection** returns a model list for a non-Azure connection, the **Model IDs** field suggests those IDs as you type.
 6. Click **Save**.
 
 :::tip
