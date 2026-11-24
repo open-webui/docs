@@ -74,7 +74,7 @@ The **Reasoning Effort** advanced parameter, set in the chat controls or the mod
 
 ## Working With an Agent
 
-- **Attachments.** Files you attach are uploaded to the machine, and the agent is told their paths.
+- **Attachments.** Files you attach are uploaded to the machine, and the agent is told their paths. Images (PNG, JPEG, GIF and WebP) are also sent to the agent itself, up to 10 MB per message in total.
 - **Workspace.** A new conversation starts in the machine's current working directory. An existing agent conversation keeps its workspace, even if you browse to other folders in the [file browser](./file-browser.md).
 - **Tool requests.** When the agent wants to run a tool, the request appears in the chat and follows the [tool permission mode](/features/extensibility/plugin/tools#tool-approval). In **Auto** (offered when [`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions) and [`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto) are on), Codex uses its own reviewer and passes on only what it escalates. Claude Code and Grok do the same in agent versions that support it. Escalated actions still go through Open WebUI's approval checks. Other ACP agents keep asking for approval in **Auto** unless an administrator sets the **Engine** under [Auto permissions](/features/extensibility/plugin/tools#auto).
 - **Questions.** When the agent asks you a question, it appears in the chat and the agent waits for your answer. Questions are always shown, whichever permission mode is set.
