@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 
 **Stay current without losing your data.**
 
-Your data (chats, users, settings, uploads) lives in a Docker volume or local database, not inside the container. Updating Open WebUI means swapping the container image for a newer one. Your data stays exactly where it is.
+For Docker installs, updating Open WebUI means pulling a newer image and recreating the container with the same data mount. The default SQLite database and local uploads live under `/app/backend/data`. Reuse the existing named volume or bind mount at that path (or at your configured `DATA_DIR`). If you use an external database or object storage, keep the same connections in the replacement container.
 
 ---
 
@@ -76,6 +76,8 @@ Setting `ENABLE_DB_MIGRATIONS=false` on all but one instance decides **which** i
 ---
 
 ## Manual Update
+
+In **Settings > General** (admin section), **Check for updates** looks up the latest GitHub release. To install it in Docker, pull the image and recreate the container using the steps below. The button appears on release-channel builds when [`ENABLE_VERSION_UPDATE_CHECK`](/reference/env-configuration#enable_version_update_check) is enabled (the default). `OFFLINE_MODE=true` disables the check.
 
 <Tabs groupId="setup-method">
   <TabItem value="docker-run" label="Docker Run" default>
