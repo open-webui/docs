@@ -4643,7 +4643,7 @@ Provide a clear and direct response to the user's query, including inline citati
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls what happens to a file when it is removed from a knowledge base, or when the knowledge base itself is deleted. By default the file record, the stored copy of the file and its embeddings are all deleted with it. Enable this to keep them, so that removal takes the file out of the knowledge base without destroying anything, which suits deployments that retain uploads for audit or reuse. Storage then grows with every removal, since nothing is reclaimed.
+- Description: Controls whether removing a file in the Knowledge workspace also deletes its upload. With `False`, Open WebUI attempts to delete the file record and stored copy if the person removing it owns the file or is an admin. With `True`, removal keeps the file record and stored copy. In both cases, Open WebUI removes the file from the knowledge base and attempts to remove its entries from that base's search index. The setting also controls file retention during knowledge reset, directory deletion with contents, and sync cleanup. Deleting the entire knowledge base removes its associations and attempts to remove its search index, while the underlying uploaded files remain.
 - Persistence: No
 
 #### `CHUNK_SIZE`
