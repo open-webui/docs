@@ -108,7 +108,7 @@ For high-concurrency PostgreSQL deployments, the default connection pool may be 
 
 SQLite uses its own pool sizing, see [SQLite Memory Footprint on Constrained Containers](#5-sqlite-memory-footprint-on-constrained-containers).
 
-**Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keep the combined total under 50-80 per Open WebUI instance to leave room for other clients and maintenance operations.
+**Important:** For PostgreSQL, count the synchronous pool, asynchronous pool, and any pgvector pool that connects to the same database server. Multiply by the number of workers across replicas and leave room for other clients. See [PostgreSQL pool sizing](/reference/env-configuration#database_pool_size).
 
 ### Vector Database (RAG)
 For multi-user setups, the choice of Vector DB matters.
