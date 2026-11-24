@@ -164,7 +164,7 @@ Pick the model new chats in this folder start with, or leave it on **Use default
 
 ### Default Machine and Working Directory
 
-Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. A chat that was already on another machine before it moved into the folder keeps that machine. A machine with a separate instance per chat or model is only suggested for new chats. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents).
+Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. A chat that was already on another machine before it moved into the folder keeps that machine. A machine with a separate instance per chat or model is only suggested for new chats. While that machine is offline or not shared with you, the message box in the folder's chats is disabled. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents).
 
 ### System Prompt
 
