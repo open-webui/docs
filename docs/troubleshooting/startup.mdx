@@ -19,6 +19,19 @@ docker logs --tail 100 --timestamps open-webui
 
 Replace `open-webui` with your container name. A restart count that keeps increasing means the process is repeatedly exiting. If `oom=true`, check available memory and any memory limit on the container. Otherwise, look for the last error before each restart. If the logs stop at the Open WebUI banner while the container stays up, see [startup delays while reaching Hugging Face](#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked).
 
+## Cannot connect after Docker install
+
+Check readiness inside the Open WebUI container, then through the published port. The v0.13.4 image's Docker health check calls `/health` inside the container. A healthy status confirms the web server answered there. The `/ready` endpoint also checks whether startup has finished and whether the database and configured Redis connection respond.
+
+```bash
+docker exec open-webui sh -c 'curl -i --max-time 5 "http://127.0.0.1:${PORT:-8080}/ready"'
+curl -i --max-time 5 http://127.0.0.1:3000/ready
+```
+
+Run both commands on the Docker host. Replace `open-webui` with your container name and `3000` with your published host port. A listening server can return HTTP 503 from `/ready` with `Startup not complete`, `Database not ready`, or `Redis not ready`. Use that response and the container logs to identify what is still failing. If the container probe cannot connect, check the container state and startup logs above.
+
+If the container probe returns HTTP 200 with `{"status":true}` and the host probe cannot connect, check the published mapping with `docker port open-webui`. For the default container port of `8080`, a mapping such as `3000:8080` forwards requests from host port `3000` to container port `8080`. If you changed `PORT`, check that the mapping points to that container port.
+
 ## No space left on device
 
 If startup or an upload fails with `No space left on device` or `database or disk is full`, check the path in the server log. In the standard Docker image, `/app/backend/data` holds the default SQLite database, uploads, and application cache. With S3 storage, uploads still go to local disk before being sent to the bucket, and file reads download a local copy.
