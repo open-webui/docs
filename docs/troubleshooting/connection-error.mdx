@@ -338,6 +338,14 @@ Open WebUI lists only the models that the Ollama URLs in **Admin Panel > Setting
 - **A renamed or missing Docker volume.** Ollama keeps models in the volume mounted at `/root/.ollama`. A container started with a different volume name starts with an empty model list.
 - **The bundled `:ollama` image run without `-v ollama:/root/.ollama`.** Models pulled into it are gone after the container is recreated.
 
+If the models disappeared after switching between `docker run` and Compose or renaming the Compose project, inspect the mount on the container that serves Ollama:
+
+```bash
+docker inspect --type container --format '{{json .Mounts}}' ollama
+```
+
+Use `open-webui` for the bundled image or substitute your container name. Find the entry with `Destination` set to `/root/.ollama`. For a named volume, compare its `Name` with the old setup. Compose normally prefixes the volume name with the project name, so `myproject_ollama` and `ollama` are separate volumes. For a bind mount, compare `Source`. If the old volume still exists, configure the new setup to mount that exact volume. In Compose, use an [external volume with its existing name](https://docs.docker.com/reference/compose-file/volumes/#external).
+
 To spot a stale second server, open **Settings > About**. **Ollama Version** shows the lowest version reported by all enabled Ollama connections. A version older than the one you installed means one of the configured URLs points to a different Ollama server.
 
 ### `does not support tools` {#ollama-does-not-support-tools}
