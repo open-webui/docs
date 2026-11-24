@@ -109,7 +109,7 @@ Settings > Connections (admin section). These are instance-wide and shared by al
 Connections added in the Tether app keep the keys on your computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools). An admin can add shared connections under **Settings > Connections** (admin section).
 
 **"I set a system prompt but my admin's model settings override it."**
-A system prompt an admin has configured on the model in the Workspace takes precedence over your personal one. Advanced parameters go the other way: one you set for your account, or for a single chat under **Model controls > Controls**, is the value sent. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params) for the full precedence hierarchy.
+Open WebUI combines the Workspace model's system prompt, the folder's prompt if present, and the chat's prompt or your account prompt, in that order. The account prompt is used when the chat has no prompt of its own. See [Chat Parameters](/features/chat-conversations/chat-features/chat-params#how-system-prompts-combine).
 
 **"A switch in Settings > Interface has Default written next to it. What does that mean?"**
 It means you have never changed that option, so it is following the instance-wide [Default Interface Settings](/features/administration/interface-defaults) your admin configured. Change it and it becomes yours; set it back to the current default and it goes back to following.
