@@ -40,6 +40,7 @@ Folders can be nested within other folders to create hierarchical organization:
 
 - **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
+- **Reorder**: Drag a folder just above or below another one to place it there. The order is saved with your settings, so it is the same on every device, and folders you have not placed yet sort by name at the end. Shared folders stay sorted by name.
 - **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. It needs the [Allow Chat Export](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. There is no move entry. Folders are re-parented by drag and drop only.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").

@@ -41,6 +41,10 @@ Dismissing a tab or collapsing the whole pane changes nothing about what the AI 
 The command list streams live, and so does the output of the tab on screen while the pane is open. A command in a background tab sends no output to your browser until you switch to it.
 :::
 
+:::info Extra keys on touch screens
+On a phone or tablet, a row above the terminal adds the keys a touch keyboard lacks: **Tab**, **Esc**, **Ctrl**, the arrow keys and `| ~ / - _`. **Ctrl** applies to the next key you type or tap.
+:::
+
 :::info One terminal at a time
 The pane follows the terminal selected in the chat, the same as the file browser. Switching terminals switches which instance you are looking at.
 :::
