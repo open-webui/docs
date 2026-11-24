@@ -118,55 +118,13 @@ To verify your setup is working:
 - ✓ Configure Let's Encrypt for automatic certificate renewal
 - ✓ Disable proxy buffering for SSE streaming (see below)
 
-## Garbled Markdown / Streaming Response Corruption
+## Delayed streaming behind Nginx {#garbled-markdown--streaming-response-corruption}
 
-If streaming responses show garbled markdown rendering (e.g., visible `##`, `**`, or broken formatting), but disabling streaming fixes the issue, this is typically caused by **nginx proxy buffering**.
+Open WebUI normally delivers browser chat updates over Socket.IO at `/ws/socket.io`. If replies only stall when you use the proxy URL, check that connection in your browser's Network tab. With the default `ENABLE_WEBSOCKET_SUPPORT=true`, look for a successful WebSocket connection. See the [Nginx WebSocket settings](/reference/https/nginx#http2-and-websockets).
 
-### Common Symptoms
+For an API client reading an HTTP stream such as `POST /api/chat/completions` with `stream: true`, Nginx response buffering can delay events so updates arrive in bursts. Use `proxy_buffering off;` in the location that serves the streaming endpoint. See [Nginx response buffering](/reference/https/nginx).
 
-- Raw markdown tokens visible in responses (`##`, `**`, `###`)
-- Bold markers appearing incorrectly (`** Control:**` instead of `**Control:**`)
-- Words or sections randomly missing from responses
-- Formatting works correctly when streaming is disabled
-
-### Cause: Nginx Proxy Buffering
-
-When nginx's proxy buffering is enabled, it re-chunks the SSE (Server-Sent Events) stream arbitrarily. This breaks markdown tokens across chunk boundaries: for example, `**bold**` becomes separate chunks `**` + `bold` + `**`, causing the markdown parser to fail.
-
-### Solution: Disable Proxy Buffering
-
-Add these directives to your nginx location block for Open WebUI:
-
-```nginx
-location / {
-    proxy_pass http://your-open-webui-upstream;
-    
-    # CRITICAL: Disable buffering for SSE streaming
-    proxy_buffering off;
-    proxy_cache off;
-    
-    # WebSocket support
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    
-    # Standard proxy headers
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
-```
-
-:::tip
-Disabling proxy buffering also **significantly improves streaming speed**, as responses stream byte-by-byte directly to the client without nginx's buffering delay.
-:::
-
-### For Other Reverse Proxies
-
-- **HAProxy**: Ensure `option http-buffer-request` is not enabled for SSE endpoints
-- **Traefik**: Check compression/buffering middleware settings
-- **Caddy**: Generally handles SSE correctly by default, but check for any buffering plugins
+HTTP read boundaries can fall anywhere in a server-sent event (SSE). Open WebUI's browser SSE reader reconstructs events before extracting text. If Markdown is still malformed after the reply finishes, inspect the completed response text for malformed Markdown before changing proxy settings.
 
 ## Blank Replies When the Model Uses a Tool
 
