@@ -4755,7 +4755,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Sets the maximum number of files that can be uploaded at once in a chat. Knowledge base uploads use [`KNOWLEDGE_MAX_UPLOAD_COUNT`](#knowledge_max_upload_count).
+- Description: Limits chat attachments. Adding files in the composer checks pending attachments plus the new batch. Sending a message checks pending attachments plus retained chat attachments, so documents and knowledge collections already attached to the chat can count against a later send. Knowledge base uploads use [`KNOWLEDGE_MAX_UPLOAD_COUNT`](#knowledge_max_upload_count).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `KNOWLEDGE_MAX_UPLOAD_COUNT`

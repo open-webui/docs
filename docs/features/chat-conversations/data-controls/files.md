@@ -65,7 +65,7 @@ Every file carries metadata that helps both you and the AI understand its contex
 **A:** Yes, from a file's menu, or **Actions** > **Download** for several files at once.
 
 **Q: Are there limits on the number of files I can manage?**  
-**A:** No limit applies by default. An admin can set a maximum upload size in MB (`RAG_FILE_MAX_SIZE`, enforced on upload) and a maximum number of files attached at once in the chat input (`RAG_FILE_MAX_COUNT`) under **Settings > Admin > Documents**. Beyond that, the scalability depends on your storage (disk/S3) and your Vector Database (e.g., ChromaDB, PGVector).
+**A:** No limit applies by default. An admin can set a maximum upload size in MB (`RAG_FILE_MAX_SIZE`, enforced on upload) and a [chat attachment limit](/reference/env-configuration#rag_file_max_count) (`RAG_FILE_MAX_COUNT`) in **Settings > Documents** (admin section). When you send a message, the limit also counts attachments retained by that chat. Beyond that, the scalability depends on your storage (disk/S3) and your Vector Database (e.g., ChromaDB, PGVector).
 
 **Q: Does managing files require Admin privileges?**  
 **A:** No. The File Manager lists only your *own* uploaded files, for administrators too.

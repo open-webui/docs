@@ -44,6 +44,8 @@ Folders can be nested within other folders to create hierarchical organization:
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
+A chat in a child folder uses that folder's **System Prompt** and **Knowledge** settings. For example, if a parent folder has a handbook attached, attach the handbook to the child as well to make it available automatically in chats there.
+
 ### Unread Badge
 
 A folder shows a count of the chats inside it that you have not read yet or that are waiting for you to approve a tool call, next to its name in the sidebar.
