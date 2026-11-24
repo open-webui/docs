@@ -496,7 +496,7 @@ AUDIT_LOG_LEVEL=METADATA
 | Level | What is logged |
 |---|---|
 | `NONE` | Nothing (default) |
-| `METADATA` | User, IP, user agent, method, URL, timestamp, requested model |
+| `METADATA` | User, IP, user agent, method, URL, timestamp, requested model, response status code |
 | `REQUEST` | Metadata plus request body |
 | `REQUEST_RESPONSE` | Metadata plus request and response bodies |
 
@@ -507,6 +507,8 @@ AUDIT_LOG_LEVEL=METADATA
 ENABLE_AUDIT_LOGS_FILE=true
 AUDIT_LOGS_FILE_PATH=/app/backend/data/audit.log
 AUDIT_LOG_FILE_ROTATION_SIZE=10MB
+# Refuse to start when the audit log file cannot be opened
+ENABLE_AUDIT_LOGS_FILE_STARTUP_CHECK=true
 
 # Also send to stdout, useful for log aggregators
 ENABLE_AUDIT_STDOUT=true
@@ -535,7 +537,7 @@ AUDIT_EXCLUDED_PATHS=/chats,/folders
 
 With chat requests recorded, every model reply to a `/api/chat/completions` request writes its own audit entry next to the entry for the request. When a reply calls tools, each round of the model's answer between tool calls gets one. Such an entry has the model that answered in `model_id` and the token counts the provider reported in `usage` (`input_tokens`, `output_tokens` and `total_tokens`). Its `extra.request_id` holds the `id` of the request's entry, which links the two. A reply whose provider reports no token counts writes none. Background tasks, such as title and tag generation, write an entry the same way, with the task name in `extra.task`.
 
-Within these filters, the audit log covers `POST`, `PUT`, `PATCH` and `DELETE` requests (add `GET` with [`ENABLE_AUDIT_GET_REQUESTS`](/reference/env-configuration#enable_audit_get_requests)) that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. Requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](/reference/env-configuration#enable_audit_anonymous_requests) is `true`, which has no effect while `AUDIT_LOG_LEVEL` is `NONE`. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
+Within these filters, the audit log covers `POST`, `PUT`, `PATCH` and `DELETE` requests (add `GET` with [`ENABLE_AUDIT_GET_REQUESTS`](/reference/env-configuration#enable_audit_get_requests)) that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. A successful sign-in or sign-up is logged under the account that signed in. Requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](/reference/env-configuration#enable_audit_anonymous_requests) is `true`, which has no effect while `AUDIT_LOG_LEVEL` is `NONE`. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
 
 ---
 

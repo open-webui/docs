@@ -47,7 +47,7 @@ Typical for OpenAI (GPT-5.6), Anthropic (Claude), Google (Gemini), DeepSeek, and
 | **Chunk Size** | `2000` | Larger chunks preserve more surrounding context per hit |
 | **Chunk Overlap** | `200` | More overlap prevents sentence splits |
 | **Top K** | `15` to `25` | Cast a wide net, you have the context budget for it |
-| **Always Use Full Text** | Consider for small docs | If a document is under ~20K tokens, full text can outperform retrieval. **Full Text Threshold (Characters)** sets which files are included in full without it |
+| **Always Use Full Text** | Consider for small docs | If a document is under ~20K tokens, full text can outperform retrieval. **Full Text Threshold** (in characters or tokens) sets which files are included in full without it |
 
 :::tip When to use full text
 If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, full text often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Switch an attachment to **Using Entire Document** to do this for one file, or turn on **Always Use Full Text** in **Settings** > **Documents** (admin section) for all of them.

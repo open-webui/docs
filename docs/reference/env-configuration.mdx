@@ -1371,6 +1371,12 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Default: `True`
 - Description: Controls whether audit logs are written to a file. When enabled, logs are written to the location specified by `AUDIT_LOGS_FILE_PATH`.
 
+#### `ENABLE_AUDIT_LOGS_FILE_STARTUP_CHECK`
+
+- Type: `bool`
+- Default: `False`
+- Description: Stops Open WebUI from starting when audit logging is on and the audit log file cannot be opened, for example because the folder is not writable. By default it logs the error and starts without the audit log file.
+
 #### `AUDIT_LOGS_FILE_PATH`
 
 - Type: `str`
@@ -1395,7 +1401,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its JSON body when the body has one. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks`, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the token counts the provider reports in a `usage` field (written only when the provider reports them), linked to the request's entry through `extra.request_id`. Background tasks such as title and tag generation write one too, with the task name in `extra.task`. See [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Other requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](#enable_audit_anonymous_requests) is on. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. Every level records the response status code in `response_status_code`. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its JSON body when the body has one. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks`, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the token counts the provider reports in a `usage` field (written only when the provider reports them), linked to the request's entry through `extra.request_id`. Background tasks such as title and tag generation write one too, with the task name in `extra.task`. See [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Other requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](#enable_audit_anonymous_requests) is on. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -5113,12 +5119,24 @@ Strictly return in JSON format:
 - Description: Always includes the complete text of documents instead of retrieving chunks. Shown as **Always Use Full Text** in **Settings** > **Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-#### `RAG_FULL_TEXT_CHAR_THRESHOLD`
+#### `RAG_FULL_TEXT_THRESHOLD`
 
 - Type: `int`
 - Default: `50000`
-- Description: Sets the number of characters up to which the complete extracted text of an uploaded file or text attachment is included in the prompt. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** in **Settings** > **Documents** (admin section). The aliases `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
+- Description: Sets the size up to which the complete extracted text of an uploaded file or text attachment is included in the prompt, in characters or, with [`RAG_FULL_TEXT_THRESHOLD_TYPE`](#rag_full_text_threshold_type) set to `token`, in tokens. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** or **Full Text Threshold (Tokens)** in **Settings** > **Documents** (admin section). The older names `RAG_FULL_TEXT_CHAR_THRESHOLD`, `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_FULL_TEXT_THRESHOLD_TYPE`
+
+- Type: `str`
+- Default: Empty string (`""`), which measures in characters
+- Options: `""` or `token`
+- Description: How [`RAG_FULL_TEXT_THRESHOLD`](#rag_full_text_threshold) measures a file. `token` counts tokens with the [`TIKTOKEN_ENCODING_NAME`](#tiktoken_encoding_name) encoding, so the count is approximate for models that use another tokenizer. Also available as **Full Text Threshold Type** in **Settings** > **Documents** (admin section).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `RAG_FULL_TEXT_CHAR_THRESHOLD`
+
+Older name of [`RAG_FULL_TEXT_THRESHOLD`](#rag_full_text_threshold).
 
 #### `RAG_SYSTEM_CONTEXT`
 
