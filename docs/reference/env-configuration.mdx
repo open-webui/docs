@@ -2394,6 +2394,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
   - The application restarts (without Redis; a list stored in Redis survives restarts)
   - The connection settings are saved in the **Settings > Connections** (admin section) (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
   - An admin downloads, deletes, loads or unloads a model on a connection
+  - An admin selects **Refresh** beside **Cache Base Model List** under **Admin Panel > Settings > Connections > User Connections**. The button appears only while caching is enabled. It requests fresh model lists from connected providers without changing the connection settings.
 - **No TTL**: There is no automatic time-based expiration.
 
 :::tip Performance Consideration
@@ -2422,7 +2423,7 @@ Open WebUI has **two model caching mechanisms** that work independently:
 
 | Setting | Type | Default | Refresh Trigger |
 |---------|------|---------|-----------------|
-| `ENABLE_BASE_MODELS_CACHE` | Memory, or Redis when configured | `False` | Admin Save, or app restart without Redis |
+| `ENABLE_BASE_MODELS_CACHE` | Memory, or Redis when configured | `False` | Admin **Refresh**, settings save, or app restart without Redis |
 | `MODELS_CACHE_TTL` | TTL-based | `1` second | Automatic after TTL expires |
 
 For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODELS_CACHE_TTL=300`.
