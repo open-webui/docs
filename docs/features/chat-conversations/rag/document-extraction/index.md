@@ -23,9 +23,11 @@ With proper document extraction, Open WebUI can help you:
 - Extract data in structured formats for further processing
 - Support multilingual content recognition
 
-:::note Privacy in Temporary Chats
-In **Temporary Chat** mode, document extraction is performed **exclusively in the browser** to prevent data from being stored or processed on the backend. This strict privacy measure means that some complex file formats (like certain DOCX files) that rely on backend parsers may not be processed correctly.
-:::
+### Document attachments in temporary chats
+
+When you attach a local document in **Temporary Chat**, the browser extracts its text without uploading the original as an Open WebUI file. When you send the message, the extracted text goes to the Open WebUI backend as part of the chat request.
+
+The browser uses built-in parsers for this step. PDF extraction reads the text layer without OCR and joins text items with spaces, so scanned pages may yield no text and table layout may be lost. DOCX extraction returns plain text. Use a standard chat if you need the server's configured extraction engine.
 
 :::info Sending images and video to your extraction engine
 

@@ -385,7 +385,7 @@ A video is attached as its transcript, so one with no usable transcript cannot b
 A variety of parsers extract content from local and remote documents: built-in engines like Tika, Docling and Mistral OCR, or your own service via the [external engine](/features/chat-conversations/rag/document-extraction/external) if you need per-file-type routing or custom logic. See [Document Extraction](/features/chat-conversations/rag/document-extraction) for the full list and setup steps.
 
 :::warning Temporary Chat Limitations
-When using **Temporary Chat**, document processing is restricted to **frontend-only** operations to ensure your data stays private and is not stored on the server. Consequently, advanced backend parsing (used for formats like complex DOCX files) is disabled, which may result in raw data being seen instead of parsed text. For full document support, use a standard chat session.
+For local documents attached in **Temporary Chat**, the browser extracts text and sends it to the backend when you submit your message. If you need the server's configured extraction engine, use a standard chat. See [Document attachments in temporary chats](/features/chat-conversations/rag/document-extraction#document-attachments-in-temporary-chats).
 :::
 
 ### CSV Table Summary
