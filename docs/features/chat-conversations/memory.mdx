@@ -119,6 +119,20 @@ Taking the permission away closes every route memories take to a model. The affe
 - **Background review**: when [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) is enabled (default **off**), Open WebUI periodically reviews recent conversation with the chat's own model and can add, replace, move or remove memories of either type, `user` included, every [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) turns (default `10`), instead of relying only on explicit tool calls.
 - **Injection budgets**: [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) and [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) (both default `2000`) cap how many characters of `context` and `user` memories are injected into the prompt.
 
+The character limits apply when Open WebUI includes memories in a model request. Raising a limit gives the model more room to see existing memories. Saved memory entries keep their full text.
+
+For an instance with persistent configuration enabled, changing the environment variable after the limit has been saved leaves the stored value in effect. To update the stored user memory limit, send this JSON to `POST /api/v1/configs/import` using an administrator session token:
+
+```json
+{
+  "config": {
+    "memories.user_char_limit": 6000
+  }
+}
+```
+
+Use `memories.context_char_limit` for the context memory budget.
+
 ### Memory System Context
 By default Open WebUI adds the user's stored memories to the model's context so the model is aware of them. With Native function calling they arrive once per reply as a hidden `recall_memories` tool result after the user's message, otherwise they are appended to the user's message. Recall also needs the model's **Memory** capability. This injection can be turned off independently of the memory tools: when disabled, the model can still add, update and delete memories on request, but remembered information is no longer added to the prompt automatically.
 - **Admin UI**: Settings > General > Features > **Memory System Context** (admin section) (shown when Memories is enabled)
