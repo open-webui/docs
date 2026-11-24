@@ -4643,7 +4643,7 @@ Provide a clear and direct response to the user's query, including inline citati
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls whether removing a file in the Knowledge workspace also deletes its upload. With `False`, Open WebUI attempts to delete the file record and stored copy if the person removing it owns the file or is an admin. With `True`, removal keeps the file record and stored copy. In both cases, Open WebUI removes the file from the knowledge base and attempts to remove its entries from that base's search index. The setting also controls file retention during knowledge reset, directory deletion with contents, and sync cleanup. Deleting the entire knowledge base removes its associations and attempts to remove its search index, while the underlying uploaded files remain.
+- Description: Controls whether removing a file in the Knowledge workspace also deletes its upload. With `False`, Open WebUI attempts to delete the file record and stored copy if the person removing it owns the file or is an admin. With `True`, removal keeps the file record and stored copy. In both cases, Open WebUI removes the file from the knowledge base and attempts to remove its entries from that base's search index. The file-removal API can override this default with its `delete_file` query parameter. The setting also controls file retention during knowledge reset, directory deletion with contents, and sync cleanup. Directory deletion and sync cleanup also keep uploads still linked to another knowledge base. Deleting an entire local knowledge base removes its file associations and attempts to remove its search index, while the underlying uploaded files remain.
 - Persistence: No
 
 #### `CHUNK_SIZE`
