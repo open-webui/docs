@@ -703,7 +703,7 @@ Before adding a file to a knowledge base, verify that processing has completed u
 
 #### Adding Files to Knowledge Collections
 
-After uploading, you can group files into a knowledge base or reference them individually in chats.
+After uploading, you can group files into a knowledge base or reference them individually in chats. Adding a file to an existing local knowledge base requires ownership of the knowledge base, a **Write** grant on it, or an administrator account. Non-admins also need read access to files they do not own.
 
 :::important
 **Always wait for file processing to complete before adding files to a knowledge base.** Files that are still processing will have empty content, causing a `400` error. Use the status endpoint described above to verify the file status is `completed`.
