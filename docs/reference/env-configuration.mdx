@@ -2436,6 +2436,8 @@ For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODE
 - Description: Sets how long a sign-in token stays valid, as a number followed by a unit: `ms`, `s`, `m`, `h`, `d` or `w`, for example `4w` or `12h`. Use `-1` for no expiration. A number without a unit, such as `30`, is not valid, and **Settings > Authentication** (admin section) does not save it.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+To check or change the active lifetime, open **Settings > Authentication** in the admin panel and look for **JWT Expiration**. With persistent configuration enabled, a stored value takes precedence over the environment value. Saving a new lifetime applies to newly issued sign-in tokens. Existing tokens keep their original expiration, so sign out and back in to test the new lifetime.
+
 :::warning
 
 Setting `JWT_EXPIRES_IN` to `-1` disables JWT expiration, making issued tokens valid forever. **This is extremely dangerous in production** and exposes your system to severe security risks if tokens are leaked or compromised.
