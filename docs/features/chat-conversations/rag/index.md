@@ -264,6 +264,12 @@ If you change the embedding model, those standalone chat file embeddings will st
 | **Chunk Size / Overlap** | Uses new settings | Old chunks still work, but quality may vary | Re-chunked with new settings | Old chunks, re-upload to update |
 | **Embedding Model** | Uses new model | Old embeddings, incompatible vector space | Re-embedded with new model | Old embeddings, re-upload to update |
 
+### Monitoring re-index progress
+
+Open WebUI logs the number of knowledge bases and files at the start of the knowledge-file phase. At info log level, it logs a file counter and starts reporting an estimated time remaining after the first file. The admin action then rebuilds the knowledge search index and memory vectors before showing success.
+
+Check the server log even if the UI reports success. The knowledge-file phase can continue after individual errors and return success. Look for the error lines and the `Failed to process ... files` summary to find files that need attention.
+
 ### Danger Zone Reset Buttons
 
 The **Danger Zone** at the bottom of **Settings** > **Documents** (admin section) has two reset buttons. Both apply to every user on the instance, and neither can be undone.

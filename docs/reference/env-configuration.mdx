@@ -4717,7 +4717,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Extracts images from PDFs using OCR when loading documents. Also configurable as **PDF Extract Images (OCR)** in **Settings > Documents** (admin section). The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
+- Description: Runs OCR on embedded images in the default PDF loader and adds the recognized words to the extracted page text. The loader outputs text, so searchable diagram labels do not carry the diagram image or its visual structure. Also configurable as **PDF Extract Images (OCR)** in **Settings > Documents** (admin section). The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAPIDOCR_PARAMS`
