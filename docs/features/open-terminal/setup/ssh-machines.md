@@ -43,7 +43,7 @@ Open WebUI creates its own SSH key for the machine and needs it added to `~/.ssh
 
 ### 4. Choose an Open Terminal version
 
-Leave **Open Terminal version** empty to install the latest release, or enter a version such as `0.17.21` to pin one. `0.17.21` is the oldest version Open WebUI works with.
+Leave **Version** empty to install the latest release, or enter a version such as `0.17.21` to pin one. `0.17.21` is the oldest version Open WebUI works with.
 
 Leave **Packages** empty, or list what to add on the machine, such as `desktop browser ffmpeg`. `desktop` adds a desktop and `browser` adds Chrome, which give you the [Desktop and Browser tabs](../use-cases/web-development.md). Any other name is installed as an apt package. This needs a user that can run `sudo` without a password.
 
@@ -72,7 +72,7 @@ Open the machine from the **Machines** list to see its Open Terminal version and
 
 **Start directory** is where terminal sessions start, the home folder of the SSH user when empty. To start somewhere else, enter an absolute path that exists on the machine, such as `/home/user/project`, when you add the machine or later by editing it. Changing it restarts Open Terminal in the new directory.
 
-**Open Terminal flags** adds options to the `open-terminal run` command that starts Open Terminal on the machine, such as `--desktop-mode host` to share the desktop you are logged in to. Open WebUI sets `--ipc` and `--api-key` itself and refuses them here. Saving a change restarts Open Terminal, and if it does not start with the new flags, Open WebUI puts the previous ones back and shows the error.
+**Flags** adds options to the `open-terminal run` command that starts Open Terminal on the machine, such as `--desktop-mode host` to share the desktop you are logged in to. Open WebUI sets `--ipc` and `--api-key` itself and refuses them here. Saving a change restarts Open Terminal, and if it does not start with the new flags, Open WebUI puts the previous ones back and shows the error.
 
 To remove the machine, delete it and confirm. Open WebUI uninstalls Open Terminal from the machine and forgets its own key. If the machine cannot be reached, Open WebUI offers to remove it from Open WebUI anyway, and the files under `~/.open-webui/` stay on the machine until you delete them yourself.
 
