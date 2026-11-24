@@ -572,21 +572,14 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` tool, which shares the same **Sub-agents** builtin category. Can be set in **Settings > Sub-agents** (admin section). See [Sub-agents](/features/chat-conversations/chat-features/subagents).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `SUBAGENTS_BACKGROUND_ENABLED`
-
-- Type: `bool`
-- Default: `False`
-- Description: Allows sub-agents to run in the **background**. The model then returns immediately with a dispatch handle instead of waiting, and when the sub-agent finishes, its result is posted back into the parent chat, which continues on its own without the user sending a message. When this is off, the `background` parameter is removed from the tool schema entirely, so the model cannot request it.
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` and `send_message` tools, which share the same **Sub-agents** builtin category. Can be set in **Settings > Sub-agents** (admin section). See [Sub-agents](/features/chat-conversations/chat-features/subagents).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_CONCURRENT`
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum number of foreground sub-agents running at once. Delegations beyond the limit **wait** for a free slot. Empty, `0` or `-1` means no limit. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
+- Description: Maximum number of foreground sub-agents, the ones started in channels and automation runs, running at once. Delegations beyond the limit **wait** for a free slot. Empty, `0` or `-1` means no limit. Counted **per worker process**, not across a cluster, so the effective ceiling is this value multiplied by the number of workers or replicas.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning `SUBAGENTS_MAX_CONCURRENT` needs a restart to change
@@ -599,7 +592,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum number of background sub-agents running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty, `0` or `-1` means no limit. Also counted per worker process.
+- Description: Maximum number of background sub-agents, the ones started in saved chats, running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty, `0` or `-1` means no limit. Also counted per worker process.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_ITERATIONS`
