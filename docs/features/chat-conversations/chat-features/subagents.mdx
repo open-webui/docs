@@ -31,7 +31,7 @@ Typical uses are researching several questions at once, working through a task t
 
 ## Foreground and Background
 
-In a saved chat, sub-agents run in the **background**. The model gets the sub-agent's chat ID right away and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible **Sub-agent finished** row with an **Open thread** button. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
+In a saved chat, sub-agents run in the **background**. The model gets the sub-agent's chat ID right away and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible row reading **Sub-agent finished**, **Sub-agent stopped** or **Sub-agent failed**, then the task's title and how long it ran, with an **Open thread** button. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
 
 In a channel and in an automation run, sub-agents run in the **foreground**: the reply waits for the sub-agent and receives its answer as the tool result, the same as any other tool call.
 
