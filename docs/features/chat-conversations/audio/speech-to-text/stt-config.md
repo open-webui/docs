@@ -26,6 +26,10 @@ The following speech-to-text providers are supported:
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 
+### Server-side recording storage
+
+When a recording is uploaded to the Open WebUI transcription endpoint, the server writes the original audio to `DATA_DIR/cache/audio/transcriptions` before sending it to the selected engine. The endpoint keeps that original file after processing. Include this directory when deciding what audio to retain and how to protect the data volume and its backups. Browser speech recognition does not send a recording through this endpoint.
+
 ## Configuring Your STT Provider
 
 To configure a speech to text provider:

@@ -349,7 +349,7 @@ The Messages API previously always reported `input_tokens: 0` in the streaming `
 
 ### Speech-to-text transcription
 
-Send recorded audio to `POST /api/v1/audio/transcriptions` with bearer authentication and a `multipart/form-data` body. Include the recording in the required `file` field. The optional `language` field supplies a language hint to transcription engines that use it. Non-admin callers need the speech-to-text permission (`chat.stt`).
+Send recorded audio to `POST /api/v1/audio/transcriptions` with bearer authentication and a `multipart/form-data` body. Include the recording in the required `file` field. The optional `language` field supplies a language hint to transcription engines that use it. Non-admin callers need the speech-to-text permission (`chat.stt`). The endpoint saves the original upload on the server. See [server-side recording storage](/features/chat-conversations/audio/speech-to-text/stt-config#server-side-recording-storage).
 
 ```bash
 curl https://open-webui.example.com/api/v1/audio/transcriptions \
