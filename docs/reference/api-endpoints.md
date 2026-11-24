@@ -19,17 +19,9 @@ When Open WebUI is behind a reverse proxy that already uses the `Authorization` 
 
 ## Swagger Documentation Links
 
-:::important
+Open WebUI serves Swagger UI at `/docs` and its machine-readable OpenAPI schema at `/openapi.json` when the backend starts with `ENV=dev`. The backend defaults to `dev` when `ENV` is unset, but the Docker image sets `ENV=prod`, which disables both routes.
 
-Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
-
-:::
-
-Access detailed API documentation for different services provided by Open WebUI:
-
-| Application | Documentation Path      |
-|-------------|-------------------------|
-| Main        | `/docs`                 |
+If these URLs are unavailable on a local Docker test instance, set `ENV=dev` in the container environment and recreate the container. Use the same host and port you use to reach Open WebUI. Keep `ENV=prod` on production deployments.
 
 ## Notable API Endpoints
 
@@ -95,6 +87,10 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models. A model on a Responses API connection also answers in Chat Completions format, streamed or not, with `finish_reason` set to `length` or `content_filter` when the reply was cut off.
+
+**Connect an OpenAI-compatible chat client.** If the client appends `/models` and `/chat/completions` to its base URL, set the base URL to your Open WebUI URL followed by `/api/v1`, for example `http://localhost:3000/api/v1`. Use a key from **Settings > Account > API keys > Secrets > Show** and copy the model ID from the response to `GET /api/v1/models`. API keys are disabled by default. An administrator must enable **API Keys**, and non-admin accounts also need the **API Keys** feature permission. See [API Keys](/features/authentication-access/api-keys) for setup.
+
+If **API Key Endpoint Restrictions** is enabled under **Settings > Authentication** (admin section), include `/api/v1/models` and `/api/v1/chat/completions` in **Allowed Endpoints** for a client that calls both. The check uses the path the client actually calls, so an entry for `/api/chat/completions` alone does not cover its `/api/v1/chat/completions` alias.
 
 **Use this endpoint for workspace models.** Only `/api/chat/completions` (and its alias `/api/v1/chat/completions`) applies a workspace model's settings. On a plain API call it applies the base model, system prompt, parameters and filters, but not the model's tools, knowledge or default features, which need extra fields, as listed below the table. The proxy routes under `/openai` skip more:
 
