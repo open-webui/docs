@@ -293,7 +293,16 @@ The tool edits one page. The model must read the page with `view_note` first, an
 The tool has two modes. Passing whole `content` replaces the entire page, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the page and leaves the rest untouched. Each operation names the text to change in one of two ways:
 
 - **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, nothing changes and the model gets the positions of all matches to choose from.
-- **By position.** `start` and `end` give a character range. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
+- **By position.** `start` and `end` are zero-based character offsets into the original Markdown returned by `view_note`. The end is exclusive and the ranges in one request must not overlap. Use the original offsets for every operation, even if an earlier replacement changes the text length. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
+
+For example, to change `red blue` to `green navy`, send these two operations in one request:
+
+```json
+[
+  {"action": "replace_text", "start": 0, "end": 3, "expected": "red", "content": "green"},
+  {"action": "replace_text", "start": 4, "end": 8, "expected": "blue", "content": "navy"}
+]
+```
 
 The older `replace_range` action still works as an alias of the position form, but it is deprecated. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for these operations.
 
