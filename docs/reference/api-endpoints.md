@@ -57,9 +57,18 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 | `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
 | `POST /api/v1/models/create` | Create a single model. |
 | `POST /api/v1/models/model/update` | Update a single model. |
-| `POST /api/v1/models/model/delete` | Delete a single model. |
+| `POST /api/v1/models/model/delete` | Delete a saved custom model by ID. |
 
-**Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+**Bulk operations.** `sync` is admin-only. Non-admins need the `workspace.models_import` permission for `import` or the `workspace.models_export` permission for `export`. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+
+**Delete a custom model.** Send a JSON body containing the saved custom model's ID as a string. An administrator, the model owner, or a user with Write access to the model can delete it. The response body is the JSON boolean `true` on success.
+
+```bash
+curl -X POST https://open-webui.example.com/api/v1/models/model/delete \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "my-custom-model"}'
+```
 
 **Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
