@@ -207,7 +207,8 @@ Open WebUI implements various limits to ensure system stability and prevent abus
 *   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (no limit by default; only the browser enforces it). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to `RAG_FILE_MAX_SIZE` and the knowledge base [file limits](/features/workspace/knowledge#file-limits).
-    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used with **Using Entire Document** (click the attachment in a chat), which feeds the full document content to the model instead of using vector search retrieval.
+    *   **Vector indexing:** By default, Open WebUI indexes files when they are added to a knowledge base. **Bypass Embedding and Retrieval** in **Settings > Documents** (admin section) skips vector indexing for both chat uploads and files added to knowledge bases. Open WebUI still extracts text from document uploads and stores it.
+    *   **Full-text attachments:** To use full text for a single attachment and keep indexing enabled, click the attachment in the chat and select **Using Entire Document**. For a file-backed knowledge base, full-text mode can include the extracted text of every file in the collection. Check the combined text against the model's context budget.
 
 :::info
 By separating these limits, administrators can better manage resource usage across different features. For example, you might want to allow larger uploads in a curated Knowledge Base while restricting the number of files in ad-hoc Folder uploads.
