@@ -69,11 +69,13 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 1. Click on any folder in the sidebar to select it.
 2. The chat interface will show that folder is active.
 3. Any new chat you start will automatically be created inside this folder.
-4. New chats will **inherit the folder's settings** (default model, default machine, working directory, system prompt and knowledge).
+4. New chats will **inherit the folder's settings** (default model, machine, working directory, system prompt and knowledge).
 
 A folder's three-dot menu also has **New Chat**, which opens the folder the same way.
 
 Each folder in the sidebar is a link to its own page, so a middle click or Ctrl/Cmd click opens the folder in a new tab.
+
+A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. The new chat page lists your folders with work in progress under **Continue**: a chat that is running or waiting for your approval, or tabs left open. Each entry shows the folder's working directory and its open tabs, terminals and ports, so you can pick up where you left off.
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
 
@@ -161,7 +163,7 @@ Pick the model new chats in this folder start with, or leave it on **Use default
 
 ### Default Machine and Working Directory
 
-Under **Advanced**, **Default machine** picks the machine new chats in this folder start with. Once one is picked, **Working directory** sets the path on that machine where those chats start; leave it empty to use the machine's own default. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents). These settings apply to new chats only.
+Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. A chat that was already on another machine before it moved into the folder keeps that machine. A machine with a separate instance per chat or model is only suggested for new chats. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents).
 
 ### System Prompt
 
