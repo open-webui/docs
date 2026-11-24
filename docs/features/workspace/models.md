@@ -433,6 +433,8 @@ Setting a model as Selected does not stop anyone from switching to another model
 
 Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
 
+In the chat model picker, open **All** next to the search box and choose a model tag to show only models with that tag. The same menu offers **Local** and **External** when those connection types are available. You can apply one menu filter at a time and still use **Search a model** to narrow the results by name, ID, or tag. Select **Clear filters** (×) next to the active filter to return to **All**.
+
 ![The model selector, searchable and showing pinned models](/images/features/chat/model-selector.png)
 
 You can also switch without opening the picker. Send `/model` followed by a model id, for example `/model gpt-5.1`, and the chat moves to that model; send `/model` on its own and it tells you which model the chat is on. The id has to match exactly, the display name will not do, and an id you cannot reach reports `Model not found`. Picking **Model** from the `/` menu opens the picker with its search box focused instead. See [Chat Features](/features/chat-conversations/chat-features/) for the other built-in slash commands.
