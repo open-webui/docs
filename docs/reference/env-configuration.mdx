@@ -5332,11 +5332,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 
 #### `WEB_SEARCH_DOMAIN_FILTER_LIST`
 
-- Type: `list` of `str`
-- Default: `[]`
-- Description: Comma-separated list of domains to filter web search results. Domains prefixed with `!` are blocked; domains without prefix create an allowlist (only those domains permitted).
-- Example: `wikipedia.org,github.com,!malicious-site.com`
+- Type: `list` of `str` (JSON array in the environment variable)
+- Default: `[]` (no filtering)
+- Description: Filters results from search engines that support the list, such as SearXNG. Use bare domain names to match a domain and its subdomains. URL paths such as `example.com/news` are unsupported. Entries prefixed with `!` exclude matching results. If you include any unprefixed entries, a result must match at least one of them, and exclusions still take precedence. [Jina](/features/chat-conversations/web-search/providers/jina#limits) does not apply this list.
+- Example: `WEB_SEARCH_DOMAIN_FILTER_LIST='["example.com","!archive.example.com"]'`
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+In **Settings > Web Search** (admin section), turn on **Web Search** to see **Domain Filter List**. The admin field takes comma-separated entries, for example `example.com,!archive.example.com`. In v0.13.4, a comma-separated value in the environment variable fails JSON parsing and falls back to an empty list.
 
 #### `WEB_SEARCH_RESULT_COUNT`
 

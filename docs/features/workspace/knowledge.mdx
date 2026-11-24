@@ -372,7 +372,8 @@ The in-app **Sync directory** runs in your browser: it enumerates, hashes and up
 Behavior to be aware of:
 
 - Hidden files and folders (anything beginning with `.`) are skipped.
-- Files modified locally upload with a new content hash; the old file entry is removed from the KB and replaced.
+- For a locally modified file, sync removes the old entry from the knowledge base before it uploads the replacement. If the upload or processing fails, that file can be missing from retrieval until a later sync succeeds.
+- If sync reports `Upload failed for … of … files.`, open the browser's developer console and look for `Upload failed:` to find each affected relative path and the reported error. Fix the reported problem, then run **Add Content → Sync directory** again with the same local folder.
 - Files removed locally are deleted from the KB during the cleanup step.
 - The action is **non-destructive** for unchanged files.
 - A file still marked **Processing** in the knowledge base, for example because Open WebUI restarted before it finished processing, is not uploaded again for one hour after its original upload, as long as its path, name and content are unchanged. During that hour a sync counts it under **unmodified** in the `Sync complete` message. After the hour, the next sync uploads it again.
