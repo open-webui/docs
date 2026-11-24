@@ -149,11 +149,14 @@ With **Copy Formatted Text** enabled, the assistant response's **Copy** action t
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
 | `ctrlEnterToSend` | Enter Key Behavior | `false` (**Enter to Send**); `true` is **Ctrl+Enter to Send**, in chats, channel messages and thread replies |
+| `showInputSelections` | Show Input Selections | `false` |
 | `richTextInput` | Rich Text Input for Chat | `true` |
 | `promptAutocomplete` | Prompt Autocompletion | `false` |
 | `showFormattingToolbar` | Show Formatting Toolbar | `false` |
 | `insertPromptAsRichText` | Insert Prompt as Rich Text | `false` |
 | `largeTextAsFile` | Paste Large Text as File | `false` |
+
+**Show Input Selections** displays indicators beside the chat input's **+** menu for tools, skills and filters already selected in the chat and for eligible capabilities that are on. Check the effective switch in the user's **Settings > Interface** first. If it is on and a selected tool still has no indicator for a non-admin, check **Selected Tools** under **Visible controls** in the admin **Settings > Interface**. The other indicators have their own visibility switches.
 
 ### Artifacts
 
