@@ -29,6 +29,12 @@ Here you can configure:
 
 The **Voice mode** button in the message input shows only when a call can work. That is when **Call mode** is **Realtime**, when a call is already running or when the admin **Speech-to-Text Engine** is not **Web API** and the user has the **Allow Speech to Text** permission. Users also need **Allow Call**. Admins always pass the permission checks. A `?call=true` link or the desktop app's call shortcut follows the same checks. If the button is missing, check these settings first.
 
+### OpenAI-compatible audio settings
+
+OpenAI-compatible speech-to-text and text-to-speech each use their own base URL and API key in **Admin Panel > Settings > Audio**. Adding a provider under **Connections** configures chat. To use that provider for audio too, select **OpenAI** for the relevant audio engine and enter the provider's audio base URL, credentials and audio model.
+
+Open WebUI appends `/audio/transcriptions` for speech-to-text and `/audio/speech` for text-to-speech. Enter the base URL before that suffix, such as `https://provider.example/v1`, and check that the server supports the corresponding endpoint and request format. Support for audio in chat alone is insufficient for these engines.
+
 ### User Settings (Per-User)
 
 Individual users can customize their audio experience:

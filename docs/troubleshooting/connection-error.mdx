@@ -386,6 +386,12 @@ If every chat with an Ollama model fails with `registry.ollama.ai/library/<model
 
 An Ollama URL is `http://host:port` with nothing after the port. An OpenAI-compatible URL is the base URL that comes before `/models` and `/chat/completions`. For most providers it ends in `/v1`, as in the suggestions the **URL** field offers.
 
+## Duplicate OpenAI model IDs
+
+When two admin-managed OpenAI connections expose the same model ID, Open WebUI keeps the first entry for that ID when it merges their model lists. Chat requests for that ID use the connection attached to the retained entry.
+
+To select each connection separately, edit each connection under **Admin Panel > Settings > Connections** and set a different **Prefix ID** under **Advanced**. For example, if both offer `example-model`, the prefixes `local` and `hosted` give you `local.example-model` and `hosted.example-model`. Open WebUI strips the prefix before sending the model ID to the provider. If a workspace model used the previous ID, reselect its **Base Model** and save.
+
 ## Intermittent Name Lookup Failures (Often Reported as "Model not found")
 
 ### Common Symptoms
