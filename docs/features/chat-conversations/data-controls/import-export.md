@@ -30,6 +30,10 @@ A temporary chat is the exception. Images stay inside the chat as base64 data an
 It's a good practice to periodically export your chats, especially before major updates or migrations.
 :::
 
+To save one conversation as a PDF, open the chat's three-dot menu at the top of the chat or beside an editable chat in the sidebar. Choose **Download > PDF document (.pdf)**. **Allow Chat Export** is on by default. If an administrator removes this [permission](/features/authentication-access/rbac/permissions#3-chat-permissions), the **Download** menu is hidden for affected users. Admins retain access.
+
+**Settings > Interface > Stylized PDF Export** is on by default. It captures the rendered conversation as page images. If the stylized PDF is blank or too large, or you need selectable text, turn this setting off and export the PDF again. The text-based PDF contains the active branch's message text without the rendered layout or inline images.
+
 ## Importing Chats
 
 Click the **Import Chats** button and select a JSON file to restore conversations. Open WebUI supports importing from:
