@@ -230,7 +230,7 @@ The icon is there whenever a selected model has controls, and for anyone allowed
 - **Default follows the model.** While **Default** is ticked, every message sends the default option's parameters, or nothing from that control when the default option is **None**. If someone later changes the default option, everyone on **Default** moves with it.
 - **A picked option replaces the same parameter everywhere else.** Its values win over the model's **Advanced Params**, the [Global Model Defaults](#global-model-defaults-admin), the person's **Settings > General** and the chat's **Controls**. If two controls set the same parameter, the one lower in the list wins.
 - **A removed option blocks the model until a new pick.** If an editor removes an option someone picked, that person's messages to the model fail with `Model control <key>: the selected option is no longer available.` until they pick another option or **Default**. A pick for a removed control is skipped.
-- **Automations use the defaults.** A chat started by an [automation](/features/chat-conversations/chat-features/automations) always sends each control's default option.
+- **Automations use the defaults.** An [automation](/features/chat-conversations/chat-features/automations#model-settings-used-by-a-run) uses each control's default option. A default of **None** leaves the underlying parameter settings in effect.
 
 API callers get the same controls. See [Chat Completions](/reference/api-endpoints#chat-completions) for how a request picks an option.
 
