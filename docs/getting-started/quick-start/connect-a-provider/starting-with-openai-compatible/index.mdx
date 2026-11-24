@@ -142,7 +142,7 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
   </TabItem>
   <TabItem value="mistral" label="Mistral">
 
-  **Mistral AI** is fully OpenAI-compatible with working `/models` auto-detection.
+  **Mistral AI** offers an OpenAI-compatible API with working `/models` auto-detection. Reasoning replies are the exception, covered below.
 
   | Setting | Value |
   |---|---|
@@ -152,6 +152,10 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::caution No more `-latest` aliases
   Mistral no longer publishes `-latest` alias names such as `mistral-large-latest`. Use the dated model IDs from the [Mistral models overview](https://docs.mistral.ai/getting-started/models/models_overview/).
+  :::
+
+  :::caution Reasoning replies show raw `thinking` parts
+  With reasoning on, Mistral returns the reply `content` as a list of parts instead of text ([Mistral reasoning docs](https://docs.mistral.ai/inference/conversations/reasoning)). Open WebUI turns any `content` that is not text into text, so the chat shows the raw list, starting with `[{'type': 'thinking'`, instead of a thinking block. One option is to turn reasoning off for the model: under **Advanced Params**, switch **Reasoning Effort** to **Custom** and enter `none`. Mistral then returns plain text, without the reasoning.
   :::
 
   </TabItem>
@@ -682,7 +686,7 @@ If you've saved an unreachable URL and the UI becomes unresponsive, see the [Mod
 
 Turn it on only for a server you control that authenticates the person behind the request by cookie, typically one sitting inside your own network behind the same sign-on. Everything the browser holds for your Open WebUI domain goes with the request, session cookie included, so a third-party endpoint should never have this on.
 
-**This changed:** connections using the **Session** or **System OAuth** auth types used to forward cookies unconditionally. They no longer do. If such a connection stops authenticating after an upgrade, switch this on.
+**This changed:** connections using the **Session** or **OAuth** auth types used to forward cookies unconditionally. They no longer do. If such a connection stops authenticating after an upgrade, switch this on.
 
 :::
 
@@ -696,13 +700,13 @@ With **Auth** set to **OAuth**, Open WebUI sends the access token from the user'
 
 Every OpenAI connection has a **Provider** dropdown, hidden behind **Advanced** in the connection dialog. It is a hint about what the server on the other end actually is. Open WebUI cannot tell a llama.cpp server from a LiteLLM proxy by looking at `/v1/chat/completions`, since both answer it the same way, so the dropdown is how you tell it, and each option switches on the extras that server supports.
 
-Leaving it at **Default** is always safe.
+**Default** works for any plain OpenAI-compatible server. Choosing the option that names your server turns on its extras, and for llama.cpp servers and DeepSeek's API those include sending reasoning back and continuing a reply, as the table shows.
 
 | Option | What it changes |
 | :--- | :--- |
 | **Default** | Nothing. The connection is treated as a plain OpenAI-compatible endpoint. |
 | **Azure OpenAI** | Requests are rewritten into Azure's deployment-based URL form with an `api-version` parameter, so the connection needs an **API Version** and the deployment names listed under **Model IDs**. Also switched on automatically for Azure-looking URLs, see the Azure OpenAI tab under [Cloud Providers](#cloud-providers). |
-| **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. The option names the request format, so hosted servers that speak it, such as DeepSeek's API (whose thinking mode needs the reasoning sent back), use it too. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
+| **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. The option names the request format, so hosted servers that speak it, such as DeepSeek's API (whose thinking mode needs the reasoning sent back), use it too. When you click **Continue Response**, Open WebUI adds `continue_final_message: true` and `add_generation_prompt: false` to the request so the server continues the last reply. Connections left at **Default** do not send these fields, and neither does an **API Type** of **Responses**. If **Continue Response** on a llama.cpp server repeats earlier text or starts a fresh reply, set this option. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
 | **LM Studio** | Unlocks the same [model management panel](#managing-local-models-from-open-webui), loaded markers and model details, minus deleting models and minus the **Eject** button. |
 | **vLLM** and **OpenRouter** | Stored reasoning is sent back to the model on later turns. See [reasoning models](/features/chat-conversations/chat-features/reasoning-models#how-reasoning-is-sent-back). |
 | **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
@@ -756,6 +760,19 @@ To ensure full compatibility with Open WebUI, your server should implement the f
 ### Supported Parameters
 
 Open WebUI passes standard OpenAI parameters such as `temperature`, `top_p`, `max_tokens` (or `max_completion_tokens`), `stop`, `seed`, and `logit_bias`. It also supports **Tool Use** (Function Calling) if your model and server support the `tools` and `tool_choice` parameters.
+
+#### How the model ID changes the request
+
+Before it sends a chat request on any OpenAI-compatible connection, Open WebUI checks the model ID it is about to send. That is the ID after the connection's **Prefix ID** is removed, and for a custom model it is the base model's ID. The check ignores case and first removes a leading `openai.` or `<region>.openai.` (Amazon Bedrock style, for example `us.openai.gpt-5`). The ID counts as an OpenAI reasoning model when it starts with `o` followed by a digit (`o1`, `o3-mini`, `o4-mini`) or with `gpt-` followed by a number of 5 or higher (`gpt-5`, `gpt-5.2`, `gpt-6`).
+
+- **Matching IDs:** `max_tokens` is renamed to `max_completion_tokens`. If the first message has the `system` role, it is sent with the `developer` role instead, or with the `user` role for IDs starting with `o1-mini` or `o1-preview`.
+- **Other IDs, on a URL that does not contain `api.openai.com`:** `max_completion_tokens` is renamed to `max_tokens`.
+
+This applies to every server, not only OpenAI, so it explains these cases:
+
+- **Your server returns an error about the `developer` role, or the model does not follow the system prompt, for a model named like `gpt-5` or `o3`.** The model ID matches the rule even though the server behind it is not OpenAI. Give the model a different ID on the server or proxy (for example in your LiteLLM config) so it no longer starts with `o<digit>` or `gpt-<5 or higher>`.
+- **The token limit has no effect for a reasoning model behind a proxy.** For a matching ID, the **max_tokens** value from **Advanced Params** is sent as `max_completion_tokens`. Check that your server or proxy accepts that parameter.
+- **A proxy model such as `openai/gpt-5` gets `max_tokens` and a `system` message.** Only the `openai.` form of the provider prefix is removed, so an ID with `openai/` does not match. If the upstream API requires `max_completion_tokens` or the `developer` role, expose the model under an ID without that prefix.
 
 ---
 

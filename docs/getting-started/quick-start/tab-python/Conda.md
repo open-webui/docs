@@ -15,7 +15,7 @@
 3. **Install Open WebUI:**
 
    ```bash
-   pip install open-webui
+   python -m pip install open-webui
    ```
 
 4. **Start the Server:**

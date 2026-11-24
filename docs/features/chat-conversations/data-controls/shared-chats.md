@@ -18,7 +18,7 @@ This page documents the **management dashboard** for shared chats. For informati
 
 ## Dashboard Features
 
-The **Shared Chats** modal provides a unified interface for your public content:
+The **Shared Chats** modal provides a unified interface for the chats you have shared:
 
 - **Centralized List**: View all conversations that have an active share link.
 - **Search & Filter**: Quickly find specific shared chats by title.
@@ -28,9 +28,9 @@ The **Shared Chats** modal provides a unified interface for your public content:
 - **Copy Link**: Use the **Clipboard icon** next to any entry to instantly copy the share URL back to your clipboard.
 - **Revoke Access (Unshare)**: Use the **Unshare icon** (represented by a slashed link) to deactivate a share link.
     - :::warning
-      Revoking access immediately invalidates the link. Anyone attempting to visit the URL will receive a "Not Found" error. For a chat shared with [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies), the people you shared with also lose access to the chat itself. This action is permanent, though you can generate a *new* unique link by sharing the chat again from the main interface.
+      Revoking access immediately invalidates the link. Anyone attempting to visit the URL is redirected to the home page, or to the login page when signed out. For a chat shared with [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies), the people you shared with also lose access to the chat itself. This action is permanent, though you can generate a *new* unique link by sharing the chat again from the main interface.
       :::
-- **Pagination**: Efficiently browse through your history using the "Load More" functionality at the bottom of the list.
+- **Pagination**: The list loads 60 entries at a time and fetches the next batch automatically when you scroll to the bottom. An **Unshare All Shared Chats** button at the bottom revokes every link at once, after a confirmation.
 
 ## FAQ
 

@@ -56,7 +56,7 @@ Admins add shared tool servers that are available to all or selected users acros
 
 ![Settings Page](/images/openapi-servers/open-webui/settings.png)
 
-Requests to these servers are sent by the Open WebUI backend, so the backend must be able to reach the URL. `localhost` means the backend server. If the backend runs in Docker, `localhost` inside the container does not reach your host machine, so use `host.docker.internal` or the machine's actual IP instead. Only expose endpoints that are safe to be used by multiple users.
+Requests to these servers are sent by the Open WebUI backend, so the backend must be able to reach the URL. `localhost` means the backend server. If the backend runs in Docker, `localhost` inside the container does not reach your host machine, so use `host.docker.internal` or the machine's actual IP instead. If the tool server runs in another container on the same Docker network, use its service name and the port it listens on inside its container, for example `http://time-server:8000`, not `localhost` or the port published on the host. See Docker's [Networking in Compose](https://docs.docker.com/compose/how-tos/networking/). Only expose endpoints that are safe to be used by multiple users.
 
 #### 2. Tool servers added in Tether
 
@@ -131,6 +131,7 @@ Instead:
 
 - Global tools are hidden by default and must be explicitly activated per user.
 - To enable them, you'll need to open the **+** menu in the message input area, select **Tools**, and manually toggle on the specific global tool(s) you want to use.
+- To have one on in every new chat with a model, add it to that model's **Tools** list in the model editor (**Workspace > Models**). Each new chat with that model starts with the tool server turned on for users who can access it. Users can still turn it off in the chat.
 
 Here's what that looks like:
 
@@ -139,7 +140,7 @@ Here's what that looks like:
 Important Notes for Global Tool Servers:
 
 - They will not show up in the tool indicator popup until enabled from the **+** menu.
-- Each global tool must be individually toggled on to become active inside your current chat.
+- Each global tool must be individually toggled on to become active inside your current chat, unless the model has it in its **Tools** list.
 - Admins can control access to global tools via role-based permissions.
 
 This is ideal for team setups or shared environments, where commonly-used tools (e.g., document search, memory, or web lookup) should be centrally accessible by multiple users.
@@ -197,6 +198,10 @@ Connection failures, authentication errors, and tool-server errors still need th
 ### Connection fails even though the server is running
 
 **Understand which machine "localhost" refers to.** This is the most common connectivity issue. The backend sends the requests, so `localhost` and `host.docker.internal` follow the [rules for admin-added servers](#1-tool-servers-added-by-an-admin). Make sure the tool server binds to `0.0.0.0` if it runs on another machine.
+
+### Some endpoints are missing from the tool list
+
+Open WebUI turns each operation in the OpenAPI spec that has an `operationId` into a tool, and uses the `operationId` as the tool's name. Operations without an `operationId` are left out without an error or a log message. Set a unique `operationId` on every endpoint the model should call.
 
 ### General tips
 

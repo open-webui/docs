@@ -29,6 +29,12 @@ Here you can configure:
 
 The **Voice mode** button in the message input shows only when a call can work. That is when **Call mode** is **Realtime**, when a call is already running or when the admin **Speech-to-Text Engine** is not **Web API** and the user has the **Allow Speech to Text** permission. Users also need **Allow Call**. Admins always pass the permission checks. A `?call=true` link or the desktop app's call shortcut follows the same checks. If the button is missing, check these settings first.
 
+### OpenAI-compatible audio settings
+
+OpenAI-compatible speech-to-text and text-to-speech each use their own base URL and API key in **Admin Panel > Settings > Audio**. Adding a provider under **Connections** configures chat. To use that provider for audio too, select **OpenAI** for the relevant audio engine and enter the provider's audio base URL, credentials and audio model.
+
+Open WebUI appends `/audio/transcriptions` for speech-to-text and `/audio/speech` for text-to-speech. Enter the base URL before that suffix, such as `https://provider.example/v1`, and check that the server supports the corresponding endpoint and request format. Support for audio in chat alone is insufficient for these engines.
+
 ### User Settings (Per-User)
 
 Individual users can customize their audio experience:
@@ -244,6 +250,17 @@ services:
     restart: unless-stopped
 ```
 
+### Kokoro.js (Browser) Stuck on "Loading Kokoro.js..."
+
+**Symptom:** With **Kokoro.js (Browser)** as the **Text-to-Speech Engine** in **Settings → Audio**, the **Voice** section keeps showing `Loading Kokoro.js...` after the model download reaches 100%, and no voice list appears.
+
+**Cause:** Open WebUI runs Kokoro.js on WebGPU whenever the browser reports a WebGPU adapter, and on WebAssembly only when it reports none. If loading on WebGPU fails, Open WebUI does not retry on WebAssembly. The settings page keeps the loading message, and the error shows only in the browser console.
+
+**Options to try:**
+- Choose another **Kokoro.js Dtype** in the same section. Open WebUI loads the model again with each change.
+- Use another browser.
+- Turn WebGPU off in the browser, so Open WebUI loads Kokoro.js on WebAssembly.
+
 ### TTS Voice Not Found / No Audio Output
 
 **Checklist:**
@@ -251,6 +268,14 @@ services:
 2. Check that the voice name matches an available voice for your chosen engine
 3. For external TTS services, verify the API Base URL is accessible from the Open WebUI container
 4. Check container logs for any error messages
+
+### SpeechT5 voice stays the same
+
+Local Transformers TTS uses the default speaker when the configured value does not match a speaker embedding filename. Short speaker names such as `bdl` and `slt` fall back to that same voice.
+
+1. In **Settings > Audio** (admin section), select **Transformers (Local)** as the **Text-to-Speech Engine**.
+2. Copy the full value from the `filename` column of the [CMU ARCTIC speaker embeddings dataset](https://huggingface.co/datasets/Matthijs/cmu-arctic-xvectors), for example `cmu_us_awb_arctic-wav-arctic_a0001`.
+3. Paste it into **TTS Model** and save. To hear the server's voice, leave your personal **Text-to-Speech Engine** set to **Default**.
 
 ### Docker Networking Issues with TTS
 
@@ -338,6 +363,14 @@ environment:
 pip install av==14.0.1
 ```
 
+### ffmpeg Missing on a pip Install
+
+**Symptoms:** the server log shows `Couldn't find ffmpeg or avconv - defaulting to ffmpeg, but may not work`, and speech-to-text or text-to-speech requests that need audio converted fail.
+
+**Cause:** Open WebUI converts, compresses and splits audio for speech-to-text, and converts non-MP3 replies from an OpenAI-compatible text-to-speech engine to MP3, with ffmpeg. The standard Docker image installs it. A pip, uv, Conda or venv install does not.
+
+**Solutions:** install ffmpeg with your operating system's package manager, make sure `ffmpeg` is on the `PATH` of the process that runs Open WebUI, and restart. To skip this processing instead, set [`BYPASS_PYDUB_PREPROCESSING`](/reference/env-configuration#bypass_pydub_preprocessing) to `True`; audio then goes to the engine unconverted.
+
 ### STT Not Recognizing Speech Correctly
 
 **Tips for better recognition:**
@@ -368,6 +401,22 @@ If your STT or TTS engine is hosted behind a self-signed certificate or an inter
 - Set [`AIOHTTP_CLIENT_SESSION_SSL=False`](/reference/env-configuration#aiohttp_client_session_ssl) to disable certificate verification for these upstream calls.
 - Text-to-speech and speech-to-text both honor this setting.
 - Prefer installing the internal CA into the container's trust store where possible; disabling verification removes protection against man-in-the-middle interception on that connection.
+
+### OpenAI-Compatible STT Fails Behind a Proxy
+
+**Symptoms:** every transcription fails with an error that starts with `Error transcribing chunk: External:`, and the rest of the message says the server does not support a `response_format` value.
+
+**Cause:** with the **OpenAI** **Speech-to-Text Engine**, Open WebUI posts to `<API Base URL>/audio/transcriptions` and never sends `response_format`:
+
+- With **Request Format** set to **Multipart Upload** (the default), the form has a `model` field (the **STT Model**), a `language` field when a language is set, and the `file`.
+- With **JSON Base64**, the JSON body has `model`, `language` when a language is set, and `input_audio` with the base64 audio and its `format`.
+
+Open WebUI reads the reply as JSON and uses only its `text` field. If the error names a `response_format`, something between Open WebUI and the transcription server added it, such as a proxy like LiteLLM.
+
+**Solutions:**
+
+- Configure the proxy to request `json` for that model. In LiteLLM, set `response_format: json` in the model's `litellm_params`.
+- Or point **API Base URL** straight at the transcription server, if it accepts requests without `response_format`.
 
 ---
 

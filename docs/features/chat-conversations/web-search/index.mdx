@@ -38,6 +38,16 @@ That is why there are two settings: one chooses **who finds the links**, and the
 
 The web loader settings apply with web search off too. **Web Search Engine** is required only while **Web Search** is on, so the **Loader** settings save without an engine. While **Web Search** is off, the page hides **Web Search Confirmation**, **Web Search Engine** and its settings, **Search Limits**, **Fetch URL Content Length Limit**, **Domain Filter List** and **Bypass Web Loader**. Their saved values are kept. **Bypass Embedding and Retrieval** and **Trust Proxy Environment** stay visible.
 
+### Playwright and External loader settings
+
+Choosing `playwright` or `external` as the **Web Loader Engine** shows extra fields in the **Loader** section.
+
+- **Playwright WebSocket URL** (`PLAYWRIGHT_WS_URL`): Open WebUI connects to the Chromium browser at this address instead of starting its own. The Docker image does not include Chromium. The container installs it at startup only when the environment sets `WEB_LOADER_ENGINE=playwright` and leaves `PLAYWRIGHT_WS_URL` empty. Choosing `playwright` in the admin panel alone installs no browser, so set the environment variable and restart, or enter a WebSocket URL.
+
+A remote Playwright connection can fail with `428 Precondition Required` if the client and server versions differ. Match the Playwright server's major and minor versions to the client bundled with your Open WebUI release. For Open WebUI v0.13.4, use Playwright `1.60.x`. The release's [Playwright Compose file](https://github.com/open-webui/open-webui/blob/v0.13.4/docker-compose.playwright.yaml) pins the server to `1.60.0`. [Playwright connection requirements](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect)
+- **Playwright Timeout (ms)** (`PLAYWRIGHT_TIMEOUT`, default `10000`): the time in milliseconds Open WebUI gives each page to load, and each request the page makes while loading. A page that runs out of time is skipped and logged as `Error loading <url>:` followed by Playwright's error. The other pages still load. If no page loads, web search fails with `[ERROR: None of the web search results could be loaded]` (unless **Bypass Embedding and Retrieval** is on), and a link attached with `#` fails with `[ERROR: Could not read content from <url>]`.
+- **External Web Loader URL** (`EXTERNAL_WEB_LOADER_URL`): Open WebUI sends a `POST` to this URL with the JSON body `{"urls": [...]}`, up to 20 URLs per request, and the header `Authorization: Bearer <External Web Loader API Key>`. The service must answer with a JSON array of objects, each with `page_content` (the page text) and `metadata`. Set `metadata.source` to the URL the text came from: web search keeps only the results whose link matches a returned `source`. An error status or a response that is not such an array skips the whole batch, logged as `Error extracting content from batch <urls>: <error>`. Open WebUI sets no timeout on this request, so a service that never answers holds up the search.
+
 ## Why are there so many options?
 
 Open WebUI lets you choose which service does each job. The lists are **alternatives to choose from**. You do **not** need to set up all of them.
@@ -64,6 +74,12 @@ Finding a page does not guarantee Open WebUI can read it. A website may appear i
 
 :::tip Require confirmation before searching
 Admins can require users to **confirm before a web search runs**, so a query is never sent to an external provider unintentionally. Enable it in **Settings → Web Search** (admin section), where the switch shows while **Web Search** is on (or via [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation)); the prompt text is set by [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content).
+
+The text goes in **Web Search Confirmation Content**, which shows below the switch while it is on. Users see it in a `Use Web Search?` dialog with **Continue** and **Cancel** when they turn on **Web Search** in the chat input, and when they send a message while web search is on and not yet confirmed. With the field empty, the dialog shows `Your query will be sent to the configured web search provider.` One confirmation covers the rest of the chat. Starting a new chat or turning web search off asks again. The check runs in the chat interface only, so requests sent straight to the API are not held for confirmation.
+:::
+
+:::info Web search runs with the chat toggle off
+**Web Search in Chat** in **Settings → Interface** switches between **Default** and **Always**. With **Always**, every message uses web search, even after you turn off **Web Search** in the chat input. The only exception is a selected model whose **Web Search** capability is off. To turn web search on and off per chat, set **Web Search in Chat** back to **Default**.
 :::
 
 <DocCardList />

@@ -40,10 +40,16 @@ To manage your Ollama instance in Open WebUI, follow these steps:
 *   **Docker Users**: If Ollama is running on your host machine, use `http://host.docker.internal:11434` as the URL.
 *   **Load Balancing**: You can add **multiple** Ollama instances. Open WebUI will distribute requests between them using a **random selection** strategy, providing basic load balancing for concurrent users.
     *   **Note**: To enable this, ensure the **Model IDs match exactly** across instances. If you use **Prefix IDs**, they must be identical (or empty) for the models to merge into a single entry.
+    *   **Pull the same tag on every server**: Models are merged by name only. Open WebUI does not compare versions or digests, so two servers holding different builds under the same name still show as one model, and a chat can land on either. The parameter size, quantization and file size shown in the model selector come from the first connection in the list that has the model. After an update, run **Update All Models** on each connection.
+    *   **Each request picks a server**: Open WebUI picks one of the servers that has the model at random for every request, so messages in the same chat can go to different servers.
+    *   **Several users on one server**: Open WebUI sends each request to Ollama as it arrives and keeps no queue of its own. Whether one Ollama server answers several requests for the same model at once or makes them wait is set on the Ollama server by `OLLAMA_NUM_PARALLEL`, which defaults to `1`. Memory use grows with it. See Ollama's [concurrent requests FAQ](https://docs.ollama.com/faq#how-does-ollama-handle-concurrent-requests).
+    *   **Two Ollama containers on one host**: Ollama listens on port `11434` inside its container, so map a different host port to it for the second one, for example `docker run -d -v ollama2:/root/.ollama -p 11435:11434 --name ollama2 ollama/ollama`, and add it as `http://host.docker.internal:11435`.
 
 ### Advanced Configuration
 
-*   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote/`) to distinguish them.
+*   **Prefix ID**: If you have multiple Ollama instances serving the same model names, use a prefix (e.g., `remote`) to distinguish them. Open WebUI joins the prefix and the model name with a dot, so `llama3` appears as `remote.llama3`.
+
+    After adding, changing, or removing a **Prefix ID**, check any workspace preset that uses a model from that connection. The preset stores the old model ID. In **Workspace > Models**, edit the preset, reselect **Base Model (From)** using the updated ID, and save.
 *   **Model IDs (Filter)**: Make specific models visible by listing them here (whitelist). Leave empty to show all.
 
 :::tip Connection Timeout Configuration
@@ -67,7 +73,7 @@ Here’s what the management screen looks like:
 
 ## A Quick and Efficient Way to Download Models
 
-If you’re looking for a faster option to get started, you can download models directly from the **Model Selector**. Simply type the name of the model you want, and if it’s not already available, Open WebUI will prompt you to download it from Ollama.
+If you’re looking for a faster option to get started, admins can download models directly from the **Model Selector**. Simply type the name of the model you want, and if it’s not already available, Open WebUI will prompt you to download it from Ollama.
 
 Here’s an example of how it works:
 
@@ -133,6 +139,15 @@ Open WebUI shows a green "Loaded" indicator next to any Ollama model that is cur
 
 This is useful for freeing GPU/VRAM when juggling multiple large models, or for forcing a fresh load after pulling a new revision. Trying to unload a model that the connected provider does not support unloading returns an error rather than silently failing.
 
+### Slow First Reply After a Pause
+
+When the first reply after a quiet period takes much longer than the replies after it, Ollama is loading the model into memory again. Ollama unloads a model that has not been used for 5 minutes by default. Two settings change how long it stays loaded:
+
+- **`OLLAMA_KEEP_ALIVE`**, set on the **Ollama server**, applies to all models. It takes a duration such as `10m` or `24h`, a number of seconds, or a negative number to keep the model loaded. See Ollama's [keep-alive FAQ](https://docs.ollama.com/faq#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately).
+- **keep_alive (Ollama)**, an Open WebUI advanced parameter, is sent to Ollama as `keep_alive` with each chat request and takes the place of `OLLAMA_KEEP_ALIVE` for that request. Set it per model in **Workspace** > **Models**, or in a chat's **Controls** or **Settings > General**, where only admin accounts see it (see [Chat Parameters](/features/chat-conversations/chat-features/chat-params)). Switching it from **Default** to **Custom** fills in `5m`. On **Default**, Open WebUI sends nothing and `OLLAMA_KEEP_ALIVE` applies.
+
+A model stays in memory for as long as the keep-alive says, so a longer value keeps that memory in use between chats.
+
 ---
 
 ## Using Reasoning / Thinking Models
@@ -172,6 +187,14 @@ A context that is too small silently truncates the prompt. This is most visible 
 - To set a default for all Ollama models, set `OLLAMA_CONTEXT_LENGTH` on the **Ollama server** and **leave `num_ctx` unset** in Open WebUI so it is not overridden.
 - To set it per model or per chat, set `num_ctx` to a realistic value for the model (for example `8192`, `16384` or the model's maximum), not the `2048` pre-fill. Remember it overrides `OLLAMA_CONTEXT_LENGTH`.
 - A larger context uses more VRAM and RAM, so size it to what your hardware can hold.
+
+---
+
+## Text Written Before a Tool Call
+
+When a model writes a sentence and calls a tool in the same reply, such as "Let me check the calendar." followed by a tool call, the chat shows both. For a model from a connection under **Manage Ollama API Connections**, every later request sends that assistant turn to Ollama with empty text and only the tool call. This applies to the follow-up request after the tool result and to every later message in the chat. The model's thinking and the tool call are kept, and the chat itself still stores and shows the text.
+
+Open WebUI does this on purpose for every assistant turn that carries a tool call, so the model does not see that sentence in later turns.
 
 ---
 

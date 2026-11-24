@@ -218,6 +218,10 @@ A note in a [shared folder](/features/chat-conversations/chat-features/conversat
 
 People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. Each user can have up to 20 note pages open for live editing at once, counted across all their browser tabs and devices. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
 
+Pages you open with read access count toward the 20 as well. A page you can edit, opened past the limit, shows an empty editor, and anything you type in it is ignored, so none of it is saved. Switching pages, downloading the note or leaving the page shows `Tab is not connected. Reconnect before leaving this tab.` Close notes you have open in other tabs or on other devices, then reload the page. The server log records `is at the open-document limit. Rejecting join.` for each refused page.
+
+Live editing on one page holds at most 16 MiB of edit history. Past that, your edits still save to the note, but other people with the page open stop receiving them as you type. The server log shows `is invalid or over the size limit. Rejecting update.` To start over, have everyone close the page. The history is cleared when the last person leaves, and the page reopens from the saved note.
+
 Administrators can control sharing via environment variables or the Admin Panel:
 
 * [`USER_PERMISSIONS_NOTES_ALLOW_SHARING`](/reference/env-configuration#user_permissions_notes_allow_sharing) shows the **Access** button and menu entry, and the access list in the **Access Control** panel (default `False`)
@@ -254,7 +258,7 @@ The [search window](/features/chat-conversations/chat-features/history-search#se
 
 ### Quick delete
 
-Hold **Shift** while the Notes list is open and every note's **⋯** menu button turns into a delete button. Clicking it deletes that note straight away, with no menu and no confirmation prompt. It works in both **List** and **Grid** layouts, and holding Shift closes any note menu that is already open. Release Shift, or click away from the window, and the menu button comes back. Without Shift nothing changes: delete still goes through the menu and asks you to confirm.
+Hold **Shift** while the Notes list is open and every note's **⋯** menu button turns into a delete button. Clicking it deletes that note straight away, with no menu and no confirmation prompt. It works in both **List** and **Grid** layouts, and holding Shift closes any note menu that is already open. Release Shift, or click away from the window, and the menu button comes back. Without Shift nothing changes: delete still goes through the menu and asks you to confirm. While a button or link you reached with `Tab` has focus, holding Shift does not turn the menu buttons into delete buttons, so `Shift+Tab` moves back through the list as usual.
 
 :::info Admin Visibility
 Notes are workspace items. By default (`BYPASS_ADMIN_ACCESS_CONTROL=True`), administrators can see all users' notes. Set `BYPASS_ADMIN_ACCESS_CONTROL` to `False` to restrict this. See [Environment Configuration](/reference/env-configuration#bypass_admin_access_control) for details. To turn Notes off for the whole instance, see [`ENABLE_NOTES`](/reference/env-configuration#enable_notes).
@@ -293,7 +297,16 @@ The tool edits one page. The model must read the page with `view_note` first, an
 The tool has two modes. Passing whole `content` replaces the entire page, so anything the model leaves out is gone. Passing `replace_text` operations changes only part of the page and leaves the rest untouched. Each operation names the text to change in one of two ways:
 
 - **By text.** `find` holds the exact text to replace. The match is literal and case sensitive. If the text appears more than once, `occurrence` picks one match (counting from 0) and `replace_all: true` replaces every match. With neither set, nothing changes and the model gets the positions of all matches to choose from.
-- **By position.** `start` and `end` give a character range. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
+- **By position.** `start` and `end` are zero-based character offsets into the original Markdown returned by `view_note`. The end is exclusive and the ranges in one request must not overlap. Use the original offsets for every operation, even if an earlier replacement changes the text length. An optional `expected` field holds the current text of that range, and a mismatch rejects the edit.
+
+For example, to change `red blue` to `green navy`, send these two operations in one request:
+
+```json
+[
+  {"action": "replace_text", "start": 0, "end": 3, "expected": "red", "content": "green"},
+  {"action": "replace_text", "start": 4, "end": 8, "expected": "blue", "content": "navy"}
+]
+```
 
 The older `replace_range` action still works as an alias of the position form, but it is deprecated. Ask for partial edits explicitly (add a section, change these lines) so the model reaches for these operations.
 

@@ -1,5 +1,5 @@
 ```bash
-pip install open-webui
+python -m pip install open-webui
 open-webui serve
 ```
 

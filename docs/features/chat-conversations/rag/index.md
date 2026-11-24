@@ -215,6 +215,8 @@ Each remaining chunk carries meaningful semantic context instead of being a frag
 
 Change the RAG embedding model in **Settings** > **Documents** (admin section). The embedding engine is the built-in SentenceTransformers default, Ollama, OpenAI or Azure OpenAI.
 
+If your embedding model's documentation asks for a prefix on search queries and another on stored text, enter them as **Query Prefix** and **Content Prefix** under **Advanced** in the **Embedding** section of the same page. They match [`RAG_EMBEDDING_QUERY_PREFIX`](/reference/env-configuration#rag_embedding_query_prefix) and [`RAG_EMBEDDING_CONTENT_PREFIX`](/reference/env-configuration#rag_embedding_content_prefix). Include any trailing space the model expects. Ollama, OpenAI and Azure OpenAI get the prefix added to the front of each text, unless [`RAG_EMBEDDING_PREFIX_FIELD_NAME`](/reference/env-configuration#rag_embedding_prefix_field_name) sends it as a separate request field. The built-in engine passes it to SentenceTransformers as the `prompt`. Reindex existing documents after changing **Content Prefix**, because documents embedded before the change keep the old prefix.
+
 ## Changing RAG Settings After Initial Setup
 
 If you need to change your chunking configuration (chunk size, overlap) or embedding model after documents have already been indexed, it is important to understand what actions are required and what effects those changes will have.
@@ -263,6 +265,23 @@ If you change the embedding model, those standalone chat file embeddings will st
 |---|---|---|---|---|
 | **Chunk Size / Overlap** | Uses new settings | Old chunks still work, but quality may vary | Re-chunked with new settings | Old chunks, re-upload to update |
 | **Embedding Model** | Uses new model | Old embeddings, incompatible vector space | Re-embedded with new model | Old embeddings, re-upload to update |
+
+### Monitoring re-index progress
+
+Open WebUI logs the number of knowledge bases and files at the start of the knowledge-file phase. At info log level, it logs a file counter and starts reporting an estimated time remaining after the first file. The admin action then rebuilds the knowledge search index and memory vectors before showing success.
+
+Check the server log even if the UI reports success. The knowledge-file phase can continue after individual errors and return success. Look for the error lines and the `Failed to process ... files` summary to find files that need attention.
+
+### Danger Zone Reset Buttons
+
+The **Danger Zone** at the bottom of **Settings** > **Documents** (admin section) has two reset buttons. Both apply to every user on the instance, and neither can be undone.
+
+| Button | What it deletes | What stays |
+|---|---|---|
+| **Reset Upload Directory** | Every file record, every stored file (the upload directory, or the S3, GCS or Azure storage in use), and the vector storage | Knowledge bases, now without files or vectors, and memories, without their vectors |
+| **Reset Vector Storage/Knowledge** | The vector storage and every knowledge base | Uploaded files and memories, without their vectors |
+
+With the default Chroma vector database, resetting the vector storage removes every collection: knowledge bases, single files, cached web search results and user memories. Memories keep their text, so **Reindex Knowledge and Memory Vectors** in the same section rebuilds their vectors with the current embedding model. Knowledge bases deleted by **Reset Vector Storage/Knowledge** are gone, so there is nothing left to reindex for them.
 
 ## Citations in RAG Feature
 
@@ -351,6 +370,8 @@ Any one of these resolves it:
 
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
+If you use pgvector, you can enable **Hybrid Search** in **Settings > Documents** (admin section) without re-indexing your knowledge bases or re-uploading chat files. With the same embedding settings, the vector part of hybrid search uses the embeddings you already have, and keyword search uses the stored chunk text.
+
 :::tip Filesystem-style knowledge access (`kb_exec`)
 For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode [builtin tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
@@ -366,7 +387,7 @@ A video is attached as its transcript, so one with no usable transcript cannot b
 A variety of parsers extract content from local and remote documents: built-in engines like Tika, Docling and Mistral OCR, or your own service via the [external engine](/features/chat-conversations/rag/document-extraction/external) if you need per-file-type routing or custom logic. See [Document Extraction](/features/chat-conversations/rag/document-extraction) for the full list and setup steps.
 
 :::warning Temporary Chat Limitations
-When using **Temporary Chat**, document processing is restricted to **frontend-only** operations to ensure your data stays private and is not stored on the server. Consequently, advanced backend parsing (used for formats like complex DOCX files) is disabled, which may result in raw data being seen instead of parsed text. For full document support, use a standard chat session.
+For local documents attached in **Temporary Chat**, the browser extracts text and sends it to the backend when you submit your message. If you need the server's configured extraction engine, use a standard chat. See [Document attachments in temporary chats](/features/chat-conversations/rag/document-extraction#document-attachments-in-temporary-chats).
 :::
 
 ### CSV Table Summary

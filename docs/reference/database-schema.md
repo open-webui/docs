@@ -350,7 +350,7 @@ Things to know about the chat table:
 - `share_id` references the `shared_chat.id` token when the chat has an active share link.
 - `current_message_id` was added by migration `9a1b2c3d4e5f`. It records the chat's current message, the leaf of the active branch that a new reply continues from, and is backfilled from the existing history when the migration runs. Context compaction and context-usage resolution read it so they work on the branch actually in play rather than the whole message tree.
 - `variables` was added by migration `c49178636c78`. It holds the values a user filled in for the [chat variables](/features/chat-conversations/chat-features/chat-params#chat-variables) declared by the model's system prompt, as a flat map keyed by variable name, and is copied along when the chat's owner forks or clones it. A copy made by anyone else starts with an empty map. Temporary chats keep their values in the request only, so nothing is stored.
-- A migration (`242a2047eae0`) adds an **`old_chat`** column (Text) that backs up the original JSON `chat` blob as text. It is a migration safety net, not part of the active model, and is not read at runtime.
+- Migration `242a2047eae0` temporarily renames the original Text `chat` column to `old_chat`, adds a new JSON `chat` column, copies the data across, then drops `old_chat`; no upgraded database keeps an `old_chat` column.
 
 ## Shared Chat Table
 
@@ -1731,7 +1731,7 @@ Replace `webui.db` with `webui-plain.db`, then set `DATABASE_TYPE=sqlite` (or un
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_ENABLE_SQLITE_WAL` | `False` | Enable Write-Ahead Logging for better performance |
+| `DATABASE_ENABLE_SQLITE_WAL` | `True` | Enable Write-Ahead Logging for better performance |
 | `DATABASE_SQLITE_PRAGMA_SYNCHRONOUS` | `NORMAL` | SQLite sync mode (safe with WAL, avoids fsync per txn) |
 | `DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT` | `5000` | Write-lock wait time in milliseconds |
 | `DATABASE_SQLITE_PRAGMA_CACHE_SIZE` | `-65536` | Page cache size (negative = KiB; ≈ 64 MB) |
@@ -1739,6 +1739,7 @@ Replace `webui.db` with `webui-plain.db`, then set `DATABASE_TYPE=sqlite` (or un
 | `DATABASE_SQLITE_PRAGMA_MMAP_SIZE` | `268435456` | Memory-mapped I/O size in bytes (≈ 256 MB) |
 | `DATABASE_SQLITE_PRAGMA_JOURNAL_SIZE_LIMIT` | `67108864` | Max WAL file size after checkpoint (≈ 64 MB) |
 | `DATABASE_POOL_SIZE` | `None` | Database connection pool size |
+| `DATABASE_POOL_MAX_OVERFLOW` | `0` | Extra connections allowed beyond the pool size |
 | `DATABASE_POOL_TIMEOUT` | `30` | Pool connection timeout in seconds |
 | `DATABASE_POOL_RECYCLE` | `3600` | Pool connection recycle time in seconds |
 

@@ -10,7 +10,7 @@ import TabItem from '@theme/TabItem';
 
 **Stay current without losing your data.**
 
-Your data (chats, users, settings, uploads) lives in a Docker volume or local database, not inside the container. Updating Open WebUI means swapping the container image for a newer one. Your data stays exactly where it is.
+For Docker installs, updating Open WebUI means pulling a newer image and recreating the container with the same data mount. The default SQLite database and local uploads live under `/app/backend/data`. Reuse the existing named volume or bind mount at that path (or at your configured `DATA_DIR`). If you use an external database or object storage, keep the same connections in the replacement container.
 
 ---
 
@@ -39,6 +39,8 @@ ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
 ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
 ```
 
+The `-ollama` images install Ollama when the image is built. The bundled Ollama changes only when you pull a newer Open WebUI image, and a pinned `vX.Y.Z-ollama` tag keeps the Ollama version it was built with. To update Ollama on its own schedule, run it as a separate container, as shown in [Ollama's Docker guide](https://docs.ollama.com/docker).
+
 Browse all available tags on the [GitHub releases page](https://github.com/open-webui/open-webui/releases).
 
 ---
@@ -49,8 +51,8 @@ Browse all available tags on the [GitHub releases page](https://github.com/open-
 2. **Check the [release notes](https://github.com/open-webui/open-webui/releases)** for breaking changes.
 3. **Clear your browser cache** after updating (`Ctrl+F5` / `Cmd+Shift+R`) to avoid stale frontend assets.
 
-:::info Coding agent chats from an earlier version
-The first new message in a coding agent chat started before this update begins a new agent session. The agent receives the chat so far as text.
+:::info Agent chats from an earlier version
+The first new message in an agent chat started before this update begins a new agent session. The agent receives the chat so far as text.
 :::
 
 :::info Direct Connections replaced by Tether
@@ -62,7 +64,7 @@ The image environment variables for engines, models, API URLs, keys, ComfyUI wor
 :::
 
 :::info Arena models become router models
-Arena models are now [router models](/features/administration/router-models). The first start converts your existing arena models into router models with a **Random** default, which keeps the blind comparison. An arena that was switched off comes over switched off. The **Evaluations** settings tab with **Arena Models** is gone, so manage them in **Settings > Models** (admin section). `ENABLE_EVALUATION_ARENA_MODELS` is no longer read. `EVALUATION_ARENA_MODELS` is replaced by [`ROUTER_MODELS`](/reference/env-configuration#router_models), which uses a different [JSON shape](/features/administration/router-models#set-them-up-from-the-environment), so move any deployment that sets `EVALUATION_ARENA_MODELS` to `ROUTER_MODELS`.
+Arena models are now [router models](/features/administration/router-models). The first start converts your existing arena models into router models with a **Random** default, which keeps the blind comparison. An arena that was switched off comes over switched off. An arena that drew from all models, or that excluded some, gets a fixed list of the models connected at that first start. Add any model you connect later to its [default models](/features/administration/router-models#default-models) yourself. An arena with a single model still works but no longer hides which model answered, because **Random** needs at least two. The built-in **Arena Model**, which was used when **Arena Models** was on and no arena model had been added, is not converted. To keep blind comparison, create a router model with the **Random** strategy and two or more default models. The **Evaluations** settings tab with **Arena Models** is gone, so manage them in **Settings > Models** (admin section). `ENABLE_EVALUATION_ARENA_MODELS` is no longer read. `EVALUATION_ARENA_MODELS` is replaced by [`ROUTER_MODELS`](/reference/env-configuration#router_models), which uses a different [JSON shape](/features/administration/router-models#set-them-up-from-the-environment), so move any deployment that sets `EVALUATION_ARENA_MODELS` to `ROUTER_MODELS`.
 :::
 
 :::info v0.12.1 adds sign-in records for SCIM users
@@ -78,6 +80,8 @@ Setting `ENABLE_DB_MIGRATIONS=false` on all but one instance decides **which** i
 ---
 
 ## Manual Update
+
+In **Settings > General** (admin section), **Check for updates** looks up the latest GitHub release. To install it in Docker, pull the image and recreate the container using the steps below. The button appears on release-channel builds when [`ENABLE_VERSION_UPDATE_CHECK`](/reference/env-configuration#enable_version_update_check) is enabled (the default). `OFFLINE_MODE=true` disables the check.
 
 <Tabs groupId="setup-method">
   <TabItem value="docker-run" label="Docker Run" default>
@@ -98,7 +102,7 @@ docker run -d -p 3000:8080 \
   ghcr.io/open-webui/open-webui:main
 ```
 
-For NVIDIA GPU support, add `--gpus all` to the `docker run` command.
+For NVIDIA GPU support, add `--gpus all` to the `docker run` command and use the `:cuda` tag. Pull the same tag you run, in step 2 and step 3: a container started from `:cuda`, `:ollama` or a version tag starts its old version again after a pull of `:main`.
 
   </TabItem>
   <TabItem value="docker-compose" label="Docker Compose">
@@ -159,6 +163,7 @@ After updating, confirm everything is working:
 2. **Load the UI** at [http://localhost:3000](http://localhost:3000). You should see the login page.
 3. **If the UI looks broken**, clear your browser cache (`Ctrl+F5` / `Cmd+Shift+R`).
 4. **If you see migration errors** in the logs, check the [release notes](https://github.com/open-webui/open-webui/releases) for known issues and the [Connection Errors](/troubleshooting/connection-error) troubleshooting page.
+5. **If nothing changed after the update**, check where your volume is mounted. Mount it at `/app/backend/data`, never at `/app/backend`. The image keeps the application code in `/app/backend`, so a volume or bind mount there covers the new code and the container keeps running whatever code the mount holds. To fix a bind mount such as `./backend:/app/backend`, change it to `./backend/data:/app/backend/data`. If you never set `WEBUI_SECRET_KEY`, copy the value in `./backend/.webui_secret_key` into it first: the generated key is saved in `/app/backend/.webui_secret_key`, outside the data folder, so after the move Open WebUI generates a new key and everyone is signed out.
 
 ---
 

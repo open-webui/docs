@@ -137,6 +137,8 @@ Both need you to be signed in and to have the [**Allow Chat Import**](/features/
 
 In the copy, the original owner's prompts and replies become yours, so you can edit them and use **Regenerate** and **Continue Response** on them like in any chat of your own. Messages that other people wrote into a chat with replies allowed keep their authors.
 
+With **Clone only**, the page a share link opens shows the messages only, with no **Artifacts** panel, so HTML and SVG code in the replies does not open as an artifact there. Clone or fork the chat to see its artifacts in your copy.
+
 #### Using a Shared Chat as Context
 
 Read access to a chat also lets you attach that conversation to a chat of your own, so a model can work from it. This covers a share granted to you by name, one granted to a group you belong to, one set to **Public** and a chat sitting in a [folder shared with you](/features/chat-conversations/chat-features/conversation-organization#sharing-folders).

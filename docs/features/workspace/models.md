@@ -40,6 +40,8 @@ Instead of manually attaching documents and enabling tools every chat, bind them
 
 Restrict models to specific users or groups. A finance team sees their models; engineering sees theirs. Admins control what's available instance-wide.
 
+Read access lets a user chat with a model, not see how it is built. In **Workspace > Models** such a model carries a **Read Only** badge, and opening its editor returns `You do not have permission to edit this model`. Its system prompt and other parameters are left out of what Open WebUI sends that user. Only the owner, admins (while `BYPASS_ADMIN_ACCESS_CONTROL` is on) and users with write access receive them.
+
 ### Dynamic system prompts
 
 Use variables like `{{USER_NAME}}` and `{{CURRENT_DATE}}` so the system prompt adapts to each user and session automatically. Write them without spaces inside the braces: the spaced form reaches the model as literal text. Only the chat and user variables (`{{ chat.variables.x }}`, `{{ user.variables.x }}`) tolerate spaces.
@@ -88,8 +90,8 @@ The editor saves with **Save & Update** (**Save & Create** for a new model). Whe
 | :--- | :--- |
 | **Avatar** | Upload a custom image. Animated GIF and WebP are supported |
 | **Background** | An image shown in the editor's banner and behind the chat whenever this model is in use. Hover the banner and use **Add background**, **Change** or **Remove**. It has to be uploaded here, since only a file held by this instance is accepted: an external URL or a pasted data URI is refused outright. PNG, JPEG, WebP or GIF, at most 5 MiB and 25 megapixels |
-| **Name and ID** | Display name and unique identifier. An ID holds no spaces or tabs and is at most 256 characters |
-| **Base Model (From)** | The actual model that powers this agent. Admins can pick hidden models here. Other users see them in this list only with the [**Hidden Models**](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission, which is off by default. Hidden models still stay out of their chat model selector. The permission changes only this list, not who can use a hidden model |
+| **Name and ID** | Display name and unique identifier. An ID holds no whitespace (spaces, tabs or line breaks) and is at most 256 characters. The editor refuses whitespace with `Model ID cannot contain whitespace.`, and the API refuses both cases with `The model id is too long. Please make sure your model id is less than 256 characters long.` Import skips any model whose ID breaks these rules. On a new model the ID is filled from the name: lowercase, spaces turned into hyphens, other characters outside a to z, 0 to 9 and hyphens removed. Editing the name rewrites the ID, so change the ID last. The ID cannot be changed after the model is saved |
+| **Base Model (From)** | The actual model that powers this agent. Admins can pick hidden models here. Other users see them in this list only with the [**Hidden Models**](/features/authentication-access/rbac/permissions#1-workspace-permissions) permission, which is off by default. Hidden models still stay out of their chat model selector. The permission changes only this list, not who can use a hidden model. Personal Tether models are excluded from this picker |
 | **Description** | Short summary shown in the model selector |
 | **Tags** | Organize models in the dropdown |
 | **Provider details** | Admins only. What the provider's model list reports for the model: inputs and outputs, context window, max output and supported parameters. **Not provided** when the provider leaves a field out. Hidden when the provider reports none of them |
@@ -228,7 +230,7 @@ The icon is there whenever a selected model has controls, and for anyone allowed
 - **Default follows the model.** While **Default** is ticked, every message sends the default option's parameters, or nothing from that control when the default option is **None**. If someone later changes the default option, everyone on **Default** moves with it.
 - **A picked option replaces the same parameter everywhere else.** Its values win over the model's **Advanced Params**, the [Global Model Defaults](#global-model-defaults-admin), the person's **Settings > General** and the chat's **Controls**. If two controls set the same parameter, the one lower in the list wins.
 - **A removed option blocks the model until a new pick.** If an editor removes an option someone picked, that person's messages to the model fail with `Model control <key>: the selected option is no longer available.` until they pick another option or **Default**. A pick for a removed control is skipped.
-- **Automations use the defaults.** A chat started by an [automation](/features/chat-conversations/chat-features/automations) always sends each control's default option.
+- **Automations use the defaults.** An [automation](/features/chat-conversations/chat-features/automations#model-settings-used-by-a-run) uses each control's default option. A default of **None** leaves the underlying parameter settings in effect.
 
 API callers get the same controls. See [Chat Completions](/reference/api-endpoints#chat-completions) for how a request picks an option.
 
@@ -293,7 +295,7 @@ The same actions are available over the API, each taking the model ID as `?id=`:
 
 Rows you can edit also carry an **Enabled** switch, in **Workspace > Models** and in **Settings > Models** (admin section) alike. Switching it off pulls that one model out of the model list for everyone: it leaves the selector, and a request that names it fails with **"Model not found"**. Nothing is deleted, every other model stays where it was, and switching it back on brings the model straight back.
 
-**Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it.
+**Hide** is the lighter option. It keeps the model in the list and only takes it out of the selector, which is why a hidden base model still powers the presets built on it. A hidden model still comes back from `/api/models` with `info.meta.hidden` set to `true`, and still answers API requests that name it.
 
 ### Import and export
 
@@ -357,6 +359,10 @@ Each model's ellipsis (**...**) menu starts with one of two actions, and both as
 
 Filter the admin model list by status (Enabled, Disabled, Visible, Hidden, Public, Private, Selected, Pinned) and use the **Actions** menu to enable, disable, show or hide every model in the current view at once. Useful when external providers expose hundreds of models. Drag-to-reorder works in a filtered view too: the model you move lands next to the visible model you dropped it by, and every model the filter hides keeps its place.
 
+The menu labels these **Enable All**, **Disable All**, **Show All** and **Hide All**. **Hide All** marks every model in the current view as hidden, workspace models included, which takes them out of the model selector for everyone, admins too. Its toast reads `All models are now hidden` even when the view held only some models. **Show All** in the same view undoes it in one step, but it also shows models that were hidden before, so check the **Hidden** view first if some were hidden on purpose. **Hide All** does not change the **Selected** or **Pinned** model settings, but hidden models are skipped when a new chat picks its model. If every model is hidden, a new chat opens with no model selected.
+
+Each row shows **Public**, **Shared** or **Private** next to the model name. **Public** means every user has read access. **Shared** means specific users or groups have access. **Private** means the model has no access grants. **Make Public** and **Make Private** in the row's ellipsis (**...**) menu switch this without opening the model. **Make Private** removes every access grant, group and user shares included, not only public access. **Make Public** on a base model that has no saved settings saves an entry for it. The **Private** filter lists shared models too.
+
 ---
 
 ## Selected and Pinned Models (Admin)
@@ -366,7 +372,7 @@ These are the two instance-wide settings that decide which model or models a use
 | Setting | Menu action | What it does | Config key |
 | :--- | :--- | :--- | :--- |
 | **Selected Model** | **Set as Selected Model** | Pre-selects this model in a new chat for users who have no model preference of their own and no [group default models](/features/authentication-access/rbac/groups#default-models-per-group) | [`DEFAULT_MODELS`](/reference/env-configuration#default_models) |
-| **Pinned Model** | **Set as Pinned Model** | Pre-fills the model shortcuts in the sidebar for users who have not pinned any models themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
+| **Pinned Model** | **Set as Pinned Model** | Shows this model as a shortcut in the sidebar for users who have never pinned, unpinned or reordered a model themselves | [`DEFAULT_PINNED_MODELS`](/reference/env-configuration#default_pinned_models) |
 
 Both accept more than one model, so you can hand users a small starting set rather than a single model.
 
@@ -386,7 +392,7 @@ The **Model Defaults** panel at the top of the same page is a different feature:
 The change is saved immediately, no separate save step, and the row picks up a **Selected** or **Pinned** label next to the model name. Repeat on as many models as you want. To take one back out, open the same menu and choose **Remove Selected Model** or **Remove Pinned Model**.
 
 :::tip Faster toggling
-Hold **Shift** while the model list is open and every row exposes inline icon buttons for the same actions: the eye toggles visibility, the check toggles Selected, the pin toggles Pinned, the globe or lock toggles public access, and the pencil opens the model. A model that is already pinned shows a crossed-out pin, because clicking it removes the pin. Releasing Shift hides the icons again.
+Hold **Shift** while the model list is open and every row exposes inline icon buttons for the same actions: the eye toggles visibility, the check toggles Selected, the pin toggles Pinned, the globe or lock toggles public access, and the pencil opens the model. A model that is already pinned shows a crossed-out pin, because clicking it removes the pin. Releasing Shift hides the icons again. While a button or link you reached with `Tab` has focus, holding Shift does not show the inline quick-action icons, so `Shift+Tab` moves back through the list as usual.
 
 ![Inline quick-action icons revealed by holding Shift](/images/features/models/model-quick-actions.png)
 :::
@@ -403,16 +409,19 @@ For a new chat, Open WebUI takes the first of these that yields a model the user
 
 1. A `model` or `models` [URL parameter](/features/chat-conversations/chat-features/url-params).
 2. The models bound to the folder the chat is started in, if any.
-3. The user's own default model, saved from the model selector in a chat with **Set as default**.
-4. The [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), taken from the group deepest in the group hierarchy that sets some (the earliest created group wins a tie). Groups the user inherits through a parent group count too.
-5. The instance's **Selected Models**.
-6. The first available model in the list.
+3. The models selected in the last saved chat the user had open in the same browser tab. Open WebUI keeps them for that tab only and uses them for one new chat, then clears them, so this step wins over **Set as default** once.
+4. The user's own default model, saved from the model selector in a chat with **Set as default**.
+5. The [default models of the user's groups](/features/authentication-access/rbac/groups#default-models-per-group), taken from the group deepest in the group hierarchy that sets some (the earliest created group wins a tie). Groups the user inherits through a parent group count too.
+6. The instance's **Selected Models**.
+7. The first available model in the list.
 
-Steps 3 to 5 also pick the starting model in Notes and the Playground.
+Steps 4 to 6 also pick the starting model in Notes and the Playground.
 
 Models that have been hidden or removed are dropped at every step, so a user whose last-used model disappeared lands on a working one instead of an empty selector.
 
-**Pinned Models** work differently: they seed the user's sidebar shortcuts once, only when the user has no pinned models of their own. From then on the user's own pins win, and pins pointing at hidden or deleted models are cleaned up automatically.
+Opening an existing chat follows the same rule. The chat's models that were removed, or that the user can no longer access, are dropped from the selector. If none are left, the chat falls back through steps 4 to 7: the user's own default model, then the group default models or the **Selected Models**, then the first available model. A model that was only hidden stays selected in that chat.
+
+**Pinned Models** work differently: a user who has never pinned, unpinned or reordered a model follows the instance's **Pinned Models** in the sidebar, so later changes to them keep reaching that user. The first time the user pins, unpins or reorders a model, the current list becomes the user's own and admin changes stop reaching them. An own list emptied by unpinning everything stays empty. Pins pointing at hidden or deleted models, or models the user cannot access, stay in the user's settings but are left out of the sidebar, so they come back if the model does.
 
 :::warning Selected is a starting point, not a restriction
 Setting a model as Selected does not stop anyone from switching to another model they have access to. To control what a user can reach, use per-model access control or **Hide**, described in [Curated-Interface Deployments](#curated-interface-deployments).
@@ -423,6 +432,8 @@ Setting a model as Selected does not stop anyone from switching to another model
 ## Model Switching in Chat
 
 Switch models mid-conversation without losing context. Select up to two models simultaneously to compare responses side-by-side, using the arrow buttons to navigate between them. The model picker is **searchable**, type in the **Search a model** box to filter a long list, and a custom model is only selectable when its **base model** is available.
+
+In the chat model picker, open **All** next to the search box and choose a model tag to show only models with that tag. The same menu offers **Local** and **External** when those connection types are available. You can apply one menu filter at a time and still use **Search a model** to narrow the results by name, ID, or tag. Select **Clear filters** (×) next to the active filter to return to **All**.
 
 ![The model selector, searchable and showing pinned models](/images/features/chat/model-selector.png)
 
@@ -459,6 +470,8 @@ Before picking an approach, understand the one rule that governs all of this.
 Every model you create under **Workspace > Models** is a *workspace model*: it points at a base model and stores a reference to it, rather than being a standalone copy of that base. Creating one never produces a second, independent base model. It always sits on top of an existing base.
 
 When a user runs a workspace model, Open WebUI checks access to **both** the workspace model **and** its underlying base model. If the user cannot access the base model, the request fails with **"Model not found"**, even when the workspace model itself is shared publicly with them.
+
+A base model counts as accessible to a non-admin only when it has a saved entry in **Settings > Models** (admin section). A base model that comes straight from a connection and was never saved there is admin-only. A workspace model built on it works for admins and still shows in other users' model selector, but fails for them with **"Model not found"**. The server log names the cause as `reason=base_model_unregistered`, or `reason=base_model_read_denied` when the base model has an entry the user cannot read. To fix it, choose **Make Public** in the base model's ellipsis (**...**) menu in **Settings > Models** (admin section). This saves an entry for the base model and gives every user read access. To limit it to some groups instead, change its **Access** afterward. Then **Hide** it if users should not pick it directly, as described below.
 
 This is by design. Without it, anyone could bypass a base model's access control by building a workspace model on a restricted base and sharing that wrapper publicly. A shared wrapper can never grant access that the base model withholds.
 

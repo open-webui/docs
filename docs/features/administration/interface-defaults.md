@@ -101,6 +101,8 @@ Every option on the **Settings > Interface** page, in the order it appears there
 
 `textScale` is the **UI Scale** slider and `highContrastMode` is **Accessibility Mode**. With Accessibility Mode on, phones allow pinch zoom up to 5x; with it off, zoom stays locked so phones do not zoom into small text fields on their own.
 
+With **Copy Formatted Text** enabled, the assistant response's **Copy** action tries to put both HTML and plain text on the clipboard. The app you paste into chooses the format, so a plain-text editor still pastes plain text. If the browser's rich clipboard write fails, Open WebUI tries to copy plain text instead.
+
 `fontFamily` names a font that has to be installed on each person's own machine. Nothing is downloaded, so a default naming a font your users do not have simply falls back to the standard one, and everybody sees the usual interface. Set it only where you know what is installed, such as a managed fleet with a corporate typeface.
 
 ### Chat
@@ -147,11 +149,14 @@ Every option on the **Settings > Interface** page, in the order it appears there
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
 | `ctrlEnterToSend` | Enter Key Behavior | `false` (**Enter to Send**); `true` is **Ctrl+Enter to Send**, in chats, channel messages and thread replies |
+| `showInputSelections` | Show Input Selections | `false` |
 | `richTextInput` | Rich Text Input for Chat | `true` |
 | `promptAutocomplete` | Prompt Autocompletion | `false` |
 | `showFormattingToolbar` | Show Formatting Toolbar | `false` |
 | `insertPromptAsRichText` | Insert Prompt as Rich Text | `false` |
 | `largeTextAsFile` | Paste Large Text as File | `false` |
+
+**Show Input Selections** displays indicators beside the chat input's **+** menu for tools, skills and filters already selected in the chat and for eligible capabilities that are on. Check the effective switch in the user's **Settings > Interface** first. If it is on and a selected tool still has no indicator for a non-admin, check **Selected Tools** under **Visible controls** in the admin **Settings > Interface**. The other indicators have their own visibility switches.
 
 ### Artifacts
 

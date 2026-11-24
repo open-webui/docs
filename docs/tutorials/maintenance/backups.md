@@ -17,7 +17,7 @@ This tutorial is a community contribution and is not supported by the Open WebUI
 
  This guide is intended to recommend some basic recommendations for how users might go about doing that.
 
- This guide assumes that the user has installed Open WebUI via Docker (or intends to do so)
+ This guide assumes that the user has installed Open WebUI via Docker (or intends to do so). For pip, uv and Conda installs, see [pip, uv and Conda installs](#pip-uv-and-conda-installs).
 
 ## Ensuring data persistence
 
@@ -79,6 +79,23 @@ services:
 
 If this is how you've deployed your instance, you'll want to note the paths on root.
 
+## pip, uv and Conda installs
+
+An instance started with `open-webui serve` keeps its data in the folder set by [`DATA_DIR`](/reference/env-configuration#data_dir). Without `DATA_DIR`, that folder is `open_webui/data` inside the Python environment's `site-packages`, so removing or recreating the environment deletes the data with it. To print the path, run this in the activated environment:
+
+```bash
+python -c "import open_webui, pathlib; print(pathlib.Path(open_webui.__file__).resolve().parent / 'data')"
+```
+
+Back up two things:
+
+- **The data directory.** It holds the same files as the Docker volume, listed in [Files in persistent data store](#files-in-persistent-data-store).
+- **The `.webui_secret_key` file**, unless you set [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) in the environment. `open-webui serve` creates it on first start in the folder you run the command from, not in the data directory, and prints its path at every start: `Loading WEBUI_SECRET_KEY from <path>`. A restored instance without it generates a new key, which signs everyone out.
+
+Stop Open WebUI before copying, so `webui.db` and its `webui.db-wal` file are copied in the same state.
+
+To move the data out of the environment, stop Open WebUI, copy the data directory to a folder of your own, and start with `DATA_DIR` pointing at it, for example `DATA_DIR=~/.open-webui open-webui serve`. Start from the folder that holds `.webui_secret_key`, or copy that file to the folder you start from.
+
 ## Scripting A Backup Job
 
 However your instance is provisioned, it's worth inspecting the app's data store on your server to understand what data you'll be backing up. You should see something like this:
@@ -100,6 +117,22 @@ However your instance is provisioned, it's worth inspecting the app's data store
 | `uploads/` | Directory for storing user-uploaded files. |
 | `vector_db/` | Directory containing the ChromaDB vector database. |
 | `webui.db` | SQLite database for persistent storage of other instance data |
+
+## Exporting the admin configuration
+
+The **Config** section of **Settings > Database** (admin section) has **Export Config** and **Import Config**. They copy the admin settings only, so they do not replace a backup of the data store.
+
+**Export Config** downloads `config-<timestamp>.json`, a flat JSON object holding every row of the `config` table under dotted keys such as `openai.api_base_urls` or `ui.banners`.
+
+- The file holds secrets in plain text: connection API keys (`openai.api_keys`), web search API keys, Jupyter tokens and passwords, and OAuth client secrets. Store it like a password file.
+- It leaves out everything stored outside the `config` table: users, chats, models, knowledge, files, functions and tools. Settings that exist only as environment variables, such as `WEBUI_SECRET_KEY`, are not in it either.
+- With `ENABLE_PERSISTENT_CONFIG=False`, the file holds the values Open WebUI is running with, which start from the environment.
+
+**Import Config** reads a file in the same shape and writes every key in it as given, without checking key names or values. Keys missing from the file keep their current values, so an import merges into the existing settings and does not reset the rest. A successful import shows `Config imported successfully`.
+
+- With `ENABLE_PERSISTENT_CONFIG=False`, and for `oauth.*` keys while `ENABLE_OAUTH_PERSISTENT_CONFIG` is off, the imported values change the running instance only and are lost on restart.
+- A full export contains the MFA keys (`auth.mfa.enable`, `auth.mfa.allow_oauth_bypass`, `auth.mfa.allow_trusted_header_bypass`). An import that carries them must come from an admin signed in to the browser. Sent with an API key, it fails with `A human administrator session is required to change MFA settings.`
+- If the imported MFA values differ from the current ones, every user is signed out. If the file turns MFA on and the instance cannot run it (no authentication, no persistent config, or stored MFA secrets that no longer decrypt), the import fails with `Unable to update MFA policy. Check configuration and retry.` and nothing is written.
 
 # File Level Backup Approaches
 

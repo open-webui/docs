@@ -310,7 +310,7 @@ yield details_block
 
 ## Using Internal Open WebUI Functions
 
-Sometimes, you may want to leverage the internal functions of Open WebUI within your Pipe. You can import these functions directly from the `open_webui` package. Keep in mind that while unlikely, internal functions may change for optimization purposes, so always refer to the latest documentation.
+Sometimes, you may want to leverage the internal functions of Open WebUI within your Pipe. You can import these functions directly from the `open_webui` package. They are internal code, not a stable plugin API, and can change in any release.
 
 Here's how you can use internal Open WebUI functions:
 
@@ -351,11 +351,12 @@ class Pipe:
   - **Process**:
     1. **Fetch User Object**: Retrieves the user object using their ID.
     2. **Set Model**: Specifies the model to be used.
-    3. **Generate Completion**: Calls `generate_chat_completion` to process the input and produce an output.
+    3. **Generate Completion**: Calls `generate_chat_completion` to process the input and produce an output. It sends the request straight to the target model's connection, so that model's filters, tools and attached knowledge do not run, and it still checks that a `user` role account can access the model unless [`BYPASS_MODEL_ACCESS_CONTROL`](/reference/env-configuration#bypass_model_access_control) is on.
 
 ### Important Notes
 
 - **Function Signatures**: Refer to the latest Open WebUI codebase or documentation for the most accurate function signatures and parameters.
+- **Do not call the chat route**: `open_webui.main` also exports `generate_chat_completion` and `generate_chat_completions`, but these are the `/api/chat/completions` route itself. When the form data carries a `session_id` and a `chat_id`, the route starts a separate background chat task and returns `{"status": true, "task_ids": [...], "chat_id": ...}` instead of a completion.
 - **Best Practices**: Always handle exceptions and errors gracefully to ensure a smooth user experience.
 
 ---

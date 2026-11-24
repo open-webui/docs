@@ -45,7 +45,7 @@ Add Open Terminal in the **Machines** section, not in the **Tools** section unde
 | :--- | :--- |
 | **URL** | `http://localhost:8000` (or `http://open-terminal:8000` if using Docker Compose) |
 | **API Key** | The password you chose during installation |
-| **Auth** | Leave as `Bearer` (the default) |
+| **Auth** | Leave as `Bearer` (the default). [Auth](#auth) covers why the other options break the interactive terminal |
 | **Chat Uploads** | Starts on `Filesystem` for a new connection. [Chat Uploads](#chat-uploads) covers what each option does |
 | **Working Directory Context** | Under **Advanced**, on by default. [Working Directory Context](#working-directory-context) covers when to turn it off |
 | **User Shell Tools** | Under **Advanced**. Leave as `Automatic`. [User Shell Tools](#user-shell-tools) covers what `Always Include` changes |
@@ -77,7 +77,7 @@ In the chat input area, click the cloud icon. Your machines appear under **Machi
 
 The selected machine name appears next to the cloud icon. The AI can now execute commands, read files, and run code through it. You can pick another machine at any time except while a reply is generating.
 
-Hover over a machine in the menu and click its **System info** button to see the CPU, memory, disk and network use, the uptime and the top processes it reports. The view refreshes every 5 seconds while it is open. For a machine with a separate instance per chat, the button appears once the chat is saved.
+Hover over a machine in the menu, click its **More** button and choose **System info** to see the CPU, memory, disk and network use, the uptime and the top processes it reports. The view refreshes every 5 seconds while it is open. For a machine with a separate instance per chat, **System info** appears once the chat is saved.
 
 ### 8. Enable native function calling
 
@@ -85,7 +85,7 @@ Native function calling is the default tool-calling mode, so it is already activ
 
 1. Go to **Workspace → Models**
 2. Click the edit button on the model you're using
-3. Make sure **Function Calling** is set to **Native** (the default), not **Legacy**
+3. Make sure **Function Calling** is set to **Default** or **Native**, not **Legacy**
 4. Save
 
 ![Model capabilities showing Builtin Tools enabled](/images/open-terminal-model-capabilities.png)
@@ -118,6 +118,23 @@ For Docker deployments, you can configure machines automatically using the [`MAC
 ## Your own machine (Tether)
 
 Without admin access, add a machine in the Tether app. It is yours alone and its URL and key stay on your computer. See [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
+
+---
+
+## Auth
+
+**Auth** on the connection form decides what Open WebUI sends the terminal server as credentials. The model's tools and the file browser's listings, reads and uploads go over HTTP. The shell in a **New Terminal** tab, the file browser's live refresh and listening ports, the **Desktop** tab and the streamed output of running commands go over a websocket. The two paths send different things:
+
+| Auth | HTTP requests | Websocket connections |
+| :--- | :--- | :--- |
+| `Bearer` | The **API Key** as a bearer token | The **API Key** |
+| `None` | No key | An empty token |
+| `Session` | The user's own Open WebUI token as a bearer token | An empty token |
+| `OAuth` | The user's OAuth access token as a bearer token, when they have an OAuth sign-in session | An empty token |
+
+`Bearer` is the only option that sends the **API Key**, and the only one that authenticates both paths. With `Session` or `OAuth` the model's tools and the file browser can work against a terminal server that accepts that token, while every websocket feature reaches the server with an empty token. Those features work only if the terminal server accepts a connection with no key. Open Terminal is set up with an API key, so keep `Bearer` for it.
+
+Terminals created from a [Terminals orchestrator](/features/open-terminal/terminals/) connection always use `Bearer` with the connection's **API Key**, whatever **Auth** is set to.
 
 ---
 
@@ -158,7 +175,7 @@ Tool instructions are part of the cached prefix of every request, so each change
 
 A **New Terminal** tab, from the **+** menu of the **Tabs**, is your own shell. Two tools let the model read that shell's recent output and send input to it. **User Shell Tools**, under **Advanced**, decides when the model gets them:
 
-- `Automatic` (default): only while your shell for that terminal is open in the chat you are sending from. Before each message, Open WebUI asks your browser whether it is.
+- `Automatic` (default): only while your shell for that machine is open in the chat you are sending from. Before each message, Open WebUI asks the terminal server whether it is.
 - `Always Include`: on every message, open shell or not. The tool list stays the same from message to message, which keeps the [prompt cache](/features/chat-conversations/prompt-caching) intact when you open and close the shell.
 
 Automations and sub-agents never get the two tools. The field is on every machine an administrator adds. [Tether](/ecosystem/tether) machines always use **Automatic**.
@@ -226,6 +243,12 @@ Make sure:
 Only machines the user is allowed to use are listed, so check the connection's access grants and that the connection is enabled.
 
 For an orchestrator connection, a machine is listed for you only when it is shared with you or you have **Write** access to the connection. A machine with a separate instance per chat is hidden in temporary chats because it needs a saved conversation. See [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
+
+### Command output is empty
+
+The `run_command` result shows `"status": "running"` and an empty `output` list. `run_command` starts the command in the background and returns its command ID right away. It waits for the command only when the call sends a `wait` value (up to `300` seconds) or the server sets `OPEN_TERMINAL_EXECUTE_TIMEOUT`, which is unset by default. The model reads the output later by calling `get_process_status` with that ID, which accepts `wait` too.
+
+To get the output of short commands in the first result, set `OPEN_TERMINAL_EXECUTE_TIMEOUT` on the Open Terminal server, for example `OPEN_TERMINAL_EXECUTE_TIMEOUT=5`, and restart it. A command that finishes sooner returns as soon as it ends. A command that runs longer still returns status `running`, and its output comes from `get_process_status`. See [Configuration](/features/open-terminal/advanced/configuration).
 
 ### Wrong API key
 

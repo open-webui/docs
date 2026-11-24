@@ -7,7 +7,7 @@ title: "API Keys"
 
 **Programmatic access to Open WebUI, for scripts, bots, and integrations.**
 
-An API key is a personal access token that lets external code call the same endpoints the web UI uses. Anything you can do in a browser - chat completions, model listing, file uploads, RAG queries - your scripts can do with a single `Authorization: Bearer` header. The key acts as the user who created it, so there is no separate permission model to learn.
+An API key is a personal access token that lets external code call the same endpoints the web UI uses. Anything you can do in a browser - chat completions, model listing, file uploads, RAG queries - your scripts can do with a single `Authorization: Bearer` header, except the few account-security endpoints listed under [Endpoints that need a signed-in session](#endpoints-that-need-a-signed-in-session). The key acts as the user who created it, so there is no separate permission model to learn.
 
 Each account has exactly **one** API key. Creating a key when you already have one replaces it, and the previous key stops working immediately.
 
@@ -25,7 +25,7 @@ An API key acts as you. It inherits your role and group permissions, and those p
 
 ### Revocable and auditable
 
-A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill one user's key by removing their feature permission or [deleting it for them](#managing-a-users-key-admin). Key creation and deletion are recorded as authentication events. With [audit logging](/getting-started/advanced-topics/hardening#audit-logging) on, requests made with a key appear in the audit log under the key's owner, whether the key arrives as a Bearer token or in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)).
+A key can be replaced or removed outright. Creating a new key overwrites the old one, and deleting a key leaves the account with none, so a leaked credential can be retired in one step either way and the change takes effect instantly. There is no password reset and no session invalidation involved. Admins can also kill every key at once by turning the global **API Keys** toggle off, or kill a non-admin user's key by removing their feature permission (an admin's key ignores that permission) or [deleting it for them](#managing-a-users-key-admin). Key creation and deletion are recorded as authentication events. Keys are stored in plain text in the database, and neither a password change nor signing out affects them. With [audit logging](/getting-started/advanced-topics/hardening#audit-logging) on, requests made with a key appear in the audit log under the key's owner, whether the key arrives as a Bearer token or in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)).
 
 ---
 
@@ -193,6 +193,7 @@ Retiring an integration for good is a **Delete** rather than a rotation, since t
 - The global **API Keys** toggle may have been turned off, which invalidates existing keys
 - The key's owner may have lost the **API Keys** feature permission
 - If endpoint restrictions are enabled, confirm the route you are calling is in the allowlist
+- If the response body reads `A human session is required.`, the route does not accept API keys at all. See [Endpoints that need a signed-in session](#endpoints-that-need-a-signed-in-session)
 
 ---
 
@@ -205,6 +206,24 @@ An account holds a single unnamed key. There is no way to run two keys side by s
 ### No per-key permissions
 
 A key inherits the full permissions of the user who created it. You cannot restrict a key to a subset of its owner's permissions, and endpoint restrictions apply instance-wide rather than per key.
+
+### Endpoints that need a signed-in session
+
+These routes accept only the token of a browser sign-in. An API key gets `403` with `A human session is required.`, whatever the owner's role or permissions:
+
+| Route | What it does |
+|-------|--------------|
+| `GET /api/v1/auths/` | Returns the signed-in user with its token and sets the `token` cookie |
+| `GET /api/v1/auths/mfa/status` | Two-factor status |
+| `POST /api/v1/auths/mfa/replace` | Starts replacing a two-factor method |
+| `POST /api/v1/auths/mfa/recovery/codes` | Creates new recovery codes |
+| `GET /api/v1/auths/sessions` | Lists your persistent sessions for native clients |
+| `POST /api/v1/auths/sessions` | Creates a persistent session for a native client |
+| `GET /api/v1/auths/sessions/{session_id}/request` | Reads a pending sign-in request from a native client |
+| `POST /api/v1/auths/sessions/{session_id}/authorize` | Approves that sign-in request |
+| `DELETE /api/v1/auths/sessions/{session_id}` | Revokes a persistent session |
+
+To read the key owner's own account with an API key, call `GET /api/v1/users/user/status`. It returns the user record, including `id`, `name`, `email` and `role`, and answers `403` when user status is turned off with [`ENABLE_USER_STATUS`](/reference/env-configuration#enable_user_status). `GET /api/v1/users/permissions` returns the owner's permissions.
 
 ### No automatic expiration
 

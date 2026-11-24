@@ -82,7 +82,7 @@ The following URL parameters can be used to customize your Open WebUI instance:
 ### Temporary Chat Sessions
 
 - `temporary-chat`: Mark the chat as a temporary session by setting this parameter to `true` (e.g., `/?temporary-chat=true`)
-  - *Note: Document processing is frontend-only in temporary chats. Complex files requiring backend parsing may not work.*
+  - See [Document attachments in temporary chats](/features/chat-conversations/rag/document-extraction#document-attachments-in-temporary-chats) for what the browser extracts and what goes to the backend.
 
 See https://docs.openwebui.com/features/chat-conversations/chat-features/url-params for more info on URL parameters and how to use them.
 

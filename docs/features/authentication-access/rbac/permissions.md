@@ -48,7 +48,7 @@ Some permissions are **dependent** on others (e.g., you cannot import models if 
 | **Import Models** | *(Requires Models Access)* Ability to import models from JSON/files. |
 | **Export Models** | *(Requires Models Access)* Ability to export models to files. |
 | **Hidden Models** | *(Requires Models Access)* Ability to pick hidden models as the base model of a workspace model ([`USER_PERMISSIONS_WORKSPACE_MODELS_HIDDEN`](/reference/env-configuration#user_permissions_workspace_models_hidden)). Off by default. |
-| **Knowledge Access** | Access the **Knowledge** workspace to manage knowledge bases. |
+| **Knowledge Access** | Open the **Knowledge** workspace and create knowledge bases ([`USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS`](/reference/env-configuration#user_permissions_workspace_knowledge_access)). Off by default for non-admins. Access to an existing knowledge base is governed separately by ownership and [resource grants](./groups.md#access-grant-system). |
 | **Prompts Access** | **(Parent)** Access the **Prompts** workspace to manage custom system prompts. |
 | **Import Prompts** | *(Requires Prompts Access)* Ability to import prompts. |
 | **Export Prompts** | *(Requires Prompts Access)* Ability to export prompts. |

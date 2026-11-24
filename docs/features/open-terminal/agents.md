@@ -1,15 +1,15 @@
 ---
 sidebar_position: 9
-title: "Coding Agents"
+title: "Agents"
 ---
 
-# Coding Agents
+# Agents
 
-When the selected Open Terminal lists coding agents, they show up in the model picker next to your regular models. Pick one and the agent works in the machine's workspace, using the files and tools of that environment.
+When the selected Open Terminal lists agents, they show up in the model picker next to your regular models. Pick one and the agent works in the machine's workspace, using the files and tools of that environment.
 
 Which agents and models appear depends on the Open Terminal you select. Agents the machine reports as unavailable are not listed.
 
-Hand a whole coding task to an agent: describe a feature or a bug and it edits the project's files and runs its commands in the terminal, while you follow its work, answer its questions and approve its tool requests in the chat. Pick Claude Code, Codex or another listed agent from the model picker like any other model. Use an agent when a task needs real work on a project, and a normal model when you only want an answer.
+Ask an agent to summarize project files, prepare a report, or fix a bug and run the tests. You can follow its work, answer questions, and review tool requests in chat.
 
 For installation, login, and connection steps, start with [Connect an Agent](/getting-started/quick-start/connect-an-agent#quick-start-with-open-terminal).
 
@@ -19,19 +19,19 @@ Open Terminal starts the installed CLI through the interface below. Install and 
 
 | Agent | Interface | Executable |
 | :--- | :--- | :--- |
-| **Codex** | Native app-server protocol | `codex` |
-| **Claude Code** | Native streaming JSON protocol | `claude` |
-| **Pi** | Native RPC protocol | `pi` |
-| **Cursor** | ACP | `agent` |
-| **Grok** | ACP | `grok` |
-| **OpenCode** | ACP | `opencode` |
-| **Cline** | ACP | `cline` |
-| **Gemini CLI** | ACP | `gemini` |
-| **Hermes** | ACP | `hermes` |
-| **Antigravity** | ACP | `agy` |
-| **GitHub Copilot** | ACP | `copilot` |
-| **Goose** | ACP | `goose` |
-| **Qwen Code** | ACP | `qwen` |
+| [Codex](/getting-started/quick-start/connect-an-agent/codex-cli) | Native app-server protocol | `codex` |
+| [Claude Code](/getting-started/quick-start/connect-an-agent/claude-code) | Native streaming JSON protocol | `claude` |
+| [Pi](/getting-started/quick-start/connect-an-agent/pi) | Native RPC protocol | `pi` |
+| [Cursor](/getting-started/quick-start/connect-an-agent/cursor-cli) | ACP | `agent` |
+| [Grok](/getting-started/quick-start/connect-an-agent/grok-build) | ACP | `grok` |
+| [OpenCode](/getting-started/quick-start/connect-an-agent/opencode) | ACP | `opencode` |
+| [Cline](/getting-started/quick-start/connect-an-agent/cline) | ACP | `cline` |
+| [Gemini CLI](/getting-started/quick-start/connect-an-agent/gemini-cli) | ACP | `gemini` |
+| [Hermes](/getting-started/quick-start/connect-an-agent/hermes-agent) | ACP | `hermes` |
+| [Antigravity](/getting-started/quick-start/connect-an-agent/antigravity) | ACP | `agy` |
+| [GitHub Copilot](/getting-started/quick-start/connect-an-agent/github-copilot) | ACP | `copilot` |
+| [Goose](/getting-started/quick-start/connect-an-agent/goose) | ACP | `goose` |
+| [Qwen Code](/getting-started/quick-start/connect-an-agent/qwen-code) | ACP | `qwen` |
 
 [Agent Client Protocol (ACP)](https://agentclientprotocol.com/get-started/introduction) standardizes communication between an agent and its client. These integrations use ACP v1. Open Terminal launches the agent process, while Open WebUI handles its protocol messages for chat output, tool approvals, and session continuation. The other three agents have dedicated protocol adapters.
 
@@ -54,7 +54,7 @@ The command must start an ACP v1 agent over standard input/output. It runs with 
 Select a machine in the chat, then open the model picker. Each agent model is named `<agent>/<model>`.
 
 - **One agent per conversation.** Add only one agent model to a chat. Agents cannot be combined with other models in a multi-model chat.
-- **Regenerate, edit and fork.** You can regenerate a reply, edit an earlier message, and fork or clone the chat. Codex and Claude Code continue their own conversation from that point. Claude Code needs an up-to-date [Open Terminal](/features/open-terminal/setup/updating) for it and Codex needs an up-to-date Codex CLI on the terminal. Other agents start over from the chat so far. File changes the agent already made stay in the terminal.
+- **Regenerate, edit, or fork.** Since Open WebUI 0.13.4, you can regenerate a reply, edit an earlier message, and fork or clone an agent chat. Codex can resume at the selected turn with an up-to-date Codex CLI. Claude Code needs an up-to-date [Open Terminal](/features/open-terminal/setup/updating) to do the same. Other agents start a new session with the chat history up to that point. File changes stay in the workspace. [Version requirements](https://github.com/open-webui/open-webui/releases/tag/v0.13.4)
 - **Missing agents.** When the machine or its agent model is unavailable, the agent is removed from the selection and the default model is used.
 - **Saved chats only.** Agent conversations need a saved chat, so they are not available in temporary chats.
 
@@ -64,7 +64,7 @@ Agent steps and the terminal tool calls of regular models show as readable cards
 
 ## Model IDs
 
-An agent model ID uses only letters, digits, dashes and underscores. A model name with other characters, such as dots, has them replaced by dashes plus a short suffix. Pins, default models and [automations](/features/chat-conversations/chat-features/automations#running-a-coding-agent) store this ID.
+The model part of an agent model ID uses only letters, digits, dashes and underscores. A model name with other characters, such as dots, has them replaced by dashes plus a short suffix. Pins, default models and [automations](/features/chat-conversations/chat-features/automations#running-a-coding-agent) store this ID.
 
 ## Options
 
@@ -75,7 +75,7 @@ The **Reasoning Effort** advanced parameter, set in the chat controls or the mod
 ## Working With an Agent
 
 - **Attachments.** Files you attach are uploaded to the machine, and the agent is told their paths. Images (PNG, JPEG, GIF and WebP) are also sent to the agent itself, up to 10 MB per message in total.
-- **Workspace.** A new conversation starts in the machine's current working directory. An existing agent conversation keeps its workspace, even if you browse to other folders in the [file browser](./file-browser.md).
+- **Workspace.** A new conversation starts in the folder selected under **Choose working directory** in the message input. An existing agent conversation keeps its workspace, even if you browse to other folders in the [file browser](./file-browser.md).
 - **Tool requests.** When the agent wants to run a tool, the request appears in the chat and follows the [tool permission mode](/features/extensibility/plugin/tools#tool-approval). In **Auto** (offered when [`ENABLE_TOOL_PERMISSIONS`](/reference/env-configuration#enable_tool_permissions) and [`ENABLE_TOOL_PERMISSIONS_AUTO`](/reference/env-configuration#enable_tool_permissions_auto) are on), Codex uses its own reviewer and passes on only what it escalates. Claude Code and Grok do the same in agent versions that support it. Escalated actions still go through Open WebUI's approval checks. Other ACP agents keep asking for approval in **Auto** unless an administrator sets the **Engine** under [Auto permissions](/features/extensibility/plugin/tools#auto).
 - **Messages while it works.** With the [message queue](/features/chat-conversations/chat-features/message-queue) on, a message you send while Claude Code or Codex is working goes to the agent right away, and what it does next becomes the reply to that message. A message with attachments waits until the agent's turn ends, and other agents answer queued messages after their turn.
 - **Questions.** When the agent asks you a question, it appears in the chat and the agent waits for your answer. Questions are always shown, whichever permission mode is set.

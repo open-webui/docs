@@ -20,7 +20,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into a [folder](/features/chat-conversations/chat-features/conversation-organization#the-folder-page) you can edit, shared folders included, so a team sees every run in one place
-- Give runs a machine and working folder, and run a [coding agent](/features/open-terminal/coding-agents) from that machine
+- Give runs a machine and working folder, and run an [agent](/features/open-terminal/agents) from that machine
 
 ## Access Control
 
@@ -30,6 +30,8 @@ Automations are permission-gated for non-admin users.
 - **Users**: require the **Features > Automations** permission
 
 Every run uses the creator's account, so the creator decides what an automation does. Admins can open every automation. Other people reach an automation through [sharing](#sharing) or a shared [folder](#folders), and an automation that is not shared with them stays hidden. The **Features > Automations** permission decides whether someone may have automations at all.
+
+An administrator cannot pause or delete another user's automation from the interface. To stop a user's automations, set their role to **Pending** or remove their **Features > Automations** permission. Each run then ends as failed with `Owner no longer permitted to run automations`, and the schedule keeps advancing, so runs resume once the role or permission is back.
 
 See [RBAC Permissions](/features/authentication-access/rbac/permissions#4-features-permissions) for the permission category.
 
@@ -73,6 +75,16 @@ Administrators can set global limits on automation usage for non-admin users. Th
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
 
+### Model settings used by a run
+
+For a model backed by an Ollama or OpenAI-compatible connection, runs use the model's **System Prompt** and **Advanced Params**. In **Instructions**, enter the task you want the model to perform. The automation editor has no **Model controls** picker. Runs use the model's [default options](/features/workspace/models#model-controls), including when you choose **Run now**.
+
+A model's **Default Features** can turn on Web Search, Image Generation, or Video Generation for a run when the matching capability and instance setting are both enabled. The **Code Interpreter** switch in **Default Features** only applies to interactive chats.
+
+### Chat titles
+
+When a run creates a chat, its initial title is the automation's saved **Title**. Prompt variables such as `{{CURRENT_DATE}}` expand in **Instructions**. In **Title**, they appear as literal text.
+
 ### Giving a Run a Machine
 
 The automation editor has a **Machine** list and, once one is picked, a **Working Directory** field. The run uses that machine and starts in that folder. With the field empty it starts in the machine's default folder. The list appears when at least one machine is available to you, and a machine picked here replaces the one configured on the model.
@@ -83,9 +95,9 @@ Without a machine in the editor, a run uses the machine configured on its model.
 Machines, including the limits for channel automations, are described in [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 :::
 
-### Running a Coding Agent
+### Running an Agent {#running-a-coding-agent}
 
-With a machine picked, the **Model** list also offers the coding agents that machine reports, named `<agent>/<model>`. Changing the machine or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a machine before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the machine and the agent are still available and the run fails if either is gone.
+With a machine picked, the **Model** list also offers the agents that machine reports, named `<agent>/<model>`. Changing the machine or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a machine before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the machine and the agent are still available and the run fails if either is gone.
 
 ## Edit and Manage
 
@@ -103,7 +115,7 @@ For a channel, **Reply in thread** (on by default) decides where the model answe
 
 ### Quick delete
 
-Hold **Shift** while the Automations list is open and each automation's menu button and on/off switch turn into a delete button. Clicking it deletes that automation straight away, without asking. Release **Shift** and the menu and switch come back. Deleting from the menu still asks you to confirm.
+Hold **Shift** while the Automations list is open and each automation's menu button and on/off switch turn into a delete button. Clicking it deletes that automation straight away, without asking. Release **Shift** and the menu and switch come back. Deleting from the menu still asks you to confirm. While a button or link you reached with `Tab` has focus, holding **Shift** does not turn the menu buttons and switches into delete buttons, so `Shift+Tab` moves back through the list as usual.
 
 ## Export and Import
 
@@ -122,7 +134,7 @@ What import does and does not do:
 
 ## Folders
 
-An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose and **Folder** lists your own folders.
+An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose, **Folder** lists your own folders and **Channel** posts into a channel instead (see [Channels](#channels)).
 
 A folder's own page works as a home for its automations. Its header has a **Chats** and **Automations** switch (visible to users who have the Automations permission). The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
 
@@ -160,6 +172,17 @@ An automation can be shared with specific users and groups, so a team follows a 
 
 Automations that sit in a shared folder follow the folder's access (see [Folders](#folders)).
 
+## Channels
+
+With **Destination** set to **Channel**, a run posts into a [channel](/features/channels) instead of creating a chat. The list shows your channels without direct messages.
+
+- Saving needs write access to a standard channel or membership in a group channel. Users who are not admins also need the **Channels** permission.
+- Each run posts the instructions into the channel as a message from you. The model's reply goes into a thread under that message, or into the timeline when the admin **Model Response Mode** is set to **Channel**.
+- The model receives only the instructions, not earlier messages from the channel.
+- Clicking a run in **Activity** opens the channel.
+- Agent automations need a chat destination. Saving one with **Channel** is refused with `Agent automations require a chat destination.`, or with `This machine requires a chat destination.` when the machine comes from a template. That second message also refuses a template machine limited to chats.
+- A run fails with `Channel not found` when channels are turned off for the instance, and with `Owner no longer permitted to use channels` when its creator has lost the **Channels** permission.
+
 ## Scheduling
 
 Supported schedule modes:
@@ -171,9 +194,15 @@ Supported schedule modes:
 - **Monthly**
 - **Custom** (`RRULE`)
 
-**Daily**, **Weekly** and **Monthly** run at the exact minute you pick, in your own timezone.
+**Daily**, **Weekly** and **Monthly** are scheduled for the minute you pick in your account's stored timezone. Open WebUI reads the timezone from your browser when you sign in or reload the signed-in app. If the server has no valid timezone for the account, it uses its own local timezone.
+
+If the schedule looks wrong, check your device's timezone and reload Open WebUI to sync it. Make an edit to the automation and click **Save** to recalculate its next run with the updated timezone.
 
 Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
+
+To run twice a day, choose **Schedule > Custom** and enter `RRULE:FREQ=DAILY;BYHOUR=8,16;BYMINUTE=0` for 08:00 and 16:00 in your schedule timezone.
+
+In Open WebUI 0.13.4, reopening this schedule can show **Daily** with only the first time. Saving an edit to another field while leaving **Schedule** untouched keeps the stored rule. If you change the time in **Daily**, saving replaces the rule with a single daily time. To change the times in a multi-time rule, select **Custom** and re-enter the complete rule before clicking **Save**.
 
 A few rules about how a custom rule is read:
 

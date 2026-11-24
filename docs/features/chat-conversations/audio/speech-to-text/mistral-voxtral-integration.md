@@ -27,7 +27,7 @@ See the companion guide: [Using Mistral for Text-to-Speech](/features/chat-conve
 |---------|-------|
 | **Speech-to-Text Engine** | `MistralAI` |
 | **API Key** | Your Mistral API key |
-| **STT Model** | `voxtral-mini-2602` (or leave empty for the built-in default) |
+| **STT Model** | `voxtral-mini-2602` (empty falls back to `voxtral-mini-latest`, an alias Mistral may no longer serve, so set it) |
 
 5. Click **Save**
 
@@ -64,7 +64,7 @@ services:
 | `AUDIO_STT_MISTRAL_API_KEY` | Your Mistral API key | empty |
 | `AUDIO_STT_MISTRAL_API_BASE_URL` | Mistral API base URL | `https://api.mistral.ai/v1` |
 | `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS` | Use chat completions endpoint | `false` |
-| `AUDIO_STT_MODEL` | STT model | `voxtral-mini-2602` |
+| `AUDIO_STT_MODEL` | STT model | empty (`voxtral-mini-latest` is used at request time) |
 
 ## Transcription Methods
 
@@ -74,8 +74,12 @@ Mistral supports two transcription methods:
 Uses the dedicated transcription endpoint. This is the recommended method.
 
 ### Chat Completions Method
-Set `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS=true` to use Mistral's chat completions API for transcription. This method:
-- Requires audio in mp3 or wav format (automatic conversion is attempted)
+Turn on **Use Chat Completions API** in the admin **Audio** settings, or set `AUDIO_STT_MISTRAL_USE_CHAT_COMPLETIONS=true`, to use Mistral's chat completions API for transcription. The toggle shows only when **Speech-to-Text Engine** is `MistralAI`.
+
+Open WebUI then posts to `<API Base URL>/chat/completions` instead of `<API Base URL>/audio/transcriptions`. The request sends the **STT Model** as `model` and one user message with two parts: the audio as base64 `input_audio`, and the instruction `Transcribe this audio exactly as spoken in its original language. Do not translate it to another language.` When a **Language** is set in your **Settings > Audio**, the instruction becomes `Transcribe this audio exactly as spoken in <language>. Do not translate it.` Open WebUI uses the reply's message content as the transcript, so set **STT Model** to a Mistral model that accepts audio input on the chat completions endpoint.
+
+This method:
+- Sends FLAC, M4A, MP3, MP4, MPEG, WAV and WebM audio as it is, and converts other formats, and AAC audio in an MP4 container, to MP3 first. Nothing is converted with [`BYPASS_PYDUB_PREPROCESSING`](/reference/env-configuration#bypass_pydub_preprocessing) on, which slim images always have
 - May provide different results than the standard endpoint
 
 ## Using STT
@@ -105,10 +109,11 @@ If you see "Mistral API key is required":
 1. Check container logs: `docker logs open-webui -f`
 2. Verify the STT Engine is set to `MistralAI`
 3. Try the standard transcription method (disable chat completions)
+4. If the error is `Failed to parse Mistral response: Empty transcript in response`, the reply had no text. With **Use Chat Completions API** on, try another **STT Model** or turn the toggle off
 
 ### Audio Format Issues
 
-If using chat completions method and audio conversion fails:
+If using chat completions method and audio conversion fails, the error is `Audio conversion failed. Chat completions API requires mp3 or wav format.` On an image with `USE_SLIM_DOCKER=true`, Open WebUI does not convert audio for this method, and audio that reaches it as anything other than an `.mp3` or `.wav` file fails with `Mistral chat transcription requires MP3 or WAV in slim; local conversion is unavailable.` To fix either error:
 - Ensure FFmpeg is available in the container
 - Try recording in a different format (wav or mp3)
 - Switch to the standard transcription method

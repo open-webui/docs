@@ -10,7 +10,7 @@ Apps are external services that join [channels](/features/channels) as members. 
 An app runs on its own server. Open WebUI opens the connection to the app, so Open WebUI itself can stay on a private network with no public callback address. To post messages into a channel without answering anyone, a [channel webhook](/features/administration/webhooks#3-channel-webhooks-external-message-integration) is simpler.
 
 :::info
-Apps are experimental.
+Apps are experimental. The **Apps** section in **Settings > Integrations** (admin section) shows an **Experimental** badge.
 :::
 
 ---
@@ -42,7 +42,7 @@ An app answers a mention with a channel message. A button click can be answered 
 
 After a button click, an app can also send a Markdown file as a private reply. It shows as a **Download** button with the file name, for example **Download report.md**, that saves the file to your device.
 
-If a mention fails, Open WebUI posts the reason under the app's name as a reply to your message, starting with `App error:`. Everyone in the channel sees it. If the app cannot post in the channel, for example because it is disabled or lacks the scope to post, the reason appears under your message and only you see it. If a button click fails, the reason appears under the app's message and only you see it. Ask an admin to check the app in **Settings > Integrations** (admin section). [Troubleshooting](#troubleshooting) lists the messages you are most likely to see.
+If a mention fails, Open WebUI posts the reason under the app's name as a reply to your message, starting with `App error:`. Everyone in the channel sees it. If the app cannot post in the channel, for example because it is disabled or lacks the scope to post, the reason appears under your message and only you see it. If a button click fails, the reason appears under the app's message and only you see it. Ask an admin to check the app under **Apps** in **Settings > Integrations** (admin section). [Troubleshooting](#troubleshooting) lists the messages you are most likely to see.
 
 ### Buttons
 
@@ -56,7 +56,7 @@ Channel messages from an app can carry buttons and cards. A link button opens a 
 
 1. Go to **Settings > General** (admin section).
 2. Turn on **Apps** and **Channels**, then save. Apps only act in channels, so both are needed.
-3. An **Apps** section appears at the bottom of **Settings > Integrations**.
+3. An **Apps** section appears at the bottom of **Settings > Integrations** (admin section).
 
 The same switch is available as [`ENABLE_APPS`](/reference/env-configuration#enable_apps). Turning it off closes every app connection.
 
@@ -66,7 +66,7 @@ You need two things from the app's operator: its **App URL**, for example `https
 
 For an app on your own network, on the Docker host or on plain HTTP, set up [Private and plain HTTP app servers](#private-and-plain-http-app-servers) first.
 
-1. Go to **Settings > Integrations** (admin section), scroll to **Apps** and click **Add app**.
+1. Go to **Settings > Integrations** (admin section), scroll to **Apps** and click **Add app** (the plus button).
 2. Enter the **App URL** and **API Key**, then click **Continue**. Open WebUI loads the app's details from that URL.
 3. Review the scopes the app requests. Switch off any you do not want to grant, then click **Continue**.
 4. Check the **Name**, the **App handle** and **Access**. The handle is a short unique ID shown next to the name in the **Apps** list. It takes lowercase letters, digits and hyphens, starts with a letter and has at most 40 characters. The handle and the App URL are fixed once the app is saved; to move an app to a new address, install it again under a new handle.
@@ -118,7 +118,7 @@ Receiving mentions needs `channels:mentions:read` or `channels:messages:read`. A
 
 ### Connection status
 
-Open WebUI keeps a live connection to each enabled app and reconnects on its own, waiting up to 30 seconds between attempts. Every Open WebUI worker opens its own connection; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling) for workers and Redis. The **Apps** section of **Settings > Integrations** (admin section) shows the state of each enabled app and refreshes every few seconds:
+Open WebUI keeps a live connection to each enabled app and reconnects on its own, waiting up to 30 seconds between attempts. Every Open WebUI worker opens its own connection; see [Scaling Open WebUI](/getting-started/advanced-topics/scaling) for workers and Redis. The **Apps** section shows the state of each enabled app and refreshes every few seconds:
 
 | Status | Meaning |
 |--------|---------|
@@ -175,7 +175,7 @@ After a mention, these messages appear in a reply from the app that starts with 
 
 | Message | What to check |
 |---------|---------------|
-| `App is disconnected; event was not sent` | Check the status in the **Apps** section of **Settings > Integrations**. |
+| `App is disconnected; event was not sent` | Check the status under **Apps** in **Settings > Integrations**. |
 | `App response timed out; execution outcome may be unknown` | The app did not confirm a mention within 10 seconds, did not answer a button click within 3 seconds or lost its connection while Open WebUI waited. It may still have acted. After a mention a second line follows: `Delivery was not confirmed. The app may have accepted the message; check before retrying.` |
 | `App returned an invalid delivery receipt` | Shown after a mention. The app answered with something other than its delivery confirmation. An app built with oix needs oix 0.8.0 or newer. |
 | `App is inactive` | The app is disabled or uninstalled. |

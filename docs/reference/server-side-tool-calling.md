@@ -75,6 +75,10 @@ When you pick a model in the browser, the frontend reads `meta.machineId` off th
 You can read a model's configured machine with `GET /api/v1/models/model?id=<model-id>` and use `meta.machineId`, or just pick one from `/api/v1/machines/`, which already lists only the machines your user is allowed to use.
 :::
 
+:::warning The model's tools, default features and knowledge are UI defaults too
+The web UI also copies the model's **Tools** (`meta.toolIds`) into `tool_ids` and its **Default Features** into `features`. The backend does neither, so send them yourself. The model's **Knowledge** is searched only through the built-in tools, which need a `session_id`, or in legacy mode. A request with neither does not use the model's knowledge at all. See [Chat Completions](/reference/api-endpoints#chat-completions) for the full list.
+:::
+
 ### Machine scope
 
 Machines on a Terminals server carry a `scope`: `null`, `user`, `chat` or `model`. It decides what your request must carry to use the machine:
@@ -95,7 +99,7 @@ Four calls. This is what the web UI does, minus the browser.
 
 ### A1. Create the chat
 
-The completion has to attach to a chat and an assistant message that already exist. Create both up front:
+The completion endpoint can create the chat itself (send `"parent_id": null`, no `chat_id`, a `user_message` object and a `session_id`; the response carries the new `chat_id`) and inserts the assistant placeholder for the `id` you pass. Creating both up front, as below, still works as long as A2 also sends the same user message as `user_message`; without it the placeholder is saved with no parent:
 
 ```bash
 USER_MSG_ID=$(uuidgen)
@@ -132,6 +136,7 @@ curl -s -X POST $OWUI_URL/api/chat/completions \
     \"stream\": true,
     \"chat_id\": \"$CHAT_ID\",
     \"id\": \"$ASSISTANT_MSG_ID\",
+    \"user_message\": {\"id\": \"$USER_MSG_ID\", \"role\": \"user\", \"content\": \"Search the web for the latest Open WebUI release and summarise it.\", \"parentId\": null, \"childrenIds\": [\"$ASSISTANT_MSG_ID\"], \"timestamp\": $TS, \"models\": [\"gpt-5.6-sol\"]},
     \"session_id\": \"api-$(uuidgen)\",
     \"features\": {\"web_search\": true, \"code_interpreter\": true, \"image_generation\": false, \"memory\": true},
     \"tool_ids\": [\"my_workspace_tool\", \"server:mcp:my_mcp_server\"],
@@ -154,6 +159,7 @@ Field by field:
 | :--- | :--- |
 | `stream: true` | Required. The native tool loop only exists on the streaming path. |
 | `chat_id` + `id` | Required. Without both, no tools are executed server-side at all. |
+| `user_message` | The user message this run answers, as stored in A1. The backend sets the assistant message's `parentId` from its `id`; without it the assistant message is saved with no parent. |
 | `session_id` | **The built-in tools switch.** Any non-empty string works. Without it, built-in tools are not offered to the model. It also makes the request asynchronous (you get `task_ids` instead of blocking). |
 | `features` | Turns on the four togglable built-in groups: `web_search`, `code_interpreter`, `image_generation`, `memory`. The other built-ins (knowledge, files, notes, channels, calendar, automations, chats, time, tasks, sub-agents) need no flag and are offered whenever their global setting, your permission and the model's category allow it. |
 | `tool_ids` | Workspace tools and MCP servers. Optional. |
@@ -329,6 +335,15 @@ def run(
         "stream": True,  # required, the native tool loop is streaming-only
         "chat_id": chat_id,
         "id": assistant_msg_id,
+        "user_message": {
+            "id": user_msg_id,
+            "role": "user",
+            "content": prompt,
+            "parentId": None,
+            "childrenIds": [assistant_msg_id],
+            "timestamp": now,
+            "models": [MODEL],
+        },
         "background_tasks": {
             "title_generation": False,
             "tags_generation": False,

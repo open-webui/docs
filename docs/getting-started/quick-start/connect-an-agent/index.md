@@ -1,105 +1,109 @@
 ---
 sidebar_position: 0
-title: "Connect an Agent"
+sidebar_label: "Connect an Agent"
+title: "Run Claude Code, Codex, and More with Open Terminal"
+description: "Connect Claude Code, Codex, Gemini CLI, or another agent to Open WebUI with Open Terminal. Find your agent, sign in, and run a task in your project."
 ---
 
-# Connect an Agent
+# Run Claude Code, Codex, and Other Agents in Open WebUI
 
-**Run an agent in Open WebUI with Open Terminal, or connect an existing agent gateway.**
+To use an agent in Open WebUI, select the **machine where its CLI is installed**, then select the **agent in the model picker**. You send messages and review its work in chat. The agent reads files, runs commands, and makes edits in the machine's workspace using its own tools and model provider.
 
-An agent harness is the software around a model that manages tools, instructions, permissions, and the loop of taking actions and checking their results. Open WebUI can run that loop with a regular model and Open Terminal, or let you work with a separate harness such as Claude Code, Codex, or Hermes from the same chat interface.
+Already have a connected machine and a working agent CLI? [Start your first agent chat](#start-your-first-agent-chat). If you already run a Hermes or OpenClaw gateway, you can also [connect its API directly](#connect-an-existing-agent-gateway).
 
-## Choose Your Setup
+## Which agents does Open Terminal support?
 
-| What you want | Setup | Where to connect |
+Open Terminal has built-in integrations for the 13 agents below. The `:agents` Docker image comes with **Claude Code and Codex**. Install any other CLI you want in the same terminal environment. Choose your agent below for installation, sign-in, and model selection.
+
+| Agent | CLI executable | Model picker prefix |
 | :--- | :--- | :--- |
-| Give your existing model a workspace for commands, files, and code | **Open WebUI + Open Terminal**: Open WebUI manages the model's tool calls; Open Terminal executes them | The **Machines** section of **Settings > Integrations** (admin section) |
-| Use Claude Code, Codex, Cursor, Gemini CLI, Hermes, or another supported agent in chat | **Agent through Open Terminal**: the agent CLI runs in the terminal environment and supplies its own tools and agent loop | The same connection in the **Machines** section; select the machine, then an agent model |
-| Use an agent service you already operate | **Agent gateway**: Open WebUI sends chat requests to the service's OpenAI-compatible API | **Settings > Connections > OpenAI** (admin section) |
+| [Claude Code](/getting-started/quick-start/connect-an-agent/claude-code) | `claude` | `claude-code/` |
+| [OpenAI Codex CLI](/getting-started/quick-start/connect-an-agent/codex-cli) | `codex` | `codex/` |
+| [Cline CLI](/getting-started/quick-start/connect-an-agent/cline) | `cline` | `cline/` |
+| [Cursor CLI](/getting-started/quick-start/connect-an-agent/cursor-cli) | `agent` | `cursor/` |
+| [Gemini CLI](/getting-started/quick-start/connect-an-agent/gemini-cli) | `gemini` | `gemini/` |
+| [GitHub Copilot CLI](/getting-started/quick-start/connect-an-agent/github-copilot) | `copilot` | `copilot/` |
+| [Google Antigravity CLI](/getting-started/quick-start/connect-an-agent/antigravity) | `agy` | `antigravity/` |
+| [Goose](/getting-started/quick-start/connect-an-agent/goose) | `goose` | `goose/` |
+| [Grok Build](/getting-started/quick-start/connect-an-agent/grok-build) | `grok` | `grok/` |
+| [Hermes Agent](/getting-started/quick-start/connect-an-agent/hermes-agent) | `hermes` | `hermes/` |
+| [OpenCode](/getting-started/quick-start/connect-an-agent/opencode) | `opencode` | `opencode/` |
+| [Pi](/getting-started/quick-start/connect-an-agent/pi) | `pi` | `pi/` |
+| [Qwen Code](/getting-started/quick-start/connect-an-agent/qwen-code) | `qwen` | `qwen/` |
 
-For a new setup, start with **Open Terminal**. One connection gives you a workspace for regular models and access to the supported agent CLIs installed there.
+Open Terminal starts each CLI when needed. Codex uses its app server, Claude Code uses streaming JSON, and Pi uses RPC. The other built-in agents use the **Agent Client Protocol (ACP)**. For another ACP v1 agent, such as **Kiro CLI** or **Factory Droid**, install and configure the CLI, register its launch command in `OPEN_TERMINAL_ACP_AGENTS`, and restart Open Terminal. [Custom ACP agent setup](/features/open-terminal/agents#add-another-acp-agent) · [Agent launch commands](https://github.com/open-webui/open-terminal#coding-agents-in-chat)
 
 ## Quick Start with Open Terminal
 
-### 1. Prepare the terminal environment
+### 1. Choose where the agent will work
 
-Follow the [Open Terminal installation guide](/features/open-terminal/setup/installation). Choose Docker for a container workspace, or bare metal to use files and tools on the host.
+- **On your own computer.** Connect your computer with Open WebUI Tether. Install and sign in to the CLI on that computer. In chat, select it under **Your devices** in the machine menu, then continue to [Start your first agent chat](#start-your-first-agent-chat). [Tether setup](/ecosystem/tether#get-started)
+- **On an existing Open Terminal.** Use a shell in that environment and continue to step 2. If you change an existing container to the `:agents` image, keep its home volume. [Update Open Terminal](/features/open-terminal/setup/updating)
+- **In a new Docker workspace.** For Open WebUI running directly on the same host, start the container below. If Open WebUI itself runs in Docker Compose, add the `open-terminal` service to the same Compose network using the `:agents` image. [Docker Compose and bare-metal installation](/features/open-terminal/setup/installation)
 
-If you want **Codex or Claude Code**, the `ghcr.io/open-webui/open-terminal:agents` image includes both CLIs. For a new Docker installation:
+Replace `your-secret-key` with a key of your own. The volume keeps the single user's workspace, CLI settings, and file-based credentials when you replace the container. For separate users and credentials, see [team deployment](/features/open-terminal/advanced/multi-user).
 
 ```bash
 docker run -d \
   --name open-terminal \
   --restart unless-stopped \
-  -p 8000:8000 \
+  -p 127.0.0.1:8000:8000 \
   -v open-terminal:/home/user \
   -e OPEN_TERMINAL_API_KEY=your-secret-key \
   ghcr.io/open-webui/open-terminal:agents
 ```
 
-Replace `your-secret-key` with your own key. For an existing installation, follow the [update guide](/features/open-terminal/setup/updating) and retain your workspace volume when changing the image.
+### 2. Sign in to the agent inside the terminal
 
-### 2. Install and sign in to your agent
-
-For a regular model using terminal tools, continue to step 3. For an agent CLI, install it **inside the environment running Open Terminal** and complete its login or provider configuration as the terminal's operating-system user. A CLI installed on your laptop is not automatically available inside a Docker container or on a remote terminal.
-
-For the Docker container above, open a shell:
+For the Docker example, open a shell as the terminal user.
 
 ```bash
 docker exec -it open-terminal bash
 ```
 
-Run `codex` or `claude` and complete its setup. For other agents, follow their installation instructions in that same environment. Verify that the agent can answer a prompt there before connecting it to chat. See the [supported agents](/features/open-terminal/coding-agents#supported-agents) and [agent deployment guide](https://github.com/open-webui/open-terminal/blob/main/docs/deployment.md#coding-agents).
+For **Codex**, run `codex login --device-auth` if your account allows device login, then start `codex`. For **Claude Code**, run `claude` and follow its login prompts. For another agent, follow its setup link above. Ask the CLI a short question and confirm it answers in this shell. Exit the interactive CLI when you're done. [Agent authentication and API-key options](https://github.com/open-webui/open-terminal/blob/main/docs/deployment.md#coding-agents)
 
-The Open Terminal **API Key** authenticates the connection to the machine. Each agent also needs its own login or model-provider credentials. Keep the home volume mounted so file-based agent settings and credentials survive container replacement.
+### 3. Connect the machine to Open WebUI
 
-### 3. Connect Open Terminal
+As an admin, open **Settings > Integrations** (admin section). In the **Machines** section, click **+**, give the connection a name, and enter the URL the **Open WebUI server** can reach. Use `http://127.0.0.1:8000` for the host setup above, or `http://open-terminal:8000` for a Compose service named `open-terminal` on the same network.
 
-In Open WebUI, open **Settings > Integrations** in the **Admin** section. In the **Machines** section, add the machine's URL and API key, save, and enable the connection.
+Choose **Bearer** and enter your **Open Terminal API key**. Save and enable the connection. This key gives Open WebUI access to the workspace. The CLI uses the provider login from step 2 to generate replies. [Connection settings and access grants](/features/open-terminal/setup/connecting)
 
-Use an address reachable from the Open WebUI server: for example, `http://open-terminal:8000` on a shared Docker Compose network, or `http://localhost:8000` when both processes run directly on the same machine. For separate containers, remote hosts, and access grants, follow the [connection guide](/features/open-terminal/setup/connecting).
+### Start your first agent chat
 
-### 4. Select a machine and model
+Use a project that already exists in the machine's workspace. If you started with an empty container, run these commands in its shell to make a small project you can check from chat.
 
-Start a saved chat, click the cloud icon, which reads **Machine** until you pick one, and select your machine. Then choose either:
-
-- **A regular model** with capable native tool calling. Open WebUI gives it terminal tools to run commands and work with files. Check the model's [Terminal capability and bindings](/features/workspace/models#capabilities-and-bindings) if the tools are missing.
-- **An agent model** named `<agent>/<model>`. Open WebUI discovers the agents and models available on the selected machine. Only agents that successfully report their models appear.
-
-Agent conversations support one agent at a time and require a saved chat. See [Coding Agents](/features/open-terminal/coding-agents) for how regenerating, editing and forking work.
-
-### 5. Try a task
-
-Open your project directory in the [file browser](/features/open-terminal/file-browser), start a new agent conversation, and ask:
-
-> Inspect this project, explain how to run it, and run its existing tests. Report any failures with the relevant output.
-
-The agent works in that machine's workspace. Tool requests appear in chat and follow the selected [tool permission mode](/features/extensibility/plugin/tools#tool-approval). An existing agent conversation keeps its original working directory when you browse elsewhere.
-
-## How Open Terminal Connects Different Harnesses
-
-Open Terminal launches each supported agent CLI and communicates through its native interface. **Agent Client Protocol (ACP)** provides a shared interface for many agents; Codex, Claude Code, and Pi use dedicated integrations for their own protocols. See the [protocol and agent list](/features/open-terminal/coding-agents#supported-agents).
-
-```mermaid
-flowchart LR
-    UI["Open WebUI chat"] <-->|"Session and streaming connection"| OT["Open Terminal"]
-    OT <-->|"ACP"| ACP["Cursor, Gemini CLI, Hermes, and other ACP agents"]
-    OT <-->|"Native protocols"| Native["Codex, Claude Code, Pi"]
-    ACP --> Workspace["Terminal workspace: files, tools, and commands"]
-    Native --> Workspace
+```bash
+mkdir -p ~/agent-demo
+printf '%s\n' '# Field Notes' 'Run the project with: python -m http.server 8080' > ~/agent-demo/README.md
 ```
 
-Open Terminal discovers the installed agents' models and runs their processes as the terminal user. Open WebUI turns their streamed output, tool requests, and questions into chat interactions, uploads attachments into the workspace, and stores the conversation's session information for follow-up messages. Model choices and optional controls depend on what each agent reports.
+1. Open **New Chat** with **Temporary Chat** off. In the message input, click the cloud icon, which reads **Machine** until you pick one, and select your machine.
+2. Open **Choose working directory** beside the machine selector and select your project folder (`/home/user/agent-demo` for the Docker example). A new agent conversation starts there. Browsing another folder in the **Files** tab leaves the chat's working directory in place.
+3. Open the **model picker** and search for your agent's prefix, such as `claude-code/` or `codex/`. Choose one of the models the CLI reports. Use a single agent model for this chat.
+4. Send the prompt below. Expand the agent's read or command step in chat and compare its reply with the README in **Files**. For the example project, the answer should include `python -m http.server 8080`.
 
-You can also [register another ACP agent](/features/open-terminal/coding-agents#add-another-acp-agent) through configuration. The agent must support the protocol used by this integration and run successfully in the terminal environment.
+   > Read the README in this folder. What command does it give for running the project? Quote the relevant line.
+
+Continue in the same chat to ask the agent to run the command or edit a file. You can attach a file, answer the agent's questions, and review tool requests according to your [tool permission mode](/features/extensibility/plugin/tools#tool-approval). Regenerating a reply or forking the chat preserves file changes the agent already made. How the agent resumes the conversation depends on the CLI and its version. [Agent chat behavior](/features/open-terminal/agents#picking-an-agent)
+
+## Why is my agent missing from the model picker?
+
+| What you see | What to check |
+| :--- | :--- |
+| The machine itself is missing | Check the connection URL from the Open WebUI server, the Bearer key, the enabled toggle, and your account's access to the machine. For Tether, check that your device is online and connected to the same account. |
+| The machine works, but the agent is missing | In that terminal's shell, run `command -v` with the executable from the table (for example, `command -v agent` for Cursor). Complete the CLI's provider setup as the terminal user. Use versions of Open WebUI, Open Terminal, and the CLI that support the integration, then reselect the machine to refresh discovery. |
+| The agent appears, but its first reply fails | Try the same model in the CLI inside that workspace. A CLI can report model names before it has a working provider login. Check its credentials and connectivity to the provider. |
+| Codex replies, but a shell step reports `bwrap: No permissions to create a new namespace` | The container runtime is blocking the Linux sandbox Codex uses for commands. Use a terminal environment that supports the Codex sandbox, such as Open Terminal running directly on a supported host, then retry the same file read. |
+| The agent sees the wrong files | Check the machine and working directory you selected before the first message. For a different project, start a new chat and select that project's directory. |
+
+## Use a regular model with terminal tools
+
+To give an existing model shell and file access, select the machine and keep your regular model selected. Open WebUI manages its tool calls and Open Terminal executes them. This route requires a model with native tool calling and the **Terminal** capability. You can skip the agent CLI installation and login. [Model capabilities and bindings](/features/workspace/models#capabilities-and-bindings)
 
 ## Connect an Existing Agent Gateway
 
-Use a gateway connection when you want a separately running agent service to handle requests through an OpenAI-compatible API.
+If your agent already runs as a service with an OpenAI-compatible API, add its endpoint under **Settings > Connections > OpenAI** (admin section). The gateway manages its own workspace, tools, and conversation handling.
 
-| Agent | Connection | Guide |
-| :--- | :--- | :--- |
-| **Hermes Agent** | Hermes gateway's OpenAI-compatible API; Hermes is also supported through Open Terminal's ACP integration | [Set up the Hermes gateway](/getting-started/quick-start/connect-an-agent/hermes-agent) |
-| **OpenClaw** | OpenClaw gateway's OpenAI-compatible API | [Set up OpenClaw](/getting-started/quick-start/connect-an-agent/openclaw) |
-
-For this route, Open WebUI sends the conversation to the gateway; the remote agent manages its own workspace, tools, and execution loop. Follow the specific guide to enable the endpoint and configure its URL, authentication, and model IDs. Chat Completions compatibility alone does not guarantee support for every Open WebUI feature or for native agent approvals and session controls.
+- **Hermes Agent** supports both routes. Choose the terminal integration above to use Hermes in a selected project folder, or connect the API of a running Hermes gateway. [Hermes gateway setup](/getting-started/quick-start/connect-an-agent/hermes-agent#connect-the-hermes-gateway)
+- **OpenClaw** exposes a gateway that you can select as a model in chat. [OpenClaw gateway setup](/getting-started/quick-start/connect-an-agent/openclaw)

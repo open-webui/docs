@@ -14,6 +14,7 @@ If you're experiencing connectivity problems with Open WebUI, especially when us
 You might be experiencing these issues if you see:
 - Empty responses like `"{}"` in the chat
 - Errors like `"Unexpected token 'd', "data: {"id"... is not valid JSON"`
+- Errors like `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`, see [`Unexpected token '<'`](#unexpected-token--doctype--is-not-valid-json)
 - Garbled markdown (visible `##`, `**`, broken formatting) during streaming, see [Streaming Response Corruption](#garbled-markdown--streaming-response-corruption)
 - WebSocket connection failures in browser console
 - WebSocket connection failures in CLI logs
@@ -84,6 +85,17 @@ If WebSockets are not working:
    - **Fix for Nginx**: Ensure you are using `proxy_http_version 1.1;` in your location block (which is the default in many Open WebUI examples).
 
 For multi-instance deployments, set `WEBSOCKET_MANAGER=redis` as shown above. For detailed Redis setup instructions, see [Redis WebSocket Support](/tutorials/integrations/redis). For a complete multi-instance scaling walkthrough, see [Scaling Open WebUI](/getting-started/advanced-topics/scaling). If you're seeing WebSocket 403 errors specifically in a multi-replica setup, see [Scaling & HA Troubleshooting](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures).
+
+### Works in One Browser but Not Another
+
+With `ENABLE_WEBSOCKET_SUPPORT=true`, the default, the browser connects to Open WebUI only over a WebSocket at `/ws/socket.io`, with no HTTP long-polling fallback. Open WebUI sends chat replies and status updates to the browser over that connection. A browser that blocks the WebSocket can fail at chat while other browsers on the same server work. Each failed attempt logs `connect_error` in that browser's console.
+
+Before you change the server or the proxy:
+
+1. Open Open WebUI in a private window of the failing browser.
+2. Open it in another browser.
+3. If chat works in either one, the server is fine. In the failing browser, turn off privacy shields, ad or tracker blockers and strict tracking protection for your Open WebUI address. Then clear the site data for that address and sign in again.
+4. If chat fails in every browser, go through the WebSocket checks above.
 
 ### Testing Your Configuration
 
@@ -237,6 +249,27 @@ Two causes account for almost all of these:
 
 This is a deployment and networking condition, not an Open WebUI bug.
 
+## `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`
+
+**Symptom:** an error toast or the browser console shows `SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON`. When the model list is the request that failed, the console line starts with `Failed to load models:`.
+
+**What it actually means:** the browser asked an Open WebUI API path for JSON and got an HTML page back. The error does not come from the model or the provider. Two things return HTML there:
+
+1. **Open WebUI itself.** Open WebUI answers a `GET` request for any path it has no route for with its own web page, `index.html`, and status `200`. A reverse proxy that adds or strips a path prefix sends API calls to paths that do not exist, so they come back as the web page. This is the usual result of putting Open WebUI under a subpath, which is [not supported](/faq#q-can-i-serve-open-webui-under-a-subpath-such-as-examplecomopenwebui).
+2. **Something in front of Open WebUI.** The request never reached it, and a proxy, a sign-in gateway or another site on the same domain answered with its own page, such as an error page for a request that was too large or took too long.
+
+To tell them apart, open **DevTools > Network**, select the failing request and read its response. Open WebUI's own page has the title `Open WebUI`. Any other page names the proxy or site that answered. Then serve Open WebUI from the root of its own hostname and route every path to it unchanged, as described in [HTTPS & Reverse Proxies](/reference/https).
+
+## Edits and Ratings Lost After Reload in Long Chats
+
+**Symptom:** in a long chat, an edited message, a rating or a copy made with **Save As Copy** shows on screen but is gone after you reload the page. No error appears. New messages and replies in the same chat still save, and shorter chats keep every change.
+
+**What it actually means:** a reverse proxy in front of Open WebUI refused the save because the request was larger than its body size limit. Saving an edit with **Save**, **Save As Copy**, a rating and **Merge Responses** each send the whole chat in one `POST` to `/api/v1/chats/{id}`: every message in every branch, plus the messages of the branch on screen. That request grows with the chat. New messages do not go through it, because Open WebUI stores each turn on the server when the reply starts, so they keep saving after the chat outgrows the limit.
+
+To confirm it, open **DevTools > Network**, make the change again and select the `POST` request to `/api/v1/chats/<id>`. Status `413` means the proxy refused it.
+
+To fix it, raise the proxy's body size limit. In nginx that is [`client_max_body_size`](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size), which defaults to `1m`; `0` turns the check off. See [Header and Body Size Limits](/reference/https/nginx#header-and-body-size-limits) and, for other proxies, [Key configuration notes](/reference/https#key-configuration-notes). After a reload, changes the proxy refused are gone, so make them again.
+
 ## Connection to Ollama Server
 
 ### Accessing Ollama from Open WebUI
@@ -249,17 +282,115 @@ If Open WebUI cannot reach Ollama, it's likely because Ollama is only listening 
 
 Verify connectivity by accessing the WebUI interface after restarting. For detailed instructions, see the [Ollama documentation](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#setting-environment-variables-on-linux).
 
+**Check that the change applied.** Ollama binds `127.0.0.1` port `11434` by default ([Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-can-i-expose-ollama-on-my-network)). On the machine that runs Ollama, see which address port `11434` listens on. On Linux:
+
+```bash
+ss -tlnp | grep 11434
+```
+
+On Windows:
+
+```powershell
+netstat -an | findstr 11434
+```
+
+`127.0.0.1:11434` in the output means Ollama still listens only on loopback and the new `OLLAMA_HOST` did not apply. `0.0.0.0:11434`, `*:11434` or `[::]:11434` means it listens on all interfaces. When the setting did not apply, compare your steps with [Ollama's FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-do-i-configure-ollama-server):
+
+- **Linux with systemd:** run `systemctl edit ollama.service` and put `Environment="OLLAMA_HOST=0.0.0.0:11434"` on a line under `[Service]`. Then run `systemctl daemon-reload` and `systemctl restart ollama`. A missing `[Service]` line, a skipped `daemon-reload` or a skipped restart are the usual reasons the address stays at `127.0.0.1`.
+- **Windows:** quit Ollama from the taskbar, set `OLLAMA_HOST` in your user environment variables, then start Ollama again from the Start menu.
+- **macOS app:** run `launchctl setenv OLLAMA_HOST "0.0.0.0:11434"`, then restart the Ollama application.
+
+:::warning Keep port 11434 off your network
+Open WebUI calls Ollama from its backend, never from the browser, so your users' browsers do not need to reach port `11434`. Ollama's local API does not require authentication ([Ollama API docs](https://github.com/ollama/ollama/blob/main/docs/api/authentication.mdx)), so with `OLLAMA_HOST=0.0.0.0` any device that can reach the host on port `11434` can use it. Block port `11434` at the host firewall for everything except the Open WebUI host, or run Ollama in the same Docker network as Open WebUI without publishing its port. The repository's [`docker-compose.yaml`](https://github.com/open-webui/open-webui/blob/main/docker-compose.yaml) does the latter: the `ollama` service has no `ports` entry, and Open WebUI reaches it at `OLLAMA_BASE_URL=http://ollama:11434`.
+:::
+
 ### Docker Connection Error
 
 If Open WebUI in Docker cannot connect to Ollama running on the host machine:
 
-Use the `--network=host` flag in your Docker command. This links your container directly to your host's network.
+If you use bridge networking and set the Ollama URL to `http://host.docker.internal:11434`, test it from the Open WebUI container:
+
+```bash
+docker exec open-webui curl --fail --show-error --silent --max-time 5 http://host.docker.internal:11434/api/version
+```
+
+Use your container name if it differs. A version response confirms the container can reach Ollama. If the hostname does not resolve on Linux Docker Engine, add `--add-host=host.docker.internal:host-gateway` when creating the container, or the equivalent [`extra_hosts` entry in Compose](https://docs.docker.com/compose/how-tos/networking/#custom-dns-with-extra_hosts). If the hostname resolves but the request fails, check the Ollama listener as described above and check whether the host firewall allows traffic from the Docker network to port `11434`. Keep access to that port limited to clients that need it.
+
+You can also use the `--network=host` flag in your Docker command. This links your container directly to your host's network.
 
 **Example Docker Command**:
 ```bash
 docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
 ```
 After running the above, your WebUI should be available at `http://localhost:8080`.
+
+With `--network=host`:
+
+- Docker ignores `-p` and `--publish` and prints `WARNING: Published ports are discarded when using host network mode.` ([Docker docs](https://docs.docker.com/engine/network/drivers/host/)). Open WebUI listens on the port in `PORT`, `8080` by default. Add `-e PORT=3000` to move it.
+- On Docker Desktop, host networking works only from version 4.34 and only after you turn on **Settings > Resources > Network > Enable host networking**. Without it, the container shares the network of Docker Desktop's Linux VM and your browser cannot connect, as shown in [Network Diagrams](/reference/network-diagrams). Publish the port with `-p 3000:8080` and use `OLLAMA_BASE_URL=http://host.docker.internal:11434` instead.
+- Other machines reach Open WebUI on that port of the host directly, so the host firewall must allow it.
+
+### Models Missing or Different from `ollama list`
+
+Open WebUI lists only the models that the Ollama URLs in **Admin Panel > Settings > Connections** return. It asks every enabled URL for `/api/tags` and merges the answers. A URL that does not answer adds no models and logs `Connection error:`. When the list differs from `ollama list`, Open WebUI and your terminal are usually talking to different Ollama servers or different model storage:
+
+- **Two Ollama installs**, such as a native install plus an Ollama container, or one in WSL plus one on Windows. Each has its own models. Run `ollama list` inside the install the URL points to, for example `docker exec ollama ollama list` for a container named `ollama`.
+- **A renamed or missing Docker volume.** Ollama keeps models in the volume mounted at `/root/.ollama`. A container started with a different volume name starts with an empty model list.
+- **The bundled `:ollama` image run without `-v ollama:/root/.ollama`.** Models pulled into it are gone after the container is recreated.
+
+If the models disappeared after switching between `docker run` and Compose or renaming the Compose project, inspect the mount on the container that serves Ollama:
+
+```bash
+docker inspect --type container --format '{{json .Mounts}}' ollama
+```
+
+Use `open-webui` for the bundled image or substitute your container name. Find the entry with `Destination` set to `/root/.ollama`. For a named volume, compare its `Name` with the old setup. Compose normally prefixes the volume name with the project name, so `myproject_ollama` and `ollama` are separate volumes. For a bind mount, compare `Source`. If the old volume still exists, configure the new setup to mount that exact volume. In Compose, use an [external volume with its existing name](https://docs.docker.com/reference/compose-file/volumes/#external).
+
+To spot a stale second server, open **Settings > About**. **Ollama Version** shows the lowest version reported by all enabled Ollama connections. A version older than the one you installed means one of the configured URLs points to a different Ollama server.
+
+### `does not support tools` {#ollama-does-not-support-tools}
+
+If every chat with an Ollama model fails with `registry.ollama.ai/library/<model> does not support tools`, Ollama is refusing the tool definitions in the request. With **Function Calling** on Native, the default, and the model's **Builtin Tools** capability on, also the default, Open WebUI adds its built-in tools to every request sent from the chat interface. The request carries tools even when you did not turn on any tool in the chat.
+
+**Solutions:**
+
+1. **Set the model to Legacy.** In the model's **Advanced Params** in **Settings > Models** (admin section), set **Function Calling** to **Legacy**. Built-in tools are not sent in Legacy mode.
+2. **Turn off Builtin Tools on the model.** Disable the **Builtin Tools** capability in the model editor. Workspace tools or MCP tools you enable for a chat are still sent in Native mode and cause the same error.
+3. **Use a model that supports tool calling** if you want the built-in tools.
+
+### Chat Fails While Verify Connection Works {#ollama-model-fails-to-load}
+
+**Symptom:** **Verify Connection** shows **Server connection verified** and the Ollama models appear in the model list, but chats with a model end in an error.
+
+**Cause:** neither check runs a model. **Verify Connection** requests only `/api/version`, and the model list comes from `/api/tags`. Only the chat request, sent to `/api/chat`, asks Ollama to run the model. When Ollama answers with an error, Open WebUI shows Ollama's own error text in the chat message and logs it as `Error processing chat payload: <text>`. When Ollama's error carries no message, the chat shows `Open WebUI: Server Connection Error`.
+
+**Fix:**
+
+1. On the machine that runs Ollama, run the same model in a terminal with `ollama run <model>`. For an Ollama container named `ollama`, run `docker exec -it ollama ollama run <model>`. If it fails there too, the problem is in Ollama, not in the connection.
+2. Read Ollama's server log for the reason. [Ollama's troubleshooting page](https://github.com/ollama/ollama/blob/main/docs/troubleshooting.mdx) lists where the log is on each system, such as `journalctl -u ollama` on Linux with systemd and `docker logs <container-name>` for a container.
+3. If the error mentions memory, the model does not fit in the RAM or VRAM that is free. Try a smaller model or a smaller variant of it. `ollama ps` shows the loaded models and whether each runs on the GPU or the CPU ([Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-can-i-tell-if-my-model-was-loaded-onto-the-gpu)).
+
+## `Network Problem` When You Verify a Connection URL
+
+**Symptom:** **Verify Connection** on a connection in **Admin Panel > Settings > Connections** shows `Ollama: Network Problem` or `OpenAI: Network Problem`, and no models from that URL appear.
+
+**Cause:** Open WebUI does not check the format of the URL. It removes one trailing slash and appends a fixed path. To verify, it requests `<url>/api/version` for an Ollama connection and `<url>/models` for an OpenAI connection. Chats go to `<url>/api/chat` for Ollama and `<url>/chat/completions` for OpenAI. Azure and Anthropic URLs follow their own rules. Any failure of the Ollama check shows `Ollama: Network Problem`. A failed OpenAI check shows `OpenAI: Network Problem`, or `OpenAI:` followed by the provider's message when the provider answers with a JSON error.
+
+| You entered | What Open WebUI requests to verify | Enter instead |
+| :--- | :--- | :--- |
+| `192.168.1.5:11434` | Nothing: the request fails before it is sent, since the URL has no `http://` | `http://192.168.1.5:11434` |
+| `http://192.168.1.5` | Port `80`, the default for `http://` | `http://192.168.1.5:11434` |
+| `http://localhost:11434/api` | `http://localhost:11434/api/api/version` | `http://localhost:11434` |
+| `https://api.openai.com/v1/chat/completions` | `https://api.openai.com/v1/chat/completions/models` | `https://api.openai.com/v1` |
+| `https://api.openai.com` | `https://api.openai.com/models` | `https://api.openai.com/v1` |
+
+An Ollama URL is `http://host:port` with nothing after the port. An OpenAI-compatible URL is the base URL that comes before `/models` and `/chat/completions`. For most providers it ends in `/v1`, as in the suggestions the **URL** field offers.
+
+## Duplicate OpenAI model IDs
+
+When two admin-managed OpenAI connections expose the same model ID, Open WebUI keeps the first entry for that ID when it merges their model lists. Chat requests for that ID use the connection attached to the retained entry.
+
+To select each connection separately, edit each connection under **Admin Panel > Settings > Connections** and set a different **Prefix ID** under **Advanced**. For example, if both offer `example-model`, the prefixes `local` and `hosted` give you `local.example-model` and `hosted.example-model`. Open WebUI strips the prefix before sending the model ID to the provider. If a workspace model used the previous ID, reselect its **Base Model** and save.
 
 ## Intermittent Name Lookup Failures (Often Reported as "Model not found")
 
@@ -296,6 +427,7 @@ If your Open WebUI takes a long time to load models, or the model selector spins
 ### Common Symptoms
 
 - Model selector shows a loading spinner for extended periods
+- After you click **Send**, there is a pause before the selected provider receives the request
 - `500 Internal Server Error` on `/api/models` endpoint
 - UI becomes unresponsive when opening Settings
 - Docker/server logs show: `Connection error: Cannot connect to host...`
@@ -305,6 +437,8 @@ If your Open WebUI takes a long time to load models, or the model selector spins
 When you configure multiple Ollama or OpenAI base URLs (for load balancing or redundancy), Open WebUI attempts to fetch models from **all** configured endpoints. If any endpoint is unreachable, the system waits for the full connection timeout before returning results.
 
 By default, Open WebUI waits **10 seconds** per unreachable endpoint when fetching the model list. Endpoints are queried concurrently, so the wait is the slowest one, not the sum.
+
+If the server has no model list loaded when it receives a chat request, it fetches models from enabled connections before forwarding the request. An offline endpoint can delay that first send even when the model you selected is on a working connection.
 
 ### Solution 1: Adjust the Timeout
 
@@ -401,7 +535,7 @@ docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host
 
 ## SSL Certificate Issues with Internal Tools
 
-If you are using external tools like Tika, Ollama (for embeddings), or an external reranker with self-signed certificates, you might encounter SSL verification errors.
+If Tika, Ollama (for embeddings), an external reranker, a model connection or a tool server uses a self-signed certificate or one from a private CA, you might encounter SSL verification errors.
 
 ### Common Symptoms
 
@@ -427,6 +561,22 @@ You can disable SSL verification for these internal tool connections using the f
 :::warning
 Disabling SSL verification reduces security. Only do this if you trust the network and the services you are connecting to (e.g., functioning within a secure internal network).
 :::
+
+### Trust a Private or Self-Signed CA Instead
+
+Model connections and tool servers can verify a certificate from your own CA, so verification stays on. Give Open WebUI the path to a CA bundle file (PEM) inside the container:
+
+| Variable | Connections it covers | Values |
+| :--- | :--- | :--- |
+| [`AIOHTTP_CLIENT_SSL_CERT_FILE`](/reference/env-configuration#aiohttp_client_ssl_cert_file) | Every connection below whose own variable is `true` | Path to a CA bundle file. Unset by default |
+| [`AIOHTTP_CLIENT_SESSION_SSL`](/reference/env-configuration#aiohttp_client_session_ssl) | Ollama and OpenAI connections (model lists, connection checks and chat), Ollama embeddings, speech-to-text and text-to-speech, image generation, and the OAuth 2.1 discovery, registration and token refresh requests of MCP tool servers | `true` (default), `false`, or a path to a CA bundle file |
+| [`AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`](/reference/env-configuration#aiohttp_client_session_tool_server_ssl) | OpenAPI tool servers (loading the spec and calling tools) and MCP tool server traffic | `true` (default), `false`, or a path to a CA bundle file |
+
+`true` and `false` are not case sensitive. Any other value is read as a file path, and that path wins over `AIOHTTP_CLIENT_SSL_CERT_FILE` for that variable's connections. To cover everything at once, set only `AIOHTTP_CLIENT_SSL_CERT_FILE` and leave the other two at `true`.
+
+A bundle replaces the default trust store for the connections that use it: they trust only the CAs in that file ([Python `ssl.create_default_context`](https://docs.python.org/3/library/ssl.html#ssl.create_default_context)). If the same connections also reach public endpoints, such as `api.openai.com`, put your CA and the public roots in one file, for example a copy of the container's `/etc/ssl/certs/ca-certificates.crt` with your CA appended.
+
+If the file does not exist, Open WebUI logs `SSL CA bundle path does not exist: '<path>', ignoring` and falls back to `AIOHTTP_CLIENT_SSL_CERT_FILE`, or to the default trust store when that is unset, so the `CERTIFICATE_VERIFY_FAILED` errors continue. These variables are read once at startup, so restart Open WebUI after you change them.
 
 For Milvus over TLS, point [`MILVUS_SERVER_PEM_PATH`](/reference/env-configuration#milvus_server_pem_path) at the CA or server certificate. Verification stays on.
 

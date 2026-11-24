@@ -18,22 +18,22 @@ Archived chats used to sit behind a **Manage** button on the **Data Controls** t
 The **Archived Chats** view provides tools to manage your archived conversations:
 
 - **Search**: Quickly find archived chats by title using the search bar.
-- **Restore**: Bring an archived chat back to your main sidebar.
+- **Restore**: Bring an archived chat back to your main sidebar. Archiving a single chat removes it from its folder and stops any response still generating; restoring does not put it back in the folder.
 - **Delete**: Permanently remove an archived chat from your account.
 
 ## Bulk Operations
 
-From the Data Controls tab, you can also perform bulk operations:
+Open **Settings > Data Controls** (under **Data**) for bulk operations:
 
 - **Archive All Chats**: Move all your current conversations to the archive at once. This is useful for periodic cleanup.
-- **Delete All Chats**: Permanently remove all conversations (both active and archived). 
+- **Delete All Chats**: Permanently remove all chats you own, including archived chats and chats in folders, along with every share link you created. The scope is your own account, even when signed in as an admin. Files uploaded to those chats and images generated in them are not deleted; remove them in **Manage Files**.
   - :::warning
-    This action cannot be undone. All chat history will be permanently deleted.
+    This action is permanent and offers no filter by age or folder. To keep some chats, delete the others individually.
     :::
 
 :::info Deleting needs the Chat Delete permission
 
-**Delete** on an archived chat and **Delete All Chats** are drawn only for people who hold **Allow Chat Delete**. Without it neither appears, so there is no button that refuses when you press it, and archiving and **Unarchive All** work as before. Admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
+**Delete** on an archived chat and **Delete All Chats** are drawn only for people who hold **Allow Chat Delete**. Without it neither appears, so there is no button that refuses when you press it, and archiving and **Unarchive All** work as before. The permission is on by default, and admins are always exempt. See [Permissions](/features/authentication-access/rbac/permissions#3-chat-permissions).
 
 :::
 

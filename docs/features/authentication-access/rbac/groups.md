@@ -51,6 +51,12 @@ To maintain a clean and manageable system, consider separating your groups into 
     *   **Membership Sync:** Users are strictly added/removed from groups to match their OAuth claims.
 *   **Synced groups and the hierarchy:** OAuth, LDAP and trusted-header group sync manage a user's direct memberships. Groups created by sync start at the top level. Once you place one under a parent group, it keeps that parent and its synced members inherit from it like any other subgroup.
 
+### Default group for new users
+
+Create the group first, then select it under **Settings > Authentication > User Access > Default Group** (admin section) and save. Open WebUI adds users to this group when their accounts are created. Changing the setting leaves existing memberships as they are. To enroll an existing user, edit the group and add them from its **Users** tab.
+
+If you sync groups through [OAuth](../auth/sso/index.mdx) or [LDAP](../auth/ldap.mdx), synchronization can remove the default group membership at sign-in. Check the corresponding sync settings if a new user is missing from the group.
+
 ### Group Structure
 A group definition typically includes:
 *   **Name**: The display name of the group.

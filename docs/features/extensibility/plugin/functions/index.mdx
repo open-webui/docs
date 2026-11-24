@@ -77,7 +77,7 @@ An Event function runs custom Python in response to **system events** (a user si
 
 ### Type Detection
 
-When you save a Function, Open WebUI scans the Python source code for a top-level class named `Pipe`, `Filter`, `Action`, or `Event`. The first match determines the function type. You never need to manually set the type because it's inferred from the code.
+When you save a Function, Open WebUI loads the Python source code and looks for a top-level class named `Pipe`, `Filter`, `Action`, or `Event`, in that order. The first one found determines the function type, so a file that defines both `Pipe` and `Filter` is a Pipe. You never need to manually set the type because it's inferred from the code.
 
 ```
 # This is detected as a Pipe function:
@@ -176,6 +176,18 @@ Functions are managed from **Admin Panel > Functions**. The page is hidden when 
 | **Global toggle** | When enabled, the function applies to **all models** automatically. Available for Filters and Actions. |
 | **Valves** (gear icon) | Opens the admin-configurable settings for this function. |
 | **Export / Delete** | Export the function as a file or remove it. |
+
+### Activation via API
+
+These endpoints require an administrator. A successful `POST /api/v1/functions/create` creates a Function with `is_active: false` and `is_global: false`.
+
+| Endpoint | Result |
+|:---------|:-------|
+| `GET /api/v1/functions/id/{id}` | Returns the Function, including its current `is_active` and `is_global` values. |
+| `POST /api/v1/functions/id/{id}/toggle` | Flips `is_active` and returns the updated Function. |
+| `POST /api/v1/functions/id/{id}/toggle/global` | Flips `is_global` and returns the updated Function. |
+
+Call a toggle only when the current value differs from the desired value. If a request times out, read the current state before deciding whether to retry. For an active Filter, the Global flag controls which models it is available on. [User-toggleable filters](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) also require a selection in the chat request.
 
 ### Version history
 

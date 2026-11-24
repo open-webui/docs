@@ -13,7 +13,7 @@ Open WebUI has two logging surfaces: the **browser console** for frontend debugg
 
 ## Frontend Logging
 
-The frontend uses standard browser `console.log()` calls. Open your browser's developer tools (**F12** or **Cmd+Option+I** on macOS), navigate to the **Console** tab, and you'll see informational messages, warnings, and errors from the client application.
+The frontend uses standard browser `console` calls. Open your browser's developer tools (**F12** or **Cmd+Option+I** on macOS) and navigate to the **Console** tab. Production builds, the Docker image included, strip `console.log`, `console.debug` and `console.error` calls at build time unless the frontend was built with `ENV=dev`, so there you mainly see `console.warn` and `console.info` output plus the browser's own errors.
 
 Browser-specific documentation:
 
@@ -60,11 +60,28 @@ environment:
 Use `DEBUG` for development and troubleshooting. For production, stick with `INFO` or `WARNING` to keep log volume manageable.
 :::
 
+A value Python's `logging` module does not recognize (for example `TRACE`) falls back to `INFO`. Use one of the level names in the table above: the aliases `WARN` and `FATAL` pass that check, but Loguru rejects them and the backend fails to start.
+
 ---
 
 ### What the Log Level Costs
 
 Raising the level saves work as well as log volume, because a message the level filters out is never built. Knowledge searches write the found file names and full results only at `DEBUG`, as do the External, Firecrawl, Kagi, Mojeek, SearchApi, SerpApi, Serply and Yandex web search engines. `DEBUG` is the most expensive level to run, whole chat request payloads included, so set it back once you have chased down whatever you turned it on for.
+
+---
+
+### Turning Off Access Logs
+
+Each HTTP request writes an access line from uvicorn's `uvicorn.access` logger at `INFO`. At startup Open WebUI takes over every logger named in `AUDIT_UVICORN_LOGGER_NAMES`, `uvicorn.access` by default: it replaces the logger's handlers with its own and sets its level to `GLOBAL_LOG_LEVEL`. That is why `UVICORN_ACCESS_LOG=false` on its own leaves the access lines in place.
+
+In the Docker image, which starts uvicorn from the command line, drop the access lines and keep `GLOBAL_LOG_LEVEL=INFO` by setting both:
+
+```bash
+UVICORN_ACCESS_LOG=false
+AUDIT_UVICORN_LOGGER_NAMES=
+```
+
+The empty `AUDIT_UVICORN_LOGGER_NAMES` stops the takeover, so uvicorn's own switch applies. `open-webui serve` starts uvicorn from Python and does not read `UVICORN_ACCESS_LOG`, so there the access lines follow `GLOBAL_LOG_LEVEL` and only a level above `INFO`, such as `WARNING`, hides them. The [audit log](/getting-started/advanced-topics/hardening#audit-logging) is written by Open WebUI itself, not by `uvicorn.access`, so it keeps working.
 
 ---
 
@@ -94,8 +111,8 @@ environment:
 | `msg` | Log message |
 | `caller` | Source location (`module:function:line`) |
 | `extra` | Additional context data (if any) |
-| `error` | Error details (if applicable) |
-| `stacktrace` | Stack trace (if applicable) |
+| `error` | Error details (if applicable): an object with `type`, `message` and `stacktrace`, or a plain string on early startup lines |
+| `stacktrace` | Stack trace, only on early startup lines logged with `stack_info=True` |
 
 **Example output:**
 

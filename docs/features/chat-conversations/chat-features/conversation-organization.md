@@ -45,6 +45,8 @@ Folders can be nested within other folders to create hierarchical organization:
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
 
+A chat in a child folder uses that folder's **System Prompt** and **Knowledge** settings. For example, if a parent folder has a handbook attached, attach the handbook to the child as well to make it available automatically in chats there.
+
 ### Unread Badge
 
 A folder shows a count of the chats inside it that you have not read yet or that are waiting for you to approve a tool call, next to its name in the sidebar.
@@ -101,7 +103,7 @@ Open **Display options** (the sliders icon beside search and filter) to pick a *
 
 The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Priority**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, priority, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags.
 
-Each chat in the list or on the board has the same three-dot menu as in the sidebar, with rename, move, clone, share, archive, delete and mark as unread. In a chat someone else started, the menu is shorter.
+Each chat in the list or on the board has the same three-dot menu as in the sidebar, with rename, move, clone, share, archive, delete and mark as unread. In a chat someone else started, the menu has only **Rename**. In a folder shared with you as read-only, chats you did not start have no menu.
 
 ### Statuses
 
@@ -164,13 +166,13 @@ Pick the model new chats in this folder start with, or leave it on **Use default
 
 ### Default Machine and Working Directory
 
-Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. A chat that was already on another machine before it moved into the folder keeps that machine. A machine with a separate instance per chat or model is only suggested for new chats. While that machine is offline or not shared with you, the message box in the folder's chats is disabled. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [coding agents](/features/open-terminal/coding-agents).
+Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. A chat that was already on another machine before it moved into the folder keeps that machine. A machine with a separate instance per chat or model is only suggested for new chats. While that machine is offline or not shared with you, the message box in the folder's chats is disabled. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [agents](/features/open-terminal/agents).
 
 ### System Prompt
 
 Assign a dedicated **System Prompt** to the folder that automatically applies to all conversations within it:
 
-- The system prompt is **prepended to every new conversation** created in the folder.
+- The system prompt is **added to every chat in the folder**, including chats moved into it later. It is sent after the model's system prompt and before the chat's or account's ([order](/features/chat-conversations/chat-features/chat-params#how-system-prompts-combine)).
 - This tailors the AI's behavior for specific tasks or personas.
 - System prompts are optional. You can use folders purely for organization without one.
 

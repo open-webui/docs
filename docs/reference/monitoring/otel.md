@@ -13,6 +13,8 @@ If you are running Open WebUI from source or via `pip` (outside of the official 
 pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 ```
 
+Those three are not enough on their own: the setup also imports eight `opentelemetry-instrumentation-*` packages (FastAPI, SQLAlchemy, Redis, requests, httpx, aiohttp-client, logging and system-metrics). Install the `## Trace` block from `backend/requirements.txt`, which pins all of them.
+
 :::
 
 ## Quick Start with Docker Compose
@@ -39,7 +41,7 @@ After startup:
 
 ## Environment Variables
 
-You can configure OpenTelemetry in Open WebUI with these environment variables (as used in the Compose file):
+You can configure OpenTelemetry in Open WebUI with these environment variables (as used in the Compose file). Outside that file the code defaults are all four `ENABLE_OTEL*` switches off, the endpoint `http://localhost:4317`, and `OTEL_EXPORTER_OTLP_INSECURE` off:
 
 | Variable                            | Default                         | Description                                         |
 |--------------------------------------|---------------------------------|-----------------------------------------------------|
@@ -52,6 +54,7 @@ You can configure OpenTelemetry in Open WebUI with these environment variables (
 | `OTEL_LOGS_EXPORTER_OTLP_ENDPOINT`   | `http://lgtm:4317` in Compose   | OTLP endpoint used for logs                         |
 | `OTEL_EXPORTER_OTLP_INSECURE`        | **true** in Compose             | Insecure (no TLS) connection for OTLP               |
 | `OTEL_SERVICE_NAME`                  | `open-webui`                    | Service name (tagged in traces and metrics)         |
+| `OTEL_OTLP_SPAN_EXPORTER`            | `grpc`                          | Exporter protocol: `grpc` (port 4317) or `http` (port 4318, with the signal path in the endpoint, such as `/v1/traces`, since the endpoint is passed to the exporter unchanged); `OTEL_METRICS_OTLP_SPAN_EXPORTER` and `OTEL_LOGS_OTLP_SPAN_EXPORTER` override it per signal |
 | `OTEL_METRICS_EXPORT_INTERVAL_MILLIS`| `10000`                         | Metrics export interval in ms (10s = ~6 DPM; set `60000` for ~1 DPM) |
 | `OTEL_BASIC_AUTH_USERNAME` / `OTEL_BASIC_AUTH_PASSWORD` | *(empty)*      | Basic Auth credentials if Collector requires them   |
 
@@ -83,9 +86,12 @@ Override defaults in your `.env` file or Compose file as needed.
 The Open WebUI backend automatically instruments:
 
 - **FastAPI** (routes)
-- **SQLAlchemy** (database queries)
+- **SQLAlchemy** (the sync engine only: the `/ready` and `/health/db` pings, the user-count gauges, and pgvector or openGauss when they share the main database; request-time queries run on the async engine)
 - **Redis**
 - **requests**, **httpx**, **aiohttp** (external calls)
+- **logging** (trace and span ids on log records) and host **system metrics**
+
+Log export needs both `ENABLE_OTEL` and `ENABLE_OTEL_LOGS`.
 
 Each trace span includes rich data such as:
 
@@ -141,10 +147,16 @@ docker run -d --name open-webui \
 - Double-check `ENABLE_OTEL`, `ENABLE_OTEL_TRACES`, and `ENABLE_OTEL_METRICS` are all set to `true`
 - Is the endpoint correct? In the example Compose file it must be reachable as `http://lgtm:4317` from the Open WebUI container.
 - Inspect logs from Open WebUI (`docker logs open-webui-otel`) for OTLP errors
-- Collector's OTLP port (`4317`) should be open and reachable. Try:
-  `curl http://localhost:4317` (replace host as needed)
+- Check that the collector is reachable from the Open WebUI container. A plain HTTP `curl` request to port `4317` cannot verify that the collector accepts OTLP over gRPC.
+
+### OTLP reports UNAVAILABLE
+
+If the exporter logs `UNAVAILABLE` even though the port is reachable, check that the exporter protocol matches the listener on the collector. The default ports are `4317` for gRPC and `4318` for HTTP. With HTTP, check the path for the failing signal, such as `/v1/traces`, `/v1/metrics`, or `/v1/logs`. [OTLP protocol specification](https://opentelemetry.io/docs/specs/otlp/)
+
+Check `OTEL_OTLP_SPAN_EXPORTER` for traces. Metrics and logs can override that choice with `OTEL_METRICS_OTLP_SPAN_EXPORTER` and `OTEL_LOGS_OTLP_SPAN_EXPORTER`, respectively.
 
 **Authentication required?**
 
 - Set `OTEL_BASIC_AUTH_USERNAME` and `OTEL_BASIC_AUTH_PASSWORD` for auth-protected collectors
+- Set the standard OpenTelemetry variable `OTEL_EXPORTER_OTLP_HEADERS` to comma-separated `key=value` pairs (for example `x-api-key=your-key,x-team-id=your-team`) for backends that expect other headers, such as an API key. It is ignored while the basic auth variables are set.
 - If using SSL/TLS, adjust or remove `OTEL_EXPORTER_OTLP_INSECURE` as appropriate
