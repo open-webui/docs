@@ -51,6 +51,10 @@ Click the **Import Chats** button and select a JSON file to restore conversation
 - If using ChatGPT exports, the format is automatically detected and converted
 - Tags your account does not have yet are created from the file. An export stores each tag in lowercase with underscores, so a tag named Import Test comes back as import_test
 
+### Moving chats between instances
+
+Chat JSON exports, including **Export** from a folder menu, contain conversation records. Importing them does not create folders or restore folder settings such as system prompts. Open WebUI keeps an exported folder ID only if that exact folder exists on the destination and you can write to it. Otherwise, the chat is imported outside any folder. Recreate the folders and their settings on the destination, then move the imported chats into them.
+
 ## Chat Import JSON Schema
 
 The import file must be a **JSON array** of chat objects. There are two accepted formats: the **standard format** (used by Open WebUI exports) and a **legacy format**.
