@@ -151,7 +151,9 @@ Supported schedule modes:
 - **Monthly**
 - **Custom** (`RRULE`)
 
-**Daily**, **Weekly** and **Monthly** run at the exact minute you pick, in your own timezone.
+**Daily**, **Weekly** and **Monthly** are scheduled for the minute you pick in your account's stored timezone. Open WebUI reads the timezone from your browser when you sign in or reload the signed-in app. If the server has no valid timezone for the account, it uses its own local timezone.
+
+If the schedule looks wrong, check your device's timezone and reload Open WebUI to sync it. Make an edit to the automation and click **Save** to recalculate its next run with the updated timezone.
 
 Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
 
