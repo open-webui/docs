@@ -19,6 +19,22 @@ docker logs --tail 100 --timestamps open-webui
 
 Replace `open-webui` with your container name. A restart count that keeps increasing means the process is repeatedly exiting. If `oom=true`, check available memory and any memory limit on the container. Otherwise, look for the last error before each restart. If the logs stop at the Open WebUI banner while the container stays up, see [startup delays while reaching Hugging Face](#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked).
 
+## No space left on device
+
+If startup or an upload fails with `No space left on device` or `database or disk is full`, check the path in the server log. In the standard Docker image, `/app/backend/data` holds the default SQLite database, uploads, and application cache. With S3 storage, uploads still go to local disk before being sent to the bucket, and file reads download a local copy.
+
+Check which filesystem backs the failing path. For a running Linux container with the default data directory, use:
+
+```bash
+docker inspect --format '{{json .Mounts}}' open-webui
+docker exec open-webui df -h /app/backend/data
+docker exec open-webui df -i /app/backend/data
+```
+
+Replace `open-webui` with your container name and use the configured [`DATA_DIR`](/reference/env-configuration#data_dir) path if it differs. The second command checks free space, and the third checks free inodes, which can run out even when there is space left. If the container cannot stay up, use the mount information to check the backing filesystem on the Docker host. For errors from Docker itself while pulling or creating the container, check the filesystem where Docker stores its data.
+
+Free space or expand the affected filesystem, then retry. Preserve the Open WebUI data volume. See [Backups](/tutorials/maintenance/backups) before removing files from it.
+
 ## Container hangs at startup on Apple Silicon (M1/M2/M3)
 
 ### Symptom
