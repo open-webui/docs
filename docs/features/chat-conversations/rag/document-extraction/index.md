@@ -47,6 +47,20 @@ With the default **Content Extraction Engine**, **PDF Loader Mode** in **Setting
 
 Pick **Single** when sentences or tables often continue onto the next page and you can do without page numbers in citations. The mode applies when a file is extracted. Files already in a knowledge base change only after **Reindex Knowledge and Memory Vectors** in the same settings page, which extracts them again.
 
+## Dependencies for ODT, MSG, and PowerPoint
+
+When the default **Content Extraction Engine** runs on a non-slim installation, these formats use the following parsers.
+
+| Format | Extraction dependencies |
+| --- | --- |
+| OpenDocument Text (`.odt`) | Requires `unstructured`, `pypandoc`, and a Pandoc executable. The parser converts the file to DOCX before extracting its text. |
+| Outlook messages (`.msg`) | Requires `unstructured` and `python-oxmsg` for Outlook MSG content. Open WebUI skips message attachments. |
+| PowerPoint (`.ppt`, `.pptx`) | Uses `unstructured` when it can be imported. If that import fails, Open WebUI tries `python-pptx`, which reads `.pptx` files. Legacy binary `.ppt` files need an extractor that supports that format. |
+
+The PowerPoint fallback runs during loader selection. If `unstructured` imports successfully and parsing fails later, that error does not trigger the fallback.
+
+**Allowed File Extensions** controls which uploads are accepted for processing. For RAG indexing, the selected extractor must also be able to read the file. Preview support depends on the file viewer.
+
 ## Files Without a Dedicated Loader
 
 With the default **Content Extraction Engine**, a file whose extension has no loader of its own is read as plain text. Source code and configuration files, such as `.py`, `.js`, `.ts`, `.go`, `.sql`, `.json`, `.yaml` or `.toml`, work in RAG this way. A binary format with no loader, such as `.ods` or `.odp`, is read the same way and produces unreadable text instead of an error, so retrieval returns noise from it. On the slim image such a file fails with `This file type requires an external document extractor in slim. Configure one that supports it.` instead.

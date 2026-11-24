@@ -368,6 +368,8 @@ Any one of these resolves it:
 
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
+If you use pgvector, you can enable **Hybrid Search** in **Settings > Documents** (admin section) without re-indexing your knowledge bases or re-uploading chat files. With the same embedding settings, the vector part of hybrid search uses the embeddings you already have, and keyword search uses the stored chunk text.
+
 :::tip Filesystem-style knowledge access (`kb_exec`)
 For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode [builtin tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).
 :::
