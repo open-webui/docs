@@ -604,24 +604,17 @@ If you're seeing SSL errors like `UNEXPECTED_EOF_WHILE_READING` or `Max retries 
 - `Max retries exceeded with url: /v1/web-search`
 - Web search works in standalone Python scripts but fails in Open WebUI
 
-#### Cause: HTTP Proxy Configured for HTTPS Traffic
+#### Check proxy routing and HTTPS tunneling
 
-This typically happens when you have an **HTTP proxy** configured for **HTTPS traffic**. The HTTP proxy cannot properly handle TLS connections, causing SSL handshake failures.
+An `HTTPS_PROXY` value that starts with `http://` is valid when the proxy accepts HTTP CONNECT tunnels to HTTPS destinations. Check that the proxy supports CONNECT and allows the destination. The scheme in the proxy URL describes the connection to the proxy itself. See [aiohttp proxy support](https://docs.aiohttp.org/en/stable/client_advanced.html#proxy-support).
 
-Check your environment for these variables:
-- `HTTP_PROXY` / `http_proxy`
-- `HTTPS_PROXY` / `https_proxy`
+Open WebUI's server-side Ollama requests, including model listing and chat, and its SearXNG search requests read the proxy environment. If an internal provider should connect directly, add the hostname from its configured URL to `NO_PROXY` in the Open WebUI service environment. Keep any existing entries. For example, if the connection URLs use the Docker service names `ollama` and `searxng-core`:
 
-If your `https_proxy` points to `http://...` (HTTP) instead of `https://...` (HTTPS), SSL handshakes will fail because the proxy terminates the connection unexpectedly.
+```bash
+NO_PROXY=ollama,searxng-core
+```
 
-#### Solutions
-
-1. **Fix proxy configuration**: Use an HTTPS-capable proxy for HTTPS traffic, or configure your HTTP proxy to properly support CONNECT tunneling for SSL
-2. **Bypass proxy for specific hosts**: Set `NO_PROXY` environment variable:
-   ```bash
-   NO_PROXY=api.bochaai.com,api.tavily.com,api.search.brave.com
-   ```
-3. **Disable proxy if not needed**: Unset the proxy environment variables entirely
+For Docker Compose, update the Open WebUI service's environment and apply the change with `docker compose up -d`. For a service started outside Docker, restart it with the updated environment. Then check model listing or run a search again.
 
 #### Why Standalone Scripts Work
 

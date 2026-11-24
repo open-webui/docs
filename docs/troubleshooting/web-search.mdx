@@ -35,7 +35,7 @@ WEB_SEARCH_TRUST_ENV=True
 
 This is a **ConfigVar** variable, meaning it can be set via environment variable on startup OR configured through the Admin Panel UI. Once set in the UI, the database value takes precedence over the environment variable.
 
-This setting tells Open WebUI's web content loader to respect the proxy settings from your environment variables (`http_proxy`, `https_proxy`). Without this, even if your search engine works through the proxy, fetching content from the returned URLs will fail.
+This setting controls whether the web content loader reads proxy environment variables when fetching the pages behind search results. The request to the SearXNG search API uses the server's proxy environment separately. If only your SearXNG server should be reached directly, add its hostname to `NO_PROXY` and keep **Trust Proxy Environment** enabled for page fetching. See [proxy routing and HTTPS tunneling](/troubleshooting/connection-error#check-proxy-routing-and-https-tunneling).
 
 :::
 
