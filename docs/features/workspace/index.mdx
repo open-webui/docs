@@ -45,6 +45,14 @@ Pointing at an owner's name in the **Models**, **Knowledge**, **Prompts**, **Ski
 
 With [comments](/features/chat-conversations/chat-features/comments) turned on, each item in these lists can be discussed in a side panel.
 
+## Workspace access and sharing
+
+Workspace is a section of your Open WebUI instance. To collaborate, share individual items such as a skill or knowledge base with the people or groups who need them.
+
+Each tab has its own [Workspace permission](/features/authentication-access/rbac/permissions#1-workspace-permissions). If you cannot open a tab, ask an administrator to check **Admin Panel > Users > Groups > Default Permissions** and the permissions of your groups. For example, **Workspace > Skills Access** opens the **Skills** tab. The built-in defaults for these tab permissions are off for non-admins. The **Tools** tab also requires Tools to be enabled on the instance.
+
+To share a skill you can edit, open it in **Workspace > Skills**, click **Access**, and use **Add Access** to choose an eligible user or group. The **Access** button requires **Sharing > Skills Sharing** for non-admins, which is off by default. The recipient's access to the skill and their permission to open the **Skills** tab are checked separately.
+
 ## Creating, importing and exporting
 
 Everything that adds or moves workspace items runs through one **Create** button, at the right of the Workspace header next to the section tabs. The individual pages do not carry their own **+ New Model**, **+ New Prompt** or similar buttons. The button acts on the section you are currently looking at, and the chevron beside it opens the rest of that section's actions (the menu repeats **Create** as its first entry).

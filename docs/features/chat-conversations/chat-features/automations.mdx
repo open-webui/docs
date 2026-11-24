@@ -167,6 +167,10 @@ If the schedule looks wrong, check your device's timezone and reload Open WebUI 
 
 Custom schedules accept standard RRULE syntax. Invalid or exhausted rules are rejected.
 
+To run twice a day, choose **Schedule > Custom** and enter `RRULE:FREQ=DAILY;BYHOUR=8,16;BYMINUTE=0` for 08:00 and 16:00 in your schedule timezone.
+
+In Open WebUI 0.13.4, reopening this schedule can show **Daily** with only the first time. Saving an edit to another field while leaving **Schedule** untouched keeps the stored rule. If you change the time in **Daily**, saving replaces the rule with a single daily time. To change the times in a multi-time rule, select **Custom** and re-enter the complete rule before clicking **Save**.
+
 A few rules about how a custom rule is read:
 
 - **Sub-daily rules snap to the clock.** A `SECONDLY`, `MINUTELY` or `HOURLY` rule with no `DTSTART` is anchored to the clock, so every 5 minutes means `:00`, `:05`, `:10` rather than five minutes after you happened to save it.
