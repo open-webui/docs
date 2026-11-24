@@ -33,6 +33,11 @@ title: "Image Generation"
     - The placeholder is not clickable, so the full-screen preview does not open on an image that cannot be shown. If the message later points at a different image address, the image is loaded again.
     - If you run more than one replica and the placeholder comes and goes, check that `/app/backend/data` really is shared between them. See [Scaling & HA → Uploaded Files or RAG Knowledge Inaccessible](/troubleshooting/multi-replica#5-uploaded-files-or-rag-knowledge-inaccessible).
 
+### OpenAI-compatible image edits
+
+- **Only one input image reaches the edit model.** On Open WebUI v0.13.4, the server sends an image list to the connection's `/images/edits` endpoint as multipart form data with one `image[]` part per file. A single image supplied as a string uses the `image` field.
+- When testing a custom provider or proxy, use two small test images and check the field names and part count at the endpoint. Configure the multipart parser to collect all `image[]` values. A manual test that uploads repeated `image` fields exercises a different request shape.
+
 ### ComfyUI Issues
 
 - **Incompatible Workflow / JSON Errors** (you see `Invalid JSON format for ComfyUI Workflow.` after uploading a workflow):
