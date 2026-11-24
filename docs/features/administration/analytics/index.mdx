@@ -264,7 +264,7 @@ Tokens are the units that language models use to process text. Both the **input*
 
 ### How Token Tracking Works
 
-Open WebUI automatically captures token usage from model responses and stores it with each message. The Analytics feature aggregates this data to show:
+Open WebUI stores reported token usage on saved assistant messages. A stateless call to `/api/chat/completions` that omits both `chat_id` and `parent_id` can return usage to the API caller without saving an assistant message, so that usage is outside the Analytics totals. Analytics aggregates saved usage to show:
 
 - **Input tokens** - Tokens in user prompts and context
 - **Output tokens** - Tokens in model responses
