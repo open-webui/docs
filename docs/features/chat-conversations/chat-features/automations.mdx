@@ -72,6 +72,16 @@ Administrators can set global limits on automation usage for non-admin users. Th
 
 After creation, Open WebUI opens the dedicated automation editor page at `/automations/{id}`.
 
+### Model settings used by a run
+
+For a model backed by an Ollama or OpenAI-compatible connection, runs use the model's **System Prompt** and **Advanced Params**. In **Instructions**, enter the task you want the model to perform. The automation editor has no **Model controls** picker. Runs use the model's [default options](/features/workspace/models#model-controls), including when you choose **Run now**.
+
+A model's **Default Features** can turn on Web Search, Image Generation, or Video Generation for a run when the matching capability and instance setting are both enabled. The **Code Interpreter** switch in **Default Features** only applies to interactive chats.
+
+### Chat titles
+
+When a run creates a chat, its initial title is the automation's saved **Title**. Prompt variables such as `{{CURRENT_DATE}}` expand in **Instructions**. In **Title**, they appear as literal text.
+
 ### Giving a Run a Terminal
 
 The automation editor has a **Terminal** list and, once one is picked, a **Working Directory** field. The run uses that terminal and starts in that folder; with the field empty it starts in the terminal's default folder. The list appears when at least one terminal is available to you, and a terminal picked here replaces the one configured on the model.
