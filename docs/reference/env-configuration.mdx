@@ -1206,7 +1206,7 @@ Unset, a provider that stops sending data mid-stream holds the connection until 
 
 Connection URLs configured via the Admin Settings UI are **persisted in the database** and take precedence over environment variables. If you save an unreachable URL and the UI becomes unresponsive, you may need to use one of these recovery options:
 
-- `RESET_CONFIG_ON_START=true`: Resets database config to environment variable values on next startup
+- `RESET_CONFIG_ON_START=true`: Clears saved database settings on startup. See [reset order](#reset_config_on_start) if your data directory has a legacy `config.json`
 - `ENABLE_PERSISTENT_CONFIG=false`: Always use environment variables (UI changes won't persist)
 
 See the [Model List Loading Issues](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for detailed recovery steps.
@@ -2952,7 +2952,7 @@ RAG will also not work on a default installation, if this is set to `True`.
 
 - Type: `bool`
 - Default: `False`
-- Description: Resets the `config.json` file on startup.
+- Description: Clears saved settings from the application database at startup. Open WebUI then imports `DATA_DIR/config.json` if present, renames it to `old_config.json`, and fills in missing settings from defaults, including environment variables. A legacy file can therefore supply settings after the reset. Set this flag only for the startup on which you want to discard saved settings.
 
 #### `SAFE_MODE`
 
