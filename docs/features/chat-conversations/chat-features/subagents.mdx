@@ -106,6 +106,10 @@ What delegation costs shows up in [Analytics](/features/administration/analytics
 
 `delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), optional `file_ids` naming attachments the sub-agent has to open (see [Handing Over Files](#handing-over-files)), `model_id` to pick one of the model's sub-agent models, and `background` when background sub-agents are enabled.
 
+The **Sub-agents** list in the model editor gives the parent model additional targets it can choose. When a `delegate_task` call omits `model_id`, the sub-agent runs on the current model even if the list contains other models.
+
+If the expected target is missing, check that the target is configured on the parent model and available to the user running the chat. Open WebUI offers only configured targets the user can access. If no targets qualify, the tool omits the `model_id` parameter. If a call explicitly names an unavailable target, it returns an error.
+
 :::info The Sub-agents category also controls timers
 The `timer` tool is injected by the same category and the same [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) toggle. Turning sub-agents off also removes timers.
 :::
