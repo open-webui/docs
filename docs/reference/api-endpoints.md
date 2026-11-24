@@ -482,6 +482,21 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
 If you need `outlet()` output over HTTP today, call `/api/chat/completions` followed by `/api/chat/completed`. Inline execution on `dev` runs your outlet filters, and their side effects (persisted message, `chat:outlet` WebSocket event, logging or tracing calls) all take place, but the filtered text is not returned in the HTTP response. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#filter-behavior-with-api-requests).
 :::
 
+### OpenAI-compatible embeddings
+
+On Open WebUI v0.13.4, send `POST /api/embeddings` (also available at `/api/v1/embeddings`) with a model ID and the text to embed. Choose an embedding model available to your account through an Ollama or OpenAI-compatible connection. Use its ID from [`GET /api/models`](#retrieve-all-models), including the connection prefix if one is configured.
+
+The endpoint routes by the request's `model` field. The embedding engine and model under **Admin Panel > Settings > Documents** configure RAG separately. If you configured an embedding model only under **Documents**, make it available through a model connection before using it with this endpoint.
+
+```bash
+curl https://open-webui.example.com/api/v1/embeddings \
+  -H "Authorization: Bearer $OPEN_WEBUI_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "YOUR_EMBEDDING_MODEL_ID", "input": ["First text", "Second text"]}'
+```
+
+Read the vectors from `data[].embedding` in the JSON response. For the native Ollama request and response format, use [the Ollama embeddings proxy](#generate-embeddings).
+
 ### Ollama API Proxy Support
 
 If you want to interact directly with Ollama models (including for embedding generation or raw prompt streaming) Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
