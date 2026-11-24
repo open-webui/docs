@@ -43,6 +43,8 @@ Let's start with the simplest representation of a Filter Function. Don't worry i
 
 ### Basic Skeleton of a Filter
 
+Each server worker caches the `Filter` instance by Function ID and can reuse it across requests. Keep request-specific values in hook arguments or local variables. For example, calculate a request's token count in `inlet()` using a local variable and reserve instance attributes for configuration such as `self.toggle`.
+
 ```python
 from pydantic import BaseModel
 from typing import Optional
@@ -315,16 +317,13 @@ Filters can exist in one of four states, controlled by two boolean flags in the 
 
 | State | `is_active` | `is_global` | Effect |
 |-------|------------|------------|--------|
-| **Globally Enabled** | `True` | `True` | Applied to **ALL** models automatically, cannot be disabled per-model |
+| **Globally Enabled** | `True` | `True` | Available on all models automatically |
 | **Globally Disabled** | `False` | `True` | Not applied anywhere; even though the filter is globally enabled, the filter itself is disabled |
 | **Model-Specific** | `True` | `False` | Only applied to models where the admin explicitly enables it |
 | **Inactive** | `False` | `False` | Not applied anywhere, even if filter is enabled for a model by the admin; the filter itself is turned off |
 
 :::tip Global Filter Behavior
-When a filter is set as **Global** (`is_global=True`) and **Active** (`is_active=True`), it becomes **force-enabled** for all models:
-- It appears in every model's filter list as **checked and greyed out**
-- Admins **cannot** uncheck it in model settings
-- It runs on **every** chat completion request, regardless of model
+An active global filter is in scope for every model. It appears checked and greyed out in model settings. An always-on filter runs automatically, while a [user-toggleable filter](#toggleable-filters-making-filters-user-controllable-selftoggle) runs only when its ID is in the request's `filter_ids`. If a chat completion API caller omits `filter_ids`, the server uses an empty selection. The chat UI uses the model's `defaultFilterIds` to initialize its selection.
 :::
 
 #### Admin Panel: Making a Filter Global
@@ -339,10 +338,7 @@ To make a filter global:
 5. Flip the **Global** switch in that menu
 6. Ensure the filter is also **Active** (green toggle switch)
 
-**API Endpoint:**
-```http
-POST /api/v1/functions/id/{filter_id}/toggle/global
-```
+Use the [Function activation API](./index.mdx#activation-via-api) to read or change the **Active** and **Global** flags programmatically.
 
 **Visual Indicators:**
 - Green toggle = `is_active=True` (filter is active)
