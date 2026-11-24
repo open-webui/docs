@@ -144,7 +144,7 @@ Models that depend on the prompt-based behavior need **Legacy** set [per chat, p
 
 Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode**, the prompt-based opt-out kept only for backward compatibility.
 
-In both modes, an administrator can cap how much of a tool result reaches the model with [`TOOL_OUTPUT_MAX_CHARS`](/reference/env-configuration#tool_output_max_chars) (**Settings > General > Tool Output Limit**). A longer result is cut off and ends with a note of its original length.
+In both modes, an administrator can cap how much of a tool result reaches the model with [`TOOL_OUTPUT_MAX_CHARS`](/reference/env-configuration#tool_output_max_chars) (**Settings > General > Tool Output Limit**). A longer result is cut off and ends with a note of its original length. When the chat has a [machine](/features/open-terminal), the full result is also saved as a text file in `~/.open-webui/users/<user id>/outputs/` on it, and the note gives the model the path so it can read the rest. Results of the machine's own tools are cut off only.
 
 ### Legacy Mode (Prompt-based)
 
