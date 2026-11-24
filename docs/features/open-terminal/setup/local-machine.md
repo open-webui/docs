@@ -54,6 +54,6 @@ Open Terminal is installed in `~/.open-webui/` in the home directory of the Open
 
 ## Manage the machine
 
-Open the machine from the **Machines** list to change **Start directory** and to upgrade, restart or read the logs, as described in [SSH Machines](./ssh-machines.md#manage-the-machine). Changing **Start directory** restarts Open Terminal in the new directory.
+Open the machine from the **Machines** list to change **Start directory** and to upgrade, restart or read the logs, as described in [SSH Machines](./ssh-machines.md#manage-the-machine). Changing **Start directory** restarts Open Terminal in the new directory. **Open Terminal flags** works as on [SSH machines](./ssh-machines.md).
 
 When you delete the machine, Open WebUI uninstalls Open Terminal. Your files in the session folder stay.
