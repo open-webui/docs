@@ -23,6 +23,8 @@ Automation webhook URLs are reachable without signing in, because the secret in 
 
 DDoS protection and brute-force prevention (rate limiting, connection throttling, fail2ban) should be handled at the proxy or network layer.
 
+Open WebUI listens on every network interface (`0.0.0.0`) by default. When a reverse proxy on the same machine fronts it, keep Open WebUI on loopback so clients cannot bypass the proxy: publish the port as `-p 127.0.0.1:3000:8080` in Docker, or run `open-webui serve --host 127.0.0.1`. See [`HOST`](/reference/env-configuration#host). Open WebUI also reaches Ollama from its backend, so Ollama's port `11434` does not need to be open to your users; see [Keep port 11434 off your network](/troubleshooting/connection-error#accessing-ollama-from-open-webui).
+
 ### Requests for paths that do not exist
 
 Open WebUI serves a single-page application, so a request for a path the application does not know returns the application shell with a status of 200 rather than a 404. Requests for JavaScript files are the exception and do return 404, because a missing script has to fail rather than be handed a page of HTML.
@@ -632,7 +634,7 @@ RAG_FILE_MAX_SIZE=50
 RAG_FILE_MAX_COUNT=10
 
 # Restrict allowed file extensions (empty = all allowed)
-RAG_ALLOWED_FILE_EXTENSIONS=.pdf,.txt,.md,.docx,.csv
+RAG_ALLOWED_FILE_EXTENSIONS=pdf,txt,md,docx,csv
 ```
 
 ---
@@ -685,7 +687,7 @@ If a Function causes problems at startup, you can deactivate all Functions by st
 SAFE_MODE=true
 ```
 
-This lets you access the admin panel and disable the problematic function.
+This lets you access the admin panel and disable the problematic function. Safe Mode sets every Function to inactive in the database, so after you remove `SAFE_MODE` and restart, turn each Function you need back on in **Admin Panel > Functions**.
 
 ### Dependency installation
 

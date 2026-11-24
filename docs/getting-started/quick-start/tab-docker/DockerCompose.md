@@ -81,14 +81,14 @@ deploy:
           capabilities: [gpu]
 ```
 
-This setup ensures that your application can leverage GPU resources when available. The `:cuda` image moves Open WebUI's own local models (embedding, reranking, and Whisper speech-to-text) to the GPU; Ollama's models use a GPU only if the Ollama container has one. If no GPU is visible, the image falls back to the CPU without an error. For the pre-release channel the tag is `:dev-cuda`.
+This setup ensures that your application can leverage GPU resources when available. The `:cuda` image moves Open WebUI's own local models (embedding, reranking, and Whisper speech-to-text) to the GPU; Ollama's models use a GPU only if the Ollama container has one. The `driver: nvidia` reservation needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on the host, the same as `--gpus all` in [GPU support](#gpu-support-nvidia). If no GPU is visible, the image falls back to the CPU and logs `CUDA unavailable (USE_CUDA_DOCKER=true), falling back to CPU`. For the pre-release channel the tag is `:dev-cuda`.
 
 ### Helper Scripts
 
 A set of helper scripts is included with the codebase to streamline common Docker workflows:
 
-- `docker-compose-launcher.sh`: Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, a host data mount for Ollama's models, and optional Playwright support. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project. Put options with square brackets in quotes, as in `./docker-compose-launcher.sh '--enable-gpu[count=1]'`, since zsh (the default shell on macOS) otherwise stops with `no matches found`.
-- `docker-cleanup.sh`: Stops the Compose project and **deletes all volumes**, including persistent data. Prompts for confirmation before destroying data.
+- `docker-compose-launcher.sh`: Interactive Compose launcher with GPU auto-detection, configurable WebUI/API ports, a host data mount for Ollama's models, and optional Playwright support. It runs the repository's own `docker-compose.yaml`, not the file above, which starts Ollama in a second container next to Open WebUI. That Ollama publishes no port on your machine; `--enable-api` adds `docker-compose.api.yaml` and publishes it on port `11435`. `--build` builds the image from your checkout instead of pulling it. Run `./docker-compose-launcher.sh --help` for the full list of flags. Use `--drop` to tear down the project. Put options with square brackets in quotes, as in `./docker-compose-launcher.sh '--enable-gpu[count=1]'`, since zsh (the default shell on macOS) otherwise stops with `no matches found`.
+- `docker-cleanup.sh`: Stops the Compose project and **deletes all volumes** with `docker compose down -v`, including your chats and the Ollama volume with every downloaded model. Prompts for confirmation before destroying data.
 - `docker-run.sh`: Builds the Open WebUI image and runs a single container, exposing it on `OPEN_WEBUI_PORT` (default `3000`). It sets no `WEBUI_SECRET_KEY`, so add one to its `docker run` line before using the container for anything beyond a quick test.
 - `docker-ollama.sh`: Pulls and runs the official Ollama container with optional GPU passthrough, exposing it on `OLLAMA_PORT` (default `11434`).
 - `docker-update-models.sh`: Iterates through every model installed in the Ollama container and pulls the latest version.

@@ -48,7 +48,7 @@ Knowledge bases, notes and single files can be attached to a chat, to a [folder]
 **In a chat:**
 
 - Type `#` in the message input. The list offers **Folders**, **Knowledge** (knowledge bases) and **Files** (single files from knowledge bases), and accepts a web or YouTube URL.
-- Or click **+** (**More**) and open **Attachments**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**.
+- Or click **+** (**More**) and open **Attachments**. **Attach Knowledge** lists your knowledge bases, with **Show Files** to pick single files from one. **Attach Notes** lists your notes. The same menu has **Attach Webpage**, **Attach Files** (files you uploaded before) and **Reference Chats**. **Attach Webpage** refuses private and loopback addresses unless [`ENABLE_LOCAL_WEB_FETCH`](/reference/env-configuration#enable_local_web_fetch) is on; see [Attaching a Link Fails](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails).
 - Or drag a note, folder or chat from the sidebar into the message input.
 
 **On a model or a folder:** open the **Knowledge** field, in the model editor (**Workspace > Models**, or **Settings > Models > Edit** (admin section)) or in the folder's **Edit** dialog under **Advanced**. Its search lists **Notes**, **Knowledge** (knowledge bases) and **Files** (single files from knowledge bases), and **Upload Files** adds a file straight from your computer.
@@ -314,6 +314,10 @@ While you have unsaved edits, opening another file, closing the preview, deletin
 
 **Download** sits in the **⋯** menu of the preview and in the three-dot menu of each file row. It saves the original file. For a file that opens on **Indexed text** because its original is not available, Download saves the indexed text as a `.txt` file.
 
+**Removing files**
+
+Keep the stored uploads for knowledge bases you still use. Indexing stores searchable text, while **Download** and re-indexing can still need the original file. Deleting an upload directly from storage leaves its Open WebUI record in place. Use the file removal action to remove it from a knowledge base, and see [file retention settings](/reference/env-configuration#enable_knowledge_file_retention) for what happens to the stored copy.
+
 **Search, filter and sort**
 
 The **Search Files** box above the tree searches the whole knowledge base by file name, and results inside a folder show the folder path next to the name. The filter button next to it offers:
@@ -368,9 +372,12 @@ The in-app **Sync directory** runs in your browser: it enumerates, hashes and up
 Behavior to be aware of:
 
 - Hidden files and folders (anything beginning with `.`) are skipped.
-- Files modified locally upload with a new content hash; the old file entry is removed from the KB and replaced.
+- For a locally modified file, sync removes the old entry from the knowledge base before it uploads the replacement. If the upload or processing fails, that file can be missing from retrieval until a later sync succeeds.
+- If sync reports `Upload failed for … of … files.`, open the browser's developer console and look for `Upload failed:` to find each affected relative path and the reported error. Fix the reported problem, then run **Add Content → Sync directory** again with the same local folder.
 - Files removed locally are deleted from the KB during the cleanup step.
 - The action is **non-destructive** for unchanged files.
+- A file still marked **Processing** in the knowledge base, for example because Open WebUI restarted before it finished processing, is not uploaded again for one hour after its original upload, as long as its path, name and content are unchanged. During that hour a sync counts it under **unmodified** in the `Sync complete` message. After the hour, the next sync uploads it again.
+- A **Processing** file has no item menu, so it cannot be removed from the knowledge base view. To retry it before the hour is up, find its ID with `GET /api/v1/knowledge/{id}/files/pending`, delete it with `DELETE /api/v1/files/{file_id}`, then sync again.
 
 For programmatic use, the same workflow is exposed as two endpoints under [API access](#api-access) below.
 

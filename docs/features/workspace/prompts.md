@@ -88,7 +88,7 @@ Automatically replaced with their value at runtime:
 
 | Variable | Description |
 | :--- | :--- |
-| `{{CLIPBOARD}}` | Content from your clipboard. If the browser blocks clipboard access, a message says the clipboard could not be read. |
+| `{{CLIPBOARD}}` | Content from your clipboard. Reading the clipboard needs HTTPS or `localhost`. When the browser blocks it, for example over `http://` on a LAN address, Open WebUI shows `Failed to read clipboard contents` and leaves `{{CLIPBOARD}}` in the prompt unchanged. |
 | `{{CURRENT_DATE}}` | Current date |
 | `{{CURRENT_DATETIME}}` | Current date and time |
 | `{{CURRENT_TIME}}` | Current time |
@@ -102,7 +102,7 @@ Automatically replaced with their value at runtime:
 | `{{USER_BIRTH_DATE}}` | Birth date from Settings > Account > User Profile (unreplaced if not set) |
 | `{{USER_AGE}}` | Age calculated from birth date (unreplaced if not set) |
 | `{{USER_LANGUAGE}}` | Your selected language |
-| `{{USER_LOCATION}}` | Your location. The browser asks for geolocation permission directly, which needs HTTPS. The Interface toggle only controls the location sent with chat requests |
+| `{{USER_LOCATION}}` | Your location. The browser asks for geolocation permission directly, which needs HTTPS or `localhost`. When the browser blocks the request, you deny it, or no position arrives within 10 seconds, Open WebUI shows `Location access not allowed` and inserts `LOCATION_UNKNOWN`. The Interface toggle only controls the location sent with chat requests |
 | `{{USER_GROUPS}}` | Comma-separated list of the groups the user belongs to, including groups inherited through parent groups (empty if none). Resolved from the database only when the placeholder is present, and only in model system prompts and task templates. In a prompt inserted with `/` it stays literal. |
 
 ### Custom input variables
@@ -224,6 +224,18 @@ Over the API, `GET /api/v1/prompts/id/{prompt_id}/history/diff?from_id=...&to_id
 :::note Migration
 Prompts created before the versioning update were automatically migrated with their content preserved as the initial "Live" version. The URL structure changed from command-based to ID-based, so existing bookmarks may need updating. As of v0.5.0, all variables are optional by default.
 :::
+
+---
+
+## Import and Export
+
+**Export JSON** in the Workspace header of **Workspace > Prompts** saves every prompt you can read to one JSON file. **Export** in a prompt's **⋯** menu saves only that prompt. Both need the [**Export Prompts**](/features/authentication-access/rbac/permissions) permission, and **Import JSON** needs **Import Prompts**. Admins always see all three.
+
+The export file holds each prompt's command, name, content, tags, `is_active`, `data`, `meta`, owner, timestamps and access grants. It holds no version history.
+
+**Import JSON** reads only the `command`, `name` and `content` of each prompt in the file and ignores everything else. An imported prompt has no tags, is enabled and is private to you. Add the tags and sharing again after the import.
+
+A prompt whose command already exists on the instance, for any user, is skipped with `Uh-oh! This command is already registered. Please choose another command string.`, and the rest of the file is still imported.
 
 ---
 

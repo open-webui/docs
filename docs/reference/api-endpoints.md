@@ -19,17 +19,9 @@ When Open WebUI is behind a reverse proxy that already uses the `Authorization` 
 
 ## Swagger Documentation Links
 
-:::important
+Open WebUI serves Swagger UI at `/docs` and its machine-readable OpenAPI schema at `/openapi.json` when the backend starts with `ENV=dev`. The backend defaults to `dev` when `ENV` is unset, but the Docker image sets `ENV=prod`, which disables both routes.
 
-Make sure to set the `ENV` environment variable to `dev` in order to access the Swagger documentation for any of these services. Without this configuration, the documentation will not be available.
-
-:::
-
-Access detailed API documentation for different services provided by Open WebUI:
-
-| Application | Documentation Path      |
-|-------------|-------------------------|
-| Main        | `/docs`                 |
+If these URLs are unavailable on a local Docker test instance, set `ENV=dev` in the container environment and recreate the container. Use the same host and port you use to reach Open WebUI. Keep `ENV=prod` on production deployments.
 
 ## Notable API Endpoints
 
@@ -43,6 +35,8 @@ Access detailed API documentation for different services provided by Open WebUI:
   curl -H "Authorization: Bearer YOUR_API_KEY" http://localhost:3000/api/models
   ```
 
+**Hidden models are still listed.** Hiding a model with **Hide** in **Admin Panel > Settings > Models** or in **Workspace > Models** only sets `info.meta.hidden` to `true`. The chat model selector leaves such models out, but `GET /api/models` returns them to every caller with access, and `/api/chat/completions` still answers requests for them. To keep a model away from API users, remove their access to it instead. A script that should skip hidden models can drop entries where `info.meta.hidden` is `true`.
+
 ### Programmatic Model Management (Export / Import / Sync)
 
 Custom models are plain JSON, so you can manage them declaratively (in git, via scripts or from an AI agent) without the UI. These endpoints live under `/api/v1/models`:
@@ -55,9 +49,18 @@ Custom models are plain JSON, so you can manage them declaratively (in git, via 
 | `POST /api/v1/models/sync` | **(Admin)** Declarative **reconcile**: makes the instance match the list you send exactly, it creates, updates and **deletes** any model not in the payload. |
 | `POST /api/v1/models/create` | Create a single model. |
 | `POST /api/v1/models/model/update` | Update a single model. |
-| `POST /api/v1/models/model/delete` | Delete a single model. |
+| `POST /api/v1/models/model/delete` | Delete a saved custom model by ID. |
 
-**Auth:** an [API key](/features/authentication-access/api-keys) for an admin (or, for `import`, a user with the `workspace.models_import` permission). `sync` is admin-only. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+**Bulk operations.** `sync` is admin-only. Non-admins need the `workspace.models_import` permission for `import` or the `workspace.models_export` permission for `export`. Both `import` and `sync` take a body of the form `{"models": [ ... ]}`, where the array is exactly what `export` returns.
+
+**Delete a custom model.** Send a JSON body containing the saved custom model's ID as a string. An administrator, the model owner, or a user with Write access to the model can delete it. The response body is the JSON boolean `true` on success.
+
+```bash
+curl -X POST https://open-webui.example.com/api/v1/models/model/delete \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"id": "my-custom-model"}'
+```
 
 **Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
@@ -84,6 +87,27 @@ This gives reproducible, version-controlled model definitions. Use `/import` ins
 
 - **Endpoint**: `POST /api/chat/completions`
 - **Description**: Serves as an OpenAI API compatible chat completion endpoint for models on Open WebUI including Ollama models, OpenAI models, and Open WebUI Function models. A model on a Responses API connection also answers in Chat Completions format, streamed or not, with `finish_reason` set to `length` or `content_filter` when the reply was cut off.
+
+**Connect an OpenAI-compatible chat client.** If the client appends `/models` and `/chat/completions` to its base URL, set the base URL to your Open WebUI URL followed by `/api/v1`, for example `http://localhost:3000/api/v1`. Use a key from **Settings > Account > API keys > Secrets > Show** and copy the model ID from the response to `GET /api/v1/models`. API keys are disabled by default. An administrator must enable **API Keys**, and non-admin accounts also need the **API Keys** feature permission. See [API Keys](/features/authentication-access/api-keys) for setup.
+
+If **API Key Endpoint Restrictions** is enabled under **Settings > Authentication** (admin section), include `/api/v1/models` and `/api/v1/chat/completions` in **Allowed Endpoints** for a client that calls both. The check uses the path the client actually calls, so an entry for `/api/chat/completions` alone does not cover its `/api/v1/chat/completions` alias.
+
+**Use this endpoint for workspace models.** Only `/api/chat/completions` (and its alias `/api/v1/chat/completions`) applies a workspace model's settings. On a plain API call it applies the base model, system prompt, parameters and filters, but not the model's tools, knowledge or default features, which need extra fields, as listed below the table. The proxy routes under `/openai` skip more:
+
+| Route | Workspace model handling |
+| :--- | :--- |
+| `POST /api/chat/completions` | Base model, system prompt, parameters and filters apply. Tools, knowledge and default features apply only when the request asks for them. |
+| `POST /openai/chat/completions` | Swaps in the base model and applies the workspace model's system prompt and parameters. Knowledge, tools and filters do not run. |
+| `POST /openai/responses` | Nothing applies. The `model` you send is forwarded to the provider as is, and a workspace model ID that no connection offers goes to the first OpenAI connection, which usually rejects it. |
+
+To use `/openai/responses`, send the provider's own model ID. On both `/openai` routes, a non-admin asking for a model that has no saved model record gets `403` with `Model not found`, unless [`BYPASS_MODEL_ACCESS_CONTROL`](/reference/env-configuration#bypass_model_access_control) is on.
+
+**What a plain API call leaves out.** The web UI fills in some of a model's settings itself when it builds the request, so an API caller has to send them:
+
+- **Tools.** The tools picked under **Tools** in the model editor are added to the request by the web UI, not by the server. Send their IDs in `tool_ids`. `GET /api/v1/models/model?id=<model-id>` lists them under `meta.toolIds`.
+- **Default features.** The features picked under **Default Features** are turned on by the web UI only. Send them yourself in `features`.
+- **Knowledge and web search.** Function calling runs in native mode unless the request sends `params.function_calling`, or the model's **Function Calling** parameter (or the one under **Model Defaults**) is set to `legacy`. In native mode, built-in tools, which include knowledge search and web search, are offered only to requests that carry a `session_id`. Without one, the model's **Knowledge** is not searched, and `features.web_search` and `features.image_generation` have no effect. Send `"params": {"function_calling": "legacy"}` and Open WebUI searches the model's knowledge, and runs the web search or image generation that `features` asks for, before the model answers. To stay in native mode with built-in tools, follow [Server-Side Tool Calling (API)](/reference/server-side-tool-calling). Files and knowledge bases you list in `files` are searched either way, unless the model has **Preload files** turned off (see [Using a Knowledge Collection in Chat Completions](#using-a-knowledge-collection-in-chat-completions)).
+- **Filters.** Global filters and the filters attached to the model run. A filter with a toggle runs only when its ID is in `filter_ids`, and the filters marked **Start enabled in new chats** are sent only by the web UI. `filter_ids` cannot add a filter that is neither global nor attached to the model.
 
 :::warning Reading `usage` from a reply that used tools
 
@@ -328,6 +352,35 @@ The count is obtained from the upstream provider behind the resolved connection,
 The Messages API previously always reported `input_tokens: 0` in the streaming `message_start` block. Input tokens are now counted up front and reported in both streaming and non-streaming responses. If counting fails the request still succeeds, so clients should treat the value as best-effort rather than guaranteed.
 :::
 
+### Speech-to-text transcription
+
+Send recorded audio to `POST /api/v1/audio/transcriptions` with bearer authentication and a `multipart/form-data` body. Include the recording in the required `file` field. The optional `language` field supplies a language hint to transcription engines that use it. Non-admin callers need the speech-to-text permission (`chat.stt`). The endpoint saves the original upload on the server. See [server-side recording storage](/features/chat-conversations/audio/speech-to-text/stt-config#server-side-recording-storage).
+
+```bash
+curl https://open-webui.example.com/api/v1/audio/transcriptions \
+  -H "Authorization: Bearer $OPEN_WEBUI_TOKEN" \
+  -F "file=@recording.wav" \
+  -F "language=en"
+```
+
+Read the transcript from `text` in the JSON response. To ask a model about the recording, send that transcript as a user message in a separate [chat completions request](#chat-completions).
+
+### Image Generation and Editing
+
+- **Endpoints**: `POST /api/v1/images/generations` (body: `prompt`, optional `model`, `size`, `n`, `steps`, `negative_prompt`) and `POST /api/v1/images/edit` (body: `image` as one or more base64-encoded images or URLs, `prompt`, optional `model`, `size`, `n`, `negative_prompt`, `background`).
+- **Listing image models**: `GET /api/v1/images/models` returns the image models you can use. Each entry has an `id` of the form `<connection-id>:<model-id>`, the bare `model` ID, and `image_generation` and `image_edit` flags for what it can do.
+
+The `model` you send must be one of those image models, given as its `id` or its bare `model` ID, and it must be able to do the job: an edit needs a model with `image_edit` set. These routes do not fall back to another model. A model you cannot use, or one no connection offers, returns `400` with `Image model "<model>" was not found`. A model that cannot do the job returns `400` with `Image model "<model>" cannot be used for image generation` or `Image model "<model>" cannot be used for image edit`. Leave `model` out and the admin's default image model for that job runs, or else the first one you can use. With no usable model at all, the request fails with `400` and `[ERROR: No image model is available]` (`[ERROR: No image model that can edit images is available]` for edits).
+
+Image generation or image editing turned off by the admin, or a non-admin without the image generation permission, returns `403` with `You do not have permission to access this resource. Please contact your administrator for assistance.`
+
+```bash
+curl -X POST http://localhost:3000/api/v1/images/generations \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "gpt-image-2", "prompt": "A lighthouse at dusk"}'
+```
+
 ### `POST /api/v1/users/user/settings/update` patches, it does not replace
 
 The `ui` object in this request is applied field by field. A field you leave out keeps its current value, and a field sent as `null` is cleared, which drops the user back to the instance default for it. Sending a partial object is therefore the normal way to change one setting.
@@ -425,6 +478,21 @@ In every case, **`outlet()` does not rewrite the HTTP response body**. It update
 If you need `outlet()` output over HTTP today, call `/api/chat/completions` followed by `/api/chat/completed`. Inline execution on `dev` runs your outlet filters, and their side effects (persisted message, `chat:outlet` WebSocket event, logging or tracing calls) all take place, but the filtered text is not returned in the HTTP response. For more details on filter behavior, see the [Filter Function documentation](/features/extensibility/plugin/functions/filter#filter-behavior-with-api-requests).
 :::
 
+### OpenAI-compatible embeddings
+
+On Open WebUI v0.13.4, send `POST /api/embeddings` (also available at `/api/v1/embeddings`) with a model ID and the text to embed. Choose an embedding model available to your account through an Ollama or OpenAI-compatible connection. Use its ID from [`GET /api/models`](#retrieve-all-models), including the connection prefix if one is configured.
+
+The endpoint routes by the request's `model` field. The embedding engine and model under **Admin Panel > Settings > Documents** configure RAG separately. If you configured an embedding model only under **Documents**, make it available through a model connection before using it with this endpoint.
+
+```bash
+curl https://open-webui.example.com/api/v1/embeddings \
+  -H "Authorization: Bearer $OPEN_WEBUI_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"model": "YOUR_EMBEDDING_MODEL_ID", "input": ["First text", "Second text"]}'
+```
+
+Read the vectors from `data[].embedding` in the JSON response. For the native Ollama request and response format, use [the Ollama embeddings proxy](#generate-embeddings).
+
 ### Ollama API Proxy Support
 
 If you want to interact directly with Ollama models (including for embedding generation or raw prompt streaming) Open WebUI offers a transparent passthrough to the native Ollama API via a proxy route.
@@ -500,6 +568,29 @@ curl -X POST http://localhost:3000/ollama/v1/embeddings \
 ```
 
 A specific backend can be targeted with `/ollama/v1/embeddings/{url_idx}`. The endpoint returns `503` if the Ollama integration is disabled.
+
+#### Chat Completions, Completions, Messages and Models (OpenAI-Compatible)
+
+Open WebUI also proxies Ollama's other `/v1` routes. Each one takes a `/{url_idx}` suffix to target one Ollama connection, for example `/ollama/v1/chat/completions/0`. On the `POST` routes, a non-admin needs read access to the workspace model they name, and the connection's **Prefix ID** is removed from the model ID before the request goes to Ollama.
+
+| Route | What Open WebUI applies |
+| :--- | :--- |
+| `POST /ollama/v1/chat/completions` | Swaps a workspace model ID for its base model and applies the workspace model's system prompt and parameters. Knowledge, tools and filters do not run. |
+| `POST /ollama/v1/completions` | Swaps in the base model and applies the workspace model's parameters. The system prompt is not added. |
+| `POST /ollama/v1/messages` | Takes the Anthropic Messages format. Swaps in the base model and forwards the rest of the request unchanged. Returns `503` if the Ollama integration is disabled. |
+| `GET /ollama/v1/models` | Lists models in the OpenAI format, from every enabled Ollama connection. A user with the `user` role sees only models with a saved model record they can read, unless [`BYPASS_MODEL_ACCESS_CONTROL`](/reference/env-configuration#bypass_model_access_control) is on. With `/{url_idx}` it lists that connection's models and is admin-only. Other users get `401`. |
+
+```bash
+curl -X POST http://localhost:3000/ollama/v1/chat/completions \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+  "model": "qwen3.6:27b",
+  "messages": [{"role": "user", "content": "Why is the sky blue?"}]
+}'
+```
+
+For filters, tools and knowledge, use [`/api/chat/completions`](#chat-completions) instead.
 
 ### Retrieval Augmented Generation (RAG)
 
@@ -632,7 +723,7 @@ Before adding a file to a knowledge base, verify that processing has completed u
 
 #### Adding Files to Knowledge Collections
 
-After uploading, you can group files into a knowledge base or reference them individually in chats.
+After uploading, you can group files into a knowledge base or reference them individually in chats. Adding a file to an existing local knowledge base requires ownership of the knowledge base, a **Write** grant on it, or an administrator account. Non-admins also need read access to files they do not own.
 
 :::important
 **Always wait for file processing to complete before adding files to a knowledge base.** Files that are still processing will have empty content, causing a `400` error. Use the status endpoint described above to verify the file status is `completed`.
@@ -888,6 +979,15 @@ Leverage a knowledge base to enhance the response when the inquiry may benefit f
       response = requests.post(url, headers=headers, json=payload)
       return response.json()
   ```
+
+##### Reading the Citations in the Response
+
+When retrieval finds content, the response carries the retrieved sources so you can show citations. This applies to a plain API request, sent without `session_id` and `chat_id`.
+
+- **Non-streaming** (`"stream": false`): the JSON response has a top-level `sources` key next to `choices`.
+- **Streaming** (`"stream": true`): the first event is `data: {"sources": [...]}`, sent before the model's first chunk. It has no `choices` key, so a client that reads `choices[0].delta.content` from every event must skip it.
+
+Each entry in `sources` holds `source` (the file or collection it came from), `document` (the retrieved text chunks), `metadata` (one object per chunk) and, when the vector database returns them, `distances`. The key is left out when nothing was retrieved.
 
 These methods enable effective utilization of external knowledge via uploaded files and curated knowledge bases, enhancing chat applications' capabilities using the Open WebUI API. Whether using files individually or within knowledge bases, you can customize the integration based on your specific needs.
 

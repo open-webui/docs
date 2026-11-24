@@ -26,6 +26,8 @@ docker run --rm --volume /var/run/docker.sock:/var/run/docker.sock nickfedor/wat
    docker pull ghcr.io/open-webui/open-webui:main
    ```
 
+   Pull the same tag you run, such as `:cuda`, `:ollama` or a version tag, and use it again in step 3. Pulling `:main` does not update the image of a container started from `:cuda`, so it starts the old version again.
+
 3. Start the container again:
 
    ```bash

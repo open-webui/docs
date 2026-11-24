@@ -47,10 +47,10 @@ Set `ENABLE_PERSISTENT_CONFIG=False` in your environment. This forces Open WebUI
 The simplest and safest way to change `ConfigVar` settings is directly through the **Admin Panel** within Open WebUI. Even if an environment variable is set, changes made in the UI will take precedence and be saved to the database.
 
 #### Option 3: Manual Database Update (Last Resort / Lock-out Recovery)
-If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker:
+If you are locked out or cannot access the UI, you can manually update the SQLite database via Docker. The image has no `sqlite3` command, so this uses the SQLite shell built into Python:
 
 ```bash
-docker exec -it open-webui sqlite3 /app/backend/data/webui.db "UPDATE config SET value = json('true') WHERE key = 'ui.enable_signup';"
+docker exec -it open-webui python3 -m sqlite3 /app/backend/data/webui.db "UPDATE config SET value = json('true') WHERE key = 'ui.enable_signup';"
 ```
 *(Each setting is its own row, stored under an internal key that differs from the environment variable name. List the keys with `SELECT key FROM config;`, then replace `ui.enable_signup` and `true` with the setting and value needed.)*
 
@@ -63,6 +63,22 @@ If you are performing a clean installation and want to ensure all environment va
 :::danger
 **Warning:** Removing the volume will delete all user data, including chats and accounts.
 :::
+
+### `.env` File Ignored by pip, uv and Conda Installs
+
+An Open WebUI installed with pip, uv or Conda does not read a `.env` file from the folder you start `open-webui serve` in. It loads only the `.env` in the folder that holds the environment's `site-packages`: `<env>/lib/python3.12/` on Linux and macOS with Python 3.12, `<env>\Lib\` on Windows (the [Python install layout](https://docs.python.org/3/library/sysconfig.html#installation-paths)). The startup log does not say which `.env` file it read. To print the exact path, run this in the activated environment:
+
+```bash
+python -c "import open_webui, pathlib; print(pathlib.Path(open_webui.__file__).resolve().parents[2] / '.env')"
+```
+
+Set your variables in one of these ways:
+
+- Export them in the shell, or set them in the service unit that starts Open WebUI.
+- Set them on the command line: `DATA_DIR=~/.open-webui open-webui serve` on Linux and macOS, `$env:DATA_DIR="C:\open-webui\data"; open-webui serve` in PowerShell.
+- Put the `.env` file at the printed path. A variable already set in the shell takes precedence over the same variable in the file. With `uvx`, the environment sits in the uv cache that `uv cache clean` removes, so use the shell instead.
+
+`open-webui serve` reads `WEBUI_SECRET_KEY` before it loads the `.env` file, so a key set only in the file is not used. Set it in the shell, or let the command keep its `.webui_secret_key` file in the folder you start from.
 
 ## App/Backend
 
@@ -223,7 +239,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Comma-separated list of model IDs to pin by default for users who haven't pinned any models of their own. This gives new accounts a ready-made set of model shortcuts in the sidebar. It seeds the user's own pin list once; after that the user's pins win. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Models** (admin section), see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
+- Description: Comma-separated list of model IDs to pin by default for users who have never pinned, unpinned or reordered a model. This gives new accounts a ready-made set of model shortcuts in the sidebar. Those users follow the list as it changes. The first time a user pins, unpins or reorders a model, the current list is saved as their own and later changes to this setting no longer reach them. In the interface this list is managed per model as **Set as Pinned Model** in **Settings > Models** (admin section), see [Selected and Pinned Models](/features/workspace/models#selected-and-pinned-models-admin).
 - Example: `gpt-5.6-sol,claude-opus-5,muse-glimmer:30b-q4_K_M`
 - Persistence: This environment variable is a `ConfigVar` variable.
 
@@ -406,15 +422,17 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets a custom title for the pending user overlay. Shown only while [`ENABLE_MFA`](#enable_mfa) is off. With MFA on, a pending account's sign-in ends on the sign-in page with "Your account is awaiting administrator approval."
+- Description: Sets a custom title for the pending user overlay. Shown only while [`ENABLE_MFA`](#enable_mfa) is off. With MFA on, a pending account's sign-in ends on the sign-in page with "Your account is awaiting administrator approval." Left empty, the overlay shows "Account Activation Pending" and "Contact Admin for WebUI Access".
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Pending User Overlay Title** in the **Pending Accounts** section of **Settings > Authentication** (admin section).
 
 #### `PENDING_USER_OVERLAY_CONTENT`
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets a custom text content for the pending user overlay. Shown only while [`ENABLE_MFA`](#enable_mfa) is off. With MFA on, a pending account's sign-in ends on the sign-in page with "Your account is awaiting administrator approval."
+- Description: Sets a custom text content for the pending user overlay. Shown only while [`ENABLE_MFA`](#enable_mfa) is off. With MFA on, a pending account's sign-in ends on the sign-in page with "Your account is awaiting administrator approval." The text is rendered as Markdown and keeps its line breaks.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Pending User Overlay Content** in the **Pending Accounts** section of **Settings > Authentication** (admin section).
 
 #### `ENABLE_CALENDAR`
 
@@ -441,7 +459,7 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds an **Apps** section to **Settings > Integrations** (admin section). Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > General** (admin section) (**Apps**).
+- Description: Enables [Apps](/features/channels/apps): external services that join channels as members, answer mentions and post messages with buttons. Adds the **Apps** section to **Settings > Integrations** (admin section), where admins install and connect apps. Apps act only in channels, so [`ENABLE_CHANNELS`](#enable_channels) must be on too. Turning it off closes every app connection. Experimental. Can also be set in **Settings > General** (admin section) (**Apps**).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `APP_ALLOWED_PRIVATE_ORIGINS`
@@ -725,6 +743,12 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 - Default: `True`
 - Description: Controls whether the admin-panel **Analytics** tab is visible and the analytics API router is mounted. When set to `False`, the tab is hidden and the corresponding endpoints are not registered. Disabling does not stop the underlying data being collected, and admin retains the ability to query that data directly from the database; this toggle controls the in-product surface, see the admin-posture-toggles note above. Requires a restart to take effect.
 
+#### `TZ`
+
+- Type: `str`
+- Default: Not set (the server's system time zone)
+- Description: Sets the time zone Open WebUI uses to split the usage chart in the admin **Analytics** tab into intervals, including the **Daily** interval. A day in the chart runs from midnight to midnight in the Open WebUI server's time zone, not in the viewer's browser time zone and not in the database server's time zone. Set it to an IANA zone name, such as `America/New_York`, to move the day boundaries to your own day. On PostgreSQL the daily totals are computed in the database in this zone. When `TZ` is not set, Open WebUI uses the zone that `/etc/localtime` points to, or UTC when the system has no UTC offset and no daylight saving time. If the zone found this way is not a valid IANA zone name, the daily totals are computed in Open WebUI with the server's local time instead. The same server local time fills `{{CURRENT_DATE}}`, `{{CURRENT_TIME}}`, `{{CURRENT_DATETIME}}` and `{{CURRENT_WEEKDAY}}` in requests that carry no browser variables: API calls, automations and timers. Chats sent from the web interface use the browser's time instead. If these values come out in UTC, set `TZ` in the Open WebUI server's or container's environment.
+
 #### `BYPASS_ADMIN_ACCESS_CONTROL`
 
 - Type: `bool`
@@ -827,8 +851,9 @@ On weak hardware (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or
 #### `ADMIN_EMAIL`
 
 - Type: `str`
-- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS`
+- Description: Sets the admin email shown by `SHOW_ADMIN_DETAILS` on the pending account overlay, next to the name of the account that uses this email. Left empty, the overlay shows the name and email of the first user created on the instance.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Admin Contact Email** in the **Pending Accounts** section of **Settings > Authentication** (admin section), shown while **Admin Details** is on.
 
 #### `ENV`
 
@@ -874,6 +899,17 @@ On weak hardware (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or
 - Type: `str`
 - Default: A random UUID generated at each start
 - Description: Identifies the backend process. It is stamped as `instance_id` on every event envelope Open WebUI emits, so a multi-replica deployment can see which replica produced an event. Set it explicitly to keep the value stable across restarts.
+
+#### `HOST`
+
+- Type: `str`
+- Default: `0.0.0.0`
+- Description: Sets the address Open WebUI listens on. `0.0.0.0` accepts connections on every network interface. `127.0.0.1` accepts connections only from the same machine, for example when a reverse proxy on that machine fronts Open WebUI. Read at startup by the Docker image and the Windows start script. The `open-webui serve` and `open-webui dev` commands ignore it; use `--host` instead, for example `open-webui serve --host 127.0.0.1`.
+- Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
+
+:::warning
+In Docker, `HOST=127.0.0.1` makes Open WebUI accept connections only from inside the container, so the published port stops answering. To keep it on the host's loopback, leave `HOST` unset and publish the port as `-p 127.0.0.1:3000:8080`.
+:::
 
 #### `PORT`
 
@@ -946,7 +982,7 @@ With `*`, any client that reaches the backend directly can set its own address i
 
 - Type: `int`
 - Default: `1`
-- Description: Sets a system-wide minimum value for the number of tokens to batch together before sending them to the client during a streaming response. This allows an administrator to enforce a baseline level of performance and stability across the entire system by preventing excessively small chunk sizes that can cause high CPU load. The final chunk size used for a response will be the highest value set among this global variable, the model's advanced parameters, or the per-chat settings. The default is 1, which applies no minimum batching at the global level.
+- Description: Sets a system-wide minimum for how many streamed text updates are batched together before they are sent to the client. This lets an administrator prevent very small batches, which can cause high CPU load. A model's **Stream Delta Chunk Size** replaces the per-chat value, and the larger of this variable and that value is used. The default is 1, which applies no minimum batching at the global level. See [Replies Arrive in Bursts or Only When Finished](/troubleshooting/performance#replies-arrive-in-bursts-or-only-when-finished).
 
 #### `CHAT_STREAM_RESPONSE_CHUNK_MAX_BUFFER_SIZE`
 
@@ -1192,7 +1228,7 @@ Unset, a provider that stops sending data mid-stream holds the connection until 
 
 Connection URLs configured via the Admin Settings UI are **persisted in the database** and take precedence over environment variables. If you save an unreachable URL and the UI becomes unresponsive, you may need to use one of these recovery options:
 
-- `RESET_CONFIG_ON_START=true`: Resets database config to environment variable values on next startup
+- `RESET_CONFIG_ON_START=true`: Clears saved database settings on startup. See [reset order](#reset_config_on_start) if your data directory has a legacy `config.json`
 - `ENABLE_PERSISTENT_CONFIG=false`: Always use environment variables (UI changes won't persist)
 
 See the [Model List Loading Issues](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) troubleshooting guide for detailed recovery steps.
@@ -1324,8 +1360,8 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 #### `DATA_DIR`
 
 - Type: `str`
-- Default: `./data`
-- Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc.
+- Default: `backend/data` in the source tree, which is `/app/backend/data` in the Docker image. For pip, uv and Conda installs started with `open-webui serve`, `open_webui/data` inside the environment's `site-packages`.
+- Description: Specifies the base directory for data storage, including uploads, cache, vector database, etc. For pip, uv and Conda installs, set it to a folder outside the Python environment, because the default folder is deleted when you remove or recreate the environment. When `open-webui serve` starts without `DATA_DIR` and finds a `data` folder directly in `site-packages`, it copies that folder into `open_webui/data`, saves a copy as `site-packages/open_webui_data.zip` and deletes the original.
 
 #### `FRONTEND_BUILD_DIR`
 
@@ -1336,8 +1372,8 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 #### `STATIC_DIR`
 
 - Type: `str`
-- Default: `./static`
-- Description: Specifies the directory for static files, such as the favicon.
+- Default: `backend/open_webui/static` (in the Docker image, `/app/backend/open_webui/static`)
+- Description: Specifies the directory Open WebUI serves its bundled static assets from. At every startup Open WebUI deletes the files at the top level of this directory, copies the bundled assets back in, and overwrites `favicon.png`, `splash.png` and `loader.js`, so files you place or replace there do not survive a restart. The logo and favicon are covered by the [Open WebUI License](/license).
 
 ### Logging
 
@@ -1388,7 +1424,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `str`
 - Default: `uvicorn.access`
-- Description: Comma-separated list of logger names to capture for audit logging. Defaults to Uvicorn's access logger.
+- Description: Comma-separated list of Python logger names whose output Open WebUI takes over. Despite the name, it has nothing to do with the audit log: Open WebUI replaces each named logger's handlers with its own, sets the logger's level to [`GLOBAL_LOG_LEVEL`](#global_log_level), and writes its lines to stdout in the Open WebUI log format (see [`LOG_FORMAT`](#log_format)). Audit entries come only from the audit middleware, so these lines never reach the file at `AUDIT_LOGS_FILE_PATH`. The default covers Uvicorn's access log. Names are not trimmed, so do not put spaces after the commas. An empty value names no Uvicorn logger, and Open WebUI then leaves `uvicorn.access` as Uvicorn set it up.
 
 #### `AUDIT_LOG_LEVEL`
 
@@ -1609,7 +1645,7 @@ Several parameters have no effect on background requests wherever you set them: 
 
 - Type: `str`
 - Default: Empty string (use the built-in approval policy)
-- Description: Approval policy that describes which tool calls need approval. Used by both engines. Can also be set in **Settings > Interface** (admin section) (**Approval policy**).
+- Description: Approval policy that describes which tool calls need approval in **Auto**. Used by both engines. An empty or whitespace-only value uses the built-in policy. A custom value replaces the built-in policy in full. See [Auto](/features/extensibility/plugin/tools#auto) for the built-in text and how each engine uses it. Can also be set in **Settings > Interface** (admin section) (**Approval policy prompt**, shown once **Auto permissions** is on).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_permissions.auto.prompt`.
 
 #### `TOOL_PERMISSIONS_AUTO_DECISIONS_API_BASE_URL`
@@ -1839,7 +1875,7 @@ With the built-in template, the chat history it receives is the first user messa
 #### `TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`
 
 - Type: `str`
-- Description: Prompt to use when calling tools.
+- Description: System prompt for the tool-selection request that [Legacy Mode](/features/extensibility/plugin/tools#how-legacy-mode-picks-tools) sends to the task model before each reply. Not used in Native Mode. `{{TOOLS}}` is replaced with the JSON list of the chat's tool definitions, and no other placeholder is filled. The reply must contain a JSON object with a `tool_calls` array of `{"name": ..., "parameters": {...}}` entries. Can also be set in **Settings > Interface** (admin section) (**Tools Function Calling Prompt**, under **Generation**).
 - Default: Empty string, which falls back to the built-in template shown below. (`DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE` is a built-in constant, not an environment variable, so it cannot be set.)
 
 `DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE`:
@@ -2332,6 +2368,8 @@ This variable replaces the deprecated `ENABLE_API_KEY_ENDPOINT_RESTRICTIONS` env
 - Description: Specifies a comma-separated list of allowed API endpoints when API key endpoint restrictions are enabled.
 - Example: `/api/v1/messages,/api/v1/channels,/api/v1/chat/completions`
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Allowed Endpoints** in the **User Access** section of **Settings > Authentication** (admin section), shown while **API Key Endpoint Restrictions** is on.
+- Matching: each entry allows that exact path and every path below it, so `/api/v1/chats` also allows `/api/v1/chats/list`. Wildcards are not supported. A request made with an API key to any other path is refused with `403` and `You do not have permission to access this resource. Please contact your administrator for assistance.` The restriction applies to admin keys too. With restrictions on and this list empty, every API key request is refused.
 
 :::note
 
@@ -2396,6 +2434,7 @@ The header name is matched case-insensitively by the ASGI layer, so pick whateve
   - The application restarts (without Redis; a list stored in Redis survives restarts)
   - The connection settings are saved in the **Settings > Connections** (admin section) (clicking the **Save** button on the bottom right will trigger a refresh and update the cache with the newly fetched models)
   - An admin downloads, deletes, loads or unloads a model on a connection
+  - An admin selects **Refresh** beside **Cache Base Model List** under **Admin Panel > Settings > Connections > User Connections**. The button appears only while caching is enabled. It requests fresh model lists from connected providers without changing the connection settings.
 - **No TTL**: There is no automatic time-based expiration.
 
 :::tip Performance Consideration
@@ -2424,7 +2463,7 @@ Open WebUI has **two model caching mechanisms** that work independently:
 
 | Setting | Type | Default | Refresh Trigger |
 |---------|------|---------|-----------------|
-| `ENABLE_BASE_MODELS_CACHE` | Memory, or Redis when configured | `False` | Admin Save, or app restart without Redis |
+| `ENABLE_BASE_MODELS_CACHE` | Memory, or Redis when configured | `False` | Admin **Refresh**, settings save, or app restart without Redis |
 | `MODELS_CACHE_TTL` | TTL-based | `1` second | Automatic after TTL expires |
 
 For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODELS_CACHE_TTL=300`.
@@ -2437,6 +2476,8 @@ For maximum performance, enable both: `ENABLE_BASE_MODELS_CACHE=True` with `MODE
 - Default: `4w`
 - Description: Sets how long a sign-in token stays valid, as a number followed by a unit: `ms`, `s`, `m`, `h`, `d` or `w`, for example `4w` or `12h`. Use `-1` for no expiration. A number without a unit, such as `30`, is not valid, and **Settings > Authentication** (admin section) does not save it.
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+To check or change the active lifetime, open **Settings > Authentication** in the admin panel and look for **JWT Expiration**. With persistent configuration enabled, a stored value takes precedence over the environment value. Saving a new lifetime applies to newly issued sign-in tokens. Existing tokens keep their original expiration, so sign out and back in to test the new lifetime.
 
 :::warning
 
@@ -2954,7 +2995,7 @@ RAG will also not work on a default installation, if this is set to `True`.
 
 - Type: `bool`
 - Default: `False`
-- Description: Resets the `config.json` file on startup.
+- Description: Clears saved settings from the application database at startup. Open WebUI then imports `DATA_DIR/config.json` if present, renames it to `old_config.json`, and fills in missing settings from defaults, including environment variables. A legacy file can therefore supply settings after the reset. Set this flag only for the startup on which you want to discard saved settings.
 
 #### `SAFE_MODE`
 
@@ -3045,7 +3086,7 @@ modeling files for reranking.
 
 - Type: `bool`
 - Default: `True`
-- Description: Toggles automatic update of the Sentence-Transformer model.
+- Description: Toggles automatic update of the Sentence-Transformer model. While `True`, every start with the **Default (SentenceTransformers)** embedding engine contacts Hugging Face to check [`RAG_EMBEDDING_MODEL`](#rag_embedding_model) and download missing files, even when a copy is cached, and the server does not accept connections until that finishes. With Hugging Face slow or blocked, startup looks frozen, see [Startup & Docker Failures](/troubleshooting/startup#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked). Set to `False`, Open WebUI loads the cached copy without contacting Hugging Face; a model that is not cached yet is still loaded from Hugging Face by name. Forced to `False` when [`OFFLINE_MODE`](#offline_mode) is `True`.
 
 #### `RAG_RERANKING_MODEL_AUTO_UPDATE`
 
@@ -3118,7 +3159,7 @@ For multi-replica setups, you **must** configure `CHROMA_HTTP_HOST` and `CHROMA_
 #### `CHROMA_HTTP_HOST`
 
 - Type: `str`
-- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-replica deployments**: it switches ChromaDB from the embedded, SQLite-backed `PersistentClient` to an `HttpClient` that talks to a separate ChromaDB server.
+- Description: Specifies the hostname of a remote ChromaDB Server. Uses a local ChromaDB instance if not set. **Setting this variable is required for multi-replica deployments**: it switches ChromaDB from the embedded, SQLite-backed `PersistentClient` to an `HttpClient` that talks to a separate ChromaDB server. Run that server at the same version as the bundled `chromadb` client, which each Open WebUI release pins in `pyproject.toml`. If uploads fail with errors raised from the Chroma client after you switch, compare the two versions first.
 
 #### `CHROMA_HTTP_PORT`
 
@@ -3536,13 +3577,13 @@ Your MariaDB server must support `VECTOR` and `VECTOR INDEX` features (MariaDB 1
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables SSL for OpenSearch.
+- Description: Enables or disables SSL for OpenSearch. When `True`, Open WebUI connects over HTTPS even if `OPENSEARCH_URI` starts with `http://`. Set it to `False` for an OpenSearch server that serves plain HTTP. A URI that starts with `https://` uses HTTPS either way.
 
 #### `OPENSEARCH_URI`
 
 - Type: `str`
 - Default: `https://localhost:9200`
-- Description: Sets the URI for OpenSearch.
+- Description: Sets the URI for OpenSearch. An `http://` URI alone does not turn off HTTPS. Also set `OPENSEARCH_SSL=False`.
 
 #### `OPENSEARCH_USERNAME`
 
@@ -3591,10 +3632,10 @@ If set to `false`, open-webui will assume the postgreSQL database where embeddin
 
 - Type: `str`
 - Options:
-  - `ivfflat`: Uses inverted file with flat compression, better for datasets with many dimensions.
+  - `ivfflat`: Groups vectors into lists and searches a subset of those lists.
   - `hnsw`: Uses Hierarchical Navigable Small World graphs, generally provides better query performance.
-- Default: Not specified (pgvector will use its default)
-- Description: Specifies the index method for pgvector. The choice affects query performance and index build time.
+- Default: unset. Open WebUI selects `ivfflat` for `vector` columns and `hnsw` for `halfvec` columns.
+- Description: Specifies the index method for pgvector. If the existing `idx_document_chunk_vector` uses a different method, initialization fails and Open WebUI leaves the index in place. Plan a maintenance window to replace the index with one that uses the new method before restarting. Changing only the index method can reuse the stored embeddings.
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
 :::info
@@ -4305,7 +4346,7 @@ DOCLING_PARAMS="{\"do_ocr\": true, \"ocr_engine\": \"tesseract\", \"ocr_lang\": 
 
 - Type: `str`
 - Default: Empty string
-- Description: API key for the Datalab Marker service. Required when [`CONTENT_EXTRACTION_ENGINE`](#content_extraction_engine) is `datalab_marker`.
+- Description: API key for the Datalab Marker service. Required when [`CONTENT_EXTRACTION_ENGINE`](#content_extraction_engine) is `datalab_marker`. Marker runs only while a key is set. Without one, files are read by the default loader even with `datalab_marker` selected.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_API_BASE_URL`
@@ -4330,14 +4371,14 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `use_llm`, which asks Marker to run an LLM pass for higher accuracy on tables, forms and math at higher cost and latency.
+- Description: Sends `use_llm`, which asks Marker to run an LLM pass for higher accuracy on tables, forms and math at higher cost and latency. Also set as **Use LLM** in **Settings > Documents** (admin section). Each chunk records the setting in its `processed_with_llm` metadata field.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_SKIP_CACHE`
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `skip_cache`, which makes Datalab re-run the conversion instead of returning a cached result for a file it has seen before.
+- Description: Sends `skip_cache`, which makes Datalab re-run the conversion instead of returning a cached result for a file it has seen before. Also set as **Skip Cache** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_FORCE_OCR`
@@ -4358,28 +4399,28 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `strip_existing_ocr`, which discards a document's existing OCR text layer and OCRs it again.
+- Description: Sends `strip_existing_ocr`, which discards a document's existing OCR text layer and OCRs it again. Also set as **Strip Existing OCR** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_DISABLE_IMAGE_EXTRACTION`
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `disable_image_extraction`, which skips image extraction from the document.
+- Description: Sends `disable_image_extraction`, which skips image extraction from the document. Also set as **Disable Image Extraction** in **Settings > Documents** (admin section). Open WebUI never stores the images Marker returns: it keeps only their count and names in each chunk's `image_count` and `images` metadata fields.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_FORMAT_LINES`
 
 - Type: `bool`
 - Default: `False`
-- Description: Sends `format_lines`, which reformats lines with an OCR pass to improve inline math and text formatting.
+- Description: Sends `format_lines`, which reformats lines with an OCR pass to improve inline math and text formatting. Also set as **Format Lines** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `DATALAB_MARKER_OUTPUT_FORMAT`
 
 - Type: `str`
 - Default: `markdown`
-- Description: Output format requested from Marker. Datalab accepts `markdown`, `html`, `json` and `chunks`. Open WebUI ingests the returned text, so keep `markdown` unless you have a reason not to.
+- Description: Output format requested from Marker. Open WebUI accepts `markdown`, `html` and `json`; any other value, `chunks` included, fails the upload with `Unsupported output format: <value>`. Open WebUI ingests the returned text, so keep `markdown` unless you have a reason not to.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_MODE`
@@ -4407,7 +4448,10 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `300`
-- Description: Sets the timeout in seconds for MinerU API requests during document processing.
+- Description: Sets the timeout in seconds for MinerU API requests during document processing. Also set as **API Timeout** in **Settings > Documents** (admin section). What it covers depends on [`MINERU_API_MODE`](#mineru_api_mode):
+  - `local` with a MinerU 3.x server: the whole parse request. A slower parse fails with `MinerU Local API request timed out`.
+  - `local` with a MinerU 4.x server: the total wait for the parse job, and each request that uploads the file or checks the job. A slower job fails with `MinerU processing timed out after <seconds> seconds`.
+  - `cloud`: only the upload of the file. Open WebUI then checks the batch status up to 300 times, two seconds apart, and fails with `MinerU processing timed out after 10 minutes` if the file is still not done. This limit is fixed, and raising `MINERU_API_TIMEOUT` does not extend it. For a large PDF that hits it, split the PDF into smaller files or use `local` mode with a higher timeout.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_FILE_EXTENSIONS`
@@ -4486,7 +4530,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `str`
 - Default: `sentence-transformers/all-MiniLM-L6-v2`
-- Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used.
+- Description: Sets a model for embeddings. Locally, a Sentence-Transformer model is used. Also set as **Embedding Model** in **Settings > Documents** (admin section). With the default (SentenceTransformers) engine, the download icon next to the field (**Update embedding model**) applies the embedding settings right away, without **Save**: it unloads the old model, loads the new one (downloading it from Hugging Face when [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](#rag_embedding_model_auto_update) is on) and stores the name. **Save** runs the same step. If the model fails to load, the name is still stored and the server log shows `Error loading SentenceTransformer`; uploads then fail with `No embedding model is loaded. Set RAG_EMBEDDING_MODEL to a valid SentenceTransformer model name, or configure an external RAG_EMBEDDING_ENGINE (ollama, openai, azure_openai).` Neither step touches existing vectors: run **Reindex Knowledge and Memory Vectors** afterward so stored documents are embedded with the new model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SENTENCE_TRANSFORMERS_BACKEND`
@@ -4519,7 +4563,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `float`
 - Default: `0.0`
-- Description: Sets the relevance threshold to consider for documents when used with reranking. Only chunks scoring at or above this value are kept. `0` means no threshold. Negative values are valid for rerankers that return raw scores outside the 0 to 1 range.
+- Description: Sets the relevance threshold to consider for documents when used with reranking. Only chunks scoring at or above this value are kept. `0` means no threshold. Negative values are valid for rerankers that return raw scores outside the 0 to 1 range. A value above `0` also filters [Context memories](/features/chat-conversations/memory#1-manual-management-settings) by their vector similarity score, without a reranker and even while hybrid search is off, so a value tuned for reranker scores can stop them from reaching the model.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_HYBRID_SEARCH`
@@ -4581,7 +4625,7 @@ Of the files it does receive, images are dispatched with `fileType=1` and PDFs w
 
 - Type: `float`
 - Default: `0.5`
-- Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword search, 0 means only vector search.
+- Description: Sets the weight given to the keyword search (BM25) during hybrid search. 1 means only keyword search, 0 means only vector search. Also set as **BM25 Weight** in **Settings > Documents** (admin section), where the slider runs from **semantic** (0) to **lexical** (1). It is read only while **Hybrid Search** ([`ENABLE_RAG_HYBRID_SEARCH`](#enable_rag_hybrid_search)) is on, and the field is hidden otherwise. Values in between run both searches and blend their results with weights `BM25 Weight` and `1 - BM25 Weight`. Whatever the weight, the merged results then go through the reranking step. Choosing **Default** next to the field only hides the slider and does not reset a saved weight; set the slider to `0.5` to return to the default.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_HYBRID_SEARCH_ENRICHED_TEXTS`
@@ -4626,7 +4670,7 @@ If the sources don't contain the answer, say so, then answer from your own knowl
 
 - Type: `bool`
 - Default: `False`
-- Description: Controls what happens to a file when it is removed from a knowledge base, or when the knowledge base itself is deleted. By default the file record, the stored copy of the file and its embeddings are all deleted with it. Enable this to keep them, so that removal takes the file out of the knowledge base without destroying anything, which suits deployments that retain uploads for audit or reuse. Storage then grows with every removal, since nothing is reclaimed.
+- Description: Controls whether removing a file in the Knowledge workspace also deletes its upload. With `False`, Open WebUI attempts to delete the file record and stored copy if the person removing it owns the file or is an admin. With `True`, removal keeps the file record and stored copy. In both cases, Open WebUI removes the file from the knowledge base and attempts to remove its entries from that base's search index. The file-removal API can override this default with its `delete_file` query parameter. The setting also controls file retention during knowledge reset, directory deletion with contents, and sync cleanup. Directory deletion and sync cleanup also keep uploads still linked to another knowledge base. Deleting an entire local knowledge base removes its file associations and attempts to remove its search index, while the underlying uploaded files remain.
 - Persistence: No
 
 #### `CHUNK_SIZE`
@@ -4665,7 +4709,7 @@ If the sources don't contain the answer, say so, then answer from your own knowl
 
 - Type: `str`
 - Default: `(empty)`
-- Description: When `RAG_TEXT_SPLITTER=token_transformers`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Leave empty to use Tiktoken. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`); use it to match chunk boundaries to your embedding model's own tokenizer.
+- Description: When `RAG_TEXT_SPLITTER=token_transformers`, selects a HuggingFace transformers tokenizer (by model id, e.g. `bert-base-uncased`) to measure token length for chunking, instead of the default Tiktoken encoder. Also set as **Tokenizer Model** in **Settings > Documents** (admin section), shown when **Text Splitter** is **Token (Transformers)**. A name without a `/` that is not a local path gets the `sentence-transformers/` prefix. Left empty, Open WebUI uses the tokenizer of the loaded local embedding model, which exists only with the default (SentenceTransformers) embedding engine; with Ollama, OpenAI or Azure OpenAI embeddings an empty value makes processing fail with `Tokenizer model required for Token (Transformers) text splitter`, and the admin panel requires the field. The tokenizer is downloaded and cached (honoring `SENTENCE_TRANSFORMERS_HOME` / `HF_HUB_CACHE`) only while [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](#rag_embedding_model_auto_update) is on; otherwise it must already be in the cache. Use it to match chunk boundaries to your embedding model's own tokenizer.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_MARKDOWN_HEADER_TEXT_SPLITTER`
@@ -4700,7 +4744,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `bool`
 - Default: `False`
-- Description: Extracts images from PDFs using OCR when loading documents. Also configurable as **PDF Extract Images (OCR)** in **Settings > Documents** (admin section). The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
+- Description: Runs OCR on embedded images in the default PDF loader and adds the recognized words to the extracted page text. The loader outputs text, so searchable diagram labels do not carry the diagram image or its visual structure. Also configurable as **PDF Extract Images (OCR)** in **Settings > Documents** (admin section). The OCR runs on the Open WebUI server with RapidOCR, tuned by [`RAPIDOCR_PARAMS`](#rapidocr_params).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAPIDOCR_PARAMS`
@@ -4717,7 +4761,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
   - `page`: Creates one document per page (default).
   - `single`: Combines all pages into one document for better chunking across page boundaries.
 - Default: `page`
-- Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic.
+- Description: Controls how PDFs are loaded and split into documents when using the **default content extraction engine** (PyPDFLoader). Page mode creates one document per page, while single mode combines all pages into one document, which can improve chunking quality when content spans across page boundaries. This setting has no effect when using external content extraction engines like Tika, Docling, Document Intelligence, MinerU, or Mistral OCR, as those engines have their own document handling logic. Also set as **PDF Loader Mode** in **Settings > Documents** (admin section), shown only with the default engine. In `page` mode the text splitter works on each page separately, so no chunk spans a page break, and each chunk keeps its page number: the citation shows `(page N)` and its link opens the PDF at that page. In `single` mode pages are joined into one text, chunks can run across page breaks, and chunks carry no page number, so citations show neither. The mode is applied when a file is extracted; existing knowledge files change only after **Reindex Knowledge and Memory Vectors**, which extracts them again.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_RAG_CSV_SUMMARY`
@@ -4738,7 +4782,7 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `int`
 - Default: unset (no limit)
-- Description: Sets the maximum number of files that can be uploaded at once in a chat. Knowledge base uploads use [`KNOWLEDGE_MAX_UPLOAD_COUNT`](#knowledge_max_upload_count).
+- Description: Limits chat attachments. Adding files in the composer checks pending attachments plus the new batch. Sending a message checks pending attachments plus retained chat attachments, so documents and knowledge collections already attached to the chat can count against a later send. Knowledge base uploads use [`KNOWLEDGE_MAX_UPLOAD_COUNT`](#knowledge_max_upload_count).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `KNOWLEDGE_MAX_UPLOAD_COUNT`
@@ -4773,19 +4817,21 @@ The `markdown_header` option has been removed from `RAG_TEXT_SPLITTER`. Markdown
 
 - Type: `int`
 - Default: `None`
-- Description: Sets the maximum width, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured width limit is applied.
+- Description: Sets the maximum width, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured width limit is applied. Also set as **Image Compression Width** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `FILE_IMAGE_COMPRESSION_HEIGHT`
 
 - Type: `int`
 - Default: `None`
-- Description: Sets the maximum height, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured height limit is applied.
+- Description: Sets the maximum height, in pixels, used for client-side compression of image files uploaded. When unset, no backend-configured height limit is applied. Also set as **Image Compression Height** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::note
 
 These values are exposed through app config and consumed by the frontend chat upload flow for image files. Compression happens client-side with aspect ratio preserved. Non-image file uploads are not affected.
+
+The same limits apply to images added in channels and in notes. Images are only scaled down, never up. The limits act as a ceiling on each user's own **Image Compression** setting: a user can pick a smaller size but not a larger one, and with only these limits set, every image is held to them even when the user has compression turned off.
 
 :::
 
@@ -4811,7 +4857,7 @@ When configuring `RAG_FILE_MAX_SIZE` and `RAG_FILE_MAX_COUNT`, ensure that the v
 
 - Type: `int`
 - Default: `1`
-- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000 (not recommended)) may process documents faster by sending less, but larger API requests. Some external APIs do not support batching or sending more than 1 chunk per request. In such casey you must leave this at `1`. Default is 1 (safest option if the API does not support batching / more than 1 chunk per request). This setting only applies to external embedding engines, not the default SentenceTransformers engine. 
+- Description: Controls how many text chunks are embedded in a single API request when using external embedding providers (Ollama, OpenAI, or Azure OpenAI). Higher values (20-100+; max 16000 (not recommended)) may process documents faster by sending less, but larger API requests. Some external APIs do not support batching or sending more than 1 chunk per request. In such casey you must leave this at `1`. Default is 1 (safest option if the API does not support batching / more than 1 chunk per request). With the default SentenceTransformers engine, the value is the batch size passed to the local model, so the default of `1` embeds one chunk at a time and makes large uploads slow; raise it if memory allows. Also set as **Embedding Batch Size** in **Settings > Documents** (admin section).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info
@@ -4831,7 +4877,7 @@ Only increase this variable's value if it does. Otherwise you might run into une
 
 - Type: `bool`
 - Default: `true`
-- Description: Runs embedding tasks asynchronously (parallelized) for maximum performance. Only works for Ollama, OpenAI and Azure OpenAI, does not affect sentence transformer setups.
+- Description: Runs embedding tasks asynchronously (parallelized) for maximum performance. Only works for Ollama, OpenAI and Azure OpenAI, does not affect sentence transformer setups. Also set as **Async Embedding Processing** in **Settings > Documents** (admin section), shown only for those three engines. When on, all batches of a document's processing step (up to [`RAG_EMBEDDING_BUFFER_SIZE`](#rag_embedding_buffer_size) chunks, split by **Embedding Batch Size**) are sent at the same time; with the default batch size of `1`, that is one request per chunk, up to 1,000 at once. When off, the batches are sent one after another. Either way the embeddings are stored in the original chunk order, so search results do not change.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip
@@ -4853,7 +4899,7 @@ If you are embedding externally via API, ensure your rate limits are high enough
 
 - Type: `int`
 - Default: `0`
-- Description: Limits the number of concurrent embedding API requests when async embedding is enabled. Uses an asyncio semaphore to throttle parallel requests. Set to `0` for unlimited concurrency (default behavior), or set to a positive integer to cap simultaneous requests. Useful for respecting rate limits on external embedding APIs or reducing load on local embedding servers.
+- Description: Limits the number of concurrent embedding API requests when async embedding is enabled. Uses an asyncio semaphore to throttle parallel requests. Set to `0` for unlimited concurrency (default behavior), or set to a positive integer to cap simultaneous requests. Useful for respecting rate limits on external embedding APIs or reducing load on local embedding servers. Also set as **Embedding Concurrent Requests** in **Settings > Documents** (admin section). The cap counts requests per document being embedded, not across the server: two documents processed at the same time can each send that many requests.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip
@@ -4967,14 +5013,14 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 #### `RAG_RERANKING_MODEL`
 
 - Type: `str`
-- Description: Sets a model for reranking results. Locally, the model is loaded as a Sentence-Transformer CrossEncoder, with one exception: `jinaai/jina-colbert-v2` is loaded as a ColBERT model, and that takes precedence over `RAG_RERANKING_ENGINE`, so it runs locally even when the engine is set to `external`.
+- Description: Sets a model for reranking results. Locally, the model is loaded as a Sentence-Transformer CrossEncoder, with one exception: `jinaai/jina-colbert-v2` is loaded as a ColBERT model, and that takes precedence over `RAG_RERANKING_ENGINE`, so it runs locally even when the engine is set to `external`. For the local engine, use a Hugging Face model ID such as `BAAI/bge-reranker-v2-m3` or a local path; an Ollama model tag cannot be loaded. If the model fails to load when the settings are saved, Open WebUI logs `Error loading reranking model:` and turns hybrid search off. With the `external` engine, the value is sent as `model` in the rerank request.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_RERANKING_BATCH_SIZE`
 
 - Type: `int`
 - Default: `32`
-- Description: Controls how many query-document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call.
+- Description: Controls how many query-document pairs are scored in a single batch during local reranking. Higher values use more memory but can be faster on GPUs with sufficient VRAM. This applies to the local ColBERT/CrossEncoder reranking model's `predict()` call. Also set as **Reranking Batch Size** in **Settings > Documents** (admin section). It has no effect with the `external` reranking engine, which sends all results for a query to the reranker in one request.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SENTENCE_TRANSFORMERS_CROSS_ENCODER_BACKEND`
@@ -5006,7 +5052,7 @@ This variable was introduced alongside a fix for **uvicorn worker death during d
 
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets the **full URL** for the external reranking API.
+- Description: Sets the **full URL** for the external reranking API. Open WebUI sends a `POST` with a JSON body of `model`, `query`, `documents` and `top_n`, and a `Bearer` token from [`RAG_EXTERNAL_RERANKER_API_KEY`](#rag_external_reranker_api_key). The response must contain `results`, each with `index` and `relevance_score`. On any other response or a failed request, the log shows `Error in external reranking:` or `No results found in external reranking response`, and results are returned without reranking.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::warning
@@ -5028,7 +5074,7 @@ You **MUST** provide the full URL, including the endpoint path (e.g., `https://a
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables retrieval query generation.
+- Description: Enables or disables retrieval query generation. Also set as **Retrieval Query Generation** in **Settings > Interface** (admin section). When on, the task model writes the search queries for attached files and knowledge bases from the conversation, so the same question can retrieve different sources between runs. When off, the last user message is used as the query as written. See [The Same Question Retrieves Different Sources Each Time](/troubleshooting/rag#19-the-same-question-retrieves-different-sources-each-time).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_QUERIES_CACHE`
@@ -5094,7 +5140,7 @@ Strictly return in JSON format:
 
 - Type: `str`
 - Default: `prebuilt-layout`
-- Description: Specifies the model for document intelligence.
+- Description: Specifies the model for document intelligence. Also set as **Document Intelligence Model** in **Settings > Documents** (admin section). The value is sent to Azure as the model ID for each analysis, and Open WebUI asks for Markdown output. Only PDF, DOCX, PPT and PPTX files go to Document Intelligence; other files use the built-in loaders. Each file becomes one document, so citations carry no page number.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 ### Advanced Settings
@@ -5144,10 +5190,10 @@ Strictly return in JSON format:
 
 - Type: `bool`
 - Default: `False`
-- Description: Deprecated alias of [`ENABLE_LOCAL_WEB_FETCH`](#enable_local_web_fetch), still honored when the new name is unset. Controls whether outbound fetches can access URLs that resolve to private/local network IP addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading, OAuth profile-picture fetches and skill [**Import from URL**](/features/workspace/skills#importing-from-a-url).
+- Description: Deprecated alias of [`ENABLE_LOCAL_WEB_FETCH`](#enable_local_web_fetch), still honored when the new name is unset. Controls whether outbound fetches can access URLs that resolve to addresses that are not globally routable, such as private, loopback and link-local addresses. It started as a RAG web-fetch guard, but the same SSRF gate now also covers other caller-influenced fetch surfaces, including user and automation **webhooks**, retrieval, remote image loading, OAuth profile-picture fetches and skill [**Import from URL**](/features/workspace/skills#importing-from-a-url).
 - Persistence: Set via environment variable; applied at startup (not a `ConfigVar`).
 
-When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to private IP addresses, including:
+When disabled (default), Open WebUI blocks web fetch requests to URLs that resolve to any address that is not globally routable, and logs `Blocked non-global address:`. This includes the shared address range `100.64.0.0/10`, which Tailscale uses, as well as:
 
 - IPv4 private ranges (`10.x.x.x`, `172.16.x.x`-`172.31.x.x`, `192.168.x.x`, `127.x.x.x`)
 - IPv6 private ranges
@@ -5313,11 +5359,13 @@ Allow only specific domains: WEB_FETCH_FILTER_LIST="example.com,trusted-site.org
 
 #### `WEB_SEARCH_DOMAIN_FILTER_LIST`
 
-- Type: `list` of `str`
-- Default: `[]`
-- Description: Comma-separated list of domains to filter web search results. Domains prefixed with `!` are blocked; domains without prefix create an allowlist (only those domains permitted).
-- Example: `wikipedia.org,github.com,!malicious-site.com`
+- Type: `list` of `str` (JSON array in the environment variable)
+- Default: `[]` (no filtering)
+- Description: Filters results from search engines that support the list, such as SearXNG. Use bare domain names to match a domain and its subdomains. URL paths such as `example.com/news` are unsupported. Entries prefixed with `!` exclude matching results. If you include any unprefixed entries, a result must match at least one of them, and exclusions still take precedence. [Jina](/features/chat-conversations/web-search/providers/jina#limits) does not apply this list.
+- Example: `WEB_SEARCH_DOMAIN_FILTER_LIST='["example.com","!archive.example.com"]'`
 - Persistence: This environment variable is a `ConfigVar` variable.
+
+In **Settings > Web Search** (admin section), turn on **Web Search** to see **Domain Filter List**. The admin field takes comma-separated entries, for example `example.com,!archive.example.com`. In v0.13.4, a comma-separated value in the environment variable fails JSON parsing and falls back to an empty list.
 
 #### `WEB_SEARCH_RESULT_COUNT`
 
@@ -5685,7 +5733,7 @@ The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and th
 
 - Type: `str`
 - Default: `basic`
-- Description: Specifies the extract depth for Tavily search results.
+- Description: Specifies the extract depth for Tavily search results. Set under **Tavily Extract Depth** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `tavily`. See [Tavily as the web loader](/features/chat-conversations/web-search/providers/tavily#optional-configurations) for the accepted values and the errors it logs.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `TAVILY_SEARCH_DEPTH`
@@ -5729,13 +5777,13 @@ The setting is named **Ollama Cloud Web Search API Key** in the admin UI, and th
 #### `EXTERNAL_WEB_LOADER_URL`
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Specifies the URL of an external web content loader service for fetching and processing web pages.
+- Description: Specifies the URL of an external web content loader service for fetching and processing web pages. Set under **External Web Loader URL** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `external`. See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for the request and response format the service must use.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `EXTERNAL_WEB_LOADER_API_KEY`
 - Type: `str`
 - Default: Empty string (' ')
-- Description: Sets the API key for authenticating with the external web loader service.
+- Description: Sets the API key for authenticating with the external web loader service. Set under **External Web Loader API Key** in **Settings > Web Search** (admin section). See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for how it is sent.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `YANDEX_WEB_SEARCH_URL`
@@ -5888,7 +5936,7 @@ When using `playwright`, you have two options:
 
 - Type: `str`
 - Default: `None`
-- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`
+- Description: Specifies the WebSocket URI of a remote Playwright browser instance. When set, Open WebUI will use this remote browser instead of installing browser dependencies locally. This is particularly useful in containerized environments where you want to keep the Open WebUI container lightweight and separate browser concerns. Example: `ws://playwright:3000`. Set under **Playwright WebSocket URL** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `playwright`. See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for when the container installs Chromium itself.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::tip
@@ -5919,14 +5967,14 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 
 - Type: `int`
 - Default: `None`
-- Description: Specifies the timeout in milliseconds for Firecrawl requests. If not set, the default Firecrawl timeout is used.
-- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Firecrawl Timeout** (admin section).
+- Description: Timeout in seconds for Firecrawl requests. Open WebUI sends it to Firecrawl in milliseconds, kept between 1 and 300 seconds, and waits 10 seconds longer itself. If not set or not a positive number, no timeout is sent and Open WebUI waits 70 seconds. See the [Firecrawl page](/features/chat-conversations/web-search/providers/firecrawl) for retries.
+- Persistence: This environment variable is a `ConfigVar` variable. It can be configured in **Settings > Web Search > Firecrawl Timeout (s)** (admin section).
 
 #### `PLAYWRIGHT_TIMEOUT`
 
 - Type: `int`
 - Default: `10000` (milliseconds)
-- Description: Specifies the timeout for Playwright requests.
+- Description: Specifies the timeout for Playwright requests. Set under **Playwright Timeout (ms)** in **Settings > Web Search** (admin section) when **Web Loader Engine** is `playwright`. See [Playwright and External loader settings](/features/chat-conversations/web-search#playwright-and-external-loader-settings) for what it limits and the errors a timeout produces.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `WEB_LOADER_TIMEOUT`
@@ -6531,7 +6579,7 @@ You can only configure one OAUTH provider at a time. You cannot have two or more
 
 - Type: `bool`
 - Default: `False`
-- Description: When enabled, an unauthenticated visitor to `/auth` is redirected straight to the OAuth provider's login page, skipping the "Continue with SSO" screen. It only fires on an unambiguously SSO-only deployment: exactly one OAuth provider configured, [`ENABLE_LOGIN_FORM`](#enable_login_form) set to `False` and no LDAP or trusted-header auth. The redirect is suppressed during onboarding, after a failed sign-in and for an existing session. Visit `/auth?form=true` to reach the local login form anyway (an escape hatch for admins).
+- Description: Shown as **Auto Redirect** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section). When enabled, an unauthenticated visitor to `/auth` is redirected straight to the OAuth provider's login page, skipping the "Continue with SSO" screen. It only fires on an unambiguously SSO-only deployment: exactly one OAuth provider configured, [`ENABLE_LOGIN_FORM`](#enable_login_form) set to `False` and no LDAP or trusted-header auth. The redirect is suppressed during onboarding, after a failed sign-in and for an existing session. Visit `/auth?form=true` to reach the local login form anyway (an escape hatch for admins).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::danger
@@ -6568,6 +6616,9 @@ The environment is authoritative, so the **OAuth / OIDC** section of **Settings 
 - Default: `None`
 - Description: Overrides the default claim used to identify a user's unique ID (`sub`) from the OAuth/OIDC provider's user info response. By default, Open WebUI attempts to infer this from the provider's configuration. This variable allows you to explicitly specify which claim to use. For example, if your identity provider uses 'employee_id' as the unique identifier, you would set this variable to 'employee_id'.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Sub Claim** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
+- Default claim: `sub`, or `id` for GitHub and `user_id` for Feishu. If the configured claim is missing from the user data, sign-in fails with `Sign-in with your identity provider failed. Please contact your administrator for assistance.` and the server logs `OAuth callback failed, sub is missing`.
+- Changing it on an instance with existing users: accounts are looked up by provider and this value, so existing users no longer match their accounts. With [`OAUTH_MERGE_ACCOUNTS_BY_EMAIL`](#oauth_merge_accounts_by_email) on, they are linked again by email and the new value is stored. Otherwise their sign-in fails, with `Uh-oh! This email is already registered. Sign in with your existing account or choose another email to start anew.` while [`ENABLE_OAUTH_SIGNUP`](#enable_oauth_signup) is on.
 
 #### `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`
 
@@ -6576,6 +6627,9 @@ The environment is authoritative, so the **OAuth / OIDC** section of **Settings 
 - Description: If enabled, merges OAuth accounts with existing accounts using the same email
 address. This is considered unsafe as not all OAuth providers will verify email addresses and can lead to potential account takeovers.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a toggle: **Merge Accounts by Email** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
+- What it allows: when no account is linked yet to that provider and `sub`, the sign-in is attached to whatever account has the same email, including a local email and password account or an admin account. Open WebUI does not check whether the provider verified the address, so anyone who can set that email at the provider signs in as that account. Turn it on only for providers that verify email addresses.
+- With it off, a provider sign-in whose email belongs to an existing account that is not linked to it fails with `Uh-oh! This email is already registered. Sign in with your existing account or choose another email to start anew.` while [`ENABLE_OAUTH_SIGNUP`](#enable_oauth_signup) is on.
 
 #### `ENABLE_OAUTH_WITHOUT_EMAIL`
 
@@ -6588,6 +6642,8 @@ address. This is considered unsafe as not all OAuth providers will verify email 
 - Default: `False`
 - Description: If enabled, updates the local user profile picture with the OAuth-provided picture on login.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a toggle: **Update Picture** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
+- Every sign-in replaces the picture when it differs, including one the user set in their own settings. If the provider sends no picture, or Open WebUI cannot download it, the picture is reset to the default icon.
 
 :::info
 
@@ -6599,15 +6655,17 @@ If the OAuth picture claim is disabled by setting `OAUTH_PICTURE_CLAIM` to `''` 
 
 - Type: `bool`
 - Default: `False`
-- Description: If enabled, replaces the local user's name with the value of [`OAUTH_USERNAME_CLAIM`](#oauth_username_claim) on every OAuth login when the two differ.
+- Description: If enabled, replaces the local user's name with the value of [`OAUTH_USERNAME_CLAIM`](#oauth_username_claim) on every OAuth login when the two differ. A name the user changed in their own settings is overwritten at their next sign-in. An empty or missing claim leaves the name as it is.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a toggle: **Update Name** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
 
 #### `OAUTH_UPDATE_EMAIL_ON_LOGIN`
 
 - Type: `bool`
 - Default: `False`
-- Description: If enabled, replaces the local user's email with the value of [`OAUTH_EMAIL_CLAIM`](#oauth_email_claim) on every OAuth login when the two differ. The update is skipped, and an error logged, when another account already uses the new address.
+- Description: If enabled, replaces the local user's email with the value of [`OAUTH_EMAIL_CLAIM`](#oauth_email_claim) on every OAuth login when the two differ. The update is skipped, and an error logged, when another account already uses the new address. An email changed in Open WebUI is overwritten at the user's next sign-in.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a toggle: **Update Email** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
 
 #### `ENABLE_OAUTH_EMAIL_FALLBACK`
 
@@ -7056,6 +7114,10 @@ Alternatively, if your provider does not support standard OIDC discovery (e.g., 
 - Default: `name`
 - Description: Set username claim for OpenID.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Username Claim** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section).
+- Where it is read: from the ID token when the ID token carries both this claim and the [`OAUTH_EMAIL_CLAIM`](#oauth_email_claim) claim. Otherwise Open WebUI fetches the userinfo response and reads the claim there, with ID token claims filling in keys the userinfo response lacks. The value is a top-level claim name; a dotted name is not read as a nested path.
+- When the claim is missing or empty: a new account gets its email address as its name, and the server logs `Username claim is missing, using email as name`.
+- Existing accounts keep their name. Turn on [`OAUTH_UPDATE_NAME_ON_LOGIN`](#oauth_update_name_on_login) to replace it from this claim at every sign-in.
 
 #### `OAUTH_EMAIL_CLAIM`
 
@@ -7077,11 +7139,11 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 
 :::
 
-#### `OAUTH_GROUP_CLAIM`
+#### `OAUTH_GROUPS_CLAIM`
 
 - Type: `str`
 - Default: `groups`
-- Description: Specifies the group claim for OAuth authentication. `OAUTH_GROUPS_CLAIM` is read as well and wins when both are set. The admin UI field and the persisted key keep the singular name.
+- Description: Specifies the group claim for OAuth authentication. This is the current name. The older `OAUTH_GROUP_CLAIM` is still read as a fallback when `OAUTH_GROUPS_CLAIM` is not set, and `OAUTH_GROUPS_CLAIM` wins when both are set. The admin config API field keeps the singular name `OAUTH_GROUP_CLAIM`, and the database stores the value under the key `oauth.group_claim`.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `ENABLE_OAUTH_ROLE_MANAGEMENT`
@@ -7104,6 +7166,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `False`
 - Description: When enabled, groups from OAuth claims that don't exist in Open WebUI will be automatically created. Groups matching [`OAUTH_BLOCKED_GROUPS`](#oauth_blocked_groups) are never created.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a toggle: **Auto-Create Groups** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section), shown while **Group Mapping** ([`ENABLE_OAUTH_GROUP_MANAGEMENT`](#enable_oauth_group_management)) is on. It has no effect while group mapping is off.
 
 #### `OAUTH_GROUP_DEFAULT_SHARE`
 
@@ -7122,6 +7185,7 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `[]`
 - Description: JSON array of OAuth group names that [group management](/features/authentication-access/auth/sso#oauth-group-management) leaves alone. At sign-in, a matching group is never created (with `ENABLE_OAUTH_GROUP_CREATION`), and users are never added to or removed from it (with `ENABLE_OAUTH_GROUP_MANAGEMENT`). Each entry matches exactly, as a shell-style wildcard (`*`, `?`) or as a regular expression. To deny sign-in by role, use [`OAUTH_ALLOWED_ROLES`](#oauth_allowed_roles).
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Blocked Groups** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section), shown while **Group Mapping** is on. The field takes comma-separated names or a JSON array; use the JSON array for a pattern that contains a comma. Despite the field's description, "Provider groups blocked from signing in.", it blocks no one: a user in a blocked group still signs in, and sessions that already exist are not touched.
 
 #### `OAUTH_ROLES_CLAIM`
 
@@ -7136,13 +7200,16 @@ If `OAUTH_PICTURE_CLAIM` is set to `''` (empty string), then the OAuth picture c
 - Default: `user,admin`
 - Description: Sets the roles that are allowed access to the platform. A value of `*` in the list acts as a wildcard that matches any role, so any user presenting a roles claim is allowed.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Allowed Roles** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section), shown while **Role Mapping** ([`ENABLE_OAUTH_ROLE_MANAGEMENT`](#enable_oauth_role_management)) is on.
+- How it works with [`OAUTH_ADMIN_ROLES`](#oauth_admin_roles): roles are checked at every sign-in. A provider role in this list gives the Open WebUI role `user`. A provider role in the admin list gives `admin`, and wins when both match. A user whose provider roles match neither list is refused with `You do not have permission to access this resource. Please contact your administrator for assistance.` A user whose provider sends no roles keeps their current role, and a new user gets [`DEFAULT_USER_ROLE`](#default_user_role). The only account on an instance is always `admin`.
 
 #### `OAUTH_ADMIN_ROLES`
 
 - Type: `str`
 - Default: `admin`
-- Description: Sets the roles that are considered administrators.
+- Description: Sets the roles that are considered administrators. A matching role lets the user sign in as `admin` even when it is not in [`OAUTH_ALLOWED_ROLES`](#oauth_allowed_roles). Roles are checked at every sign-in in which the provider sends roles, so a user promoted to `admin` by hand in Open WebUI, or one whose provider roles lose their admin role, becomes `user` at that sign-in when a role matches only the allowed list.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Admin Roles** in the **OAuth / OIDC** section of **Settings > Authentication** (admin section), shown while **Role Mapping** is on.
 
 #### `OAUTH_ROLES_SEPARATOR`
 
@@ -7245,8 +7312,9 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 #### `LDAP_ATTRIBUTE_FOR_MAIL`
 
 - Type: `str`
-- Description: Sets the attribute to use as mail for LDAP authentication.
+- Description: Sets the attribute to use as mail for LDAP authentication. The LDAP user signs in to the Open WebUI account that has this email, if one exists, however that account was created.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Attribute for Mail** in the **LDAP** section of **Settings > Authentication** (admin section). The section cannot be saved while it is empty.
 
 #### `LDAP_DEFAULT_EMAIL_DOMAIN`
 
@@ -7258,33 +7326,38 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 #### `LDAP_ATTRIBUTE_FOR_USERNAME`
 
 - Type: `str`
-- Description: Sets the attribute to use as a username for LDAP authentication.
+- Description: Sets the attribute to use as a username for LDAP authentication. Open WebUI searches for an entry whose value of this attribute equals the name typed on the sign-in page, compared in lowercase. A new account takes its display name from the entry's `cn` attribute, not from this one.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Attribute for Username** in the **LDAP** section of **Settings > Authentication** (admin section). The section cannot be saved while it is empty.
 
 #### `LDAP_APP_DN`
 
 - Type: `str`
-- Description: Sets the distinguished name for the LDAP application.
+- Description: Sets the distinguished name for the LDAP application. Open WebUI binds as this account to search for the user before checking their password. Left empty, it binds anonymously. A failed bind ends the sign-in with `Application account bind failed`.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Application DN** in the **LDAP** section of **Settings > Authentication** (admin section).
 
 #### `LDAP_APP_PASSWORD`
 
 - Type: `str`
 - Description: Sets the password for the LDAP application.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Application DN Password** in the **LDAP** section of **Settings > Authentication** (admin section).
 
 #### `LDAP_SEARCH_BASE`
 
 - Type: `str`
-- Description: Sets the base to search for LDAP authentication.
+- Description: Sets the base to search for LDAP authentication. A user outside this base gets `User not found in the LDAP server`.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Search Base** in the **LDAP** section of **Settings > Authentication** (admin section). The section cannot be saved while it is empty.
 
 #### `LDAP_SEARCH_FILTER`
 
 - Type: `str`
 - Default: `None`
-- Description: Sets additional filter conditions for LDAP user search. This filter is **appended** to the automatically-generated username filter. Open WebUI automatically constructs the username portion of the filter using `LDAP_ATTRIBUTE_FOR_USERNAME`, so you should **not** include user placeholders like `%(user)s` or `%s`; these are not supported. Use this for additional conditions such as group membership restrictions (e.g., `(memberOf=cn=allowed-users,ou=groups,dc=example,dc=com)`). Alternative to `LDAP_SEARCH_FILTERS`.
+- Description: Sets additional filter conditions for LDAP user search. This filter is **appended** to the automatically-generated username filter. Open WebUI automatically constructs the username portion of the filter using `LDAP_ATTRIBUTE_FOR_USERNAME`, so you should **not** include user placeholders like `%(user)s` or `%s`; these are not supported. Use this for additional conditions such as group membership restrictions (e.g., `(memberOf=cn=allowed-users,ou=groups,dc=example,dc=com)`). Alternative to `LDAP_SEARCH_FILTERS`, and read first when both are set.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Search Filters** in the **LDAP** section of **Settings > Authentication** (admin section). Left empty, users are matched on [`LDAP_ATTRIBUTE_FOR_USERNAME`](#ldap_attribute_for_username) alone. The field's placeholder, `(&(objectClass=inetOrgPerson)(uid=%s))`, is not a working value: Open WebUI does not replace `%s`, so a copy of it also requires a `uid` of `%s` and sign-in fails with `User not found in the LDAP server`.
 
 #### `LDAP_SEARCH_FILTERS`
 
@@ -7302,14 +7375,17 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 #### `LDAP_CA_CERT_FILE`
 
 - Type: `str`
-- Description: Sets the path to the LDAP CA certificate file.
+- Description: Sets the path to the LDAP CA certificate file. The path is read inside the Open WebUI container. If it names a file that does not exist there, LDAP sign-in fails with `Failed to configure TLS for LDAP connection.` See [LDAP troubleshooting](/features/authentication-access/auth/ldap#failed-to-configure-tls).
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a field: **Certificate Path** in the **LDAP** section of **Settings > Authentication** (admin section).
 
 #### `LDAP_VALIDATE_CERT`
 
 - Type: `bool`
-- Description: Sets whether to validate the LDAP CA certificate.
+- Default: `True`
+- Description: Sets whether to validate the LDAP CA certificate. When `False`, Open WebUI accepts any certificate the LDAP server presents.
 - Persistence: This environment variable is a `ConfigVar` variable.
+- Also a toggle: **Validate Certificate** in the **LDAP** section of **Settings > Authentication** (admin section), shown while **TLS** ([`LDAP_USE_TLS`](#ldap_use_tls)) is on. It has no effect while TLS is off.
 
 #### `LDAP_CIPHERS`
 
@@ -7329,7 +7405,7 @@ If you set both `OAUTH_AUDIENCE` and `OAUTH_AUTHORIZE_PARAMS` containing an `aud
 
 - Type: `bool`
 - Default: `False`
-- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable in the LDAP section of **Settings > Authentication** (admin section).
+- Description: If a group from LDAP does not exist in Open WebUI, it will be created automatically. Also configurable as **Auto-Create Groups** in the LDAP section of **Settings > Authentication** (admin section), shown while **Group Mapping** ([`ENABLE_LDAP_GROUP_MANAGEMENT`](#enable_ldap_group_management)) is on. It has no effect while group mapping is off.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `LDAP_ATTRIBUTE_FOR_GROUPS`
@@ -8192,7 +8268,7 @@ pip install opentelemetry-api opentelemetry-sdk opentelemetry-exporter-otlp
 
 - Type: `str`
 - Default: `sqlite:///${DATA_DIR}/webui.db`
-- Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. This variable takes precedence over individual database connection parameters if explicitly set.
+- Description: Specifies the complete database connection URL, following SQLAlchemy's URL scheme. When `DATABASE_TYPE`, `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME` and at least one of `DATABASE_USER` or `DATABASE_PASSWORD` are all set, Open WebUI builds the URL from them and ignores `DATABASE_URL`. The SQLite default applies only when the variable is not set at all. An empty value, or a `DATABASE_URL` left in your shell from another project, replaces it; an empty value stops startup with `sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL string`. Unset the variable or give it a full URL.
 
 :::info
 
@@ -8298,7 +8374,7 @@ For multi-replica or high-availability deployments (Kubernetes, Docker Swarm), y
 
 :::info
 
-When `DATABASE_URL` is not explicitly set, Open WebUI will attempt to construct it using a combination of `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT`, and `DATABASE_NAME`. For this automatic construction to occur, **all** of these individual parameters must be provided. If any are missing, the default `DATABASE_URL` (SQLite file) or any explicitly set `DATABASE_URL` will be used instead.
+Open WebUI builds the database URL from `DATABASE_TYPE`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_HOST`, `DATABASE_PORT` and `DATABASE_NAME` when `DATABASE_TYPE`, `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME` and at least one of `DATABASE_USER` or `DATABASE_PASSWORD` are set. The built URL replaces `DATABASE_URL`, even one you set explicitly. If any of them is missing, the explicitly set `DATABASE_URL` or the default SQLite file is used instead.
 
 :::
 
@@ -8371,23 +8447,13 @@ Each SQLite connection carries its own page cache (`DATABASE_SQLITE_PRAGMA_CACHE
 
 For deployments with many concurrent users, consider increasing both `DATABASE_POOL_SIZE` and `DATABASE_POOL_MAX_OVERFLOW`. A good starting point is `DATABASE_POOL_SIZE=15` and `DATABASE_POOL_MAX_OVERFLOW=20`.
 
-**Important:** The combined total (`DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW`) should remain well below your database server's `max_connections` limit. PostgreSQL defaults to 100 max connections, so keeping the combined total under 50-80 per Open WebUI instance is recommended to leave room for other clients and maintenance connections.
-
 :::
 
-:::warning Pool Size Multiplies with Concurrency
+:::warning PostgreSQL pools multiply with workers
 
-**Each Open WebUI process maintains its own independent connection pool.** This applies to every replica, whether Kubernetes pods, Docker Compose or Docker Swarm replicas, and to every Uvicorn worker inside one.
+Each Open WebUI worker has separate synchronous and asynchronous application engines. When pooling is enabled, each can open up to `DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW` connections. For example, a size of 15 and overflow of 20 across four replicas with one worker each gives an application pool capacity of 280 connections (2 × 35 × 4).
 
-The actual maximum number of database connections is:
-
-```
-Total connections = (DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × Number of processes/instances
-```
-
-For example, with `DATABASE_POOL_SIZE=15`, `DATABASE_POOL_MAX_OVERFLOW=20`, and 4 replicas, you could open up to **140 connections** (35 × 4).
-
-When calculating pool settings, always account for this multiplier to avoid exhausting your database's `max_connections` limit. This is a fundamental limitation: connection pools cannot be shared across separate processes or containers.
+With `VECTOR_DB=pgvector`, an unset `PGVECTOR_DB_URL` defaults to `DATABASE_URL`. The nonempty URL gives pgvector a separate engine governed by [its own pool settings](#pgvector_pool_size), even when it points to the same server. Count that pool against the server it connects to. Leave room under each server's `max_connections` for clients outside Open WebUI. These limits describe configured pools. Disabling pooling does not set a connection cap.
 
 :::
 

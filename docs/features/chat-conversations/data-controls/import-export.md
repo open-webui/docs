@@ -20,9 +20,19 @@ Click the **Export Chats** button to download all your conversations as a JSON f
 - Model information used in each conversation
 - Timestamps and conversation structure
 
+:::warning Images and attached files are not in the export
+In a saved chat, images and other files you attach are uploaded to the server as files. The chat, and so the export, keeps only each file's ID and name, and Open WebUI loads the image from `/api/v1/files/<id>/content` when it shows the message. Import the chat on another Open WebUI instance and those images do not load and those files cannot be opened, because that instance has no file with that ID. Keep the original files if you need them after a migration.
+
+A temporary chat is the exception. Images stay inside the chat as base64 data and other files as their extracted text, so **Download** > **Export chat (.json)** in the chat menu of a temporary chat carries them.
+:::
+
 :::tip Regular Backups
 It's a good practice to periodically export your chats, especially before major updates or migrations.
 :::
+
+To save one conversation as a PDF, open the chat's three-dot menu at the top of the chat or beside an editable chat in the sidebar. Choose **Download > PDF document (.pdf)**. **Allow Chat Export** is on by default. If an administrator removes this [permission](/features/authentication-access/rbac/permissions#3-chat-permissions), the **Download** menu is hidden for affected users. Admins retain access.
+
+**Settings > Interface > Stylized PDF Export** is on by default. It captures the rendered conversation as page images. If the stylized PDF is blank or too large, or you need selectable text, turn this setting off and export the PDF again. The text-based PDF contains the active branch's message text without the rendered layout or inline images.
 
 ## Importing Chats
 
@@ -44,6 +54,10 @@ Click the **Import Chats** button and select a JSON file to restore conversation
 - Each imported chat receives a new unique ID, so re-importing the same file will create duplicates
 - If using ChatGPT exports, the format is automatically detected and converted
 - Tags your account does not have yet are created from the file. An export stores each tag in lowercase with underscores, so a tag named Import Test comes back as import_test
+
+### Moving chats between instances
+
+Chat JSON exports, including **Export** from a folder menu, contain conversation records. Importing them does not create folders or restore folder settings such as system prompts. Open WebUI keeps an exported folder ID only if that exact folder exists on the destination and you can write to it. Otherwise, the chat is imported outside any folder. Recreate the folders and their settings on the destination, then move the imported chats into them.
 
 ## Chat Import JSON Schema
 
@@ -179,7 +193,7 @@ Messages use a **tree structure** rather than a flat list. Each message referenc
 
 ### ChatGPT Export Format
 
-ChatGPT exports are automatically detected when the first object in the array contains a `mapping` key. You don't need to manually convert ChatGPT exports: just import the file directly and Open WebUI will handle the conversion.
+ChatGPT exports are automatically detected when any object in the array contains a `mapping` key; entries without one (ChatGPT's folder and project records) are skipped. You don't need to manually convert ChatGPT exports: just import the file directly and Open WebUI will handle the conversion.
 
 ### Minimal Working Example
 

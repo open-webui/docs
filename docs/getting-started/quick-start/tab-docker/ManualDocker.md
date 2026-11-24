@@ -6,13 +6,13 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 
 | Flag | What it does |
 |---|---|
-| `-p 3000:8080` | The UI is on port 3000 of your machine. Change the left number if 3000 is taken. |
-| `-v open-webui:/app/backend/data` | Your chats, users and settings live in this volume. It survives updates; never run without it. |
+| `-p 3000:8080` | The UI is on port 3000 of your machine. Change the left number if 3000 is taken. Keep the right number at 8080, the port Open WebUI listens on inside the container unless you set `PORT`. With `-p 3000:3000` the page never loads. |
+| `-v open-webui:/app/backend/data` | Your chats, users and settings live in this volume. It survives updates; never run without it. Mount it at `/app/backend/data`, not `/app/backend`: a mount at `/app/backend` [covers](https://docs.docker.com/engine/storage/volumes/) the application code in the image, so the container runs whatever the mount holds and updates seem to change nothing. |
 | `--add-host=host.docker.internal:host-gateway` | Lets the container reach Ollama, or anything else, running on your machine. |
 | `--restart always` | Comes back after a reboot. |
 | `-e WEBUI_SECRET_KEY=your-secret-key` | Set it once and keep it. Without a fixed key, every recreated container logs everyone out. Generate one with `openssl rand -hex 32`. |
 
-
+The log line `Waiting for application startup.` appears on every normal start. Open WebUI accepts connections once the log shows `Uvicorn running on http://0.0.0.0:8080`.
 
 ## Image Variants
 
@@ -21,7 +21,7 @@ docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-
 | `:main` | Standard image (recommended). Everything included: the app plus the bundled speech-to-text and embedding models. |
 | `:dev` | Pre-release (nightly) build from the `dev` branch. Fixes and features arrive here first. See [Using the Dev Branch](#using-the-dev-branch). |
 | `:slim`, `:main-slim` | About **197 MB instead of 1.62 GB** to download, **88% smaller** on Linux/amd64. Same chat experience with your model provider. See [Why choose slim?](#what-slim-leaves-out) |
-| `:cuda` | Nvidia GPU support, CUDA 12.8 (add `--gpus all` to `docker run`) |
+| `:cuda` | Runs Open WebUI's own local models (embeddings, reranking, local Whisper) on an Nvidia GPU, CUDA 12.8 (add `--gpus all` to `docker run`). Chat replies are not faster; see [GPU support](#gpu-support-nvidia) |
 | `:cuda126` | Same as `:cuda`, built against CUDA 12.6 |
 | `:ollama` | Bundles Ollama inside the container for an all-in-one setup |
 
@@ -153,11 +153,18 @@ The same images are mirrored to Docker Hub as `openwebui/open-webui`, but only a
 docker run -d -p 3000:8080 --gpus all --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:cuda
 ```
 
+The `:cuda` image runs the local embedding model, the local reranking model and local Whisper speech-to-text on the GPU. Chat replies come from Ollama or your provider, so their speed depends on where that model runs: give the GPU to Ollama. If the container cannot use CUDA, Open WebUI logs `CUDA unavailable (USE_CUDA_DOCKER=true), falling back to CPU` followed by the reason, and runs those models on the CPU. Started without `--gpus all`, the line ends in `CUDA not available`.
+
+`--gpus all` needs the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) on the host. Without it, `docker run` fails with `could not select device driver "" with capabilities: [[gpu]]` and no container starts. Install the toolkit, run `sudo nvidia-ctk runtime configure --runtime=docker`, restart Docker with `sudo systemctl restart docker`, then run the command again. Docker's [GPU access](https://docs.docker.com/engine/containers/gpu/) page lists the driver steps.
+
+There is no ROCm image of Open WebUI. With an AMD GPU, run the `:main` image and give the GPU to Ollama's `rocm` image, as shown in [Ollama's Docker guide](https://docs.ollama.com/docker).
+
 ### Bundled with Ollama
 
 A single container with Open WebUI and Ollama together:
 
-**With GPU:**
+**With GPU:** `--gpus=all` passes an NVIDIA GPU and needs the NVIDIA Container Toolkit, as in [GPU support](#gpu-support-nvidia). For an AMD GPU, use the ROCm setup described there instead.
+
 ```bash
 docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
 ```
@@ -166,6 +173,14 @@ docker run -d -p 3000:8080 --gpus=all -v ollama:/root/.ollama -v open-webui:/app
 ```bash
 docker run -d -p 3000:8080 -v ollama:/root/.ollama -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:ollama
 ```
+
+To check whether a chat model is using the GPU, send a message and run `ollama ps` while the model is still loaded. Check the `PROCESSOR` column for CPU, GPU, or a split between them.
+
+- For bundled Ollama, run `docker exec open-webui ollama ps`.
+- For a separate Ollama container, run `docker exec ollama ollama ps` or substitute its container name.
+- For a native install, run `ollama ps` on the machine serving the model.
+
+Match the instance to the Ollama URL in **Admin Panel > Settings > Connections**. A device check such as `nvidia-smi` can confirm GPU visibility, while `ollama ps` shows where Ollama loaded the specific model.
 
 ### Connecting to Ollama on a different server
 

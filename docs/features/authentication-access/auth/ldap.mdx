@@ -145,6 +145,8 @@ Open WebUI needs an email address for every account. A user whose mail attribute
 
 :::
 
+`LDAP_ATTRIBUTE_FOR_USERNAME` is used only to find the user's entry from the name typed on the sign-in page. An account created by LDAP sign-in takes its name from the entry's `cn` attribute and its email from the mail attribute, and its Open WebUI username is left empty.
+
 ### UI Configuration
 
 Alternatively, you can configure these settings directly in the UI:
@@ -152,7 +154,7 @@ Alternatively, you can configure these settings directly in the UI:
 1. Log in as an administrator.
 2. Open the **Admin Panel**, go to **Settings** > **Authentication**, and find the **LDAP** section.
 3. Turn on the **LDAP** switch.
-4. Fill in the fields corresponding to the environment variables above.
+4. Fill in the fields corresponding to the environment variables above. Each field's label is listed with its variable under [LDAP](/reference/env-configuration#ldap). Do not copy the **Search Filters** placeholder, `(&(objectClass=inetOrgPerson)(uid=%s))`: Open WebUI does not replace `%s`, so that filter finds no user and sign-in fails with `User not found in the LDAP server`.
 5. Save the settings. They apply to the next login attempt, with no restart.
 
 ## 5. Logging In
@@ -164,7 +166,29 @@ Open a new incognito browser window and navigate to your Open WebUI instance.
 
 Upon successful login, a new user account is created automatically in Open WebUI with the instance's default role, which is `pending` unless an administrator changed it under **Settings** > **Authentication**. The very first account on an instance becomes an administrator. An administrator can later change the user's role if needed.
 
-## 6. Troubleshooting Common Errors
+## 6. Syncing Groups from LDAP
+
+With **Group Mapping** (`ENABLE_LDAP_GROUP_MANAGEMENT`) turned on in the **LDAP** section, Open WebUI reads the user's groups at every LDAP sign-in from the attribute set in **Group Attribute** (`LDAP_ATTRIBUTE_FOR_GROUPS`, default `memberOf`). Each value is a group DN, and Open WebUI uses its first `CN` as the group name.
+
+:::warning Manual group assignments do not survive the next sign-in
+
+When the user's entry lists at least one group, the sync makes their Open WebUI groups match their LDAP groups:
+
+- The user is added to every Open WebUI group whose name matches one of their LDAP group names.
+- The user is removed from every other Open WebUI group, including groups an admin added them to by hand.
+- The **Default Group** set for new users is removed too. A new user who has LDAP groups leaves it at their first sign-in, unless its name matches one of their LDAP groups.
+- Admin accounts are synced the same way.
+
+To keep a user in a group, add them to an LDAP group of the same name in the directory. LDAP has no setting that exempts a group from the sync.
+
+:::
+
+- With **Auto-Create Groups** (`ENABLE_LDAP_GROUP_CREATION`) on, Open WebUI creates any of the user's LDAP groups that has no Open WebUI group of the same name, then adds the user to it. With it off, those LDAP groups are skipped.
+- When the user's entry has no group attribute, or it is empty, the sync does not run and the user's Open WebUI groups stay as they are.
+- A change in the directory takes effect at the user's next LDAP sign-in.
+- If the sync fails, the sign-in still succeeds and the server log shows `Failed to sync groups for user`.
+
+## 7. Troubleshooting Common Errors
 
 Here are solutions to common errors encountered during LDAP integration.
 
@@ -192,6 +216,14 @@ ERROR | LDAP authentication error: ("('socket ssl wrapping error: [SSL: UNEXPECT
 -   **If you don't intend to use TLS:** Set `LDAP_USE_TLS="false"` and connect to the standard plaintext port `389`.
 -   **If you intend to use LDAPS:** Ensure your LDAP server is configured for TLS and listening on port `636`. Set `LDAP_SERVER_PORT="636"` and `LDAP_USE_TLS="true"`.
 -   **StartTLS is not supported.** `LDAP_USE_TLS` opens an implicit TLS connection only, so `"true"` against a plain listener on port `389` fails. Use LDAPS on `636` or plaintext on `389`.
+
+### `Failed to configure TLS for LDAP connection.` {#failed-to-configure-tls}
+
+**Cause:** Open WebUI could not build the TLS settings for the LDAP connection, so sign-in stops before it contacts the LDAP server. A common reason is a **Certificate Path** ([`LDAP_CA_CERT_FILE`](/reference/env-configuration#ldap_ca_cert_file)) that points to a file that does not exist inside the Open WebUI container. The server log then shows `TLS configuration error: invalid CA public key file`.
+
+**Solution:**
+-   **If you use a custom CA:** Mount the CA certificate file into the container and set **Certificate Path** to its path inside the container, not its path on the host.
+-   **If you do not need a custom CA:** Clear **Certificate Path** in the **LDAP** section of **Settings > Authentication**.
 
 ### `err=49 text=` (Invalid Credentials)
 

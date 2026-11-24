@@ -106,7 +106,7 @@ Try uploading a document and preview the extracted content. If it's blank or mis
 
 ### 2. Only a Small Part of the Document is Being Used
 
-Open WebUI is designed to work with models that have limited context windows by default. For instance, Ollama picks a model's default context length from available VRAM, and on GPUs with less than 24 GiB that is 4096 tokens (see [Ollama's context length documentation](https://docs.ollama.com/context-length)), well below what most models support. Because of this, Open WebUI aggressively trims down the retrieved content to fit within the assumed available space.
+Open WebUI is designed to work with models that have limited context windows by default. For instance, Ollama picks a model's default context length from available VRAM, and on GPUs with less than 24 GiB that is 4096 tokens (see [Ollama's context length documentation](https://docs.ollama.com/context-length)), well below what most models support. Open WebUI does not measure the model's context or trim retrieved content to fit it. It injects the Top K retrieved chunks (default 10), so only those parts of the document reach the model, and a small context window can cut off even those.
 
 **Solutions:**
 
@@ -204,10 +204,11 @@ Open WebUI implements various limits to ensure system stability and prevent abus
     *   **Office and EPUB documents** are additionally checked against what they contain, because those formats are archives. One that unpacks to far more than its own size is refused with a message about the archive being too large after decompression, even though the file itself is small. A genuine document rarely trips this; one that does is either corrupt or built to exhaust memory on whatever opens it.
     *   **Max File Count:** Controlled by `RAG_FILE_MAX_COUNT` (default: Unlimited). Configurable in **Settings > Documents > Files > Max Upload Count** (admin section).
     *   **Allowed File Extensions:** Controlled by `RAG_ALLOWED_FILE_EXTENSIONS` (default: All). Configurable in **Settings > Documents > Files > Allowed File Extensions** (admin section).
-*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (defaults to 100). This limit applies to the number of files directly associated with a folder.
+*   **Folder Uploads:** Subject to the `FOLDER_MAX_FILE_COUNT` [environment variable](/reference/env-configuration/#folder_max_file_count) (no limit by default; only the browser enforces it). This limit applies to the number of files directly associated with a folder.
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to `RAG_FILE_MAX_SIZE` and the knowledge base [file limits](/features/workspace/knowledge#file-limits).
-    *   **RAG Enforcement:** All files uploaded to a Knowledge Base are automatically indexed. However, similar to chat uploads, Knowledge Bases can also be used with **Using Entire Document** (click the attachment in a chat), which feeds the full document content to the model instead of using vector search retrieval.
+    *   **Vector indexing:** By default, Open WebUI indexes files when they are added to a knowledge base. **Bypass Embedding and Retrieval** in **Settings > Documents** (admin section) skips vector indexing for both chat uploads and files added to knowledge bases. Open WebUI still extracts text from document uploads and stores it.
+    *   **Full-text attachments:** To use full text for a single attachment and keep indexing enabled, click the attachment in the chat and select **Using Entire Document**. For a file-backed knowledge base, full-text mode can include the extracted text of every file in the collection. Check the combined text against the model's context budget.
 
 :::info
 By separating these limits, administrators can better manage resource usage across different features. For example, you might want to allow larger uploads in a curated Knowledge Base while restricting the number of files in ad-hoc Folder uploads.
@@ -251,6 +252,8 @@ If your initial response is fast but follow-up questions become increasingly slo
 | Slow follow-up responses | Enable `RAG_SYSTEM_CONTEXT=True` to fix KV cache invalidation |
 | API returns "empty content" | Wait for file processing to complete before adding to knowledge base |
 | CUDA OOM during embedding | Reduce batch size, isolate GPU, or restart container |
+| Large uploads slow to embed | Raise **Embedding Batch Size**, use an external embedding engine, or bypass embedding |
+| Hybrid search changes nothing | Set `GLOBAL_LOG_LEVEL=DEBUG` and check the reranker model and endpoint |
 | PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
 | Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
 | Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
@@ -330,7 +333,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
    Set `CUDA_VISIBLE_DEVICES` to pin embedding to a specific GPU separate from your chat model.
 
 2. **Reduce Embedding Batch Size**:
-   Lower `RAG_EMBEDDING_BATCH_SIZE` (e.g., from 32 to 8 or 4) to reduce peak memory usage.
+   If you raised `RAG_EMBEDDING_BATCH_SIZE` (the default is 1; 32 is the default of `RAG_RERANKING_BATCH_SIZE`), lower it again to reduce peak memory usage.
 
 3. **Enable Expandable Segments**:
    Set the environment variable to reduce fragmentation:
@@ -354,7 +357,7 @@ CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB o
 When using a **remote/external embedding provider** (OpenAI, Azure OpenAI, etc.) with [`ENABLE_ASYNC_EMBEDDING`](/reference/env-configuration#enable_async_embedding) enabled, you may see HTTP 429 "Too Many Requests" errors in the logs during bulk document ingestion:
 
 ```
-Error generating embeddings: 429 Rate limit reached
+aiohttp.client_exceptions.ClientResponseError: 429, message='Too Many Requests', url='https://api.openai.com/v1/embeddings'
 ```
 
 **The Problem**: With async embedding enabled, Open WebUI sends embedding requests concurrently. If you're ingesting many documents or large documents at once, this can easily exceed your provider's API rate limits, especially on free-tier or lower-tier plans.
@@ -368,7 +371,7 @@ Error generating embeddings: 429 Rate limit reached
    environment:
      RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
    ```
-   Or configure it in the **Settings > Documents > Embedding Concurrent Requests** (admin section) field. The default of `0` means unlimited concurrency.
+   Or configure it in the **Settings > Documents > Embedding Concurrent Requests** (admin section) field, shown for the Ollama, OpenAI and Azure OpenAI embedding engines. The default of `0` means unlimited concurrency.
 
 2. **Reduce Batch Size**:
    Lower [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) to send fewer texts per API call.
@@ -382,6 +385,10 @@ If PDFs containing images with text are returning empty content:
 
 **The Problem**: The default "pypdf" content extractor may struggle with certain PDF formats, especially those containing primarily image-based content.
 
+The default extractor reads only the text layer of each page. **PDF Extract Images (OCR)** is off by default, so scanned pages produce no text. If every page is empty, the upload fails with `The content provided is empty. Please ensure that there is text or data present before proceeding.` If at least one page has text, the upload succeeds and the scanned pages are missing from search results without any error.
+
+With **PDF Extract Images (OCR)** on, an image the default extractor cannot decode is skipped, and the server log shows `Skipping unreadable PDF image` followed by the image name and the error. The rest of the file is still processed. For scanned PDFs that hit this, switch to a content extraction engine with its own OCR.
+
 **Solutions:**
 
 1. **Use a Different Content Extraction Engine**:
@@ -393,7 +400,7 @@ If PDFs containing images with text are returning empty content:
    - OCR uses one processor thread per upload. On an idle many-core server, raise `intra_op_num_threads` in [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) to OCR a single upload faster.
 
 3. **Update pypdf** (if using the default engine):
-   Recent pypdf releases (6.0.0+) have improved handling of various PDF formats
+   Recent pypdf releases (6.0.0+) have improved handling of various PDF formats. Each Open WebUI release pins its pypdf version, so updating pypdf means updating Open WebUI
 
 4. **Check for Corrupted PDFs**:
    Verify the PDF opens correctly in a standard PDF viewer before uploading
@@ -494,9 +501,11 @@ For the full explanation of how knowledge scoping and retrieval modes work, see 
 
 A webpage or YouTube attachment came back as an error toast. The message names the step that failed: a link that could not be read names the link, a refused YouTube transcript gives the reason, and a message about the knowledge base means the content was read and only saving it failed.
 
-`[ERROR: Could not read content from <url>]` means nothing was attached. The usual causes are a site that blocks the request or serves its content only after JavaScript runs, which [`WEB_LOADER_ENGINE=playwright`](../reference/env-configuration.mdx#web_loader_engine) handles; a proxy Open WebUI is not being told to use, see [`WEB_SEARCH_TRUST_ENV`](../reference/env-configuration.mdx#web_search_trust_env); or an address refused on purpose, since private and loopback addresses, cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](../reference/env-configuration.mdx#web_fetch_filter_list) are never requested.
+`[ERROR: Could not read content from <url>]` means nothing was attached. The usual causes are a site that blocks the request or serves its content only after JavaScript runs, which [`WEB_LOADER_ENGINE=playwright`](../reference/env-configuration.mdx#web_loader_engine) handles; a proxy Open WebUI is not being told to use, see [`WEB_SEARCH_TRUST_ENV`](../reference/env-configuration.mdx#web_search_trust_env); or an address refused on purpose. Cloud metadata endpoints and anything matched by [`WEB_FETCH_FILTER_LIST`](../reference/env-configuration.mdx#web_fetch_filter_list) are never requested, and the log shows `Blocked by filter list:`. Private, loopback, link-local and other addresses that are not globally routable are refused by default, and the log shows `Blocked non-global address:` followed by the address.
 
-A YouTube attachment is the video's transcript, so a video without a usable one cannot be attached at all. Where the message says YouTube blocked the request from your server's address, common for cloud provider ranges, route it through [`YOUTUBE_LOADER_PROXY_URL`](../reference/env-configuration.mdx#youtube_loader_proxy_url). Where a transcript exists but not in the languages asked for, add yours to [`YOUTUBE_LOADER_LANGUAGE`](../reference/env-configuration.mdx#youtube_loader_language). Captions switched off by the uploader, age restriction and unavailable videos cannot be worked around.
+To attach pages from your own network, such as an intranet wiki or a service on the same host, set [`ENABLE_LOCAL_WEB_FETCH=True`](../reference/env-configuration.mdx#enable_local_web_fetch) (the older name `ENABLE_RAG_LOCAL_WEB_FETCH` still works) and restart. Every user who can chat can then make the server request internal addresses, so turn it on only when you trust all of them. The filter list and its metadata endpoints stay blocked either way.
+
+A YouTube attachment is the video's transcript, so a video without a usable one cannot be attached at all. Where the message says YouTube blocked the request from your server's address, common for cloud provider ranges, route it through [`YOUTUBE_LOADER_PROXY_URL`](../reference/env-configuration.mdx#youtube_loader_proxy_url). Where a transcript exists but not in the languages asked for, add yours to [`YOUTUBE_LOADER_LANGUAGE`](../reference/env-configuration.mdx#youtube_loader_language). The message then reads `No transcript found for the YouTube video <id> in these languages: <list>.` Set the list in **Youtube Language** under **Settings > Web Search** (admin section) as language codes separated by commas, such as `de,fr`. Leave out spaces in the environment variable, since only the admin field trims them. Open WebUI tries them in order and adds `en` at the end when it is missing, so `de,fr` tries German, French, then English. For each language it takes a manually created transcript over an automatically generated one. Captions switched off by the uploader, age restriction and unavailable videos cannot be worked around.
 
 ### 15. Attaching a Single File Returns No Sources
 
@@ -508,6 +517,63 @@ Attaching one file with `#` retrieves nothing, while attaching the knowledge bas
 
 1. **Re-index** at **Settings > Documents > Reindex Knowledge and Memory Vectors** (admin section). This rebuilds each knowledge base, the per-file index of every file inside it and every user's memories. It extracts and re-embeds everything, so allow for the time and, on a paid embedding model, the cost.
 2. **Re-upload the file** if it is not in any knowledge base, since re-indexing only covers knowledge bases.
+
+### 16. Text in an Attached Image Is Not Read
+
+An image attached in a chat is sent to the model as an image. It never goes through the content extraction engine, so no OCR runs on it, whichever engine is set in **Settings > Documents** (admin section). Only a vision model can read it.
+
+- If every selected model has the **Vision** capability turned off, Open WebUI refuses the image with `Selected model(s) do not support image inputs`.
+- A model with no capabilities set counts as vision capable, so the image is sent. A model server that cannot take images then returns its own error, for example `Multimodal data provided, but model does not support multimodal requests.` That text comes from the model server, not from Open WebUI.
+
+**Solutions:**
+
+1. **Use a vision model** for chats with images, and turn off **Vision** in **Settings > Models > Edit** (admin section) for models that cannot take images, so users get the Open WebUI message instead of a model server error.
+2. **Extract the text with OCR** by uploading the image to a knowledge base. This needs **Content Extraction Engine** in **Settings > Documents** (admin section) set to an engine other than **Default**, and **Supported Media MIME Types** listing the image type, for example `image/*`. The **External** engine also accepts images while that field has never been set. Otherwise the upload shows the warning `File type image/png is not supported for processing`, with the image's own type.
+
+### 17. Large Uploads Take a Long Time to Embed
+
+A large CSV or XLSX file, or many PDFs uploaded at once, stays in processing for a long time on the **Default (SentenceTransformers)** embedding engine. Every chunk must be embedded before the file is searchable.
+
+**The Problem**: **Embedding Batch Size** in **Settings > Documents** (admin section), set by [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size), defaults to `1`. The local engine passes it to the model as its batch size, so it embeds one chunk at a time.
+
+**Solutions:**
+
+1. **Raise Embedding Batch Size**, for example to `32`. Larger batches use more memory. If you then see CUDA out of memory errors, lower it again (see [section 10](#10-cuda-out-of-memory-during-embedding)).
+2. **Use an external embedding engine**: set **Embedding Model Engine** to **Ollama**, **OpenAI** or **Azure OpenAI** ([`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine)). The same batch size then sets how many chunks go into one request, so raise it only if the provider accepts several inputs per request. With **Ollama**, each upload and each search also sends text to the embedding model through `/api/embed`. If the same Ollama runs the chat model and the two do not fit in memory together, replies start after a long pause while Ollama loads the models again. Choose an embedding model small enough to stay loaded beside the chat model and check with `ollama ps` that both are listed, or point [`RAG_OLLAMA_BASE_URL`](/reference/env-configuration#rag_ollama_base_url) at a separate Ollama for embeddings (see [Task model parameters](/features/administration/task-models#task-model-parameters)).
+3. **Skip embedding**: turn on **Bypass Embedding and Retrieval** ([`BYPASS_EMBEDDING_AND_RETRIEVAL`](/reference/env-configuration#bypass_embedding_and_retrieval)). Uploads are stored as extracted text without embeddings, and the full text goes to the model, so each document must fit in its context window.
+
+### 18. Hybrid Search or the Reranker Has No Visible Effect
+
+With **Hybrid Search** on, answers look the same as plain vector search, and no error appears in the chat.
+
+**The Problem**: hybrid search falls back to vector search on its own.
+
+- If the hybrid search query raises an error, Open WebUI runs vector search instead and logs `Hybrid search failed, falling back to vector search:` only at the `DEBUG` level.
+- A knowledge base whose hybrid query fails is dropped from the results while the others are still searched. The log shows `query_collection_with_hybrid_search: <n> collection(s) had failing queries:` followed by the collection names at the `ERROR` level.
+- If the external reranker request fails or its response has no `results`, the log shows `Error in external reranking:` or `No results found in external reranking response`, then `No valid scores found, check your reranking function. Returning original documents.` The documents are passed on without reranking.
+- If the local reranking model cannot be loaded when you save the settings, the log shows `Error loading reranking model:` and Open WebUI turns **Hybrid Search** off again.
+
+**Solutions:**
+
+1. **Read the debug log**: set [`GLOBAL_LOG_LEVEL=DEBUG`](/reference/env-configuration#global_log_level), restart, ask a question about a document, and search the log for the lines above.
+2. **Check the reranking model**: with **Reranking Engine** set to **Default (SentenceTransformers)**, **Reranking Model** must be a Hugging Face model ID such as `BAAI/bge-reranker-v2-m3`, or a local path to one. Open WebUI loads it as a SentenceTransformers CrossEncoder, so an Ollama model tag does not work there.
+3. **Check the external reranker**: with **Reranking Engine** set to **External**, **API Base URL** must be the full rerank endpoint. Open WebUI posts JSON with `model`, `query`, `documents` and `top_n`, and reads `results[].index` and `results[].relevance_score` from the response. A chat completions or embeddings endpoint does not answer in that shape.
+4. **Turn Hybrid Search off** to isolate the problem. If retrieval improves or changes, the fault is in the hybrid or reranker setup, not in the embeddings.
+
+### 19. The Same Question Retrieves Different Sources Each Time
+
+Asking the same question about the same files returns different sources or a different answer from one run to the next.
+
+**The Problem**: with **Retrieval Query Generation** on (the default), Open WebUI does not search with your message. The task model reads the conversation and writes the search queries, and those queries can change between runs. The chat shows them as chips under **Querying** while the response is generated.
+
+- If the task model's reply has no JSON object, the whole reply is used as one query.
+- If query generation fails, or **Retrieval Query Generation** is off, Open WebUI searches with your last message exactly as written.
+
+**Solutions:**
+
+1. **Compare the queries**: open the status history of each response and check the chips under **Querying**.
+2. **Turn off Retrieval Query Generation** in **Settings > Interface** (admin section), under **Generation**, or set [`ENABLE_RETRIEVAL_QUERY_GENERATION=False`](/reference/env-configuration#enable_retrieval_query_generation). Retrieval then uses your last message as is, so the same message searches the same way each time. Earlier messages are not used, so a follow-up such as "what about the second one?" is searched with those words alone.
+3. **Change the task model** under **Task Model** in the **Tasks** section of the same page, if you keep query generation on. The queries come from that model, not from the chat model.
 
 ---
 

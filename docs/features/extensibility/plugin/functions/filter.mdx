@@ -43,6 +43,8 @@ Let's start with the simplest representation of a Filter Function. Don't worry i
 
 ### Basic Skeleton of a Filter
 
+Each server worker caches the `Filter` instance by Function ID and can reuse it across requests. Keep request-specific values in hook arguments or local variables. For example, calculate a request's token count in `inlet()` using a local variable and reserve instance attributes for configuration such as `self.toggle`.
+
 ```python
 from pydantic import BaseModel
 from typing import Optional
@@ -272,7 +274,7 @@ The flag is read exclusively on the `inlet` pass, and the file references are st
 
 #### The recipe
 
-1. Set `file_handler = True` at the top of your filter module.
+1. Set `self.file_handler = True` in your filter's `__init__`, or declare it as a class attribute.
 2. In `inlet()`, read the file references from `body["metadata"]["files"]` (and `body["files"]` for ad-hoc attachments).
 3. Retrieve chunks yourself. Two options:
    - **HTTP**: call `POST /api/v1/retrieval/query/doc` (single collection) or `POST /api/v1/retrieval/query/collection` (multiple), passing the user's last message as the query string and the inbound request's bearer token so permissions stay scoped to the user.
@@ -315,16 +317,13 @@ Filters can exist in one of four states, controlled by two boolean flags in the 
 
 | State | `is_active` | `is_global` | Effect |
 |-------|------------|------------|--------|
-| **Globally Enabled** | `True` | `True` | Applied to **ALL** models automatically, cannot be disabled per-model |
+| **Globally Enabled** | `True` | `True` | Available on all models automatically |
 | **Globally Disabled** | `False` | `True` | Not applied anywhere; even though the filter is globally enabled, the filter itself is disabled |
 | **Model-Specific** | `True` | `False` | Only applied to models where the admin explicitly enables it |
 | **Inactive** | `False` | `False` | Not applied anywhere, even if filter is enabled for a model by the admin; the filter itself is turned off |
 
 :::tip Global Filter Behavior
-When a filter is set as **Global** (`is_global=True`) and **Active** (`is_active=True`), it becomes **force-enabled** for all models:
-- It appears in every model's filter list as **checked and greyed out**
-- Admins **cannot** uncheck it in model settings
-- It runs on **every** chat completion request, regardless of model
+An active global filter is in scope for every model. It appears checked and greyed out in model settings. An always-on filter runs automatically, while a [user-toggleable filter](#toggleable-filters-making-filters-user-controllable-selftoggle) runs only when its ID is in the request's `filter_ids`. If a chat completion API caller omits `filter_ids`, the server uses an empty selection. The chat UI uses the model's `defaultFilterIds` to initialize its selection.
 :::
 
 #### Admin Panel: Making a Filter Global
@@ -339,10 +338,7 @@ To make a filter global:
 5. Flip the **Global** switch in that menu
 6. Ensure the filter is also **Active** (green toggle switch)
 
-**API Endpoint:**
-```http
-POST /api/v1/functions/id/{filter_id}/toggle/global
-```
+Use the [Function activation API](./index.mdx#activation-via-api) to read or change the **Active** and **Global** flags programmatically.
 
 **Visual Indicators:**
 - Green toggle = `is_active=True` (filter is active)
@@ -543,6 +539,12 @@ Here's the complete flow from admin configuration to filter execution:
 - Execute stream() filters (during streaming)
 - Repeat request() and stream() for every further call the turn makes, such as after tool results come back
 - Execute outlet() filters (once, after the final response)
+
+:::note Background task calls skip Filter Functions
+Filters run only on chat requests. Open WebUI's background calls, such as title, tag, follow-up, query, autocomplete, emoji and image prompt generation on the [task model](/features/administration/task-models), context compaction, memory review and **Legacy** tool selection, run no Filter Function's `inlet()`, `request()`, `stream()` or `outlet()`, global filters included. A Filter cannot read or change those prompts or their replies.
+
+To act on a task call, make a [Pipe](/features/extensibility/plugin/functions/pipe) the task model. It reads the task name from `__task__`. A Pipelines filter is the other option: title, tag, follow-up, query, autocomplete, emoji and image prompt calls run Pipelines inlet filters for the task model, but no Pipelines outlet filters. Context compaction, memory review and **Legacy** tool selection run neither.
+:::
 
 ---
 
@@ -1137,14 +1139,29 @@ Suppose the input from the user looks messy or includes unwanted symbols like `!
 
 ```python
 async def inlet(self, body: dict, __user__: Optional[dict] = None) -> dict:
-    # Clean the last user input (from the end of the 'messages' list)
-    last_message = body["messages"][-1]["content"]
-    body["messages"][-1]["content"] = last_message.replace("!!!", "").strip()
+    messages = body.get("messages", [])
+    if not messages or messages[-1].get("role") != "user":
+        return body
+
+    message = messages[-1]
+    content = message.get("content")
+    if isinstance(content, str):
+        message["content"] = content.replace("!!!", "").strip()
+    elif isinstance(content, list):
+        for part in content:
+            if (
+                isinstance(part, dict)
+                and part.get("type") == "text"
+                and isinstance(part.get("text"), str)
+            ):
+                part["text"] = part["text"].replace("!!!", "").strip()
     return body
 ```
 
 **What Happens?**
 - Before: `"How can I debug this issue!!!"` → Sent to the model as `"How can I debug this issue"`
+
+Image prompts send `content` as a list of parts. The filter edits the text parts and preserves the image parts. If a filter raises `expected string or bytes-like object, got 'list'` when you attach an image, disable it and retry the prompt to isolate the error.
 
 :::note
 

@@ -5,7 +5,7 @@ title: "Customizable Banners"
 
 ## Overview
 
-Open WebUI allows administrators to display custom banners on the new-chat screen. They are shown under the chat header only while no chat is open, and not on workspace, admin or other pages. Banners are useful for announcements, system-wide alerts, maintenance notices, and other important messages.
+Open WebUI allows administrators to display custom banners on the new-chat screen. They are shown under the chat header only while no chat is open, and not on workspace, admin or other pages. Every account with the `user` or `admin` role gets the same list of banners. Accounts still in the `pending` role do not get them. Banners are useful for announcements, system-wide alerts, maintenance notices, and other important messages.
 
 Users can close any banner for the current page load, and a banner can optionally remember that dismissal. You can configure banners in two ways:
 
@@ -394,6 +394,7 @@ If you keep adding banners without removing old ones, users may ignore them. Rem
 - Ensure `WEBUI_BANNERS` is a valid JSON **array** of objects (not a single object).
 - Check the server logs for parsing errors related to `WEBUI_BANNERS`.
 - If using Admin Panel, confirm you clicked **Save**.
+- If changes to `WEBUI_BANNERS` have no effect after a restart, check **Banners** under **Settings > General** (admin section). When persistent configuration is enabled, the saved list takes precedence over the environment variable, even if the saved list is empty. Update the list there and click **Save**.
 
 ### Banner cannot be dismissed
 

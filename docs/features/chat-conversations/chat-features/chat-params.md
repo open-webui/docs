@@ -9,15 +9,25 @@ Within Open WebUI, there are three levels to setting a **System Prompt** and **A
 
 | **Level** | **Definition** | **Modification Permissions** | **Override Capabilities** |
 | --- | --- | --- | --- |
-| **Per-Chat** | System prompt and advanced parameters for a specific chat instance | Users can modify, but cannot override the model's system prompt | An advanced parameter set here is the one sent, in place of the per-account and per-model value |
-| **Per-Account** | Default system prompt and advanced parameters for a specific user account | Users can set, but the system prompt may be overridden by model-specific settings | An advanced parameter set here replaces the per-model value, and gives way to a per-chat one |
-| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | The system prompt takes precedence. Advanced parameters apply to every chat that has not set them itself |
+| **Per-Chat** | System prompt and advanced parameters for a specific chat instance | Users can modify. The system prompt replaces the per-account one, and is sent after the model's system prompt | An advanced parameter set here is the one sent, in place of the per-account and per-model value |
+| **Per-Account** | Default system prompt and advanced parameters for a specific user account | Users can set. A chat's own system prompt replaces this one for that chat | An advanced parameter set here replaces the per-model value, and gives way to a per-chat one |
+| **Per-Model** | Default system prompt and advanced parameters for a specific model | Administrators can set, Users cannot modify | The system prompt is sent first, ahead of the folder, chat or account system prompt, and does not replace them. Advanced parameters apply to every chat that has not set them itself |
+
+### How system prompts combine
+
+Open WebUI joins the system prompts of the levels below into a single `system` message, one part per line, in this order:
+
+1. The model's **System Prompt**, set in **Workspace > Models**.
+2. The folder's **System Prompt**, when the chat is in a [folder](/features/chat-conversations/chat-features/conversation-organization#system-prompt) that has one.
+3. The chat's **System Prompt** from **Controls**. When the chat has none, the account's **System Prompt** from **Settings > General** takes its place. The two are never sent together.
+
+Variables such as `{{CURRENT_DATE}}`, [chat variables](#chat-variables) and [user variables](#user-variables) are filled in at every level. The order is the same for Ollama and OpenAI-compatible connections. A request to the `/api/chat/completions` API follows the same order, with the request's own `system` message in place of the chat or account prompt. A request sent straight to `/openai/chat/completions` or `/ollama/api/chat` gets only the model's system prompt, placed in front of any `system` message the request carries.
 
 ### 1. **Per-chat basis:**
 
 - **Description**: The per-chat basis setting refers to the system prompt and advanced parameters configured for a specific chat instance. These settings are only applicable to the current conversation and do not affect future chats.
 - **How to set**: Open the **Model controls** menu (the knobs icon next to the message input) and expand **Controls**. It holds the chat's files, valves, system prompt and advanced parameters, and shows for admins and for users with the **Allow Chat Controls** [permission](/features/authentication-access/rbac/permissions#3-chat-permissions).
-- **Override capabilities**: Users are restricted from overriding the **System Prompt** already set by an administrator on a per-model basis (**#3**). This ensures consistency and adherence to model-specific settings. An **Advanced Parameter** set here is the value sent for that chat, even when the model carries one of its own.
+- **Override capabilities**: A **System Prompt** set here replaces the per-account one (**#2**) for that chat. It does not replace the model's system prompt (**#3**), which is still sent ahead of it. An **Advanced Parameter** set here is the value sent for that chat, even when the model carries one of its own.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -36,7 +46,7 @@ Suppose a user wants to set a custom system prompt for a specific conversation. 
 
 - **Description**: The per-account basis setting refers to the default system prompt and advanced parameters configured for a specific user account. Any user-specific changes can serve as a fallback in situations where lower-level settings aren't defined.
 - **How to set**: Users can set their own system prompt and advanced parameters for their account within the **General** section of the **Settings** menu in Open WebUI.
-- **Override capabilities**: Users have the ability to set their own system prompt on their account, but they must be aware that it can still be overridden if an administrator has already set the **System Prompt** on a per-model basis for the particular model being used. An **Advanced Parameter** set here is sent in place of the model's, and is itself replaced by anything the chat sets in its **Controls**.
+- **Override capabilities**: Users can set their own system prompt on their account. It is sent in every chat whose **Controls** leave the **System Prompt** empty, after the model's system prompt when the model has one. An **Advanced Parameter** set here is sent in place of the model's, and is itself replaced by anything the chat sets in its **Controls**.
 
 <!-- markdownlint-disable-next-line MD033 -->
 <details>
@@ -56,7 +66,7 @@ Suppose a user wants to set their own system prompt for their account. They can 
 - **Description**: The per-model basis setting refers to the default system prompt and advanced parameters configured for a specific model. These settings are applicable to all chat instances using that model.
 - **How to set**: Administrators can set the default system prompt and advanced parameters for a specific model within the **Models** section of the **Workspace** in Open WebUI.
 - **Override capabilities**: **User** accounts are restricted from modifying the **System Prompt** or specific **Advanced Parameters** on a per-model basis (**#3**). This restriction prevents users from inappropriately altering default settings.
-- **System prompt preservation:** When a model's **System Prompt** is set manually in the **Workspace** section by an Admin, it cannot be overridden or adjusted on a per-account basis within the **General** settings or a chat's **Controls** by a **User** account. This ensures consistency and adherence to model-specific settings.
+- **System prompt preservation:** When an Admin sets a model's **System Prompt** in the **Workspace** section, it is sent with every chat that uses the model, and a **User** account cannot remove or edit it from the **General** settings or a chat's **Controls**. A system prompt set there is added after the model's, not in place of it.
 - **Parameter precedence:** An **Advanced Parameter** an Admin sets on the model applies to every chat that does not set that same parameter itself. A **User** account that sets it in the **General** settings or in a chat's **Controls** sends its own value, and the per-chat value wins over the per-account one. A parameter nobody has set at any of those levels falls through to the instance-wide values under [Global Model Defaults](/features/workspace/models#global-model-defaults-admin). This includes the context length: a `num_ctx` set in a chat's **Controls** is the one sent, even for a model that carries its own. **Stream Chat Response** is the exception: a value set on the model wins, then the chat's, then the account's.
 - **Model controls:** When the model has [Model controls](/features/workspace/models#model-controls), the option picked there (or the control's default option) sits above every level: its parameters replace the same ones set in a chat's **Controls**, the **General** settings, the model or the Global Model Defaults. The choice is saved per model on the account, so it carries across all chats with that model.
 
@@ -79,6 +89,30 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 :::
 
+## Ollama Parameters in Advanced Params
+
+**Advanced Params** also lists parameters named after Ollama's own options. Each one starts at **Default**, which sends nothing. Clicking **Default** switches the row to **Custom** and fills in the starting value below, which is then sent with every request until you click **Custom** again.
+
+For a model from an Ollama connection, Open WebUI puts each of these into the request's `options` under the same name. For a model from an OpenAI-compatible connection, it sends them as top-level fields of the request body under the same name, and the provider decides whether to use or reject them.
+
+| Parameter | Sent to Ollama as | Starting value | Slider range | What it controls |
+| --- | --- | --- | --- | --- |
+| **mirostat** | `options.mirostat` | `0` | 0 to 2 | Turns on Mirostat sampling (`1` or `2`), for controlling perplexity. `0` leaves it off. |
+| **mirostat_eta** | `options.mirostat_eta` | `0.1` | 0 to 1 | How fast Mirostat reacts to the text generated so far. |
+| **mirostat_tau** | `options.mirostat_tau` | `5` | 0 to 10 | The balance between coherent and diverse output under Mirostat. Lower is more focused. |
+| **repeat_last_n** | `options.repeat_last_n` | `64` | -1 to 128 | How many recent tokens the repetition penalty looks back over. |
+| **tfs_z** | `options.tfs_z` | `1` | 0 to 2 | Tail free sampling. `1` leaves it off, higher values cut more low-probability tokens. |
+| **repeat_penalty** | `options.repeat_penalty` | `1.1` | -2 to 2 | How strongly repeated tokens are penalized. `1` leaves it off. |
+| **use_mmap** | `options.use_mmap` | Enabled | on or off | Whether the model file is memory-mapped when loaded. |
+| **use_mlock** | `options.use_mlock` | Enabled | on or off | Whether the model's memory is locked in RAM so it is not swapped to disk. |
+| **num_keep (Ollama)** | `options.num_keep` | `24` | -1 to 10240000 | How many tokens are kept when the context is refreshed. |
+| **num_batch (Ollama)** | `options.num_batch` | `512` | 256 to 8192 | How many tokens are processed together per batch. Higher needs more memory. |
+| **num_gpu (Ollama)** | `options.num_gpu` | `0` | 0 to 256 | How many model layers are offloaded to the GPU. |
+
+For what each option does on your Ollama version, see Ollama's [Modelfile parameters](https://docs.ollama.com/modelfile#valid-parameters-and-values) and the "Generate request (With options)" example in its [API reference](https://github.com/ollama/ollama/blob/main/docs/api.md). Neither page lists every option above.
+
+**use_mmap**, **use_mlock**, **num_thread (Ollama)**, **num_gpu (Ollama)** and **keep_alive (Ollama)** appear in **Settings > General** and in a chat's **Controls** only for admin accounts. The model editor in **Workspace > Models** and the admin [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) always show them. A value set at any level follows the [parameter precedence](#3-per-model-basis) described above.
+
 ## **Optimize System Prompt Settings for Maximum Flexibility**
 
 :::tip
@@ -88,9 +122,15 @@ Suppose an administrator wants to set a default system prompt for a specific mod
 
 - Assign your primary System Prompt (**i.e., to give an LLM a defining character**) you want to use in your **General** settings **System Prompt** field. This sets it on a per-account level and allows it to work as the system prompt across all your LLMs without requiring adjustments within a model from the **Workspace** section.
 
-- For your secondary System Prompt (**i.e, to give an LLM a task to perform**), choose whether to place it in the **System Prompt** field under **Model controls > Controls** (on a per-chat basis) or the **Models** section of the **Workspace** section (on a per-model basis) for Admins, allowing you to set them directly. This allows your account-level system prompt to work in conjunction with either the per-chat level system prompt provided by **Controls**, or the per-model level system prompt provided by **Models**.
+- For your secondary System Prompt (**i.e, to give an LLM a task to perform**), choose whether to place it in the **System Prompt** field under **Model controls > Controls** (on a per-chat basis) or the **Models** section of the **Workspace** section (on a per-model basis) for Admins, allowing you to set them directly. Your account-level system prompt works together with a per-model system prompt, since both are sent. A per-chat system prompt in **Controls** replaces the account-level one for that chat.
 
 - As an administrator, you should assign your LLM parameters on a per-model basis using **Models** section for optimal flexibility. For both of these secondary System Prompts, ensure to set them in a manner that maximizes flexibility and minimizes required adjustments across different per-account or per-chat instances. It is essential for both your Admin account as well as all User accounts to understand the priority order by which system prompts within **Controls** and the **Models** section will be applied to the **LLM**.
+
+:::
+
+:::note Models that reject a system message
+
+Open WebUI sends a system prompt, whether it comes from the chat, your account, a folder or the model, as a `system` message at the start of the conversation. Some models have a chat template that accepts only alternating user and assistant turns, and the model server rejects the request with an error such as `Conversation roles must alternate user/assistant`. Use a model or chat template that accepts a system role, or clear the system prompt at every level for that model. Features that add their own instructions to the system message, such as voice mode, skills and the code interpreter, trigger the same error with such a model.
 
 :::
 

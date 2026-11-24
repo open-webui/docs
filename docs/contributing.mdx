@@ -72,9 +72,9 @@ If you're a native speaker of a language Open WebUI already ships, corrections a
 To add a new language:
 
 1. Create a new directory under `src/lib/i18n/locales` named with the appropriate language code
-2. Copy the `en-US` translation files into the new directory
+2. Copy `en-US/translation.json`, the single file each locale holds, into the new directory
 3. Translate the string values in each JSON file while preserving the object structure
-4. Register the language in `src/lib/i18n/locales/languages.json`
+4. Register the language in `src/lib/i18n/locales/languages.json`, then run `npm run i18n:parse`, which regenerates every registered locale's `translation.json` from the source strings, formats it and checks it
 
 In `en-US`, many values are empty because the key is already the English text. For those entries, translate the key and write the result as the value.
 

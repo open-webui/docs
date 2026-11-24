@@ -30,7 +30,7 @@ Settings are applied in this order (later ones override earlier ones):
 | **Enable Terminal** | `true` | `OPEN_TERMINAL_ENABLE_TERMINAL` | Turn the interactive terminal on/off |
 | **Enable Notebooks** | `true` | `OPEN_TERMINAL_ENABLE_NOTEBOOKS` | Turn Jupyter notebook execution on/off |
 | **TERM** | `xterm-256color` | `OPEN_TERMINAL_TERM` | Terminal color support |
-| **Execute Timeout** | Unset | `OPEN_TERMINAL_EXECUTE_TIMEOUT` | How long (seconds) to wait for command output |
+| **Execute Timeout** | Unset | `OPEN_TERMINAL_EXECUTE_TIMEOUT` | Seconds `run_command` and `get_process_status` wait for a command to finish when the call sends no `wait` value. Unset, `run_command` returns the command ID at once, often with status `running` and no output yet ([empty command output](/features/open-terminal/setup/connecting#command-output-is-empty)) |
 | **Execute Description** | None | `OPEN_TERMINAL_EXECUTE_DESCRIPTION` | Custom text telling the AI about installed tools |
 | **Enable System Prompt** | `true` | `OPEN_TERMINAL_ENABLE_SYSTEM_PROMPT` | Expose the `/system` prompt endpoint |
 | **System Prompt** | Generated | `OPEN_TERMINAL_SYSTEM_PROMPT` | Replace the generated prompt with a custom template |

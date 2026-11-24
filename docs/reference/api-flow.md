@@ -71,11 +71,11 @@ The `history` object must use `currentId` (**camelCase**, not `current_id`). Thi
 
 ## Implementation Guide
 
-### Critical Step: Enrich Chat Response with Assistant Message
+### Pre-creating the Assistant Message (Optional)
 
-The assistant message needs to exist in the chat data as a critical prerequisite **before** triggering the completion. This step is essential because the Open WebUI frontend expects assistant messages to exist in a specific structure.
+For an existing `chat_id`, `POST /api/chat/completions` inserts the assistant placeholder itself when you pass the assistant message's `id`, and links it under the user message you send as `user_message` (Step 2), so pre-creating it is no longer required. If you do pre-create it, always send `user_message`: the backend overwrites the stored placeholder's `parentId` with that message's `id`, or with null when `user_message` is missing.
 
-The assistant message must appear in both locations:
+A pre-created assistant message must appear in both locations:
 
 - `chat.messages[]`: The main message array (used for legacy compatibility)
 - `chat.history.messages[<assistantId>]`: The indexed message history (used by the frontend to render the tree)
@@ -97,7 +97,7 @@ The assistant message must appear in both locations:
 }
 ```
 
-Without this enrichment, the assistant's response will not appear in the frontend interface, even if the completion is successful.
+If you do pre-create it, use this structure.
 
 ## Step-by-Step Implementation
 
@@ -107,7 +107,7 @@ This creates the chat with **both** the user message and an empty assistant plac
 
 :::tip
 
-You can combine chat creation and assistant enrichment into this single step. The key is to include both the user message and an empty assistant message in the initial payload, with proper `parentId`, `childrenIds`, and `currentId` fields.
+You can combine chat creation and the assistant placeholder into this single step. The key is to include both the user message and an empty assistant message in the initial payload, with proper `parentId`, `childrenIds`, and `currentId` fields.
 
 :::
 
@@ -303,9 +303,9 @@ curl -X POST https://<host>/api/chat/completions \
 
 Assistant responses can be handled in two ways depending on your implementation needs:
 
-#### Option A: Stream Processing (Recommended)
+#### Option A: Stream Processing
 
-If using `stream: true` in the completion request, you can process the streamed response in real-time and wait for the stream to complete. This is the approach used by the OpenWebUI web interface and provides immediate feedback.
+Streaming over the HTTP response only happens when the request carries no `session_id` (or no `chat_id`). With both present, as in Step 2, the completion runs as a background task and the response body is `{"status": true, "task_ids": [...], "chat_id": "..."}`, returned immediately; the output goes out as Socket.IO `events` to the `user:<id>` room (every socket signed in as that user), not to the `session_id`. To stream over HTTP, omit `session_id`; to track a background task, poll `GET /api/tasks/chat/{chat_id}` or the chat itself (Option B). The message types on that channel are listed in [Real-time events](#real-time-events).
 
 #### Option B: Polling Approach
 
@@ -362,14 +362,14 @@ curl -X GET https://<host>/api/v1/models/model?id=<model-name> \
 
 ### Send Additional Messages to an Existing Chat
 
-For multi-turn conversations, you can add new messages to an existing chat. You must include the full updated message tree with proper `parentId` and `childrenIds` linkage:
+For multi-turn conversations, add the new user message and assistant placeholder to the existing chat, each with the correct `parentId`:
 
 ```bash
 NEW_USER_MSG_ID=$(uuidgen || python3 -c "import uuid; print(uuid.uuid4())")
 NEW_ASSISTANT_MSG_ID=$(uuidgen || python3 -c "import uuid; print(uuid.uuid4())")
 
 # First: update the chat to add the new user + assistant placeholder
-# You need to link the previous assistant message to the new user message via childrenIds
+# childrenIds is recomputed from parentId, so the previous assistant message need not be resent
 curl -X POST https://<host>/api/v1/chats/<chatId> \
   -H "Authorization: Bearer <token>" \
   -H "Content-Type: application/json" \
@@ -378,9 +378,6 @@ curl -X POST https://<host>/api/v1/chats/<chatId> \
       "history": {
         "currentId": "'"$NEW_ASSISTANT_MSG_ID"'",
         "messages": {
-          "'"$ASSISTANT_MSG_ID"'": {
-            "childrenIds": ["'"$NEW_USER_MSG_ID"'"]
-          },
           "'"$NEW_USER_MSG_ID"'": {
             "id": "'"$NEW_USER_MSG_ID"'",
             "role": "user",
@@ -435,9 +432,59 @@ curl -X POST https://<host>/api/chat/completions \
 
 :::note
 
-When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, you can pass partial updates: existing messages that are not included in the update will be preserved.
+When updating an existing chat via `POST /api/v1/chats/<chatId>`, the payload is **merged** with the existing chat data. You only need to include the fields you are changing. For `history.messages`, the merge is per message, not per field: messages you omit are preserved, but a message you include replaces the stored one wholesale, so send full message objects. `childrenIds` is recomputed from each message's `parentId`, so you need not set it on the parent.
 
 :::
+
+## Real-time events
+
+This list is for Open WebUI v0.13.4. Since v0.13.4, updates for notes, presence, comments, the inbox and access changes arrive as typed messages on the `events` channel. A client that listened for `events:note` or `note:presence` as channel names receives nothing and must listen on `events` and read `data.type` instead.
+
+### Connecting
+
+- Connect a Socket.IO client to the root of your Open WebUI host with the path `/ws/socket.io`, and pass `{"token": "<token>"}` as the `auth` object.
+- The token must be the session token returned by sign-in. The socket decodes it as a JWT, so an API key (`sk-...`) is not accepted. Only users with the `user` or `admin` role are accepted.
+- With a valid token, the socket joins the room `user:<user id>`, which receives every event sent to that user, from any of their sessions.
+- After connecting, emit `user-join` with `{"auth": {"token": "<token>"}}`. It returns `{"id", "name"}` and joins the `channel:<channel id>` room for each channel the user belongs to, if the user can use channels.
+- Every 30 seconds the server checks the token of each socket and disconnects any socket whose token is no longer valid.
+
+### Rooms you join on request
+
+| Emit | Payload | Room joined | Condition |
+|---|---|---|---|
+| `events:chat` | `{"chat_id": "<id>", "data": {"type": "join"}}` | `chat:<chat id>` | Read access to a saved chat. The acknowledgement is `true` or `false`. Send `{"type": "leave"}` to leave |
+| `note:join` | `{"note_id": "<id>", "auth": {"token": "<token>"}}` | `note:<note id>` | Notes are enabled, the user has the notes feature, and owns or can read the note. Emit `note:leave` with `{"note_id": "<id>"}` to leave |
+| `comments:join` | `{"resource_type": "<type>", "resource_id": "<id>", "subscription_id": "<name>"}` | One comments room for that resource | Comments are enabled and the user can read the resource. `resource_type` is `model`, `knowledge`, `prompt`, `skill`, `tool`, `note` or `chat`. The acknowledgement is `{"ok": true}` or `{"error": "..."}`. A socket can hold up to 10 subscriptions. Emit `comments:leave` with the same `subscription_id` to leave |
+
+### Messages on the `events` channel
+
+Every message on `events` has the form `{"data": {"type": "<type>", "data": {...}}}`. Chat messages also carry `chat_id` and `message_id` at the top level.
+
+| `type` | Sent to | `data` |
+|---|---|---|
+| Chat output types such as `chat:completion`, `status`, `source`, `files`, `chat:message:error` | `user:<id>` | The event the model or a tool emitted. See [Events](/features/extensibility/plugin/development/events) for the types |
+| Copies of chat output, `chat:messages` and `chat:active` for saved chats | `chat:<id>`, except the socket that started the request | The top level also carries `"shared": true` and the `user_id` of the person who sent the message |
+| `chat:presence` | `chat:<id>` | `{"users": [{"id", "name"}]}`, the people with the chat open |
+| `typing` | `chat:<id>`, except the sender | `{"typing": true or false}`. The top level carries `user` with `id` and `name`. Send it yourself with `events:chat` and `{"chat_id": "<id>", "data": {"type": "typing", "data": {"typing": true}}}`, which needs write access and a joined room |
+| `chat:access` | Each socket that has someone else's chat open, when access to it is checked again | `{}`. Fetch the chat again. If access was removed, the socket has already left the room |
+| `chat:list` | `user:<id>` | Sometimes `{"chat_id", "last_read_at", "folder_unread_counts"}`, sometimes nothing. Refresh the chat list |
+| `chat:reload` | `user:<id>` | Nothing. Fetch the chat again |
+| `note:updated` | `note:<id>` | The note. After an edit in the editor, `{"id", "page", "updated_at"}` with only the saved page |
+| `note:presence` | `note:<id>` | `{"note_id", "users": [...]}`. Each user has `id` and `name`, plus `page_id`, `document_id`, `cursor`, `cursor_position` and `updated_at` when known |
+| `comments:changed` | The comments room | `{"resource_type", "resource_id"}`, with no comment text. Fetch `GET /api/v1/comments/?resource_type=<type>&resource_id=<id>` again |
+| `comments:unavailable` | The one socket that lost access | `{"resource_type", "resource_id"}`. The socket has already left the room |
+| `notifications:changed` | `user:<id>` | Nothing. Fetch `GET /api/v1/notifications/inbox` again |
+| `access:updated` | Each socket of users whose groups changed, or every socket when an admin saves the default user permissions | Nothing. After a group change the server disconnects those sockets right after this message, so reconnect and fetch permissions again |
+| `machines:changed` | `user:<id>` | Nothing. Fetch machines, models and tools again |
+| `calendar:alert` | `user:<id>` | `{"event_id", "title", "description", "start_at", "minutes_until", "calendar_id", "location"}` for a calendar reminder |
+| `channel:app` | `user:<id>` | `{"app_id", "app_name", "channel_id", "message_id", "parent_id", "reply": {"type": "error", "content"}}` when an app could not reply in a channel |
+| `encryption:available` | `channel:<id>` | `{"channel", "session"}` when a private chat in that channel starts, with `session` set to `null` when it ends. Its packets use the separate `encryption:event` channel |
+
+### Other channels
+
+- `events:channel` carries channel messages to the `channel:<id>` room in the form `{"channel_id", "message_id", "data": {"type", "data"}}`. Types include `message`, `message:update`, `message:reply`, `message:delete`, `message:reaction:add`, `message:reaction:remove` and `typing`. `channel:created` and `channel:mute` go to `user:<id>`.
+- `automation:result` goes to `user:<id>` when an automation run finishes, with `automation_id`, `name`, `chat_id` and `status`.
+- Collaborative note editing uses `ydoc:document:*` and `ydoc:awareness:update`, which carry Yjs updates for the editor.
 
 ## Response Processing
 
@@ -835,10 +882,10 @@ This cleaning process handles:
 - `id`: Assistant message ID
 - `messages`: Array of ChatCompletionMessage
 - `model`: Model identifier
-- `session_id`: Session identifier (caller-generated UUID)
 
 **ChatCompletionsRequest - Optional Fields:**
 
+- `session_id`: Session identifier (caller-generated). Together with `chat_id` it runs the completion as a background task that returns `task_ids`; omit it to stream over HTTP.
 - `stream`: Enable streaming (defaults to false)
 - `background_tasks`: Control automatic tasks
 - `features`: Enable/disable features
@@ -895,7 +942,7 @@ This cleaning process handles:
 |---|---|---|
 | Chat created but messages don't appear in UI | Missing `childrenIds` on messages | Add `childrenIds` array linking parent → child messages |
 | Chat shows "How can I help you today?" | Using `current_id` instead of `currentId` | Use camelCase `currentId` in the history object |
-| Completion works but response only appears as notification | Assistant message not in chat history before triggering completion | Include empty assistant placeholder in Step 1 |
+| Completion works but response only appears as notification | Assistant message not in chat history before triggering completion | Pass the assistant message's `id` and `user_message` in the completion request (Step 2), or include the assistant placeholder in Step 1 |
 | Messages exist in DB but frontend shows empty chat | Missing `parentId` or broken tree linkage | Ensure every message has correct `parentId` and parent's `childrenIds` includes the child |
 | User message disappears after a page reload once the completion ran | `user_message` missing from the `/api/chat/completions` request, so the assistant message is saved with no parent | Send `user_message` with the user message's `id` in the completion request (Step 2) |
 

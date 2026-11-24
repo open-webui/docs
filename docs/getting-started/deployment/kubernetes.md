@@ -38,7 +38,7 @@ helm repo update
 
 **Expected result:** your nodes are ready and the `openwebui` namespace exists. If it already exists, reuse it.
 
-This guide pins **chart 18.0.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-17.5.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
+This guide pins **chart 18.0.0** and **application v0.13.0**. Chart and application versions are separate. Consult the [published chart](https://github.com/open-webui/helm-charts/tree/open-webui-18.0.0/charts/open-webui) and [image reference](/getting-started/quick-start#image-variants) before changing versions.
 
 ## 2. Configure the Application
 
@@ -339,7 +339,9 @@ kubectl -n openwebui get pods,ingress
 
 This disables migrations on all replicas, applies the desired replica count, and enables ingress. Expect a brief restart. Point DNS at your ingress controller, then open your HTTPS hostname.
 
-Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. See [connection troubleshooting](/troubleshooting/connection-error).
+Configure your controller for WebSockets, streamed responses without buffering, suitable request/idle timeouts, and your required upload size. Socket.IO is served under `/ws/socket.io/`, so a path-based ingress must forward that prefix with upgrade headers. See [connection troubleshooting](/troubleshooting/connection-error).
+
+Open WebUI has no upload size limit until **Max Upload Size** (`RAG_FILE_MAX_SIZE`) or a knowledge base file limit is set, and its own `413` carries the message `Oops! The file you're trying to upload is too large.` Any other `413` on a knowledge upload comes from the ingress controller or another proxy in front of it, such as a service mesh or CDN. Raise its body size limit as described under [Key configuration notes](/reference/https#key-configuration-notes). On the NGINX Ingress Controller, that is the [`nginx.ingress.kubernetes.io/proxy-body-size`](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/#custom-max-body-size) annotation, or `proxy-body-size` in its ConfigMap for all Ingress rules.
 
 Session affinity is optional with WebSockets on and required with [`ENABLE_WEBSOCKET_SUPPORT=false`](/reference/env-configuration#enable_websocket_support); see [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Affinity does not replace Redis. On the NGINX Ingress Controller, add these annotations to the Ingress resource:
 
@@ -486,7 +488,7 @@ spec:
       app.kubernetes.io/name: open-webui
 ```
 
-Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count and prevent GitOps from fighting HPA changes to `spec.replicas`. Helm upgrades can also reset the replica count.
+Apply with `kubectl -n openwebui apply -f scaling.yaml`. The thresholds are examples, not a user-capacity guarantee. Budget database connections for the maximum replica count and prevent GitOps from fighting HPA changes to `spec.replicas`. Each worker process has a sync and an async database engine, and each can open `DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW` connections (SQLAlchemy's 5 + 10 when `DATABASE_POOL_SIZE` is unset). With `VECTOR_DB=pgvector`, PGVector opens its own pool of `PGVECTOR_POOL_SIZE` + `PGVECTOR_POOL_MAX_OVERFLOW` (also 5 + 10 when unset), even when it uses `DATABASE_URL`. Helm upgrades can also reset the replica count.
 
 Before updates, remove this HPA with `kubectl -n openwebui delete hpa openwebui` and pause any controller that would recreate it. Reapply it only after verifying the restored deployment. A PDB limits voluntary evictions such as node drains; it does not prevent Deployment scale-down or the maintenance outage described above.
 

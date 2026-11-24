@@ -23,9 +23,11 @@ With proper document extraction, Open WebUI can help you:
 - Extract data in structured formats for further processing
 - Support multilingual content recognition
 
-:::note Privacy in Temporary Chats
-In **Temporary Chat** mode, document extraction is performed **exclusively in the browser** to prevent data from being stored or processed on the backend. This strict privacy measure means that some complex file formats (like certain DOCX files) that rely on backend parsers may not be processed correctly.
-:::
+### Document attachments in temporary chats
+
+When you attach a local document in **Temporary Chat**, the browser extracts its text without uploading the original as an Open WebUI file. When you send the message, the extracted text goes to the Open WebUI backend as part of the chat request.
+
+The browser uses built-in parsers for this step. PDF extraction reads the text layer without OCR and joins text items with spaces, so scanned pages may yield no text and table layout may be lost. DOCX extraction returns plain text. Use a standard chat if you need the server's configured extraction engine.
 
 :::info Sending images and video to your extraction engine
 
@@ -34,6 +36,38 @@ An uploaded image or video is stored as-is for vision models to look at instead 
 [`CONTENT_EXTRACTION_SUPPORTED_MEDIA_MIME_TYPES`](/reference/env-configuration#content_extraction_supported_media_mime_types), or **Supported Media MIME Types** in **Settings > Documents** (admin section), lets you choose: list the MIME types your engine can read, for instance `image/*` for an OCR engine, and matching uploads are extracted whichever engine you run. Saving the field empty from the admin panel, or setting the variable to an empty string, stores an empty list, which turns media extraction off for every engine, the external one included.
 
 :::
+
+## PDF Loader Mode
+
+With the default **Content Extraction Engine**, **PDF Loader Mode** in **Settings > Documents** (admin section), or [`PDF_LOADER_MODE`](/reference/env-configuration#pdf_loader_mode), decides how a PDF's pages are turned into text before chunking. Other engines ignore it.
+
+| | **Page** (default) | **Single** |
+| --- | --- | --- |
+| Text | One document per page | All pages joined into one document |
+| Chunks | Never span a page break | Can run across page breaks |
+| Citations | Show `(page N)` and open the PDF at that page | Show no page number |
+
+Pick **Single** when sentences or tables often continue onto the next page and you can do without page numbers in citations. The mode applies when a file is extracted. Files already in a knowledge base change only after **Reindex Knowledge and Memory Vectors** in the same settings page, which extracts them again.
+
+## Dependencies for ODT, MSG, and PowerPoint
+
+When the default **Content Extraction Engine** runs on a non-slim installation, these formats use the following parsers.
+
+| Format | Extraction dependencies |
+| --- | --- |
+| OpenDocument Text (`.odt`) | Requires `unstructured`, `pypandoc`, and a Pandoc executable. The parser converts the file to DOCX before extracting its text. |
+| Outlook messages (`.msg`) | Requires `unstructured` and `python-oxmsg` for Outlook MSG content. Open WebUI skips message attachments. |
+| PowerPoint (`.ppt`, `.pptx`) | Uses `unstructured` when it can be imported. If that import fails, Open WebUI tries `python-pptx`, which reads `.pptx` files. Legacy binary `.ppt` files need an extractor that supports that format. |
+
+The PowerPoint fallback runs during loader selection. If `unstructured` imports successfully and parsing fails later, that error does not trigger the fallback.
+
+**Allowed File Extensions** controls which uploads are accepted for processing. For RAG indexing, the selected extractor must also be able to read the file. Preview support depends on the file viewer.
+
+## Files Without a Dedicated Loader
+
+With the default **Content Extraction Engine**, a file whose extension has no loader of its own is read as plain text. Source code and configuration files, such as `.py`, `.js`, `.ts`, `.go`, `.sql`, `.json`, `.yaml` or `.toml`, work in RAG this way. A binary format with no loader, such as `.ods` or `.odp`, is read the same way and produces unreadable text instead of an error, so retrieval returns noise from it. On the slim image such a file fails with `This file type requires an external document extractor in slim. Configure one that supports it.` instead.
+
+To accept only the formats you know extract well, list them without the leading dot in **Allowed File Extensions** in **Settings > Documents** (admin section), or in [`RAG_ALLOWED_FILE_EXTENSIONS`](/reference/env-configuration#rag_allowed_file_extensions). Uploads with any other extension then fail with `File type <extension> is not allowed`.
 
 ## Available Extraction Methods
 

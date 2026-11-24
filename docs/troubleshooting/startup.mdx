@@ -7,6 +7,47 @@ sidebar_position: 1
 
 Open WebUI not coming up at all? Start here. For failures specifically about Alembic migrations (`no such table`, `Can't locate revision`), see [Database Migration](./manual-database-migration.md) instead.
 
+## Container keeps restarting
+
+A container can exist and publish a port while Open WebUI is still starting or repeatedly exiting. If the browser cannot connect, check the container state and recent logs before recreating it:
+
+```bash
+docker ps -a --filter name=open-webui
+docker inspect --format 'status={{.State.Status}} restarts={{.RestartCount}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}' open-webui
+docker logs --tail 100 --timestamps open-webui
+```
+
+Replace `open-webui` with your container name. A restart count that keeps increasing means the process is repeatedly exiting. If `oom=true`, check available memory and any memory limit on the container. Otherwise, look for the last error before each restart. If the logs stop at the Open WebUI banner while the container stays up, see [startup delays while reaching Hugging Face](#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked).
+
+## Cannot connect after Docker install
+
+Check readiness inside the Open WebUI container, then through the published port. The v0.13.4 image's Docker health check calls `/health` inside the container. A healthy status confirms the web server answered there. The `/ready` endpoint also checks whether startup has finished and whether the database and configured Redis connection respond.
+
+```bash
+docker exec open-webui sh -c 'curl -i --max-time 5 "http://127.0.0.1:${PORT:-8080}/ready"'
+curl -i --max-time 5 http://127.0.0.1:3000/ready
+```
+
+Run both commands on the Docker host. Replace `open-webui` with your container name and `3000` with your published host port. A listening server can return HTTP 503 from `/ready` with `Startup not complete`, `Database not ready`, or `Redis not ready`. Use that response and the container logs to identify what is still failing. If the container probe cannot connect, check the container state and startup logs above.
+
+If the container probe returns HTTP 200 with `{"status":true}` and the host probe cannot connect, check the published mapping with `docker port open-webui`. For the default container port of `8080`, a mapping such as `3000:8080` forwards requests from host port `3000` to container port `8080`. If you changed `PORT`, check that the mapping points to that container port.
+
+## No space left on device
+
+If startup or an upload fails with `No space left on device` or `database or disk is full`, check the path in the server log. In the standard Docker image, `/app/backend/data` holds the default SQLite database, uploads, and application cache. With S3 storage, uploads still go to local disk before being sent to the bucket, and file reads download a local copy.
+
+Check which filesystem backs the failing path. For a running Linux container with the default data directory, use:
+
+```bash
+docker inspect --format '{{json .Mounts}}' open-webui
+docker exec open-webui df -h /app/backend/data
+docker exec open-webui df -i /app/backend/data
+```
+
+Replace `open-webui` with your container name and use the configured [`DATA_DIR`](/reference/env-configuration#data_dir) path if it differs. The second command checks free space, and the third checks free inodes, which can run out even when there is space left. If the container cannot stay up, use the mount information to check the backing filesystem on the Docker host. For errors from Docker itself while pulling or creating the container, check the filesystem where Docker stores its data.
+
+Free space or expand the affected filesystem, then retry. Preserve the Open WebUI data volume. See [Backups](/tutorials/maintenance/backups) before removing files from it.
+
 ## Container hangs at startup on Apple Silicon (M1/M2/M3)
 
 ### Symptom
@@ -64,6 +105,27 @@ docker run --rm --entrypoint python ghcr.io/open-webui/open-webui:main \
 
 ---
 
+## Startup stops after the banner while Hugging Face is slow or blocked
+
+### Symptom
+
+The log prints the Open WebUI banner and then nothing new for minutes. `Application startup complete.` does not appear and the page does not load. It happens when the server cannot reach Hugging Face quickly, for example behind a corporate proxy or firewall, or with no internet access.
+
+### Cause
+
+With the **Default (SentenceTransformers)** embedding engine, every start loads the local embedding model ([`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model), `sentence-transformers/all-MiniLM-L6-v2` by default) before the server accepts connections. While [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](/reference/env-configuration#rag_embedding_model_auto_update) is `True`, its default, that step contacts Hugging Face to check the model and download missing files, even when a copy is already cached. Startup waits until the request finishes or fails. When hybrid search is on, the reranking model goes through the same step under `RAG_RERANKING_MODEL_AUTO_UPDATE`. If the model is not cached and the request fails, the log shows `Cannot determine model snapshot path`.
+
+### Fix
+
+Pick one:
+
+- **Skip the check once the model is cached.** Set `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false`. Open WebUI then loads the cached copy without contacting Hugging Face. If the model is not cached yet, it logs `Cannot determine model snapshot path` and loads the model by its Hugging Face name, so the first start still needs the network.
+- **Go fully offline.** Set [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode), which also sets `HF_HUB_OFFLINE=1` and turns off both auto-update variables. The model must already be cached, see the next section.
+- **Send the download through your proxy.** The Hugging Face client reads the [standard proxy variables](https://www.python-httpx.org/environment_variables/) `HTTPS_PROXY` (or `https_proxy`) and `NO_PROXY` from the environment of the Open WebUI process. Set them where you set the other Open WebUI variables, such as `-e` for `docker run` or an export in the shell.
+- **Use an external embedding engine.** Set **Embedding Model Engine** in **Settings > Documents** (admin section) to **Ollama**, **OpenAI** or **Azure OpenAI**, or set [`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine). No local embedding model loads at startup then.
+
+---
+
 ## `ValueError: No embedding model is loaded` with offline mode on a fresh install
 
 ### Symptom
@@ -118,3 +180,40 @@ The script reads the key from `.webui_secret_key` and generates one only when th
 Setting `WEBUI_SECRET_KEY` yourself also works, and is the right configuration for anything beyond a personal machine. With it set, the script skips key generation entirely.
 
 See [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) for how each start method generates and persists the key.
+
+---
+
+## `Could not parse SQLAlchemy URL from given URL string` at startup
+
+### Symptom
+
+Open WebUI stops while loading, and the traceback ends with:
+
+```text
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL string
+```
+
+### Cause
+
+`DATABASE_URL` is set to an empty value, such as a `DATABASE_URL=` line with nothing after the equals sign. Open WebUI uses its SQLite default only when the variable is not set at all, so the empty value is passed on as the database URL. A `DATABASE_URL` left in your shell from another project also replaces the default, and Open WebUI then connects to that project's database.
+
+### Fix
+
+Remove or unset `DATABASE_URL` (`unset DATABASE_URL` in the shell you start Open WebUI from) to use the SQLite database in [`DATA_DIR`](/reference/env-configuration#data_dir), or set it to a full URL. See [`DATABASE_URL`](/reference/env-configuration#database_url).
+
+---
+
+## A Function stops Open WebUI loading
+
+### Symptom
+
+Open WebUI does not start, or its interface does not load, after you added or updated a Function.
+
+### Fix
+
+1. Restart Open WebUI with [`SAFE_MODE=true`](/reference/env-configuration#safe_mode). At startup it turns off every Function in the database, so none of them load.
+2. Open **Admin Panel > Functions** and delete or fix the Function that caused the problem.
+3. Remove `SAFE_MODE` and restart. While it is set, every restart turns all Functions off again.
+4. Turn each Function you still need back on in **Admin Panel > Functions**. Removing `SAFE_MODE` does not turn them back on.
+
+See [Safe Mode](/getting-started/advanced-topics/hardening#safe-mode).

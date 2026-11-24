@@ -96,11 +96,24 @@ For models that support variable reasoning depth (like some API providers), this
 - Common values: `low`, `medium`, `high`
 - Some providers accept numeric values
 
-[Coding agents](/features/open-terminal/coding-agents#options) in Open Terminal receive the setting too.
+[Agents](/features/open-terminal/agents#options) in Open Terminal receive the setting too.
 
 :::info
 Reasoning Effort is only applicable to models from specific providers that support this parameter. It is not forwarded on native Ollama connections, where the `think` setting above covers the same ground. Ollama's OpenAI-compatible endpoint does accept `reasoning_effort` when Ollama is added as an OpenAI connection instead.
 :::
+
+### Turning Thinking Off on vLLM and llama.cpp
+
+Models served by vLLM or llama.cpp `llama-server` often switch thinking on or off through their chat template, which reads `chat_template_kwargs` from the request. Open WebUI has no setting for it, so send it as a custom parameter on an OpenAI connection:
+
+1. Go to **Workspace → Models** and edit the model.
+2. Expand **Advanced Params**.
+3. At the bottom, click **Add Custom Parameter** and set:
+   - **Name**: `chat_template_kwargs`
+   - **Value**: `{"enable_thinking": false}`
+4. Save the model.
+
+The **Add Custom Parameter** button is shown to administrators. Open WebUI parses the value as JSON and adds it to the top level of the request body. The key the template reads depends on the model. `enable_thinking` is the one Qwen3 uses, while some other models read `thinking`. Check the model card or the [vLLM reasoning outputs page](https://docs.vllm.ai/en/latest/features/reasoning_outputs.html), and see `chat_template_kwargs` in the [llama.cpp server README](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md). To turn thinking off for every request instead, vLLM also accepts `--default-chat-template-kwargs` at startup.
 
 ---
 
@@ -284,6 +297,35 @@ Look for `<think>` tags in the output. If they're not present, the model may req
 **Solution:** Check if your model outputs reasoning through:
 - Structured delta fields (`reasoning_content`, `reasoning`, `thinking`)
 - Text-based tags that Open WebUI detects (ensure reasoning tag detection is enabled)
+
+### DeepSeek: `reasoning_content` Must Be Passed Back
+
+**Symptom:** A DeepSeek model in thinking mode fails with the error below, which can happen even on the first message of a chat:
+
+```
+The `reasoning_content` in the thinking mode must be passed back to the API.
+```
+
+**Cause:** The error comes from DeepSeek, which wants the earlier reasoning sent back with the request. With the connection's **Provider** at **Default**, Open WebUI leaves reasoning out of the history it sends (see [How Reasoning Is Sent Back](#how-reasoning-is-sent-back)). Available skills, attached knowledge and recalled memories reach the model as tool calls in the history, so a chat that uses any of them has tool-call turns even when you never called a tool.
+
+**Fix:**
+
+1. Edit the DeepSeek connection in **Settings → Connections → OpenAI** (admin section), open **Advanced** and set **Provider** to **llama.cpp**. Open WebUI then sends stored reasoning back as `reasoning_content`, and gives tool-call turns that have no reasoning an empty `reasoning_content`.
+2. If the error remains, for example on a DeepSeek model reached through another service, turn thinking off for that model: under **Advanced Params**, switch **Reasoning Effort** to **Custom** and enter `none`. Open WebUI forwards it as `reasoning_effort: "none"`.
+
+On a connection with **API Type** set to **Responses**, the same requirement shows up as ``The `reasoning_text` in the thinking mode must be passed back to the API.`` Switch **API Type** to **Chat Completions** and **Provider** to **llama.cpp**, or set **Reasoning Effort** to `none`.
+
+### Encrypted Reasoning Produced Under a Different Model
+
+**Symptom:** A reasoning model reached through OpenRouter or another service that returns `reasoning_details` fails with:
+
+```
+Your request contains encrypted reasoning or compaction content that was produced under a different model.
+```
+
+**Cause:** Open WebUI sends `reasoning_details` back on later turns whatever the **Provider** setting is. It removes them from replies written by another model, and it tells models apart by their Open WebUI model ID. A model ID that now reaches a different upstream model, such as a workspace model whose base model was changed, still gets the reasoning details of the earlier replies.
+
+**Fix:** Start a new chat, or continue the chat with the upstream model that wrote the earlier replies. Changing **Provider** does not change this.
 
 ### Anthropic Extended Thinking Not Working with Tool Calls
 

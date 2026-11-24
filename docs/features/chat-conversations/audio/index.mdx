@@ -24,3 +24,13 @@ import DocCardList from '@theme/DocCardList';
 Talk to Open WebUI and have it talk back. Dictate with speech-to-text and hear responses with text-to-speech, across a range of engines and voices.
 
 <DocCardList />
+
+## Personal Text-to-Speech Settings
+
+Each user can adjust how responses are read aloud on the **Audio** tab of their **Settings**, under **TTS Settings** and **Voice**.
+
+| Setting | Shown when | What it does |
+|---------|------------|--------------|
+| **Kokoro.js Dtype** | Your **Text-to-Speech Engine** is **Kokoro.js (Browser)** | Sets the precision of the Kokoro model (`onnx-community/Kokoro-82M-v1.0-ONNX`) that your browser downloads and runs: `fp32` (full precision), `fp16`, `q8` or `q4`. Until you pick one, no model loads and the **Voice** section stays on **Loading Kokoro.js...** with no voice list. After you pick one, the model starts loading and the message shows a percentage. Keep the settings open until the voice list appears, then click **Save** to keep the dtype. The model runs on WebGPU when the browser offers a GPU adapter and on WebAssembly otherwise. If no dtype is saved, **Read Aloud** and voice calls use `fp32`. |
+| **Auto-Playback Response** | Always | Saves as soon as you switch it, without **Save**. When a response finishes, Open WebUI presses that message's **Read Aloud** button, so playback uses the same engine and voice. It does not play responses that end in an error, and it does not run during a voice call, which speaks responses itself. It needs the **Read Aloud** button, so users without the **Allow Text to Speech** permission get no playback. While it is on, Open WebUI plays a short silent clip on your first click or key press so Safari and other WebKit browsers allow the later playback. |
+| **Allow non-local voices** | The admin **Text-to-Speech Engine** is **Web API** and your **Text-to-Speech Engine** is **Default** | Off by default, so **Set Voice** lists only the browser voices that the browser reports as local (`localService` is `true`). Turn it on to also list voices the browser reports as not local. Click **Save** to keep the change. |

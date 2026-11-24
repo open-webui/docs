@@ -46,7 +46,7 @@ Restart Open WebUI after changing the environment. Previously saved admin settin
 
 Start a new conversation with the configured model and turn on **Web Search** in the chat’s **+** menu if it is not already enabled. Ask: “Search the web for the official Python documentation and give me a link to it.”
 
-Confirm that the conversation shows a web search tool call and returned sources, then open a source to check it. A plausible answer without a search tool call does not demonstrate that the provider is connected.
+Confirm that the conversation shows a web search tool call, then open it and check the links in its output. In Native mode, search results are not listed as sources. A plausible answer without a search tool call does not demonstrate that the provider is connected.
 
 ## Troubleshooting
 

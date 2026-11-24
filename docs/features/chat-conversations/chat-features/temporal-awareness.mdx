@@ -15,6 +15,8 @@ Nothing about the date or time reaches the model on its own. It arrives only whe
 - **`CURRENT_DATETIME`**: date and time together. `CURRENT_TIMEZONE` and `USER_LANGUAGE` are filled only by the browser, so they stay literal for API callers, automations and timers.
 - **`CURRENT_WEEKDAY`**: (e.g., Monday, Tuesday).
 
+The server's local time follows the [`TZ`](/reference/env-configuration#tz) environment variable. If API calls, automations or timers get a UTC time, set `TZ` on the Open WebUI server or container.
+
 These variables can be manually used in [**Prompts**](/features/workspace/prompts) or [**Model Files**](/features/workspace/models) using the `{{CURRENT_DATE}}` syntax.
 
 ---

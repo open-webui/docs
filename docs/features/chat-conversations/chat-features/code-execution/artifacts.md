@@ -26,11 +26,12 @@ To use artifacts in Open WebUI, a model must provide content that triggers the r
 
 ## How do I use Artifacts in Open WebUI?
 
-When Open WebUI creates an Artifact, you'll see the content displayed in a dedicated Artifacts window to the right side of the main chat. Open it again at any time from **Artifacts** in the **+** menu of the [tab bar](/features/chat-conversations/chat-features/#tabs-side-panel). Here's how to interact with Artifacts:
+Open **Artifacts** from the **+** menu in the [tab bar](/features/chat-conversations/chat-features/#tabs-side-panel). This entry appears when the chat contains a renderable artifact and the Artifacts control is visible for your account. **Settings > Interface > Artifacts > Detect Artifacts Automatically** is on by default and controls whether the tab opens as a new artifact is generated. Automatic opening skips mobile and compact previews. You can still use the tab menu with automatic detection off.
 
-- **Editing and iterating**: Ask an LLM within the chat to edit or iterate on the content, and these updates will be displayed directly in the Artifact window. You can switch between versions using the version selector at the bottom left of the Artifact. Each edit creates a new version, allowing you to track changes using the version selector.
+- **Editing and iterating**: Ask an LLM within the chat to edit or iterate on the content, and these updates will be displayed directly in the Artifact window. You can switch between versions using the version selector at the top left of the Artifact. Each edit creates a new version, allowing you to track changes using the version selector.
 - **Updates**: Open WebUI may update an existing Artifact based on your messages. The Artifact window will display the latest content.
-- **Actions**: Access additional actions for the Artifact, such as copying the content or opening the artifact in full screen.
+
+Use the toolbar above the preview to copy or download the selected version. For HTML previews, choose **Open in full screen** at the right end of that toolbar. SVG previews have pan and zoom controls. Tool output rendered as a Rich UI embed has its own viewer and does not show the Artifacts toolbar.
 
 ## Securing artifact previews with a CSP
 

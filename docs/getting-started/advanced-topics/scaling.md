@@ -54,7 +54,7 @@ Use a plain `postgresql://` URL. Open WebUI picks the async driver (psycopg 3) i
 
 - Open WebUI does **not** migrate data between databases, so plan this before you have production data in SQLite.
 - **Connection pool.** With [`DATABASE_POOL_SIZE`](/reference/env-configuration#database_pool_size) unset, each process uses SQLAlchemy's default of 5 connections plus 10 overflow. Once you set `DATABASE_POOL_SIZE`, the overflow default drops to `0`, so set [`DATABASE_POOL_MAX_OVERFLOW`](/reference/env-configuration#database_pool_max_overflow) too. `DATABASE_POOL_SIZE=0` disables pooling. `DATABASE_POOL_SIZE=15` with `DATABASE_POOL_MAX_OVERFLOW=20` is a good start for busy instances.
-- **Every replica has its own pool.** The maximum number of connections is `(DATABASE_POOL_SIZE + DATABASE_POOL_MAX_OVERFLOW) × replicas`. Keep that below PostgreSQL's `max_connections` (default 100) with room for other clients. With the values above, 3 replicas can open 105 connections.
+- **Budget connections per database server.** With PostgreSQL pooling enabled, each worker has a synchronous and an asynchronous application pool. With `VECTOR_DB=pgvector`, an unset `PGVECTOR_DB_URL` defaults to `DATABASE_URL`. pgvector creates a separate engine for that URL even though it targets the same server. Count the pools that connect to each server and multiply by the total number of workers across replicas. See [PostgreSQL pool sizing](/reference/env-configuration#database_pool_size) for an example.
 - For single-instance pool tuning, see [Connection Pool Sizing](/troubleshooting/performance#connection-pool-sizing).
 
 For credential handling and encryption at rest, see the [Database section of the Hardening guide](/getting-started/advanced-topics/hardening#database).

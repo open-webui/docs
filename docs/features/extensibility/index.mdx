@@ -62,7 +62,7 @@ Functions let you intercept and transform messages before they reach the model (
 
 ### Run heavy or long-running work
 
-Open WebUI's backend is **fully async**. Long-running Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users, and synchronous/CPU-bound plugin code is offloaded to a worker thread pool (see [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size)) so it doesn't stall the event loop either. In practice you can run heavy work **in-process** without the latency problems that older synchronous releases had.
+Open WebUI's backend is **fully async**. Long-running `async def` Tools and Functions (awaiting an external API, a slow query, a multi-step agent) do not block other users. A plain `def` handler still runs inline on the event loop and stalls every other request while it runs, so offload CPU-bound or blocking plugin work yourself, for example with `anyio.to_thread.run_sync`, which uses the worker thread pool sized by [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size). Written that way, you can run heavy work **in-process** without the latency problems that older synchronous releases had.
 
 If you genuinely need **GPU access, large or conflicting dependencies, hard isolation or independent scaling**, run that work as an **external service behind an [OpenAPI or MCP tool server](mcp)**.
 
@@ -79,7 +79,7 @@ Featured or popular status on the community site is not a security or quality re
 | | |
 | :--- | :--- |
 | **Tools** | Python scripts that give models new abilities: web search, API calls, code execution |
-| **Functions** | Platform extensions that add model providers (Pipes), message processing (Filters), or UI actions (Actions) |
+| **Functions** | Platform extensions that add model providers (Pipes), message processing (Filters), UI actions (Actions), or reactions to system events (Events) |
 | **MCP support** | Native Streamable HTTP for Model Context Protocol servers |
 | **OpenAPI servers** | Auto-discover and expose tools from any OpenAPI-compatible endpoint |
 | **Community library** | One-click import of community-built Tools and Functions |
@@ -94,7 +94,7 @@ Understanding which layer to use saves time:
 
 | Layer | Runs where | Best for | Trade-off |
 |-------|-----------|----------|-----------|
-| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers, including heavy/long-running work (the async backend keeps it from blocking) | Shares CPU/RAM with the main server |
+| **Tools & Functions** | Inside Open WebUI process | Real-time data, filters, UI actions, new providers, including heavy/long-running work (when the handler is `async def` and offloads CPU-bound work) | Shares CPU/RAM with the main server |
 | **OpenAPI / MCP** | Any HTTP endpoint | Connecting existing services, third-party APIs, and GPU / heavy-dependency / isolated workloads | Requires a running external server |
 
 Most users start with **Tools & Functions**. They require no extra setup, have a built-in code editor, and cover the majority of use cases.
@@ -129,7 +129,7 @@ Tools and Functions execute **arbitrary Python code** on your server. Only insta
 
 ### Resource sharing
 
-In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running and blocking work from stalling other requests, but it does not create more hardware: genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
+In-process Tools and Functions share CPU and memory with Open WebUI. The async backend keeps long-running `async def` work from stalling other requests (blocking code must be offloaded to a thread), but it does not create more hardware: genuinely CPU- or GPU-heavy workloads still compete for the same machine. For those, run the work as an external service behind an [OpenAPI / MCP tool server](mcp) so it scales independently.
 
 ### MCP transport
 

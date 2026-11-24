@@ -3,6 +3,19 @@ Open WebUI supports **Python 3.11 and 3.12**. **Python 3.13 is not supported**: 
 
 - **For production**, run the **Docker image** or use the **latest Python 3.12**. The Docker image runs Python 3.12 on Debian 13.
 - **Python 3.11 also works** for a pip install.
+
+If pip reports that your Python version is unsupported, activate the environment you want to install into, then check it:
+
+```bash
+python --version
+python -m pip --version
+```
+
+Installing Python 3.12 separately does not change the interpreter in an existing environment. If the version is wrong, create a new environment with Python 3.12, activate it, and run `python -m pip install open-webui` to install using that interpreter.
+:::
+
+:::info System packages
+A Python install does not bring ffmpeg, which the standard Docker image includes. Install it with your operating system's package manager and make sure `ffmpeg` is on the `PATH` of the shell that runs `open-webui serve`. Speech-to-text uses it to convert, compress and split audio, and text-to-speech uses it to convert replies from an OpenAI-compatible engine that are not MP3. Without it the server log shows `Couldn't find ffmpeg or avconv` and those steps fail. See [Audio Troubleshooting](/troubleshooting/audio#ffmpeg-missing-on-a-pip-install).
 :::
 
 :::tip No NVIDIA GPU?
@@ -13,4 +26,8 @@ pip install torch --index-url https://download.pytorch.org/whl/cpu
 ```
 
 With uv, run the same command as `uv pip install`. For GPU acceleration on AMD, install the ROCm build from [PyTorch's install page](https://pytorch.org/get-started/locally/) instead.
+:::
+
+:::warning `.env` in your start folder is not read
+A pip, uv or Conda install ignores a `.env` file in the folder you run `open-webui serve` from. It reads only `<env>/lib/python3.12/.env` with Python 3.12 (`<env>\Lib\.env` on Windows). Export your variables in the shell or service unit, or set them on the command line as in the examples below. See [`.env` file ignored by pip, uv and Conda installs](/reference/env-configuration#env-file-ignored-by-pip-uv-and-conda-installs) for how to print the exact path.
 :::

@@ -78,7 +78,7 @@ from open_webui.models.users import User
 
 def count_active_users():
     with get_db_context() as db:
-        return db.query(User).filter_by(is_active=True).count()
+        return db.query(User).filter_by(role='user').count()
 ```
 
 #### After (0.9.0):
@@ -90,7 +90,7 @@ from open_webui.models.users import User
 async def count_active_users():
     async with get_async_db_context() as db:
         result = await db.execute(
-            select(func.count()).select_from(User).where(User.is_active == True)
+            select(func.count()).select_from(User).where(User.role == 'user')
         )
         return result.scalar_one()
 ```
@@ -249,7 +249,7 @@ This keeps Open WebUI's event loop free while your sync call runs on a worker th
 - Treat the sync helpers (`SessionLocal`, `get_db`, `get_session`) as internal startup-only plumbing: never call them from plugin code or anything that runs inside the event loop.
 - Plugin entrypoint signatures don't change, only the code inside them. Event emitters (`__event_emitter__`, `__event_call__`) are used exactly as before.
 - Don't block the event loop; wrap unavoidable sync calls with `anyio.to_thread.run_sync`.
-- Operators: Open WebUI rewrites the database URL onto an async driver itself, `aiosqlite` for SQLite and `psycopg` v3 for Postgres. SQLCipher-encrypted SQLite is not supported in 0.9.0.
+- Operators: Open WebUI rewrites the database URL onto an async driver itself, `aiosqlite` for SQLite and, since 0.9.2, `psycopg` v3 for Postgres (0.9.0 and 0.9.1 used `asyncpg`). SQLCipher-encrypted SQLite is not supported from 0.9.0 onward.
 
 A mechanical sweep (`await` before every `Users.`/`Chats.`/`Files.`/`Models.`/`Functions.`/`Tools.`/`Knowledges.` call, then propagate `async` up through callers) gets most plugins across the line.
 

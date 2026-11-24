@@ -117,7 +117,7 @@ Create an ECS service using the **application** task definition, with `ENABLE_DB
 
 Set the target group's health-check path to `/ready`, which answers once startup has finished and the database and Redis respond. Start with a service health-check grace period of 300 seconds and adjust it to the measured startup time. `/health` serves as a separate process-liveness check. Model APIs and S3 permissions need the checks under [Verify Before Adding Users](#verify-before-adding-users).
 
-Set ALB idle timeouts for your streaming workload. Target-group stickiness is optional; it is required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Verify WebSockets and streamed responses through the ALB.
+Set ALB idle timeouts for your streaming workload. Target-group stickiness is optional; it is required only with `ENABLE_WEBSOCKET_SUPPORT=false`. See [Session Affinity](/troubleshooting/multi-replica#session-affinity-sticky-sessions). Verify WebSockets and streamed responses through the ALB. Socket.IO is served under `/ws/socket.io/`.
 
 Use the AWS CLI to wait and inspect service events, replacing the identifiers:
 
@@ -127,11 +127,11 @@ aws ecs describe-services --cluster CLUSTER --services openwebui \
   --query 'services[0].{running:runningCount,desired:desiredCount,events:events[0:5]}'
 ```
 
-Open the HTTPS hostname configured in `WEBUI_URL`. The initial administrator credentials create the first account during startup. Once verification passes, increase the desired count and optionally configure Service Auto Scaling. Budget PostgreSQL and Redis connections for the maximum task count.
+Open the HTTPS hostname configured in `WEBUI_URL`. The initial administrator credentials create the first account during startup. Once verification passes, increase the desired count and optionally configure Service Auto Scaling. Budget PostgreSQL and Redis connections for the maximum task count. Each worker process has a sync and an async database engine, and each can open `DATABASE_POOL_SIZE` + `DATABASE_POOL_MAX_OVERFLOW` connections (SQLAlchemy's 5 + 10 when `DATABASE_POOL_SIZE` is unset). With `VECTOR_DB=pgvector`, PGVector opens its own pool of `PGVECTOR_POOL_SIZE` + `PGVECTOR_POOL_MAX_OVERFLOW` (also 5 + 10 when unset), even when it uses `DATABASE_URL`.
 
 ## Verify Before Adding Users
 
-- Sign in with the initial administrator account and verify that open sign-up is disabled. Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
+- Sign in with the initial administrator account and verify that open sign-up is disabled (creating the administrator from `WEBUI_ADMIN_EMAIL` and `WEBUI_ADMIN_PASSWORD` turns it off). Configure your [identity provider](/features/authentication-access/auth/sso) before enabling wider access.
 - Select a model and stream a response. Reopen the saved conversation.
 - Upload a small document containing a distinctive fact. Confirm indexing completes and a question about that fact retrieves the source.
 - Replace an application instance and confirm the same account, conversation, and uploaded file remain available.

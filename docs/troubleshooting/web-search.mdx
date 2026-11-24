@@ -17,7 +17,7 @@ If you're running Open WebUI behind an HTTP proxy, you might notice that web sea
 - `Connection timeout to host`
 - `None of the web search results could be loaded`
 
-This happens because the web content fetcher doesn't use your `http_proxy`/`https_proxy` environment variables by default.
+Proxy trust is on by default (`WEB_SEARCH_TRUST_ENV`), so on a default install this usually means **Trust Proxy Environment** was turned off and saved in **Settings > Web Search** (admin section), where the saved value wins over the variable. Every result URL is also resolved locally before it is fetched. Where only the proxy can resolve names, the log shows `Could not resolve host`, and you also need `ENABLE_LOCAL_WEB_FETCH=True`, which also allows fetching private network addresses.
 
 **Solution:**
 
@@ -72,9 +72,15 @@ If web search returns empty content or poor quality results, the issue is often 
 
   In Native/Agentic tool calling, if the model omits `count` for `search_web`, Open WebUI uses `WEB_SEARCH_RESULT_COUNT` by default. If the model provides `count`, it is capped at the same admin-configured maximum.
 
+- **Search pushes the prompt over the context limit.** In Native mode, check whether the chat called `fetch_url`. The tool returns extracted page text and can send a long page in one result. In **Settings > Web Search** (admin section), set **Fetch URL Content Length Limit** to a positive value in characters, then retry in a new chat. Leave room for the conversation, other tool results, and the answer. The limit applies per `fetch_url` result.
+
+  In Legacy mode, check **Bypass Embedding and Retrieval** in **Settings > Web Search**. With it on, loaded page text goes directly into the prompt. Turn it off to retrieve relevant chunks, or enable **Bypass Web Loader** to use search snippets. See the [web search configuration reference](/reference/env-configuration#bypass_web_search_embedding_and_retrieval).
+
 - **Try different loaders**: Configure `WEB_LOADER_ENGINE` to use `playwright` for JavaScript-heavy sites or `firecrawl`/`tavily` for better extraction.
 
 - **Set a real User-Agent**: If results from Wikipedia, Cloudflare-protected sites, or other large publishers come back empty (or as 403s in logs), the default Python `requests`/`aiohttp` UA is being filtered by bot detection. Set [`USER_AGENT`](/reference/env-configuration#user_agent) to a real browser-like string (e.g. `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`). This affects web search result fetching, the `fetch_url` tool and web pages attached with `#`, including the check whether a link points to a file such as a PDF.
+
+- **Results on your own network are skipped**: a result URL that resolves to a private, loopback or other non-globally routable address is dropped before fetching, and the log shows `Blocked non-global address:` followed by the address. To search an intranet, set [`ENABLE_LOCAL_WEB_FETCH=True`](/reference/env-configuration#enable_local_web_fetch), which lets every user who can chat reach internal addresses through the server.
 
 - **Compressed responses are refused**: Open WebUI asks for uncompressed pages and files and refuses a compressed answer with `The server answered with a compressed response, which is not accepted.` A host that always sends a file compressed, such as an S3 or MinIO object uploaded with a `Content-Encoding` header, cannot be read. Upload the file again without that header.
 
@@ -92,7 +98,8 @@ In Native/Agentic mode, Open WebUI exposes web search as the `search_web` tool. 
 
 - **Use a modern, high-quality tool-calling model** for web-search workflows. Frontier models or large recent open-weight models are much more reliable than older/smaller models for deciding when to search and formatting tool calls correctly. See [Tool Calling Modes: Native vs. Legacy](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native) for model requirements and recommendations.
 - **Confirm Native Function Calling is active** in **Settings > Models > Edit** (admin section) the model **> Advanced Params > Function Calling**. Built-in web search tools are Native-mode tools.
-- **Check all three web-search gates**: Web Search is enabled globally, Web Search is enabled on the model, and the Web Search toggle is enabled in the chat.
+- **Switch the model to Legacy if it keeps answering without searching**, for example with "I don't have real-time access". Set **Function Calling** to **Legacy** in the model's **Advanced Params**. In Legacy mode, Open WebUI runs the search itself before the model answers whenever the chat's Web Search toggle is on, with queries written by the task model, so the model does not have to decide to search. If the task model returns an empty query list, the search is skipped and the chat shows the status `No search query generated`. If **Web Search Query Generation** is off in **Settings > Interface** (admin section), or query generation fails, Open WebUI searches with your message as written. Legacy mode is unsupported and has no built-in tools, so `fetch_url` and the other Native tools are unavailable. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
+- **Check all five web-search gates**: Web Search is enabled globally, Web Search is enabled on the model, the model's Builtin Tools include the Web Search category, the Web Search toggle is enabled in the chat, and the user's group holds the `features.web_search` permission.
 - **For DDGS/DuckDuckGo setups**, verify the provider configuration separately using the [DDGS provider guide](/features/chat-conversations/web-search/providers/ddgs), but switch models if DDGS returns results in logs while the assistant never calls `search_web`.
 
 ---
@@ -103,11 +110,28 @@ If web searches are timing out:
 
 **Solutions:**
 
-- **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (required for Brave free tier).
+- **Reduce concurrent requests**: Set `WEB_SEARCH_CONCURRENT_REQUESTS=1` for sequential execution (recommended for the Brave free tier; the Brave client already retries once after a 429).
 
 - **Adjust loader concurrency**: Lower `WEB_LOADER_CONCURRENT_REQUESTS` if fetching many pages simultaneously.
 
 - **Check network connectivity**: Ensure Open WebUI can reach both the search engine and the result URLs.
+
+---
+
+### 6. SearXNG Returns No Results Without an Error
+
+SearXNG can answer a search with an empty result list, for example when the upstream engines it queries block the instance with CAPTCHAs or rate limits. Open WebUI reads only the `results` list from the SearXNG response, so it treats this as a search that found nothing, not as a SearXNG failure.
+
+What you see depends on the **Function Calling** setting of the model:
+
+- **Legacy**: the web search status under the response shows `No results found from web search`, and the model answers without web content.
+- **Native** or **Default**: the `search_web` tool returns an empty list to the model. No error appears in the chat, and the model may say it found nothing.
+
+**Solutions:**
+
+- **Check the SearXNG log** for engine errors such as CAPTCHAs, timeouts or access denials.
+- **Run the same query in the SearXNG web interface** to see whether any engine returns results.
+- **Turn off the failing engines or enable others** in SearXNG's `settings.yml`, then restart SearXNG.
 
 ---
 
@@ -121,8 +145,8 @@ Key variables:
 |----------|-------------|
 | `WEB_SEARCH_TRUST_ENV` | Enable proxy support for content fetching |
 | `WEB_SEARCH_RESULT_COUNT` | Number of search results to fetch |
-| `WEB_SEARCH_CONCURRENT_REQUESTS` | Concurrent requests to search engine |
-| `WEB_LOADER_CONCURRENT_REQUESTS` | Concurrent page fetches |
+| `WEB_SEARCH_CONCURRENT_REQUESTS` | Concurrent requests to search engine (the Concurrent Requests field beside Search Result Count; `0` means unlimited) |
+| `WEB_LOADER_CONCURRENT_REQUESTS` | Concurrent page fetches (the Concurrent Requests field in the Loader section; default 10) |
 | `WEB_LOADER_ENGINE` | Content extraction engine |
 
 All of these are persisted settings, so **Settings > Web Search** (admin section) is the live source of truth for them. The page fetcher reads proxy trust, loader concurrency and SSL verification from that saved configuration on each search, so a change you save there applies to the next search without a restart, and matches what the same settings do elsewhere. If a change you made in the admin panel appears not to have taken effect, re-check it there rather than assuming the environment variable is still in charge: the variable seeds the initial value, and the saved setting wins afterwards.

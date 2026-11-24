@@ -340,7 +340,7 @@ docker exec -it open-webui curl http://host.docker.internal:8080/search?q=this+i
 
 Point the URL at the `/search` endpoint. Open WebUI adds the query parameters itself (`q`, `format=json`, `language` and the rest). The older `/search?q=<query>` form still works, since Open WebUI strips the query string when it sees `<query>`, but it is not required.
 
-A **Searxng search language** field (`SEARXNG_LANGUAGE`, default `all`) is sent as SearXNG's `language` parameter.
+The **Searxng search language (all, en, es, de, fr, etc.)** field (`SEARXNG_LANGUAGE`, default `all`) is sent as SearXNG's `language` parameter, with surrounding spaces and a trailing comma removed. The request's `Accept-Language` header stays `en-US,en;q=0.5` whatever this field says.
 
 5. Adjust the `Search Result Count` and `Concurrent Requests` values accordingly
 6. Save changes

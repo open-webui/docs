@@ -101,78 +101,24 @@ This is Tika Server. Please PUT
 
 ### 3. Verify the Integration
 
-Alternatively, you can also try sending a file for analysis to test the integration. You can test Apache Tika by sending a file for analysis using the `curl` command:
+Upload a small PDF with selectable text to a knowledge base. Open the file's **Indexed text** tab and look for a sentence you recognize from the PDF. Open WebUI reads plain text files locally even when Tika is selected, so use a PDF to exercise the Tika extraction path.
 
-```bash
-curl -T test.txt http://localhost:9998/tika
-```
-
-Replace `test.txt` with the path to a text file on your local machine.
-
-Apache Tika will respond with the detected metadata and content type of the file.
-
-### Using a Script to Verify Apache Tika
-
-If you want to automate the verification process, this script sends a file to Apache Tika and checks the response for the expected metadata. If the metadata is present, the script will output a success message along with the file's metadata; otherwise, it will output an error message and the response from Apache Tika.
-
-```python
-import requests
-
-def verify_tika(file_path, tika_url):
-    try:
-        # Send the file to Apache Tika and verify the output
-        response = requests.put(tika_url, files={'file': open(file_path, 'rb')})
-
-        if response.status_code == 200:
-            print("Apache Tika successfully analyzed the file.")
-            print("Response from Apache Tika:")
-            print(response.text)
-        else:
-            print("Error analyzing the file:")
-            print(f"Status code: {response.status_code}")
-            print(f"Response from Apache Tika: {response.text}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-if __name__ == "__main__":
-    file_path = "test.txt"  # Replace with the path to your file
-    tika_url = "http://localhost:9998/tika"
-
-    verify_tika(file_path, tika_url)
-```
-
-Instructions to run the script:
-
-### Prerequisites
-
-- Python 3.x must be installed on your system
-- `requests` library must be installed (you can install it using pip: `pip install requests`)
-- Apache Tika Docker container must be running (use `docker run -p 9998:9998 apache/tika` command)
-- Replace `"test.txt"` with the path to the file you want to send to Apache Tika
-
-### Running the Script
-
-1. Save the script as `verify_tika.py` (e.g., using a text editor like Notepad or Sublime Text)
-2. Open a terminal or command prompt
-3. Navigate to the directory where you saved the script (using the `cd` command)
-4. Run the script using the following command: `python verify_tika.py`
-5. The script will output a message indicating whether Apache Tika is working correctly
-
-:::note
-
-Note: If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
-
-:::
-
-### Conclusion
-
-By following these steps, you can verify that Apache Tika is working correctly in a Docker environment. You can test the setup by sending a file for analysis, verifying the server is running with a GET request, or use a script to automate the process. If you encounter any issues, ensure that the Apache Tika container is running correctly and that the file is being sent to the correct URL.
+If selectable text comes through but a scanned PDF is missing text, check the Tika server logs and its OCR setup. The PDF preview shows the original file. Use **Indexed text** to see what came back from extraction.
 
 ## Troubleshooting
 
 - Make sure the Apache Tika service is running and accessible from the Open WebUI instance.
 - Check the Docker logs for any errors or issues related to the Apache Tika service.
 - Verify that **Tika Server URL** is correctly configured in Open WebUI.
+
+### Connection refused during upload
+
+Open WebUI sends documents to Tika from the backend. If a test from the Docker host succeeds but an upload fails with `Connection refused`, check the URL from the Open WebUI container.
+
+- On a shared Compose network, use the Tika service name and container port, for example `http://tika:9998`.
+- On Docker Desktop, when Tika is published on the host, use `http://host.docker.internal:9998` and replace `9998` with the published host port. [Docker Desktop networking](https://docs.docker.com/desktop/features/networking/#i-want-to-connect-from-a-container-to-a-service-on-the-host)
+
+Set **Tika Server URL** to the address the container can reach, then upload a PDF to a knowledge base to verify extraction.
 
 ## Benefits of Integration
 

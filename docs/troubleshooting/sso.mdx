@@ -367,6 +367,10 @@ MICROSOFT_REDIRECT_URI=https://your-domain/oauth/microsoft/callback
 ENABLE_OAUTH_SIGNUP=true
 ```
 
+**Problem:** The sign-in fails at the callback with `Sign-in with your identity provider failed. Please contact your administrator for assistance.`, and the log line that starts with `OAuth callback error during authorize_access_token for provider microsoft` contains `AADSTS7000215`. Microsoft's [error code reference](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes) describes that code as "Invalid client secret is provided."
+
+**Solution:** `MICROSOFT_CLIENT_SECRET` must hold the secret's **Value**, not the **Secret ID** listed next to it. In the Microsoft Entra admin center, open your app under **App registrations**, then **Certificates & secrets** > **Client secrets**. Microsoft shows the **Value** only once, when the secret is created, so if you no longer have it, create a new client secret and copy its **Value**. See [Add and manage app credentials](https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-credentials?tabs=client-secret).
+
 #### Authentik Common Issues:
 
 **Problem:** Incorrect provider URL format.
@@ -392,6 +396,18 @@ Some providers add a vendor-specific parameter to the ID token header, which old
 
 **Solution:** Update Open WebUI. Unrecognized parameters are ignored, so nothing changes on the provider side. The signature and signing algorithm are still verified.
 
+#### Providers that encrypt the ID token:
+
+**Problem:** The login fails at the callback with `Sign-in with your identity provider failed. Please contact your administrator for assistance.`, and the log records:
+
+```
+OAuth callback failed: decode_error: Invalid JSON Web Signature
+```
+
+The ID token is not a signed token in the three-part form Open WebUI verifies. The usual cause is a provider set to encrypt the ID token (JWE). Open WebUI has no setting for a decryption key, so it cannot read an encrypted ID token.
+
+**Solution:** At the provider, turn off ID token encryption for the Open WebUI client and keep the ID token signed.
+
 ---
 
 ### 12. Existing Accounts Cannot Sign In After a Long-Delayed Upgrade
@@ -407,6 +423,46 @@ oauth
 The upgrade step that moves an account's identity provider subject into its current field encoded the value twice, so it holds the text of a JSON object rather than the object. Only databases still older than v0.6.41 at the moment they were upgraded are affected, and only accounts that had a subject stored at the time.
 
 **Solution:** Update Open WebUI. A repair migration runs on startup and rewrites the affected rows, leaving every other row alone. No manual database work, no re-linking and nothing to change on the provider side. `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` does not work around it, since the fallback lookup reads the same account and fails the same way.
+
+---
+
+### 13. First SSO Sign-In Is Pending or Refused
+
+**Problem:** A person signs in through the provider for the first time. They either land on the **Account Activation Pending** screen, or they return to the sign-in page with this error:
+
+```
+You do not have permission to access this resource. Please contact your administrator for assistance.
+```
+
+#### The new account is pending
+
+A new SSO account gets the **Default User Role** from the **User Access** section of **Settings > Authentication** (admin section), set by [`DEFAULT_USER_ROLE`](../reference/env-configuration.mdx#default_user_role). Its default is `pending`, so the account waits on the **Account Activation Pending** screen until an admin changes its role. With two-factor sign-in on, the sign-in page shows `Your account is awaiting administrator approval.` instead. The first account created on an empty instance becomes `admin`.
+
+**Solution:** Use one of these:
+- Change the account's role to `user` under **Admin Panel > Users**.
+- Set **Default User Role** to `user`, so new accounts can use Open WebUI right away. This also applies to new accounts from the sign-up form and from LDAP.
+- Turn on **Role Mapping** ([`ENABLE_OAUTH_ROLE_MANAGEMENT`](../reference/env-configuration.mdx#enable_oauth_role_management)), so the provider's roles decide between `user` and `admin`. See [OAuth Role Management](/features/authentication-access/auth/sso#oauth-role-management).
+
+#### The sign-in is refused
+
+At the callback, Open WebUI looks for an account already linked to that provider and the person's `sub`. When none exists:
+
+- With [`OAUTH_MERGE_ACCOUNTS_BY_EMAIL`](../reference/env-configuration.mdx#oauth_merge_accounts_by_email) on, an existing account with the same email is linked and signed in.
+- Otherwise, with [`ENABLE_OAUTH_SIGNUP`](../reference/env-configuration.mdx#enable_oauth_signup) off (the default), the sign-in is refused with the error above. This also happens when the person already has a local email and password account with the same email.
+- With `ENABLE_OAUTH_SIGNUP` on, a new account is created. If an account with that email already exists, the sign-in fails with `Uh-oh! This email is already registered. Sign in with your existing account or choose another email to start anew.`
+
+The same error also appears when **Role Mapping** is on and the provider's roles match neither **Allowed Roles** nor **Admin Roles**. See [`OAUTH_ALLOWED_ROLES`](../reference/env-configuration.mdx#oauth_allowed_roles).
+
+**Solution:**
+- To let SSO create accounts, set `ENABLE_OAUTH_SIGNUP=true` (**OAuth Signup** in the Admin Panel).
+- To let people who already have a local account sign in through SSO, set `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true` (**Merge Accounts by Email**). It links the sign-in to any account with that email, admin accounts included, and Open WebUI does not check whether the provider verified the address. Turn it on only for providers that verify email addresses.
+- While [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config) is `false` (the default), these two toggles are read-only in the Admin Panel. Set the environment variables and restart.
+
+#### The provider sends no `roles` claim
+
+With **Role Mapping** on, Open WebUI reads the claim named in **Roles Claim** ([`OAUTH_ROLES_CLAIM`](../reference/env-configuration.mdx#oauth_roles_claim), default `roles`) from the ID token claims merged with the userinfo response. When the claim is missing, a new account gets the **Default User Role** and an existing account keeps its role.
+
+**Solution:** If your provider sends the values you want to map under another claim, such as `groups`, set **Roles Claim** to that claim's name. Then list values from that claim in **Allowed Roles** and **Admin Roles**. The claim can be a list or a string, and a string is split on [`OAUTH_ROLES_SEPARATOR`](../reference/env-configuration.mdx#oauth_roles_separator) (default `,`). A dotted name such as `user.roles` reads a nested claim.
 
 ---
 
@@ -472,6 +528,8 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 - `httpcore.ReadTimeout` → Network timeout issue
 - `Sign-in with your identity provider failed. Please contact your administrator for assistance.` → The sign-in failed at the callback, for example because the provider denied access, the account has no email or its email domain is not allowed. The text is the same for all of these, so read the backend log for the actual cause. A role mismatch or a signup-disabled case shows the access-prohibited text, a duplicate email shows the already-registered error, and other exceptions show `Error during OAuth process`
 - `Unsupported {'app_id'} in header` → The provider adds a vendor-specific parameter to the ID token and your version still rejects it. See [Providers that add their own parameters to the ID token](#providers-that-add-their-own-parameters-to-the-id-token)
+- `decode_error: Invalid JSON Web Signature` → The ID token is not a signed token, usually because the provider encrypts it. See [Providers that encrypt the ID token](#providers-that-encrypt-the-id-token)
+- `Username claim is missing, using email as name` → A new account was created with its email as its name, because the claim named in [`OAUTH_USERNAME_CLAIM`](../reference/env-configuration.mdx#oauth_username_claim) was missing or empty
 - `1 validation error for UserModel` on the `oauth` field → An old upgrade step stored the identity provider subject as text. See [Existing Accounts Cannot Sign In After a Long-Delayed Upgrade](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
 - `404` on callback URLs → Redirect URI misconfiguration
 
@@ -492,6 +550,7 @@ If using a reverse proxy, test OAuth directly against Open WebUI:
 | CSRF/session issues       | Verify `WEBUI_SECRET_KEY` and session configuration         |
 | Multi-instance problems    | Configure Redis and shared secrets                          |
 | SSO accounts locked out right after a long-delayed upgrade | Update Open WebUI; a repair migration fixes the stored identity data on startup |
+| First SSO sign-in pending or refused | Change **Default User Role**, or set `ENABLE_OAUTH_SIGNUP` or `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`. See [First SSO Sign-In Is Pending or Refused](#13-first-sso-sign-in-is-pending-or-refused) |
 | Still stuck? | Check debug logs, test without proxy, verify provider setup |
 
 ---

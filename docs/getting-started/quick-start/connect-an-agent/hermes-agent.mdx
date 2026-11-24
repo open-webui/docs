@@ -1,13 +1,21 @@
 ---
-sidebar_position: 1
-title: "Hermes Agent"
+sidebar_position: 10
+sidebar_label: "Hermes Agent"
+title: "Connect Hermes Agent with Open Terminal or a Gateway"
+description: "Run Hermes Agent in an Open Terminal workspace through ACP, or connect an existing Hermes gateway to Open WebUI using its OpenAI-compatible API."
 ---
 
-# Hermes Agent
+# Use Hermes Agent in Open WebUI
 
-:::tip Use Hermes through Open Terminal
-If you want Hermes to run in your selected terminal workspace with agent interactions in chat, use the [Open Terminal quick start](/getting-started/quick-start/connect-an-agent#quick-start-with-open-terminal). Install and configure Hermes there; Open Terminal connects through `hermes acp`. The guide below covers the separate gateway API route.
-:::
+Use Hermes through **Open Terminal** when you want it to work in the project folder you select in chat. If you already run a Hermes gateway with its own workspace, you can [connect the gateway API](#connect-the-hermes-gateway).
+
+## Run Hermes through Open Terminal
+
+1. Install Hermes as the user running your terminal. In that environment, run `hermes model` to configure the model provider, then start `hermes` and send a test prompt. [Hermes Agent quickstart](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart)
+2. Connect the workspace using the [Open Terminal quick start](/getting-started/quick-start/connect-an-agent#quick-start-with-open-terminal). In a new saved chat, select the **Terminal** and use **Choose working directory** to select your project.
+3. Pick a model beginning with `hermes/`. Open Terminal starts `hermes acp` for you. Ask it to read a file from the project and compare its reply with the file in **Files**.
+
+## Connect the Hermes gateway
 
 **Use Open WebUI as the chat frontend for Nous Research's autonomous AI agent.**
 
@@ -23,7 +31,7 @@ When you send a message through Open WebUI, Hermes Agent receives it, decides wh
 
 ---
 
-## Step 1: Install Hermes Agent
+### Step 1: Install Hermes Agent
 
 If you haven't installed Hermes Agent yet, follow the [official quickstart](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart). Once installed, verify it's working:
 
@@ -33,7 +41,7 @@ hermes --version
 
 ---
 
-## Step 2: Enable the API Server
+### Step 2: Enable the API Server
 
 Add the following to your Hermes Agent environment file:
 
@@ -55,7 +63,7 @@ You can also customize the port and host:
 
 ---
 
-## Step 3: Start the Gateway
+### Step 3: Start the Gateway
 
 ```bash
 hermes gateway
@@ -73,7 +81,7 @@ The gateway must stay running for Open WebUI to communicate with your agent. Con
 
 ---
 
-## Step 4: Add the Connection in Open WebUI
+### Step 4: Add the Connection in Open WebUI
 
 1. Open Open WebUI in your browser.
 2. Go to **Settings > Connections** (admin section) and find the **Manage OpenAI API Connections** list.
@@ -97,7 +105,7 @@ http://host.docker.internal:8642/v1
 
 ---
 
-## Step 5: Start Chatting!
+### Step 5: Start Chatting!
 
 The `hermes-agent` model should now appear in the model dropdown. Select it and start chatting. Your agent has full access to its toolset (terminal, file ops, web search, memory, skills) right through Open WebUI's interface.
 

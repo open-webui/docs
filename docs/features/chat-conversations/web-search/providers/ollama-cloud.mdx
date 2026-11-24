@@ -24,10 +24,10 @@ Create an [Ollama account and API key](https://ollama.com/settings/keys). The [o
 
 1. Open **Settings → Web Search** (admin section) and enable web search.
 2. Set **Web Search Engine** to `ollama_cloud`.
-3. Paste your key into **Ollama Cloud Web Search API Key** and save the settings.
+3. Paste your key into **Ollama Cloud API Key** and save the settings.
 4. Enable the model’s **Web Search** capability and its **Web Search** default feature, or turn on Web Search for the conversation. Follow the [native search setup](/features/chat-conversations/web-search/agentic-search#how-to-enable-agentic-behavior) for the model settings.
 
-The admin UI calls the setting **Ollama Cloud Web Search API Key**. The configuration API and persisted setting use `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`, but the environment variable is **`OLLAMA_CLOUD_API_KEY`**. Setting `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` in the environment has no effect.
+The admin UI calls the setting **Ollama Cloud API Key**. The configuration API and persisted setting use `OLLAMA_CLOUD_WEB_SEARCH_API_KEY`, but the environment variable is **`OLLAMA_CLOUD_API_KEY`**. Setting `OLLAMA_CLOUD_WEB_SEARCH_API_KEY` in the environment has no effect.
 
 ## Environment example
 
@@ -45,7 +45,7 @@ Restart Open WebUI after changing the environment. Previously saved admin settin
 
 Start a new conversation with the configured model and turn on **Web Search** in the chat’s **+** menu if it is not already enabled. Ask: “Search the web for the official Python documentation and give me a link to it.”
 
-Confirm that the conversation shows a web search tool call and returned sources, then open a source to check it. A plausible answer without a search tool call does not demonstrate that the provider is connected.
+Confirm that the conversation shows a web search tool call, then open it and check the links in its output. In Native mode, search results are not listed as sources. A plausible answer without a search tool call does not demonstrate that the provider is connected.
 
 ## Troubleshooting
 

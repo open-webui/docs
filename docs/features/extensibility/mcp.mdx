@@ -137,6 +137,18 @@ The provider returns the browser to the Open WebUI home page when the flow finis
 
 Use this when you already have a client ID/client secret from your identity provider.
 
+:::info Redirect URI
+The OAuth client at your identity provider must allow this redirect URI:
+
+```text
+<WebUI URL>/oauth/clients/mcp:<Connection ID>/callback
+```
+
+For an instance at `https://ai.example.com` and a connection whose **Connection ID** is `notion`, that is `https://ai.example.com/oauth/clients/mcp:notion/callback`. `<WebUI URL>` is the **WebUI URL** field in **Admin Panel > Settings > General** ([`WEBUI_URL`](/reference/env-configuration#webui_url)). Set it to the public address users reach Open WebUI at before you click **Register Client**. When it is empty, Open WebUI uses the address of the request that registered the client.
+
+**Register Client** builds the redirect URI from the **WebUI URL** and **Connection ID** it sees at that moment, and the saved connection keeps it. After you change **WebUI URL** or the **Connection ID**, click **Register Client** again, click **Save**, and update the redirect URI at your identity provider. **OAuth 2.1** sends the same redirect URI during dynamic client registration, so you do not enter it anywhere.
+:::
+
 1. Open **Settings > Integrations** (admin section).
 2. Under **External Tool Servers**, click **+ Add Connection**. The Integrations page holds several sections, so make sure it is that one.
 3. Set **Type** to **MCP (Streamable HTTP)**.
@@ -184,8 +196,13 @@ If an OAuth 2.1 tool is set as a default and the user hasn't previously authenti
 
 ### Connection URLs
 
+The Open WebUI backend opens the connection, so the URL must be reachable from the backend, not from your browser. The URL must point at the server's Streamable HTTP endpoint. An SSE endpoint does not work, see [An SSE URL does not connect](#an-sse-url-does-not-connect).
+
 If you are running Open WebUI in **Docker** and your MCP server is on the **host machine**:
-*   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/sse`) instead of `localhost`.
+*   Use `http://host.docker.internal:<port>` (e.g., `http://host.docker.internal:3000/mcp`) instead of `localhost`.
+
+If your MCP server runs in **another container on the same Docker network** as Open WebUI:
+*   Use the container's service name and the port the server listens on inside its container (e.g., `http://mcp-server:8000/mcp`). `localhost` and the port published on the host do not reach it from inside the Open WebUI container. See Docker's [Networking in Compose](https://docs.docker.com/compose/how-tos/networking/).
 
 ### Custom Headers
 
@@ -204,6 +221,22 @@ This field restricts which tools are exposed to the LLM.
 Open WebUI offers each MCP tool to the model as `<server ID>_<tool name>`. Some providers, such as the OpenAI API and AWS Bedrock, reject a request whose tool names run past 64 characters, so a longer name is shortened to its first 55 characters, an underscore and an 8-character hash. The same tool always gets the same shortened name, and the MCP server is still called with the original tool name.
 
 With many MCP tools enabled, [Tool Search](/features/extensibility/plugin/tools#tool-search) keeps large tool definitions out of each request until the model looks them up. Its **Always Loaded Tools** patterns match these names, so `github_*` keeps every tool of a server with the ID `github` loaded.
+
+### What an MCP tool receives
+
+When the model calls an MCP tool, Open WebUI sends the MCP server the tool name and the arguments the model wrote, and nothing else. The reserved arguments that [workspace Python tools](/features/extensibility/plugin/development/reserved-args) get, such as `__user__`, `__metadata__` and `__files__`, are never passed to an MCP tool, so files attached to the chat do not reach it. Tools on an OpenAPI tool server get the same treatment: Open WebUI drops every argument the operation does not declare and sends the rest as path, query and body parameters.
+
+The server learns who is calling from the request headers:
+
+- The token the **Auth** setting selects, see [Authentication Modes](#authentication-modes). **Session**, **OAuth** and **OAuth 2.1** send a token that belongs to the user, while **Bearer** sends the same key for everyone.
+- Your [custom headers](#custom-headers), with placeholders such as `{{USER_ID}}` and `{{CHAT_ID}}` filled in.
+- With [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) set to `true`, the user's name, ID, email and role in `X-OpenWebUI-User-*` headers (or one signed JWT when `FORWARD_USER_INFO_HEADER_JWT_SECRET` is set), plus `X-OpenWebUI-Chat-Id` and `X-OpenWebUI-Message-Id`.
+
+To get a chat file to an MCP or OpenAPI tool:
+
+- **Pass the content or a URL.** Give the tool a parameter for the text or for a URL the server can download, and let the model fill it in.
+- **Pass the file ID.** When **Function Calling** is not set to **Legacy** and the model's **Builtin Tools** capability is on, each user message reaches the model with an `<attached_files>` block that lists every attached file's `id`. Give the tool a file ID parameter, and have the server download the file from `/api/v1/files/<id>/content` on your Open WebUI instance with the token it received. With **Session** auth that is the user's own Open WebUI token, which works for files the user can read.
+- **Use a workspace Python tool.** A tool written in **Workspace > Tools** receives the attached files in `__files__` and can forward them to your service itself.
 
 ### Structured Tool Results
 
@@ -244,6 +277,36 @@ The server log records each failure at error level as `Failed to connect to MCP 
 2.  **Filter List Bug**: If the "Function Name Filter List" is empty, try adding a comma (`,`) to it.
 3.  **OAuth 2.1 Default Tool**: If the failing tool uses OAuth 2.1 and is set as a default tool on the model, this is a known limitation. Remove it from the model's default tools and have users enable it manually per-chat.
 4.  **Slow handshake**: If the server cold-starts slowly or exposes many tools, connecting, listing its tools or reading a resource can exceed its timeout. Raise [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout) (default `10` seconds). Tool calls use [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server) instead.
+
+### `{"detail":"Not Found"}` after the OAuth sign-in
+
+**Symptom**: After you approve access at the provider, the browser lands on `/oauth/clients/mcp:<Connection ID>/callback` and shows only `{"detail":"Not Found"}`.
+
+**Cause**: Open WebUI has no OAuth client stored under the **Connection ID** in that URL. The redirect URI keeps the **Connection ID** it had when you clicked **Register Client**, so this happens when the **Connection ID** was changed afterwards, or when the connection was deleted or never saved.
+
+**Solution**: Open the connection under **Settings > Integrations** (admin section), click **Register Client** with the current **Connection ID**, and click **Save**. With **OAuth 2.1 (Static)**, update the redirect URI at your identity provider to match, see [OAuth 2.1 (Static) Setup](#oauth-21-static-setup). Then enable the tool in a chat again.
+
+### An SSE URL does not connect
+
+**Symptom**:
+A connection whose URL points at a server's SSE endpoint, usually a URL ending in `/sse`, fails. The chat shows "Failed to connect to MCP server".
+
+**Cause**:
+Open WebUI connects to MCP servers over Streamable HTTP only. It never opens an SSE connection, so an SSE endpoint cannot answer its requests.
+
+**Solutions**:
+1.  **Use the Streamable HTTP path**: If the server also offers Streamable HTTP, enter that endpoint as the **URL**. The server's documentation names the path.
+2.  **Bridge SSE with mcpo**: If the server offers SSE only, run it behind [mcpo](https://github.com/open-webui/mcpo), for example `mcpo --port 8000 --server-type "sse" -- http://127.0.0.1:8001/sse`, and add the mcpo URL as an **OpenAPI** connection. See [MCP Support](/features/extensibility/plugin/tools/openapi-servers/mcp).
+
+### "Maximum tools limit reached"
+
+The error `Maximum tools limit reached. <n> tools have been provided but the maximum is <m>` comes from the model provider or a proxy in front of it, not from Open WebUI. The request held more tool definitions than that endpoint accepts. Open WebUI sends every tool of each MCP server enabled for the chat that passes its **Function Name Filter List**, plus the built-in tools in Native Mode.
+
+To send fewer tools:
+
+- **Turn on [Tool Search](/features/extensibility/plugin/tools#tool-search).** Deferred tools are left out of the tool list sent to the provider, which then holds the tools that stay loaded plus `search_tools` and `call_tool`. Only tools whose definition is longer than the **Deferral Threshold (characters)** are deferred. Set it to `0` to defer every tool.
+- **List only the tools you need** in each server's [Function Name Filter List](#function-name-filter-list).
+- **Enable fewer MCP servers** in the chat, or turn off the [Builtin Tools categories](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model) the model does not need.
 
 ### Infinite loading screen after adding External Tool
 

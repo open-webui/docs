@@ -6,9 +6,19 @@ Create isolated Python environments using `venv`.
 
 1. **Create a Virtual Environment:**
 
-   ```bash
-   python3 -m venv venv
-   ```
+   With Python 3.12 installed, select it explicitly:
+
+   - On Linux/macOS:
+
+     ```bash
+     python3.12 -m venv venv
+     ```
+
+   - On Windows with the Python launcher:
+
+     ```powershell
+     py -3.12 -m venv venv
+     ```
 
 2. **Activate the Virtual Environment:**
 
@@ -27,7 +37,7 @@ Create isolated Python environments using `venv`.
 3. **Install Open WebUI:**
 
    ```bash
-   pip install open-webui
+   python -m pip install open-webui
    ```
 
 4. **Start the Server:**
