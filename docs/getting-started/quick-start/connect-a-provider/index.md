@@ -81,7 +81,7 @@ The other settings in the dialog:
 | Setting | What it does |
 |---|---|
 | **Connection Type** | Labels the connection **Local** or **External**. The model selector uses the label for its Local and External filters. |
-| **Auth** | **Bearer** sends your API key. **None** calls the server without a key. **Session**, **OAuth** and **Entra ID** forward the signed-in user's credentials or an Azure identity. |
+| **Auth** | **Bearer** sends your API key. **None** calls the server without a key. **Session**, **OAuth** and **Entra ID** forward the signed-in user's credentials or an Azure identity. **AWS SigV4** signs each request for Amazon Bedrock with the server's AWS credentials. |
 | **API Type** | **Chat Completions** is the default. **Responses** switches the connection to the Responses API, and is picked for you when you enter an `api.openai.com` URL. |
 | **Forward cookies** | Sends the cookies of the Open WebUI request on to this server. |
 | **Headers** | Extra request headers in JSON format. |

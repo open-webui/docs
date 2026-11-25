@@ -490,6 +490,8 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   You can also set the same values from the Open WebUI admin panel.
 
+  To use the server's AWS credentials instead of an API key, add the connection in **Settings > Connections** (admin section) with the Mantle URL and set **Auth** to **AWS SigV4**. Open WebUI then signs every request with the default AWS credential chain, such as an IAM role attached to the server or the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables. The region is read from the URL. **AWS SigV4** works with Amazon Bedrock URLs only (`bedrock-mantle` and `bedrock-runtime`).
+
   For more information, see the [Bedrock Mantle documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/bedrock-mantle.html).
 
   #### Start using Bedrock Base Models
