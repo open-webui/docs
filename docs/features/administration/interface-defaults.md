@@ -179,7 +179,7 @@ With **Copy Formatted Text** enabled, the assistant response's **Copy** action t
 
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
-| `defaultUploadContext` | Default Upload Mode | `"focused"` (**Using Focused Retrieval**); `"full"` is **Using Entire Document** |
+| `defaultUploadContext` | Default Upload Mode | `"focused"` (**Relevant passages**); `"full"` is **Full text** |
 | `imageCompression` | Image Compression | `false` |
 | `imageCompressionSize` | Image Compression > **Manage** | `{"width": "", "height": ""}` |
 | `imageCompressionInChannels` | Compress Images in Channels | `true` |

@@ -41,7 +41,7 @@ The command list streams live, and so does the output of the tab on screen while
 :::
 
 :::info Extra keys on touch screens
-On a phone or tablet, a row above the terminal adds the keys a touch keyboard lacks: **Tab**, **Esc**, **Ctrl**, the arrow keys and `| ~ / - _`. **Ctrl** applies to the next key you type or tap.
+On a phone or tablet, a row below the terminal in a **New Terminal** tab adds **Tab**, **Esc**, **Ctrl**, the arrow keys and `| ~ / - _`, the keys a touch keyboard lacks. **Ctrl** applies to the next key you type or tap.
 :::
 
 :::info One terminal at a time

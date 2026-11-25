@@ -32,7 +32,7 @@ Organize existing chats by moving them into folders:
 - **Drag and Drop**: Click and drag any conversation from the sidebar into a folder.
 - **Conversation menu**: Hover a conversation in the sidebar, click the three-dot menu that appears, then choose **Move** and pick the destination folder. The entry appears once at least one folder exists.
 
-A folder highlights while you drag a chat over it when you are allowed to file the chat there, so you can see where the drop will land before you let go. A folder of your own always takes one. A folder [shared with you](#sharing-folders) takes one only with write access; with read-only access it does not highlight and does not accept the drop, so a move that would be refused anyway is never started.
+A folder highlights while you drag a chat over it when you are allowed to file the chat there, so you can see where the drop will land before you let go. A folder of your own always takes one. A folder [shared with you](#sharing-folders) takes one only with write access. With read-only access it does not highlight.
 
 ### Nested Folders
 
@@ -40,7 +40,7 @@ Folders can be nested within other folders to create hierarchical organization:
 
 - **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
-- **Reorder**: Drag a folder just above or below another one to place it there. The order is saved with your settings, so it is the same on every device, and folders you have not placed yet sort by name at the end. Shared folders stay sorted by name.
+- **Reorder**: Drag a folder just above or below another one to place it there, at that folder's level. The order is saved with your settings, so it is the same on every device, and folders you have not placed yet sort by name at the end. Shared folders stay sorted by name.
 - **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. It needs the [Allow Chat Export](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. There is no move entry. Folders are re-parented by drag and drop only.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
@@ -62,7 +62,7 @@ The folder's page marks the same state per chat: a dot for an unread conversatio
 #### Marking Read and Unread
 
 - **Mark a chat unread**: open a chat's three-dot menu in the sidebar and choose **Mark as unread**. The chat gets its dot back, moves up with the other unread chats, and the folder count goes up again. Use it to keep a conversation on your radar after skimming it.
-- **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it; on a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
+- **Mark a folder read**: open a folder's three-dot menu and choose **Mark all as read**. On a folder you own this clears your unread chats in that folder and everything nested under it. On a folder shared with you it clears only that folder, and only your own chats in it. Archived chats are left alone.
 - **Mark everything read**: the **Chats** section header in the sidebar has its own menu with **Mark all as read**, which clears every unread chat you own, loose chats and chats in folders alike, and zeroes all the folder badges at once. Archived chats are again left alone.
 
 ### Starting a Chat in a Folder
@@ -78,7 +78,7 @@ A folder's three-dot menu also has **New Chat**, which opens the folder the same
 
 Each folder in the sidebar is a link to its own page, so a middle click or Ctrl/Cmd click opens the folder in a new tab.
 
-A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. The new chat page lists your folders with work in progress under **Continue**: a chat that is running or waiting for your approval, or tabs left open. Each entry shows the folder's working directory and its open tabs, terminals and ports, so you can pick up where you left off.
+A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. The new chat page lists your folders with work in progress under **Continue**, meaning a chat that is running or waiting for your approval, or tabs left open, so you can pick up where you left off.
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
 
@@ -86,7 +86,7 @@ The check is the same in all three places a chat is given a folder: creating a c
 
 ## The Folder Page
 
-Click a folder in the sidebar and its page shows every chat in it, laid out like a small project tracker. It suits folders that collect more than a handful of conversations, such as a research project, a queue of requests or a weekly report, where you want to see what is finished, what is waiting and what needs your attention. In a folder shared with you the page works the same way; what you can change depends on your access.
+Click a folder in the sidebar and its page shows every chat in it, laid out like a small project tracker. It suits folders that collect more than a handful of conversations, such as a research project, a queue of requests or a weekly report, where you want to see what is finished, what is waiting and what needs your attention. In a folder shared with you the page works the same way, and what you can change depends on your access.
 
 ### List and Board
 
@@ -121,16 +121,16 @@ Tags label chats by topic and feed the grouping, board and filter options above.
 
 ### Notes
 
-A folder can hold [notes](/features/notes) next to its chats, such as a project brief or meeting notes. Pick **Notes** in the switch at the top of the folder page to list the folder's notes, whoever wrote them. To add one:
+A folder can hold [notes](/features/notes) next to its chats, such as a project brief or meeting notes. Pick **Notes** in the switch at the top of the folder page to list the folder's notes, whoever wrote them. Add a note in either of these ways.
 
-- Click **+** on the folder's **Notes** list, or **New Note** in the folder's **⋯** menu in the sidebar, to start a new note in the folder.
+- Click **+** in the folder page header, to the right of the switch, or pick **New Note** in the folder's **⋯** menu in the sidebar.
 - Drag a note from the Notes list onto the folder in the sidebar, or pick the folder under **Move** in the note's **⋯** menu. **Move > No folder** takes it out again.
 
 Adding notes needs write access to the folder. Deleting the folder with **Delete all contents inside this folder** ticked also deletes the owner's notes in it, and notes other people put there move out of the folder and stay theirs.
 
 ### Automations
 
-The page header has a **Chats**, **Notes**, **Automations** and **Knowledge** switch. **Notes** shows for users who have the Notes feature. **Automations** is there for users who have the [Automations](/features/chat-conversations/chat-features/automations) feature. It lists the folder's automations and has a **New automation** button; see [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page for who can do what.
+The page header has a **Chats**, **Notes**, **Automations** and **Knowledge** switch. **Notes** shows for users who have the Notes feature. **Automations** is there for users who have the [Automations](/features/chat-conversations/chat-features/automations) feature. It lists the folder's automations and has a **New automation** button. See [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page for who can do what.
 
 ### Renaming from the Tab
 
@@ -162,11 +162,11 @@ Customize the visual appearance of your folder by uploading a background image. 
 
 ### Default Model
 
-Pick the model new chats in this folder start with, or leave it on **Use default** to fall back to your usual default. Switching models inside one of the folder's chats leaves the folder's default as it is; change it here.
+Pick the model new chats in this folder start with, or leave it on **Use default** to fall back to your usual default. Switching models inside one of the folder's chats leaves the folder's default as it is, so change it here.
 
 ### Default Machine and Working Directory
 
-Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. A chat that was already on another machine before it moved into the folder keeps that machine. A machine with a separate instance per chat or model is only suggested for new chats. While that machine is offline or not shared with you, the message box in the folder's chats is disabled. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [agents](/features/open-terminal/agents).
+Under **Advanced**, **Machine** picks the machine the folder runs on. Its chats, files and terminals use it and start in **Working directory**, or in the machine's own default when that is empty. With a machine that has a separate instance per chat or model, each chat can pick another machine. While the folder's machine is unavailable to you, the message box in your own chats of the folder is disabled. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a machine picked, **Default Model** also offers that machine's [agents](/features/open-terminal/agents).
 
 ### System Prompt
 
@@ -193,7 +193,7 @@ Attach **knowledge bases, notes and files** in the folder's **Knowledge** field 
 - Knowledge is optional. Folders work for organization without any attached files.
 - **Attaching a folder to another chat.** Folders are listed in the `#` menu, and you can also drag one from the sidebar into the message input. This attaches the files and knowledge bases linked to the folder, and only while **Preload files** is on. With Preload files off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder.
 
-**Whose access decides what is attached.** Attaching needs both your access and the **folder owner's**; every chat in the folder then follows the owner's access:
+**Whose access decides what is attached.** Attaching needs both your access and the **folder owner's**. Every chat in the folder then follows the owner's access.
 
 - Attaching a file, knowledge base or note to a folder requires both the person attaching it and the owner to be able to read it. So someone with write access to a shared folder cannot attach documents into it that its owner could not open themselves, including their own private ones, nor documents they cannot open themselves. The same check applies to a subfolder created inside a shared folder, which belongs to the parent's owner.
 - Every chat in the folder re-checks the attachments against the owner's current access before using them. If the owner loses access to a knowledge base after attaching it, it stops being used in the folder's chats.
@@ -206,12 +206,12 @@ Share a folder, and the chats inside it, with specific users or groups so a team
 Sharing a folder needs the **Folders Sharing** permission, which is off by default. An administrator turns it on under **Admin Panel > Users > Groups** or with [`USER_PERMISSIONS_FOLDERS_ALLOW_SHARING`](/reference/env-configuration#user_permissions_folders_allow_sharing).
 
 1. Open the **three-dot menu** (⋯) of the folder, either in the sidebar or on the folder page, and select **Share**. This opens the folder's **Access** dialog. The entry shows for admins and for the folder's owner when the owner has the **Folders Sharing** permission. The **Access** button at the top of the **Edit Folder** dialog opens the same dialog.
-2. Add the users or groups to share with. Each one starts on **Write**; switch it to **Read** in their row of the **Access List** where needed:
+2. Add the users or groups to share with. Each one starts on **Write**. Switch it to **Read** in their row of the **Access List** where needed:
    - **Read**: they can open the folder and read its chats. They cannot start a chat in it or move one into it, and dragging a chat over it in the sidebar does not offer it as a drop target.
    - **Write**: they can also rename the folder, start chats in it, move their own chats into it and create subfolders inside it. It highlights and takes the chat when they drag one onto it in the sidebar.
 3. Pick the **Sharing mode**. You can set it before anyone has access, so the folder is ready when you add people:
    - **Clone only** (default): people you shared with read the folder's chats and clone one to continue it on their own.
-   - **Allow replies**: people with **Write** access to the folder can send messages into the chats directly in it, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). People with **Read** access read those chats and clone them, the same as with **Clone only**. Chats in a subfolder follow that subfolder's own sharing mode, which you set in the subfolder's own **Access** dialog; until then they open read-only.
+   - **Allow replies**: people with **Write** access to the folder can send messages into the chats directly in it, which then work like a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). People with **Read** access read those chats and clone them, the same as with **Clone only**. Chats in a subfolder follow that subfolder's own sharing mode, which you set in the subfolder's own **Access** dialog. Until then they open read-only.
 
 Each change applies as soon as you make it.
 
@@ -223,17 +223,16 @@ The **Add Access** picker lists only the people and groups the folder is not alr
 Shared folders appear in the recipient's sidebar. A few rules to know:
 
 - **Subfolders inherit the share.** Access granted on a folder cascades to everything nested inside it. When someone has inherited **Write** on a subfolder and a direct **Read** grant on it too, **Write** applies. The sharing mode applies per folder, so replying in a subfolder's chats needs **Allow replies** on that subfolder.
-- **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only; with **Allow replies** on and **Write** access to the folder, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** tab. In the bubble layout, messages from other people sit on the left with their name and picture, and your own sit on the right; with **Chat Bubble UI** off in **Settings > Interface**, every message shows its sender's name and picture.
+- **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only. With **Allow replies** on and **Write** access to the folder, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** tab.
 - **The folder's owner can tidy up other people's chats.** In a folder you own, you can rename chats other people started (title only) and move them to other folders in the same shared tree.
-- **Edit and regenerate together.** With **Allow replies** on, people with **Write** access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). The chat's top bar shows who else has it open right now.
-- **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**; click the count to see everyone. Hover or click a picture to open that person's profile card.
+- **Edit and regenerate together.** With **Allow replies** on, people with **Write** access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies).
+- **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**. Click the count to see everyone. Hover or click a picture to open that person's profile card.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
 - **Write access covers the folder page.** People with write access can set the status and priority of every chat in the folder and change the folder's statuses, and people with read access can see the statuses. See [The Folder Page](#the-folder-page).
-- **Notes in a shared folder follow the folder's access.** Read access on the folder lets people read its notes, and write access lets them edit them. See [Notes](#notes).
 - **Automations can post into a shared folder.** Anyone with write access can create one there, and everyone who can write to the folder can pause it. See [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page.
-- **Clone a chat to continue it yourself.** In a folder set to **Clone only**, or with **Read** access only, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
+- **Clone a chat to continue it yourself.** In a folder set to **Clone only**, or with **Read** access only, use **Clone Chat** or **Fork chat** to continue a chat in your own chats. See [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
 - **Folders cannot be shared publicly**, by admins either. Sharing is always to specific users or groups.
 
 ![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)

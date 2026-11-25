@@ -105,6 +105,7 @@ Here is a complete list of tables in Open-WebUI's SQLite database. The tables ar
 | 51      | notification     | Stores each user's inbox notifications                       |
 | 52      | chat_view_state  | Stores each user's saved tab layout for a chat               |
 | 53      | resource_tag     | Links tags to the chats and notes that carry them            |
+| 54      | folder_view_state | Stores each user's saved tab layout for a folder            |
 
 Note: the `alembic_version` table, which records the applied migration, is not related to Open-WebUI's core functionality and is excluded from this list.
 
@@ -328,7 +329,7 @@ Things to know about the channel_file table:
 | id              | String        | PRIMARY KEY             | Unique identifier (UUID) |
 | user_id         | String        | -                       | Owner of the chat        |
 | title           | Text          | -                       | Chat title               |
-| chat            | JSON          | -                       | Chat settings, such as the models and parameters; the messages are in `chat_message` |
+| chat            | JSON          | -                       | Chat settings such as the models and parameters, with the messages in `chat_message` |
 | created_at      | BigInteger    | -                       | Creation timestamp       |
 | updated_at      | BigInteger    | -                       | Last update timestamp    |
 | share_id        | Text          | UNIQUE, nullable        | Sharing identifier       |
@@ -373,7 +374,7 @@ Things to know about the shared_chat table:
 
 ## Chat Message Table
 
-The `chat_message` table holds the messages of every chat, one row per message, distinct from the channel [Message Table](#message-table) (which holds channel/thread messages, not chat-model turns). Sending a message or saving a reply writes only the rows it touches.
+The `chat_message` table holds the messages of every chat, one row per message, distinct from the channel [Message Table](#message-table) (which holds channel and thread messages).
 
 | **Column Name** | **Data Type** | **Constraints**                          | **Description**                                          |
 | --------------- | ------------- | ---------------------------------------- | -------------------------------------------------------- |
@@ -401,11 +402,11 @@ The `chat_message` table holds the messages of every chat, one row per message, 
 Things to know about the chat_message table:
 
 - Deleting a chat cascades to delete its messages (`chat_id` foreign key with `ON DELETE CASCADE`).
-- Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), and (`user_id`, `created_at`).
+- Composite indexes back the common access patterns: (`chat_id`, `parent_id`), (`model_id`, `created_at`), (`user_id`, `created_at`) and (`chat_id`, `role`, `done`).
 - `context_summary` was added by migration `4c5ce3d2f27f` to store a summary of the message's context.
 - `meta` was added by migration `856c5b02fb54`. It carries per-message metadata and is what marks the messages Open WebUI injects on a user's behalf, such as a [sub-agent](/features/chat-conversations/chat-features/subagents) result or a fired [timer](/features/chat-conversations/chat-features/timers), so the interface can render them differently from a message the user typed.
-- Migration `5e7a2c9d4b13` moved every chat's messages out of the `chat.chat` blob (its `history` and the older flat `messages` list) into this table and added `data`. It works through the chats in batches and continues where it stopped if the upgrade is interrupted, so on a large instance the first start after the upgrade takes a while.
-- [Chat search](/features/chat-conversations/chat-features/history-search) matches the text in `chat_message.content`.
+- Migration `5e7a2c9d4b13` moved every chat's messages out of the `chat.chat` blob (its `history` and the older flat `messages` list) into this table and added `data`. On a large instance the first start after the upgrade takes a while.
+- [Chat search](/features/chat-conversations/chat-features/history-search) matches the text in `chat_message.content` and the chat titles.
 
 ## Chat View State Table
 
@@ -431,7 +432,7 @@ Things to know about the chat_view_state table:
 | user_id         | Text          | NOT NULL                | Owner of the automation |
 | folder_id       | Text          | nullable                | Folder the runs' chats are created in |
 | name            | Text          | NOT NULL                | Automation display name |
-| data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional terminal config) |
+| data            | JSON          | NOT NULL                | Automation payload (`prompt`, `model_id`, `rrule`, optional machine config) |
 | meta            | JSON          | nullable                | Optional metadata |
 | is_active       | Boolean       | NOT NULL, default=True  | Active/paused state |
 | last_run_at     | BigInteger    | nullable                | Last execution time |
@@ -564,7 +565,7 @@ Things to know about the chat_file table:
 | user_id         | String        | nullable        | Reference to user  |
 | timestamp       | BigInteger    | nullable        | Creation timestamp |
 
-Note on the `chatidtag` table: it is a **legacy** table from before chat tags moved onto the chat record. Its rows were read out into the `chat` table (migration `1af9b942657b`), which wrote each tag into `chat.meta.tags` and turned the `pinned` tag into `chat.pinned`, and nothing writes to it anymore. That migration leaves the rows where they are and no migration drops the table, so an older database may still hold stale rows in it. There is no backing model for it in current code. Tags on chats and notes are now linked through the [Resource Tag Table](#resource-tag-table).
+Note on the `chatidtag` table: it is a **legacy** table from before chat tags moved onto the chat record. Its rows were read out into the `chat` table (migration `1af9b942657b`), which wrote each tag into `chat.meta.tags` and turned the `pinned` tag into `chat.pinned`, and nothing writes to it anymore. That migration leaves the rows where they are and the table stays in the schema, so an older database may still hold stale rows in it. There is no backing model for it in current code. Tags on chats and notes are now linked through the [Resource Tag Table](#resource-tag-table).
 
 ## Comment Table
 
@@ -682,6 +683,22 @@ Things to know about the folder table:
 - Folders can be nested (`parent_id` reference)
 - Root folders have null `parent_id`
 - Folder names must be unique within the same parent
+
+## Folder View State Table
+
+| **Column Name** | **Data Type** | **Constraints**      | **Description**                                              |
+| --------------- | ------------- | -------------------- | ------------------------------------------------------------ |
+| user_id         | Text          | PRIMARY KEY          | User the view belongs to                                     |
+| folder_id       | Text          | PRIMARY KEY, indexed | Folder the view belongs to                                   |
+| state           | JSON          | NOT NULL             | Open tabs, split layout and selected terminal                |
+| revision        | BigInteger    | NOT NULL             | Save counter. A save over an out-of-date revision is refused |
+| updated_at      | BigInteger    | NOT NULL             | Last update timestamp (seconds)                              |
+
+Things to know about the folder_view_state table:
+
+- Created by migration `d2f86c0b41ae`. The primary key is (`user_id`, `folder_id`), with an index on `folder_id` (`ix_folder_view_state_folder_id`).
+- It holds the tabs a user had open in a folder, so they are restored when the folder is reopened, on any device. Each row is private to its user, even for shared folders.
+- Deleting a folder deletes its rows.
 
 ## Function Table
 
@@ -919,7 +936,7 @@ Things to know about the model history table:
 | meta            | JSON          | nullable        | Note metadata              |
 | created_at      | BigInteger    | nullable        | Creation timestamp         |
 | updated_at      | BigInteger    | nullable        | Last update timestamp      |
-| folder_id       | Text          | nullable, INDEX | Unused by current code     |
+| folder_id       | Text          | nullable, INDEX | Parent folder ID           |
 
 The note body lives in `data` under `content.md` and is markdown text. A row that holds an object or an array there instead, which a model can produce by passing structured data to the note tools, is served with that content rendered as a fenced `json` code block, and the row is rewritten to match the next time the note is saved.
 
@@ -1078,7 +1095,7 @@ Links a tag to each chat and note that carries it.
 Things to know about the resource tag table:
 
 - A `UNIQUE(resource_type, resource_id, tag_id)` constraint keeps a tag from being linked twice to the same chat or note, and an index on (`user_id`, `tag_id`) serves tag lookups and filters.
-- Migration `b7d4f1a2c960` created this table and moved every tag out of `chat.meta.tags` and `note.meta.tags` into it, so `meta` no longer holds tags. It also added the `folder_id` column to the `note` table.
+- Migration `b7d4f1a2c960` created this table and moved every tag out of `chat.meta.tags` and `note.meta.tags` into it, so `meta` no longer holds tags.
 - Deleting a chat or note removes its links here.
 
 ## Tool Table
@@ -1228,6 +1245,8 @@ erDiagram
     chat ||--o{ chat_view_state : "viewed_as"
     user ||--o{ chat_view_state : "saves"
     chat }|--|| folder : "organized_in"
+    folder ||--o{ folder_view_state : "viewed_as"
+    user ||--o{ folder_view_state : "saves"
     calendar ||--o{ calendar_event : "contains"
     calendar_event ||--o{ calendar_event_attendee : "has"
     channel ||--o{ message : "contains"
@@ -1313,6 +1332,14 @@ erDiagram
         text user_id PK
         text chat_id PK
         json state
+        bigint updated_at
+    }
+
+    folder_view_state {
+        text user_id PK
+        text folder_id PK
+        json state
+        bigint revision
         bigint updated_at
     }
 

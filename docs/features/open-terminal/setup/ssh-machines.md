@@ -72,7 +72,7 @@ Open the machine from the **Machines** list to see its Open Terminal version and
 
 **Start directory** is where terminal sessions start, the home folder of the SSH user when empty. To start somewhere else, enter an absolute path that exists on the machine, such as `/home/user/project`, when you add the machine or later by editing it. Changing it restarts Open Terminal in the new directory.
 
-**Flags** adds options to the `open-terminal run` command that starts Open Terminal on the machine, such as `--desktop-mode host` to share the desktop you are logged in to. Open WebUI sets `--ipc` and `--api-key` itself and refuses them here. Saving a change restarts Open Terminal, and if it does not start with the new flags, Open WebUI puts the previous ones back and shows the error.
+**Flags** adds options to the `open-terminal run` command that starts Open Terminal on the machine, such as `--desktop-mode host` to share the Linux desktop you are logged in to. Open WebUI sets `--ipc` and `--api-key` itself and refuses them here. Saving a change restarts Open Terminal, and if it does not start with the new flags, Open WebUI puts the previous flags and start directory back and shows the error.
 
 To remove the machine, delete it and confirm. Open WebUI uninstalls Open Terminal from the machine and forgets its own key. If the machine cannot be reached, Open WebUI offers to remove it from Open WebUI anyway, and the files under `~/.open-webui/` stay on the machine until you delete them yourself.
 

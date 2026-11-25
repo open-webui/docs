@@ -16,7 +16,7 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 - Run a prompt on a schedule (hourly, daily, weekly, monthly, custom RRULE)
 - Start a run from another service with a [webhook](#webhooks) URL, optionally passing it text
 - [Share](#sharing) an automation with users and groups so they can follow its runs
-- Trigger a run manually with **Run Now**
+- Trigger a run manually with **Run now**
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into a [folder](/features/chat-conversations/chat-features/conversation-organization#the-folder-page) you can edit, shared folders included, so a team sees every run in one place
@@ -136,7 +136,7 @@ What import does and does not do:
 
 An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose, **Folder** lists your own folders and **Channel** posts into a channel instead (see [Channels](#channels)).
 
-A folder's own page works as a home for its automations. Its header has a **Chats** and **Automations** switch (visible to users who have the Automations permission). The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
+A folder's own page works as a home for its automations. Pick **Automations** in the switch in its header (visible to users who have the Automations permission) to open it. The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
 
 - An automation can post into any folder its creator can edit, shared folders included. Create it from the shared folder's page; the **Destination** picker lists only your own folders.
 - Everyone with access to the folder sees the automation in the list and can read its runs, read-only access included. Anyone who can edit the folder can also run it, pause it and change its name and schedule. The creator keeps control of everything else and of deleting it.
@@ -148,7 +148,7 @@ A folder's own page works as a home for its automations. Its header has a **Chat
 
 ## Webhooks
 
-A webhook gives an automation a URL. Calling it starts a run, so a CI job, a monitoring alert or a Git host can trigger an automation without waiting for a schedule. An automation can have a schedule, a webhook or both.
+A webhook gives an automation a URL. Calling it starts a run, so a CI job, a monitoring alert or a Git host can trigger an automation without waiting for a schedule. An automation can have a schedule, a webhook or both, and one with neither runs only with **Run now**.
 
 To add one, open the automation, set **Webhook** to on and **Save**. The URL appears once saved. **Regenerate** creates a new URL and the old one stops working. Use it when a URL has leaked. Only the creator sees the URL and can regenerate it.
 

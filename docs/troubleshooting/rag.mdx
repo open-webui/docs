@@ -50,7 +50,7 @@ Typical for OpenAI (GPT-5.6), Anthropic (Claude), Google (Gemini), DeepSeek, and
 | **Always Use Full Text** | Consider for small docs | If a document is under ~20K tokens, full text can outperform retrieval. **Full Text Threshold** (in characters or tokens) sets which files are included in full without it |
 
 :::tip When to use full text
-If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, full text often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Switch an attachment to **Using Entire Document** to do this for one file, or turn on **Always Use Full Text** in **Settings** > **Documents** (admin section) for all of them.
+If you are working with a single small-to-medium document (under ~50 pages) and a large-context model, full text often gives better results than chunked retrieval because the model sees everything with no retrieval gaps. Turn on an attachment's **Full text** switch to do this for one file, or turn on **Always Use Full Text** in **Settings** > **Documents** (admin section) for all of them.
 :::
 
 ### Mixed environment (local + cloud)
@@ -208,7 +208,7 @@ Open WebUI implements various limits to ensure system stability and prevent abus
 *   **Knowledge Base Uploads:**
     *   **File Limit:** Subject to `RAG_FILE_MAX_SIZE` and the knowledge base [file limits](/features/workspace/knowledge#file-limits).
     *   **Vector indexing:** By default, Open WebUI indexes files when they are added to a knowledge base. **Bypass Embedding and Retrieval** in **Settings > Documents** (admin section) skips vector indexing for both chat uploads and files added to knowledge bases. Open WebUI still extracts text from document uploads and stores it.
-    *   **Full-text attachments:** To use full text for a single attachment and keep indexing enabled, click the attachment in the chat and select **Using Entire Document**. For a file-backed knowledge base, full-text mode can include the extracted text of every file in the collection. Check the combined text against the model's context budget.
+    *   **Full-text attachments:** To use full text for a single attachment and keep indexing enabled, click the attachment in the chat and turn on **Full text**. For a file-backed knowledge base, full-text mode can include the extracted text of every file in the collection. Check the combined text against the model's context budget.
 
 :::info
 By separating these limits, administrators can better manage resource usage across different features. For example, you might want to allow larger uploads in a curated Knowledge Base while restricting the number of files in ad-hoc Folder uploads.
@@ -257,7 +257,7 @@ If your initial response is fast but follow-up questions become increasingly slo
 | PDF images not extracted | Use Tika/Docling, enable OCR, or update pypdf |
 | Worker dies during upload (instant) | Switch away from default ChromaDB (SQLite) in multi-replica or multi-worker setups |
 | Worker dies during upload (timeout) | Update Open WebUI, or increase `--timeout-worker-healthcheck` |
-| Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or attach a small document in the chat with Using Entire Document |
+| Model ignores attached KB | Enable Builtin Tools, add system prompt hints, or attach a small document in the chat with its Full text switch on |
 | Single attached file returns nothing | Re-index to rebuild the per-file indexes |
 | Docling citations show the wrong page | [Re-index, or re-upload the file](/features/chat-conversations/rag/document-extraction/docling#citations-point-to-the-wrong-page) |
 
@@ -485,12 +485,12 @@ Per-model settings in **Settings > Models > Edit > Advanced Params** (admin sect
    - Confirm the uploaded file finished processing and the current user can access the knowledge base
    - Try a model with reliable native tool calling, then ask about a specific fact you can verify in the document
 
-5. **For a small document, try Using Entire Document**:
-   - Attach the knowledge base in the chat, click it and turn on **Using Entire Document**, with the model's **Preload files** capability on. On a model-attached knowledge base the toggle only takes effect with Legacy function calling
+5. **For a small document, try the Full text switch**:
+   - Attach the knowledge base in the chat, click it and turn on **Full text**, with the model's **Preload files** capability on. On a model-attached knowledge base the toggle only takes effect with Legacy function calling
    - This sends the full extracted content instead of retrieving selected passages. Ensure the document fits the model's context window
 
 :::info Why Agentic RAG?
-Open WebUI uses **agentic RAG**, where the model decides when and how to search knowledge bases and can retry with different queries. This requires a model that can use tools effectively. If the selected model cannot retrieve a known fact reliably, use a model with stronger tool calling or test a small document with Using Entire Document.
+Open WebUI uses **agentic RAG**, where the model decides when and how to search knowledge bases and can retry with different queries. This requires a model that can use tools effectively. If the selected model cannot retrieve a known fact reliably, use a model with stronger tool calling or test a small document with the **Full text** switch on.
 :::
 
 For the full explanation of how knowledge scoping and retrieval modes work, see the [Knowledge documentation](/features/workspace/knowledge#agentic-knowledge-tools) and [Preload files vs Builtin Tools](/features/chat-conversations/rag#preload-files-vs-builtin-tools).
@@ -564,7 +564,7 @@ With **Hybrid Search** on, answers look the same as plain vector search, and no 
 
 Asking the same question about the same files returns different sources or a different answer from one run to the next.
 
-**The Problem**: with **Retrieval Query Generation** on (the default), Open WebUI does not search with your message. The task model reads the conversation and writes the search queries, and those queries can change between runs. The chat shows them as chips under **Querying** while the response is generated.
+**The Problem**: with **Retrieval Query Generation** on (the default), the task model reads the conversation and writes the search queries, and those queries can change between runs. The chat shows them as chips under **Querying** while the response is generated.
 
 - If the task model's reply has no JSON object, the whole reply is used as one query.
 - If query generation fails, or **Retrieval Query Generation** is off, Open WebUI searches with your last message exactly as written.
@@ -572,7 +572,7 @@ Asking the same question about the same files returns different sources or a dif
 **Solutions:**
 
 1. **Compare the queries**: open the status history of each response and check the chips under **Querying**.
-2. **Turn off Retrieval Query Generation** in **Settings > Interface** (admin section), under **Generation**, or set [`ENABLE_RETRIEVAL_QUERY_GENERATION=False`](/reference/env-configuration#enable_retrieval_query_generation). Retrieval then uses your last message as is, so the same message searches the same way each time. Earlier messages are not used, so a follow-up such as "what about the second one?" is searched with those words alone.
+2. **Turn off Retrieval Query Generation** in **Settings > Interface** (admin section), under **Generation**, or set [`ENABLE_RETRIEVAL_QUERY_GENERATION=False`](/reference/env-configuration#enable_retrieval_query_generation). Retrieval then uses only your last message as is, so the same message searches the same way each time and a follow-up such as "what about the second one?" is searched with those words alone.
 3. **Change the task model** under **Task Model** in the **Tasks** section of the same page, if you keep query generation on. The queries come from that model, not from the chat model.
 
 ---

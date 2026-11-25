@@ -31,7 +31,7 @@ Before following this tutorial, ensure you have:
 This tutorial describes a comprehensive 6-step process that enables server-side orchestration of Open WebUI conversations while ensuring that assistant replies appear properly in the frontend UI.
 
 :::tip Looking for tool calling specifically?
-If your goal is to have the model use tools (built-in tools, workspace tools, MCP servers or a terminal) and have Open WebUI execute them server-side, see [Server-Side Tool Calling (API)](/reference/server-side-tool-calling). It builds on the chat structures documented here and adds the fields that switch tool execution on.
+If your goal is to have the model use tools (built-in tools, workspace tools, MCP servers or a machine) and have Open WebUI execute them server-side, see [Server-Side Tool Calling (API)](/reference/server-side-tool-calling). It builds on the chat structures documented here and adds the fields that switch tool execution on.
 :::
 
 ### Process Flow
@@ -75,10 +75,7 @@ The `history` object must use `currentId` (**camelCase**, not `current_id`). Thi
 
 For an existing `chat_id`, `POST /api/chat/completions` inserts the assistant placeholder itself when you pass the assistant message's `id`, and links it under the user message you send as `user_message` (Step 2), so pre-creating it is no longer required. If you do pre-create it, always send `user_message`: the backend overwrites the stored placeholder's `parentId` with that message's `id`, or with null when `user_message` is missing.
 
-A pre-created assistant message must appear in both locations:
-
-- `chat.messages[]`: The main message array (used for legacy compatibility)
-- `chat.history.messages[<assistantId>]`: The indexed message history (used by the frontend to render the tree)
+A pre-created assistant message goes into `chat.history.messages[<assistantId>]`, the indexed message history the frontend uses to render the tree.
 
 **Expected structure of the assistant message:**
 
@@ -178,7 +175,7 @@ curl -X POST https://<host>/api/v1/chats/new \
 
 :::note
 
-The `messages[]` array at the top level is a flat list for older clients. It is read only when `history.messages{}` is missing, and responses no longer include it. The `history.messages{}` object is the authoritative structure: it is a dictionary keyed by message ID that the frontend uses to build the conversation tree via `parentId` and `childrenIds`.
+The `messages[]` array at the top level is a flat list for older clients. It is read only when `history.messages{}` is missing. The `history.messages{}` object is the authoritative structure. It is a dictionary keyed by message ID, and the frontend uses it to build the conversation tree via `parentId` and `childrenIds`.
 
 :::
 

@@ -16,7 +16,7 @@ Timers are **one-shot**. For anything recurring, use [Automations](/features/cha
 Timers have **no toggle of their own**. They are part of the **Sub-agents** feature and are enabled by [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), which is off by default.
 
 :::warning Timers are enabled by the Sub-agents setting
-The `timer` tool is injected alongside `delegate_task` and shares its gate: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) plus the per-model **Sub-agents** builtin tools category and the [Sub-agents permission](/features/chat-conversations/chat-features/subagents#enable-sub-agents). There is no separate Timers category or permission, so **turning Sub-agents off also removes timers**, and turning timers on means turning Sub-agents on.
+The `timer` tool is injected alongside `delegate_task` and shares its gate: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) plus the per-model **Sub-agents** builtin tools category and the [Sub-agents permission](/features/chat-conversations/chat-features/subagents#enable-sub-agents). There is no separate Timers category or permission, so **turning Sub-agents off also removes the `timer` tool**, and turning timers on means turning Sub-agents on.
 :::
 
 As with other builtin tools, they also require native function calling in a chat started from the interface, and they are unavailable inside sub-agent chats.
@@ -52,8 +52,8 @@ A timer can carry `cancel_on` events, and is cancelled if one happens first:
 
 This is what makes "remind me in an hour unless I get to it" work: if you come back on your own, the reminder never arrives.
 
-:::info There is no UI for pending timers
-Timers cannot be listed, inspected or cancelled from the interface. A timer without `cancel_on` events will fire. The only visible trace is the collapsible **Timer** row that appears in the chat when it goes off.
+:::info Pending timers are listed in the Status panel
+The **Status** button in the chat's top bar lists the chat's pending timers, and **Cancel** removes one. A timer without `cancel_on` events fires unless you cancel it there. When it fires, a collapsible **Timer** row appears in the chat.
 :::
 
 ## Operator Notes
