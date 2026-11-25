@@ -93,7 +93,7 @@ Sub-agents are narrower than the parent chat in these ways.
 - **Sub-agent targets.** The **Sub-agents** list offers the instance's own models.
 - **No access to your terminal tab.** The tools that read or type into the terminal tab you have open are not available to a sub-agent.
 
-Each sub-agent runs in its own chat. These chats are hidden from chat lists and search, and are deleted together with the parent chat. Admins can read them by id even with [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) off.
+Each sub-agent runs in its own chat. These chats are hidden from chat lists and search, and are deleted together with the parent chat. Admins can read them by id only while [`ENABLE_ADMIN_CHAT_ACCESS`](/reference/env-configuration#enable_admin_chat_access) is on, the same as other chats.
 
 ## Cost
 
