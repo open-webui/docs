@@ -20,10 +20,11 @@ Folders are enabled by default. Administrators can control this feature via:
 
 Create a new folder to organize your conversations:
 
-1. In the **sidebar**, click the **+ button** on the Folders section header.
-2. Select **"New Folder"**.
-3. Enter a name for your folder.
-4. Click **Save**.
+1. In the **sidebar**, click the **+ button** on the Folders section header. When a machine is available to you, it opens a menu. Select **New Folder** there.
+2. Enter a name for your folder.
+3. Click **Save**.
+
+To work on a project that lives on a machine, choose **Open directory** in the same menu. Pick the machine if you have several, browse to the project's directory or [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new one, then click **Use this directory**. Open WebUI creates a folder named after the directory, with its [machine and working directory](#default-machine-and-working-directory) set, and opens it.
 
 ### Moving Conversations into Folders
 
