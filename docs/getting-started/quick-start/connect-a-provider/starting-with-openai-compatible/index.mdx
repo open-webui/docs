@@ -51,6 +51,7 @@ Saving a connection does not test it. Clicking the **Verify Connection** button 
 | Perplexity | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
 | MiniMax | No, endpoint doesn't exist | Add model IDs manually to the whitelist |
 | OpenRouter | Yes, but returns thousands of models | Strongly recommend adding a filtered allowlist |
+| Straitly | Yes | Auto-detection works; optionally filter to specific model IDs |
 | Vercel AI Gateway | Yes | Auto-detection works; filtering is recommended if you only want specific gateway models |
 | Google Gemini | Yes | Auto-detection works |
 | DeepSeek | Yes | Auto-detection works |
@@ -259,6 +260,21 @@ Each connection has a **toggle switch** that lets you enable or disable it witho
 
   :::tip
   Vercel AI Gateway implements the OpenAI Chat Completions API, including `/models` and `/chat/completions`, so you can add it as a normal OpenAI-compatible connection in Open WebUI. Use the model IDs shown in the [AI Gateway model catalog](https://vercel.com/ai-gateway/models).
+  :::
+
+  </TabItem>
+  <TabItem value="straitly" label="Straitly">
+
+  **Straitly** is an OpenAI-compatible AI gateway that provides access to more than 150 models across major providers through a single API key and base URL.
+
+  | Setting | Value |
+  |---|---|
+  | **URL** | `https://api.straitly.ai/v1` |
+  | **API Key** | Your API key from [straitly.ai](https://straitly.ai/) |
+  | **Model IDs** | Auto-detected; optionally filter to specific model IDs such as `claude-sonnet-5-5` or `deepseek/deepseek-v4-1-flash-1017` |
+
+  :::tip
+  Straitly implements the OpenAI Chat Completions and Responses APIs, including `GET /v1/models` for automatic model discovery. See the [Straitly model catalog](https://straitly.ai/models) and [quickstart docs](https://straitly.ai/docs/quickstart) for current model IDs.
   :::
 
   </TabItem>
