@@ -23,6 +23,7 @@ The following speech-to-text providers are supported:
 | Mistral (Voxtral) | Yes | [Mistral Voxtral Guide](/features/chat-conversations/audio/speech-to-text/mistral-voxtral-integration) |
 | Deepgram | Yes | N/A |
 | Azure | Yes | [Azure AI Speech STT Guide](/features/chat-conversations/audio/speech-to-text/azure-stt-integration) |
+| Oruk (Fourier 2B) | Yes | [Oruk Fourier 2B STT Guide](/features/chat-conversations/audio/speech-to-text/oruk-fourier-integration) (via OpenAI-compatible engine) |
 
 **Web API** provides STT via the browser's built-in speech recognition (no API key needed, configured in user settings).
 
