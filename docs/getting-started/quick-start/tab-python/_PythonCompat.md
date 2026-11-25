@@ -1,7 +1,8 @@
 :::info Python version compatibility
 Open WebUI supports **Python 3.11 and 3.12**. **Python 3.13 is not supported**: some dependencies have no 3.13-compatible release, so installs on 3.13 fail or break at runtime.
 
-- **For production**, run the **Docker image** or use the **latest Python 3.12**. The Docker image runs Python 3.12 on Debian 13.
+- **For production**, run the **Docker image** or use the **latest Python 3.12**, on **Linux**. The Docker image runs Python 3.12 on Debian 13.
+- **On Windows**, a pip, uv or Conda install works for personal use. Use Linux for production.
 - **Python 3.11 also works** for a pip install.
 
 If pip reports that your Python version is unsupported, activate the environment you want to install into, then check it:

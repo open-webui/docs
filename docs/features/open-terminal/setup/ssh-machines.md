@@ -13,7 +13,7 @@ The AI then works with the files and tools of the SSH user on that machine, the 
 
 ## Requirements
 
-- The Open WebUI server can reach the machine over SSH.
+- The Open WebUI server can reach the machine over SSH and runs on Linux or macOS, for example in Docker. A native Windows install of Open WebUI cannot use SSH machines, because the connection needs a Unix socket on the Open WebUI side.
 - The machine runs Linux (x86_64 or aarch64) or macOS (Apple silicon).
 - `curl` and `tar` are installed on the machine.
 - The machine has internet access to download uv, Python 3.12 and Open Terminal.
