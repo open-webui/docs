@@ -590,7 +590,7 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 - Type: `bool`
 - Default: `False`
-- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Off by default because each delegation costs additional model calls. Also gates the `timer` and `send_message` tools, which share the same **Sub-agents** builtin category. Can be set in **Settings > Sub-agents** (admin section). See [Sub-agents](/features/chat-conversations/chat-features/subagents).
+- Description: Enables **sub-agents**, letting a model delegate a focused task to a parallel sub-agent through the `delegate_task` builtin tool. The sub-agent runs a full chat completion of its own using the same tools and skills, and returns its final answer to the parent chat. Also gates the `timer` and `send_message` tools. Can be set in **Settings > Sub-agents** (admin section). See [Sub-agents](/features/chat-conversations/chat-features/subagents).
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_CONCURRENT`
@@ -602,7 +602,7 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 
 :::warning `SUBAGENTS_MAX_CONCURRENT` needs a restart to change
 
-The foreground limit is applied to a semaphore created on the first delegation and never resized afterwards. Changing it in the Admin Panel or the environment has **no effect until Open WebUI restarts**. `SUBAGENTS_MAX_ASYNC` is not affected and applies immediately.
+The foreground limit is applied to a semaphore created at the first limited foreground delegation and never resized afterwards. Changing it in the Admin Panel or the environment has **no effect until Open WebUI restarts**. `SUBAGENTS_MAX_ASYNC` is not affected and applies immediately.
 
 :::
 
@@ -610,7 +610,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `int`
 - Default: `("") empty string` (unlimited)
-- Description: Maximum number of background sub-agents, the ones started in saved chats, running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty, `0` or `-1` means no limit. Also counted per worker process.
+- Description: Maximum number of background sub-agents, the ones started anywhere except channels and automation runs, running at once. Unlike the foreground limit, delegations over this cap **fail immediately** with an error telling the model to wait or raise the limit. Empty, `0` or `-1` means no limit. Also counted per worker process.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_MAX_ITERATIONS`
@@ -624,7 +624,7 @@ The foreground limit is applied to a semaphore created on the first delegation a
 
 - Type: `int` (characters)
 - Default: `("") empty string` (unlimited)
-- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. Empty or `0` means no limit. This caps only what is returned to the parent; the sub-agent's own chat keeps the full text.
+- Description: Maximum length of the result a sub-agent hands back to the parent chat. Longer output is truncated and marked `[output truncated]`. Empty or `0` means no limit. This caps only what is returned to the parent, and the sub-agent's own chat keeps the full text.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `SUBAGENTS_SYSTEM_PROMPT`
@@ -5162,7 +5162,7 @@ Strictly return in JSON format:
 
 - Type: `int`
 - Default: `50000`
-- Description: Sets the size up to which the complete extracted text of an uploaded file or text attachment is included in the prompt, in characters or, with [`RAG_FULL_TEXT_THRESHOLD_TYPE`](#rag_full_text_threshold_type) set to `token`, in tokens. Larger ones use retrieval. Knowledge base attachments are not affected. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** or **Full Text Threshold (Tokens)** in **Settings** > **Documents** (admin section). The older names `RAG_FULL_TEXT_CHAR_THRESHOLD`, `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
+- Description: Sets the size up to which the complete extracted text of an uploaded file or text attachment is included in the prompt, in characters or, with [`RAG_FULL_TEXT_THRESHOLD_TYPE`](#rag_full_text_threshold_type) set to `token`, in tokens. Larger ones use retrieval. `0` always uses retrieval. Also available as **Full Text Threshold (Characters)** or **Full Text Threshold (Tokens)** in **Settings** > **Documents** (admin section). The older names `RAG_FULL_TEXT_CHAR_THRESHOLD`, `RAG_RETRIEVAL_CHAR_THRESHOLD` and `RAG_FULL_CONTEXT_CHAR_THRESHOLD` are also read.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `RAG_FULL_TEXT_THRESHOLD_TYPE`
@@ -7680,7 +7680,7 @@ See [Permissions](/features/authentication-access/rbac/permissions#4-features-pe
 
 - Type: `bool`
 - Default: `True`
-- Description: Enables or disables Sub-agents access for non-admin users. Users without it get neither the `delegate_task` tool nor the `timer` tool.
+- Description: Enables or disables Sub-agents access for non-admin users. Users without it get none of the `delegate_task`, `send_message` and `timer` tools.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 :::info

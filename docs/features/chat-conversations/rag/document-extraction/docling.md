@@ -141,7 +141,6 @@ Open WebUI forwards the Docling Parameters values to docling-serve as multipart 
 |----------|---------|-------------|
 | `DOCLING_SERVE_ENABLE_UI` | `false` | Enable the web UI at `/ui` endpoint |
 | `DOCLING_SERVE_ENABLE_REMOTE_SERVICES` | `false` | **Required** for API-based picture description |
-| `DOCLING_SERVE_MAX_SYNC_WAIT` | `120` | Max seconds to wait for synchronous requests |
 | `DOCLING_SERVE_ENG_LOC_NUM_WORKERS` | `1` | Number of local engine workers |
 | `DOCLING_SERVE_ARTIFACTS_PATH` | `/app/data` | Path to store model artifacts |
 | `UVICORN_WORKERS` | `1` | Number of Uvicorn workers (**keep at 1!**) |
@@ -204,8 +203,8 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Documents** (admin section) 
 **Cause**: Using outdated docling-serve version or Open WebUI version.
 
 **Solution**: 
-- Update Open WebUI to the latest version (uses `/v1/convert/file/async`)
-- Update docling-serve to v1.0+ (uses `/v1` API)
+- Update Open WebUI to the latest version
+- Update docling-serve to v1.0+
 
 ### "Invalid JSON for field ..." in the docling-serve logs
 

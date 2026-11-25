@@ -41,7 +41,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **Preload files (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High: injected content changes per query |
 | **Citations** | With Native function calling, appends the source markers to the tool result that produced them, and the markers are saved with it. With Legacy, adds the sources with the RAG template to your message on every turn (to the system message with `RAG_SYSTEM_CONTEXT`) | None with Native, see the note below. High with Legacy |
 | **Memory** | With Native function calling, adds the recalled memories once per reply as a hidden `recall_memories` tool result after your message. Without it, appends them to your message on every turn | None with Native. High with Legacy: changes whenever memories change |
-| **"Using Entire Document"** | Injects a whole file into every message | Very high: but a **Preload files** sub-mode; only fires while Preload files is on |
+| **Full text** switch | Injects a whole file into every message | Very high: but a **Preload files** sub-mode; only fires while Preload files is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low: constant while voice mode is on |
 | **Attachment metadata block** | Lists the files, knowledge bases, notes and chats attached to a message as metadata (ids and names) in that message | Low: stable as long as the attachments don't change |
 | **Attached knowledge list** | With Native function calling, lists the knowledge attached to the model or folder once per reply as a hidden `list_attached_knowledge` tool result after your message. Skipped when there is nothing to list | None: saved with the reply and replayed unchanged |
@@ -113,8 +113,8 @@ Turning Preload files off also re-routes any knowledge bases or notes attached t
 A **chat folder** attached with `#` or dragged into the input only reaches the model through Preload files, which retrieves from the folder's attached knowledge. With Preload files off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder, where its knowledge goes through the knowledge tools.
 :::
 
-:::info "Using Entire Document" is a Preload files sub-mode
-The per-file/per-knowledge **Using Entire Document** mode injects a complete document into every message, the heaviest cache-breaker of all. But it runs **inside** Preload files, so turning Preload files off (this step) **already disables it**, enabling Using Entire Document while Preload files is off does nothing. Just don't re-enable Preload files + Using Entire Document as a retrieval workaround; use on-demand tools instead. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
+:::info The Full text switch is a Preload files sub-mode
+The per-file and per-knowledge **Full text** switch injects a complete document into every message, the heaviest cache-breaker of all. But it runs **inside** Preload files, so turning Preload files off (this step) **already disables it**. Switching on **Full text** while Preload files is off does nothing. Keep Preload files off and use on-demand tools for retrieval. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
 :::
 
 ### 3. Turn Citations off and move citation rules into the system prompt
@@ -198,7 +198,7 @@ In every case the requirement is the same: **don't rewrite the beginning of the 
 Set on the model, under **Settings > Models** (admin section), click the pencil (**Edit**), then **Features** and **Builtin Tools**:
 
 - [ ] Static system prompt (no per-turn regeneration)
-- [ ] **File Upload** on, **Preload files** off, no automatic content injection (this also disables "Using Entire Document") **and** it is what injects the Files tools
+- [ ] **File Upload** on, **Preload files** off, no automatic content injection (this also disables the **Full text** switch) **and** it is what injects the Files tools
 - [ ] Optional: **Citations** off, citation rules moved into the system prompt
 - [ ] **Builtin Tools** on, with the **Files**, **Knowledge Base**, **Notes** and **Chat History** categories left enabled
 - [ ] Function calling set to **Native** (builtin tools do not exist in Legacy mode)

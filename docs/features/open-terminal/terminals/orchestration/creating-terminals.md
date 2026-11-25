@@ -13,7 +13,7 @@ Admins add the Terminals server as a connection and give people **Write** access
 
 ## Connection Access
 
-Add the connection in **Settings > Integrations** (admin section) as described in [Connecting to Open WebUI](/features/open-terminal/setup/connecting) and the [Authentication](/features/open-terminal/terminals#authentication) section. The connection form has the Name, ID, URL, API Key, Auth, **Verify Connection**, Chat Uploads, **Access** and **Advanced** options. Machines themselves are created from the chat or, by an admin, right below the connection (see [Create a Machine](#create-a-machine)).
+Add the connection in **Settings > Integrations** (admin section) as described in [Connecting to Open WebUI](/features/open-terminal/setup/connecting) and the [Authentication](/features/open-terminal/terminals#authentication) section. The connection form has the Name, ID, URL, API Key, Auth, **Verify Connection**, Chat Uploads, **Access** and **Advanced** options. Machines themselves are created from the chat or, by an admin, with the **+** on the connection's row in that list (see [Create a Machine](#create-a-machine)).
 
 **Access** on the connection has two permissions:
 
@@ -28,7 +28,7 @@ Add the connection in **Settings > Integrations** (admin section) as described i
 2. Under **Machines**, click **New machine**.
 3. Fill in the dialog and click **Create**.
 
-Admins can also do this in **Settings > Integrations** (admin section). The **+** next to a Terminals connection opens the same dialog, and the connection lists its machines below it, each with a gear that opens the machine's settings. This suits machines you set up for others, such as one you then make public.
+Admins can also do this in **Settings > Integrations** (admin section). The **+** next to a Terminals connection opens the same dialog, and the connection lists its machines below it, each with a gear for its settings. This suits machines you set up for others, such as one you then make public.
 
 | Field | What it does |
 | :--- | :--- |

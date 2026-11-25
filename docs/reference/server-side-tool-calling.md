@@ -163,7 +163,7 @@ Field by field:
 | `session_id` | **The built-in tools switch.** Any non-empty string works. Without it, built-in tools are not offered to the model. It also makes the request asynchronous (you get `task_ids` instead of blocking). |
 | `features` | Turns on the four togglable built-in groups: `web_search`, `code_interpreter`, `image_generation`, `memory`. The other built-ins (knowledge, files, notes, channels, calendar, automations, chats, time, tasks, sub-agents) need no flag and are offered whenever their global setting, your permission and the model's category allow it. |
 | `tool_ids` | Workspace tools and MCP servers. Optional. |
-| `machine_id` | The ID of a machine. Optional, and independent of `session_id`. The older name `terminal_id` is still accepted. A machine with `scope` `chat` additionally requires that `chat_id` be a saved chat, which Path A already satisfies. |
+| `machine_id` | The ID of a machine. Optional, and independent of `session_id`. A machine with `scope` `chat` additionally requires that `chat_id` be a saved chat, which Path A already satisfies. |
 | `background_tasks` | Turn title, tag and follow-up generation off unless you want the extra model calls. |
 
 :::danger Do not send your own `tools` array
@@ -233,7 +233,7 @@ Set `"stream": true` for the same thing as SSE. The tool round happens before th
 Limits, in exchange for the simplicity:
 
 - **One round of tool calls.** The model cannot look at a result and decide to call something else.
-- **No built-in tools.** No web search, no code interpreter, no knowledge browsing, no terminal-driven agentic work.
+- **No built-in tools.** No web search, no code interpreter, no knowledge browsing, no agentic work on a machine.
 - **No chat-scoped machines.** A request in this mode carries no `chat_id`, so a machine with `scope` set to `chat` cannot be used. Other machines work normally.
 - Legacy mode is **unsupported** and depends on a task model that reliably emits JSON. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
@@ -451,8 +451,8 @@ To adapt it:
 | Web search, code interpreter, memory or image generation never offered | Missing `session_id`, missing `features` flag, missing user permission, disabled globally, or the model's **Builtin Tools** category is off | All five must line up. Check them in that order |
 | `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Code Execution** (admin section, under **Legacy**), or drop `code_interpreter` from `features` |
 | File tools (`view_file`, `grep_chat_files`, ...) missing | They need `files` in the request body, a `session_id`, the model's **File Upload** capability on, and **Preload files** off. API requests treat Preload files as on unless the model saves it as off | See [Prompt Caching and Context Optimization](/features/chat-conversations/prompt-caching) |
-| `503 Machine unavailable: ...` | The machine is unreachable, disabled, or your user has no access grant | Confirm the ID appears in `GET /api/v1/machines/` for that key |
-| `409`, `This machine requires a saved chat` | The machine has `scope` `chat` and the request had no saved `chat_id` | Use Path A with a saved chat, or pick another machine |
+| `Machine unavailable: ...` | The machine is unreachable, disabled, or your user has no access grant. Path B answers with HTTP `503`, and Path A shows the error in the assistant message | Confirm the ID appears in `GET /api/v1/machines/` for that key |
+| `Machine unavailable: 409: This machine requires a saved chat` | The machine has `scope` `chat` and the request had no saved `chat_id`. It arrives as in the row above | Use Path A with a saved chat, or pick another machine |
 | MCP tool connection fails | An OAuth-protected MCP server the API key's user has not authorised | Complete the OAuth flow once in the browser as that user |
 | The chat is created but stays empty in the UI | Broken message tree | `currentId` is camelCase, and every message needs `parentId` and `childrenIds`. See [Backend-Controlled API Flow](/reference/api-flow) |
 

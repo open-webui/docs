@@ -214,7 +214,7 @@ The same panel opens from the **⋯** menu of a note in the Notes list.
 
 Saving a note never changes who it is shared with.
 
-A note in a [shared folder](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) is also open to everyone the folder is shared with, at their folder access: **Read** on the folder lets them read the note, and **Write** lets them edit it.
+A note in a [shared folder](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) is also open to everyone the folder is shared with, at their folder access. **Read** on the folder lets them read the note, and **Write** lets them edit it.
 
 People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. Each user can have up to 20 note pages open for live editing at once, counted across all their browser tabs and devices. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
 
