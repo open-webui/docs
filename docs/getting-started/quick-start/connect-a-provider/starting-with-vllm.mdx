@@ -8,7 +8,7 @@ title: "vLLM"
 vLLM provides an **OpenAI-compatible API** (Chat Completions), making it easy to connect to Open WebUI. This guide will show you how to connect your vLLM server.
 
 :::tip
-Open WebUI also supports the experimental [Open Responses](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) specification for providers that implement it.
+Open WebUI also supports the [Open Responses](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) specification for providers that implement it.
 :::
 
 ---
@@ -30,11 +30,12 @@ For remote servers, use the appropriate hostname or IP address.
 1. Go to **Settings > Connections** (admin section).
 2. Find the **Manage OpenAI API Connections** list.
 3. Click **Add Connection**.
-5. Fill in the following:
+4. Fill in the following:
    - **URL**: `http://localhost:8000/v1` (or your vLLM server URL)
      *   **Docker Users**: Use `http://host.docker.internal:8000/v1` if Open WebUI is in a container.
    - **Auth**: **None** if no key is configured, otherwise **Bearer** with your key
-6. Click **Save**.
+   - **Advanced > Provider**: choose **vLLM** so stored reasoning is sent back to the model on later turns. See [The Provider Setting](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting)
+5. Click **Save**.
 
 ---
 

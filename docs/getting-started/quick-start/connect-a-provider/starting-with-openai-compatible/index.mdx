@@ -27,7 +27,7 @@ Open WebUI is built around **Standard Protocols**. Instead of building specific 
 
 This means that while Open WebUI handles the **interface and tools**, it expects your backend to follow the universal Chat Completions standard. 
 
-- **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also have experimental support for **[Open Responses](https://www.openresponses.org/)**.
+- **We Support Protocols**: Any provider that follows widely adopted API standards is natively supported. We also support **[Open Responses](https://www.openresponses.org/)**.
 - **We Avoid Proprietary APIs**: We do not implement provider-specific, non-standard APIs in the core to maintain a universal, maintainable codebase. For unsupported providers, use a [pipe](/features/extensibility/plugin/functions/pipe) or a middleware proxy like LiteLLM or OpenRouter to bridge them.
 
 For a detailed explanation of this architectural decision, see our **[FAQ on protocol support](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**.
@@ -708,6 +708,7 @@ Every OpenAI connection has a **Provider** dropdown, hidden behind **Advanced** 
 | **Azure OpenAI** | Requests are rewritten into Azure's deployment-based URL form with an `api-version` parameter, so the connection needs an **API Version** and the deployment names listed under **Model IDs**. Also switched on automatically for Azure-looking URLs, see the Azure OpenAI tab under [Cloud Providers](#cloud-providers). |
 | **llama.cpp** | Unlocks the [model management panel](#managing-local-models-from-open-webui), the green **Loaded** marker and the admin **Eject** button in the model selector, and the extra model details on the model rows. Stored reasoning is also replayed to the server as a `reasoning_content` field, which llama.cpp routes through the chat template. The option names the request format, so hosted servers that speak it, such as DeepSeek's API (whose thinking mode needs the reasoning sent back), use it too. When you click **Continue Response**, Open WebUI adds `continue_final_message: true` and `add_generation_prompt: false` to the request so the server continues the last reply. Connections left at **Default** do not send these fields, and neither does an **API Type** of **Responses**. If **Continue Response** on a llama.cpp server repeats earlier text or starts a fresh reply, set this option. See the [llama.cpp guide](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp) and [reasoning models](/features/chat-conversations/chat-features/reasoning-models). |
 | **LM Studio** | Unlocks the same [model management panel](#managing-local-models-from-open-webui), loaded markers and model details, minus deleting models and minus the **Eject** button. |
+| **vLLM** and **OpenRouter** | Stored reasoning is sent back to the model on later turns. See [reasoning models](/features/chat-conversations/chat-features/reasoning-models#how-reasoning-is-sent-back). |
 | **LiteLLM** | Requests arriving at Open WebUI's own [Anthropic Messages endpoint](/reference/api-endpoints#anthropic-messages-api) are forwarded to LiteLLM as-is instead of being converted to Chat Completions and back. Nothing changes for chats started inside Open WebUI. |
 
 :::info Where the dropdown is not shown

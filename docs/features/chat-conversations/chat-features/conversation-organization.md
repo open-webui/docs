@@ -71,7 +71,7 @@ When you click on a folder in the sidebar, it becomes your **active workspace**:
 1. Click on any folder in the sidebar to select it.
 2. The chat interface will show that folder is active.
 3. Any new chat you start will automatically be created inside this folder.
-4. New chats will **inherit the folder's settings** (default model, default terminal, working directory, system prompt and knowledge).
+4. New chats will **inherit the folder's settings** (default model, default machine, working directory, system prompt and knowledge).
 
 A folder's three-dot menu also has **New Chat**, which opens the folder the same way.
 
@@ -89,16 +89,16 @@ Click a folder in the sidebar and its page shows every chat in it, laid out like
 
 Open **Display options** (the sliders icon beside search and filter) to pick a **Layout**.
 
-- **List** shows one row per chat. **Grouping** splits it into collapsible groups by **Status**, **Tags** or **Activity**, or leaves it as one list with **None**. Empty groups stay hidden until you turn on **Show empty groups**.
-- **Board** shows each chat as a card. **Columns** picks **Status**, **Tags** or **Activity** for the columns, and **Rows** adds horizontal lanes from one of the other two. With statuses as columns the board works like a kanban view.
+- **List** shows one row per chat. **Grouping** splits it into collapsible groups by **Status**, **Priority**, **Tags** or **Activity**, or leaves it as one list with **None**. Empty groups stay hidden until you turn on **Show empty groups**.
+- **Board** shows each chat as a card. **Columns** picks **Status**, **Priority**, **Tags** or **Activity** for the columns, and **Rows** adds horizontal lanes from one of the others. With statuses as columns the board works like a kanban view.
 
-**Ordering** sorts by **Updated** or **Title**, ascending or descending. Your layout, grouping, columns, rows and ordering are remembered in your browser, while filters start empty on every visit.
+**Ordering** sorts by **Updated**, **Title** or **Priority**, ascending or descending. Your layout, grouping, columns, rows and ordering are remembered in your browser, while filters start empty on every visit.
 
 **Activity** tells you what a chat is doing right now: **Unread** (changed since you last opened it), **Generating**, **Waiting for approval** (paused on a tool approval) and **Read**. Rows and cards mark the first three with a dot or spinner, so a chat that needs you stands out.
 
 ### Searching and Filtering
 
-The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags.
+The search icon, or the `/` key, opens a search box that matches chat titles and message text. The filter icon, or the `f` key, opens a menu with **Status**, **Priority**, **Tags**, **Users**, **Activity** and **Updated** (**Today**, **Last 7 days** or **Last 30 days**). Status, priority, tags and users accept several values at once, and the tag list includes **Untagged** for chats without tags.
 
 Each chat in the list or on the board has the same three-dot menu as in the sidebar, with rename, move, clone, share, archive, delete and mark as unread. In a chat someone else started, the menu has only **Rename**. In a folder shared with you as read-only, chats you did not start have no menu.
 
@@ -109,6 +109,8 @@ A status says where a chat stands, for example **In progress** or **Done**. Fold
 Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Earlier time spent in the same status counts toward it.
 
 Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging. It also adds and deletes statuses. Chats in a deleted status go back to **No status**.
+
+A chat can also get a priority (**Urgent**, **High**, **Medium** or **Low**) from the priority icon on the chat, with the same permissions as statuses.
 
 ### Tags
 
@@ -150,9 +152,9 @@ Customize the visual appearance of your folder by uploading a background image. 
 
 Pick the model new chats in this folder start with, or leave it on **Use default** to fall back to your usual default. Switching models inside one of the folder's chats leaves the folder's default as it is; change it here.
 
-### Default Terminal and Working Directory
+### Default Machine and Working Directory
 
-Under **Advanced**, **Default terminal** picks the terminal new chats in this folder start with. Once one is picked, **Working directory** sets the path on that terminal where those chats start; leave it empty to use the terminal's own default. Its folder button browses the terminal's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default terminal picked, **Default Model** also offers that terminal's [agents](/features/open-terminal/agents). These settings apply to new chats only.
+Under **Advanced**, **Default machine** picks the machine new chats in this folder start with. Once one is picked, **Working directory** sets the path on that machine where those chats start; leave it empty to use the machine's own default. Its folder button browses the machine's directories, where you can also [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new folder. With a default machine picked, **Default Model** also offers that machine's [agents](/features/open-terminal/agents). These settings apply to new chats only.
 
 ### System Prompt
 
@@ -216,7 +218,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.
-- **Write access covers the folder page.** People with write access can set the status of every chat in the folder and change the folder's statuses, and people with read access can see the statuses. See [The Folder Page](#the-folder-page).
+- **Write access covers the folder page.** People with write access can set the status and priority of every chat in the folder and change the folder's statuses, and people with read access can see the statuses. See [The Folder Page](#the-folder-page).
 - **Automations can post into a shared folder.** Anyone with write access can create one there, and everyone who can write to the folder can pause it. See [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, use **Clone Chat** or **Fork chat** to continue a chat in your own chats; see [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
 - **Folders cannot be shared publicly**, by admins either. Sharing is always to specific users or groups.

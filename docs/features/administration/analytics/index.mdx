@@ -403,7 +403,7 @@ GET /api/v1/analytics/tokens
 
 **Model Detail Endpoints:**
 ```
-GET /api/v1/analytics/models/{model_id}/chats    # Get chats using this model
+GET /api/v1/analytics/models/{model_id}/chats    # Get chats using this model (403 when ENABLE_ADMIN_CHAT_ACCESS is off)
 GET /api/v1/analytics/models/{model_id}/overview # Get feedback history and tags
 ```
 

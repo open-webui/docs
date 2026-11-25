@@ -21,7 +21,7 @@ When a user works in a terminal, Open WebUI sends the request to the orchestrato
 
 ## Read This Section
 
-- [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals): the dialog, instance scope, sharing and managing instances.
+- [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals): the dialog, instance scope, sharing and managing instances.
 - [Environment Variables](/features/open-terminal/terminals/orchestration/environment-variables): raw env values, quote handling, forwarding behavior and reserved keys.
 - [Custom Images](/features/open-terminal/terminals/orchestration/custom-images): build, tag, push and use custom Open Terminal images.
 - [System Prompts](/features/open-terminal/terminals/orchestration/system-prompts): generated prompts, `OPEN_TERMINAL_SYSTEM_PROMPT`, placeholders and `OPEN_TERMINAL_INFO`.

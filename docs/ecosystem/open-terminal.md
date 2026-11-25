@@ -40,22 +40,22 @@ For your own work, keep a personal environment across conversations, or give eac
 
 For collaborative work, a chat-scoped environment gives authorized collaborators the same files and running environment. Someone can ask for a change and another can inspect the result, with the work and its discussion together.
 
-For a team, prepare an analysis environment with your packages and reporting scripts, then share its template with a group. With user scope, each person gets a separate container and persistent files from that setup. Pair the terminal with a model preset's **Default terminal**, and people can select a reporting assistant that already has a place to work. You can also dedicate an environment to a model preset or share one across everyone granted access.
+For a team, prepare an analysis environment with your packages and reporting scripts, then share its template with a group. With user scope, each person gets a separate container and persistent files from that setup. Pair the machine with a model preset's **Default machine**, and people can select a reporting assistant that already has a place to work. You can also dedicate an environment to a model preset or share one across everyone granted access.
 
 People get to work through Open WebUI; operators maintain the templates, access, and resource limits centrally. You can offer a useful assistant to a whole team without setting up a development environment on every laptop.
 
 ## Make Useful Work Repeatable
 
-Build a reporting script in a personal or shared workspace, then give an Open WebUI [automation](/features/chat-conversations/chat-features/automations) that terminal and working folder. Schedule a prompt to run it against new data and summarize the results. The workspace can serve both interactive work and recurring jobs, using a model or a supported agent.
+Build a reporting script in a personal or shared workspace, then give an Open WebUI [automation](/features/chat-conversations/chat-features/automations) that machine and working folder. Schedule a prompt to run it against new data and summarize the results. The workspace can serve both interactive work and recurring jobs, using a model or a supported agent.
 
 Terminals can stop idle environments while retaining their persisted files, then start them again on demand. Set CPU and memory limits for each template. A workspace can stay available for the next task without keeping its container running all day.
 
 ## Start with One Real Task
 
 1. **[Install Open Terminal](/features/open-terminal/setup/installation).** Docker gives it a separate container environment; a host installation works with that machine's files and software under the operating-system user's permissions.
-2. **[Connect it to Open WebUI](/features/open-terminal/setup/connecting).** Add its address and API key under **Settings > Admin > Integrations > Open Terminal**.
-3. **Select the terminal in chat and put it to work.** Choose a capable model or installed agent, bring a file or project, and ask for a result you can use.
+2. **[Connect it to Open WebUI](/features/open-terminal/setup/connecting).** Add its address and API key in the **Machines** section of **Settings > Integrations** (admin section).
+3. **Select the machine in chat and put it to work.** Choose a capable model or installed agent, bring a file or project, and ask for a result you can use.
 
-For workspaces created on demand, **[deploy Terminals](https://github.com/open-webui/terminals#quick-start)** and create your first template from Open WebUI's **New terminal** menu. For a desktop app that connects your own computer, use [Open WebUI Tether](/ecosystem/tether).
+For workspaces created on demand, **[deploy Terminals](https://github.com/open-webui/terminals#quick-start)** and create your first template from Open WebUI's **New machine** menu. For a desktop app that connects your own computer, use [Open WebUI Tether](/ecosystem/tether).
 
 Open Terminal is [MIT licensed](https://github.com/open-webui/open-terminal/blob/main/LICENSE) and also works with your own applications through its REST API. [Terminals](https://github.com/open-webui/terminals/blob/main/LICENSE) is free for personal, non-commercial use; commercial or organizational production use requires an [Open WebUI Enterprise License](/enterprise) with Terminals access.

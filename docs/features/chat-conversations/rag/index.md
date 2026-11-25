@@ -29,6 +29,8 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input.
 
+Click a source under an answer that comes from an uploaded PDF, Word, PowerPoint or Excel file to open the file in a tab beside the chat, at the cited page when it is known. PDF, Word and Excel previews highlight the cited text, and hovering a highlight shows the passage the model was given.
+
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
 :::tip Bulk File Management

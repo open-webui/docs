@@ -333,6 +333,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.user_input` | Ask User | **Ask User** under **Builtin Tools** in the model editor |
 | `model_editor.tools.memory` | Memory | **Memory** under **Builtin Tools** in the model editor |
 | `model_editor.tools.chats` | Chat History | **Chat History** under **Builtin Tools** in the model editor |
+| `model_editor.tools.users` | Users | **Users** under **Builtin Tools** in the model editor |
 | `model_editor.tools.notes` | Notes | **Notes** under **Builtin Tools** in the model editor |
 | `model_editor.tools.knowledge` | Knowledge Base | **Knowledge Base** under **Builtin Tools** in the model editor |
 | `model_editor.tools.files` | Files | **Files** under **Builtin Tools** in the model editor |
@@ -349,7 +350,7 @@ is also being used and set to `True`. **Never disable this if OAUTH/SSO is not b
 | `model_editor.tools.visualizations` | Visualizations | **Visualizations** under **Builtin Tools** in the model editor |
 | `model_editor.tools.skills` | Skills | **Skills** under **Builtin Tools** in the model editor |
 | `model_editor.tools.tools` | Tool Creation | **Tool Creation** under **Builtin Tools** in the model editor |
-| `chat.capture` | Capture | **Capture** in the chat input's **+** menu |
+| `chat.capture` | Capture | **Screenshot** (**Camera** on mobile) under **Capture** in the chat input's **+** menu |
 | `chat.compare` | Compare text | **Compare text** in the **+** menu and the `/compare` command |
 | `chat.attach_webpage` | Attach Webpage | **Attach Webpage** in the **+** menu |
 | `chat.attach_files` | Attach Files | **Attach Files** in the **+** menu |
@@ -518,6 +519,13 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Description: The most characters of message text the `view_chat` tool returns when a model reads a previous chat. The newest messages are kept, and the result tells the model it was cut and how many messages it holds. Must be a positive integer, or Open WebUI stops at startup. See [Built-in System Tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chats.view_max_chars`. It can be configured in **Settings > General > Chat Read Limit** (admin section). Leave the field empty for no limit.
 
+#### `TOOL_OUTPUT_MAX_CHARS`
+
+- Type: `int`
+- Default: empty, which means no limit
+- Description: The most characters of a tool result that reach the model, see [Tools](/features/extensibility/plugin/tools). Must be a positive integer, or Open WebUI stops at startup.
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `tools.output_max_chars`. It can be configured in **Settings > General > Tool Output Limit** (admin section). Leave the field empty for no limit.
+
 #### `VISUALIZATION_PROMPT_TEMPLATE`
 
 - Type: `str`
@@ -544,6 +552,20 @@ The `chat.selected_*` indicators show only while the user has **Show Input Selec
 - Type: `int` (seconds)
 - Default: `("") empty string` (no minimum)
 - Description: Sets the minimum allowed interval in seconds between automation recurrences for non-admin users. When set, any automation schedule that recurs more frequently than this value will be rejected with a `400 Bad Request` error. One-time automations (`COUNT=1`) are exempt from this check. Admins bypass this limit.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `AUTOMATION_MAX_CONCURRENT`
+
+- Type: `int`
+- Default: `("") empty string` (unlimited)
+- Description: Maximum number of automation runs executing at once. Runs beyond the limit wait for a free slot. Empty means no limit. Applies to every run, admin automations included. Counted per worker process, so the effective ceiling is this value multiplied by the number of workers or replicas. A changed value takes effect after a restart.
+- Persistence: This environment variable is a `ConfigVar` variable.
+
+#### `ENABLE_AUTOMATION_WEBHOOKS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Allows automations to be started by a webhook URL. Anyone with the URL can start the automation and send it text. When disabled, existing webhook URLs stop working. See [Webhooks](/features/chat-conversations/chat-features/automations#webhooks). Can also be set with **Automation Webhooks** in **Admin Settings > General**.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUTOMATION_AUTH_TOKEN_EXPIRES_IN`
@@ -709,7 +731,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
 - Type: `bool`
 - Default: `True`
-- Description: Controls whether admins can open other users' chats inside Open WebUI. It hides chats in the product and does not keep an admin away from the data; see [Chat Data Privacy](/security/chat-data-privacy-and-encryption#admin-users). When enabled, an admin can read any user's chat, which opens read-only. Through the API the admin can also edit or delete its messages, delete the chat, change its share settings and clone it. Replying, regenerating, stopping replies and approving tool calls stay with the owner and anyone the chat is shared with through [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). When disabled, the admin panel hides other users' chats, the **Sessions** view in [Analytics](/features/administration/analytics#sessions) is hidden and its endpoints return `403`, and the chat endpoints give an admin only what a share gives them. The admin-only `GET /api/tasks` and `POST /api/tasks/stop/{task_id}` endpoints still list and stop any running task, whatever this setting says. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats. The toggle covers the product surface only: an admin can still reach every chat through the database, the server itself or a Function or Tool. See the admin-posture-toggles note above.
+- Description: Controls whether admins can open other users' chats inside Open WebUI. It hides chats in the product and does not keep an admin away from the data; see [Chat Data Privacy](/security/chat-data-privacy-and-encryption#admin-users). When enabled, an admin can read any user's chat, which opens read-only. Through the API the admin can also edit or delete its messages, delete the chat, change its share settings and clone it. Replying, regenerating, stopping replies and approving tool calls stay with the owner and anyone the chat is shared with through [Allow replies](/features/chat-conversations/chat-features/chatshare#allowing-replies). When disabled, the admin panel hides other users' chats, the **Sessions** view and the **Chats** tab of a model in [Analytics](/features/administration/analytics) are hidden and their endpoints return `403`, and the chat endpoints give an admin only what a share gives them. The admin-only `GET /api/tasks` and `POST /api/tasks/stop/{task_id}` endpoints still list and stop any running task, whatever this setting says. If you disable this, consider also disabling `ENABLE_ADMIN_EXPORT` (especially on SQLite), since exports include user chats. The toggle covers the product surface only: an admin can still reach every chat through the database, the server itself or a Function or Tool. See the admin-posture-toggles note above.
 
   **Exception for internal chats:** admins can still retrieve a chat marked internal even when this is `False`. Internal chats are the ones Open WebUI creates on a user's behalf without the user opening them: [sub-agent](/features/chat-conversations/chat-features/subagents) chats, [timer](/features/chat-conversations/chat-features/timers) chats and note-attached chats. This carve-out is what lets an admin retrieve one at all, because internal chats are **excluded from the chat listing surfaces**: they do not appear in chat lists, search, counts, exports or the admin chat list. Apart from the **Sessions** view in Analytics, which lists them with every other chat, they are reachable only by id.
 
@@ -735,7 +757,7 @@ Treat anything in this cluster as *what the admin sees and does in the product U
 
   Per-id direct-access endpoints (`GET /api/v1/<resource>/id/{id}` and the corresponding update / delete / access-update routes) are **intentionally not gated** by this flag and were never designed to be. Gating them would protect against nothing the admin couldn't trivially do via the database query they used to obtain the resource ID in the first place, while breaking legitimate flows where an admin operates on a known item ID. See the admin-posture-toggles note above for the full architectural reasoning.
 
-  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers, Open Terminal connections, and arena models. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
+  The same flag decides whether admins bypass access grants on admin-configured resources, which are external tool servers, MCP servers and Open Terminal machines. With `True`, admins see and use all of them. With `False`, admins are checked against each resource's access list, except that a resource with no grants at all stays admin-only, since it has no owner to fall back to. See [What Private Means for Each Resource Type](/features/authentication-access/rbac/groups#what-private-means-for-each-resource-type).
 
   This environment variable deprecates `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`. If you are still using `ENABLE_ADMIN_WORKSPACE_CONTENT_ACCESS`, switch to `BYPASS_ADMIN_ACCESS_CONTROL`.
 
@@ -1143,7 +1165,7 @@ If a reverse proxy, load balancer, ingress, or CDN (Nginx, Caddy, Traefik, Cloud
 
 - Type: `list` of `dict`
 - Default: `null` (unset, which shows the built-in prompt suggestions)
-- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured. Leave it unset (or set it to `null`) to show the built-in suggestions; set it to `[]` to turn suggestions off. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
+- Description: Sets global default prompt suggestions shown to users when starting a new chat. These apply when no model-specific prompt suggestions are configured and the user has no chats yet; a user with chats sees their recent chats there. Leave it unset (or set it to `null`) to show the built-in suggestions; set it to `[]` to turn suggestions off. Prompt suggestions can also be configured per-model via the Model Editor (see [Prompt Suggestions](/features/workspace/models#prompt-suggestions)), or globally for all models using the [Global Model Defaults](/features/workspace/models#global-model-defaults-admin) feature. The format is:
 
 ```json
 [{"title": ["Title part 1", "Title part 2"], "content": "prompt"}]
@@ -1277,11 +1299,15 @@ The `aiodns` package is pinned to `3.6.1` for the same reason. If you build your
 - Default: `10`
 - Description: Sets the timeout in seconds for retrieving tool server metadata/configuration (for example, loading server data/spec information).
 
-#### `AIOHTTP_CLIENT_TIMEOUT_TERMINAL`
+#### `AIOHTTP_CLIENT_TIMEOUT_MACHINE`
 
 - Type: `int`
 - Default: `60`. When unset, it inherits `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA` if that is set.
-- Description: Timeout in seconds for Open WebUI's requests to a terminal, such as reading its working folder and skills or uploading chat files to it. An empty value or `0` disables it.
+- Description: Timeout in seconds for Open WebUI's requests to a machine, such as reading its working folder and skills or uploading chat files to it. An empty value or a value of `0` or below disables it.
+
+#### `AIOHTTP_CLIENT_TIMEOUT_TERMINAL`
+
+Older name of [`AIOHTTP_CLIENT_TIMEOUT_MACHINE`](#aiohttp_client_timeout_machine).
 
 #### `AIOHTTP_FILE_STREAM_CHUNK_SIZE`
 
@@ -1405,7 +1431,7 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 - Type: `str`
 - Default: `NONE`
 - Options: `NONE`, `METADATA`, `REQUEST`, `REQUEST_RESPONSE`
-- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the reported token counts in a `usage` field, linked to the request's entry through `extra.request_id`; see [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
+- Description: Controls the verbosity level of audit logging. `METADATA` logs basic request info, `REQUEST` includes request bodies, `REQUEST_RESPONSE` includes both requests and responses. For requests under `/api/v1/auths` and `/oauth/`, only the metadata is recorded at every level, which keeps passwords, MFA codes and session tokens out of the audit log. Each entry has a `model_id` field with the model the client asked for, filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its JSON body when the body has one. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks`, can record the model that was called. Other requests record `null`. For requests to `/api/chat/completions`, each model reply also writes its own entry with the model that answered and the token counts the provider reports in a `usage` field (written only when the provider reports them), linked to the request's entry through `extra.request_id`. Background tasks such as title and tag generation write one too, with the task name in `extra.task`. See [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging). The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is. The audit log covers HTTP requests signed in with an `Authorization` header or the session cookie, plus the sign-in, sign-out, sign-up and MFA endpoints. Other requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](#enable_audit_anonymous_requests) is on. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](#enable_websocket_support) is off.
 
 #### `ENABLE_AUDIT_GET_REQUESTS`
 
@@ -1417,19 +1443,25 @@ Open WebUI reuses a single long-lived AIOHTTP client session for outbound HTTP t
 
 - Type: `int`
 - Default: `2048`
+#### `ENABLE_AUDIT_ANONYMOUS_REQUESTS`
+
+- Type: `bool`
+- Default: `False`
+- Description: Also audit requests that carry no credential at all. By default they are skipped, except the sign-in, sign-out, sign-up and MFA requests, which are always logged. Requests with a wrong key or token are logged either way. Has no effect while `AUDIT_LOG_LEVEL` is `NONE`.
+
 - Description: Sets the maximum size in bytes for request/response bodies in audit logs. Bodies larger than this are truncated.
 
 #### `AUDIT_EXCLUDED_PATHS`
 
 - Type: `str`
 - Default: `/chats,/chat,/folders`
-- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses. Remove it to record chat requests and the per-reply model usage entries described in [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging).
+- Description: Comma-separated list of URL paths to exclude from audit logging (blacklist mode). Paths are matched without a leading slash, at the start of the request path with or without an `/api` or `/api/v1` prefix (for example `chats` matches `/api/v1/chats` and `/chats`). Ignored when `AUDIT_INCLUDED_PATHS` is set. The default `/chat` entry skips `/api/chat/completions`, the endpoint the chat interface uses. Remove it to record chat requests and the per-reply model usage entries described in [Audit Logging](/getting-started/advanced-topics/hardening#audit-logging).
 
 #### `AUDIT_INCLUDED_PATHS`
 
 - Type: `str`
 - Default: Empty string (disabled)
-- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without leading slashes against `/api/` and `/api/v1/` prefixed routes. Auth endpoints (signin, signout, signup and the MFA endpoints) are always logged regardless of filtering mode.
+- Description: Comma-separated list of URL paths to include in audit logging (whitelist mode). When set, **only** matching paths are audited and `AUDIT_EXCLUDED_PATHS` is ignored. Paths are matched without a leading slash, at the start of the request path with or without an `/api` or `/api/v1` prefix (for example `chats` matches `/api/v1/chats` and `/chats`). List `openai` or `ollama` to audit those routes. Auth endpoints (signin, signout, signup and the MFA endpoints) are always logged regardless of filtering mode.
 
 :::tip Whitelist vs Blacklist
 By default, audit logging uses **blacklist mode**: all paths are logged except those in `AUDIT_EXCLUDED_PATHS`. If you set `AUDIT_INCLUDED_PATHS`, it switches to **whitelist mode**: only the specified paths are logged. If both are set, whitelist mode takes precedence and a warning is logged at startup.
@@ -1749,6 +1781,13 @@ Several parameters have no effect on background requests wherever you set them: 
 - Description: Tool names or glob patterns that are always sent in full when [`ENABLE_TOOL_SEARCH`](#enable_tool_search) is on, for example `jira_create_issue,github_*`. Patterns match the tool names the model sees and are case-sensitive; MCP tools carry their server's ID as a prefix. Can also be set in **Settings > Interface** (admin section) (**Always Loaded Tools**).
 - Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.always_loaded`.
 
+#### `TOOL_SEARCH_LIST_TOOLS`
+
+- Type: `bool`
+- Default: `True`
+- Description: Lists the name and a short description of every deferred tool in the system prompt, so the model knows what to search for with [Tool Search](/features/extensibility/plugin/tools#tool-search). See [Prompt Caching](/features/chat-conversations/prompt-caching) for the effect on the provider's cache. Can also be toggled in **Settings > Interface** (admin section) (**List Deferred Tools**).
+- Persistence: This environment variable is a `ConfigVar` variable. Stored at config key `chat.tool_search.list_tools`.
+
 #### `TOOL_SEARCH_DEFER_BUILTIN_TOOLS`
 
 - Type: `bool`
@@ -2042,13 +2081,13 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 
 :::
 
-### Terminal Server
+### Machines
 
-#### `TERMINAL_SERVER_CONNECTIONS`
+#### `MACHINE_CONNECTIONS`
 
 - Type: `str` (JSON array)
 - Default: `[]`
-- Description: Specifies a JSON array of terminal server connection configurations. Each connection defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). These are admin-configured and proxied through Open WebUI, which means the terminal URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
+- Description: Specifies a JSON array of machine configurations. Each machine defines the parameters needed to connect to an [Open Terminal](/features/open-terminal) instance or a [Terminals orchestrator](/features/open-terminal/terminals/). These are admin-configured and proxied through Open WebUI, which means the machine URL and API key are never exposed to the browser. Supports group-based access control via `access_grants`.
 - Example (direct Open Terminal connection):
 ```json
 [
@@ -2083,23 +2122,27 @@ The JSON data structure of `TOOL_SERVER_CONNECTIONS` might evolve over time as n
 ```
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-`config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals).
+`config.access_grants` sets who can use the connection. `read` lets a user use the terminals shared with them and `write` lets a user create and manage terminals on an orchestrator connection. See [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals).
 
-`config.chat_uploads` decides where a file attached in the chat input goes while this terminal is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the terminal's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the terminal's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
+`config.chat_uploads` decides where a file attached in the chat input goes while this machine is selected. A connection without the key uses `default`, which uploads the file to Open WebUI and extracts its text for the model to read. `filesystem` writes it into the machine's working folder instead, with no text extraction, no retrieval and nothing stored in Open WebUI; the model is given the path and opens the file with the machine's own tools. Any other value is read as `default`. See [Chat Uploads](/features/open-terminal/setup/connecting#chat-uploads).
 
 `auth_type` accepts `bearer` (send `key` as the bearer token), `session` (send the calling user's own Open WebUI credentials), `system_oauth` (send the user's OAuth access token) and `none`. An orchestrator connection needs `key` set to the orchestrator's `TERMINALS_API_KEY`.
 
 :::tip Helm chart auto-configuration
-When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, this variable is set automatically to point at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
+When deploying on Kubernetes with the Open WebUI Helm chart and `terminals.enabled: true`, the connection is set automatically and points at the in-cluster orchestrator service. See the [Terminals (Orchestrator) guide](/features/open-terminal/terminals/) for details.
 :::
 
 :::warning
 
-The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time as new features are added.
+The JSON data structure of `MACHINE_CONNECTIONS` might evolve over time as new features are added.
 
 :::
 
-#### `TERMINAL_PROXY_HEADERS`
+#### `TERMINAL_SERVER_CONNECTIONS`
+
+Older name of [`MACHINE_CONNECTIONS`](#machine_connections).
+
+#### `MACHINE_PROXY_HEADERS`
 
 - Type: `str` (JSON object)
 - Default: `{}`
@@ -2108,7 +2151,7 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
   **Security note.** The default of `{}` means the proxy forwards upstream content (HTML, JS, anything) verbatim under the Open WebUI same origin. This is intentional: many legitimate open-terminal use cases (dev servers, internal tooling, web UIs the admin runs through the terminal) depend on JavaScript executing in the proxy response. For multi-user deployments where mutually-trusted users share a single terminal-server connection, this is fine. For deployments where users in the same trust group should be additionally isolated from each other's proxied content (or where the terminal-server feature is exposed to less-trusted users on top of the documented [multi-user setup tiers](/features/open-terminal/advanced/multi-user)), set this to a sandbox CSP that locks proxied JS into an opaque origin while still allowing it to run for legitimate workflows:
 
   ```bash
-  TERMINAL_PROXY_HEADERS='{"Content-Security-Policy": "sandbox allow-scripts; default-src '\''none'\''; img-src '\''self'\'' data:; style-src '\''unsafe-inline'\''", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"}'
+  MACHINE_PROXY_HEADERS='{"Content-Security-Policy": "sandbox allow-scripts; default-src '\''none'\''; img-src '\''self'\'' data:; style-src '\''unsafe-inline'\''", "X-Content-Type-Options": "nosniff", "Referrer-Policy": "no-referrer", "X-Frame-Options": "DENY"}'
   ```
 
   Note: do **not** add `allow-same-origin` to the `sandbox` directive. That keyword nullifies the origin-isolation that makes the sandbox effective against `localStorage` exfiltration. The example above intentionally omits it.
@@ -2116,6 +2159,10 @@ The JSON data structure of `TERMINAL_SERVER_CONNECTIONS` might evolve over time 
 ### Autocomplete
 
 #### `ENABLE_AUTOCOMPLETE_GENERATION`
+
+#### `TERMINAL_PROXY_HEADERS`
+
+Older name of [`MACHINE_PROXY_HEADERS`](#machine_proxy_headers).
 
 - Type: `bool`
 - Default: `False`
@@ -2193,20 +2240,13 @@ Output:
 - Description: Sets the prompt template for autocomplete generation.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
-### Evaluation Arena Model
+### Evaluation and Router Models
 
-#### `ENABLE_EVALUATION_ARENA_MODELS`
-
-- Type: `bool`
-- Default: `False`
-- Description: Enables or disables evaluation arena models. The new default applies to new installs; an existing install keeps the value already stored in its database until an admin changes it under **Settings > Evaluations** (admin section).
-- Persistence: This environment variable is a `ConfigVar` variable.
-
-#### `EVALUATION_ARENA_MODELS`
+#### `ROUTER_MODELS`
 
 - Type: `str` (JSON)
 - Default: `[]`
-- Description: Defines the evaluation arena models as a JSON list of objects. Used to seed the arena model configuration at startup, mirroring what can be configured in the admin evaluation settings. List every ID in an object's `meta.model_ids` once: with the default `include` filter mode one of them is drawn at random per message, and an ID that appears twice is drawn twice as often. Editing such an arena model in [Settings > Evaluations](/features/administration/evaluation/#configuring-an-arena-model) (admin section) and saving it collapses the duplicates.
+- Description: Defines [router models](/features/administration/router-models) as a JSON list, mirroring what can be set under **Settings > Models** (admin section). The JSON shape is shown in [Set them up from the environment](/features/administration/router-models#set-them-up-from-the-environment). The value holds the Decisions API key, so treat it as a secret.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `AUXILIARY_EMBEDDING_MODEL`
@@ -4610,27 +4650,11 @@ Enabling this feature increases the text volume indexed by BM25, which may impac
 `DEFAULT_RAG_TEMPLATE`:
 
 ```
+Answer the user's message using the sources inside <context> below. They were retrieved automatically for this conversation and may be incomplete or irrelevant.
 
-### Task:
-Respond to the user query using the provided context, incorporating inline citations in the format [id] **only when the <source> tag includes an explicit id attribute** (e.g., <source id="1">).
+Cite a source directly after each statement it supports, using its id in square brackets: "The warranty covers parts for two years [1]." For several sources, write [1][2]. Use only ids that appear in the context. A <source> tag with nothing inside it labels the material just above it.
 
-### Guidelines:
-- If you don't know the answer, clearly state that.
-- If uncertain, ask the user for clarification.
-- Respond in the same language as the user's query.
-- If the context is unreadable or of poor quality, inform the user and provide the best possible answer.
-- If the answer isn't present in the context but you possess the knowledge, explain this to the user and provide the answer using your own understanding.
-- **Only include inline citations using [id] (e.g., [1], [2]) when the <source> tag includes an id attribute.**
-- Do not cite if the <source> tag does not contain an id attribute.
-- Do not use XML tags in your response.
-- Ensure citations are concise and directly related to the information provided.
-
-### Example of Citation:
-If the user asks about a specific topic and the information is found in a source with a provided id attribute, the response should include the citation like in the following example:
-* "According to the study, the proposed method increases efficiency by 20% [1]."
-
-### Output:
-Provide a clear and direct response to the user's query, including inline citations in the format [id] only when the <source> tag with id attribute is present in the context.
+If the sources don't contain the answer, say so, then answer from your own knowledge if you can. If the context is unrelated to the message, ignore it. Reply in the user's language, and don't reproduce the <context> or <source> tags.
 
 <context>
 {{CONTEXT}}
@@ -7800,6 +7824,13 @@ A sharing change the user may not make is refused with `403`. Admins are exempt,
 - Description: Lets non-admins share workspace skills.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
+#### `USER_PERMISSIONS_AUTOMATIONS_ALLOW_SHARING`
+
+- Type: `bool`
+- Default: `False`
+- Description: Lets non-admins share automations with specific users or groups. See [Sharing](/features/chat-conversations/chat-features/automations#sharing).
+- Persistence: This environment variable is a `ConfigVar` variable.
+
 #### `USER_PERMISSIONS_NOTES_ALLOW_SHARING`
 
 - Type: `bool`
@@ -8997,7 +9028,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal connections, Tether terminals and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
+- Description: Master switch for everything that runs code or tools from outside Open WebUI's own code. Set to `False`, it turns off [`ENABLE_TOOLS`](#enable_tools), [`ENABLE_FUNCTIONS`](#enable_functions) and [`ENABLE_TOOL_SERVERS`](#enable_tool_servers) together, whatever those are set to: workspace Tools, Functions (filters, actions, pipes), OpenAPI and MCP tool servers, Open Terminal machines, Tether machines and Tether tool servers all stop. Plugin dependency installs at startup are skipped too. Read once at startup, so changing it needs a restart.
 - Keeps working: the [built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode) (memory, knowledge, web search, sub-agents and the rest) and the code interpreter, since those are part of Open WebUI itself.
 - Note: this decides whether plugins and tool servers *run*. Some management endpoints stay reachable while it is off, for example deleting a tool or function and saving the tool server list, so treat it as an execution switch, and keep the permission to create Tools and Functions limited to people you trust.
 
@@ -9017,7 +9048,7 @@ bypassed when accessing documents from MIT.
 
 - Type: `bool`
 - Default: `True`
-- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections and the terminals and tool servers (OpenAPI and MCP) users add through [Tether](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Terminal** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
+- Description: Turns every external tool connection on or off: OpenAPI and [MCP](/features/extensibility/mcp) tool servers configured by an admin, [Open Terminal](/features/open-terminal) connections and the terminals and tool servers (OpenAPI and MCP) users add through [Tether](/ecosystem/tether). Set to `False`, none of them is loaded or called, the **Tools** and **Machines** sections of **Settings > Integrations** (admin section) are greyed out and the terminal picker leaves the chat. Forced off when [`ENABLE_PLUGINS`](#enable_plugins) is `False`. Read once at startup, so changing it needs a restart.
 
 ### Install Required Python Packages
 

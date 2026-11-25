@@ -475,7 +475,7 @@ Every message on `events` has the form `{"data": {"type": "<type>", "data": {...
 | `comments:unavailable` | The one socket that lost access | `{"resource_type", "resource_id"}`. The socket has already left the room |
 | `notifications:changed` | `user:<id>` | Nothing. Fetch `GET /api/v1/notifications/inbox` again |
 | `access:updated` | Each socket of users whose groups changed, or every socket when an admin saves the default user permissions | Nothing. After a group change the server disconnects those sockets right after this message, so reconnect and fetch permissions again |
-| `terminals:changed` | `user:<id>` | Nothing. Fetch terminal servers, models and tools again |
+| `machines:changed` | `user:<id>` | Nothing. Fetch machines, models and tools again |
 | `calendar:alert` | `user:<id>` | `{"event_id", "title", "description", "start_at", "minutes_until", "calendar_id", "location"}` for a calendar reminder |
 | `channel:app` | `user:<id>` | `{"app_id", "app_name", "channel_id", "message_id", "parent_id", "reply": {"type": "error", "content"}}` when an app could not reply in a channel |
 | `encryption:available` | `channel:<id>` | `{"channel", "session"}` when a private chat in that channel starts, with `session` set to `null` when it ends. Its packets use the separate `encryption:event` channel |
