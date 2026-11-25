@@ -250,6 +250,10 @@ The `run_command` result shows `"status": "running"` and an empty `output` list.
 
 To get the output of short commands in the first result, set `OPEN_TERMINAL_EXECUTE_TIMEOUT` on the Open Terminal server, for example `OPEN_TERMINAL_EXECUTE_TIMEOUT=5`, and restart it. A command that finishes sooner returns as soon as it ends. A command that runs longer still returns status `running`, and its output comes from `get_process_status`. See [Configuration](/features/open-terminal/advanced/configuration).
 
+### File browser shows Permission denied in multi-user mode
+
+When the file browser fails with `403` and `Permission denied` on a machine in [multi-user mode](/features/open-terminal/advanced/multi-user) while the model can still read files, check where `/home` is stored. See [Home folders on network storage](/features/open-terminal/advanced/multi-user#home-folders-on-network-storage).
+
 ### Wrong API key
 
 If you see "unauthorized" or "invalid key":

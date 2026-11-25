@@ -52,6 +52,12 @@ Each user sees only their own files in the file browser.
 
 {/* TODO: Screenshot: Two views side by side: User A's file browser showing /home/user-a/ with their files, and User B's file browser showing /home/user-b/ with completely different files. */}
 
+### Home folders on network storage
+
+Each user's home folder is open only to that user's group. Open Terminal itself reaches the folders, for example to list them in the file browser, by joining every user's group. Some NFS setups drop those extra groups, and the file browser then fails with `403` and `Permission denied` while the model's file tools keep working. This happens when the NFS server runs `rpc.mountd --manage-gids`, which ignores the groups the client sends and looks them up in the server's own user list. It also happens with plain `AUTH_SYS`, which carries at most 16 groups, once more users than that have a home folder.
+
+Keep `/home` on local storage, such as the Docker volume in the example above. If it has to live on NFS, use a setup that keeps the client's groups, such as Kerberos, or add the same users and groups on the NFS server.
+
 ### What's shared vs. separate
 
 | | Separate per user | Shared |
