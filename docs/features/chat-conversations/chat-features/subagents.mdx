@@ -7,7 +7,7 @@ title: "Sub-agents"
 
 Sub-agents let a model hand a focused piece of work to a second agent that runs in parallel, then use the result to continue. The model decides when to delegate by calling the `delegate_task` builtin tool; you do not drive it manually.
 
-A sub-agent is a full chat completion of its own. It runs with the same tools, skills and filters as the chat that spawned it, on the current model or one of the [sub-agent models](/features/workspace/models#capabilities-and-bindings) set on it, works through the task on its own, and hands back its final answer as the tool result. The work happens in a separate chat that is kept out of your chat list, so the parent conversation stays readable.
+A sub-agent is a full chat completion of its own. It runs with the same tools, skills and filters as the chat that spawned it, on the current model or one of the [sub-agent models](/features/workspace/models#capabilities-and-bindings) set on it, works through the task on its own, and hands back its final answer. The work happens in a separate chat that is kept out of your chat list, so the parent conversation stays readable.
 
 Sub-agents are disabled by default. An administrator enables them with the [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) environment variable or the **Settings > Sub-agents** (admin section) toggle. They are off by default because every delegation is an extra model call, and a single reply can start several at once.
 
@@ -31,11 +31,17 @@ Typical uses are researching several questions at once, working through a task t
 
 ## Foreground and Background
 
-**Foreground** is the default. The parent chat waits for the sub-agent and receives its answer as the tool result, the same as any other tool call.
+In a saved chat, sub-agents run in the **background**. The model gets the sub-agent's chat ID right away and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible row reading **Sub-agent finished**, **Sub-agent stopped** or **Sub-agent failed**, then the task's title and how long it ran, with an **Open thread** button. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
 
-**Background** must be enabled separately with [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) or **Enable background sub-agents** in **Settings > Sub-agents** (admin section). The model gets an immediate handle instead of an answer and carries on. When the sub-agent finishes, its result is posted back into the parent chat and **the chat continues on its own, without you sending anything**. The result appears as a collapsible "Background sub-agent finished" row. If the parent chat is busy at that moment, the result waits and is delivered when the chat is free.
+In a channel and in an automation run, sub-agents run in the **foreground**: the reply waits for the sub-agent and receives its answer as the tool result, the same as any other tool call.
 
-While background is disabled, the `background` option is stripped from the tool definition entirely, so the model cannot ask for it.
+### Following Sub-agents
+
+The **Status** button in the chat's top bar shows the chat's context usage and ID, and under **Threads** its sub-agents and scheduled [timers](/features/chat-conversations/chat-features/timers). A running sub-agent shows a spinner, one waiting for you to approve a tool shows a dot, and finished ones are collapsed under **done**. Click a sub-agent to open its chat in a tab, or **Stop** it. **Cancel** removes a timer before it fires.
+
+### Messages Between Chats
+
+With sub-agents on, the model in a saved chat also gets the `send_message` tool. It sends a message to another of your chats: a sub-agent, the chat that started it, or any other chat of yours. A chat that is working reads the message between its tool calls, and an idle one wakes up and replies to it. The message shows in the receiving chat as a row with the sending chat's title and an **Open thread** button. A chat that is waiting for you to approve a tool does not take messages.
 
 ## Handing Over Files
 
@@ -53,7 +59,7 @@ Sub-agents need four things to line up:
 
 1. **Globally enabled**: [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents), or **Settings > Sub-agents** (admin section).
 2. **Enabled for the model**: the **Sub-agents** category under **Builtin Tools** in **Settings > Models > Edit** (admin section) (or **Workspace > Models** for your own model), on by default once the feature is on.
-3. **The user's permission**: the **Sub-agents** switch under **Features** in the [default and group permissions](/features/authentication-access/rbac/permissions#4-features-permissions), or [`USER_PERMISSIONS_FEATURES_SUBAGENTS`](/reference/env-configuration#user_permissions_features_subagents). Users without it get neither `delegate_task` nor the `timer` tool.
+3. **The user's permission**: the **Sub-agents** switch under **Features** in the [default and group permissions](/features/authentication-access/rbac/permissions#4-features-permissions), or [`USER_PERMISSIONS_FEATURES_SUBAGENTS`](/reference/env-configuration#user_permissions_features_subagents). Users without it get none of `delegate_task`, `timer` and `send_message`.
 4. **Native function calling in a saved chat**: `delegate_task` is a builtin tool, so it needs Native mode and a request that carries a `session_id`, as every chat started in the interface does. It is not offered in legacy function calling or in temporary chats.
 
 Admins always pass the permission check.
@@ -64,8 +70,8 @@ Configure these in **Settings > Sub-agents** (admin section), or with the matchi
 
 | Setting | Variable | Default | Purpose |
 |---|---|---|---|
-| Max concurrent | [`SUBAGENTS_MAX_CONCURRENT`](/reference/env-configuration#subagents_max_concurrent) | Empty (unlimited) | Foreground sub-agents at once. Extra ones wait for a slot. |
-| Max background | [`SUBAGENTS_MAX_ASYNC`](/reference/env-configuration#subagents_max_async) | Empty (unlimited) | Background sub-agents at once. Extra ones are refused immediately. |
+| Max concurrent | [`SUBAGENTS_MAX_CONCURRENT`](/reference/env-configuration#subagents_max_concurrent) | Empty (unlimited) | Foreground sub-agents (channels and automations) at once. Extra ones wait for a slot. |
+| Max background | [`SUBAGENTS_MAX_ASYNC`](/reference/env-configuration#subagents_max_async) | Empty (unlimited) | Background sub-agents (saved chats) at once. Extra ones are refused immediately. |
 | Max iterations | [`SUBAGENTS_MAX_ITERATIONS`](/reference/env-configuration#subagents_max_iterations) | Empty (unlimited) | Tool-call rounds one sub-agent may run. At the limit it writes a final answer without tools, and that answer goes back to the parent. |
 | Max output | [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output) | Empty (unlimited) | Characters returned to the parent. Longer results are truncated. |
 | System prompt | [`SUBAGENTS_SYSTEM_PROMPT`](/reference/env-configuration#subagents_system_prompt) | Built-in | Added on top of the model's own system prompt. |
@@ -80,7 +86,8 @@ Three limits are worth understanding before changing them:
 
 Sub-agents are narrower than the chat that starts them:
 
-- **No recursion.** A sub-agent cannot delegate again, so delegation cannot fan out without bound.
+- **No recursion.** A sub-agent cannot delegate again or set timers, so delegation cannot fan out without bound.
+- **No questions to you.** A sub-agent cannot ask you questions. It can still send a message to the chat that started it.
 - **No memory writes.** It can read memories but cannot add, change or delete them, keeping delegated work from quietly rewriting your personalization.
 - **No code interpreter in the background**, unless the engine is Jupyter, since the browser-based Pyodide engine needs a live session.
 - **Sub-agent targets.** The **Sub-agents** list offers the instance's own models.
@@ -102,9 +109,10 @@ What delegation costs shows up in [Analytics](/features/administration/analytics
 
 | Tool | Purpose |
 |---|---|
-| `delegate_task` | Delegate a task to a parallel sub-agent and return its result. |
+| `delegate_task` | Delegate a task to a parallel sub-agent. |
+| `send_message` | Send a message to another of the user's chats, such as a sub-agent or the chat that started it. |
 
-`delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), optional `file_ids` naming attachments the sub-agent has to open (see [Handing Over Files](#handing-over-files)), `model_id` to pick one of the model's sub-agent models, and `background` when background sub-agents are enabled.
+`delegate_task` takes the `task` to perform, optional `context` to carry across (decisions, file paths, findings), optional `file_ids` naming attachments the sub-agent has to open (see [Handing Over Files](#handing-over-files)), `model_id` to pick one of the model's sub-agent models, and a short `title` for the task, which names the sub-agent's chat. `send_message` takes the `chat_id` of the receiving chat and the `message`.
 
 The **Sub-agents** list in the model editor gives the parent model additional targets it can choose. When a `delegate_task` call omits `model_id`, the sub-agent runs on the current model even if the list contains other models.
 

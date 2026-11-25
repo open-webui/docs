@@ -69,7 +69,7 @@ Every request you need to make the model call built-in tools, workspace tools, M
 | :--- | :--- |
 | **Full agentic loop** | Multi-round native tool calling, result read back from the chat |
 | **Single-request mode** | One HTTP call in, one completion out, tool results already applied |
-| **Field-by-field** | `chat_id`, `id`, `session_id`, `tool_ids`, `terminal_id`, `features` |
+| **Field-by-field** | `chat_id`, `id`, `session_id`, `tool_ids`, `machine_id`, `features` |
 
 [**Run tools server-side →**](/reference/server-side-tool-calling)
 

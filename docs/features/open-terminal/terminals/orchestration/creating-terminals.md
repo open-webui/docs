@@ -13,7 +13,7 @@ Admins add the Terminals server as a connection and give people **Write** access
 
 ## Connection Access
 
-Add the connection in **Settings > Integrations** (admin section) as described in [Connecting to Open WebUI](/features/open-terminal/setup/connecting) and the [Authentication](/features/open-terminal/terminals#authentication) section. The connection form has the Name, ID, URL, API Key, Auth, **Verify Connection**, Chat Uploads, **Access** and **Advanced** options. Machines themselves are created from the chat.
+Add the connection in **Settings > Integrations** (admin section) as described in [Connecting to Open WebUI](/features/open-terminal/setup/connecting) and the [Authentication](/features/open-terminal/terminals#authentication) section. The connection form has the Name, ID, URL, API Key, Auth, **Verify Connection**, Chat Uploads, **Access** and **Advanced** options. Machines themselves are created from the chat or, by an admin, right below the connection (see [Create a Machine](#create-a-machine)).
 
 **Access** on the connection has two permissions:
 
@@ -28,6 +28,8 @@ Add the connection in **Settings > Integrations** (admin section) as described i
 2. Under **Machines**, click **New machine**.
 3. Fill in the dialog and click **Create**.
 
+Admins can also do this in **Settings > Integrations** (admin section). The **+** next to a Terminals connection opens the same dialog, and the connection lists its machines below it, each with a gear that opens the machine's settings. This suits machines you set up for others, such as one you then make public.
+
 | Field | What it does |
 | :--- | :--- |
 | **Name** | The name shown in the machine menu |
@@ -37,7 +39,7 @@ Add the connection in **Settings > Integrations** (admin section) as described i
 | **Setup script** | Under **Advanced**. Shell script that runs in the start directory every time an instance starts, before it is ready. Only the home folder is kept between restarts, so write the script to be safe to run again. Stored as `OPEN_TERMINAL_SETUP_SCRIPT`. Progress and failures, with the exit code and the end of the log, show in **System info** |
 | **Advanced** | **Start directory**, **Setup script**, **Image**, **CPU**, **Memory**, **Storage**, **Network** and **Environment variables**. Empty fields use the server default. Values are checked against the server maximums |
 
-A new machine is private. After creating it, open **Machine settings** from the machine menu and click the **Private** button at the top of the dialog to open **Access**, where you can share the machine with chosen users and groups. Shared access is for use only.
+A new machine is private. After creating it, open **Machine settings** from the machine menu and click the **Private** button at the top of the dialog to open **Access**, where you can share the machine with chosen users and groups. An admin can also make it public, which shares it with every user. Shared access is for use only.
 
 :::warning Write access reaches other people's instances
 A person with **Write** access to a Terminals connection can open **System info** and the files of any running instance on it, with full access to those files. Give **Write** only to people you trust with everyone's workspaces.

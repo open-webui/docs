@@ -143,6 +143,31 @@ Most Chat Completions APIs reject unknown fields on assistant messages, so reaso
 
 Reasoning details that a provider returns in a `reasoning_details` field (as OpenRouter does) are sent back unchanged in that field, within a tool-call loop and on later turns. They are dropped when another model continues the chat.
 
+On connections that use the Responses API, encrypted reasoning that the provider returns is sent back unchanged, within a tool-call loop and on later turns, so the model keeps its earlier reasoning. It is dropped when another model continues the chat.
+
+OpenAI returns encrypted reasoning only when the request asks for it. To turn it on for a model:
+
+1. Go to **Workspace → Models** and edit the model.
+2. Expand **Advanced Params**.
+3. At the bottom, click **Add Custom Parameter** (shown to administrators) and set:
+   - **Name**: `include`
+   - **Value**: `["reasoning.encrypted_content"]`
+4. Save the model.
+
+To turn it on for every model, add the same parameter under **Model Defaults** in **Settings > Models** (admin section).
+
+Behind a [LiteLLM](https://docs.litellm.ai/) proxy, set `include` once per model in its `litellm_params` instead, and leave the custom parameter out of Open WebUI. A custom parameter sent by Open WebUI replaces LiteLLM's value, so if you set both, keep `reasoning.encrypted_content` in it.
+
+```yaml
+- model_name: gpt-5.5
+  litellm_params:
+    model: openai/gpt-5.5
+    api_key: os.environ/OPENAI_API_KEY
+    include: ["reasoning.encrypted_content"]
+```
+
+Anthropic models reached through LiteLLM's Responses endpoint need no setting: LiteLLM returns their thinking as encrypted reasoning by default.
+
 ### Provider Compatibility
 
 | Provider | Reasoning on replay |
