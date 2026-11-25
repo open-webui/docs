@@ -95,3 +95,5 @@ Click the microphone in the chat input, record a short sentence, and finish the 
 - **Audio decoding error:** Verify FFmpeg is available to LocalAI and try a WAV file directly with the `curl` command. For browser recordings, also check that Open WebUI's allowed extensions and content types include the format your browser sends.
 
 This configures recorded speech-to-text. It does not configure text-to-speech or a realtime voice API.
+
+For an English-focused OpenAI-compatible setup covering both a hosted API and self-hosted vLLM, see the [Oruk Fourier 2B STT Guide](/features/chat-conversations/audio/speech-to-text/oruk-fourier-integration).
