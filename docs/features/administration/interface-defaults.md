@@ -135,8 +135,8 @@ With **Copy Formatted Text** enabled, the assistant response's **Copy** action t
 | `expandDetails` | Always Expand Details | `false` |
 | `chatHoverPreview` | Chat Hover Previews | `true` |
 | `displayMultiModelResponsesInTabs` | Display Multi-model Responses in Tabs | `false` |
-| `terminalFileDisplay` | Terminal File Display | `sidebar` |
-| `terminalPreviewAllowSameOrigin` | Terminal Preview Allow Same Origin | `false` |
+| `machineFileDisplay` | Machine File Display | `sidebar` |
+| `machinePreviewAllowSameOrigin` | Machine Preview Allow Same Origin | `false` |
 | `stylizedPdfExport` | Stylized PDF Export | `true` |
 | `showFloatingActionButtons` | Floating Quick Actions | `true` |
 | `floatingActionButtons` | Floating Quick Actions > **Manage** | `null` |
@@ -179,7 +179,7 @@ With **Copy Formatted Text** enabled, the assistant response's **Copy** action t
 
 | Key | Label in Settings > Interface | Built-in default |
 | --- | --- | --- |
-| `defaultUploadContext` | Default Upload Mode | `"focused"` (**Using Focused Retrieval**); `"full"` is **Using Entire Document** |
+| `defaultUploadContext` | Default Upload Mode | `"focused"` (**Relevant passages**); `"full"` is **Full text** |
 | `imageCompression` | Image Compression | `false` |
 | `imageCompressionSize` | Image Compression > **Manage** | `{"width": "", "height": ""}` |
 | `imageCompressionInChannels` | Compress Images in Channels | `true` |

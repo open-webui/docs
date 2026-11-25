@@ -5,7 +5,7 @@ title: "Multi-User Setup"
 
 # Setting Up Open Terminal for a Team
 
-When multiple people on your team need terminal access through Open WebUI, you have two options.
+When multiple people on your team need access to a machine through Open WebUI, you have two options.
 
 | | Single Container | Terminals |
 | :--- | :--- | :--- |
@@ -16,11 +16,11 @@ When multiple people on your team need terminal access through Open WebUI, you h
 | **Included in** | Open Terminal (free) | [Terminals](https://github.com/open-webui/terminals) (enterprise) |
 
 :::danger Required for multi-user Open WebUI deployments
-If your Open WebUI instance has **more than one user account** and the same terminal-server connection is shared across users, you **must** use one of the two options below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
+If your Open WebUI instance has **more than one user account** and the same machine is shared across users, you **must** use one of the two options below. A single Open Terminal container without `OPEN_TERMINAL_MULTI_USER=true` (or without per-user containers via Terminals) places every user inside the same shell, the same filesystem, and the same network namespace, which means any user can read, modify, or replace any other user's files, run commands as the shared user, and bind shared ports. This is not a supported configuration for multi-user Open WebUI.
 
 **Option 1 separates workspaces. It is not a security boundary between users.** Everyone still shares one kernel, one process list, one network namespace and one set of system resources, and provisioning the per-user accounts requires elevated privileges inside that container, so a user who sets out to reach root inside it will get there. Run it where every user on the instance is trusted at the same level.
 
-For deployments with **untrusted users** (open signup, public-facing portals, users who are not trusted with each other's data), use **Option 2 (per-user containers via Terminals)** on its Kubernetes backend with a NetworkPolicy, which is the setup that puts a real boundary between users. Layering `TERMINAL_PROXY_HEADERS` on top of Option 1 restricts what a proxied response can do in the user's browser, and it changes nothing about the shared container itself.
+For deployments with **untrusted users** (open signup, public-facing portals, users who are not trusted with each other's data), use **Option 2 (per-user containers via Terminals)** on its Kubernetes backend with a NetworkPolicy, which is the setup that puts a real boundary between users. Layering `MACHINE_PROXY_HEADERS` on top of Option 1 restricts what a proxied response can do in the user's browser, and it changes nothing about the shared container itself.
 :::
 
 ---
@@ -41,7 +41,7 @@ docker run -d --name open-terminal -p 8000:8000 \
 
 ### What happens
 
-When someone uses the terminal through Open WebUI, Open Terminal automatically:
+When someone uses a machine through Open WebUI, Open Terminal automatically:
 
 1. Creates a personal account for that user (based on their Open WebUI user ID)
 2. Sets up a private home folder at `/home/{user-id}`
@@ -51,6 +51,12 @@ When someone uses the terminal through Open WebUI, Open Terminal automatically:
 Each user sees only their own files in the file browser.
 
 {/* TODO: Screenshot: Two views side by side: User A's file browser showing /home/user-a/ with their files, and User B's file browser showing /home/user-b/ with completely different files. */}
+
+### Home folders on network storage
+
+Each user's home folder is open only to that user's group. Open Terminal itself reaches the folders, for example to list them in the file browser, by joining every user's group. Some NFS setups drop those extra groups, and the file browser then fails with `403` and `Permission denied` while the model's file tools keep working. This happens when the NFS server runs `rpc.mountd --manage-gids`, which ignores the groups the client sends and looks them up in the server's own user list. It also happens with plain `AUTH_SYS`, which carries at most 16 groups, once more users than that have a home folder.
+
+Keep `/home` on local storage, such as the Docker volume in the example above. If it has to live on NFS, use a setup that keeps the client's groups, such as Kerberos, or add the same users and groups on the NFS server.
 
 ### What's shared vs. separate
 
@@ -67,7 +73,7 @@ Each user sees only their own files in the file browser.
 :::warning Good for small trusted teams, not production
 This mode gives everyone their own workspace, and they all run inside the same container. Resource pressure (memory, CPU) is shared. The network namespace is shared, so a port one user binds (e.g. `python -m http.server 8080`) is reachable from any other user's shell on that container. The port listing and the port proxy are scoped to the user who owns the port, so the port stays out of other users' file navigators, and reaching it takes a direct request from a shell. The process list is shared, so users can watch each other's running commands. Root inside the container is reachable from any account, because provisioning the accounts needs those privileges in the first place.
 
-Treat every user on one instance as equally trusted, and use **Option 2 (per-user containers)** below, on its Kubernetes backend, when users have to be protected from each other. Layering the [`TERMINAL_PROXY_HEADERS`](/reference/env-configuration#terminal_proxy_headers) configuration on top locks proxied responses into a sandbox CSP in the browser, which is worth doing and does not change what happens inside the container.
+Treat every user on one instance as equally trusted, and use **Option 2 (per-user containers)** below, on its Kubernetes backend, when users have to be protected from each other. Layering the [`MACHINE_PROXY_HEADERS`](/reference/env-configuration#machine_proxy_headers) configuration on top locks proxied responses into a sandbox CSP in the browser, which is worth doing and does not change what happens inside the container.
 :::
 
 ```mermaid
@@ -100,10 +106,10 @@ For larger deployments or when you need real isolation, [**Terminals**](../termi
 
 - **Full isolation**: with a separate instance per user, each instance has its own files, processes and resources
 - **On-demand provisioning**: instances are created when users start a session and cleaned up when idle
-- **Resource controls**: set CPU, memory and storage limits per terminal, within the server maximums
-- **Multiple environments**: users with write access create terminals with different setups for different teams (e.g., data science, development) and share them with users and groups
+- **Resource controls**: set CPU, memory and storage limits per machine, within the server maximums
+- **Multiple environments**: users with write access create machines with different setups for different teams (e.g., data science, development) and share them with users and groups
 - **Backends**: Docker, Kubernetes or the Kubernetes Operator
-- **Scoped instances**: a terminal can run one instance per user, saved chat or model, see [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
+- **Scoped instances**: a machine can run one instance per user, saved chat or model, see [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope)
 - **Network on the Docker backend**: with `TERMINALS_DOCKER_NETWORK` set, instances share that Docker network, the orchestrator reaches each one by name and an instance can reach a port another user's instance has opened. Without it, the orchestrator reaches instances through their published ports on the Docker host. A terminal's **Network** setting picks one of the network profiles an admin defined in `TERMINALS_NETWORK_PROFILES`, which can place it on another Docker network. Files and processes stay separate. For mutually untrusted users, run the Kubernetes backend and add a NetworkPolicy
 
 ```mermaid

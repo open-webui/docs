@@ -53,8 +53,6 @@ services:
       - DOCLING_SERVE_ENABLE_UI=true
       # CRITICAL: Required for picture description with external LLM APIs
       - DOCLING_SERVE_ENABLE_REMOTE_SERVICES=true
-      # Maximum wait time for sync requests (seconds) - increase for large documents
-      - DOCLING_SERVE_MAX_SYNC_WAIT=600
       # Number of local engine workers
       - DOCLING_SERVE_ENG_LOC_NUM_WORKERS=2
       # CPU thread configuration
@@ -143,7 +141,6 @@ Open WebUI forwards the Docling Parameters values to docling-serve as multipart 
 |----------|---------|-------------|
 | `DOCLING_SERVE_ENABLE_UI` | `false` | Enable the web UI at `/ui` endpoint |
 | `DOCLING_SERVE_ENABLE_REMOTE_SERVICES` | `false` | **Required** for API-based picture description |
-| `DOCLING_SERVE_MAX_SYNC_WAIT` | `120` | Max seconds to wait for synchronous requests |
 | `DOCLING_SERVE_ENG_LOC_NUM_WORKERS` | `1` | Number of local engine workers |
 | `DOCLING_SERVE_ARTIFACTS_PATH` | `/app/data` | Path to store model artifacts |
 | `UVICORN_WORKERS` | `1` | Number of Uvicorn workers (**keep at 1!**) |
@@ -206,20 +203,14 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Documents** (admin section) 
 **Cause**: Using outdated docling-serve version or Open WebUI version.
 
 **Solution**: 
-- Update Open WebUI to the latest version (uses `/v1/convert/file`)
-- Update docling-serve to v1.0+ (uses `/v1` API)
+- Update Open WebUI to the latest version
+- Update docling-serve to v1.0+
 
 ### "Invalid JSON for field ..." in the docling-serve logs
 
 **Cause**: A nested Docling parameter was written as an inline object. Open WebUI passes Docling Parameters through as form fields unchanged, so Docling receives the object's keys instead of the object.
 
 **Solution**: Write nested values such as `picture_description_api` as escaped JSON strings. See [JSON Configuration Examples](#json-configuration-examples).
-
-### Timeout errors on large documents
-
-**Cause**: `DOCLING_SERVE_MAX_SYNC_WAIT` is too low for document processing time.
-
-**Solution**: Increase `DOCLING_SERVE_MAX_SYNC_WAIT` (e.g., `600` for 10 minutes).
 
 ### OCR not working or incorrect language detection
 
@@ -248,5 +239,4 @@ Integrating Docling with Open WebUI enhances document processing capabilities si
 
 - **Always set `UVICORN_WORKERS=1`** to avoid task routing issues
 - **Enable `DOCLING_SERVE_ENABLE_REMOTE_SERVICES=true`** when using API-based picture description
-- **Increase `DOCLING_SERVE_MAX_SYNC_WAIT`** for large documents
 - **Validate JSON syntax** in all configuration fields

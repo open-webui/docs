@@ -29,6 +29,8 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input.
 
+Click a source under an answer that comes from an uploaded file to open the file in its own tab beside the chat, at the cited page when it is known. The preview highlights the cited text, except on PowerPoint slides, which show as images. In document previews, hovering a highlight shows the passage the model was given. Plain text and code files show it only when the source has a relevance score. Web pages, files the preview cannot show such as `.doc` or `.epub`, and sources in a read-only shared chat open their retrieved text in a popup.
+
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
 :::tip Bulk File Management
@@ -266,7 +268,7 @@ If you change the embedding model, those standalone chat file embeddings will st
 
 ### Monitoring re-index progress
 
-Open WebUI logs the number of knowledge bases and files at the start of the knowledge-file phase. At info log level, it logs a file counter and starts reporting an estimated time remaining after the first file. The admin action then rebuilds the knowledge search index and memory vectors before showing success.
+At info log level, the server log shows a file counter and, after the first file, an estimated time remaining. The admin action then rebuilds the knowledge search index and memory vectors before showing success.
 
 Check the server log even if the UI reports success. The knowledge-file phase can continue after individual errors and return success. Look for the error lines and the `Failed to process ... files` summary to find files that need attention.
 
@@ -276,10 +278,10 @@ The **Danger Zone** at the bottom of **Settings** > **Documents** (admin section
 
 | Button | What it deletes | What stays |
 |---|---|---|
-| **Reset Upload Directory** | Every file record, every stored file (the upload directory, or the S3, GCS or Azure storage in use), and the vector storage | Knowledge bases, now without files or vectors, and memories, without their vectors |
+| **Reset Upload Directory** | Every file record, every stored file (the upload directory, or the S3, GCS or Azure storage in use) and the vector storage | Knowledge bases, now without files or vectors, and memories, without their vectors |
 | **Reset Vector Storage/Knowledge** | The vector storage and every knowledge base | Uploaded files and memories, without their vectors |
 
-With the default Chroma vector database, resetting the vector storage removes every collection: knowledge bases, single files, cached web search results and user memories. Memories keep their text, so **Reindex Knowledge and Memory Vectors** in the same section rebuilds their vectors with the current embedding model. Knowledge bases deleted by **Reset Vector Storage/Knowledge** are gone, so there is nothing left to reindex for them.
+With the default Chroma vector database, resetting the vector storage removes every collection, including knowledge bases, single files, cached web search results and user memories. Memories keep their text, so **Reindex Knowledge and Memory Vectors** in the same section rebuilds their vectors with the current embedding model.
 
 ## Citations in RAG Feature
 
@@ -308,7 +310,7 @@ When Preload files is disabled, file content is **not automatically extracted or
 :::
 
 :::tip Per-File Retrieval Mode
-Individual files and knowledge bases attached in the chat can also be set to bypass RAG entirely using the **"Using Entire Document"** toggle. This injects the full file content into every message regardless of native function calling settings. Uploaded files and text attachments up to **Full Text Threshold (Characters)** in **Settings** > **Documents** (admin section) are included in full automatically, and **Always Use Full Text** applies it to every document. See [Full Context vs Focused Retrieval](/features/workspace/knowledge#retrieval-modes) for details.
+Individual files and knowledge bases attached in the chat can also be set to bypass RAG entirely using the **Full text** switch. This injects the full file content into every message regardless of native function calling settings. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes) for details.
 
 To stop choosing per file, set **Default Upload Mode** in **Settings > Interface > File**: every file you attach then starts in the mode you picked, and can still be switched individually afterwards.
 :::
@@ -368,7 +370,7 @@ Any one of these resolves it:
 
 The togglable hybrid search sub-feature for our RAG embedding feature enhances RAG functionality via `BM25`, with re-ranking powered by `CrossEncoder`, and configurable relevance score thresholds. This provides a more precise and tailored RAG experience for your specific use case.
 
-If you use pgvector, you can enable **Hybrid Search** in **Settings > Documents** (admin section) without re-indexing your knowledge bases or re-uploading chat files. With the same embedding settings, the vector part of hybrid search uses the embeddings you already have, and keyword search uses the stored chunk text.
+You can enable **Hybrid Search** in **Settings > Documents** (admin section) without re-indexing your knowledge bases or re-uploading chat files. With the same embedding settings, the vector part of hybrid search uses the embeddings you already have, and keyword search uses the stored chunk text.
 
 :::tip Filesystem-style knowledge access (`kb_exec`)
 For an even more capable, agentic experience, set `ENABLE_KB_EXEC=True`. This gives the model a shell-style interface over your knowledge bases (`ls`, `tree`, `grep`, `cat`, `head`/`tail`, read-by-line, with pipes) that capable models tend to chain more reliably than a fan-out of separate search tools, so they locate the right passage more often. It requires **native function calling** (it is a native-mode [builtin tool](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)) and is off by default; for models set to Legacy it has no effect. We recommend turning it on for capable models. See [Filesystem-style access](/features/workspace/knowledge#filesystem-style-access-kb_exec).

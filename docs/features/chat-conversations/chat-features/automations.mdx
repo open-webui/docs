@@ -5,7 +5,7 @@ title: "Automations"
 
 # Automations
 
-Automations let you schedule prompts to run automatically at recurring times. Each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
+Automations let you schedule prompts to run automatically at recurring times. By default each run creates a chat and executes through the normal chat completion pipeline, so model defaults, tools, filters, and other pipeline behavior still apply.
 
 Runs use [memory](/features/chat-conversations/memory) the same way your chats do. When memory is on for you, a run gets the memory tools and, with **Memory System Context** on, your stored memories in its context, under the same model, permission and admin settings as a chat. Whether memory is on follows your **Memory** switch in **Settings > Personalization**; if you never set it, the [default interface settings](/features/administration/interface-defaults) decide, and without those, whether Memories is enabled for the instance.
 
@@ -14,11 +14,13 @@ Automations can be enabled or disabled globally by an administrator via the [`EN
 ## What You Can Automate
 
 - Run a prompt on a schedule (hourly, daily, weekly, monthly, custom RRULE)
-- Trigger a run manually with **Run Now**
+- Start a run from another service with a [webhook](#webhooks) URL, optionally passing it text
+- [Share](#sharing) an automation with users and groups so they can follow its runs
+- Trigger a run manually with **Run now**
 - Pause/resume automations without deleting them
 - Review execution history for each automation
 - Optionally file the chats a schedule creates into a [folder](/features/chat-conversations/chat-features/conversation-organization#the-folder-page) you can edit, shared folders included, so a team sees every run in one place
-- Give runs a terminal and working folder, and run an [agent](/features/open-terminal/agents) from that terminal
+- Give runs a machine and working folder, and run an [agent](/features/open-terminal/agents) from that machine
 
 ## Access Control
 
@@ -27,7 +29,7 @@ Automations are permission-gated for non-admin users.
 - **Admins**: always have access to Automations
 - **Users**: require the **Features > Automations** permission
 
-Only the creator can open, edit or delete an automation, administrators included; every other request is answered as if the automation did not exist. One exception covers automations that post into a folder: anyone who can edit that folder can also pause it, run it and read its run history (see [Folders](#folders)). The **Features > Automations** permission decides whether someone may have automations at all.
+Every run uses the creator's account, so the creator decides what an automation does. Admins can open every automation. Other people reach an automation through [sharing](#sharing) or a shared [folder](#folders), and an automation that is not shared with them stays hidden. The **Features > Automations** permission decides whether someone may have automations at all.
 
 An administrator cannot pause or delete another user's automation from the interface. To stop a user's automations, set their role to **Pending** or remove their **Features > Automations** permission. Each run then ends as failed with `Owner no longer permitted to run automations`, and the schedule keeps advancing, so runs resume once the role or permission is back.
 
@@ -47,16 +49,17 @@ Hold **Shift** in the User Menu to reveal pin/unpin buttons. Pinning Automations
 
 ## Admin Limits
 
-Administrators can set global limits on automation usage for non-admin users. These are configured via environment variables. **Admins bypass all limits.**
+Administrators can set global limits on automation usage for non-admin users. These are configured via environment variables. **Admins bypass the count and interval limits.**
 
 | Setting | Effect | Env Variable |
 |---------|--------|--------------|
 | **Max Automation Count** | Caps the number of automations a user can create | [`AUTOMATION_MAX_COUNT`](/reference/env-configuration#automation_max_count) |
 | **Min Recurrence Interval** | Rejects schedules that run more frequently than the configured interval (in seconds) | [`AUTOMATION_MIN_INTERVAL`](/reference/env-configuration#automation_min_interval) |
+| **Max Concurrent Runs** | Caps how many automation runs execute at once on each server process. Further runs wait for a free slot, and a changed value needs a restart | [`AUTOMATION_MAX_CONCURRENT`](/reference/env-configuration#automation_max_concurrent) |
 
 - **Max count** is checked only on creation. Existing automations are not deleted if the limit is lowered.
 - **Min interval** is checked on both creation and update. One-time automations (`COUNT=1`) are exempt.
-- Both default to empty (no limit). Set to a positive integer to enforce.
+- All three default to empty (no limit). Set to a positive integer to enforce. Max concurrent runs applies to admins too.
 
 ## Create an Automation
 
@@ -66,7 +69,7 @@ Administrators can set global limits on automation usage for non-admin users. Th
    - **Title**
    - **Instructions** (prompt)
    - **Model**
-   - **Schedule**
+   - **Schedule**, or **None** for an automation that runs only when you click **Run now** or call its [webhook](#webhooks)
 4. (Optional) Choose a **Folder** for the chats the automation creates. The picker lists your own folders; to post into a shared folder, create the automation from that folder's page instead (see [Folders](#folders))
 5. Click **Create**
 
@@ -82,29 +85,33 @@ A model's **Default Features** can turn on Web Search, Image Generation, or Vide
 
 When a run creates a chat, its initial title is the automation's saved **Title**. Prompt variables such as `{{CURRENT_DATE}}` expand in **Instructions**. In **Title**, they appear as literal text.
 
-### Giving a Run a Terminal
+### Giving a Run a Machine
 
-The automation editor has a **Terminal** list and, once one is picked, a **Working Directory** field. The run uses that terminal and starts in that folder; with the field empty it starts in the terminal's default folder. The list appears when at least one terminal is available to you, and a terminal picked here replaces the one configured on the model.
+The automation editor has a **Machine** list and, once one is picked, a **Working Directory** field. The run uses that machine and starts in that folder. With the field empty it starts in the machine's default folder. The list appears when at least one machine is available to you, and a machine picked here replaces the one configured on the model.
 
-Without a terminal in the editor, a run uses the terminal configured on its model. Set that in **Workspace > Models**: edit the model and pick the terminal from the **Default terminal** field. The list appears when at least one terminal is available to you and the model's **Terminal** capability is on, which it is by default.
+Without a machine in the editor, a run uses the machine configured on its model. Set that in **Workspace > Models**: edit the model and pick the machine from the **Default machine** field. The list appears when at least one machine is available to you and the model's **Terminal** capability is on, which it is by default.
 
 :::info Terminal limits in automations
-Terminals, including the limits for channel automations, are described in [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
+Machines, including the limits for channel automations, are described in [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope).
 :::
 
 ### Running an Agent {#running-a-coding-agent}
 
-With a terminal picked, the **Model** list also offers the agents that terminal reports, named `<agent>/<model>`. Changing the terminal or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a terminal before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the terminal and the agent are still available and the run fails if either is gone.
+With a machine picked, the **Model** list also offers the agents that machine reports, named `<agent>/<model>`. Changing the machine or folder reloads the list, and **Create** and **Save** wait for it. An agent automation needs a machine before you can save it. Its results always go to a chat. Before each run Open WebUI checks that the machine and the agent are still available and the run fails if either is gone.
 
 ## Edit and Manage
 
 From the Automations list, click an automation to open its dedicated editor page.
 
-The page is the editor. Name and instructions sit at the top, followed by a **Properties** list with **Status**, **Schedule**, **Model**, **Destination**, **Terminal** and **Next run**. Click any value to change it in place. A **Save** button appears in the header as soon as something differs from the saved automation. The **Status** switch pauses or resumes the automation straight away without **Save**.
+The page is the editor. Name and instructions sit at the top, followed by a **Properties** list with **Status**, **Schedule**, **Model**, **Destination**, **Machine** and **Next run**. Click any value to change it in place. A **Save** button appears in the header as soon as something differs from the saved automation. The **Status** switch pauses or resumes the automation straight away without **Save**.
 
 The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
 
 Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. Runs load incrementally as you scroll.
+
+The **Destination** menu has a **Start each run in new chat** switch (**Start each run in new thread** for a channel), on by default. Switch it off and every run continues one ongoing chat or channel thread, so each run sees the earlier runs.
+
+For a channel, **Reply in thread** (on by default) decides where the model answers. With the switch on, each run posts its prompt as a channel message and the answer appears as a reply in a thread under it. With it off, each run posts its prompt and its answer as ordinary top-level channel messages, without a thread.
 
 ### Quick delete
 
@@ -129,15 +136,41 @@ What import does and does not do:
 
 An automation can post its chats into a folder, so a recurring report or digest lands next to the other work on that topic and the folder's unread badge shows how many runs you have not read yet. Set it with **Destination** in the editor: **New chat** keeps the chats loose, **Folder** lists your own folders and **Channel** posts into a channel instead (see [Channels](#channels)).
 
-A folder's own page works as a home for its automations. Its header has a **Chats** and **Automations** switch (visible to users who have the Automations permission). The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
+A folder's own page works as a home for its automations. Pick **Automations** in the switch in its header (visible to users who have the Automations permission) to open it. The **Automations** section lists the folder's automations with the schedule, the date of the last run (or **Paused** or **Not run yet**) and an on/off switch, and its **New automation** button creates one that starts in this folder. Chats an automation made carry a small clock mark in the folder's list and board.
 
 - An automation can post into any folder its creator can edit, shared folders included. Create it from the shared folder's page; the **Destination** picker lists only your own folders.
-- Only the creator edits the automation and opens its page. Anyone who can edit the folder can pause it with the switch. Everyone with access to the folder sees it in the list, read-only access included.
+- Everyone with access to the folder sees the automation in the list and can read its runs, read-only access included. Anyone who can edit the folder can also run it, pause it and change its name and schedule. The creator keeps control of everything else and of deleting it.
 - Runs keep landing in the folder for as long as the creator can still edit it. When the creator loses that access, the next run clears the folder and creates its chat outside any folder, and the automation keeps running.
 - The folder is a filing destination: the folder's system prompt and attached knowledge apply to the chat as they do to any other chat there.
 - Clearing the folder is a normal edit. Future chats go back to the ungrouped list; chats already created stay where they are.
 - Deleting a folder does not delete the automations pointed at it. They lose the folder and keep running.
 - Imported automations keep their folder only if a folder with that ID exists in your account; otherwise they are imported without one.
+
+## Webhooks
+
+A webhook gives an automation a URL. Calling it starts a run, so a CI job, a monitoring alert or a Git host can trigger an automation without waiting for a schedule. An automation can have a schedule, a webhook or both, and one with neither runs only with **Run now**.
+
+To add one, open the automation, set **Webhook** to on and **Save**. The URL appears once saved. **Regenerate** creates a new URL and the old one stops working. Use it when a URL has leaked. Only the creator sees the URL and can regenerate it.
+
+- **Text for the run.** Put `{{name}}` placeholders in the instructions, for example `Summarize this alert: {{message}}`. A query parameter of the URL or a field of a JSON body with that name fills the placeholder. A `variables` object in the body works too, and bodies from services such as GitHub or Gitea are read as they are. Placeholders can carry defaults and types like in any [prompt](/features/workspace/prompts); a missing required value, a wrong type or a body that is not a JSON object is answered with `400` and no run starts.
+- **Allow GET.** `POST` works by default. Switch **Allow GET** on to also accept `GET`, for services that can only open a link. With it off, a `GET` call is answered with `405`.
+- **Limits.** Bodies over 64 KB are answered with `413`. An automation takes 30 calls per minute, and further calls get `429`. A paused automation answers `409`. A successful call answers `202`.
+
+:::warning Anyone with the URL can start the automation
+The URL is the credential, so share it only with the service that needs it. The call needs no sign-in, and whoever holds the URL starts a run under the creator's account and decides what text goes into the prompt. Only create webhooks for automations whose instructions are safe to run with untrusted text.
+:::
+
+Admins control webhooks with **Automation Webhooks** in **Admin Settings > General**, or [`ENABLE_AUTOMATION_WEBHOOKS`](/reference/env-configuration#enable_automation_webhooks) (on by default). With it off, existing URLs stop working. Creating a webhook needs admin rights or the **Features > Automations** permission, and a webhook stops working when its creator loses that permission.
+
+## Sharing
+
+An automation can be shared with specific users and groups, so a team follows a report without each person creating their own. Use **Share** in the automation's header and pick people and groups, like for other [shared items](/features/authentication-access/rbac/permissions#2-sharing-permissions). Non-admin users need the **Automations Sharing** permission to share.
+
+- **Read** lets people open the automation, see its schedule and read the chats its runs created. The **Shared with me** tab of the Automations list shows automations shared directly with you.
+- **Write** adds running it, pausing it and changing its name and schedule.
+- Only the creator changes the instructions, model, destination and webhook, because runs always use the creator's account. The creator and admins can share and delete.
+
+Automations that sit in a shared folder follow the folder's access (see [Folders](#folders)).
 
 ## Channels
 
@@ -147,7 +180,7 @@ With **Destination** set to **Channel**, a run posts into a [channel](/features/
 - Each run posts the instructions into the channel as a message from you. The model's reply goes into a thread under that message, or into the timeline when the admin **Model Response Mode** is set to **Channel**.
 - The model receives only the instructions, not earlier messages from the channel.
 - Clicking a run in **Activity** opens the channel.
-- Agent automations need a chat destination. Saving one with **Channel** is refused with `Agent automations require a chat destination.`, or with `This terminal requires a chat destination.` when the terminal comes from a template. That second message also refuses a template terminal limited to chats.
+- Agent automations need a chat destination. Saving one with **Channel** is refused with `Agent automations require a chat destination.`, or with `This machine requires a chat destination.` when the machine comes from a template. That second message also refuses a template machine limited to chats.
 - A run fails with `Channel not found` when channels are turned off for the instance, and with `Owner no longer permitted to use channels` when its creator has lost the **Channels** permission.
 
 ## Scheduling

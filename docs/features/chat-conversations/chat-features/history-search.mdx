@@ -102,7 +102,6 @@ When using a model with **Native Function Calling** enabled (see the [**Central 
 ### Available History Tools:
 - **`search_chats`**: Text search across chat titles and message content, using the same matching as the **Reference Chats** picker and skipping the chat the model is currently in. Returns matching chat IDs and snippets.
 - **`view_chat`**: Reads and returns the message history of a specific chat by ID, cut to the newest messages when [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) is set.
-- **`search_users`**: Looks up users by name or email so the model can mention them in a reply. Each mentioned user who can see the chat gets an [inbox](/features/chat-conversations/chat-features/notifications#inbox) notification that opens the chat at that reply.
 
 The **Chat History** category is on by default when **Builtin Tools** are enabled. To stop a model from searching previous chats with these tools, edit it in **Workspace > Models** or **Admin Panel > Settings > Models**, open **Builtin Tools**, turn off **Chat History**, and save. This removes all three tools listed above from the model's built-in tool set.
 

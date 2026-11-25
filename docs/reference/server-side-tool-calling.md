@@ -14,7 +14,7 @@ That includes:
 - **[Built-in tools](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)**: web search, knowledge and file browsing, code interpreter, notes, channels, memory, calendar, automations, sub-agents, image generation.
 - **[Workspace tools](/features/extensibility/plugin/tools)**: your own Python tools.
 - **[MCP servers](/features/extensibility/mcp)** and OpenAPI tool servers configured in Open WebUI.
-- **[Open Terminal](/features/open-terminal)**: the terminal server the model or your user has access to.
+- **[Open Terminal](/features/open-terminal)**: the machine the model or your user has access to.
 
 ---
 
@@ -63,25 +63,25 @@ curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/models | jq '.data[].
 # Workspace tools you have access to (use .id as a tool_ids entry)
 curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/v1/tools/ | jq '.[] | {id, name}'
 
-# Terminal servers you have access to (use .id as terminal_id)
-curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/v1/terminals/ | jq '.[] | {id, name, template_id, scope}'
+# Machines you have access to (use .id as machine_id)
+curl -s -H "Authorization: Bearer $OWUI_KEY" $OWUI_URL/api/v1/machines/ | jq '.[] | {id, name, template_id, scope}'
 ```
 
 MCP servers are addressed as tool IDs of the form `server:mcp:<server-id>`. See [Using Open WebUI tools, including MCP, from the API](/reference/api-endpoints#using-open-webui-tools-including-mcp-from-the-api).
 
-:::warning The model's default terminal is a UI default, not a server default
-When you pick a model in the browser, the frontend reads `meta.terminalId` off the model and puts it in the request for you. The backend does **not** do that. An API caller must send `terminal_id` explicitly, otherwise the model gets no terminal tools even if the model is configured with one.
+:::warning The model's default machine applies only in the browser
+When you pick a model in the browser, the frontend reads `meta.machineId` off the model and puts it in the request for you. An API call sends `machine_id` itself. Without it the model gets no machine tools, even if the model is configured with a default machine.
 
-You can read a model's configured terminal with `GET /api/v1/models/model?id=<model-id>` and use `meta.terminalId`, or just pick one from `/api/v1/terminals/`, which already lists only the terminals your user is allowed to use.
+You can read a model's configured machine with `GET /api/v1/models/model?id=<model-id>` and use `meta.machineId`, or just pick one from `/api/v1/machines/`, which already lists only the machines your user is allowed to use.
 :::
 
 :::warning The model's tools, default features and knowledge are UI defaults too
 The web UI also copies the model's **Tools** (`meta.toolIds`) into `tool_ids` and its **Default Features** into `features`. The backend does neither, so send them yourself. The model's **Knowledge** is searched only through the built-in tools, which need a `session_id`, or in legacy mode. A request with neither does not use the model's knowledge at all. See [Chat Completions](/reference/api-endpoints#chat-completions) for the full list.
 :::
 
-### Terminal scope
+### Machine scope
 
-Terminals on a Terminals server carry a `scope`: `null`, `user`, `chat` or `model`. It decides what your request must carry to use the terminal:
+Machines on a Terminals server carry a `scope`: `null`, `user`, `chat` or `model`. It decides what your request must carry to use the machine:
 
 | `scope` | What the request needs |
 | :--- | :--- |
@@ -89,7 +89,7 @@ Terminals on a Terminals server carry a `scope`: `null`, `user`, `chat` or `mode
 | `chat` | A saved `chat_id`. Each chat gets its own instance |
 | `model` | A model you have access to |
 
-Read `scope` before choosing a terminal. For a `chat` terminal you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one. [Creating Terminals](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope) covers what each scope does.
+Read `scope` before choosing a machine. For a `chat` machine you have to use [Path A](#path-a-full-agentic-loop) with a real saved chat, because [Path B](#path-b-one-request-answer-in-the-body) never creates one. [Creating Machines](/features/open-terminal/terminals/orchestration/creating-terminals#machine-scope) covers what each scope does.
 
 ---
 
@@ -140,7 +140,7 @@ curl -s -X POST $OWUI_URL/api/chat/completions \
     \"session_id\": \"api-$(uuidgen)\",
     \"features\": {\"web_search\": true, \"code_interpreter\": true, \"image_generation\": false, \"memory\": true},
     \"tool_ids\": [\"my_workspace_tool\", \"server:mcp:my_mcp_server\"],
-    \"terminal_id\": \"open-terminal\",
+    \"machine_id\": \"open-terminal\",
     \"background_tasks\": {\"title_generation\": false, \"tags_generation\": false, \"follow_up_generation\": false}
   }"
 ```
@@ -163,7 +163,7 @@ Field by field:
 | `session_id` | **The built-in tools switch.** Any non-empty string works. Without it, built-in tools are not offered to the model. It also makes the request asynchronous (you get `task_ids` instead of blocking). |
 | `features` | Turns on the four togglable built-in groups: `web_search`, `code_interpreter`, `image_generation`, `memory`. The other built-ins (knowledge, files, notes, channels, calendar, automations, chats, time, tasks, sub-agents) need no flag and are offered whenever their global setting, your permission and the model's category allow it. |
 | `tool_ids` | Workspace tools and MCP servers. Optional. |
-| `terminal_id` | Open Terminal server. Optional, and independent of `session_id`. A terminal with `scope` `chat` additionally requires that `chat_id` be a saved chat, which Path A already satisfies. |
+| `machine_id` | The ID of a machine. Optional, and independent of `session_id`. A machine with `scope` `chat` additionally requires that `chat_id` be a saved chat, which Path A already satisfies. |
 | `background_tasks` | Turn title, tag and follow-up generation off unless you want the extra model calls. |
 
 :::danger Do not send your own `tools` array
@@ -204,7 +204,7 @@ A `chat_id` of `temporary:<session_id>` also runs the full loop and persists not
 
 ### Blocking variant (no `session_id`)
 
-Drop `session_id` and the request stops being asynchronous: the HTTP call blocks until the whole tool loop is finished, then returns `null`. You still read the answer from the chat, but you skip the polling in A3. The trade is that **built-in tools are not available** in this mode. Use it when `tool_ids`, `terminal_id` and MCP are all you need.
+Drop `session_id` and the request stops being asynchronous: the HTTP call blocks until the whole tool loop is finished, then returns `null`. You still read the answer from the chat, but you skip the polling in A3. The trade is that **built-in tools are not available** in this mode. Use it when `tool_ids`, `machine_id` and MCP are all you need.
 
 ---
 
@@ -222,7 +222,7 @@ curl -s -X POST $OWUI_URL/api/chat/completions \
     "stream": false,
     "params": {"function_calling": "legacy"},
     "tool_ids": ["my_workspace_tool", "server:mcp:my_mcp_server"],
-    "terminal_id": "open-terminal"
+    "machine_id": "open-terminal"
   }'
 ```
 
@@ -233,8 +233,8 @@ Set `"stream": true` for the same thing as SSE. The tool round happens before th
 Limits, in exchange for the simplicity:
 
 - **One round of tool calls.** The model cannot look at a result and decide to call something else.
-- **No built-in tools.** No web search, no code interpreter, no knowledge browsing, no terminal-driven agentic work.
-- **No chat-scoped terminals.** A request in this mode carries no `chat_id`, so a terminal with `scope` set to `chat` cannot be used. Other terminals work normally.
+- **No built-in tools.** No web search, no code interpreter, no knowledge browsing, no agentic work on a machine.
+- **No chat-scoped machines.** A request in this mode carries no `chat_id`, so a machine with `scope` set to `chat` cannot be used. Other machines work normally.
 - Legacy mode is **unsupported** and depends on a task model that reliably emits JSON. See [Tool Calling Modes](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native).
 
 ---
@@ -277,7 +277,7 @@ def _headers():
 def run(
     prompt,
     tool_ids=None,
-    terminal_id=None,
+    machine_id=None,
     features=None,
     system=None,
     builtin_tools=True,
@@ -361,8 +361,8 @@ def run(
         body["session_id"] = f"api-{uuid.uuid4()}"  # unlocks the built-in tools
     if tool_ids:
         body["tool_ids"] = tool_ids
-    if terminal_id:
-        body["terminal_id"] = terminal_id
+    if machine_id:
+        body["machine_id"] = machine_id
 
     started = requests.post(
         f"{OWUI_URL}/api/chat/completions", headers=_headers(), json=body, timeout=timeout
@@ -390,7 +390,7 @@ def run(
     return message
 
 
-def run_single_request(prompt, tool_ids=None, terminal_id=None, stream=False):
+def run_single_request(prompt, tool_ids=None, machine_id=None, stream=False):
     """Path B: one call, completion in the body. One tool round, no built-in tools."""
     body = {
         "model": MODEL,
@@ -400,8 +400,8 @@ def run_single_request(prompt, tool_ids=None, terminal_id=None, stream=False):
     }
     if tool_ids:
         body["tool_ids"] = tool_ids
-    if terminal_id:
-        body["terminal_id"] = terminal_id
+    if machine_id:
+        body["machine_id"] = machine_id
 
     if not stream:
         response = requests.post(
@@ -425,7 +425,7 @@ def run_single_request(prompt, tool_ids=None, terminal_id=None, stream=False):
 if __name__ == "__main__":
     result = run(
         "Search the web for the newest Open WebUI release, then write a three-bullet summary.",
-        terminal_id=None,
+        machine_id=None,
         tool_ids=None,
     )
     print(result["content"])
@@ -434,7 +434,7 @@ if __name__ == "__main__":
 To adapt it:
 
 - **Different tools**: pass `tool_ids=["my_tool", "server:mcp:my_server"]`.
-- **Terminal work**: pass `terminal_id="<id from /api/v1/terminals/>"`.
+- **Machine work**: pass `machine_id="<id from /api/v1/machines/>"`.
 - **Keep the conversation**: set `DELETE_CHAT_WHEN_DONE = False`. It then shows up in the user's chat list exactly like a browser conversation.
 - **Multi-turn**: reuse the `chat_id`, add a new user message plus assistant placeholder to the tree, and send the full `messages` history. See [Backend-Controlled API Flow](/reference/api-flow#send-additional-messages-to-an-existing-chat).
 - **No built-in tools wanted**: `builtin_tools=False` makes the request blocking and skips the polling loop.
@@ -449,10 +449,10 @@ To adapt it:
 | No tools were called at all, and `stream` was `false` | The native loop is streaming-only | Send `stream: true` |
 | `stream: true` was sent but nothing streamed | The workspace model's **Stream Chat Response** parameter overrides the request | Clear it on the model, or accept the model's setting |
 | Web search, code interpreter, memory or image generation never offered | Missing `session_id`, missing `features` flag, missing user permission, disabled globally, or the model's **Builtin Tools** category is off | All five must line up. Check them in that order |
-| `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Code Execution** (admin section), or drop `code_interpreter` from `features` |
+| `execute_code` returns "WebSocket connection required" | The code interpreter engine is `pyodide`, which runs in the browser | Switch the engine to **Jupyter** in **Settings > Code Execution** (admin section, under **Legacy**), or drop `code_interpreter` from `features` |
 | File tools (`view_file`, `grep_chat_files`, ...) missing | They need `files` in the request body, a `session_id`, the model's **File Upload** capability on, and **Preload files** off. API requests treat Preload files as on unless the model saves it as off | See [Prompt Caching and Context Optimization](/features/chat-conversations/prompt-caching) |
-| `503 Terminal unavailable` | The terminal server is unreachable, disabled, or your user has no access grant | Confirm the ID appears in `GET /api/v1/terminals/` for that key |
-| `409`, `This terminal requires a saved chat` | The terminal has `scope` `chat` and the request had no saved `chat_id` | Use Path A with a saved chat, or pick another terminal |
+| `Machine unavailable: ...` | The machine is unreachable, disabled, or your user has no access grant. Path B answers with HTTP `503`, and Path A shows the error in the assistant message | Confirm the ID appears in `GET /api/v1/machines/` for that key |
+| `Machine unavailable: 409: This machine requires a saved chat` | The machine has `scope` `chat` and the request had no saved `chat_id`. It arrives as in the row above | Use Path A with a saved chat, or pick another machine |
 | MCP tool connection fails | An OAuth-protected MCP server the API key's user has not authorised | Complete the OAuth flow once in the browser as that user |
 | The chat is created but stays empty in the UI | Broken message tree | `currentId` is camelCase, and every message needs `parentId` and `childrenIds`. See [Backend-Controlled API Flow](/reference/api-flow) |
 
@@ -464,5 +464,5 @@ To adapt it:
 - [Backend-Controlled API Flow](/reference/api-flow): the chat and message-tree structures used in Path A.
 - [Tools](/features/extensibility/plugin/tools): built-in tool reference, native vs legacy, per-model gating.
 - [Model Context Protocol (MCP)](/features/extensibility/mcp): adding MCP servers.
-- [Open Terminal](/features/open-terminal): setting up the terminal server.
+- [Open Terminal](/features/open-terminal): setting up Open Terminal on a machine.
 - [API Keys](/features/authentication-access/api-keys) and [Permissions](/features/authentication-access/rbac/permissions).

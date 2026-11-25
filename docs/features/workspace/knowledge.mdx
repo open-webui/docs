@@ -65,7 +65,7 @@ Upload a folder of contracts, technical specs, or research papers. The AI search
 
 ### Two retrieval modes for different needs
 
-Choose **Using Focused Retrieval** (RAG) to let the AI search large document sets efficiently, or **Using Entire Document** to inject a whole document word-for-word when precision matters.
+Retrieve relevant passages (RAG) to let the AI search large document sets efficiently, or turn on **Full text** to inject a whole document word-for-word when precision matters.
 
 ### Autonomous exploration with native function calling
 
@@ -105,7 +105,7 @@ To let a model browse all the knowledge bases the user can read, attach nothing.
 
 ## Retrieval Modes
 
-When attaching files or knowledge bases to a model, click on the attached item to toggle between **Using Focused Retrieval** and **Using Entire Document**:
+When attaching files or knowledge bases to a model, click on the attached item and use its **Full text** switch to choose between retrieving relevant passages (off) and injecting the whole file (on):
 
 ![The knowledge base list](/images/workspace/knowledge-list.png)
 
@@ -123,7 +123,7 @@ Injects the complete content of the file into every message. No chunking, no sem
 
 Best for short reference documents, style guides, or context that's always relevant.
 
-Files and text attachments up to **Full Text Threshold (Characters)** in **Settings** > **Documents** (admin section) are included in full without choosing this mode, and **Always Use Full Text** applies it to every document. Knowledge base attachments are not affected by the threshold.
+Files and text attachments up to the **Full Text Threshold (Characters)** or **Full Text Threshold (Tokens)** in **Settings** > **Documents** (admin section), as **Full Text Threshold Type** sets, are included in full without turning on **Full text**, and **Always Use Full Text** applies it to every document.
 
 ---
 
@@ -268,7 +268,7 @@ When native function calling is enabled, knowledge attached to a model or a fold
 
 1. **Add system prompt instructions** telling the model to use `list_knowledge` and `query_knowledge_files`.
 2. **Check the model's tool capabilities and retrieval setup** using [Knowledge Base troubleshooting](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working). Keep Native mode enabled and use a model that can call tools reliably.
-3. **For a small document, attach it in the chat with Using Entire Document** and the model's **Preload files** capability on, so its full text is injected. Knowledge attached to the model or folder is never injected with native function calling.
+3. **For a small document, attach it in the chat with its Full text switch on** and the model's **Preload files** capability on, so its full text is injected. Knowledge attached to the model or folder is never injected with native function calling.
 :::
 
 ---
@@ -444,7 +444,7 @@ Add dozens of papers to a knowledge base. The AI searches across all of them to 
 
 ### Context window with Full Context mode
 
-"Using Entire Document" injects the full text. A large document attached to a model with a small context window will crowd out conversation history.
+**Full text** injects the whole document. A large document attached to a model with a small context window will crowd out conversation history.
 
 ### Processing delay for API uploads
 

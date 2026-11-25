@@ -22,7 +22,7 @@ Separately from that, admins can override Open WebUI's own interface wording, th
 | **Skills** | Name, description | Workspace > Skills, in the skill editor |
 | **Functions** | Name, description, valve labels, per-action labels | Admin Panel > Functions, in the function editor |
 | **Banners** | Content, not the title | Settings > General (admin section), next to the Banners heading |
-| **Arena models** | Name, description | Settings > Evaluations (admin section), in the arena model dialog |
+| **Router models** | Name, description | Settings > Models (admin section), in the router model dialog |
 | **Default prompt suggestions** | The suggestions themselves | Settings > Models > Model Defaults (admin section) |
 | **Open WebUI's own interface** | Any string the application ships | Settings > General (admin section), under UI Translations. See [Interface text](#interface-text) |
 
@@ -36,7 +36,7 @@ Every language Open WebUI ships is offered, English included. **Default** is not
 
 In the resource editors, a language that already carries text is marked with `*`, so you can see at a glance what has been translated.
 
-In the model editor, the banner list and the arena dialog, a translated field carries two small buttons: **Copy default** drops the original in as a starting point, and **Use default** clears the translation so the original is used again. Tool and skill names and descriptions have no buttons, just type in the field, and empty it again to go back to the original.
+In the model editor, the banner list and the router model dialog, a translated field carries two small buttons: **Copy default** drops the original in as a starting point, and **Use default** clears the translation so the original is used again. Tool and skill names and descriptions have no buttons, just type in the field, and empty it again to go back to the original.
 
 ![A model editor switched to German, with a translated name, description and prompt suggestions](/images/features/translations/model-editor-translations.png)
 

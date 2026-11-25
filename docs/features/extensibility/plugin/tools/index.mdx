@@ -144,6 +144,8 @@ Models that depend on the prompt-based behavior need **Legacy** set [per chat, p
 
 Open WebUI exposes the setting in **Model Settings → Advanced Params → Function Calling**: **Native Mode (Agentic Mode)**, the default and only supported mode, and **Legacy Mode**, the prompt-based opt-out kept only for backward compatibility.
 
+In both modes, an administrator can cap how much of a tool result reaches the model with [`TOOL_OUTPUT_MAX_CHARS`](/reference/env-configuration#tool_output_max_chars) (**Settings > General > Tool Output Limit**). A longer result is cut off and ends with a note of its original length. When the chat has a [machine](/features/open-terminal), the full result is also saved as a text file on it, and the note gives the model the path so it can read the rest. The saved copy is made for the results of every tool except the machine's own.
+
 ### Legacy Mode (Prompt-based)
 
 :::warning Unsupported
@@ -385,6 +387,7 @@ An administrator turns it on in **Settings > Interface** (admin section), in the
 | **Search engine** ([`TOOL_SEARCH_ENGINE`](/reference/env-configuration#tool_search_engine)) | **BM25** | How a search is matched to deferred tools: **BM25**, **Embeddings** or **Decisions API**. See [Search engines](#search-engines). |
 | **Defer Built-in Tools** ([`TOOL_SEARCH_DEFER_BUILTIN_TOOLS`](/reference/env-configuration#tool_search_defer_builtin_tools)) | On | Treats built-in tools like any other tool. Turn it off to always send built-in tools in full. |
 | **Deferral Threshold (characters)** ([`TOOL_SEARCH_DEFER_THRESHOLD`](/reference/env-configuration#tool_search_defer_threshold)) | `400` | A tool whose definition (name, description and parameter schema, as JSON) is longer than this many characters is deferred. `0` defers every tool. |
+| **List Deferred Tools** ([`TOOL_SEARCH_LIST_TOOLS`](/reference/env-configuration#tool_search_list_tools)) | On | Lists the name and a short description of every deferred tool in the system prompt, so the model knows what to search for. |
 | **Always Loaded Tools** ([`TOOL_SEARCH_ALWAYS_LOADED`](/reference/env-configuration#tool_search_always_loaded)) | Empty | Comma-separated tool names or glob patterns, such as `jira_create_issue, github_*`, that are always sent in full. Matching is case-sensitive. |
 
 ![The Chat section of Settings > Interface (admin section) with Tool Search switched on, Defer Built-in Tools, Deferral Threshold (characters) set to 400 and an empty Always Loaded Tools field](/images/features/plugin/tools/tool-search-settings.webp)
@@ -392,9 +395,9 @@ An administrator turns it on in **Settings > Interface** (admin section), in the
 How it works:
 
 - **Which tools are deferred.** Every tool enabled for the chat is checked on each request: workspace tools, MCP and OpenAPI tool servers, Open Terminal tools and built-in tools. A tool is deferred when its definition is longer than the threshold and it matches no Always Loaded pattern. Built-in tools are only deferred while **Defer Built-in Tools** is on. Smaller tools are sent in full as usual, and a request where no tool qualifies is sent exactly as before.
-- **What the model sees.** A short `<available_tools>` instruction at the end of the system prompt tells the model to look tools up with `search_tools`. It does not list the deferred tools. Two built-in tools are added to the tool list: `search_tools` and `call_tool`.
+- **What the model sees.** A short `<available_tools>` instruction at the end of the system prompt tells the model to look tools up with `search_tools`. Two built-in tools are added to the tool list: `search_tools` and `call_tool`.
 - **How the model loads a tool.** The model calls `search_tools` with a few keywords or an exact tool name, plus an optional `count` (default `5`, at most `20`). It gets back the full definitions of the best matches. An exact tool name returns that tool alone. Otherwise each deferred tool is ranked by the selected search engine. To run tools it found, the model calls `call_tool` with a `calls` array. Each entry holds `tool_name`, the tool's exact name, and `params`, the tool's arguments as a JSON-encoded object string, for example `call_tool(calls=[{"tool_name": "get_weather", "params": "{\"city\":\"Dubai\"}"}])`. One `call_tool` call can run several independent tools. Open WebUI runs each entry as if the model had called that tool directly, so approvals, results, citations and the chat display are per tool.
-- **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. See [Prompt Caching](/features/chat-conversations/prompt-caching).
+- **Prompt caching.** Loading a tool through search leaves the tool list sent to the provider as it was. The tool list and the `<available_tools>` block only change when the set of enabled tools changes, so the cached prefix holds across tool rounds and turns. With **List Deferred Tools** on, the block names every deferred tool, so a change to the set of deferred tools resets the cached prefix too. Turn it off if that happens often. See [Prompt Caching](/features/chat-conversations/prompt-caching).
 - **Tool approval.** With **Ask for approval** on, `search_tools` asks for approval like any other tool, so using a deferred tool typically takes two approvals: one for the search and one for the tool itself. Under **Auto**, `search_tools` runs without a review. Each tool a `call_tool` call runs is approved on its own, under that tool's name.
 - **Backend support.** Every call the model makes goes to a tool in the list sent to the provider, so Tool Search also works on backends that only accept calls to listed tools, such as the OpenAI API (both Chat Completions and Responses), xAI and the llama.cpp server.
 
@@ -459,6 +462,7 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | **Chat History** | *Requires per-model "Chat History" category enabled (default: on).* |
 | `search_chats` | Text search across chat titles and message content, skipping the chat the model is currently in. A multi-word query matches chats containing all of the words in any order, with exact phrase matches ranked first. Returns matching chat IDs and snippets. |
 | `view_chat` | Reads and returns the message history of a specific chat by ID. With [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) set, it keeps the newest messages up to that many characters and says the result was cut. |
+| **Users** | *Requires per-model "Users" category enabled (default: on).* |
 | `search_users` | Look up users by name or email. The model can mention a found user in its reply, and each mentioned user who can see the chat gets an [inbox](/features/chat-conversations/chat-features/notifications#inbox) notification that opens the chat at that reply. |
 | **Channels** | *Requires `ENABLE_CHANNELS` AND per-model "Channels" category enabled (default: on).* |
 | `search_channels` | Find public or accessible channels by name/description. |
@@ -492,8 +496,9 @@ These are the **Builtin Tools** (the capability name shown in the Model Editor).
 | `calculate_timestamp` | Calculate relative timestamps (e.g., "3 days ago"). |
 | **Ask User** | *Requires per-model "Ask User" category enabled (default: on). In a saved chat the pending question is stored on the assistant message; in a [temporary chat](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions) it opens as a live dialog. Not available in channels, which have no browser tab to ask in.* |
 | `ask_user` | Pause the reply and put a question card above the message box, then continue once the user answers. It must be the only tool call in that turn, and only one `ask_user` per turn; anything else comes back to the model as an error. The pending question survives a page reload. |
-| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on) AND the user holding the `features.subagents` permission (admins always pass). Never injected into a sub-agent itself or in temporary chats. This category gates `timer` as well; there is no separate Timers category.* |
-| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same tools, and return its result. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
+| **Sub-agents** | *Requires [`ENABLE_SUBAGENTS`](/reference/env-configuration#enable_subagents) enabled (default: off) AND per-model "Sub-agents" category enabled (default: on) AND the user holding the `features.subagents` permission (admins always pass). Sub-agents themselves get neither `delegate_task` nor `timer`, and temporary chats get none of the category's tools. This category gates `timer` as well; there is no separate Timers category.* |
+| `delegate_task` | Delegate a focused task to a parallel sub-agent running the same tools. In a saved chat the result is posted into the chat later. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
+| `send_message` | Send a message to another of the user's chats, such as a sub-agent or the parent chat. Available in saved chats. See [Sub-agents](/features/chat-conversations/chat-features/subagents). |
 | `timer` | Set a one-shot timer that sends a prompt back into this chat when it fires, producing a new reply. See [Timers](/features/chat-conversations/chat-features/timers). |
 | **Notifications** | *Requires [`ENABLE_USER_WEBHOOKS`](/reference/env-configuration#enable_user_webhooks) enabled (default: off) AND the user holding the `features.webhooks` permission (admins always pass) AND per-model "Notifications" category enabled (default: on).* |
 | `notify` | Send a notification to one of the user's configured webhook targets. See [Notifications](/features/chat-conversations/chat-features/notifications). |
@@ -597,6 +602,7 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Chat History** | | |
 | `search_chats` | `query` (required; an exact phrase or a set of keywords), `count` (default: 5), `start_timestamp`, `end_timestamp` | Array of `{id, title, snippet, updated_at}`. `snippet` is `Title match: <title>` when the query was found in the title but not in any message |
 | `view_chat` | `chat_id` (required) | `{id, title, messages: [{role, content}], updated_at, created_at}`. A result cut by [`VIEW_CHAT_MAX_CHARS`](/reference/env-configuration#view_chat_max_chars) adds `truncated: true`, `total_messages` and `returned_messages` |
+| **Users** | | |
 | `search_users` | `query` (required; a name or email), `count` (default: 5, at most 20) | Array of `{id, name, email, mention}`. The model copies a user's `mention` value into its reply to mention them |
 | **Channels** | | |
 | `search_channels` | `query` (required), `count` (default: 5) | Array of `{id, name, description, type}` |
@@ -633,7 +639,8 @@ When [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set, Ope
 | **Ask User** | | |
 | `ask_user` | `questions` (required, 1-3 objects of `{id, header, question, options}` where `options` is 2-3 `{label, description}` pairs and an optional per-question `allow_other`), `allow_other` (default: `true`), `timeout_ms` (default: `120000`, clamped to 60000-240000) | `{status: "answered", answers}` keyed by question id, or `{status: "cancelled", answers: {}}` when the card times out. Dismissing the card returns a rejection error instead |
 | **Sub-agents** | | |
-| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `model_id` (optional; one of the model's [sub-agent models](/features/workspace/models#capabilities-and-bindings), offered only when some are set; omitted, the current model runs), `background` (default: false; the parameter is removed from the schema entirely unless [`SUBAGENTS_BACKGROUND_ENABLED`](/reference/env-configuration#subagents_background_enabled) is on) | Foreground: the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Background: a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. Errors are returned as an `Error: ...` string rather than raised |
+| `delegate_task` | `task` (required), `context` (optional; decisions, findings or file paths to carry across), `file_ids` (optional list; attachments from the parent chat to hand to the sub-agent, which otherwise receives no files at all. An ID that is not attached to the parent chat fails the call before anything runs), `model_id` (optional; one of the model's [sub-agent models](/features/workspace/models#capabilities-and-bindings), offered only when some are set; omitted, the current model runs), `title` (optional; 3 to 6 words naming the task) | In a saved chat, a JSON handle `{status: "dispatched", delegation_id, subagent_chat_id, mode, task}`, with the result posted into the parent chat later. In a channel or automation run, the sub-agent's final answer as text, truncated at [`SUBAGENTS_MAX_OUTPUT`](/reference/env-configuration#subagents_max_output). Errors are returned as an `Error: ...` string rather than raised |
+| `send_message` | `chat_id` (required; another of the user's chats), `message` (required) | `Sent.`, or `Error: ...` when the chat is not found, is the current chat or is waiting for the user |
 | `timer` | `prompt` (required; sent back into the chat when the timer fires), `at` (required; a relative offset such as `10s`, `5m`, `1h`, `2d`, `+10s` or `in 10 seconds`, or an RFC 3339 timestamp that **must** carry an explicit timezone; must be in the future), `cancel_on` (optional list of `chat.read`, `chat.user_message`) | `{"status": "set", "at": "<RFC 3339 UTC>", "cancel_on": [...]}` as a JSON string. Errors are returned as a plain `Error: ...` string, not JSON |
 | **Notifications** | | |
 | `notify` | `message` (required; the notification body), `target` (optional target **id**; empty uses the default target), `title` (optional) | `Notification sent to {target_id}.`, or `Notification failed: {reason}` |
@@ -696,7 +703,7 @@ Attaching a knowledge base or note to a custom model does **not** bypass access 
 2. Then use `query_knowledge_files` to search file contents within relevant KBs
 3. If still empty, the files may not be embedded yet, or you may have **Always Use Full Text enabled** which bypasses the vector store
 
-**Do NOT use Always Use Full Text or Using Entire Document with knowledge tools.** Full text injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Use Focused Retrieval (default) for tool-based access.
+**Do NOT use Always Use Full Text or the Full text switch with knowledge tools.** Full text injects file content directly and doesn't store embeddings, so `query_knowledge_files` will return empty. Keep the default relevant-passage retrieval for tool-based access.
 :::
 
 :::tip Knowledge Base Tools and Hybrid Search
@@ -709,7 +716,7 @@ The native `query_knowledge_files` tool uses **hybrid search + reranking** when 
 **If your model isn't using attached knowledge:**
 1. **Add instructions to your system prompt** telling the model to discover and query knowledge bases. Example: *"When users ask questions, first use list_knowledge to see what knowledge is available, then use query_knowledge_files to search the relevant knowledge base before answering. If no knowledge is attached to this model, use list_knowledge_bases first to discover available KBs."*
 2. **Or disable Native Function Calling** for that model to restore automatic RAG injection.
-3. **Or attach a small document in the chat with "Using Entire Document"** (click the attachment and switch its mode) while the model's **Preload files** capability is on, which injects its full content. Knowledge attached to the model or a folder is never injected in native mode.
+3. **Or attach a small document in the chat with its Full text switch on** (click the attachment) while the model's **Preload files** capability is on, which injects its full content. Knowledge attached to the model or a folder is never injected in native mode.
 
 See [Knowledge Scoping with Native Function Calling](/features/workspace/knowledge#scoped-access-keeps-things-organized) for more details.
 :::
@@ -748,7 +755,8 @@ When the **Builtin Tools** capability is enabled, you can further control which 
 | **Time & Calculation** | `get_current_timestamp`, `calculate_timestamp` | Get current time and perform date/time calculations |
 | **Ask User** | `ask_user` | Pause a response to ask the user a clarifying question |
 | **Memory** | `search_memories`, `list_memory_paths`, `read_memory_path`, `list_memories`, `update_memory`, `add_memory`, `replace_memory_content`, `delete_memory` | Search and manage user memories |
-| **Chat History** | `search_chats`, `view_chat`, `search_users` | Search and view user chat history, and look up users to mention |
+| **Chat History** | `search_chats`, `view_chat` | Search and view user chat history |
+| **Users** | `search_users` | Search the user directory to resolve @mentions |
 | **Notes** | `search_notes`, `view_note`, `write_note`, `replace_note_content` | Search, view, and manage user notes |
 | **Knowledge Base** | `list_knowledge`, `list_knowledge_bases`, `search_knowledge_bases`, `query_knowledge_bases`, `search_knowledge_files`, `query_knowledge_files`, `grep_knowledge_files`, `view_file`, `view_knowledge_file`, `display_file`, `view_note` when a note is attached (or `kb_exec` + `query_knowledge_files` + `display_file` + `view_note`/`query_knowledge_bases`/`search_knowledge_bases` as applicable when [`ENABLE_KB_EXEC`](/reference/env-configuration#enable_kb_exec) is set) | Browse and query knowledge bases |
 | **Web Search** | `search_web`, `fetch_url` | Search the web and fetch URL content |

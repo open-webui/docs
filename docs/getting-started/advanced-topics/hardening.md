@@ -19,6 +19,8 @@ For organizations where security is a priority, the recommended deployment place
 - A zero-trust access proxy (Cloudflare Access, Pomerium)
 - A reverse proxy with authentication and IP allowlisting
 
+Automation webhook URLs are reachable without signing in, because the secret in the URL is the credential. If a proxy in front requires authentication on every path, those calls need an exception. Set [`ENABLE_AUTOMATION_WEBHOOKS`](/reference/env-configuration#enable_automation_webhooks) to `false` if you do not use them.
+
 DDoS protection and brute-force prevention (rate limiting, connection throttling, fail2ban) should be handled at the proxy or network layer.
 
 Open WebUI listens on every network interface (`0.0.0.0`) by default. When a reverse proxy on the same machine fronts it, keep Open WebUI on loopback so clients cannot bypass the proxy: publish the port as `-p 127.0.0.1:3000:8080` in Docker, or run `open-webui serve --host 127.0.0.1`. See [`HOST`](/reference/env-configuration#host). Open WebUI also reaches Ollama from its backend, so Ollama's port `11434` does not need to be open to your users; see [Keep port 11434 off your network](/troubleshooting/connection-error#accessing-ollama-from-open-webui).
@@ -496,7 +498,7 @@ AUDIT_LOG_LEVEL=METADATA
 | Level | What is logged |
 |---|---|
 | `NONE` | Nothing (default) |
-| `METADATA` | User, IP, user agent, method, URL, timestamp, requested model |
+| `METADATA` | User, IP, user agent, method, URL, timestamp, requested model, response status code |
 | `REQUEST` | Metadata plus request body |
 | `REQUEST_RESPONSE` | Metadata plus request and response bodies |
 
@@ -507,6 +509,8 @@ AUDIT_LOG_LEVEL=METADATA
 ENABLE_AUDIT_LOGS_FILE=true
 AUDIT_LOGS_FILE_PATH=/app/backend/data/audit.log
 AUDIT_LOG_FILE_ROTATION_SIZE=10MB
+# Refuse to start when the audit log file cannot be opened
+ENABLE_AUDIT_LOGS_FILE_STARTUP_CHECK=true
 
 # Also send to stdout, useful for log aggregators
 ENABLE_AUDIT_STDOUT=true
@@ -518,24 +522,24 @@ MAX_BODY_LOG_SIZE=2048
 ### Path filtering
 
 ```bash
-# Only audit specific paths (whitelist mode)
+# Only audit specific paths (whitelist mode, list openai or ollama to audit those routes)
 AUDIT_INCLUDED_PATHS=auths,users,configs
 
 # Exclude specific paths (blacklist mode, default)
 AUDIT_EXCLUDED_PATHS=/chats,/chat,/folders
 ```
 
-Authentication endpoints (signin, signout, signup and the MFA endpoints) are always audited regardless of path exclusions. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, `secret`, `token`, `key` or `authorization` (or the plural, such as `tokens`), in any letter case, is masked in both request and response bodies. This includes lists of values and values cut off by the body size limit.
+The sign-in, sign-out, sign-up and MFA endpoints are always audited regardless of path exclusions. The LDAP sign-in endpoint carries no credential, so it is audited only when [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](/reference/env-configuration#enable_audit_anonymous_requests) is `true`. Requests under `/api/v1/auths` and `/oauth/` are recorded with their metadata only at every level, which keeps passwords, MFA codes and session tokens out of the log. Elsewhere, every field whose name ends in `password`, `secret`, `token`, `key` or `authorization` (or the plural, such as `tokens`), in any letter case, is masked in both request and response bodies. This includes lists of values and values cut off by the body size limit.
 
-Each entry has a `model_id` field with the model the client asked for. It is filled for chat and completion requests: `/api/chat/completions` (also served as `/api/v1/chat/completions`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, Messages and Responses requests under `/ollama`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](/reference/env-configuration#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its body too. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks` or a channel message that mentions a model, can record the model that was called. Other requests record `null`. `AUDIT_INCLUDED_PATHS` only matches routes under `/api/`, so with it set, requests under `/openai` and `/ollama` leave no audit entry. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is, so `METADATA` is enough to see who used which model. The default exclusions skip `/api/chat/completions`, the endpoint the chat interface uses. To record those requests, drop `/chat` from the list:
+Each entry has a `model_id` field with the model the client asked for. It is filled for chat, completion and embedding requests, namely `/api/chat/completions` (also served as `/api/v1/chat/completions`), `/api/embeddings` (also served as `/api/v1/embeddings`), the Anthropic-compatible `/api/v1/messages` (also served as `/api/message`), `/openai/chat/completions`, `/openai/responses` and the chat, completion, embedding, Messages and Responses requests under `/ollama`. Image generation and editing (`/api/v1/images/generations` and `/api/v1/images/edit`) and video generation (`/api/v1/videos/generations`) record the model as `<connection id>:<model>`. With [`ENABLE_OPENAI_API_PASSTHROUGH`](/reference/env-configuration#enable_openai_api_passthrough) on, every request forwarded to the provider under `/openai` records the `model` from its JSON body when the body has one. A request that makes Open WebUI call a model in turn, such as the task endpoints under `/api/v1/tasks`, can record the model that was called. Other requests record `null`. The field is written at every level and in full, whatever `MAX_BODY_LOG_SIZE` is, so `METADATA` is enough to see who used which model. The default exclusions skip `/api/chat/completions`, the endpoint the chat interface uses. To record those requests, drop `/chat` from the list.
 
 ```bash
 AUDIT_EXCLUDED_PATHS=/chats,/folders
 ```
 
-With chat requests recorded, every model reply to a `/api/chat/completions` request writes its own audit entry next to the entry for the request. When a reply calls tools, each round of the model's answer between tool calls gets one. Such an entry has the model that answered in `model_id` and the token counts the provider reported in `usage` (`input_tokens`, `output_tokens` and `total_tokens`). Its `extra.request_id` holds the `id` of the request's entry, which links the two. A reply whose provider reports no token counts writes none. Background tasks, such as title and tag generation, write none either.
+With chat requests recorded, every model reply to a `/api/chat/completions` request writes its own audit entry next to the entry for the request. When a reply calls tools, each round of the model's answer between tool calls gets one. Such an entry has the model that answered in `model_id` and the token counts the provider reported in `usage` (`input_tokens`, `output_tokens` and `total_tokens`). Its `extra.request_id` holds the `id` of the request's entry, which links the two. A reply whose provider reports no token counts writes none. Background tasks, such as title and tag generation, write an entry the same way, with the task name in `extra.task`.
 
-Within these filters, the audit log covers `POST`, `PUT`, `PATCH` and `DELETE` requests (add `GET` with [`ENABLE_AUDIT_GET_REQUESTS`](/reference/env-configuration#enable_audit_get_requests)) that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
+Within these filters, the audit log covers `POST`, `PUT`, `PATCH` and `DELETE` requests (add `GET` with [`ENABLE_AUDIT_GET_REQUESTS`](/reference/env-configuration#enable_audit_get_requests)) that carry a credential, plus the authentication endpoints above. A credential is an `Authorization` header (usually `Bearer`), the session cookie or an API key in the `x-api-key` header (renamed with [`CUSTOM_API_KEY_HEADER`](/reference/env-configuration#custom_api_key_header)). A request signed in with an API key is logged under the user who owns the key. A request with a wrong key is logged without a user. A sign-in or sign-up that starts a session is logged under the account that signed in. With two-factor sign-in on, the entry for the code step carries the account. Requests with no credential are skipped unless [`ENABLE_AUDIT_ANONYMOUS_REQUESTS`](/reference/env-configuration#enable_audit_anonymous_requests) is `true`, which has no effect while `AUDIT_LOG_LEVEL` is `NONE`. Socket.IO traffic is outside it on both transports, including the long-polling requests under `/ws/socket.io` that browsers use when [`ENABLE_WEBSOCKET_SUPPORT`](/reference/env-configuration#enable_websocket_support) is off.
 
 ---
 
@@ -659,7 +663,7 @@ ENABLE_FUNCTIONS=false
 ENABLE_TOOL_SERVERS=false
 ```
 
-This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers, Open Terminal connections, Tether terminals and Tether tool servers from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
+This is stronger than [Safe Mode](#safe-mode). Safe Mode deactivates all Functions but leaves the feature in place; `ENABLE_PLUGINS=false` hides the workspace **Tools** and admin **Functions** pages and stops Tools, Functions, OpenAPI and MCP tool servers, Open Terminal machines, Tether machines and Tether tool servers from loading or running. [`ENABLE_TOOLS`](/reference/env-configuration#enable_tools), [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) and [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) switch off one of those parts each. All four need a restart.
 
 ### Code execution
 

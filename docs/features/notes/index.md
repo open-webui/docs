@@ -57,6 +57,8 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | **Context injection** | Attach notes to any chat for full-fidelity context |
 | **Pages** | Split a note into pages and subpages |
 | **Attachments** | Files sit as blocks inside the page where you added them |
+| **Tags** | Tag notes in the notes list with the same tags as your chats, then filter the list by tag or show untagged notes |
+| **Folders** | Keep notes in a [folder](/features/chat-conversations/chat-features/conversation-organization#notes) next to that project's chats |
 | **Pin to sidebar** | Pin frequently used notes for quick access from the sidebar |
 | **Agentic access** | Models can search, read, and update notes autonomously |
 | **Export** | Download as `.txt`, `.md`, or `.pdf` |
@@ -72,7 +74,7 @@ Notes uses a context-aware **floating toolbar** for formatting:
 * **Drag-and-drop** list items to reorder
 * **Drag the handle** (⋮⋮) beside any top-level block to move it, or click it for **Move up** and **Move down**
 
-The top bar shows real-time **word and character counts**. The **microphone icon** offers **Record**, **Capture Audio** and **Upload Audio**. **Record** records your microphone. **Capture Audio** opens the browser's screen sharing dialog and records only the audio of what you pick to share there. The video is dropped and your own voice is not included, so use **Record** to capture your microphone. **Upload Audio** adds an audio file from your device. The recording is saved to the note as soon as it is uploaded, and its transcription finishes on the server.
+The top bar shows real-time **word and character counts**. The note's chat input records audio like the [chat input](/features/chat-conversations/chat-features). If you can edit the note, the recording is saved to it as soon as it is uploaded, and its transcription finishes on the server.
 
 :::info Rich Text in Chats
 This editor can also be enabled for standard chats: **Settings > Interface > Rich Text Input for Chat** and **Show Formatting Toolbar**.
@@ -211,6 +213,8 @@ Granting that reach is the **Access** button, at the top right beside the **More
 The same panel opens from the **⋯** menu of a note in the Notes list.
 
 Saving a note never changes who it is shared with.
+
+A note in a [shared folder](/features/chat-conversations/chat-features/conversation-organization#sharing-folders) is also open to everyone the folder is shared with, at their folder access. **Read** on the folder lets them read the note, and **Write** lets them edit it.
 
 People with access can work on a note at the same time and see each other's edits as they type, with each person's name shown above their cursor. The top bar shows the avatars of others who have the note open. Click one to jump to their page and cursor. Each user can have up to 20 note pages open for live editing at once, counted across all their browser tabs and devices. With [comments](/features/chat-conversations/chat-features/comments) on, anyone with access can discuss the note or a passage in it.
 

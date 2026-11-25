@@ -45,7 +45,7 @@ Without Docker (bare metal mode), the AI can run any command with your user's pe
 
 ## Always set a password
 
-An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the terminal. The server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set, and the CLI generates one when you don't supply your own. Set a strong key of your own rather than relying on the generated one.
+An API key gates all access: anyone who can reach the port and present the key can run commands, read files, and control the machine. The server refuses to start without a key: running `uvicorn` directly requires `OPEN_TERMINAL_API_KEY` to be set, and the CLI generates one when you don't supply your own. Set a strong key of your own rather than relying on the generated one.
 
 ```bash
 -e OPEN_TERMINAL_API_KEY=a-strong-password-here
@@ -72,11 +72,11 @@ Treat that generated value as a starting point, not a password. Replace it with 
 
 ## Use admin connections
 
-Add the Open Terminal connection as an admin. The API key stays hidden on the server, requests go through Open WebUI's backend and you control who has access.
+Add the machine as an admin. The API key stays hidden on the server, requests go through Open WebUI's backend and you control who has access.
 
-A terminal a user adds in Tether is reached through that user's own computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
+A machine a user adds in Tether is listed under **Your devices** and is reached through that user's own computer, see [Bring Your Own Models and Tools](/ecosystem/tether#bring-your-own-models-and-tools).
 
-![The Open Terminal connection in admin settings with the API key masked](/images/open-terminal-connection-masked-key.png)
+![Editing a machine in admin settings with its API key masked](/images/open-terminal-connection-masked-key.png)
 
 ---
 
@@ -234,7 +234,7 @@ Mounting the socket is not a narrow permission. It hands the container the same 
 
 When the agent starts a server, the [Browser tab](../use-cases/web-development.md#the-browser-tab) shows it inside a sandboxed frame. Scripts, forms, popups, modals and downloads are permitted, so an ordinary app behaves normally, but the frame is treated as a separate origin from Open WebUI by default, which keeps whatever is running in the terminal away from your session.
 
-**Settings > Interface > Terminal Preview Allow Same Origin** relaxes that, and it is off unless you turn it on. Switch it on only for something you wrote and trust that genuinely needs same-origin browser APIs, such as storage or cookies, and remember that the code being previewed is often code the agent has just written.
+**Settings > Interface > Machine Preview Allow Same Origin** relaxes that, and it is off unless you turn it on. Switch it on only for something you wrote and trust that genuinely needs same-origin browser APIs, such as storage or cookies, and remember that the code being previewed is often code the agent has just written.
 
 ## Multi-user mode is a workspace split
 
@@ -254,7 +254,7 @@ When users need to be protected from each other, give each one their own contain
 - [ ] Enable egress filtering if internet access isn't needed
 - [ ] Don't mount the Docker socket unless necessary
 - [ ] Use `slim` or `alpine` images if you don't need runtime package installs
-- [ ] Leave **Terminal Preview Allow Same Origin** off unless a preview genuinely needs it
+- [ ] Leave **Machine Preview Allow Same Origin** off unless a preview genuinely needs it
 - [ ] Give each user their own container when users must be protected from each other
 
 ## Related

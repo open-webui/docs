@@ -41,7 +41,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **Preload files (RAG)** | Retrieves file/knowledge chunks and injects them (with the RAG template) into the latest message on every turn | High: injected content changes per query |
 | **Citations** | With Native function calling, appends the source markers to the tool result that produced them, and the markers are saved with it. With Legacy, adds the sources with the RAG template to your message on every turn (to the system message with `RAG_SYSTEM_CONTEXT`) | None with Native, see the note below. High with Legacy |
 | **Memory** | With Native function calling, adds the recalled memories once per reply as a hidden `recall_memories` tool result after your message. Without it, appends them to your message on every turn | None with Native. High with Legacy: changes whenever memories change |
-| **"Using Entire Document"** | Injects a whole file into every message | Very high: but a **Preload files** sub-mode; only fires while Preload files is on |
+| **Full text** switch | Injects a whole file into every message | Very high: but a **Preload files** sub-mode; only fires while Preload files is on |
 | **Dynamic voice-mode prompt** | Prepends a short voice instruction to the system message | Low: constant while voice mode is on |
 | **Attachment metadata block** | Lists the files, knowledge bases, notes and chats attached to a message as metadata (ids and names) in that message | Low: stable as long as the attachments don't change |
 | **Attached knowledge list** | With Native function calling, lists the knowledge attached to the model or folder once per reply as a hidden `list_attached_knowledge` tool result after your message. Skipped when there is nothing to list | None: saved with the reply and replayed unchanged |
@@ -49,7 +49,7 @@ Open WebUI can insert content dynamically on each turn. Anything that changes th
 | **Open Terminal skills** | Adds terminal skills to the skills list, which with Native function calling is a hidden `list_available_skills` tool result once per reply (skipped when there are no skills). With Legacy, only the skills you select are written into the system message | Changes only the tail of the request the turn a skill is added or removed. The tool list changes only when the first skill appears or the last one goes, since the skill tools are offered while at least one skill is listed |
 | **Open Terminal working directory** | Writes the terminal's current working directory into the command tool's instructions on every turn | Changes the tool list whenever the working directory changes. Turn off the connection's [Working Directory Context](/features/open-terminal/setup/connecting#working-directory-context) to keep it stable |
 | **Open Terminal user shell tools** | By default, adds the two tools for your own shell only while that shell is open | Changes the tool list when you open or close the shell. Set the connection's [User Shell Tools](/features/open-terminal/setup/connecting#user-shell-tools) to `Always Include` to keep it stable |
-| **[Tool Search](/features/extensibility/plugin/tools#tool-search)** | Adds a fixed `<available_tools>` instruction at the end of the system message, leaves large tools out of the tool list and adds `search_tools` and `call_tool` to it. The model loads a tool's full definition through a tool call and runs it through `call_tool` | Low: the instruction and the tool list only change when the set of enabled tools changes. Loading a tool keeps the tool list as it was |
+| **[Tool Search](/features/extensibility/plugin/tools#tool-search)** | Adds a fixed `<available_tools>` instruction at the end of the system message, leaves large tools out of the tool list and adds `search_tools` and `call_tool` to it. The model loads a tool's full definition through a tool call and runs it through `call_tool` | Low: the instruction and the tool list only change when the set of enabled tools changes. Loading a tool keeps the tool list as it was. With [`TOOL_SEARCH_LIST_TOOLS`](/reference/env-configuration#tool_search_list_tools) on (the default), the list of deferred tools in the instruction also changes the prefix whenever that set changes |
 
 :::info
 The attachment metadata block is intentionally **metadata only** (no file content), so it stays stable across turns and does not meaningfully hurt caching. The content-injecting rows above are the ones to watch.
@@ -113,8 +113,8 @@ Turning Preload files off also re-routes any knowledge bases or notes attached t
 A **chat folder** attached with `#` or dragged into the input only reaches the model through Preload files, which retrieves from the folder's attached knowledge. With Preload files off, attach the folder's knowledge bases and files with `#` directly, or start the chat inside the folder, where its knowledge goes through the knowledge tools.
 :::
 
-:::info "Using Entire Document" is a Preload files sub-mode
-The per-file/per-knowledge **Using Entire Document** mode injects a complete document into every message, the heaviest cache-breaker of all. But it runs **inside** Preload files, so turning Preload files off (this step) **already disables it**, enabling Using Entire Document while Preload files is off does nothing. Just don't re-enable Preload files + Using Entire Document as a retrieval workaround; use on-demand tools instead. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
+:::info The Full text switch is a Preload files sub-mode
+The per-file and per-knowledge **Full text** switch injects a complete document into every message, the heaviest cache-breaker of all. But it runs **inside** Preload files, so turning Preload files off (this step) **already disables it**. Switching on **Full text** while Preload files is off does nothing. Keep Preload files off and use on-demand tools for retrieval. See [Retrieval Modes](/features/workspace/knowledge#retrieval-modes).
 :::
 
 ### 3. Turn Citations off and move citation rules into the system prompt
@@ -198,7 +198,7 @@ In every case the requirement is the same: **don't rewrite the beginning of the 
 Set on the model, under **Settings > Models** (admin section), click the pencil (**Edit**), then **Features** and **Builtin Tools**:
 
 - [ ] Static system prompt (no per-turn regeneration)
-- [ ] **File Upload** on, **Preload files** off, no automatic content injection (this also disables "Using Entire Document") **and** it is what injects the Files tools
+- [ ] **File Upload** on, **Preload files** off, no automatic content injection (this also disables the **Full text** switch) **and** it is what injects the Files tools
 - [ ] Optional: **Citations** off, citation rules moved into the system prompt
 - [ ] **Builtin Tools** on, with the **Files**, **Knowledge Base**, **Notes** and **Chat History** categories left enabled
 - [ ] Function calling set to **Native** (builtin tools do not exist in Legacy mode)
