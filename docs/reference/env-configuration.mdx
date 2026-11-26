@@ -867,6 +867,7 @@ On weak hardware (Raspberry Pi, tiny VPS, containers capped at about 250m CPU or
   - **`True` (Default):** Values saved in the **database** (via the Admin UI) take precedence. If a value is set in the UI, the environment variable is ignored for that setting.
   - **`False`:** **Environment variables** take precedence. The system will *not* load configuration from the database at startup if an environment variable is present (or it will use the default).
     - **CRITICAL WARNING:** When set to `False`, you can still seemingly "change" settings in the Admin UI. These changes will apply to the **current running session** but **will be lost upon restart**. The system will revert to the values defined in your environment variables (or defaults) every time it boots up.
+    - **Multiple workers or replicas:** A change saved in the Admin UI is kept in the memory of the one process that handled the save. With [`UVICORN_WORKERS`](#uvicorn_workers) above `1`, or with more than one replica, the other processes keep their previous value, so requests can get either value until the next restart. Redis does not share these changes. To change a setting on every instance, set its environment variable instead.
     - **Use Case:** Set this to `False` if you want to strictly manage configuration via a `docker-compose.yaml` or `.env` file and prevent UI changes from persisting across restarts.
 
 #### `CUSTOM_NAME`
