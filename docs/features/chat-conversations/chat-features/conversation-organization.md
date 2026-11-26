@@ -24,7 +24,7 @@ Create a new folder to organize your conversations:
 2. Enter a name for your folder.
 3. Click **Save**.
 
-To work on a project that lives on a machine, choose **Open directory** in the same menu. Pick the machine if you have several, browse to the project's directory or [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new one, then click **Use this directory**. Open WebUI creates a folder named after the directory, with its [machine and working directory](#default-machine-and-working-directory) set, and opens it.
+To work on a project that lives on a machine, choose **Open directory** in the same menu. Pick the machine if you have several, browse to the project's directory or [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new one, then click **Use this directory**. Open WebUI opens the folder you already have on that directory, or creates one named after it with its [machine and working directory](#default-machine-and-working-directory) set.
 
 ### Moving Conversations into Folders
 
@@ -96,7 +96,7 @@ Open **Display options** (the sliders icon beside search and filter) to pick a *
 - **List** shows one row per chat. **Grouping** splits it into collapsible groups by **Status**, **Priority**, **Tags** or **Activity**, or leaves it as one list with **None**. Empty groups stay hidden until you turn on **Show empty groups**.
 - **Board** shows each chat as a card. **Columns** picks **Status**, **Priority**, **Tags** or **Activity** for the columns, and **Rows** adds horizontal lanes from one of the others. With statuses as columns the board works like a kanban view.
 
-**Ordering** sorts by **Updated**, **Title** or **Priority**, ascending or descending. Your layout, grouping, columns, rows and ordering are remembered in your browser, while filters start empty on every visit.
+**Ordering** sorts by **Updated**, **Title** or **Priority**, ascending or descending. Your layout, grouping, columns, rows, ordering and collapsed groups are remembered in your browser, while filters start empty on every visit.
 
 **Activity** tells you what a chat is doing right now: **Unread** (changed since you last opened it), **Generating**, **Waiting for approval** (paused on a tool approval) and **Read**. Rows and cards mark the first three with a dot or spinner, so a chat that needs you stands out.
 
@@ -112,7 +112,7 @@ A status says where a chat stands, for example **In progress** or **Done**. Fold
 
 Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Earlier time spent in the same status counts toward it.
 
-Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging. It also adds and deletes statuses. Chats in a deleted status go back to **No status**.
+Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging, including where **No status** sits. It also adds and deletes statuses. On a board with statuses as columns, you can also drag a column's header to reorder the statuses. Chats in a deleted status go back to **No status**.
 
 A chat can also get a priority (**Urgent**, **High**, **Medium** or **Low**) from the priority icon on the chat, with the same permissions as statuses.
 
