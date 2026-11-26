@@ -83,6 +83,8 @@ Once created, the external source appears in **Workspace > Knowledge** like any 
 
 With [Retrieval Query Generation](/reference/env-configuration#enable_retrieval_query_generation) on, all generated queries run at the same time. Their results are merged by rank (the top result of each query, then the second of each, and so on), duplicates are dropped and the list is cut to the result count.
 
+To improve the order, turn on **Rerank results** under **Advanced** on the connection. Each query's results are then rescored with the reranking model from the **Documents** settings, results below the relevance threshold are dropped, and the merged list is sorted by that score.
+
 In the sources under an answer, each result is listed by its title. For Qdrant, Milvus and pgvector, when a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
 
 :::info Embedding model must match
