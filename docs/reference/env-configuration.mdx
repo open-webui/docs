@@ -6007,8 +6007,8 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `YOUTUBE_LOADER_PROXY_URL`
 
 - Type: `str`
-- Default: unset (requests come from the server's own address)
-- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
+- Default: unset (requests go through `HTTPS_PROXY` when it is set, otherwise from the server's own address)
+- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS, and it takes precedence over `HTTPS_PROXY` for these requests. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Youtube Proxy URL** (admin section).
 
 #### `YOUTUBE_LOADER_LANGUAGE`

@@ -79,7 +79,7 @@ The selected machine name appears next to the cloud icon. The AI can now execute
 
 Hover over a machine in the menu, click its **More** button and choose **System info** to see the CPU, memory, disk and network use, the uptime and the top processes it reports. The view refreshes every 5 seconds while it is open. For a machine with a separate instance per chat, **System info** appears once the chat is saved.
 
-Shells and commands keep running after you leave the chat that started them. **Sessions** in the same menu lists the ones you have running on the machine across all your chats, each with the chat it belongs to. Click the chat to open it, or stop a shell or command from the list.
+Shells and commands keep running after you leave the chat that started them. **Sessions** in the same menu lists the ones you have running on the machine across all your chats, each with the chat it belongs to. Click the chat to open it, or stop a shell or command from the list, or all of them with **Stop all**.
 
 ### 8. Enable native function calling
 
