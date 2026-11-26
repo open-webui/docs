@@ -89,6 +89,8 @@ The check is the same in all three places a chat is given a folder: creating a c
 
 Click a folder in the sidebar and its page shows every chat in it, laid out like a small project tracker. It suits folders that collect more than a handful of conversations, such as a research project, a queue of requests or a weekly report, where you want to see what is finished, what is waiting and what needs your attention. In a folder shared with you the page works the same way, and what you can change depends on your access.
 
+A folder with a [machine](#default-machine-and-working-directory) you can use also has a **Files** section in the switch at the top of the page, which browses the folder's working directory, and the page opens on it. The page reopens on the section and directory you left it on. The sidebar shows the machine's name next to such a folder.
+
 ### List and Board
 
 Open **Display options** (the sliders icon beside search and filter) to pick a **Layout**.
@@ -234,6 +236,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Write access covers the folder page.** People with write access can set the status and priority of every chat in the folder and change the folder's statuses, and people with read access can see the statuses. See [The Folder Page](#the-folder-page).
 - **Automations can post into a shared folder.** Anyone with write access can create one there, and everyone who can write to the folder can pause it. See [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, or with **Read** access only, use **Clone Chat** or **Fork chat** to continue a chat in your own chats. See [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
+- **The folder's machine is not shared with it.** When some people you share with cannot use the folder's machine, the **Access** dialog says so. They see the folder's chats but not its files.
 - **Folders cannot be shared publicly**, by admins either. Sharing is always to specific users or groups.
 
 ![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)

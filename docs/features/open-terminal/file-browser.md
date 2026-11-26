@@ -230,7 +230,7 @@ When the machine supports Git, the **Open folder** dialog and the folder picker 
 
 The Git panel lets you review, commit and publish what the AI changed in a project, and, for GitHub repositories, work through issues and pull requests without leaving the chat. Use it when the AI works on a code project on your machine: check its changes, commit them, then hand it the next issue in one click that fills the message input for you to review and send. Anyone who uses a machine with a Git repository can use it.
 
-When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand.
+When the folder open in the file browser is inside a Git repository, a **Git** panel sits at the bottom of the Files tab. It needs tool servers turned on and an Open Terminal that supports Git. Click it to expand. To give it a whole tab, click **Open in tab** on the panel, or pick **Git** in the tab bar's **+** menu (`Ctrl+Shift+G`) when the working folder is inside a repository.
 
 - **Changes**: unified or split diffs and **Hide whitespace**. Stage, unstage or discard files, commit with a summary and description, and **Undo last commit**.
   **Discard changes** works for staged, unstaged and new files. Pick several changed files with **Ctrl** or **Shift**-click (**Cmd** on macOS) to discard them together, or use **Discard all changes** in the Changes menu. It drops all changes to a file after a confirmation, and deletes a file that is not in the last commit.

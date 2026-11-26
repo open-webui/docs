@@ -287,6 +287,8 @@ With the default Chroma vector database, resetting the vector storage removes ev
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
 
+When a source has several paragraphs, the model sees each one numbered, such as `[1#4]`, and can cite the exact paragraph a statement comes from. Clicking that citation opens the file where the paragraph is and highlights the sentences that match the answer. A plain `[1]` cites the source as a whole. Files the model reads with the file tools are numbered the same way. The default [`RAG_TEMPLATE`](/reference/env-configuration#rag_template) tells the model how to cite paragraphs, so keep that instruction in a custom template.
+
 ## Preload files vs Builtin Tools
 
 Open WebUI provides two separate capabilities that control how files are handled. Understanding the difference is important for configuring models correctly.
