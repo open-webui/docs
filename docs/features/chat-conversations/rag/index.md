@@ -29,7 +29,9 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input.
 
-Click a source under an answer that comes from an uploaded file to open the file in its own tab beside the chat, at the cited page when it is known. The preview highlights the cited text, except on PowerPoint slides, which show as images. In document previews, hovering a highlight shows the passage the model was given. Plain text and code files show it only when the source has a relevance score. Web pages, files the preview cannot show such as `.doc` or `.epub`, and sources in a read-only shared chat open their retrieved text in a popup.
+Click a source under an answer that comes from an uploaded file to open the file in its own tab beside the chat, at the cited page when it is known. The preview highlights the cited text, except on PowerPoint slides, which show as images. In document previews, hovering a highlight shows the passage the model was given. Plain text and code files show it only when the source has a relevance score. Web pages, notes, chats, files the preview cannot show such as `.doc` or `.epub`, and sources in a read-only shared chat open their retrieved text in a popup.
+
+Rest the pointer on a citation marker in an answer to see a card with the source's title, its address or page number, and the start of the cited passage. When a marker cites several sources, the left and right arrow keys move between them.
 
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
@@ -287,6 +289,8 @@ With the default Chroma vector database, resetting the vector storage removes ev
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
 
+In a saved chat, each source keeps its citation number for the whole conversation. A document cited as `[3]` in one answer is still `[3]` in later answers, and a new source takes the next free number.
+
 ## Preload files vs Builtin Tools
 
 Open WebUI provides two separate capabilities that control how files are handled. Understanding the difference is important for configuring models correctly.
@@ -399,6 +403,8 @@ The `external`, `tika` and `docling` extraction engines parse `.csv` files thems
 ## Google Drive Integration
 
 When paired with a Google Cloud project that has the Google Picker API and Google Drive API enabled, this feature allows users to directly access their Drive files from the chat interface and upload documents, slides, sheets and more and uploads them as context to your chat. Can be enabled `Settings` > `Documents` (admin section) menu. Must set [`GOOGLE_DRIVE_API_KEY and GOOGLE_DRIVE_CLIENT_ID`](/reference/env-configuration) environment variables to use.
+
+You can select several files in the picker at once. When a limit on files per chat is set ([`RAG_FILE_MAX_COUNT`](/reference/env-configuration#rag_file_max_count)), the picker allows only as many files as still fit. If a file fails to download, the others are still attached and an error is shown for the one that failed.
 
 ### Detailed Instructions
 

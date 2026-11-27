@@ -15,11 +15,11 @@ Open WebUI supports image generation and editing through the **OpenAI APIs**, an
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, go to **Settings** > **Images** (admin section) and add a connection.
+1. In Open WebUI, go to **Settings** > **Images & Videos** (admin section) and add a connection.
 2. Set **Connection Type** to **OpenAI compatible**, **URL** to `https://api.openai.com/v1`, and enter your API key.
 3. Leave **Model IDs** empty to use `gpt-image-2`, or add the models you want to offer, such as `gpt-image-1.5`.
 4. Optionally open **Advanced** and set **Image Size**. GPT-Image models accept `auto`, `1024x1024`, `1536x1024` or `1024x1536`.
-5. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
+5. Click **Access**, choose who may use the connection, and click **Save**. Without a grant, only admins can use the connection.
 
 ### Azure OpenAI
 

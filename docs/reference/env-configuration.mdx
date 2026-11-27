@@ -970,7 +970,7 @@ With `*`, any client that reaches the backend directly can set its own address i
 
 - Type: `int` (bytes)
 - Default: unset (no limit)
-- Description: Maximum length, in bytes, of an inline `data:image/...;base64,...` profile image. The shared profile-image validator rejects a longer data URI on save, and it applies to both user avatars and model icons. Use it to bound the Postgres/Redis bloat (and the slower model-list responses) that oversized inline images cause. Only `data:` URIs are limited; `http(s)` avatar URLs and the built-in static paths are unaffected. The limit counts the base64-encoded string, which is about a third larger than the raw image, so `262144` (256 KiB) corresponds to roughly 190 KiB of actual image. Unset (the default) leaves inline images uncapped. **Read once at startup, not a `ConfigVar`, so it cannot be changed from the Admin UI.**
+- Description: Maximum length, in bytes, of an inline `data:image/...;base64,...` profile image. The shared profile-image validator rejects a longer data URI on save, and it applies to both user avatars and model icons sent as a `data:` URI. A picture chosen in the model editor is stored as a file, so this limit does not apply to it. Use it to bound the Postgres/Redis bloat (and the slower model-list responses) that oversized inline images cause. Only `data:` URIs are limited; `http(s)` avatar URLs and the built-in static paths are unaffected. The limit counts the base64-encoded string, which is about a third larger than the raw image, so `262144` (256 KiB) corresponds to roughly 190 KiB of actual image. Unset (the default) leaves inline images uncapped. **Read once at startup, not a `ConfigVar`, so it cannot be changed from the Admin UI.**
 
 #### `CHAT_RESPONSE_STREAM_DELTA_CHUNK_SIZE`
 
@@ -2156,13 +2156,13 @@ Older name of [`MACHINE_CONNECTIONS`](#machine_connections).
 
   Note: do **not** add `allow-same-origin` to the `sandbox` directive. That keyword nullifies the origin-isolation that makes the sandbox effective against `localStorage` exfiltration. The example above intentionally omits it.
 
-### Autocomplete
-
-#### `ENABLE_AUTOCOMPLETE_GENERATION`
-
 #### `TERMINAL_PROXY_HEADERS`
 
 Older name of [`MACHINE_PROXY_HEADERS`](#machine_proxy_headers).
+
+### Autocomplete
+
+#### `ENABLE_AUTOCOMPLETE_GENERATION`
 
 - Type: `bool`
 - Default: `False`
@@ -3828,7 +3828,7 @@ Open WebUI's Qdrant client is compatible with Qdrant servers 1.19 to 1.21. Serve
 
 - Type: `bool`
 - Default: `False`
-- Description: Use gPRC interface whenever possible.
+- Description: Use the gRPC interface whenever possible. The gRPC connection uses TLS when [`QDRANT_URI`](#qdrant_uri) starts with `https://` and plain text when it starts with `http://`.
 
 :::info
 
@@ -4427,7 +4427,7 @@ Open WebUI posts to the `/marker` endpoint, which Datalab's API reference now ma
 
 - Type: `str`
 - Default: `local`
-- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x, 4.0 or 4.1 and uses the matching interface, so all three work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key).
+- Description: `local` sends each file to a self-hosted MinerU server at [`MINERU_API_URL`](#mineru_api_url) and waits for the result. Open WebUI detects whether that server runs MinerU 3.x, 4.0 or 4.1 and uses the matching interface, so all three work. `cloud` uses MinerU's managed service, which uploads files in batches and polls for results, and requires [`MINERU_API_KEY`](#mineru_api_key). For PDFs, Open WebUI uses MinerU's page data to split the text by page, so citations show the page number and open the PDF at that page. A self-hosted MinerU 4.0 server returns each file as one document, so its citations carry no page number. Page numbers are set when a file is extracted, so files extracted before v0.13.5 have none until they are processed again.
 - Persistence: This environment variable is a `ConfigVar` variable.
 
 #### `MINERU_API_URL`
@@ -6484,7 +6484,7 @@ Strictly return in JSON format:
 
 ### Image Creation
 
-Image backends are image connections in **Admin Settings > Images**, see [Image Generation and Editing](/features/chat-conversations/image-generation-and-editing#set-up-a-connection).
+Image backends are image connections in **Admin Settings > Images & Videos**, see [Image Generation and Editing](/features/chat-conversations/image-generation-and-editing#set-up-a-connection).
 
 #### `IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN`
 

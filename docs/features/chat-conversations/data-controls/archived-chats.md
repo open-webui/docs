@@ -13,6 +13,8 @@ Open WebUI allows you to archive conversations to declutter your sidebar while p
 
 Archived chats used to sit behind a **Manage** button on the **Data Controls** tab. They now have a tab of their own in the same **Data** group.
 
+You can also list archived chats in the sidebar. Open the **More** menu in the **Chats** section header and set **Status** to **Archived** or **All**. **Unarchive** in an archived chat's three-dot menu restores it.
+
 ## Dashboard Features
 
 The **Archived Chats** view provides tools to manage your archived conversations:

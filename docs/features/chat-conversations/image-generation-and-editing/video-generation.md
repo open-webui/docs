@@ -29,7 +29,7 @@ A connection is one provider with a video API. Three kinds work:
 | **Video Size** and **Video Length** | Defaults sent with each request, for example `1280x720` and `8` seconds. |
 | **API Version** | An API version query for the provider. Not used with OpenRouter. |
 | **Additional Parameters** | Extra JSON passed through to the provider with every request. |
-| **Access Control** | Which users and groups may use the models of this connection. |
+| **Access** | Which users and groups may use the models of this connection. |
 
 Open WebUI waits up to 15 minutes for a video and checks its progress every 5 seconds. Both can be changed with [`VIDEO_GENERATION_TIMEOUT`](/reference/env-configuration#video_generation_timeout) and [`VIDEO_GENERATION_POLL_INTERVAL`](/reference/env-configuration#video_generation_poll_interval).
 
@@ -52,7 +52,7 @@ Each request fills the mapped nodes. Anything you leave unmapped keeps the value
 | **Length** | `length` | The number of frames, when **Video Length** is set. |
 | **Fps** | `fps` | The **Frame Rate** of the connection, when you set one. |
 
-Length is a frame count, the seconds of **Video Length** times the frame rate. The frame rate is the **Frame Rate** of the connection if you set one, else the value of the workflow's mapped **Fps** node, else 24. Leave **Model IDs** empty to use the model the workflow already loads. To pick from the models on the ComfyUI server, click **Verify Connection**, add the models to **Model IDs** and map a **Model** node.
+Length is a frame count: the seconds of **Video Length** times the frame rate, rounded to the nearest multiple of 8 plus 1, which is the length video models expect. For example, 8 seconds at 24 frames per second sends 193 frames. The frame rate is the **Frame Rate** of the connection if you set one, else the value of the workflow's mapped **Fps** node, else 24. Leave **Model IDs** empty to use the model the workflow already loads. To pick from the models on the ComfyUI server, click **Verify Connection**, add the models to **Model IDs** and map a **Model** node.
 
 ## Create a video in chat
 

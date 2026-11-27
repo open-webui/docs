@@ -23,11 +23,11 @@ Generate and edit images from a prompt without leaving the chat, using a local o
 
 ## Set up a connection
 
-1. Open **Admin Panel** > **Settings** > **Images** and switch on **Image Generation**, **Image Edit** or both.
+1. Open **Admin Panel** > **Settings** > **Images & Videos** and switch on **Image Generation**, **Image Edit** or both.
 2. Under **Manage Image Connections**, click **+** (Add Connection).
 3. Pick the **Connection Type**, enter a **Name** and the **URL** (plus the key if the backend needs one), and click the verify icon next to the URL to check the server.
 4. Under **Capabilities**, keep **Generate**, **Edit** or both on. Only capabilities the backend supports can be switched on: AUTOMATIC1111 handles generation only, and a ComfyUI connection needs the matching workflow.
-5. Set **Access Control** to the users who may use the connection, then click **Save**.
+5. Click **Access** and choose the users who may use the connection, then click **Save**.
 
 | Connection Type | Use it for | Edit support |
 |---|---|---|
@@ -39,7 +39,7 @@ Generate and edit images from a prompt without leaving the chat, using a local o
 A server that offers both generating and editing needs only one connection. OpenAI compatible connections have the same authentication choices as model connections, plus custom **Headers**.
 
 :::warning Access Control decides who can use a connection
-A new connection is private to administrators until you share it. Set **Access Control** to the users or groups that may use its models, or make it public for everyone. Users without access never see its models.
+A new connection is private to administrators until you share it. Click **Access** and pick the users or groups that may use its models, or make it public for everyone. Users without access never see its models.
 :::
 
 ## Models

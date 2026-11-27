@@ -78,7 +78,7 @@ A folder's three-dot menu also has **New Chat**, which opens the folder the same
 
 Each folder in the sidebar is a link to its own page, so a middle click or Ctrl/Cmd click opens the folder in a new tab.
 
-A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. The new chat page lists your folders with work in progress under **Continue**, meaning a chat that is running or waiting for your approval, or tabs left open, so you can pick up where you left off.
+A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. The new chat page lists your folders with work in progress under **Continue**, meaning a chat that is running or waiting for your approval, or tabs left open, so you can pick up where you left off. It shows up to three folders: those waiting for your approval first, then those with a chat running, then the most recently used.
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
 
@@ -113,7 +113,7 @@ Click the status icon at the start of a chat to pick a status, or drag its card 
 
 Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging. It also adds and deletes statuses. Chats in a deleted status go back to **No status**.
 
-A chat can also get a priority (**Urgent**, **High**, **Medium** or **Low**) from the priority icon on the chat, with the same permissions as statuses.
+A chat can also get a priority (**Urgent**, **High**, **Medium** or **Low**) from the priority icon on the chat, or by dragging its card on a board whose columns or rows are set to **Priority**, with the same permissions as statuses. On a board with **Status** columns and **Priority** rows, or the reverse, one drag sets both. **Show priority** in the display options shows or hides the priority icon.
 
 ### Tags
 

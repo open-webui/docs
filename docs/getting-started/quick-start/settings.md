@@ -50,6 +50,8 @@ User Settings control personal preferences: your default model, interface theme,
 
 **Theme** and **Language** under **Settings > General** are saved in the browser, not in your account, so they do not follow you to another browser or device. A browser that has not opened Open WebUI before starts on the **System** theme and on the language set by [`DEFAULT_LOCALE`](/reference/env-configuration#default_locale), or the browser's own language when the admin has not set one.
 
+**Colors**, below **Theme**, sets a **Background** and a **Text** color for the mode you are in, and Open WebUI mixes the rest of the interface colors from those two. Light and dark mode each keep their own pair, and **Reset** returns the current mode to the standard colors. These colors are saved in the browser too. The **OLED Dark** theme is gone. A browser that used it now shows **Dark** with a black background set under **Colors**.
+
 ---
 
 ## How They Work Together

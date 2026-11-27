@@ -24,13 +24,13 @@ Alternatively, if you are using Vertex AI, you can create an API key in Google C
 
 ### Configuring Open WebUI
 
-1. In Open WebUI, go to **Settings** > **Images** (admin section) and add a connection.
+1. In Open WebUI, go to **Settings** > **Images & Videos** (admin section) and add a connection.
 2. Set **Connection Type** to **Gemini**.
 3. Set **URL** to `https://generativelanguage.googleapis.com/v1beta`.
 4. Enter your Google AI Studio [API key](https://aistudio.google.com/api-keys).
 5. Under **Model IDs**, add the model you wish to use, either an [Imagen model](https://ai.google.dev/gemini-api/docs/imagen#model-versions) or a [Gemini model](https://ai.google.dev/gemini-api/docs/image-generation).
 6. Open **Advanced** and set **Endpoint Method** to match that model: `predict` for Imagen, `generateContent` for Gemini.
-7. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
+7. Click **Access**, choose who may use the connection, and click **Save**. Without a grant, only admins can use the connection.
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';

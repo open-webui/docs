@@ -64,6 +64,8 @@ curl -X POST https://open-webui.example.com/api/v1/models/model/delete \
 
 **Background images travel as data.** A model's background is stored as a file on the instance, so `export` reads that file and puts it in the record as `background_image_data`, a `data:image/...;base64,...` URI, leaving `meta.background_image_url` null. `import` reverses it: the data URI is decoded, re-uploaded as a file on the target instance and the fresh file URL written back into `meta`. That keeps an exported model portable between instances. Two consequences worth knowing when scripting: exporting a model whose background file has gone missing fails the whole request with `400`, and an image that breaks the limits (5 MiB, 25 megapixels, PNG/JPEG/WebP/GIF) is rejected on import.
 
+**Profile pictures travel as data too.** When `meta.profile_image_url` points at a file on the instance, `export` replaces it with a `data:image/...;base64,...` URI. If that file cannot be read, the picture is exported as `null` and the request still succeeds.
+
 **Voice avatars travel as references.** A [voice avatar](/features/chat-conversations/chat-features/voice-mode#voice-avatars) and its animations stay files on the source instance, and the export only carries their file IDs. Importing or syncing a model whose avatar or animation files are missing or not accessible on the target instance fails with `403` (`Avatar or animation file is not accessible. Upload it again.`). Upload the avatar on the target instance first.
 
 **Version-controlled, code-driven workflow:**
