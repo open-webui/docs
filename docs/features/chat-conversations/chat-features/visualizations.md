@@ -19,7 +19,13 @@ Visualizations are off by default. Turn them on per model in the model editor, u
 
 ## Change the Instructions
 
-The instructions the model receives for the tool decide when and how it draws. Admins can rewrite them in **Settings > Interface > Visualization Prompt** (admin section) or with [`VISUALIZATION_PROMPT_TEMPLATE`](/reference/env-configuration#visualization_prompt_template). An empty value uses the default.
+The instructions the model receives for the tool decide when and how it draws. Admins can rewrite them in the **Visualization Prompt** field, the last field of the **Tools** section in **Settings > Interface** (admin section), or with [`VISUALIZATION_PROMPT_TEMPLATE`](/reference/env-configuration#visualization_prompt_template). An empty value uses the default. The field is on the admin **Interface** tab only. The personal **Interface** tab does not have it.
+
+## If Nothing Renders
+
+- Check that **Visualizations** is on for the model you are chatting with. It is off by default, and each model has its own switch.
+- Check that the model uses native function calling and has the **Builtin Tools** capability.
+- The feature draws only when the model calls `render_visualization`. SVG or HTML that the model writes as plain text in its reply is not a visualization.
 
 ## Isolation and Security
 
