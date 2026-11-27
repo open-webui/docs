@@ -109,7 +109,7 @@ To rename or recolor your Personal calendar or one you created, hover it in the 
 
 ### Create an Event
 
-1. Click **New Event** (sidebar or top bar) or click any day/hour cell on the calendar grid
+1. Click **New Event** (sidebar or top bar) or click an hour in week or day view
 2. Fill in the event details:
    - **Title** (required)
    - **Calendar**: which calendar to add the event to
@@ -119,7 +119,7 @@ To rename or recolor your Personal calendar or one you created, hover it in the 
    - **Description** (optional)
 3. Click **Create**
 
-**New Event** opens the form on today's date, starting at the current time and ending an hour later. Both come from your own clock, so opening the form late in the evening or early in the morning still gives you today rather than tomorrow or yesterday. Opening the form by clicking the grid prefills that slot instead: the hour you clicked in week and day view, 09:00 in month view.
+**New Event** opens the form on today's date, starting at the current time and ending an hour later. Both come from your own clock, so opening the form late in the evening or early in the morning still gives you today rather than tomorrow or yesterday. Clicking an hour in week or day view opens the form on that hour instead, for example 09:00 to 10:00. Clicking a day in month view, or a day's header in week view, opens that day in day view.
 
 ### Edit or Delete an Event
 
