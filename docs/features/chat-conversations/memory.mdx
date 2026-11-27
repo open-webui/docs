@@ -73,6 +73,17 @@ Each memory has a **type** and an optional **path**:
 
 These are set automatically by the memory tools; you do not need to assign them manually.
 
+## Folder Memory
+
+A memory saved in a chat that sits in a [folder](/features/chat-conversations/chat-features/conversation-organization) belongs to that folder. Chats in the folder get the folder's memories together with your account memories, and chats outside it never see them. That keeps project details, such as a client's conventions or a codebase's quirks, out of your other conversations.
+
+To manage them, open the folder's **Edit** dialog and pick **Personalization**. It lists the folder's memories, adds new ones with **Add Memory** and has a **Memory** setting:
+
+- **Default**: the folder's chats use the folder's memories and your account memories.
+- **Folder only**: the folder's chats use only the folder's memories. Their chat search tools look only at the folder's own past chats, and chats elsewhere cannot look up the folder's chats.
+
+Folder memories are your own, also in a folder shared with you. **Settings > Personalization > Memory** lists them along with your account memories, each with its folder's name. Deleting a folder deletes its memories.
+
 ## Benefits of the Memory System
 
 -   **Proactive Learning**: Instead of you manually typing preferences, a model can say: *"I'll remember that you prefer dark mode for your UI projects"* and call `add_memory` behind the scenes.

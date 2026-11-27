@@ -127,6 +127,8 @@ Click any event on the calendar to open the event editor. From there you can upd
 
 Clicking one occurrence of a repeating event opens the whole series, dated from its first occurrence. **Save** changes every occurrence, and **Delete** removes the series.
 
+To move a single event, drag it to another day, or in week and day view to another time, in 15-minute steps. Repeating events move through the editor.
+
 ---
 
 ## Calendar Views

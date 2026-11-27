@@ -20,10 +20,11 @@ Folders are enabled by default. Administrators can control this feature via:
 
 Create a new folder to organize your conversations:
 
-1. In the **sidebar**, click the **+ button** on the Folders section header.
-2. Select **"New Folder"**.
-3. Enter a name for your folder.
-4. Click **Save**.
+1. In the **sidebar**, click the **+ button** on the Folders section header. When a machine is available to you, it opens a menu. Select **New Folder** there.
+2. Enter a name for your folder.
+3. Click **Save**.
+
+To work on a project that lives on a machine, choose **Open directory** in the same menu. Pick the machine if you have several, browse to the project's directory or [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new one, then click **Use this directory**. Open WebUI opens the folder you already have on that directory, or creates one named after it with its [machine and working directory](#default-machine-and-working-directory) set.
 
 ### Moving Conversations into Folders
 
@@ -88,6 +89,8 @@ The check is the same in all three places a chat is given a folder: creating a c
 
 Click a folder in the sidebar and its page shows every chat in it, laid out like a small project tracker. It suits folders that collect more than a handful of conversations, such as a research project, a queue of requests or a weekly report, where you want to see what is finished, what is waiting and what needs your attention. In a folder shared with you the page works the same way, and what you can change depends on your access.
 
+A folder with a [machine](#default-machine-and-working-directory) you can use also has a **Files** section in the switch at the top of the page, which browses the folder's working directory, and the page opens on it. The page reopens on the section and directory you left it on. The sidebar shows the machine's name next to such a folder.
+
 ### List and Board
 
 Open **Display options** (the sliders icon beside search and filter) to pick a **Layout**.
@@ -95,7 +98,7 @@ Open **Display options** (the sliders icon beside search and filter) to pick a *
 - **List** shows one row per chat. **Grouping** splits it into collapsible groups by **Status**, **Priority**, **Tags** or **Activity**, or leaves it as one list with **None**. Empty groups stay hidden until you turn on **Show empty groups**.
 - **Board** shows each chat as a card. **Columns** picks **Status**, **Priority**, **Tags** or **Activity** for the columns, and **Rows** adds horizontal lanes from one of the others. With statuses as columns the board works like a kanban view.
 
-**Ordering** sorts by **Updated**, **Title** or **Priority**, ascending or descending. Your layout, grouping, columns, rows and ordering are remembered in your browser, while filters start empty on every visit.
+**Ordering** sorts by **Updated**, **Title** or **Priority**, ascending or descending. Your layout, grouping, columns, rows, ordering and collapsed groups are remembered in your browser, while filters start empty on every visit.
 
 **Activity** tells you what a chat is doing right now: **Unread** (changed since you last opened it), **Generating**, **Waiting for approval** (paused on a tool approval) and **Read**. Rows and cards mark the first three with a dot or spinner, so a chat that needs you stands out.
 
@@ -111,7 +114,7 @@ A status says where a chat stands, for example **In progress** or **Done**. Fold
 
 Click the status icon at the start of a chat to pick a status, or drag its card to another column or lane on a board that uses statuses. The chat's owner can always set its status. In a shared folder, anyone who can edit the folder can set the status of every chat in it. Next to the status, each chat that has one shows how long it has been there, such as **3d**. Earlier time spent in the same status counts toward it.
 
-Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging. It also adds and deletes statuses. Chats in a deleted status go back to **No status**.
+Anyone who can edit the folder can change its statuses with **Edit statuses…** at the bottom of the status menu, or **Add status** at the end of a status board. The **Statuses** dialog changes the name (up to 40 characters, unique within the folder), the icon (a built-in shape or **Use emoji…**), the color, and the order by dragging, including where **No status** sits. It also adds and deletes statuses. On a board with statuses as columns, you can also drag a column's header to reorder the statuses. Chats in a deleted status go back to **No status**.
 
 A chat can also get a priority (**Urgent**, **High**, **Medium** or **Low**) from the priority icon on the chat, with the same permissions as statuses.
 
@@ -182,6 +185,10 @@ The System Prompt field is only visible if you have permission to set system pro
 
 :::
 
+### Memory
+
+Memories saved in the folder's chats belong to the folder. Manage them under **Personalization** in the folder's **Edit** dialog, where **Folder only** keeps the folder's chats to the folder's own memories. See [Folder Memory](/features/chat-conversations/memory#folder-memory).
+
 ### Attached Knowledge
 
 The folder page also has a **Knowledge** section that lists what new chats in the folder use.
@@ -233,6 +240,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Write access covers the folder page.** People with write access can set the status and priority of every chat in the folder and change the folder's statuses, and people with read access can see the statuses. See [The Folder Page](#the-folder-page).
 - **Automations can post into a shared folder.** Anyone with write access can create one there, and everyone who can write to the folder can pause it. See [Folders](/features/chat-conversations/chat-features/automations#folders) on the Automations page.
 - **Clone a chat to continue it yourself.** In a folder set to **Clone only**, or with **Read** access only, use **Clone Chat** or **Fork chat** to continue a chat in your own chats. See [Cloning or Forking a Shared Chat](/features/chat-conversations/chat-features/chatshare#cloning-or-forking-a-shared-chat).
+- **The folder's machine is not shared with it.** When some people you share with cannot use the folder's machine, the **Access** dialog says so. They see the folder's chats but not its files.
 - **Folders cannot be shared publicly**, by admins either. Sharing is always to specific users or groups.
 
 ![A shared folder in the sidebar where each chat shows the pictures of the people who wrote in it. The Launch checklist chat shows three pictures followed by +2](/images/features/chat/shared-folder-chat-writers.webp)

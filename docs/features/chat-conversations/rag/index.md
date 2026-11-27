@@ -83,6 +83,8 @@ Once created, the external source appears in **Workspace > Knowledge** like any 
 
 With [Retrieval Query Generation](/reference/env-configuration#enable_retrieval_query_generation) on, all generated queries run at the same time. Their results are merged by rank (the top result of each query, then the second of each, and so on), duplicates are dropped and the list is cut to the result count.
 
+To improve the order, turn on **Rerank results** under **Advanced** on the connection. Each query's results are then rescored with the reranking model from the **Documents** settings, results below the relevance threshold are dropped, and the merged list is sorted by that score.
+
 In the sources under an answer, each result is listed by its title. For Qdrant, Milvus and pgvector, when a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
 
 :::info Embedding model must match
@@ -286,6 +288,8 @@ With the default Chroma vector database, resetting the vector storage removes ev
 ## Citations in RAG Feature
 
 The RAG feature allows users to easily track the context of documents fed to LLMs with added citations for reference points. This ensures transparency and accountability in the use of external sources within your chats. To let the model cite page numbers or other details stored with each chunk, set [`RAG_SOURCE_METADATA_KEYS`](/reference/env-configuration#rag_source_metadata_keys).
+
+When a source has several paragraphs, the model sees each one numbered, such as `[1#4]`, and can cite the exact paragraph a statement comes from. Clicking that citation opens the file where the paragraph is and highlights the sentences that match the answer. A plain `[1]` cites the source as a whole. Files the model reads with the file tools are numbered the same way. The default [`RAG_TEMPLATE`](/reference/env-configuration#rag_template) tells the model how to cite paragraphs, so keep that instruction in a custom template.
 
 ## Preload files vs Builtin Tools
 

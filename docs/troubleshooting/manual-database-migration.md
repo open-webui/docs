@@ -323,7 +323,7 @@ If the process appears to hang after this message, wait 2-3 minutes; some migrat
 - Migrations with data transformations (100K+ rows: 30 seconds to several minutes)
 - Migrations that rebuild tables (SQLite doesn't support all ALTER operations)
 
-For very large databases (10M+ rows), consider running migrations during a maintenance window and monitoring progress with `sqlite3 /path/to/webui.db ".tables"` in another terminal.
+Long steps log their progress at the level set in [`GLOBAL_LOG_LEVEL`](/reference/env-configuration#global_log_level), such as the running count of chats whose messages were moved. While these lines keep coming, the step is working, so do not restart. For very large databases (10M+ rows), run migrations during a maintenance window.
 :::
 
 ### Upgrade to Specific Version

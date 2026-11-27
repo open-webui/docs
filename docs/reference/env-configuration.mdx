@@ -4651,7 +4651,7 @@ Enabling this feature increases the text volume indexed by BM25, which may impac
 ```
 Answer the user's message using the sources inside <context> below. They were retrieved automatically for this conversation and may be incomplete or irrelevant.
 
-Cite a source directly after each statement it supports, using its id in square brackets: "The warranty covers parts for two years [1]." For several sources, write [1][2]. Use only ids that appear in the context. A <source> tag with nothing inside it labels the material just above it.
+Cite a source where a statement rests on it, using its id in square brackets: "The warranty covers parts for two years [1]." Where its paragraphs start with markers like [1#4], cite the paragraph a statement comes from by copying its marker; for several, write them in a row: [1#4][1#5]. Use the plain id, like [1], when a statement is about the source as a whole or draws on many parts of it. For several sources, write [1][2]. Cite once per point, not after every sentence, and don't cite your own reasoning or general knowledge. Use only ids and markers that appear in the context. A <source> tag with nothing inside it labels the material just above it.
 
 If the sources don't contain the answer, say so, then answer from your own knowledge if you can. If the context is unrelated to the message, ignore it. Reply in the user's language, and don't reproduce the <context> or <source> tags.
 
@@ -6007,8 +6007,8 @@ Using a remote Playwright browser via `PLAYWRIGHT_WS_URL` can be beneficial for:
 #### `YOUTUBE_LOADER_PROXY_URL`
 
 - Type: `str`
-- Default: unset (requests come from the server's own address)
-- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
+- Default: unset (requests go through `HTTPS_PROXY` when it is set, otherwise from the server's own address)
+- Description: Proxy used for the requests that fetch a YouTube video's transcript, in the form `https://user:password@host:port`. The same URL is used for HTTP and HTTPS, and it takes precedence over `HTTPS_PROXY` for these requests. YouTube blocks transcript requests from many data center and cloud provider addresses; when it does, attaching a YouTube video fails with a message saying YouTube blocked the request and naming this setting.
 - Persistence: This environment variable is a `ConfigVar` variable. It can be configured in the **Settings > Web Search > Youtube Proxy URL** (admin section).
 
 #### `YOUTUBE_LOADER_LANGUAGE`
