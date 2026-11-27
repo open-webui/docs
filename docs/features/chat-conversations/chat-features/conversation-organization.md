@@ -185,6 +185,10 @@ The System Prompt field is only visible if you have permission to set system pro
 
 :::
 
+### Memory
+
+Memories saved in the folder's chats belong to the folder. Manage them under **Personalization** in the folder's **Edit** dialog, where **Folder only** keeps the folder's chats to the folder's own memories. See [Folder Memory](/features/chat-conversations/memory#folder-memory).
+
 ### Attached Knowledge
 
 The folder page also has a **Knowledge** section that lists what new chats in the folder use.
