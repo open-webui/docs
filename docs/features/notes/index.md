@@ -31,7 +31,7 @@ Unlike standard chats, which are linear and ephemeral, Notes are persistent docu
 
 ### AI-assisted writing, built in
 
-Open the **Chat sidebar** to brainstorm, critique, expand or rewrite your content without leaving the editor. It is the full chat interface, so you keep the model picker, tools and attachments, and you can hold several separate conversations per note. Highlight a passage first and the model rewrites just that part, in place.
+Use the chat docked at the bottom of the note to brainstorm, critique, expand or rewrite your content without leaving the editor. It is the full chat interface, so you keep the model picker, tools and attachments, and you can hold several separate conversations per note. Highlight a passage first and the model rewrites just that part, in place.
 
 ### Precise context injection
 
@@ -53,7 +53,7 @@ With [native function calling](/features/extensibility/plugin/tools#tool-calling
 | :--- | :--- |
 | **Rich editor** | Markdown and Rich Text with a floating formatting toolbar |
 | **AI Enhance** | Ask the note's chat to rewrite or improve selected text in place |
-| **Chat sidebar** | The full chat interface inside the note, with as many conversations per note as you want |
+| **Docked chat** | The full chat interface at the bottom of the note, with as many conversations per note as you want |
 | **Context injection** | Attach notes to any chat for full-fidelity context |
 | **Pages** | Split a note into pages and subpages |
 | **Attachments** | Files sit as blocks inside the page where you added them |
@@ -96,23 +96,25 @@ Deleting a page moves its subpages up one level. The first page cannot be moved 
 
 ## AI Integration
 
-Open the note's chat with the **speech bubble** button in the editor toolbar, at the top of the note next to Undo/Redo. Everything the AI does to a note runs through that chat, and it works on the page you have open.
+The note's chat is docked at the bottom of the note, and its input is always there. Everything the AI does to a note runs through that chat, and it works on the page you have open.
 
 ### Enhance
 
-Rewriting happens in the chat, there is no separate **Enhance** button. Select the passage you want reworked, open the chat and either use the **Rewrite the selected text.** suggestion or say what you want. The model rewrites the note in place through `replace_note_content`, and the change appears in the editor as it happens. Leave nothing selected to talk about the whole note.
+Rewriting happens in the chat, there is no separate **Enhance** button. Select the passage you want reworked, then either say what you want in the chat input or expand the chat and use the **Rewrite the selected text.** suggestion. The model rewrites the note in place through `replace_note_content`, and the change appears in the editor as it happens. Leave nothing selected to talk about the whole note.
 
-### Chat Sidebar
+### Docked Chat
 
-Opens the full chat interface in a pane beside the note, or over it on screens narrower than 768 px. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
+The chat sits at the bottom center of the note on every screen size. Collapsed, it shows only the chat input, with a small arrow and the conversation's title above it (**Chat** while the note has no conversation yet). Click that title to expand the conversation. It opens above the input and covers the lower part of the note, up to 60% of the window's height. Sending a message expands it too. The **Collapse** arrow at the top right of the conversation shrinks it back to the input. A note always opens with its chat collapsed.
+
+It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
 
 **Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
 
 **Insert a response into the note.** With write access on the note, every assistant response carries an **Insert into note** button that drops that response into the note at the cursor. A read-only collaborator does not get the button. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
 
-**Several conversations per note.** The panel header is a dropdown listing every chat attached to this note. Use it to switch between them, start a new one or delete one. A new conversation is only stored once you send its first message, so opening one and walking away leaves nothing behind. Deleting the last remaining chat immediately recreates an empty one.
+**Several conversations per note.** The title at the top left of the expanded conversation is a dropdown listing every chat attached to this note. Use it to switch between them, start a new one or delete one. A new conversation is only stored once you send its first message, so opening one and walking away leaves nothing behind. Deleting the last remaining chat leaves a new, empty conversation in its place.
 
-**Suggested prompts.** While a conversation is still empty, four prompts are offered: enhance the note and update it, summarize it, extract action items, rewrite the selected text. They disappear as soon as the conversation has messages, and they are also suppressed if you set **Settings > Interface > Landing Page Mode** to **Chat**.
+**Suggested prompts.** While an expanded conversation is still empty, four prompts are offered: enhance the note and update it, summarize it, extract action items, rewrite the selected text. They disappear as soon as the conversation has messages.
 
 **Selected text is passed along.** If you have text selected in the note, that selection is appended to whatever you send as the target for a rewrite. Selecting nothing sends the message on its own.
 
