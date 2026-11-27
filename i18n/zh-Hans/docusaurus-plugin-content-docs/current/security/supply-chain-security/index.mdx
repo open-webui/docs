@@ -1,0 +1,86 @@
+---
+sidebar_position: 2
+title: "供应链与安全扫描器"
+---
+
+# 供应链与安全扫描器
+
+自动化软件成分与供应链扫描器（例如 socket.dev）会定期将 Open WebUI 的 PyPI 软件包和容器镜像标记为具有风险指标。本页说明 Open WebUI 团队对这些指标的官方立场，帮助评估 Open WebUI 的安全团队准确理解它们。
+
+:::note 想查询某个具体 CVE，而不是扫描器标记？
+如果数据库或扫描报告显示某个 CVE 涉及 Open WebUI，请在采取行动前检查该标识符是否仍然有效。一些漏洞数据库不会重新处理 CVE 撤回事件，因此，签发 CNA 已正式驳回的记录仍会被显示为活跃发现。请参阅[漏洞数据库中的已驳回 CVE](/security/supply-chain-security/vulnerability-databases)，了解我们正在追踪的案例，以及如何在几秒内自行核验任何记录。
+:::
+
+:::info 简要说明
+这些扫描器针对 Open WebUI 提出的所有指标，均不对应任何已命名漏洞、CVE 或已确认的恶意代码。其中大多数是自动化行为启发式规则，用于标记软件在设计上具备的能力。有些扫描器甚至发布耸人听闻且毫无根据的断言，最典型的是“潜在恶意软件”横幅，却不指出任何具体文件、函数或代码行，也不提供支持该断言的证据。Open WebUI 中未发现任何恶意代码。由于每个发布产物都由 [open-webui/open-webui](https://github.com/open-webui/open-webui) 中的公开源代码构建，所有此类断言都可以直接对照代码核查。
+:::
+
+## 这些扫描器测量什么 {#what-these-scanners-measure}
+
+供应链扫描器根据自动化信号为软件包评分：使用哪些语言特性、能够访问哪些系统能力、依赖项的状况，以及基于模式的分类器。这些信号描述的是软件包*能够*做什么，而不是它是否*滥用*了任何能力。对于自托管 AI 平台，得分最高的能力（运行代码、访问网络、调用 shell）恰恰是产品的核心且有文档说明的功能。因此，大量信号反映的是软件的功能，而不是软件缺陷。
+
+扫描器显示的主要数字评分（例如满分 100 的供应链评分）同样是这些自动化信号的汇总，因此低于 100 的评分反映的是下述启发式标记，而不是已确认缺陷的数量。
+
+我们会审查每一个新标记，但标记只是分析的起点，不是发现。
+
+## 按类别说明各项指标 {#the-indicators-category-by-category}
+
+### 行为能力标记：“uses eval”、“shell access”、“network access” {#behavioral-capability-flags-uses-eval-shell-access-network-access}
+
+这些标记描述的是预期且有文档说明的功能：
+
+- **网络访问**是 Open WebUI 与模型服务提供方及外部工具通信的方式。
+- **代码执行（“eval”）和 shell 访问**来自代码解释器以及 Tools 和 Functions 系统，这些组件在设计上就会执行代码。
+
+这些能力由管理员配置和基于角色的权限控制（请参阅下文的[代码执行与沙箱](#code-execution-and-sandboxing)）。扫描器标记的是能力，而不是能力遭到滥用，因此这些标记都不构成漏洞。
+
+### 缺乏依据的分类：“potential malware”、“AI-detected security risk”、“potential vulnerability” {#unsubstantiated-classifications-potential-malware-ai-detected-security-risk-potential-vulnerability}
+
+这些指标最容易让审查人员警觉，却也最缺乏依据：
+
+- **“Potential malware”（潜在恶意软件）**：未指出任何具体文件、函数或代码行，也未附上支持证据。Open WebUI 中未发现任何恶意代码。我们认为，不指明代码也不展示证据就发布“检测到恶意软件”的横幅，会在实质上误导读者，尤其是企业审查人员；他们很容易合理地将这种横幅理解为已确认的发现，而不是自动化猜测。
+- **“AI-detected security risk”（AI 检测到的安全风险）**：这是由上述行为信号驱动的机器生成分类（软件“可能包含潜在安全问题”）。它没有指出任何具体代码，也没有确认任何问题。
+- **“Potential vulnerability”（潜在漏洞）**：按照扫描器自己的措辞，这是一个*有待进一步分析和确认*的条目。它是待处理队列中的一项，而不是发现。
+
+Open WebUI 发布的软件包完全由公开源代码构建，因此任何此类断言都可以对照代码验证。出现缺乏依据的横幅时，我们会要求扫描厂商重新审查。
+
+### 依赖项警报与“混淆代码” {#dependency-alerts-and-obfuscated-code}
+
+这些标记来自传递依赖项，以及发行包中捆绑的预构建、压缩前端资源。压缩后的 JavaScript 不便于人工阅读，因此扫描器经常将其归类为“混淆代码”；但它只是普通的编译后前端代码，不是 Open WebUI 源代码中经人工混淆的逻辑。依赖项警报反映更广泛的生态系统状况，通过常规依赖维护处理。
+
+容器镜像 CVE 是另一个问题：它们来自基础镜像，通过在更新后的基础镜像上重新构建来解决，不属于这里讨论的 PyPI 软件包扫描。
+
+### 维护者数量 {#maintainer-count}
+
+扫描器会根据软件包元数据报告维护者数量，Open WebUI 通常显示为“1 名维护者”。这个数字表示在 PyPI 软件包上拥有发布权限的账户数量，即一个发布账户，而不是项目开发人员的数量。Open WebUI 由核心团队和广泛的外部贡献者共同开发，可在仓库的[贡献者历史](https://github.com/open-webui/open-webui/graphs/contributors)和我们的[团队页面](/team)中查看。使用一个账户发布版本是常见且有意为之的打包实践，并不意味着项目维护存在巴士因子为 1 的风险。
+
+## 代码执行与沙箱 {#code-execution-and-sandboxing}
+
+评估人员经常询问 Open WebUI 是否“默认在未强制启用沙箱的情况下”执行代码。关键在于，服务器端代码执行需要管理员显式操作才能启用，并非向任意用户开放：
+
+- **默认引擎在浏览器中运行。** 除非管理员选择其他引擎，否则代码执行和代码解释器使用 Pyodide（WebAssembly），因此代码在用户的浏览器中运行。
+- **服务器端执行引擎（例如 Jupyter）需要主动启用**，并由管理员配置。默认情况下，它们不会连接到服务器运行时。
+- **编写服务器端 Tools 和 Functions 被视为等同于授予服务器代码执行权限。** 该能力受 `workspace.tools` 权限限制，对非管理员**默认禁用**；文档明确说明，授予该权限等同于向该用户提供服务器 shell 访问权限。
+- **隔离执行环境是文档明确规定的部署责任。** 管理员启用服务器端执行引擎时，应在适当的容器、网络和文件系统边界内运行它，详见我们的[安全加固指南](/getting-started/advanced-topics/hardening)。
+
+这是一种有意采用的分层设计：服务器端代码执行需要管理员显式配置，并受默认关闭的权限控制，而不是每位用户都可使用。完整模型请参阅 [Tools 和 Functions 安全模型](/features/extensibility/plugin/tools)及[安全策略](/security/security-policy)。
+
+## 面向企业评估人员 {#for-enterprise-evaluators}
+
+Open WebUI 由核心团队积极维护。团队执行明确、人工参与的安全流程，而不是依赖自动化评分：
+
+- **每份报告都由人工审查。** 收到的安全报告会由人工对照实际代码进行分类和验证，不会自动关闭或自动分类。
+- **有效发现会得到修复并妥善披露。** 我们会在合理范围内尽快修补已确认的问题，为有效发现申请 CVE 标识符，并在修复发布后通过 GitHub Security Advisory 公开结果。
+- **记录公开且可审计。** 我们接受、修复并发布的问题的完整历史，均可在 [Open WebUI Security Advisories 页面](https://github.com/open-webui/open-webui/security/advisories)查看。任何人都可以看到发现了什么、如何解决，以及哪个版本包含修复。
+- **无效或描述错误的断言会得到回应，而不会被忽视。** 当外部 CVE 错误描述软件或我们的威胁模型时，我们会发布有理有据的[厂商处置结论](/security/vendor-dispositions)，而不是任由公开记录中的错误不受质疑。
+- **一个权威渠道。** 所有漏洞处理都通过 GitHub Security Advisories 进行，由团队负责验证、修复和披露时机。
+
+总体而言，这比自动化风险评分更有说服力：由人工从头到尾执行的流程，留下了一条公开、可审计的发现、修复和发布记录。我们很乐意直接支持你的评估。
+
+有用的起点：
+
+- [安全策略](/security/security-policy)：报告流程、威胁模型，以及哪些情况会被视为漏洞。
+- [厂商处置结论](/security/vendor-dispositions)：我们对具体外部报告 CVE 的正式评估。
+- [Tools 和 Functions](/features/extensibility/plugin/tools)：代码执行与权限模型。
+
+如果你认为某个扫描器标记对应真实的安全问题，而不是行为启发式规则，请通过 [GitHub Security Advisories](https://github.com/open-webui/open-webui/security) 报告，以便我们验证，并在确认后发布。

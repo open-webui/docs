@@ -1,0 +1,145 @@
+---
+sidebar_position: 7
+title: "Open Responses"
+
+---
+
+## 概述 {#overview}
+
+Open WebUI 支持 **[Open Responses](https://www.openresponses.org/)**，这是一项面向多服务提供方、可互操作 LLM 接口的开放规范。本指南介绍如何为连接启用 Open Responses API。
+
+---
+
+## 什么是 Open Responses？ {#what-is-open-responses}
+
+Open Responses 是一项开源规范，用于统一不同服务提供方之间 LLM 请求和响应的结构。它提供：
+
+- **一套规范，多个服务提供方**：只需描述一次输入/输出，即可在 OpenAI、Anthropic、Gemini 或本地模型上运行。
+- **可组合的智能体循环**：统一的流式传输、工具调用和消息编排。
+- 更轻松的**评估和路由**：通过共享架构比较服务提供方、路由请求和记录结果。
+
+Open Responses 以 OpenAI Responses API 格式为基础，但设计上适用于任何实现该规范的服务提供方。
+
+---
+
+## 步骤 1：添加或编辑连接 {#step-1-add-or-edit-a-connection}
+
+1. 前往**设置（Settings）> 连接（Connections）**（管理员区域），找到**管理 OpenAI API 连接（Manage OpenAI API Connections）**列表。
+2. 点击**添加连接（Add Connection）**创建连接，或点击现有连接上的**配置（Configure）**（齿轮图标）进行编辑。
+
+---
+
+## 步骤 2：选择 API 类型 {#step-2-select-the-api-type}
+
+在连接模态框中，找到 **API 类型（API Type）**设置：
+
+- **Chat Completions**（默认）：使用标准 OpenAI Chat Completions API 格式。
+- **Responses**：使用 Open Responses API 格式。
+
+点击 **API 类型（API Type）**开关在两者之间切换。对于其他服务提供方，点击一次以选择 **Responses**。输入 `api.openai.com` URL 会自动选择 **Responses**，因此输入 URL 后，请检查开关并保持选择 **Responses**。
+
+![API 类型开关](/images/getting-started/quick-start/api-type-responses.gif)
+
+---
+
+## 步骤 3：配置服务提供方 {#step-3-configure-your-provider}
+
+输入支持 Open Responses 格式的服务提供方连接信息：
+
+- **URL**：服务提供方的 API 端点
+- **API 密钥（API Key）**：你的身份验证凭据
+- **模型 ID（Model IDs）**：（可选）指定要使用的特定模型
+
+---
+
+## 步骤 4（可选）：启用原生服务器端工具 {#step-4-optional-enable-native-server-side-tools}
+
+某些服务提供方（最典型的是 **OpenAI**）通过 Responses API 提供**服务器端工具**。最具代表性的示例是**原生 Web 搜索**：模型自行执行搜索，然后返回有依据并附带来源引用的回答。Open WebUI 会将这些工具转发给服务提供方，并原生渲染其结果，因此无需进行任何其他接入。
+
+:::info 这与 Open WebUI 的 Web 搜索相互独立
+原生服务器端工具完全在服务提供方一侧运行，并且仅适用于 **API 类型：Responses** 连接（上述步骤 1 和 2）。它们**独立于** Open WebUI 自己的 [Web 搜索](/features/chat-conversations/web-search)服务提供方（Tavily、SearXNG 等），你无需配置或启用这些服务提供方。请将模型的 **Web 搜索（Web Search）**能力保持**关闭**；原生工具会取代它，同时启用两者属于冗余。
+:::
+
+要为模型启用原生 Web 搜索：
+
+1. 前往**工作区（Workspace）→ 模型（Models）**，编辑使用你的 Responses 连接的模型。
+2. 展开**高级参数（Advanced Params）**。
+3. 在底部点击**添加自定义参数（Add Custom Parameter）**，并设置：
+   - **名称（Name）**：`tools`
+   - **值（Value）**：`[{"type": "web_search"}]`
+4. 保存模型。
+
+模型会保留 Open WebUI 自身的工具。笔记、知识、任务、附加到模型的工具以及所附文件的上下文都会继续工作，自定义 `tools` 会与它们一起发送。
+
+与该模型聊天时，服务提供方会在服务器端执行 Web 搜索，Open WebUI 会以流式方式显示：
+
+- 展示模型所执行查询的**“Web 搜索（Web Search）”**状态块。
+- 根据结果生成的**可点击来源引用**。
+- 模型有依据的回答。
+
+:::tip 多个工具和工具选项
+`tools` 自定义参数接受服务提供方在 Responses API 中支持的任何工具。将多个工具添加到数组中即可传入：
+
+```json
+[{"type": "web_search"}, {"type": "code_interpreter"}]
+```
+
+你还可以在工具对象中包含服务提供方特有的选项（例如 Web 搜索的 `search_context_size` 或 `user_location`）。请参阅服务提供方的 Responses API 文档。较旧的 OpenAI 模型快照可能需要使用 `{"type": "web_search_preview"}`，而不是 `web_search`。
+:::
+
+:::warning 自定义参数会原样转发
+自定义参数会未经更改地发送到服务提供方，因此只使用有效的 Responses API 工具定义。
+:::
+
+:::info 实例范围的自定义参数仍然适用
+**设置（Settings）> 模型（Models）**（管理员区域）的**模型默认值（Model Defaults）**下也有相同的按钮，其设置适用于每个模型。来自这两个位置的自定义参数会按名称合并，因此在此处添加 `tools` 时，模型未指定名称的实例范围参数仍会保留。如果在两个位置使用相同名称，则发送模型的值。请参阅[全局模型默认值](/features/workspace/models#global-model-defaults-admin)。
+:::
+
+以相同方式添加值为 `["reasoning.encrypted_content"]` 的 `include` 自定义参数，可让模型跨轮次保留其推理内容。请参阅[如何回传推理内容](/features/chat-conversations/chat-features/reasoning-models#how-reasoning-is-sent-back)。
+
+---
+
+## 支持的服务提供方 {#supported-providers}
+
+Open Responses 是一项新规范，因此服务提供方的支持仍在不断增加。请查看 [Open Responses 网站](https://www.openresponses.org/)，获取最新的兼容服务提供方和实现列表。
+
+---
+
+## 故障排除 {#troubleshooting}
+
+### 连接在 Chat Completions 下正常，但在 Responses 下不正常 {#connection-works-with-chat-completions-but-not-responses}
+
+并非所有服务提供方都已支持 Open Responses 格式。可以尝试：
+
+1. 切换回 Chat Completions
+2. 检查服务提供方是否明确支持 Open Responses
+3. 使用能够转换为 Open Responses 格式的中间件代理
+
+### 流式传输或工具调用行为异常 {#streaming-or-tool-calls-behave-unexpectedly}
+
+Responses API 连接支持工具调用、重复调用和流式传输。Open WebUI 会在 Chat Completions 和 Responses API 格式之间透明转换，包括工具调用参数、函数调用输出和多轮工具使用。如果仍遇到问题：
+
+1. 在 [Open WebUI Discord](https://discord.gg/5rJgQTnV4s) 中检查已知问题
+2. 在 [GitHub](https://github.com/open-webui/open-webui/issues) 上报告缺陷
+
+### 偏离 Responses 格式的服务提供方 {#providers-that-deviate-from-the-responses-format}
+
+并非每个宣称支持 Responses 格式的端点都会严格按该格式输出。Open WebUI 会处理常见偏差，而不会因此丢失回复。如果流关闭时报告没有内容，已经流式传输的内容仍会保留。如果某个片段在其所属项目之前到达，系统会跳过该片段，而不会截断其余回答。如果服务提供方直到最后才提供完成的消息，系统会应用该消息，从而保存回复及其引用，并将其带入下一轮。
+
+Open WebUI 无法恢复服务提供方从未发送的内容。如果回复始终很短或为空，请先使用相同提示词直接调用服务提供方自己的 API 进行对比，再在这里报告问题。
+
+### 有状态会话 {#stateful-sessions}
+
+默认情况下，Open WebUI 将 Responses API 连接视为**无状态**：它在本地管理对话历史，并在每个请求中发送完整上下文。如果上游服务提供方支持**有状态会话**（在服务器端存储响应，并以 `previous_response_id` 为关联依据，例如直接连接 OpenAI），你可以启用 `ENABLE_RESPONSES_API_STATEFUL=true`，让服务提供方管理对话状态。
+
+:::warning
+大多数代理和第三方 Responses API 端点都是无状态的，启用有状态模式后会出现故障。仅对明确支持有状态 Responses API 会话的服务提供方使用此功能。
+:::
+
+---
+
+## 了解更多 {#learn-more}
+
+- **[Open Responses 规范](https://www.openresponses.org/specification)**：完整技术规范
+- **[Open Responses GitHub](https://github.com/openresponses/openresponses)**：源代码和讨论
+- **[常见问题：Open WebUI 为什么不原生支持专有 API？](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**：了解我们协议优先的设计理念

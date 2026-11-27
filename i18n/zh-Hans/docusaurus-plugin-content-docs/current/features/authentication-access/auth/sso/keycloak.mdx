@@ -1,0 +1,159 @@
+---
+title: "Keycloak"
+---
+
+:::warning
+
+本教程由社区贡献，Open WebUI 团队不提供支持。它仅用于演示如何针对你的特定用例定制 Open WebUI。想要参与贡献吗？请查看贡献教程。
+
+:::
+
+本指南介绍如何将 Open WebUI 与 Keycloak 集成，实现 OIDC 单点登录（SSO）。
+
+## 1. 环境准备与端口更改 {#1-environment-preparation-and-port-change}
+
+### Open WebUI 服务器端口 {#open-webui-server-port}
+- **默认端口**：`8080`
+
+### Keycloak 端口冲突问题 {#keycloak-port-conflict-issue}
+Keycloak 默认也使用端口 `8080`，因此会产生冲突。请将 Keycloak 端口更改为 `9090`。
+
+```bash
+bin/kc.sh start-dev --http-port=9090
+```
+{/* TODO：插入 Keycloak 端口更改的控制台输出截图 */}
+
+## 2. 创建 Keycloak 领域 {#2-create-a-keycloak-realm}
+
+1. 打开浏览器并访问 `http://localhost:9090`。创建一个管理员账户。
+2. 通过 `http://localhost:9090/admin` 登录管理控制台。
+3. 在顶部的领域下拉菜单中，点击 **Add realm（添加领域）**。
+4. 输入 `openwebui` 作为 **Realm name（领域名称）**，然后点击 **Create（创建）**。
+
+![创建领域](/images/features/auth/keycloak/create-realm.png)
+
+## 3. 创建 OpenID Connect 客户端 {#3-create-an-openid-connect-client}
+
+:::info
+
+请确保已选择 `openwebui` 领域。默认选中的是 `master`。
+
+:::
+
+![选择领域](/images/features/auth/keycloak/select-realm.png)
+
+1. 确保选中刚刚创建的 `openwebui` 领域。
+2. 在左侧菜单中，点击 **Clients（客户端）** → **Create client（创建客户端）**。
+3. 将 **Client ID（客户端 ID）**设置为 `open-webui`。
+4. 保持 **Client protocol（客户端协议）**为 `openid-connect`。
+5. 将 **Access Type（访问类型）**设置为 `confidential`，然后点击 **Save（保存）**。
+
+![客户端访问设置](/images/features/auth/keycloak/access-setting-client.png)
+
+## 4. 启用客户端身份验证并获取凭据 {#4-enable-client-authentication-and-get-credentials}
+
+默认情况下，Keycloak 26.x 会将 Client Authentication 设置为“None”，因此需要手动配置。
+
+1. 转到 **Clients（客户端）** → **open-webui** → **Settings（设置）**。
+2. 查看 **Client Authenticator（客户端验证器）**下拉菜单。
+3. 将“None”更改为 **Client ID and secret（客户端 ID 和密钥）**，然后点击 **Save（保存）**。
+4. 点击 **Advanced（高级）**标签页。
+5. 在 **Client authentication（客户端身份验证）**部分，点击 **Reveal secret（显示密钥）**并复制密钥。
+6. 将此密钥粘贴为 `OAUTH_CLIENT_SECRET` 变量的值，该变量位于你的 `.env` 文件中。
+
+{/* TODO：插入 Advanced 标签页中 Client Authenticator 设置的截图 */}
+
+## 5. 创建测试用户 {#5-create-a-test-user}
+
+1. 在左侧菜单中，转到 **Users（用户）** → **Add user（添加用户）**。
+2. 填写 **Username（用户名）**、**Email（电子邮件）**等信息，然后点击 **Save（保存）**。
+3. 点击新创建的用户，然后转到 **Credentials（凭据）**标签页。
+4. 输入新密码，取消选中 **Temporary（临时）**，然后点击 **Set Password（设置密码）**。
+    -   *示例：用户名 `testuser`，密码 `Test1234!`*
+
+## 6. 配置 Open WebUI .env {#6-configure-open-webui-env}
+
+在 `.env` 文件中添加或修改以下变量。
+
+```env
+
+# 启用 OAuth2/OIDC 登录
+ENABLE_OAUTH_SIGNUP=true
+
+# Keycloak 客户端信息
+OAUTH_CLIENT_ID=open-webui
+OAUTH_CLIENT_SECRET=<YOUR_COPIED_SECRET>
+
+# OIDC 发现文档 URL
+OPENID_PROVIDER_URL=http://localhost:9090/realms/openwebui/.well-known/openid-configuration
+
+# （可选）SSO 按钮标签
+OAUTH_PROVIDER_NAME=Keycloak
+
+# （可选）OAuth 回调 URL
+OPENID_REDIRECT_URI=http://localhost:8080/oauth/oidc/callback
+```
+**修改 `.env` 文件后，请重启 Open WebUI 服务器。**
+
+## 7. HTTP 与 HTTPS {#7-http-vs-https}
+
+-   **HTTP（开发/测试）**：
+    -   协议：`http://`
+    -   示例：`http://localhost:9090`
+-   **HTTPS（生产环境推荐）**：
+    -   需要配置 Keycloak TLS，或使用支持 SSL 终止的反向代理。
+    ```bash
+    bin/kc.sh start --https-port=9090 \
+      --https-key-store=keystore.jks \
+      --https-key-store-password=<password>
+    ```
+
+## 8. 测试集成 {#8-test-the-integration}
+
+1. 访问 `http://localhost:8080`。你应会看到“Continue with Keycloak”按钮。
+2. 点击该按钮。你应会被重定向到 Keycloak 登录页面。
+3. 使用 `testuser` / `Test1234!` 登录。你应会被成功重定向回 Open WebUI。
+
+{/* TODO：插入实际登录界面截图 */}
+
+## 9. 配置 Keycloak 组映射 {#9-configure-keycloak-group-mapping}
+
+### 9.1. 概览 {#91-overview}
+默认情况下，Keycloak 客户端不会在令牌中包含组信息。请按照以下步骤传递组信息。
+
+### 9.2. 找到映射器创建入口 {#92-locate-mapper-creation}
+1. 转到 Keycloak 管理控制台：`http://localhost:9090/admin`。
+2. 选择 `openwebui` 领域。
+3. 导航到 **Clients（客户端）**并选择 `open-webui` 客户端。
+4. 转到 **Client scopes（客户端作用域）**标签页。
+5. 选择将包含组信息的作用域（例如 `profile` 或 `open-webui-dedicated`）。
+
+    ![客户端作用域](/images/features/auth/keycloak/scope-client.png)
+
+6. 在所选作用域的详细信息中，转到 **Mappers（映射器）**标签页。
+
+### 9.3. 创建映射器 {#93-create-mapper}
+点击 **Create（创建）**或 **Add builtin（添加内置映射器）**，开始创建新的映射器。
+
+### 9.4. 映射器设置 {#94-mapper-settings}
+使用适当的设置配置映射器，以包含组成员关系。
+
+![客户端组映射器设置](/images/features/auth/keycloak/mappers-setting-group-client.png)
+
+### 9.5. 保存并应用 {#95-save-and-apply}
+-   **Save（保存）**映射器配置。
+-   **Restart（重启）**Open WebUI 服务器以应用更改。
+
+### 9.6. 配置 Open WebUI 环境变量 {#96-configure-open-webui-environment-variables}
+在 `.env` 文件中添加或修改以下变量：
+
+```env
+
+# 启用组同步
+ENABLE_OAUTH_GROUP_MANAGEMENT=true
+
+# （可选）启用即时组创建
+ENABLE_OAUTH_GROUP_CREATION=true
+
+# 令牌中组信息的声明键
+OAUTH_GROUP_CLAIM=groups

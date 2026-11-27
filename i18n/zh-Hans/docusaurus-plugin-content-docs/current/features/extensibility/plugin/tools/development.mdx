@@ -1,0 +1,1426 @@
+---
+sidebar_position: 2
+title: "开发"
+---
+
+# 工具开发
+
+:::danger 严重安全警告
+**工作区工具会在你的服务器上执行任意 Python 代码。** 只从可信来源安装，在导入前审查代码，并且仅允许受信任的管理员访问工作区。授予用户创建或导入工具的能力，等同于授予其服务器的 shell 访问权限。完整说明请参阅[插件安全警告](/features/extensibility/plugin/)。
+:::
+
+## 编写自定义工具包 {#writing-a-custom-toolkit}
+
+工具包定义在单个 Python 文件中，其中包含用于提供元数据的顶层文档字符串和一个 `Tools` 类。
+
+:::warning 使用 `async def` 定义工具方法
+Open WebUI 会直接在其事件循环上运行未使用 `async def` 定义的工具方法。运行期间，该 Open WebUI 工作进程无法处理任何其他请求，因此缓慢或阻塞的工具会使该工作进程上所有用户的聊天停滞。使用 `requests` 调用 Open WebUI 自身 HTTP API 的同步工具，最终可能等待被自己阻塞的工作进程，调用会一直挂起，直到请求超时。`async def` 方法中的阻塞调用同样会使工作进程停滞。
+
+- 使用 `async def` 定义工具方法，并使用 `httpx.AsyncClient` 或 `aiohttp` 等异步 HTTP 客户端代替 `requests`。Open WebUI 已附带这两种客户端。
+- 对于无法避免的阻塞工作，使用 `await anyio.to_thread.run_sync(...)` 在工作线程中运行。
+- 要读取或更改 Open WebUI 数据，请调用内部模型，例如 `from open_webui.models.chats import Chats`，而不是调用 Open WebUI 的 HTTP API。
+
+示例请参阅[尚不支持异步的第三方库](/features/extensibility/plugin/migration/to-0.9.0#7-third-party-libraries-that-dont-yet-support-async)。
+:::
+
+### 顶层文档字符串示例 {#example-top-level-docstring}
+
+```python
+"""
+title: String Inverse
+author: Your Name
+author_url: https://website.com
+git_url: https://github.com/username/string-reverse.git
+description: This tool calculates the inverse of a string
+required_open_webui_version: 0.4.0
+requirements: langchain-openai, langgraph, ollama, langchain_ollama
+version: 0.4.0
+licence: MIT
+"""
+```
+
+:::tip 元数据自动填充
+创建**新**工具时（同样适用于函数和技能），编辑器会在你粘贴或输入代码时读取 frontmatter；如果你尚未填写 **Name**、**ID** 和 **Description** 字段，它会根据 `title` 和 `description` 自动填充。它绝不会覆盖你已输入的值，也不会在编辑现有项目时重新推导字段，因此你无需重新输入源代码中已经声明的元数据。
+:::
+
+### Tools 类 {#tools-class}
+
+工具必须定义为名为 `Tools` 的类中的方法，并可选用名为 `Valves` 和 `UserValves` 的子类，例如：
+
+```python
+class Tools:
+    def __init__(self):
+        """初始化工具。"""
+        self.valves = self.Valves()
+
+    class Valves(BaseModel):
+        api_key: str = Field("", description="Your API key here")
+
+    async def reverse_string(self, string: str) -> str:
+        """
+        反转输入字符串。
+        :param string: 要反转的字符串
+        """
+        # valves 的用法示例
+        if self.valves.api_key != "42":
+            return "Wrong API key"
+        return string[::-1]
+```
+
+类的加载方式决定了两条规则。实例上的每个公共可调用对象都会作为工具公开给模型，因此辅助方法必须以 `_` 开头。此外，`__init__` 必须设置 `self.valves = self.Valves()`：只有实例已经具有 `valves` 属性时，系统才会将管理员保存的 Valves 加载到该实例上；如果没有这一行，无论管理员保存了什么，工具都会使用类默认值运行。
+
+### 方法文档字符串 {#method-docstrings}
+
+模型在决定是否调用方法之前，会读取该方法的文档字符串。第一个 `:param` 之前的文本会成为工具自身的描述，每个 `:param name:` 则会成为 JSON schema 中对应参数的描述。
+
+参数描述可以按需跨越多行。后续每一行都属于该描述，直到遇到下一个 `:param` 或 `:return:` 等其他字段。缩进会被移除，空行会被丢弃，因此你可以将较长的描述按段落排版，模型仍会收到全部内容：
+
+```python
+async def search_docs(self, query: str, limit: int = 5) -> str:
+    """
+    搜索内部文档。
+
+    :param query: 要搜索的短语。
+        支持 AND 和 OR 运算符。
+
+        使用双引号括起完全匹配的短语。
+    :param limit: 要返回的结果数量。
+    :return: 匹配的段落。
+    """
+```
+
+在这个例子中，模型不仅会收到第一行，还会了解运算符和引号规则。`:return:` 后面的文本不会发送给模型，因此请将模型需要知道的所有信息放在描述或 `:param` 中。
+
+系统只读取 reST 的 `:param name:` 形式。Google 风格的 `Args:` 块不会生成参数描述，而会被并入工具自身的描述。
+
+### 类型提示 {#type-hints}
+
+每个工具的参数都必须具有类型提示。类型也可以嵌套，例如 `queries_and_docs: list[tuple[str, int]]`。这些类型提示用于生成发送给模型的 JSON schema。没有类型提示的参数会在 schema 中被视为字符串，因此模型将始终发送字符串。`Optional[X]` 会折叠为 `X`，`None` 默认值会被丢弃。名称以 `__` 开头的参数及其 `:param` 行会从 schema 中移除，因此模型永远不会看到下面列出的保留参数。
+
+### 返回值 {#return-values}
+
+工具可以返回 `str`、`dict` 或 `list`。`dict` 会为模型进行 JSON 编码，裸 `list` 会包装为 `{"results": [...]}`，其他任何类型都会通过 `str()` 转换。以 `data:image/` 开头的字符串会被分离为图片附件，模型则会收到 `<name>: Image file read successfully.`。
+
+### Valves 和 UserValves（可选，但强烈建议） {#valves-and-uservalves-optional-but-highly-encouraged}
+
+Valves 和 UserValves 用于指定工具的可自定义设置，更多内容请参阅专门的 [Valves 与 UserValves 页面](/features/extensibility/plugin/development/valves)。Valves 中存储的机密（例如 API 密钥）可以[进行静态加密](/features/extensibility/plugin/development/valves#encrypting-valve-values-at-rest)。
+
+### 可选参数 {#optional-arguments}
+
+以下是工具可以依赖的可选参数列表：
+- `__event_emitter__`：发出事件（请参阅下一节）
+- `__event_call__`：与事件发射器相同，但可用于用户交互。它会等待浏览器应答；除非将 [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) 设置为秒数，否则没有超时限制。
+- `__user__`：包含用户信息的字典。其中还通过 `__user__["valves"]` 包含 `UserValves` 对象。
+- `__metadata__`：包含聊天元数据的字典
+- `__messages__`：先前消息的列表
+- `__files__`：附加文件（消息没有附件时为空列表）
+- `__model__`：包含模型信息的字典。对于工作区工具，如果在**设置 > 界面**（管理员区域）中配置了任务模型，则该值为任务模型；否则为聊天模型。请读取 `__metadata__["model"]` 获取用户正在聊天的模型。
+- `__id__`：工具自身的 ID
+- `__chat_id__` 和 `__message_id__`：当前聊天和消息的 ID
+- `__request__`：FastAPI 请求
+- `__oauth_token__`：包含用户有效且会自动刷新的 OAuth 令牌负载的字典。这是访问用户令牌以发起经过身份验证的 API 调用的**全新、推荐且安全的**方式。该字典通常包含 `access_token`、`id_token` 以及特定于提供方的其他数据。
+
+有关 `__oauth_token__` 以及如何配置将该令牌发送给工具的更多信息，请查阅[环境变量文档页面](/reference/env-configuration/)中的 OAuth 章节和 [SSO 文档](/features/authentication-access/)。
+
+只需像上面示例中的 `__user__` 一样，将它们添加为 Tool 类中任意方法的参数。`__messages__` 和 `__files__` 会在每次原生工具调用前刷新。其他参数在请求开始时确定。
+
+#### `file_handler` {#file_handler}
+
+模块级 `file_handler = True` 会告知 Open WebUI，在工具运行后从请求中移除附加文件，以免检索管线再次注入这些文件。只有旧版函数调用路径会读取此标志。原生循环会忽略它。
+
+#### 在工具中使用 OAuth 令牌 {#using-the-oauth-token-in-a-tool}
+
+构建需要代表用户与外部 API 交互的工具时，现在可以直接访问用户的 OAuth 令牌。这样无需再使用脆弱的 cookie 抓取方式，并能确保令牌始终有效。
+
+**示例：** 使用用户的访问令牌调用外部 API 的工具。
+
+```python
+import httpx
+from typing import Optional
+
+class Tools:
+    # ... 其他类设置 ...
+
+    async def get_user_profile_from_external_api(self, __oauth_token__: Optional[dict] = None) -> str:
+        """
+        使用用户的 OAuth 访问令牌，从安全的外部 API 获取用户资料数据。
+
+        :param __oauth_token__: 由 Open WebUI 注入，包含用户的令牌数据。
+        """
+        if not __oauth_token__ or "access_token" not in __oauth_token__:
+            return "Error: User is not authenticated via OAuth or token is unavailable."
+
+        access_token = __oauth_token__["access_token"]
+
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-Type": "application/json"
+        }
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get("https://api.my-service.com/v1/profile", headers=headers)
+                response.raise_for_status() # 对错误状态码抛出异常
+                return f"API Response: {response.json()}"
+        except httpx.HTTPStatusError as e:
+            return f"Error: Failed to fetch data from API. Status: {e.response.status_code}"
+        except Exception as e:
+            return f"An unexpected error occurred: {e}"
+```
+
+### 事件发射器 {#event-emitters}
+
+事件发射器用于向聊天界面添加附加信息。与 Filter Outlet 类似，事件发射器能够向聊天追加内容；但与 Filter Outlet 不同，它们不能移除信息。此外，发射器可以在工具执行期间的任何阶段激活。
+
+:::danger 面向原生模式编写工具
+旧版模式**已经过时且不再受支持**。完整政策请参阅[工具调用模式指南](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)。编写的工具应在**原生（智能体）模式**下正确工作，这是今后唯一受支持的模式。下面的事件发射器兼容性矩阵仍记录旧版模式行为，供历史参考以及尚未迁移的现有工具维护者使用，但新工具不应依赖仅适用于旧版模式的事件类型。如果工具的用户体验从本质上需要仅在旧版模式下工作的事件类型（流式输出过程中的 `message`、`chat:message:delta`、`chat:message`、`replace`），请围绕原生兼容事件（`status`、`notification`、`citation`、`chat:message:files`、`confirmation`、`chat:message:follow_ups`）重新设计用户体验，而不是要求用户将模型切换为旧版模式。
+:::
+
+事件发射器的行为因两种函数调用模式而异。函数调用模式由 `function_calling` 参数控制：
+
+- **原生模式（智能体模式）**（`function_calling = "native"`）：唯一受支持的模式。使用模型的结构化工具调用 API。**事件发射器支持范围有限**：具体支持哪些事件类型，请参阅下面的矩阵。
+- **旧版模式**（`function_calling = "legacy"`）：提示词注入模式。支持完整的事件发射器接口，但该模式本身不受支持，新部署不应选择它。
+
+完整的模式政策、模型要求和配置说明，请参阅[**工具调用模式指南**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)。简而言之：**使用原生模式**；下面的矩阵会说明其中哪些事件类型可用。
+
+#### 函数调用模式配置 {#function-calling-mode-configuration}
+
+可以在两个位置配置函数调用模式：
+
+1. **管理员级别**：前往**设置 > 模型**（管理员区域），点击模型上的铅笔图标（**编辑**），然后选择**高级参数 > 函数调用**（设置为“Native”或“Legacy”）。
+2. **按请求设置**：在**模型控制 > 控制 > 高级参数**中设置 `params.function_calling = "native"` 或 `"legacy"`。
+
+如果模型似乎无法调用工具，请确保工具已启用（通过模型页面或聊天输入字段旁边的 `+` 号启用）。
+
+:::info 原生模式与内置工具
+编写自定义工具时，请注意 Open WebUI 在启用原生模式时还会提供**内置系统工具**。有关内置工具、函数调用模式和模型要求的详细信息，请参阅[**工具调用模式指南**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)。
+:::
+
+#### 在工具中检测模式 {#detecting-the-mode-in-your-tool}
+
+大多数工具无需根据模式进行分支。如果你的工具需要，请从 `__metadata__` 读取模式。**原生模式是默认值，因此要显式检测旧版模式。** 任何不是 `"legacy"` 的值（包括未设置的值）都会运行原生模式：
+
+```python
+def is_legacy_mode(__metadata__) -> bool:
+    # 原生模式是默认值；只有显式设置 "legacy" 才会退出原生模式。
+    return (__metadata__ or {}).get("params", {}).get("function_calling") == "legacy"
+```
+
+请只定义一次该函数，并在需要分支的位置调用，而不要在每个方法中重新推导模式：
+
+```python
+if is_legacy_mode(__metadata__):
+    # 旧版：可使用完整的事件发射器接口（message、replace、delta）
+    ...
+else:
+    # 原生（默认）：使用兼容事件并返回最终内容
+    ...
+```
+
+:::caution 不要检查 `"native"` 或 `"default"`
+未设置模式的模型运行的是**原生模式**，但不会携带字符串 `"native"`。因此，`== "native"` 检查（或将 `"default"` 回退值视为非原生）会把当前的默认情况错误归类为旧版模式，并向其发送会静默失效的旧版专属事件。请检查 `== "legacy"`，并将其他所有情况都视为原生模式。
+:::
+
+#### 完整事件类型兼容性矩阵 {#complete-event-type-compatibility-matrix}
+
+下面全面列出了各事件类型在不同函数调用模式下的行为：
+
+| 事件类型 | 旧版模式功能 | 原生模式功能 | 状态 |
+| --- | --- | --- | --- |
+| `status` | 完全支持：在工具执行期间更新状态历史 | **相同**：跟踪函数执行状态 | **兼容** |
+| `message` | 完全支持：在流式输出期间追加增量内容 | **失效**：会被原生补全快照覆盖 | **不兼容** |
+| `chat:completion` | 完全支持：处理流式响应和补全数据 | **有限**：携带函数结果，但可能覆盖工具更新 | **部分兼容** |
+| `chat:message:delta` | 完全支持：在执行期间流式输出增量内容 | **失效**：内容会被原生函数快照替换 | **不兼容** |
+| `chat:message` | 完全支持：干净地替换整条消息内容 | **失效**：会被后续原生补全覆盖 | **不兼容** |
+| `replace` | 完全支持：精确控制内容替换 | **失效**：替换的内容会立即被覆盖 | **不兼容** |
+| `chat:message:files` / `files` | 完全支持：处理消息中的文件附件 | **相同**：处理函数输出中的文件 | **兼容** |
+| `chat:message:error` | 完全支持：显示错误通知 | **相同**：显示函数调用错误 | **兼容** |
+| `chat:message:follow_ups` | 完全支持：显示后续问题建议 | **相同**：显示函数生成的后续问题 | **兼容** |
+| `chat:title` | 完全支持：动态更新聊天标题 | **相同**：根据函数交互更新标题 | **兼容** |
+| `chat:tags` | 完全支持：修改聊天标签 | **相同**：管理函数输出中的标签 | **兼容** |
+| `chat:tasks:cancel` | 完全支持：取消正在进行的任务 | **相同**：取消原生函数执行 | **兼容** |
+| `citation` / `source` | 完全支持：处理带有完整元数据的引用 | **相同**：处理函数生成的引用 | **兼容** |
+| `notification` | 完全支持：显示 toast 通知 | **相同**：显示函数执行通知 | **兼容** |
+| `confirmation` | 完全支持：请求用户确认 | **相同**：确认函数执行 | **兼容** |
+| `execute` | 完全支持：动态执行代码 | **相同**：运行函数生成的代码 | **兼容** |
+| `input` | 完全支持：通过完整 UI 请求用户输入 | **相同**：为函数收集输入 | **兼容** |
+
+#### 为什么原生模式会破坏某些事件类型 {#why-native-mode-breaks-certain-event-types}
+
+在**原生模式**下，服务器根据流式模型输出构造内容块，并反复发出包含完整序列化内容快照的 `"chat:completion"` 事件。客户端将这些快照视为权威数据并完全替换消息内容，实际上会覆盖工具此前通过 `message`、`chat:message` 或 `replace` 等事件发出的任何更新。
+
+**技术细节：**
+- `middleware.py` 将工具直接添加到表单数据中，供原生模型处理
+- 流式处理程序通过 `chat:completion` 事件反复发出内容快照
+- 客户端的 `chatCompletionEventHandler` 将快照视为完整替换：`message.content = content`
+- 这会导致工具发出的内容更新闪烁并消失
+
+#### 最佳实践与建议 {#best-practices-and-recommendations}
+
+**对于需要实时 UI 更新的工具：**
+```python
+class Tools:
+    def __init__(self):
+        # 添加函数调用模式要求说明
+        self.description = "This tool requires Legacy Mode for full functionality"
+
+    async def interactive_tool(self, prompt: str, __event_emitter__=None) -> str:
+        """
+        此工具需要 function_calling = "legacy" 才能正确发出事件
+        """
+        if not __event_emitter__:
+            return "Event emitter not available - ensure Legacy Mode is enabled"
+
+        # 在旧版模式中可以安全使用 message 事件
+        await __event_emitter__({
+            "type": "message",
+            "data": {"content": "Processing step 1..."}
+        })
+        # ... 其余工具逻辑
+```
+
+**对于必须在两种模式下工作的工具：**
+
+根据 [`is_legacy_mode()`](#detecting-the-mode-in-your-tool) 进行分支：旧版路径使用 `message` / `replace` 流式输出；原生路径发出 `status` 更新，并从工具返回组装后的内容。辅助函数和完整分支模式见上文的[检测模式](#detecting-the-mode-in-your-tool)。不要在每个方法中重新推导模式。
+
+#### 排查事件发射器问题 {#troubleshooting-event-emitter-issues}
+
+**原生模式冲突的症状：**
+- 工具发出的消息短暂出现后消失
+- 工具执行期间内容闪烁
+- `message` 或 `replace` 事件似乎被忽略
+- 状态更新有效，但内容更新无法保留
+
+**解决方案：**
+1. **切换到旧版模式**：在模型设置中将 `function_calling` 从 `"native"` 改为 `"legacy"`
+2. **使用兼容的事件类型**：在原生模式中坚持使用 `status`、`citation`、`notification` 及其他兼容事件类型
+3. **实现模式检测**：添加检测函数调用模式的逻辑，并相应调整事件用法
+4. **考虑混合方案**：核心功能使用兼容事件，并进行优雅降级
+
+**调试事件发射器：**
+```python
+async def debug_events_tool(self, __event_emitter__=None, __metadata__=None) -> str:
+    """用于测试事件发射器功能的调试工具"""
+
+    if not __event_emitter__:
+        return "No event emitter available"
+
+    # 测试各种事件类型
+    test_events = [
+        {"type": "status", "data": {"description": "Testing status events", "done": False}},
+        {"type": "message", "data": {"content": "Testing message events (may not work in native mode)"}},
+        {"type": "notification", "data": {"content": "Testing notification events"}},
+    ]
+
+    mode_info = "Unknown"
+    if __metadata__:
+        mode_info = __metadata__.get("params", {}).get("function_calling") or "native (default)"
+
+    await __event_emitter__({
+        "type": "status",
+        "data": {"description": f"Function calling mode: {mode_info}", "done": False}
+    })
+
+    for i, event in enumerate(test_events):
+        await asyncio.sleep(1)  # 将事件间隔开
+        await __event_emitter__(event)
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": f"Sent event {i+1}/{len(test_events)}", "done": False}
+        })
+
+    await __event_emitter__({
+        "type": "status",
+        "data": {"description": "Event testing complete", "done": True}
+    })
+
+    return f"Event testing completed in {mode_info} mode. Check for missing or flickering content."
+```
+
+有几种特定事件类型具有不同的行为：
+
+#### 状态事件：完全兼容 {#status-events-fully-compatible}
+
+**状态事件在旧版和原生函数调用模式下的工作方式完全相同。** 这是在工具执行期间提供实时反馈的最可靠事件类型。
+
+状态事件会在消息执行步骤时向消息添加实时状态更新。它们可以在工具执行的任何阶段发出。状态消息显示在消息内容正上方，对于会延迟 LLM 响应或处理大量信息的工具至关重要。
+
+**基本状态事件结构：**
+```python
+await __event_emitter__({
+    "type": "status",
+    "data": {
+        "description": "Message that shows up in the chat",
+        "done": False,        # False = 仍在处理，True = 已完成
+        "hidden": False       # False = 可见，True = 完成后自动隐藏
+    }
+})
+```
+
+**状态事件参数：**
+- `description`：向用户显示的状态消息文本
+- `done`：布尔值，指示此状态是否表示完成
+- `hidden`：布尔值，在设置 `done: True` 后自动隐藏状态
+
+<details>
+<summary>基本状态示例</summary>
+
+```python
+async def data_processing_tool(
+        self, data_file: str, __user__: dict, __event_emitter__=None
+    ) -> str:
+        """
+        处理大型数据文件并提供状态更新
+        在旧版和原生函数调用模式下均可工作
+        """
+
+        if not __event_emitter__:
+            return "Processing completed (no status updates available)"
+
+        # 第 1 步：加载
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Loading data file...", "done": False}
+        })
+
+        # 模拟加载时间
+        await asyncio.sleep(2)
+
+        # 第 2 步：处理
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Analyzing 10,000 records...", "done": False}
+        })
+
+        # 模拟处理时间
+        await asyncio.sleep(3)
+
+        # 第 3 步：完成
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Analysis complete!", "done": True, "hidden": False}
+        })
+
+        return "Data analysis completed successfully. Found 23 anomalies."
+```
+</details>
+
+<details>
+<summary>带错误处理的高级状态</summary>
+
+```python
+async def api_integration_tool(
+        self, endpoint: str, __event_emitter__=None
+    ) -> str:
+        """
+        集成外部 API，并提供全面的状态跟踪
+        兼容两种函数调用模式
+        """
+
+        if not __event_emitter__:
+            return "API integration completed (no status available)"
+
+        try:
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": "Connecting to API...", "done": False}
+            })
+
+            # 模拟 API 连接
+            await asyncio.sleep(1.5)
+
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": "Authenticating...", "done": False}
+            })
+
+            # 模拟身份验证
+            await asyncio.sleep(1)
+
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": "Fetching data...", "done": False}
+            })
+
+            # 模拟数据获取
+            await asyncio.sleep(2)
+
+            # 成功状态
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": "API integration successful", "done": True}
+            })
+
+            return "Successfully retrieved 150 records from the API"
+
+        except Exception as e:
+            # 错误状态 - 始终可见，便于调试
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": f"Error: {str(e)}", "done": True, "hidden": False}
+            })
+
+            return f"API integration failed: {str(e)}"
+```
+</details>
+
+<details>
+<summary>多步骤进度状态</summary>
+
+```python
+async def batch_processor_tool(
+        self, items: list, __event_emitter__=None
+    ) -> str:
+        """
+        分批处理条目，并提供详细的进度跟踪
+        在两种函数调用模式下均可完美工作
+        """
+
+        if not __event_emitter__ or not items:
+            return "Batch processing completed"
+
+        total_items = len(items)
+        batch_size = 10
+        completed = 0
+
+        for i in range(0, total_items, batch_size):
+            batch = items[i:i + batch_size]
+            batch_num = (i // batch_size) + 1
+            total_batches = (total_items + batch_size - 1) // batch_size
+
+            # 更新当前批次的状态
+            await __event_emitter__({
+                "type": "status",
+                "data": {
+                    "description": f"Processing batch {batch_num}/{total_batches} ({len(batch)} items)...",
+                    "done": False
+                }
+            })
+
+            # 模拟批处理
+            await asyncio.sleep(1)
+
+            completed += len(batch)
+
+            # 进度更新
+            progress_pct = int((completed / total_items) * 100)
+            await __event_emitter__({
+                "type": "status",
+                "data": {
+                    "description": f"Progress: {completed}/{total_items} items ({progress_pct}%)",
+                    "done": False
+                }
+            })
+
+        # 最终完成状态
+        await __event_emitter__({
+            "type": "status",
+            "data": {
+                "description": f"Batch processing complete! Processed {total_items} items",
+                "done": True
+            }
+        })
+
+        return f"Successfully processed {total_items} items in {total_batches} batches"
+```
+</details>
+
+#### 消息事件：仅限默认模式 {#message-events-default-mode-only}
+
+:::warning
+
+**严重警告：消息事件与原生函数调用模式不兼容！**
+
+:::
+
+消息事件（`message`、`chat:message`、`chat:message:delta`、`replace`）允许你在工具执行的任何阶段追加或修改消息内容。这可用于嵌入图片、渲染网页、流式更新内容，以及创建丰富的交互体验。
+
+**但是，这些事件类型存在严重的兼容性问题：**
+- **旧版模式**：功能完整，内容会持久保留并正确显示
+- **原生模式**：失效，内容会被补全快照覆盖并消失
+
+**消息事件在原生模式中失效的原因：**
+原生函数调用会反复发出包含完整内容快照的 `chat:completion` 事件，这些快照会完全替换消息内容，导致工具发出的任何消息更新闪烁并消失。
+
+**安全的消息事件结构（仅限旧版模式）：**
+```python
+await __event_emitter__({
+    "type": "message",  # 也可以是："chat:message"、"chat:message:delta"、"replace"
+    "data": {"content": "This content will be appended/replaced in the chat"},
+    # 注意：message 类型不需要 "done" 条件
+})
+```
+
+**消息事件类型：**
+- `message` / `chat:message:delta`：向现有消息追加内容
+- `chat:message` / `replace`：替换整条消息内容
+- 两种类型都会在原生模式下被覆盖
+
+<details>
+<summary>安全的消息流式输出（旧版模式）</summary>
+
+```python
+async def streaming_content_tool(
+        self, query: str, __event_emitter__=None, __metadata__=None
+    ) -> str:
+        """
+        在处理期间流式更新内容
+        需要 function_calling = "legacy" - 在原生模式下无法工作！
+        """
+
+        # 仅限旧版模式；请参阅上文的“在工具中检测模式”。
+        if not is_legacy_mode(__metadata__):
+            return "This tool requires Legacy Mode. Message streaming is overwritten in Native mode, which is the default."
+
+        if not __event_emitter__:
+            return "Event emitter not available"
+
+        # 流式输出渐进式内容更新
+        content_chunks = [
+            "**Phase 1: Research**\nGathering information about your query...\n\n",
+            "**Phase 2: Analysis**\nAnalyzing gathered data patterns...\n\n",
+            "**Phase 3: Synthesis**\nGenerating insights and recommendations...\n\n",
+            "**Phase 4: Final Report**\nCompiling comprehensive results...\n\n"
+        ]
+
+        accumulated_content = ""
+
+        for i, chunk in enumerate(content_chunks):
+            accumulated_content += chunk
+
+            # 将此内容块追加到消息
+            await __event_emitter__({
+                "type": "message",
+                "data": {"content": chunk}
+            })
+
+            # 显示进度状态
+            await __event_emitter__({
+                "type": "status",
+                "data": {
+                    "description": f"Processing phase {i+1}/{len(content_chunks)}...",
+                    "done": False
+                }
+            })
+
+            # 模拟处理时间
+            await asyncio.sleep(2)
+
+        # 最终完成
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Content streaming complete!", "done": True}
+        })
+
+        return "Content streaming completed successfully. All phases processed."
+```
+</details>
+
+<details>
+<summary>动态内容替换（旧版模式）</summary>
+
+```python
+async def live_dashboard_tool(
+        self, __event_emitter__=None, __metadata__=None
+    ) -> str:
+        """
+        使用内容替换创建实时更新的仪表板
+        仅在旧版模式下工作
+        """
+
+        # 仅限旧版模式；请参阅上文的“在工具中检测模式”。
+        if not is_legacy_mode(__metadata__):
+            return """
+**Native Mode Incompatibility**
+
+This dashboard tool cannot function in Native mode (the default) because:
+- Content replacement events get overwritten by completion snapshots
+- Live updates will flicker and disappear
+- Real-time data will not persist in the interface
+
+**Solution:** Set Function Calling to "Legacy" in Model Settings → Advanced Params. Legacy Mode is unsupported, so prefer redesigning around Native-compatible events.
+"""
+
+        if not __event_emitter__:
+            return "Dashboard created (static mode - no live updates)"
+
+        # 创建初始仪表板
+        initial_dashboard = """
+
+# Live System Dashboard
+
+## System Status: Initializing...
+
+### Current Metrics:
+- **CPU Usage**: Loading...
+- **Memory**: Loading...
+- **Active Users**: Loading...
+- **Response Time**: Loading...
+
+---
+*Last Updated: Initializing...*
+"""
+
+        await __event_emitter__({
+            "type": "replace",
+            "data": {"content": initial_dashboard}
+        })
+
+        # 模拟实时数据更新
+        updates = [
+            {
+                "status": "Online",
+                "cpu": "23%",
+                "memory": "64%",
+                "users": "1,247",
+                "response": "145ms"
+            },
+            {
+                "status": "Optimal",
+                "cpu": "18%",
+                "memory": "61%",
+                "users": "1,352",
+                "response": "132ms"
+            },
+            {
+                "status": "Busy",
+                "cpu": "67%",
+                "memory": "78%",
+                "users": "1,891",
+                "response": "234ms"
+            }
+        ]
+
+        for i, data in enumerate(updates):
+            await asyncio.sleep(3)  # 模拟数据收集延迟
+
+            updated_dashboard = f"""
+
+# Live System Dashboard
+
+## System Status: {data['status']}
+
+### Current Metrics:
+- **CPU Usage**: {data['cpu']}
+- **Memory**: {data['memory']}
+- **Active Users**: {data['users']}
+- **Response Time**: {data['response']}
+
+---
+*Last Updated: {datetime.now().strftime('%H:%M:%S')}*
+*Update {i+1}/{len(updates)}*
+"""
+
+            # 替换整个仪表板内容
+            await __event_emitter__({
+                "type": "replace",
+                "data": {"content": updated_dashboard}
+            })
+
+            # 状态更新
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": f"Dashboard updated ({i+1}/{len(updates)})", "done": False}
+            })
+
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Live dashboard monitoring complete", "done": True}
+        })
+
+        return "Dashboard monitoring session completed."
+```
+</details>
+
+<details>
+<summary>可安全处理两种模式的消息工具</summary>
+
+根据 [`is_legacy_mode()`](#detecting-the-mode-in-your-tool) 进行分支的工具可以适配两种模式：旧版路径通过渐进式 `message` 事件流式输出；原生路径（默认）发出 `status` 更新，并将组装后的内容作为工具结果返回。辅助函数和分支骨架请参阅[检测模式](#detecting-the-mode-in-your-tool)。
+
+</details>
+
+#### 引用：完全兼容 {#citations-fully-compatible}
+
+**引用事件在旧版和原生函数调用模式下的工作方式完全相同。** 此事件类型在聊天界面中提供来源参考和引用，让用户可以点击并查看来源材料。
+
+对于从外部来源、数据库或文档检索信息的工具，引用至关重要。它们提供了透明度，并允许用户核实信息来源。
+
+**引用事件结构：**
+```python
+await __event_emitter__({
+    "type": "citation",
+    "data": {
+        "document": [content],                    # 内容字符串数组
+        "metadata": [                             # 元数据对象数组
+            {
+                "date_accessed": datetime.now().isoformat(),
+                "source": title,
+                "author": "Author Name",          # 可选
+                "publication_date": "2024-01-01", # 可选
+                "url": "https://source-url.com"   # 可选
+            }
+        ],
+        "source": {"name": title, "url": url}    # 主要来源信息
+    }
+})
+```
+
+:::info `self.citation` 不再有任何作用
+旧指南会告诉你设置 `self.citation = False`，以防止自动引用覆盖自定义引用。系统仍会从模块读取该标志，但已没有任何逻辑使用它。在旧版模式中，无论该标志如何设置，每个工具结果都会成为来源；在原生模式中，只有一组固定的内置工具会生成来源，Python 工具的结果绝不会生成来源。设置它没有害处，省略它也不会带来任何变化。
+:::
+
+<details>
+<summary>基本引用示例</summary>
+
+```python
+class Tools:
+    async def research_tool(
+            self, topic: str, __event_emitter__=None
+        ) -> str:
+        """
+        研究主题并提供适当的引用
+        在旧版和原生模式下的工作方式完全相同
+        """
+
+        if not __event_emitter__:
+            return "Research completed (citations not available)"
+
+        # 模拟研究发现
+        sources = [
+            {
+                "title": "Advanced AI Systems",
+                "url": "https://example.com/ai-systems",
+                "content": "Artificial intelligence systems have evolved significantly...",
+                "author": "Dr. Jane Smith",
+                "date": "2024-03-15"
+            },
+            {
+                "title": "Machine Learning Fundamentals",
+                "url": "https://example.com/ml-fundamentals",
+                "content": "The core principles of machine learning include...",
+                "author": "Prof. John Doe",
+                "date": "2024-02-20"
+            }
+        ]
+
+        # 为每个来源发出引用
+        for source in sources:
+            await __event_emitter__({
+                "type": "citation",
+                "data": {
+                    "document": [source["content"]],
+                    "metadata": [
+                        {
+                            "date_accessed": datetime.now().isoformat(),
+                            "source": source["title"],
+                            "author": source["author"],
+                            "publication_date": source["date"],
+                            "url": source["url"]
+                        }
+                    ],
+                    "source": {
+                        "name": source["title"],
+                        "url": source["url"]
+                    }
+                }
+            })
+
+        return f"Research on '{topic}' completed. Found {len(sources)} relevant sources with detailed citations."
+```
+</details>
+
+<details>
+<summary>高级多来源引用</summary>
+
+```python
+async def comprehensive_analysis_tool(
+        self, query: str, __event_emitter__=None
+    ) -> str:
+        """
+        使用多种来源类型执行综合分析
+        完全兼容所有函数调用模式
+        """
+
+        if not __event_emitter__:
+            return "Analysis completed"
+
+        # 具有丰富元数据的多种来源类型
+        research_sources = {
+            "academic": [
+                {
+                    "title": "Neural Network Architecture in Modern AI",
+                    "authors": ["Dr. Sarah Chen", "Prof. Michael Rodriguez"],
+                    "journal": "Journal of AI Research",
+                    "volume": "Vol. 45, Issue 2",
+                    "pages": "123-145",
+                    "doi": "10.1000/182",
+                    "date": "2024-01-15",
+                    "content": "This comprehensive study examines the evolution of neural network architectures..."
+                }
+            ],
+            "web_sources": [
+                {
+                    "title": "Industry AI Implementation Trends",
+                    "url": "https://tech-insights.com/ai-trends-2024",
+                    "site_name": "TechInsights",
+                    "published": "2024-03-01",
+                    "content": "Recent industry surveys show that 78% of companies are implementing AI solutions..."
+                }
+            ],
+            "reports": [
+                {
+                    "title": "Global AI Market Report 2024",
+                    "organization": "International Tech Research Institute",
+                    "report_number": "ITRI-2024-AI-001",
+                    "date": "2024-02-28",
+                    "content": "The global artificial intelligence market is projected to reach $1.8 trillion by 2030..."
+                }
+            ]
+        }
+
+        citation_count = 0
+
+        # 处理学术来源
+        for source in research_sources["academic"]:
+            citation_count += 1
+            await __event_emitter__({
+                "type": "citation",
+                "data": {
+                    "document": [source["content"]],
+                    "metadata": [
+                        {
+                            "date_accessed": datetime.now().isoformat(),
+                            "source": source["title"],
+                            "authors": source["authors"],
+                            "journal": source["journal"],
+                            "volume": source["volume"],
+                            "pages": source["pages"],
+                            "doi": source["doi"],
+                            "publication_date": source["date"],
+                            "type": "academic_journal"
+                        }
+                    ],
+                    "source": {
+                        "name": f"{source['title']} - {source['journal']}",
+                        "url": f"https://doi.org/{source['doi']}"
+                    }
+                }
+            })
+
+        # 处理 Web 来源
+        for source in research_sources["web_sources"]:
+            citation_count += 1
+            await __event_emitter__({
+                "type": "citation",
+                "data": {
+                    "document": [source["content"]],
+                    "metadata": [
+                        {
+                            "date_accessed": datetime.now().isoformat(),
+                            "source": source["title"],
+                            "site_name": source["site_name"],
+                            "publication_date": source["published"],
+                            "url": source["url"],
+                            "type": "web_article"
+                        }
+                    ],
+                    "source": {
+                        "name": source["title"],
+                        "url": source["url"]
+                    }
+                }
+            })
+
+        # 处理报告
+        for source in research_sources["reports"]:
+            citation_count += 1
+            await __event_emitter__({
+                "type": "citation",
+                "data": {
+                    "document": [source["content"]],
+                    "metadata": [
+                        {
+                            "date_accessed": datetime.now().isoformat(),
+                            "source": source["title"],
+                            "organization": source["organization"],
+                            "report_number": source["report_number"],
+                            "publication_date": source["date"],
+                            "type": "research_report"
+                        }
+                    ],
+                    "source": {
+                        "name": f"{source['title']} - {source['organization']}",
+                        "url": f"https://reports.example.com/{source['report_number']}"
+                    }
+                }
+            })
+
+        return f"""
+
+# Analysis Complete
+
+Comprehensive analysis of '{query}' has been completed using {citation_count} authoritative sources:
+
+- **{len(research_sources['academic'])}** Academic journal articles
+- **{len(research_sources['web_sources'])}** Industry web sources
+- **{len(research_sources['reports'])}** Research reports
+
+All sources have been properly cited and are available for review by clicking the citation links above.
+"""
+```
+</details>
+
+<details>
+<summary>数据库引用工具</summary>
+
+```python
+async def database_query_tool(
+        self, sql_query: str, __event_emitter__=None
+    ) -> str:
+        """
+        查询数据库并提供数据引用
+        在两种函数调用模式下均可完美工作
+        """
+
+        if not __event_emitter__:
+            return "Database query executed"
+
+        # 使用引用元数据模拟数据库结果
+        query_results = [
+            {
+                "record_id": "USR_001247",
+                "data": "John Smith, Software Engineer, joined 2023-01-15",
+                "table": "employees",
+                "last_updated": "2024-03-10T14:30:00Z",
+                "updated_by": "admin_user"
+            },
+            {
+                "record_id": "USR_001248",
+                "data": "Jane Wilson, Product Manager, joined 2023-02-20",
+                "table": "employees",
+                "last_updated": "2024-03-08T09:15:00Z",
+                "updated_by": "hr_system"
+            }
+        ]
+
+        # 为每条数据库记录创建引用
+        for i, record in enumerate(query_results):
+            await __event_emitter__({
+                "type": "citation",
+                "data": {
+                    "document": [f"Database Record: {record['data']}"],
+                    "metadata": [
+                        {
+                            "date_accessed": datetime.now().isoformat(),
+                            "source": f"Database Table: {record['table']}",
+                            "record_id": record['record_id'],
+                            "last_updated": record['last_updated'],
+                            "updated_by": record['updated_by'],
+                            "query": sql_query,
+                            "type": "database_record"
+                        }
+                    ],
+                    "source": {
+                        "name": f"Record {record['record_id']} - {record['table']}",
+                        "url": f"database://internal/tables/{record['table']}/{record['record_id']}"
+                    }
+                }
+            })
+
+        return f"""
+
+# Database Query Results
+
+Executed query: `{sql_query}`
+
+Retrieved **{len(query_results)}** records with complete citation metadata. Each record includes:
+- Record ID and source table
+- Last modification timestamp
+- Update attribution
+- Full audit trail
+
+All data sources have been properly cited for transparency and verification.
+"""
+```
+</details>
+
+#### 其他兼容事件类型 {#additional-compatible-event-types}
+
+以下事件类型在旧版和原生函数调用模式下的工作方式完全相同：
+
+**通知事件**
+```python
+await __event_emitter__({
+    "type": "notification",
+    "data": {"content": "Toast notification message"}
+})
+```
+
+**文件事件**
+```python
+await __event_emitter__({
+    "type": "files", # 或 "chat:message:files"
+    "data": {"files": [{"type": "file", "name": "report.pdf", "url": "/files/report.pdf"}]}
+})
+```
+
+**后续问题事件**
+```python
+await __event_emitter__({
+    "type": "chat:message:follow_ups",
+    "data": {"follow_ups": ["What about X?", "Tell me more about Y"]}
+})
+```
+
+**标题更新事件**
+```python
+await __event_emitter__({
+    "type": "chat:title",
+    "data": {"title": "New Chat Title"}
+})
+```
+
+**标签事件**
+```python
+await __event_emitter__({
+    "type": "chat:tags",
+    "data": {"tags": ["research", "analysis", "completed"]}
+})
+```
+
+**错误事件**
+```python
+await __event_emitter__({
+    "type": "chat:message:error",
+    "data": {
+        "error": {
+            "content": "Error message to display"
+        }
+    }
+})
+```
+
+接下来的 `confirmation` 和 `input` 两种事件会等待浏览器应答，因此需要 `__event_call__`；通过 `__event_emitter__` 发出时，回复无处返回。`execute` 可与两者中的任意一个配合使用：需要取回结果时使用 `__event_call__`，发出后无需等待结果时使用 `__event_emitter__`。
+
+**确认事件**
+```python
+confirmed = await __event_call__({
+    "type": "confirmation",
+    "data": {"title": "Please confirm", "message": "Are you sure you want to continue?"}
+})
+```
+
+**输入请求事件**
+```python
+answer = await __event_call__({
+    "type": "input",
+    "data": {"title": "More detail needed", "message": "Please enter additional information:", "placeholder": "..."}
+})
+```
+
+**代码执行事件**
+```python
+result = await __event_call__({
+    "type": "execute",
+    "data": {"code": "return document.title;"}  # 在浏览器中运行，因此使用 JavaScript
+})
+```
+
+#### 函数调用模式综合指南 {#comprehensive-function-calling-mode-guide}
+
+:::danger 面向原生模式编写工具，旧版模式不受支持
+旧版模式**已经过时且不再受支持**。新工具应编写为在原生模式下工作。保留下面的模式比较详情，是为了让现有旧版模式工具的维护者了解迁移时需要弥补的差距。这些内容**并非**建议新工具选择旧版模式。
+
+如果工具设计依赖仅适用于旧版模式的事件类型，请围绕原生兼容接口（`status`、`notification`、`citation`、`chat:message:files`、`confirmation`、`chat:message:follow_ups`，以及从工具方法返回最终内容块）重新设计用户体验。要求用户将模型切换为旧版模式才能运行工具，是今后不可接受的做法。
+:::
+
+**模式比较概览**（*仅供迁移参考；原生模式是唯一受支持的目标*）：
+
+| 方面 | 旧版模式（过时 / 不受支持） | 原生模式（受支持） |
+| --- | --- | --- |
+| **状态** | 过时，不再受支持 | 新工具必须使用 |
+| **延迟** | 较高（完整提示词注入管线） | 较低（直接工具调用 API） |
+| **KV 缓存** | 每轮都会失效 | 保留 |
+| **事件支持** | 完整事件类型接口 | 有限接口（见上方矩阵） |
+| **流式输出** | 流式输出过程中的内容重写有效 | 流式输出过程中的重写会被补全快照覆盖 |
+| **状态 / 通知 / 引用** | 是 | 是 |
+| **消息内容事件（`message`、`chat:message`、`replace`）** | 是 | 被覆盖 |
+| **内置系统工具（记忆、笔记、知识、Web 搜索、图像生成、代码解释器）** | 否 | 是 |
+
+**如何面向原生模式设计：**
+
+- 将工具的主要输出作为工具方法的**返回值**提供。该内容会由模型作为其响应的一部分发出，不受事件覆盖问题影响。
+- 使用 `status` 和 `notification` 提供进度和面向用户的提醒；原生模式完全支持它们。
+- 使用 `citation` / `source` 事件提供参考来源；原生模式完全支持。
+- 通过 `__event_call__` 使用 `confirmation` / `input` 实现交互流程；原生模式完全支持。
+- 通过 `chat:message:files` 事件附加文件；原生模式完全支持。
+- 避免在流式输出过程中依赖 `message`、`chat:message:delta`、`chat:message` 或 `replace`；这四种事件会在原生模式下失效。如果需要渐进式输出，请发出一系列 `status` 更新，并从工具返回最终内容。
+
+<details>
+<summary>将旧版模式工具迁移到原生模式</summary>
+
+将旧版模式工具迁移到原生模式时，常见的重写方式包括：
+
+- 将用于追加内容的流式 `message` 事件，替换为包含组装后内容的单个最终返回值。
+- 将基于 `replace` 的进度条替换为一系列 `status` 事件（`"description": "Step 3 of 5 — fetching..."`）。
+- 将基于 `chat:message` 的仪表板替换为包含渲染后仪表板的返回值（Markdown / HTML 均可）。
+- 保持 `citation`、`notification`、`confirmation` 和文件附件不变；它们在两种模式下的工作方式完全相同。
+
+**通用兼容模式：**根据 [`is_legacy_mode()`](#detecting-the-mode-in-your-tool) 进行分支。旧版路径发送 `message` 事件以实现渐进式输出；原生路径（默认）发出 `status` 更新，并从工具返回结果。辅助函数和分支骨架请参阅[检测模式](#detecting-the-mode-in-your-tool)。
+
+</details>
+
+<details>
+<summary>调试事件发射器问题</summary>
+
+**常见问题与解决方案：**
+
+**问题：内容出现后消失**
+- **原因**：在原生模式中使用 `message` / `chat:message` / `replace` 事件；补全快照会覆盖它们。
+- **解决方案**：从工具方法返回内容，并改用 `status` 事件显示进度。**不要**切换到旧版模式。旧版模式不再受支持。
+
+**问题：工具似乎没有响应**
+- **原因**：未为模型启用函数调用
+- **解决方案**：在模型设置中或通过 `+` 按钮启用工具
+
+**问题：事件完全没有触发**
+- **原因**：缺少 `__event_emitter__` 参数或其值为 None
+- **解决方案**：确保工具方法签名中包含该参数
+
+**诊断工具：**
+```python
+async def event_diagnostics_tool(
+        self, __event_emitter__=None, __metadata__=None, __user__=None
+    ) -> str:
+        """
+        用于事件发射器调试的综合诊断工具
+        """
+
+        report = ["# Event Emitter Diagnostic Report\n"]
+
+        # 检查事件发射器是否可用
+        if __event_emitter__:
+            report.append("Event emitter is available\n")
+        else:
+            report.append("Event emitter is NOT available\n")
+            return "".join(report)
+
+        # 检查元数据是否可用
+        if __metadata__:
+            mode = __metadata__.get("params", {}).get("function_calling") or "native"
+            report.append(f"Function calling mode: **{mode}**\n")
+        else:
+            report.append("Metadata not available; assuming Native (the default)\n")
+            mode = "native"
+
+        # 检查用户上下文
+        if __user__:
+            report.append("User context available\n")
+        else:
+            report.append("User context not available\n")
+
+        # 测试兼容事件（在两种模式下均可工作）
+        report.append("\n## Testing Compatible Events:\n")
+
+        try:
+            await __event_emitter__({
+                "type": "status",
+                "data": {"description": "Testing status events...", "done": False}
+            })
+            report.append("Status events: WORKING\n")
+        except Exception as e:
+            report.append(f"Status events: FAILED - {str(e)}\n")
+
+        try:
+            await __event_emitter__({
+                "type": "notification",
+                "data": {"content": "Test notification"}
+            })
+            report.append("Notification events: WORKING\n")
+        except Exception as e:
+            report.append(f"Notification events: FAILED - {str(e)}\n")
+
+        # 测试有问题的事件（在原生模式下失效）
+        report.append("\n## Testing Mode-Dependent Events:\n")
+
+        try:
+            await __event_emitter__({
+                "type": "message",
+                "data": {"content": "**Test message event** - This should appear in Legacy Mode only\n"}
+            })
+            report.append("Message events: SENT (may disappear in Native mode)\n")
+        except Exception as e:
+            report.append(f"Message events: FAILED - {str(e)}\n")
+
+        # 最终状态
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Diagnostic complete", "done": True}
+        })
+
+        # 针对具体模式的建议
+        report.append("\n## Recommendations:\n")
+
+        if mode == "legacy":
+            report.append("""
+**Legacy Mode Detected**: full event support, but Legacy Mode is unsupported
+- All event types work, but new tools should not depend on Legacy-only events
+- Migrate to Native Mode (the default): return your final content and use status / citation / notification
+""")
+        else:
+            report.append("""
+**Native Mode** (the default): limited event support
+- Use: status, citation, notification, files events
+- Avoid: message, replace, chat:message events (overwritten by completion snapshots)
+- Return your primary output as the tool's return value
+""")
+
+        return "".join(report)
+```
+</details>
+
+<details>
+<summary>事件发射器快速参考</summary>
+
+**始终兼容（两种模式）：**
+```python
+
+# 状态更新 - 非常适合进度跟踪
+await __event_emitter__({
+    "type": "status",
+    "data": {"description": "Processing...", "done": False}
+})
+
+# 引用 - 对来源归属至关重要
+await __event_emitter__({
+    "type": "citation",
+    "data": {
+        "document": ["Content"],
+        "source": {"name": "Source", "url": "https://example.com"}
+    }
+})
+
+# 通知 - 用户提醒
+await __event_emitter__({
+    "type": "notification",
+    "data": {"content": "Task completed!"}
+})
+```
+
+**仅限旧版模式（在原生模式下失效）：**
+```python
+
+# 这些内容会在原生模式下闪烁/消失
+
+# 渐进式内容流式输出
+await __event_emitter__({
+    "type": "message",
+    "data": {"content": "Streaming content..."}
+})
+
+# 内容替换
+await __event_emitter__({
+    "type": "replace",
+    "data": {"content": "New complete content"}
+})
+
+# 增量更新
+await __event_emitter__({
+    "type": "chat:message:delta",
+    "data": {"content": "Additional content"}
+})
+```
+
+**模式检测模式：**辅助函数和注意事项请参阅[在工具中检测模式](#detecting-the-mode-in-your-tool)。
+```python
+# 原生模式是默认值；只有显式设置 "legacy" 才会退出原生模式。
+is_legacy = is_legacy_mode(__metadata__)
+can_stream_messages = is_legacy   # message / replace 仅在旧版模式下有效
+```
+
+**必要的导入：**
+```python
+import asyncio
+from datetime import datetime
+from typing import Optional, Callable, Awaitable
+```
+</details>
+
+### 富 UI 元素嵌入 {#rich-ui-element-embedding}
+
+工具和 Action 可以返回 HTML 内容，并作为交互式 iframe 直接渲染在聊天中。完整文档、示例、安全注意事项和 CORS 配置，请参阅专门的**[富 UI 嵌入](/features/extensibility/plugin/development/rich-ui)**指南。
+
+
+## 外部软件包 {#external-packages}
+
+你可以在 Tools 定义元数据中指定自定义软件包。点击 `Save` 时，系统会解析该行，并一次性对所有依赖项运行 `pip install`。
+
+Open WebUI 还会在每次重启后再次运行这些安装。启动时，它会安装每个活动 Function 和每个由管理员拥有的活动 Tool 的 `requirements:`。由任何其他用户拥有的 Tool 不包含在启动安装中；其软件包会在重启后 Open WebUI 首次加载该工具时安装，例如在首次使用该工具的聊天中，该聊天会等待 pip 完成。当 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) 为 `False` 或 [`OFFLINE_MODE`](/reference/env-configuration#offline_mode) 为 `True` 时，两种安装都不会运行。
+
+:::warning
+
+**严重警告：软件包版本可能冲突**
+
+当多个工具定义同一软件包的不同版本时（例如工具 A 需要 `pandas==1.5.0`，工具 B 需要 `pandas==2.0.0`），Open WebUI 会以不确定的顺序安装它们。这可能导致不可预测的行为，并使一个或多个工具失效。
+
+**解决此问题的唯一稳健方案是使用 OpenAPI 工具服务器。**
+
+我们强烈建议使用 [OpenAPI 工具服务器](/features/extensibility/plugin/tools/openapi-servers/)来避免这些依赖冲突。
+
+:::
+
+:::danger 生产部署
+
+**不要在生产环境中依赖运行时 pip 安装。** 每个副本都会在启动时自行安装软件包。当 `UVICORN_WORKERS > 1` 时，每个工作进程都会同时安装到同一环境中，并发 pip 进程会因 `AssertionError` 崩溃。
+
+**在生产环境中设置 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)**，完全禁用运行时 pip 安装。然后使用自定义 Dockerfile，在镜像构建时预装所有必需的软件包：
+
+```dockerfile
+FROM ghcr.io/open-webui/open-webui:main
+
+RUN pip install --no-cache-dir python-docx requests beautifulsoup4
+```
+
+运行时安装仅适用于你尝试新函数和工具的**开发或家庭实验室环境**。对于任何服务多个用户的部署，都应将依赖项构建到容器镜像中。
+
+:::
+
+:::warning 安装依赖项时保存失败
+
+Open WebUI 通过运行 Open WebUI 所用的同一 Python 的 `python -m pip install` 来安装 `requirements:` 行。安装失败时，保存也会失败。创建工具或函数时会显示 `[ERROR: Error creating tool]` 或 `[ERROR: Error creating function]`。保存现有项目同样会因错误而失败。服务器日志会显示 `Error installing packages:`，后接列出的软件包，而 pip 自身的输出就位于它之前。
+
+两种原因很常见：
+
+- **列出了标准库模块。** `smtplib`、`json` 和 `datetime` 等模块随 Python 提供，并不是 pip 软件包。将它们从 `requirements:` 中移除，但保留 `import`。
+- Open WebUI 运行的 Python 环境中**缺少 pip**，某些使用 uv 设置的环境就是如此。请自行将软件包安装到该环境中，并设置 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) 以跳过安装。
+
+:::
+
+:::note
+
+pip 作为子进程在工作线程上运行，因此安装期间 Open WebUI 的其余部分会继续处理请求。只有触发安装的保存操作会等待。
+
+Open WebUI 还会将保存源代码中的四个导入前缀 `from utils`、`from apps`、`from main` 和 `from config` 通过纯子字符串替换重写为对应的 `open_webui.` 形式。因此，`from configparser import ConfigParser` 会变成 `from open_webui.configparser import ConfigParser` 并失败。请改写为 `import configparser`，并避免在文件中的任何位置使用这四个前缀。
+
+系统不会采取任何措施来处理软件包与 Open WebUI 自身依赖之间的冲突。如果不谨慎，指定依赖项可能会破坏 Open WebUI。你可以尝试将 `open-webui` 本身指定为依赖项来解决此问题。
+
+:::
+
+<details>
+<summary>示例</summary>
+
+```python
+"""
+title: myToolName
+author: myName
+funding_url: [any link here will be shown behind a `Heart` button for users to show their support to you]
+version: 1.0.0
+
+# 版本会显示在 UI 中，帮助用户跟踪更新。
+license: GPLv3
+description: [recommended]
+requirements: package1>=2.7.0,package2,package3
+"""
+```
+
+</details>

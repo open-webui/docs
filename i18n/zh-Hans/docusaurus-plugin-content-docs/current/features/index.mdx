@@ -1,0 +1,226 @@
+---
+sidebar_position: 200
+title: "功能"
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+export const Banner = ({slug, alt}) => (
+  <ThemedImage
+    alt={alt}
+    sources={{ light: useBaseUrl(`/images/banners/${slug}-light.svg`), dark: useBaseUrl(`/images/banners/${slug}-dark.svg`) }}
+    style={{ width: '100%', margin: '0.25rem 0 1.25rem' }}
+  />
+);
+
+# 使用 Open WebUI 可以做什么
+
+**一个界面，连接所有 AI 模型。私密、可扩展，为团队而构建。**
+
+<Banner slug="features" alt="功能：不同高度的区块，其中一个带有标记" />
+
+Open WebUI 取代团队每天需要应付的零散 AI 工具：用 ChatGPT 写作、用单独的应用生成图像、再用另一个应用搜索文档，还有散落在电子表格中、谁也找不到的提示词。现在，一切都集中在一个地方：对话、知识、工具以及驱动它们的模型。
+
+---
+
+## 聊天与对话 {#chat--conversations}
+
+<Banner slug="chat-conversations" alt="聊天与对话" />
+
+**与任意模型对话，在对话中途切换模型，并完整保留上下文。**
+
+对话是 Open WebUI 的核心。在同一个界面中与 Ollama、OpenAI、Anthropic 或任何兼容 OpenAI 的服务提供方聊天。附加文件、搜索 Web、执行代码并让 AI 使用工具，一切都无需离开聊天。
+
+| | |
+| :--- | :--- |
+| **多模型聊天** | 并排运行两个模型并比较响应 |
+| **文件与图像上传** | 附加文档、图像和代码，供 AI 分析 |
+| **Web 搜索** | AI 实时搜索 Web 并引用来源 |
+| **代码执行** | 直接在浏览器中或通过 [Open Terminal](/features/open-terminal) 运行 Python |
+| **消息队列** | AI 响应时仍可继续输入，消息会自动发送 |
+| **记忆** | AI 跨对话记住与你有关的事实 |
+| **文件夹、标签、置顶** | 按照你的工作方式整理对话 |
+| **语音与音频** | 语音转文字、文字转语音、免提语音和视频通话、[实时语音通话](/features/chat-conversations/chat-features/voice-mode#realtime-calls) |
+| **图像生成** | 使用 GPT-Image、Gemini、ComfyUI 等创建和编辑图像 |
+| **视频生成** | 使用 OpenAI、LiteLLM、OpenRouter 或 ComfyUI 视频模型，根据提示词创建短视频 |
+| **自动化** | 安排提示词按周期计划自动运行 |
+| **任务管理** | 模型为多步骤工作流程维护结构化任务列表 |
+
+[**探索聊天功能 →**](/features/chat-conversations/chat-features) · [**音频 →**](/features/chat-conversations/audio) · [**图像生成 →**](/features/chat-conversations/image-generation-and-editing)
+
+---
+
+## 知识与 RAG {#knowledge--rag}
+
+<Banner slug="kbsync" alt="知识与 RAG" />
+
+**让 AI 访问你的文档，并找到真正重要的内容。**
+
+上传文件、构建知识库，让 AI 准确检索所需信息。大型文档集可以选择向量搜索（RAG），需要精确性时则可选择全文注入。借助原生函数调用，模型可以自主搜索、浏览并综合整个知识库中的信息。
+
+| | |
+| :--- | :--- |
+| **13 种向量数据库** | ChromaDB 和 PGVector（官方维护），以及非核心集成：Qdrant、Milvus、Elasticsearch 等 |
+| **混合搜索** | BM25 + 向量搜索，并使用交叉编码器重排序 |
+| **8 种提取引擎** | Tika、Docling、Azure、Mistral OCR、Datalab Marker、MinerU、PaddleOCR、自定义加载器 |
+| **智能体式检索** | 模型自主搜索并阅读文档 |
+| **始终使用全文** | 注入完整文档，无需分块，无需猜测 |
+| **[带预览的文件浏览器](/features/workspace/knowledge#browsing-and-previewing-files)** | 浏览知识库中的文件和文件夹，并就地预览 |
+
+[**了解知识库 →**](/features/workspace/knowledge)
+
+---
+
+## 模型与智能体 {#models--agents}
+
+<Banner slug="workspace" alt="模型与智能体" />
+
+**为任意模型封装自定义指令、工具和知识，构建专用智能体。**
+
+创建一个始终遵循你的风格指南的“Python 导师”、一个使用公司模板的“会议摘要助手”，或一个内置代码检查规则的“代码审查员”。每个智能体都是一个配置封装器：选择任意基础模型，绑定知识、工具和系统提示词。
+
+| | |
+| :--- | :--- |
+| **模型预设** | 将系统提示词、工具、知识和参数打包在一起 |
+| **动态变量** | 自动注入 `{{USER_NAME}}`、`{{CURRENT_DATE}}` |
+| **绑定工具** | 为每个模型强制启用特定工具 |
+| **访问控制** | 将模型限制给特定用户或组 |
+| **全局默认值** | 为所有模型设置基线能力和参数 |
+| **[模型控制](/features/workspace/models#model-controls)** | 让用户直接在聊天中从已批准的参数预设（如思考强度）中选择 |
+| **[版本历史](/features/workspace/models#version-history)** | 保留每次保存的配置，并可重新启用其中任意版本 |
+
+[**了解模型 →**](/features/workspace/models)
+
+---
+
+## 笔记 {#notes}
+
+<Banner slug="notes" alt="笔记" />
+
+**在 AI 的陪伴下写作、思考和完善内容。**
+
+一个专门用于存放独立于任何单次对话的内容的工作区。使用富文本编辑器起草，用 AI 就地改写文本，并将笔记附加到任意聊天以精确注入上下文，无需分块，也无需向量搜索。
+
+| | |
+| :--- | :--- |
+| **富文本编辑器** | Markdown 和富文本，配有浮动格式工具栏 |
+| **AI 增强** | 就地改写或改进所选文本 |
+| **上下文注入** | 将笔记附加到任意聊天，提供完整、不失真的上下文 |
+| **智能体式访问** | 模型可以自主搜索、读取和更新笔记 |
+
+[**了解笔记 →**](/features/notes)
+
+---
+
+## 频道 {#channels}
+
+<Banner slug="channels" alt="频道" />
+
+**团队与 AI 实时共同思考的空间。**
+
+持久化的共享空间，让人类和 AI 模型参与同一场对话。标记 `@gpt-5.6` 来起草计划，再标记 `@claude` 进行评审，整个团队都能在同一时间线上看到双方的响应。
+
+| | |
+| :--- | :--- |
+| **@模型标记** | 按需让任意 AI 模型加入对话 |
+| **话题与回应** | 回复、置顶和表情回应 |
+| **访问控制** | 公开、私密、基于组的频道和私信频道 |
+| **AI 频道感知** | 模型自主跨频道搜索并综合信息 |
+| **[应用](/features/channels/apps)** | 外部服务加入频道，回应 `@mentions`，并发布带按钮的消息 |
+
+[**了解频道 →**](/features/channels)
+
+---
+
+## Open Terminal {#open-terminal}
+
+<Banner slug="terminal" alt="Open Terminal" />
+
+**为 AI 提供一台真正可用的计算机。**
+
+将真实的计算环境连接到 Open WebUI。AI 编写代码、执行代码、读取输出、修复错误并迭代，一切都在聊天中完成。它可以处理文件、安装软件包、运行服务器并返回结果。
+
+| | |
+| :--- | :--- |
+| **代码执行** | 运行真实命令并返回输出 |
+| **文件浏览器** | 在侧边栏中浏览、上传、下载和编辑文件 |
+| **网站预览** | 在 Open WebUI 内实时预览 Web 项目 |
+| **可选隔离** | Docker 容器或裸机 |
+
+[**了解 Open Terminal →**](/features/open-terminal)
+
+---
+
+## 可扩展性 {#extensibility}
+
+<Banner slug="extensibility" alt="可扩展性" />
+
+**通过 Python 工具、MCP 或 OpenAPI 服务器添加任意能力。**
+
+Open WebUI 是一个平台，而非封闭的产品。编写可在聊天中运行的 Python 工具，通过 OpenAPI 或 MCP 连接外部服务，构建能够过滤、转换或路由每条消息的函数，一键导入社区构建的扩展。
+
+| | |
+| :--- | :--- |
+| **工具与函数** | 在聊天中运行的 Python 脚本，内置代码编辑器，并提供[版本历史](/features/extensibility/plugin/tools#version-history)和适用于大型工具集的[工具搜索](/features/extensibility/plugin/tools#tool-search) |
+| **MCP 支持** | 为 Model Context Protocol 服务器提供原生 Streamable HTTP |
+| **OpenAPI 服务器** | 从任何兼容 OpenAPI 的端点自动发现工具 |
+| **技能** | 通过 Markdown 指令集及配套文件和版本历史，教模型如何处理任务 |
+| **提示词** | 带类型化输入变量和版本控制的斜杠命令模板 |
+
+[**了解可扩展性 →**](/features/extensibility)
+
+---
+
+## 身份验证与访问 {#authentication--access}
+
+<Banner slug="authentication-access" alt="身份验证与访问" />
+
+**控制谁可以进入、可以执行什么操作，以及如何接入你的身份体系。**
+
+Open WebUI 从设计之初就支持多用户。定义角色、创建用户组、设置模型级访问权限，并与身份提供方集成。无论是个人独立安装，还是拥有数千个席位的组织，都同样适用。
+
+| | |
+| :--- | :--- |
+| **RBAC** | 角色、组和资源级权限 |
+| **SSO/OIDC/LDAP** | 与任意身份提供方进行联合身份验证 |
+| **SCIM 2.0** | 自动预配用户和组 |
+| **API 密钥** | 为脚本、机器人和集成提供编程访问 |
+| **[双重登录验证（MFA）](/features/authentication-access/mfa)** | 每次登录都要求输入身份验证器应用中的验证码 |
+
+[**了解身份验证与访问 →**](/features/authentication-access)
+
+---
+
+## 管理 {#administration}
+
+<Banner slug="administration" alt="管理" />
+
+**监控使用情况、评估模型，并与用户沟通。**
+
+| | |
+| :--- | :--- |
+| **分析** | 使用情况仪表板，跟踪消息量、令牌消耗和成本 |
+| **评估** | 使用路由器模型进行盲测 A/B 测试，并提供基于 ELO 的排行榜 |
+| **公告横幅** | 可自定义的全系统公告 |
+| **默认界面设置** | 为所有用户的界面选项设置实例级初始值 |
+| **Webhooks** | 针对注册、聊天完成和外部集成的通知 |
+
+[**了解管理 →**](/features/administration)
+
+---
+
+## 部署到任意环境 {#deploy-anywhere}
+
+**无状态架构支持水平扩展，可部署在 Docker、Kubernetes、pip 或裸机上。**数据存储在共享数据库和存储中，Redis 负责协调各实例；随着需求增长，可在负载均衡器后添加应用副本。
+
+| | |
+| :--- | :--- |
+| **Docker 与 Compose** | 一条命令完成部署，支持 GPU |
+| **Kubernetes 与 Helm** | 生产级编排 |
+| **pip install** | `pip install open-webui && open-webui serve` |
+| **云存储** | 使用 S3、GCS、Azure Blob 支持无状态实例 |
+| **OpenTelemetry** | 将跟踪、指标和日志接入你的可观测性技术栈 |
+| **水平扩展** | 使用共享数据库、存储和 Redis 的无状态应用副本 |
+
+[**快速开始 →**](/getting-started/quick-start) · [**扩展指南 →**](/getting-started/advanced-topics/scaling) · [**高级主题 →**](/getting-started/advanced-topics)

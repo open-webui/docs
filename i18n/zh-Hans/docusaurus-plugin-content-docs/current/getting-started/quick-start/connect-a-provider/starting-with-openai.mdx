@@ -1,0 +1,118 @@
+---
+sidebar_position: 2
+title: "OpenAI"
+
+---
+
+## 概述 {#overview}
+
+Open WebUI 可以轻松连接到 **OpenAI** 和 **Azure OpenAI**。本指南将介绍如何添加 API 密钥、设置正确的端点并选择模型，让你可以立即开始聊天。
+
+对于其他提供 OpenAI 兼容 API 的提供方（Mistral、Groq、DeepSeek 等），请参阅 **[OpenAI 兼容提供方](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)**指南。对于 Anthropic 的 Claude 模型，请参阅专门的 **[Anthropic（Claude）](/getting-started/quick-start/connect-a-provider/starting-with-anthropic)**指南。
+
+---
+
+## 重要：以协议为中心，而非提供方 {#important-protocols-not-providers}
+
+Open WebUI 是一个**以协议为中心**的平台。虽然我们对 OpenAI 模型提供一流支持，但主要通过 **OpenAI Chat Completions API 协议**实现。
+
+我们专注于数十个提供方共同采用的通用标准，并支持 **[Open Responses](https://www.openresponses.org/)**等新兴标准。有关详细说明，请参阅**[协议支持常见问题](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**。
+
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## 第 1 步：获取 OpenAI API 密钥 {#step-1-get-your-openai-api-key}
+
+- **OpenAI**：在 [platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys) 获取密钥
+- **Azure OpenAI**：从 [Azure 门户](https://portal.azure.com/)获取密钥
+
+---
+
+## 第 2 步：在 Open WebUI 中添加 API 连接 {#step-2-add-the-api-connection-in-open-webui}
+
+Open WebUI 运行后：
+
+1. 转到**设置 > 连接（Settings > Connections）**（管理员区域）。
+2. 找到**管理 OpenAI API 连接（Manage OpenAI API Connections）**列表。
+3. 点击旁边的**添加连接（Add Connection）**按钮。
+
+<Tabs>
+  <TabItem value="standard" label="OpenAI" default>
+
+  *   **连接类型（Connection Type）**：外部（External）
+  *   **URL**：`https://api.openai.com/v1`
+  *   **API 密钥（API Key）**：你的密钥（以 `sk-...` 开头）
+
+  </TabItem>
+  <TabItem value="azure" label="Azure OpenAI">
+
+  适用于 Microsoft Azure OpenAI 部署。
+
+  1.  展开**高级（Advanced）**，将**提供方（Provider）**下拉菜单设置为 **Azure OpenAI**。Azure 端点 URL 通常会自动启用此模式。
+  2.  **URL**：你的 Azure 端点（例如 `https://my-resource.openai.azure.com`）。
+  3.  **API 版本（API Version）**：例如 `2024-02-15-preview`。
+  4.  **API 密钥（API Key）**：你的 Azure API 密钥。
+  5.  **模型 ID（部署）（Model IDs (Deployments)）**：你**必须**在此添加具体的部署名称（例如 `my-gpt4-deployment`）。
+
+  </TabItem>
+</Tabs>
+
+### 高级配置 {#advanced-configuration}
+
+*   **模型 ID（Model IDs）**（位于**高级（Advanced）**下）：
+    *   *默认（为空）*：自动检测提供方的所有可用模型。
+    *   *已设置*：替换获取的列表。Open WebUI 会停止为该连接调用提供方的 `/models`，并仅列出你输入的 ID，因此提供方报告的名称、大小和加载状态将不再显示。可以用它隐藏较旧或昂贵的模型，也可以列出提供方未列出的模型。
+    *   *每个 ID 一条*：输入内容开头和结尾的空格会被去除；如果 ID 已在列表中，则会拒绝添加并显示 **Model ID is already added**。重新打开存储列表含重复项的连接时，每个 ID 会合并为一条，保存时会将清理后的列表写回。
+
+*   **ID 前缀（Prefix ID）**：
+    *   如果连接的多个提供方具有同名模型（例如两个提供方都提供 `qwen3.6`），请在此添加前缀（例如 `groq`）以区分它们。Open WebUI 会用点连接前缀和模型 ID，使模型显示为 `groq.qwen3.6`，并在请求发送到上游前再次去除前缀。输入 `groq/` 作为前缀会生成 `groq/.qwen3.6`。未设置前缀时，Open WebUI 对每个 ID 只保留一个模型：当两个连接返回相同 ID 时，只列出列表中位置较高的连接所返回的副本，并在没有警告的情况下丢弃另一个。
+
+*   **提供方（Provider）**：
+    *   告知 Open WebUI URL 背后是哪种服务器，从而启用 Azure 路由、本地模型管理或 Anthropic 直通等附加功能。对于 OpenAI，请保持为**默认（Default）**。请参阅[提供方设置](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting)。
+
+4. 点击**保存（Save）**。
+
+这会安全地存储你的凭据。
+
+:::tip 连接超时配置
+
+如果 API 提供方响应缓慢或你遇到超时问题，可以调整模型列表获取超时：
+
+```bash
+# 为较慢的网络增加超时时间（默认为 10 秒）
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=15
+```
+
+如果保存了无法访问的 URL 并导致界面无响应，请参阅[模型列表加载问题](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints)故障排除指南，了解恢复方法。
+
+:::
+
+![OpenAI 连接界面](/images/getting-started/quick-start/manage-openai.png)
+
+---
+
+## 第 3 步：开始使用模型 {#step-3-start-using-models}
+
+保存连接后，即可直接在 Open WebUI 中使用模型。
+
+你无需下载任何模型，只需从模型选择器中选择一个模型并开始聊天。如果提供方支持某个模型，你就可以通过其 API 立即使用该模型。
+
+模型选择界面如下所示：
+
+![OpenAI 模型选择器](/images/getting-started/quick-start/selector-openai.png)
+
+只需选择 GPT-5.6 Sol、GPT-5.6 Terra 或提供方提供的任何兼容模型。
+
+---
+
+## 全部完成！ {#all-set}
+
+就是这样！你的 OpenAI API 连接已可使用。
+
+如果要连接其他提供方，请参阅 **[Anthropic（Claude）](/getting-started/quick-start/connect-a-provider/starting-with-anthropic)**指南；有关 Mistral、Groq、DeepSeek 等提供方，请参阅 **[OpenAI 兼容提供方](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)**指南。
+
+如果遇到问题或需要更多支持，请访问我们的[帮助部分](/troubleshooting)。
+
+祝你提示词编写愉快！

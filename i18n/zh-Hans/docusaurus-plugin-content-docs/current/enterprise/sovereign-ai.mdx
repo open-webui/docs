@@ -1,0 +1,131 @@
+---
+sidebar_position: 1.5
+title: "主权 AI 平台"
+description: "了解 Open WebUI 如何通过自托管基础设施、数据驻留控制、模型选择、企业身份和受治理的 AI 工作流程支持主权 AI 部署。"
+keywords:
+  [
+    "主权 AI 平台",
+    "主权 AI",
+    "自托管 AI 平台",
+    "私有 AI 平台",
+    "本地 AI 平台",
+    "气隙隔离 AI 平台",
+    "AI 数据驻留",
+    "企业 AI 治理"
+  ]
+---
+
+# 主权 AI 平台
+
+主权 AI 是指能够决定 AI 在何处运行、可以访问哪些数据、可以使用哪些模型端点、谁可以访问它，以及如何随时间推移治理系统。
+
+对企业团队而言，难点很少只是勾选一个复选框，而是围绕整个 AI 工作流程建立一系列运营边界：提示词、文件、知识、模型调用、工具、日志、备份、用户生命周期和管理员访问。
+
+Open WebUI 通过提供可在组织自主运营的基础设施内运行的自托管 AI 工作区和控制层，支持主权 AI 部署。它不是主权云提供方，而是团队用来在自有身份、部署和治理控制下提供获批模型、知识、工具和工作流程的应用层。
+
+:::info 产品概览
+有关 Open WebUI 主权 AI 方法的产品级概览，请参阅 [**openwebui.com 上的主权 AI**](https://openwebui.com/sovereign-ai)。
+:::
+
+## 主权 AI 在实践中的含义 {#what-sovereign-ai-means-in-practice}
+
+首先定义组织需要控制的边界。
+
+| 边界 | 需要回答的问题 | Open WebUI 相关事项 |
+| :--- | :--- | :--- |
+| 基础设施 | 应用在何处运行？哪个区域、云账户、VPC、集群或数据中心负责承载？ | 部署模式、网络、存储和高可用性 |
+| 数据路径 | 提示词、上传的文件、知识索引、日志、导出内容和备份存储在哪里？ | 数据库、对象存储、向量数据库、日志和备份策略 |
+| 模型边界 | 哪些模型服务提供方会接收提示词和检索到的上下文？敏感用例能否保留在本地或私有端点上？ | 模型连接、提供方路由和基于组的访问控制 |
+| 身份 | 哪个身份提供方控制登录、MFA、用户生命周期和组成员关系？ | SSO、OIDC、LDAP、SCIM、角色和组 |
+| 权限 | 谁可以上传文件、创建知识、使用工具、创建 API 密钥或访问特定模型？ | RBAC、资源共享和功能权限 |
+| 运营 | 谁负责管理实例、读取日志、管理备份、轮换机密和批准变更？ | 管理员设置、审计日志、操作员访问和变更控制 |
+
+如果这些边界不明确，即使 AI 部署在技术上属于自托管，也仍可能出现控制权旁落。获批数据边界之外的模型端点、共享数据库的运维人员或不受限制的文件上传，其影响可能与应用的运行位置同样重大。
+
+## Open WebUI 的定位 {#where-open-webui-fits}
+
+Open WebUI 位于基础设施和模型推理之上。云、数据中心、Kubernetes 平台、存储层、数据库、模型服务提供方和网络控制仍由你的组织选择。
+
+Open WebUI 为团队提供运行在该环境中的受治理工作区：
+
+- **面向用户的 AI 界面**，用于聊天、文件、知识、工具和共享工作流程。
+- **模型选择**，涵盖本地模型、私有端点、获批的托管服务提供方和 OpenAI 兼容网关。
+- **企业身份集成**，支持 SSO、OIDC、LDAP、SCIM、角色、组和权限。
+- **运营控制**，涵盖聊天记录、临时聊天、文件上传、知识访问、工具、API 密钥、审计日志和管理功能。
+- **部署自主性**，支持 VM、容器、Kubernetes、私有云、本地、混合和离线环境。
+
+Open WebUI 仅凭自身无法让环境具备主权属性。它为平台和安全团队提供一个自托管层，使其能够按照所选边界提供、限制、审查和运营 AI 服务。
+
+## 团队需要评估的事项 {#what-teams-need-to-evaluate}
+
+向大规模用户群开放 AI 访问之前，请使用此清单。
+
+| 注意事项 | 需要决定的内容 | 入手文档 |
+| :--- | :--- | :--- |
+| 数据驻留 | 哪些区域、租户、存储账户、数据库、向量数据库、日志接收端和备份系统可以保存 AI 数据？ | [企业安全](/enterprise/security)、[聊天数据隐私与加密](/security/chat-data-privacy-and-encryption) |
+| 模型服务提供方数据暴露 | 哪些提示词和检索到的上下文可以发送给托管服务提供方，哪些必须保留在私有或本地推理环境中？ | [集成](/enterprise/integration)、[工作区模型](/features/workspace/models) |
+| 身份与生命周期 | 用户将通过 SSO、OIDC、LDAP 还是本地账户进行身份验证？如何预配和移除组？ | [身份验证与访问](/features/authentication-access)、[SSO](/features/authentication-access/auth/sso)、[SCIM](/features/authentication-access/auth/scim) |
+| 权限 | 哪些组可以使用文件上传、知识、工具、网页搜索、API 密钥或特定模型？ | [RBAC](/features/authentication-access/rbac)、[RBAC 权限](/features/authentication-access/rbac/permissions) |
+| 知识与文件 | 哪些数据类别可以上传、建立索引、保留、共享或删除？ | [知识](/features/workspace/knowledge)、[聊天数据隐私与加密](/security/chat-data-privacy-and-encryption) |
+| 工具与代码执行 | 谁受信任，可以创建工具、函数或执行工作流程？需要采用哪种沙盒隔离模型？ | [企业安全](/enterprise/security#code-execution--sandboxing)、[加固 Open WebUI](/getting-started/advanced-topics/hardening) |
+| 日志与审计 | 日志应仅包含元数据，还是允许请求和响应正文进入日志平台？ | [聊天数据隐私与加密](/security/chat-data-privacy-and-encryption)、[审计日志级别](/reference/env-configuration#audit_log_level) |
+| 操作员访问 | 谁可以访问主机、数据库、备份、应用机密和管理员设置？某些团队是否需要独立实例？ | [聊天数据隐私与加密](/security/chat-data-privacy-and-encryption#who-can-read-chat-data)、[部署选项](/enterprise/deployment) |
+| 规模与韧性 | 扩展到单个实例以上之前，需要哪些后端服务？ | [架构与高可用性](/enterprise/architecture)、[部署选项](/enterprise/deployment) |
+
+## 部署模式 {#deployment-patterns}
+
+主权 AI 规划始于信任边界。合适的部署模式取决于哪个团队运营基础设施、受监管数据可以存放在哪里，以及哪些模型端点已获批准。
+
+### 私有云或 VPC {#private-cloud-or-vpc}
+
+在组织的云账户或租户内运行 Open WebUI，使用私有网络、托管 PostgreSQL、Redis、向量存储、对象存储和获批的模型端点。如果组织已经以 AWS、Azure、GCP 或其他私有云环境为标准，此模式非常适用。
+
+请参阅[容器服务](/enterprise/deployment/container-service)和[使用 Helm 部署到 Kubernetes](/enterprise/deployment/kubernetes-helm)。
+
+### 本地 Kubernetes {#on-premise-kubernetes}
+
+在数据中心或受控托管环境中的 Kubernetes 集群上运行 Open WebUI。当应用、存储和模型推理需要保留在内部网络边界内时，通常会采用此模式。
+
+请参阅[架构与高可用性](/enterprise/architecture)和[使用 Helm 部署到 Kubernetes](/enterprise/deployment/kubernetes-helm)。
+
+### 混合模型路由 {#hybrid-model-routing}
+
+在受控环境中运行 Open WebUI，同时向不同用户组开放不同的模型服务提供方。一般工作负载可以使用获批的托管服务提供方，而处理敏感任务的团队使用本地模型、私有端点或专用网关。
+
+此模式需要明确的组权限、提供方审批和使用指导。请从[集成](/enterprise/integration)、[RBAC](/features/authentication-access/rbac) 和[聊天数据隐私与加密](/security/chat-data-privacy-and-encryption)开始。
+
+### 离线或气隙隔离环境 {#offline-or-air-gapped-environments}
+
+在无法访问互联网或有意阻止互联网访问的环境中运行 Open WebUI。完全气隙隔离的部署需要做好准备工作：预加载模型、嵌入模型、语音模型、软件包和容器镜像，并准备更新流程。
+
+请参阅[离线模式](/tutorials/maintenance/offline-mode)和[加固 Open WebUI](/getting-started/advanced-topics/hardening)。
+
+## 实施清单 {#implementation-checklist}
+
+| 步骤 | 结果 | 文档 |
+| :--- | :--- | :--- |
+| 选择部署边界 | 应用在组织控制的云账户、区域、集群或数据中心中运行。 | [部署选项](/enterprise/deployment) |
+| 配置生产后端服务 | 在横向扩展之前，准备好 PostgreSQL、Redis、向量存储、共享存储和提取服务。 | [架构与高可用性](/enterprise/architecture) |
+| 设置身份边界 | 用户通过获批的身份系统进行身份验证，并集中管理生命周期和组。 | [身份验证与访问](/features/authentication-access) |
+| 定义组权限 | 对模型、知识、文件、工具和 API 密钥的访问符合数据类别和团队边界。 | [RBAC 权限](/features/authentication-access/rbac/permissions) |
+| 批准模型端点 | 敏感提示词仅路由到获批的本地、私有或托管服务提供方。 | [集成](/enterprise/integration) |
+| 尽量减少聊天数据暴露 | 审慎配置管理员可见性、导出、临时聊天、日志级别、备份和保留策略。 | [聊天数据隐私与加密](/security/chat-data-privacy-and-encryption) |
+| 加固部署 | 网络位置、Cookie、CORS、标头、机密、身份验证和执行设置符合威胁模型。 | [加固 Open WebUI](/getting-started/advanced-topics/hardening) |
+| 规划运营 | 在推广前明确更新、备份恢复、日志审查、事件响应和操作员访问的负责人。 | [企业安全](/enterprise/security) |
+
+## 实用的起点 {#practical-starting-point}
+
+对于首次主权 AI 部署，请保持初始边界简单：
+
+1. 在组织控制的基础设施中运行 Open WebUI。
+2. 使用 SSO 和基于组的权限。
+3. 从私有或获批的模型端点开始。
+4. 除非日志平台已获准处理聊天内容，否则日志仅保留元数据。
+5. 限制文件上传、知识、工具和 API 密钥，直到每个组都有明确的用例。
+6. 当团队需要独立的运维人员、数据库、备份或模型服务提供方时，使用独立的 Open WebUI 实例。
+
+这会建立一个受治理的基线，同时不会假设所有工作负载都具有相同的风险。在此基础上，平台团队可以按组、模型、功能和数据类别逐步扩大访问范围。
+
+---
+
+[**联系企业销售团队 →**](https://openwebui.com/contact/sales)

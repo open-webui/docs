@@ -1,0 +1,153 @@
+---
+sidebar_position: 3
+title: "Astellas Pharma Inc.（安斯泰来制药）"
+description: "Astellas Pharma Inc. 如何在 Azure 上利用 Open WebUI 构建安全灵活的内部 AI 平台，使 3,000 多名员工能够创建、定制和分享生成式 AI 模型。用户自发构建了 420 多个自定义模型，全组织净推荐值（NPS）达到 +43。"
+keywords: ["Astellas Pharma AI", "Open WebUI case study", "pharmaceutical AI platform", "enterprise LLM", "private AI deployment", "Azure AKS AI", "RAG internal data", "AI productivity", "secure generative AI", "custom AI models pharma"]
+---
+
+# 安斯泰来员工借助 Open WebUI 的安全自托管平台构建 420 多个自定义 AI 模型
+
+![Astellas Pharma Inc.](/images/enterprise/customers/astellas-pharma/hero.png)
+
+## 概览 {#overview}
+
+:::info
+Astellas Pharma Inc. 在 Azure 上利用 **Open WebUI** 构建了一个安全灵活的内部 AI 平台，使 **3,000 多名员工**能够创建、定制和分享生成式 AI 模型。用户自发构建了 **420 多个自定义模型**，全组织净推荐值达到 **+43 NPS**。
+:::
+
+### 要点一览 {#at-a-glance}
+
+- **用户**：总计 3,200 多人；800 多名高级用户可使用前沿模型
+- **地区**：全球（总部位于日本东京）
+- **行业**：制药
+- **部署**：Azure AKS（专用端点）
+- **模型**：Azure OpenAI、Gemini、DeepSeek、Perplexity
+- **部署耗时**：约 1 个月（2025 年 4 月至 5 月）
+- **采用情况**：周活跃用户数在五个月内持续保持在 30% 至 40%
+- **关键成果**：创建 420 多个自定义模型，68% 的用户报告效率显著提升，NPS 为 +43
+
+
+## 关于 Astellas Pharma Inc. {#about-astellas-pharma-inc}
+
+[Astellas Pharma Inc.](https://www.astellas.com/)是一家全球性生命科学公司，从事处方药的研发、销售与营销以及生产制造。Astellas 的业务遍布约 70 个国家，拥有近 20,000 名员工和合同人员，致力于将创新科学转化为全球患者的价值。
+
+## 挑战：灵活安全且避免供应商锁定的 AI {#the-challenge-flexible-secure-ai-without-vendor-lock-in}
+
+随着生成式 AI 能力快速发展，Astellas 需要一个既能跟上发展步伐、又不会将组织绑定到单一模型服务提供方的平台。该公司业务遍布数十个国家，需要应对复杂的监管环境，并支持跨多种语言和学科的科学工作流。第三方 SaaS 工具的集成选项有限、定制能力受限，而且缺乏全球制药公司所需的安全与合规控制。
+
+目标是部署一个**安全的自托管 AI 平台**，让从研发、临床开发到药物警戒和合规的每个部门，都能灵活利用尖端模型，同时完全掌控安全、合规和数据治理。
+
+**关键要求**
+
+- **灵活的模型选择**：可自由选择和切换提供方
+- **可选择使用本地托管模型**进行敏感分析
+- **能够创建自定义模型**，适配特定工作流
+- 在指定群组内**安全分享和联合开发**模型
+- 与内部和外部系统进行**技术集成**
+
+## 解决方案：Azure 上的 Open WebUI {#the-solution-open-webui-on-azure}
+
+Open WebUI 凭借其**灵活性、细粒度权限控制和可扩展架构**入选，使 Astellas 能够完全托管在其安全的专用环境中，同时支持自定义模型创建和基于群组的协作。
+
+**架构亮点**
+
+- **计算/编排**：Kubernetes（AKS）集群，根据需求自动扩缩容
+- **存储/数据库**：Azure Database for PostgreSQL（静态加密；备份遵循内部政策）
+- **网络**：VNet 隔离；Application Gateway 为 LLM API 提供专用端点
+- **机密**：Azure Key Vault 与 Open WebUI 集成，实现安全的凭据管理
+- **CI/CD**：Azure DevOps 管道，用于升级、配置部署和治理控制
+- **日志/监控**：API Management Service、Azure Dashboards、Databricks
+- **安全控制**：通过 IdP 实现 MFA、按组实施 RBAC、强制执行数据驻留要求
+
+
+> “Open WebUI 让我们能够在整个公司安全地创建和分享自定义 AI 模型，同时赋予我们充分利用任何可用尖端模型全部潜力的灵活性。”——Astellas 生成式 AI 团队经理
+
+## 模型与数据处理 {#models--data-handling}
+
+Astellas 采用**多模型、多提供方战略**，让每个团队都能为各项任务使用合适的工具：
+
+- **主要模型**：Azure OpenAI 模型
+- **研究增强**：Gemini、DeepSeek、Perplexity（联网搜索增强）
+- **模型选择**：高级用户可从所有可用模型中选择；为新手提供精选选项以便使用。按用户组分配默认模型，也可手动切换
+- **RAG**：针对性能优化嵌入模型和分块大小。来源包括 SOP、监管政策文件和外部医学研究数据
+- **敏感数据处理**：采用明确的治理优先方法。所有用户在获得访问权限前都要完成机密数据处理培训；监控使用情况以确保合规；通过运营流程设计来管理对共享知识和模型的访问，强制执行最小权限原则
+
+## 采用与赋能 {#adoption--enablement}
+
+Astellas 采取了全面的赋能措施，开展了**面向 2,000 多名员工的两个月入职培训计划**，包括演示、互动研讨会和实操课程。全组织赋能工作在推广期结束前完成。
+
+培训包括：
+
+- 关于**生成式 AI 基础知识**的互动课程
+- 涵盖模型创建和分享的 **Open WebUI 操作培训**
+- 持续开展**办公时间答疑**，支持高级使用和问答
+
+随后几个月：
+
+- **周活跃用户数在五个月内稳定在 30% 至 40%**
+- 用户自发创建了**数百个自定义模型**，并跨部门分享
+- **所有部门**都采用了该平台，包括研究、临床开发、医学、销售、营销、法务、合规、药物警戒、行政、企业传播和企业战略部门
+
+
+> “我们收集外部科学信息的效率大幅提升。能够根据使用场景选择和切换模型，让我们的研究工作更加高效。”——Astellas 研究部门用户
+
+## 成果：普及、生产力与满意度 {#results-democratization-productivity-and-satisfaction}
+
+![显示 Astellas 内部 AI 平台的 Open WebUI 截图。](/images/enterprise/customers/astellas-pharma/open-webui.png)
+
+
+
+### 01. 用户驱动的模型创建 {#01-user-driven-model-creation}
+
+员工创建了适合其特定工作流的自定义生成式 AI 模型，涵盖研究简报模板、监管文件分析等，无需等待 IT 部门。该平台目前托管着 **420 多个用户构建的模型**，清楚体现了自下而上的自发采用。
+
+### 02. 自然增长与采用 {#02-organic-growth--adoption}
+
+平台用户自然增长至**总计 3,200 多人**，高级用户超过 **800 人**，展现了整个组织由强劲需求驱动的采用。
+
+### 03. 可衡量的效率提升 {#03-measurable-efficiency-gains}
+
+**68% 的用户**报告日常工作取得显著效率提升，**+43 的 NPS** 表明各部门用户满意度很高。
+
+### 04. 加速研究 {#04-research-acceleration}
+
+研发团队报告，在收集和综合科学信息、临床试验摘要及多语言医学文档方面取得了显著改进。
+
+
+> “对于编码任务，效率提高了十倍以上，我现在已经无法想象没有这款工具该如何工作。”——Astellas 高级用户
+
+## 主要使用场景 {#top-use-cases}
+
+- 为研发项目起草和审查科学研究简报
+- 总结临床试验报告
+- 对 SOP 和监管政策文档执行 RAG
+- 收集外部医学研究数据信息
+- 翻译多语言医学文档
+- 为研究中的数据分析管道生成代码片段
+
+## 集成 {#integrations}
+
+- **Microsoft Outlook**：AI 辅助起草和安排回复
+- **Microsoft Teams**：AI 驱动的协作聊天，用于项目讨论
+- **SharePoint**：在 AI 工作流中安全地摄取和搜索文档
+- **内部文档管理系统**：即时检索企业知识库
+
+
+## Astellas 选择 Open WebUI 的原因 {#why-astellas-chose-open-webui}
+
+- **模型自由**：选择、切换和更新模型，不受供应商锁定
+- **自定义模型创建**：员工构建并分享适合其工作流的模型
+- **细粒度权限**：RBAC 和基于群组的协作控制
+- **自托管灵活性**：完全私密的 Azure 内部部署
+- **深度集成**：连接现有 Microsoft 生态系统和内部系统
+- **可扩展架构**：从初始部署自然扩展到 3,200 多名用户
+
+---
+
+:::tip
+
+**正在寻找[企业方案](/enterprise)？** **[立即联系我们的销售团队！](/enterprise)**
+
+获得**增强功能**，包括**自定义主题和品牌**、**服务等级协议（SLA）支持**、**长期支持（LTS）**以及**更多能力！**
+
+:::

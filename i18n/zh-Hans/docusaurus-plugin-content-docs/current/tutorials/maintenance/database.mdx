@@ -1,0 +1,130 @@
+---
+sidebar_position: 310
+title: "导出和导入数据库"
+---
+
+如果需要将 **Open WebUI** 数据（例如聊天历史记录、配置等）从一台服务器迁移到另一台服务器，或将其备份以供以后使用，可以导出和导入数据库。本指南假定你使用内部 SQLite 数据库（而不是 PostgreSQL）运行 Open WebUI。复制 `webui.db` 会移动数据库中存储的所有内容（帐户、聊天、设置、文件和知识记录），但不会移动文件本身：`/app/backend/data/uploads` 下的上传文件和 `/app/backend/data/vector_db` 下的向量存储会留在原处，因此引用文件的聊天将指向缺失的对象。要完整迁移，请复制整个 `/app/backend/data` 目录（请参阅[备份指南](/tutorials/maintenance/backups)），并保留相同的 `WEBUI_SECRET_KEY`；Docker 镜像会将其自动生成的密钥写入 `/app/backend/.webui_secret_key`，该文件位于上述目录之外。使用 PGVector 等外部向量数据库时，向量存储在该数据库中，而不是 `vector_db` 中。
+
+按照以下步骤导出和导入包含数据库的 `webui.db` 文件。
+
+---
+
+### 导出数据库 {#exporting-database}
+
+:::note
+
+请按照以下说明自行复制数据库文件。**设置 > 数据库**（管理员部分）中的**数据库**下载不包含 `webui.db-wal`，因此可能缺少最近的数据。
+
+:::
+
+要从当前 Open WebUI 实例导出数据库：
+
+1. **复制数据库前停止 Open WebUI**：
+   Open WebUI 默认以预写日志（WAL）模式运行 SQLite，因此最近提交的更改会保存在 `webui.db` 旁边的 `webui.db-wal` 中。请先停止容器，确保导出期间不会有任何内容写入数据库：
+   ```bash
+   docker stop open-webui
+   ```
+
+2. **将待处理更改写入 `webui.db`**：
+   停止容器后，这些更改仍留在 `webui.db-wal` 中，因此仅复制 `webui.db` 可能会缺少它们。请在容器停止时，使用同一镜像运行检查点：
+   ```bash
+   docker run --rm --volumes-from open-webui --entrypoint python3 "$(docker inspect -f '{{.Config.Image}}' open-webui)" -c "import sqlite3; db = sqlite3.connect('/app/backend/data/webui.db'); db.execute('PRAGMA wal_checkpoint(TRUNCATE)'); db.close()"
+   ```
+
+3. **使用 `docker cp` 复制数据库文件**：
+   `webui.db` 文件位于容器内的 `/app/backend/data` 目录中。运行以下命令将其复制到本地计算机：
+   ```bash
+   docker cp open-webui:/app/backend/data/webui.db ./webui.db
+   ```
+
+4. **在源服务器上重新启动 Open WebUI**：
+   ```bash
+   docker start open-webui
+   ```
+
+5. **将导出的文件传输到新服务器**：
+   你可以使用 **FileZilla** 或任何其他文件传输工具，将 `webui.db` 文件移动到新服务器。
+
+   :::info
+   FileZilla 向新服务器传输文件时操作简便，因此推荐使用。
+   :::
+
+---
+
+### 导入数据库 {#importing-database}
+
+将 `webui.db` 文件移动到新服务器后，请按照以下步骤操作：
+
+1. **在新服务器上安装并运行 Open WebUI**：
+   使用 Docker 容器设置并运行 Open WebUI。按照[快速上手](/getting-started)中的说明安装并启动 Open WebUI 容器。运行后，请先停止容器，再执行导入步骤。
+   ```bash
+   docker stop open-webui
+   ```
+
+2. **删除目标 SQLite 附属文件**：
+   如果目标容器已创建 `webui.db-wal` 或 `webui.db-shm`，请在替换 `webui.db` 之前删除这些文件。它们属于目标数据库的旧状态，不能与导入的数据库混用。
+   ```bash
+   docker run --rm --volumes-from open-webui --entrypoint rm "$(docker inspect -f '{{.Config.Image}}' open-webui)" -f /app/backend/data/webui.db-wal /app/backend/data/webui.db-shm
+   ```
+
+3. **使用 `docker cp` 将数据库文件复制到容器中**：
+   假设导出的 `webui.db` 文件位于当前工作目录中，请将其复制到容器中：
+   ```bash
+   docker cp ./webui.db open-webui:/app/backend/data/webui.db
+   ```
+
+4. **启动 Open WebUI 容器**：
+   再次启动容器以使用导入的数据库。
+   ```bash
+   docker start open-webui
+   ```
+
+   新服务器现在应已使用导入的数据库运行 Open WebUI。
+
+---
+
+### 注意事项 {#notes}
+
+- 此导出/导入过程**仅在使用内部 SQLite 数据库（`webui.db`）时有效**。
+- 如果使用外部 PostgreSQL 数据库，此方法不适用，因为数据库在容器外部管理。对于 PostgreSQL，需要使用 PostgreSQL 专用工具和流程来备份和恢复数据库。
+- 不要混用来自不同数据库副本的 `webui.db-wal` 或 `webui.db-shm` 文件。在目标位置替换 `webui.db` 时，请先删除任何现有的目标附属文件，再启动 Open WebUI。
+
+---
+
+### 为什么这很重要 {#why-its-important}
+
+此方法在以下情况下特别有用：
+
+- 将 Open WebUI 数据迁移到新服务器或计算机。
+- 在更新或修改之前创建数据备份。
+- 使用相同设置在多台服务器上测试 Open WebUI。
+
+```bash
+
+# 导出和导入的快速命令摘要
+
+# 导出：
+docker stop open-webui
+docker run --rm --volumes-from open-webui --entrypoint python3 "$(docker inspect -f '{{.Config.Image}}' open-webui)" -c "import sqlite3; db = sqlite3.connect('/app/backend/data/webui.db'); db.execute('PRAGMA wal_checkpoint(TRUNCATE)'); db.close()"
+docker cp open-webui:/app/backend/data/webui.db ./webui.db
+docker start open-webui
+
+# 停止新服务器上的容器：
+docker stop open-webui
+
+# 导入：
+docker run --rm --volumes-from open-webui --entrypoint rm "$(docker inspect -f '{{.Config.Image}}' open-webui)" -f /app/backend/data/webui.db-wal /app/backend/data/webui.db-shm
+docker cp ./webui.db open-webui:/app/backend/data/webui.db
+
+# 启动容器：
+docker start open-webui
+```
+
+通过这些步骤，你可以轻松管理 Open WebUI 的迁移或备份过程。请注意所使用的数据库格式，以确保兼容性。
+
+---
+
+## 相关指南 {#related-guides}
+
+- [SQLite 数据库概述](/reference/database-schema) - 详细的数据库架构
+- [备份](/tutorials/maintenance/backups) - 实例的全面备份策略

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import Translate, { translate } from "@docusaurus/Translate";
 import Footer from "@theme-original/Footer";
 import {
 	analyticsConsent,
@@ -8,6 +9,11 @@ import styles from "./styles.module.css";
 
 export default function FooterWrapper(props) {
 	const [showConsent, setShowConsent] = useState(false);
+	const analyticsPreferencesLabel = translate({
+		id: "theme.footer.analyticsPreferences",
+		message: "Analytics preferences",
+		description: "The analytics preferences button and dialog label",
+	});
 	useEffect(() => {
 		const refresh = () => setShowConsent(!analyticsConsent());
 		refresh();
@@ -23,25 +29,31 @@ export default function FooterWrapper(props) {
 			<Footer {...props} />
 			<div className={styles.settings} data-no-analytics>
 				<button type="button" onClick={() => setShowConsent(true)}>
-					Analytics preferences
+					{analyticsPreferencesLabel}
 				</button>
 			</div>
 			{showConsent && (
 				<aside
 					className={styles.notice}
-					aria-label="Analytics preferences"
+					aria-label={analyticsPreferencesLabel}
 					data-no-analytics
 				>
 					<p>
-						Allow optional analytics to help us improve our websites?{" "}
-						<a href="https://openwebui.com/privacy">Privacy policy</a>
+						<Translate id="theme.footer.analyticsQuestion">
+							Allow optional analytics to help us improve our websites?
+						</Translate>{" "}
+						<a href="https://openwebui.com/privacy">
+							<Translate id="theme.footer.privacyPolicy">
+								Privacy policy
+							</Translate>
+						</a>
 					</p>
 					<div>
 						<button type="button" onClick={() => choose("accepted")}>
-							Accept
+							<Translate id="theme.footer.acceptAnalytics">Accept</Translate>
 						</button>
 						<button type="button" onClick={() => choose("rejected")}>
-							Reject
+							<Translate id="theme.footer.rejectAnalytics">Reject</Translate>
 						</button>
 					</div>
 				</aside>

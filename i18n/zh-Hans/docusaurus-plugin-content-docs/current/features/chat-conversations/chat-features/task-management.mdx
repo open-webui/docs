@@ -1,0 +1,64 @@
+---
+sidebar_position: 12
+title: "任务管理"
+---
+
+# 任务管理
+
+任务管理为智能体模型提供了一种在聊天中规划和跟踪多步骤工作的结构化方式。模型可以维护具有明确状态的实时任务列表，而无需将隐含的计划保存在自由文本中。
+
+## 为什么这对智能体 AI 很重要 {#why-this-matters-for-agentic-ai}
+
+对于简单问答，单次回答就足够了。对于真正的智能体工作流（研究、调试、迁移、调查），模型需要可靠的执行循环：
+
+1. 分解工作；
+2. 执行步骤；
+3. 更新进度；
+4. 调整计划。
+
+任务列表让用户可以看到这个循环，并减少因步骤被跳过或遗忘而导致的失败。
+
+## 工作原理 {#how-it-works}
+
+模型使用两个内置工具管理列表：
+
+- `create_tasks`：在多步骤工作开始时调用一次，列出完整检查清单。
+- `update_task`：每完成一个步骤后调用，按 ID 将单个任务标记为 `pending`、`in_progress`、`completed` 或 `cancelled`。
+
+由于列表存储在聊天本身中，这两个工具都需要已保存的聊天。在[临时聊天](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions)或[频道](/features/channels)中，没有可供写入的聊天记录，因此系统根本不会向模型提供这些工具，模型会改用纯文本进行规划。
+
+使用这些工具时：
+
+- 任务存储在聊天级别；
+- 界面会在聊天中显示进度（例如已完成数与总数）；
+- 状态变化会实时反映出来。
+
+支持的状态：
+
+- `pending`
+- `in_progress`
+- `completed`
+- `cancelled`
+
+## 启用任务管理 {#enabling-it}
+
+任务管理在内置工具中按模型控制：
+
+1. 前往 **设置 > 模型 > 编辑**（管理员区域；对于自己的模型，则前往 **工作区 > 模型**）。
+2. 确保已启用 **功能 > 内置工具**。
+3. 在内置工具类别中，保持 **任务管理** 处于启用状态。
+
+有关工具详情，请参阅[内置系统工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)。
+
+## 最佳实践 {#best-practices}
+
+- 对需要多个具体步骤的请求使用任务列表。
+- 同一时间只将一项任务保持为 `in_progress`。
+- 完成后立即将任务标记为 `completed`。
+- 明确取消过时任务，不要让它们一直处于待处理状态。
+
+## 相关功能 {#related-features}
+
+- [推理与思考模型](./reasoning-models.mdx)
+- [自动化](./automations.mdx)
+- [工具开发 / 内置工具](/features/extensibility/plugin/tools)

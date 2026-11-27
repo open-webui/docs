@@ -1,0 +1,158 @@
+---
+sidebar_position: 4
+title: "网络搜索故障排除"
+sidebar_label: "网络搜索"
+description: "解决 Open WebUI 中网络搜索连接失败、页面内容为空、代理错误和搜索工具调用缺失的问题。"
+---
+
+如果网络搜索失败，首先区分是搜索请求失败，还是读取返回页面失败。本指南介绍代理设置、服务提供方错误、空内容、超时，以及模型不调用搜索工具的问题。
+
+## 常见网络搜索问题 {#common-web-search-issues}
+
+### 1. 网络搜索在 HTTP 代理后失败 {#1-web-search-fails-behind-http-proxy}
+
+如果你在 HTTP 代理后运行 Open WebUI，可能会发现网络搜索查询成功（例如 SearXNG 返回结果），但随后的内容抓取失败，并出现如下错误：
+
+- `[Errno -3] Temporary failure in name resolution`
+- `Connection timeout to host`
+- `None of the web search results could be loaded`
+
+代理信任默认开启（`WEB_SEARCH_TRUST_ENV`），因此在默认安装中，这通常意味着**信任代理环境**已在 **设置 > 网络搜索**（管理员区域）中被关闭并保存，而保存的值优先于环境变量。每个结果 URL 在抓取前也会在本地解析。如果只有代理能解析名称，日志会显示 `Could not resolve host`，此时还需要设置 `ENABLE_LOCAL_WEB_FETCH=True`，这也会允许抓取私有网络地址。
+
+**解决方法：**
+
+1. 导航至：**设置 > 网络搜索**（管理员区域）
+2. 启用**信任代理环境**
+3. 保存更改
+
+或者，设置环境变量 [`WEB_SEARCH_TRUST_ENV`](/reference/env-configuration#web_search_trust_env)：
+
+```bash
+WEB_SEARCH_TRUST_ENV=True
+```
+
+:::info
+
+这是一个 **ConfigVar** 变量，意味着它既可以在启动时通过环境变量设置，也可以通过管理员面板 UI 配置。一旦在 UI 中设置，数据库值就优先于环境变量。
+
+此设置让 Open WebUI 的网页内容加载器遵循环境变量中的代理设置（`http_proxy`、`https_proxy`）。如果没有此设置，即使搜索引擎可以通过代理工作，从返回的 URL 抓取内容也会失败。
+
+:::
+
+---
+
+### 2. SearXNG 返回 403 Forbidden 错误 {#2-403-forbidden-errors-from-searxng}
+
+如果使用 SearXNG 并在日志中看到 `403 Client Error: Forbidden`，说明未启用 JSON 格式。
+
+**解决方法：**
+
+编辑 SearXNG 的 `settings.yml`，将 `json` 添加到 formats 列表：
+
+```yaml
+search:
+  formats:
+    - html
+    - json
+```
+
+完成此更改后重启 SearXNG。
+
+---
+
+### 3. 内容为空或结果质量差 {#3-empty-content-or-poor-results}
+
+如果网络搜索返回空内容或质量较差的结果，问题通常与上下文窗口大小或内容提取有关。
+
+**解决方法：**
+
+- **增加上下文长度**：网页通常包含 4,000–8,000+ token。如果模型在显存小于 24 GiB 的 GPU 上采用 Ollama 默认的 4096 token，你会错过大部分内容。请在 **设置 > 模型 > 编辑**（管理员区域）中，将该模型的 **> 高级参数**里的上下文长度增加到 16384+ token（低于此值对网页内容而言效果都不理想）。
+
+- **检查结果数量**：调整 `WEB_SEARCH_RESULT_COUNT`，控制抓取的结果数量。
+
+  在原生/智能体工具调用中，如果模型调用 `search_web` 时省略 `count`，Open WebUI 默认使用 `WEB_SEARCH_RESULT_COUNT`。如果模型提供了 `count`，该值会被限制为管理员配置的同一最大值。
+
+- **搜索使提示词超过上下文限制。**在原生模式下，检查聊天是否调用了 `fetch_url`。该工具返回提取的页面文本，并可能在一个结果中发送长页面。在 **设置 > 网络搜索**（管理员区域）中，将 **Fetch URL 内容长度限制**设置为正整数字符数，然后在新聊天中重试。请为对话、其他工具结果和答案留出空间。该限制分别应用于每个 `fetch_url` 结果。
+
+  在旧版模式下，检查 **设置 > 网络搜索**中的**绕过嵌入和检索**。开启后，加载的页面文本会直接进入提示词。关闭此项可检索相关分块，或启用**绕过网页加载器**以使用搜索摘要。请参阅[网络搜索配置参考](/reference/env-configuration#bypass_web_search_embedding_and_retrieval)。
+
+- **尝试不同的加载器**：将 `WEB_LOADER_ENGINE` 配置为使用 `playwright` 处理大量依赖 JavaScript 的网站，或使用 `firecrawl`/`tavily` 获得更好的提取效果。
+
+- **设置真实的 User-Agent**：如果 Wikipedia、受 Cloudflare 保护的网站或其他大型发布方的结果为空（或日志中显示 403），说明默认的 Python `requests`/`aiohttp` UA 正在被机器人检测过滤。请将 [`USER_AGENT`](/reference/env-configuration#user_agent) 设置为类似真实浏览器的字符串（例如 `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36`）。这会影响网络搜索结果抓取、`fetch_url` 工具，以及通过 `#` 附加的网页，包括检查链接是否指向 PDF 等文件。
+
+- **你自己网络中的结果被跳过**：如果结果 URL 解析为私有、环回或其他非全局可路由地址，它会在抓取前被丢弃，日志会显示 `Blocked non-global address:`，随后显示该地址。若要搜索内联网，请设置 [`ENABLE_LOCAL_WEB_FETCH=True`](/reference/env-configuration#enable_local_web_fetch)，这会让每个可以聊天的用户都能通过服务器访问内部地址。
+
+- **压缩响应被拒绝**：Open WebUI 请求未压缩的页面和文件，并会拒绝压缩响应，显示 `The server answered with a compressed response, which is not accepted.`。如果主机始终发送压缩文件，例如上传时带有 `Content-Encoding` 标头的 S3 或 MinIO 对象，就无法读取。请在不带该标头的情况下重新上传文件。
+
+有关上下文窗口问题的更多详情，请参阅 [RAG 故障排除指南](./rag.mdx)。
+
+---
+
+### 4. 已启用网络搜索，但模型未调用 `search_web` {#4-web-search-is-enabled-but-the-model-does-not-call-search_web}
+
+如果已配置网络搜索引擎（例如以后端 DuckDuckGo 使用 DDGS）、模型已启用网络搜索，且每个聊天的网络搜索开关也已开启，但助手仍在不搜索的情况下回答，问题通常在于模型能力，而不是搜索服务提供方。
+
+在原生/智能体模式下，Open WebUI 将网络搜索公开为 `search_web` 工具。模型必须决定调用该工具并返回有效的结构化工具调用。即使所有 Open WebUI 设置都正确，较旧、较小或能力较弱的本地模型也可能遗漏或忽略该工具，或者生成格式错误的工具调用。
+
+**解决方法：**
+
+- 对于网络搜索工作流，请**使用现代、高质量的工具调用模型**。在决定何时搜索和正确格式化工具调用方面，前沿模型或近期的大型开放权重模型远比较旧或较小的模型可靠。有关模型要求和建议，请参阅[工具调用模式：原生与旧版](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)。
+- 在 **设置 > 模型 > 编辑**（管理员区域）中，转到该模型的 **> 高级参数 > 函数调用**，**确认原生函数调用已启用**。内置网络搜索工具属于原生模式工具。
+- **如果模型持续不搜索就回答，请将其切换到旧版模式**，例如它总是回答“我无法实时访问”。在模型的**高级参数**中将**函数调用**设置为**旧版**。在旧版模式下，只要聊天的网络搜索开关开启，Open WebUI 就会在模型回答前自行运行搜索，查询由任务模型编写，因此模型无需决定是否搜索。如果任务模型返回空查询列表，则会跳过搜索，聊天会显示状态 `No search query generated`。如果 **设置 > 界面**（管理员区域）中的**网络搜索查询生成**已关闭，或查询生成失败，Open WebUI 会按原样使用你的消息进行搜索。旧版模式不受支持且没有内置工具，因此 `fetch_url` 和其他原生工具不可用。请参阅[工具调用模式](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)。
+- **检查全部五项网络搜索条件**：全局启用网络搜索、模型启用网络搜索、模型的内置工具包含网络搜索类别、聊天中启用网络搜索开关，以及用户所在组具有 `features.web_search` 权限。
+- **对于 DDGS/DuckDuckGo 设置**，请使用 [DDGS 服务提供方指南](/features/chat-conversations/web-search/providers/ddgs)单独验证提供方配置；但如果日志显示 DDGS 返回结果，而助手从未调用 `search_web`，请更换模型。
+
+---
+
+### 5. 连接超时 {#5-connection-timeouts}
+
+如果网络搜索超时：
+
+**解决方法：**
+
+- **减少并发请求**：设置 `WEB_SEARCH_CONCURRENT_REQUESTS=1` 以按顺序执行（建议 Brave 免费套餐采用；Brave 客户端在收到 429 后本就会重试一次）。
+
+- **调整加载器并发数**：如果同时抓取许多页面，请调低 `WEB_LOADER_CONCURRENT_REQUESTS`。
+
+- **检查网络连接**：确保 Open WebUI 可以同时访问搜索引擎和结果 URL。
+
+---
+
+### 6. SearXNG 未报错但未返回结果 {#6-searxng-returns-no-results-without-an-error}
+
+SearXNG 可能以空结果列表应答搜索，例如它查询的上游引擎通过 CAPTCHA 或速率限制阻止了该实例。Open WebUI 只读取 SearXNG 响应中的 `results` 列表，因此会将其视为未找到任何内容的搜索，而不是 SearXNG 故障。
+
+你看到的内容取决于模型的**函数调用**设置：
+
+- **旧版**：响应下方的网络搜索状态显示 `No results found from web search`，模型在没有网页内容的情况下回答。
+- **原生**或**默认**：`search_web` 工具向模型返回空列表。聊天中不会出现错误，模型可能会说它未找到任何内容。
+
+**解决方法：**
+
+- **检查 SearXNG 日志**，查找 CAPTCHA、超时或访问被拒绝等引擎错误。
+- **在 SearXNG Web 界面中运行相同查询**，查看是否有任何引擎返回结果。
+- 在 SearXNG 的 `settings.yml` 中**关闭失败的引擎或启用其他引擎**，然后重启 SearXNG。
+
+---
+
+## 环境变量参考 {#environment-variables-reference}
+
+有关所有网络搜索环境变量的完整列表，请参阅[环境配置文档](/reference/env-configuration#web-search)。
+
+关键变量：
+
+| 变量 | 描述 |
+|----------|-------------|
+| `WEB_SEARCH_TRUST_ENV` | 为内容抓取启用代理支持 |
+| `WEB_SEARCH_RESULT_COUNT` | 要抓取的搜索结果数量 |
+| `WEB_SEARCH_CONCURRENT_REQUESTS` | 对搜索引擎的并发请求数（“搜索结果数量”旁的“并发请求数”字段；`0` 表示无限制） |
+| `WEB_LOADER_CONCURRENT_REQUESTS` | 并发页面抓取数（“加载器”部分中的“并发请求数”字段；默认 10） |
+| `WEB_LOADER_ENGINE` | 内容提取引擎 |
+
+所有这些都是持久化设置，因此 **设置 > 网络搜索**（管理员区域）是它们的实时事实来源。页面抓取器会在每次搜索时从该保存配置中读取代理信任、加载器并发数和 SSL 验证，因此你在那里保存的更改无需重启即可应用于下一次搜索，并与相同设置在其他位置的行为一致。如果管理员面板中的更改看似未生效，请重新检查该处，不要假设环境变量仍起控制作用：变量提供初始值，之后由保存的设置生效。
+
+只有开启**网络搜索**时才需要设置**网络搜索引擎**，因此未设置搜索引擎也可以保存**加载器**设置。
+
+关闭**网络搜索**时，页面会隐藏仅适用于搜索的设置。这些设置的保存值会保留。
+
+---

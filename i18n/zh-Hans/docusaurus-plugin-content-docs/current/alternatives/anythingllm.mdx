@@ -1,0 +1,101 @@
+---
+sidebar_position: 9
+title: "Open WebUI 与 AnythingLLM 对比"
+sidebar_label: "Open WebUI 与 AnythingLLM"
+description: "Open WebUI 与 AnythingLLM 对比：两个我们非常喜爱的本地 AI 与文档问答项目。"
+keywords: ["Open WebUI 与 AnythingLLM 对比", "AnythingLLM 替代方案", "文档问答", "本地文档 AI", "私有 RAG", "Open WebUI 替代方案", "Open WebUI 对比", "最佳文档 AI", "自托管 RAG"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Open WebUI 和 AnythingLLM 有何异同？","acceptedAnswer":{"@type":"Answer","text":"两者都提供聊天、文档问答、智能体和模型集成功能。AnythingLLM 将对话和文档知识组织到工作区中。Open WebUI 使用聊天、文件夹和知识库，同时提供笔记和频道。两者各自拥有不同的界面和配置选项。"}},{"@type":"Question","name":"我可以同时使用 Open WebUI 和 AnythingLLM 吗？","acceptedAnswer":{"@type":"Answer","text":"可以。你可以将它们作为独立的应用程序使用，在尝试另一个的同时保留现有设置。根据自己的需求选择其中一个或同时使用两者。"}},{"@type":"Question","name":"如何开始使用？","acceptedAnswer":{"@type":"Answer","text":"按照你想尝试的项目的设置指南操作，连接模型并开始对话。两个项目都提供安装和配置文档。"}}]})}</script>
+</Head>
+
+# Open WebUI 与 AnythingLLM
+
+*最后更新：2026 年 9 月*
+
+[AnythingLLM](https://anythingllm.com/) 是 Mintplex Labs 开发的项目，也是我们最喜爱的本地 AI 项目之一。创建一个工作区，添加文档，即可围绕这些知识开始对话。工作区模式将每个项目的文档和对话集中在一起，是整理工作的一种出色方式。桌面应用无需单独设置服务器，就能让你轻松地在自己的计算机上运行 AI。团队出色地将这些部分整合为一种容易上手和适应的使用体验。
+
+它们的智能体工具也值得一试：你可以使用内置技能、连接 MCP 服务器、编写自定义技能，并构建将模型指令与 API 调用和文件操作相结合的流程。模型服务提供方、嵌入模型和向量数据库均可配置，因此你可以根据自己的需求定制设置。周到的界面设计与实用的灵活性相结合，正是我们如此喜爱 AnythingLLM 的重要原因。Mintplex Labs 和各位贡献者构建了一个我们乐于推荐的项目，我们非常尊重他们的工作。
+
+[网站](https://anythingllm.com/) · [文档](https://docs.anythingllm.com/) · [GitHub](https://github.com/Mintplex-Labs/anything-llm) · [MIT 许可证](https://github.com/Mintplex-Labs/anything-llm/blob/master/LICENSE)
+
+---
+
+## AnythingLLM 的优势 {#what-anythingllm-does-well}
+
+- **文档问答：**将文档引入对话，并针对其内容提问。
+- **工作区模式：**将知识库和对话整理到不同的项目中。
+- **嵌入自定义：**可控制分块、重叠和嵌入模型选择，让你能够决定如何为检索准备文档。
+- **向量数据库选择：**集成包括 LanceDB、Chroma、Milvus、Pinecone、Qdrant 和 Weaviate，为存储和搜索文档嵌入提供多种选择。
+- **模型选择：**支持本地和云端服务提供方，包括 Ollama、OpenAI、Anthropic、Google、Azure 和 Bedrock，让用户可以使用自己偏好的模型。
+- **桌面应用：**在 macOS、Windows 和 Linux 上提供独立的本地体验，无需 Docker 或服务器。
+- **自托管和云端部署：**Docker 和托管选项为个人与团队提供多种项目使用方式。
+- **本地运行：**使用本地模型和嵌入，在自己的硬件上处理文档。
+- **智能体和工具：**提供文档检索、网页浏览等任务的内置技能，同时支持自定义技能和 MCP 连接。
+- **智能体流程：**工作流可以连接网页抓取、API 调用、模型指令和文件操作等步骤。
+- **音频和图像：**语音转文字、文字转语音和图像生成功能，让你在输入消息之外拥有更多 AI 交互方式。
+- **多用户访问：**Docker 版本支持基于角色的权限，适用于共享部署。
+- **社区贡献：**团队和贡献者共享的代码、文档与创意。
+
+有关各项部署的功能和设置详情，请浏览 [AnythingLLM 文档](https://docs.anythingllm.com/)。
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **智能体和计划任务：**[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP 服务器](/features/extensibility/mcp)、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)。
+- **自定义：**可按模型设置提示词、工具、知识和参数，还提供[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)、主题、横幅和按组权限。
+- **文档检索：**向量数据库和提取引擎集成、BM25 与向量混合搜索、交叉编码器重排序以及智能体式检索。
+- **工作方式：**聊天、笔记、频道、自动化、Open Terminal、语音/视频通话和图像生成。
+- **团队访问：**用于协作的频道、基于角色的访问控制、SSO/OIDC/LDAP 和 SCIM 2.0。
+- **模型配置：**将模型与指令、工具、知识和参数组合使用。
+- **部署和运维：**Kubernetes、水平扩展、Redis 支持的会话、OpenTelemetry 和分析。
+
+---
+
+## 一览 {#at-a-glance}
+
+以下是两个项目各自的功能和选项示例。有关配置详情，请参阅 [AnythingLLM 文档](https://docs.anythingllm.com/)和 [Open WebUI 文档](/getting-started)。
+
+| | AnythingLLM | Open WebUI |
+| :--- | :--- | :--- |
+| **聊天和知识** | AI 聊天、文档问答、工作区 | AI 聊天、文档问答、知识库 |
+| **文档检索** | 嵌入和分块设置；向量数据库集成 | 嵌入和提取设置；向量数据库集成 |
+| **组织方式** | 包含文档知识和对话的工作区 | 文件夹、标签、知识库、笔记、频道 |
+| **模型服务提供方** | Ollama、OpenAI、Anthropic、Google、Azure、Bedrock 等 | Ollama、OpenAI、Anthropic、Google、Azure、Bedrock 等 |
+| **智能体和扩展性** | 内置和自定义技能、MCP、智能体流程、开发者 API | 内置工具和 Python 工具、MCP、OpenAPI、函数、管道 |
+| **音频和图像** | 语音转文字、文字转语音、图像生成 | 语音转文字、文字转语音、图像生成 |
+| **共享访问** | 支持基于角色权限的 Docker 多用户模式 | 支持角色、组和权限的多用户访问 |
+
+---
+
+## 同时使用两者 {#using-both}
+
+你可以同时使用 Open WebUI 和 AnythingLLM。如果你已经在使用其中一个，可以在保留现有满意设置的同时尝试另一个。
+
+两者都支持文档问答、智能体和多种模型服务提供方。用自己的文档和日常任务试用它们，感受各自界面的特点。你可能会发现自己针对不同的项目同时使用两者，也可能只是在特定任务上更偏好其中一个。
+
+- [AnythingLLM 文档](https://docs.anythingllm.com/)
+- [Open WebUI 文档](/getting-started)
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**Open WebUI 和 AnythingLLM 有何异同？**
+两者都提供聊天、文档问答、智能体和模型集成功能。AnythingLLM 将对话和文档知识组织到工作区中。Open WebUI 使用聊天、文件夹和知识库，同时提供笔记和频道。两者各自拥有不同的界面和配置选项。
+
+**我可以同时使用 Open WebUI 和 AnythingLLM 吗？**
+可以。你可以将它们作为独立的应用程序使用，在尝试另一个的同时保留现有设置。根据自己的需求选择其中一个或同时使用两者。
+
+**如何开始使用？**
+按照你想尝试的项目的设置指南操作，连接模型并开始对话。两个项目都提供安装和配置文档。
+
+[Open WebUI 快速上手](/getting-started) · [AnythingLLM 文档](https://docs.anythingllm.com/)
+
+---
+
+**相关内容：**[Open WebUI 与 LibreChat](/alternatives/librechat) · [Open WebUI 与 Dify](/alternatives/dify) · [Open WebUI 与 Ollama](/alternatives/ollama)

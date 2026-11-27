@@ -1,0 +1,119 @@
+---
+sidebar_position: 30
+title: "自托管 ChatGPT 替代方案"
+sidebar_label: "Open WebUI 与 ChatGPT"
+description: "正在寻找自托管的 ChatGPT 替代方案？Open WebUI 可连接 OpenAI API，并在你自己的基础设施上运行。"
+keywords: ["Open WebUI 与 ChatGPT 对比", "ChatGPT 替代方案", "自托管 ChatGPT", "开源 ChatGPT 替代方案", "ChatGPT 自托管", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "我可以自托管 ChatGPT 吗？", "acceptedAnswer": {"@type": "Answer", "text": "无法自托管 ChatGPT 本身，但 Open WebUI 可以连接 OpenAI API，让你使用 API 账户可用的 OpenAI 模型。Open WebUI 在你的基础设施上运行，但 API 调用仍会发送至 OpenAI。"}}, {"@type": "Question", "name": "我可以在 Open WebUI 中使用 OpenAI 模型吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。在设置中添加你的 OpenAI API 密钥后，API 账户可用的 OpenAI 模型就会显示在模型选择器中。"}}, {"@type": "Question", "name": "Open WebUI 是 ChatGPT 的替代方案吗？", "acceptedAnswer": {"@type": "Answer", "text": "Open WebUI 可以连接 OpenAI API，因此你可以使用 API 账户可用的 OpenAI 模型。Open WebUI 在你自己的基础设施上运行，但 API 调用仍会发送至服务提供方。它还支持连接其他服务提供方。"}}, {"@type": "Question", "name": "我可以将 ChatGPT 和本地模型结合使用吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。许多用户在同一个 Open WebUI 界面中，将 OpenAI 用于复杂推理，同时通过 Ollama 使用本地模型处理隐私敏感任务。"}}]})}</script>
+</Head>
+
+
+# Open WebUI 与 ChatGPT
+
+*最后更新：2026 年 8 月*
+
+OpenAI 的 [ChatGPT](https://chat.openai.com/) 将现代 AI 带入数亿人的日常生活，并为对话式 AI 体验树立了标杆。它改变了全世界对 AI 的看法，并持续激励着我们。我们每天都在使用它，也从其背后的工作中学习：研究、工程、设计、安全工作、基础设施、产品判断和支持，正是这些让如此大规模的产品拥有自然的体验。GPT-5.6 系列、ChatGPT agent、ChatGPT Images 以及持续不断的产品创新，使 ChatGPT 始终走在前沿；坦白说，它们也不断推动我们把 Open WebUI 做得更好。
+
+Open WebUI 所在的品类正是由 ChatGPT 协助开创的。OpenAI 的团队让 AI 变得实用、易于接近，并值得融入日常工作，而不只停留在实验室和演示中。他们的工作提高了这一领域所有开发者的标准。Open WebUI 面向希望自行运行界面、连接所选模型，并使技术栈适应自身环境的个人和团队。
+
+商业产品 · 提供免费套餐
+
+---
+
+## ChatGPT 的优势 {#what-chatgpt-does-well}
+
+- **前沿模型**，包括 GPT-5.6 系列
+- **写作和代码块**，支持在对话中进行长文起草、编辑和代码工作
+- **项目**，通过持久上下文和自定义指令整理对话
+- **深度研究**，综合多个来源的信息，生成全面的报告
+- **精致体验**，界面历经多年迭代打磨
+- **GPT Store**，拥有由社区构建的自定义 GPT 生态系统
+- **多模态**，支持视觉、语音、ChatGPT Images 和代码执行
+- **记忆**，可跨对话记住上下文
+- **ChatGPT agent**，用于智能体式网页浏览和任务自动化
+- **企业套餐**，提供 SSO、管理员控制和数据隐私承诺
+- **零设置**，注册即可开始，无需安装
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，提供由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)，并可使用你选择的模型，而非局限于某一家供应商
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **自托管**，平台本身在你的硬件上运行
+- **任意模型、任意服务提供方**，让你可以在同一个界面中同时使用 API 账户可用的 OpenAI 模型、Claude、Gemini 和本地模型
+- **知识与 RAG**，通过高级检索从你的文档构建知识库
+- **团队平台**，提供频道、笔记、自动化、RBAC、SSO/OIDC/LDAP 和 SCIM 2.0
+- **Open Terminal**，提供完整的沙箱计算环境
+- **免费社区版**，在你自己的基础设施上支持不限数量的用户
+
+---
+
+## 一览 {#at-a-glance}
+
+| | Open WebUI | ChatGPT |
+| :--- | :--- | :--- |
+| **模型** | 来自任意服务提供方的任意模型 | ChatGPT 中可用的 OpenAI 模型，具体取决于套餐 |
+| **数据** | 自托管，使用你的基础设施 | 由 OpenAI 托管在云端 |
+| **知识与 RAG** | 13 种向量数据库、8 种提取引擎、混合搜索 | 包含文件、记忆和项目上下文的项目 |
+| **自定义智能体** | 具有工具、知识和参数的模型智能体 | 通过 GPT Store 使用自定义 GPT |
+| **代码执行** | 浏览器内 Python + Open Terminal | 内置代码解释器 |
+| **扩展性** | Python 工具、MCP、OpenAPI、管道 | GPT Actions 和插件目录 |
+| **定价** | 免费社区版；提供企业套餐 | Free、Go、Plus、Pro、Business 和 Enterprise 套餐 |
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你希望以最直接、精致的方式体验 OpenAI 的杰出成果，请选择 ChatGPT。**无需安装，无需配置，注册即可开始。项目、记忆、语音、ChatGPT agent、图像生成和深度研究等原生功能体验出色，并且在持续改进。
+
+**如果你希望在自己的基础设施上运行、在一个界面中连接多个服务提供方、从自己的文档构建知识库，或需要免费社区版中包含的 RBAC 和 SSO 等团队功能，请选择 Open WebUI。**
+
+**两者结合使用。**许多人都这样做。将 Open WebUI 连接到 OpenAI API，即可在同一个地方同时使用 OpenAI 模型、Claude、Gemini 和本地模型。想要完整的 OpenAI 产品体验时直接使用 ChatGPT；需要自己的知识库、工具、权限或团队工作区时使用 Open WebUI。
+
+---
+
+## 通过 Open WebUI 使用 OpenAI 模型 {#use-openai-models-through-open-webui}
+
+Open WebUI 可连接 OpenAI API，因此你的 API 账户可用的 OpenAI 模型可以与 Open WebUI 的知识管理、工具和团队功能结合使用。
+
+**连接方法：**
+
+1. 从 [platform.openai.com](https://platform.openai.com/) 获取 API 密钥
+2. 在 Open WebUI 中，前往**设置 → 连接**（管理员区域）
+3. 使用你的 API 密钥添加新的 OpenAI 连接
+4. API 账户可用的 OpenAI 模型将显示在模型选择器中
+
+许多用户在同一个界面中，将 OpenAI 模型用于复杂推理，同时通过 Ollama 使用本地模型处理隐私敏感任务。
+
+---
+
+*ChatGPT 让 AI 在全球范围内变得实用且易于接近。Open WebUI 帮助团队将 OpenAI 模型及其他模型引入自己控制的基础设施。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**我可以自托管 ChatGPT 吗？**
+无法自托管 ChatGPT 本身，但 Open WebUI 可以连接 OpenAI API，让你使用 API 账户可用的 OpenAI 模型。Open WebUI 在你的基础设施上运行，但 API 调用仍会发送至 OpenAI。
+
+**我可以在 Open WebUI 中使用 OpenAI 模型吗？**
+可以。在设置中添加你的 OpenAI API 密钥后，API 账户可用的 OpenAI 模型就会显示在模型选择器中。
+
+**Open WebUI 是 ChatGPT 的替代方案吗？**
+Open WebUI 可以连接 OpenAI API，因此你可以使用 API 账户可用的 OpenAI 模型。Open WebUI 在你自己的基础设施上运行，但 API 调用仍会发送至服务提供方。它还支持连接其他服务提供方。
+
+**我可以将 ChatGPT 和本地模型结合使用吗？**
+可以。许多用户在同一个 Open WebUI 界面中，将 OpenAI 用于复杂推理，同时通过 Ollama 使用本地模型处理隐私敏感任务。
+
+
+---
+
+**相关内容：**[Open WebUI 与 Claude](/alternatives/claude) · [Open WebUI 与 Gemini](/alternatives/gemini) · [Open WebUI 与 Ollama](/alternatives/ollama)

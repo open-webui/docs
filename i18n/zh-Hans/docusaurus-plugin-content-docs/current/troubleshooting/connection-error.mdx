@@ -1,0 +1,642 @@
+---
+sidebar_position: 0
+title: "连接错误"
+---
+
+本页介绍常见的连接问题、其原因及解决方法。
+
+## HTTPS、TLS、CORS 与 WebSocket 问题 {#https-tls-cors--websocket-issues}
+
+如果你在使用 Open WebUI 时遇到连接问题，尤其是在使用反向代理或 HTTPS 时，这些问题通常源于 CORS、TLS、WebSocket 或 Cookie 配置不当。下面介绍如何诊断和修复这些问题。
+
+### 常见症状 {#common-symptoms}
+
+如果看到以下情况，你可能正遇到这些问题：
+- 聊天中出现 `"{}"` 之类的空响应
+- 出现 `"Unexpected token 'd', "data: {"id"... is not valid JSON"` 之类的错误
+- 出现 `Unexpected token '<', "<!DOCTYPE "... is not valid JSON` 之类的错误，请参阅[`Unexpected token '<'`](#unexpected-token--doctype--is-not-valid-json)
+- 流式传输期间 Markdown 渲染混乱（可见 `##`、`**`、格式损坏），请参阅[流式响应损坏](#garbled-markdown--streaming-response-corruption)
+- 浏览器控制台中出现 WebSocket 连接失败
+- CLI 日志中出现 WebSocket 连接失败
+- 登录问题或会话问题
+- 浏览器开发者工具中出现 CORS 错误
+- 通过 HTTPS 访问时出现混合内容警告
+
+### HTTPS 与反向代理的必要配置 {#required-configuration-for-https--reverse-proxies}
+
+**关键环境变量**
+
+在带 HTTPS 的反向代理后运行 Open WebUI 时，必须配置以下设置：
+
+```bash
+# 在首次启动前将其设置为你的实际域名（OAuth/SSO 和正常运行均需要）
+WEBUI_URL=https://your-open-webui-domain.com
+# 如果你已经启动过 Open WebUI，也不用担心，也可以在管理员面板中设置此配置！
+
+# CORS 配置——对 WebSocket 功能至关重要
+# 包含用户可能访问实例的所有方式
+# 确保包含用户能够或可能用来访问 Open WebUI 的所有 IP、主机名和域名，以及请求到达 Open WebUI 实例的方式
+# 例如 localhost、127.0.0.1、0.0.0.0、<服务器/计算机的 IP>、公共域名——均使用正确的端口，并同时包含 http 和 https
+CORS_ALLOW_ORIGIN="https://yourdomain.com;http://yourdomain.com;https://yourip;http://localhost:3000"
+
+# HTTPS 的 Cookie 安全设置
+# 如果不使用 HTTPS，请禁用
+WEBUI_SESSION_COOKIE_SECURE=true
+WEBUI_AUTH_COOKIE_SECURE=true
+
+# 对于 OAuth/SSO，可能需要使用“lax”（strict 可能破坏 OAuth 回调）
+WEBUI_SESSION_COOKIE_SAME_SITE=lax
+WEBUI_AUTH_COOKIE_SAME_SITE=lax
+
+# 实时连接。仅当反向代理无法传递 WebSocket 升级时才设为 false：
+# 此时浏览器会使用 HTTP 长轮询，运行多个副本时需要粘性会话
+ENABLE_WEBSOCKET_SUPPORT=true
+
+# 仅在运行多个副本时使用
+WEBSOCKET_MANAGER=redis
+WEBSOCKET_REDIS_URL=redis://redis:6379/1
+```
+
+**WEBUI_URL 配置**
+
+必须在使用 OAuth/SSO 之前正确设置 `WEBUI_URL`。由于它是持久化配置变量，只能通过以下方式更改：
+- 使用 `ENABLE_PERSISTENT_CONFIG=false` 暂时禁用持久化配置
+- 在管理员区域的“设置”>“通用”>“WebUI URL”中更改
+- 在首次启动前正确设置
+
+**CORS 配置详情**
+
+`CORS_ALLOW_ORIGIN` 设置对 WebSocket 功能至关重要。如果日志中出现 `"https://yourdomain.com is not an accepted origin"` 或 `"http://127.0.0.1:3000 is not an accepted origin"` 之类的错误，则需要将该 URL 添加到 CORS 配置中。使用分号分隔多个源，并包含用户访问实例的所有可能方式（域名、IP、localhost）。
+
+### 反向代理 / SSL/TLS 配置 {#reverse-proxy--ssltls-configuration}
+
+有关反向代理和 TLS 设置，请查看[这里的教程](/reference/https)。
+
+### WebSocket 故障排除 {#websocket-troubleshooting}
+
+如果 WebSocket 无法工作：
+
+1. **检查反向代理配置**：确保正确设置了 `Upgrade` 和 `Connection` 请求头
+2. **验证 CORS 设置**：WebSocket 连接遵循 CORS 策略
+3. **检查浏览器控制台**：查找 WebSocket 连接错误
+4. **测试直接连接**：尝试不通过代理直接连接 Open WebUI，以隔离问题。
+5. **检查 HTTP/2 WebSocket 问题**：某些代理（如 HAProxy 3.x）默认启用 HTTP/2。如果代理通过 HTTP/2 处理客户端连接，但后端/应用程序不能正确支持 RFC 8441（基于 H2 的 WebSocket），实例可能会“冻结”或停止响应。
+   - **HAProxy 的修复方法**：在配置中添加 `option h2-workaround-bogus-websocket-clients`，或强制后端连接使用 HTTP/1.1。
+   - **Nginx 的修复方法**：确保在 location 块中使用 `proxy_http_version 1.1;`（许多 Open WebUI 示例默认都包含此项）。
+
+对于多实例部署，请如上所示设置 `WEBSOCKET_MANAGER=redis`。详细的 Redis 设置说明请参阅 [Redis WebSocket 支持](/tutorials/integrations/redis)。完整的多实例扩展操作演示请参阅[扩展 Open WebUI](/getting-started/advanced-topics/scaling)。如果在多副本设置中专门遇到 WebSocket 403 错误，请参阅[扩展与高可用故障排除](/troubleshooting/multi-replica#2-websocket-403-errors--connection-failures)。
+
+### 在一个浏览器中正常，在另一个浏览器中不正常 {#works-in-one-browser-but-not-another}
+
+默认启用 `ENABLE_WEBSOCKET_SUPPORT=true` 时，浏览器仅通过 `/ws/socket.io` 上的 WebSocket 连接 Open WebUI，没有 HTTP 长轮询回退。Open WebUI 通过该连接向浏览器发送聊天回复和状态更新。如果某个浏览器阻止 WebSocket，聊天可能失败，而同一服务器上的其他浏览器仍可正常工作。每次失败的尝试都会在该浏览器的控制台中记录 `connect_error`。
+
+在更改服务器或代理之前：
+
+1. 在出现故障的浏览器的隐私窗口中打开 Open WebUI。
+2. 在另一个浏览器中打开它。
+3. 如果聊天在任意一个浏览器中可以正常工作，说明服务器正常。在出现故障的浏览器中，针对你的 Open WebUI 地址关闭隐私防护、广告或跟踪器拦截器以及严格的跟踪保护。然后清除该地址的站点数据并重新登录。
+4. 如果聊天在所有浏览器中都失败，请完成上述 WebSocket 检查。
+
+### 测试配置 {#testing-your-configuration}
+
+要验证设置是否正常：
+
+1. **检查 HTTPS**：访问你的域名，确保看到有效证书且浏览器没有警告
+2. **测试 WebSocket**：打开浏览器开发者工具，进入“网络”选项卡，按“WS”筛选，并验证 WebSocket 连接已建立
+3. **验证 CORS**：检查浏览器控制台中是否有任何 CORS 相关错误
+4. **测试功能**：发送一条消息，确保流式响应正常工作
+
+### 快速修复清单 {#quick-fixes-checklist}
+
+- ✓ 在启用 OAuth 前，将 `WEBUI_URL` 设置为你的实际 HTTPS 域名
+- ✓ 在 `CORS_ALLOW_ORIGIN` 中配置所有可能的访问 URL
+- ✓ 为 HTTPS 启用 `WEBUI_SESSION_COOKIE_SECURE=true`
+- ✓ 在反向代理配置中添加 WebSocket 请求头
+- ✓ 在 SSL 配置中使用 TLSv1.2 或 TLSv1.3
+- ✓ 在反向代理中设置正确的 `X-Forwarded-Proto` 请求头
+- ✓ 确保已配置 HTTP 到 HTTPS 重定向
+- ✓ 配置 Let's Encrypt 以自动续订证书
+- ✓ 为 SSE 流式传输禁用代理缓冲（见下文）
+
+## Markdown 混乱 / 流式响应损坏 {#garbled-markdown--streaming-response-corruption}
+
+如果流式响应的 Markdown 渲染混乱（例如可见 `##`、`**` 或格式损坏），但禁用流式传输后问题消失，通常是由 **nginx 代理缓冲**引起的。
+
+### 常见症状 {#common-symptoms-1}
+
+- 响应中可见原始 Markdown 标记（`##`、`**`、`###`）
+- 粗体标记显示不正确（显示为 `** Control:**` 而不是 `**Control:**`）
+- 响应中的单词或段落随机缺失
+- 禁用流式传输后格式正常
+
+### 原因：Nginx 代理缓冲 {#cause-nginx-proxy-buffering}
+
+启用 nginx 的代理缓冲后，它会任意重新切分 SSE（服务器发送事件）流。这会使 Markdown 标记在分块边界处断开：例如，`**bold**` 被拆成 `**` + `bold` + `**` 几个独立块，导致 Markdown 解析器解析失败。
+
+### 解决方案：禁用代理缓冲 {#solution-disable-proxy-buffering}
+
+在 Open WebUI 的 nginx location 块中添加以下指令：
+
+```nginx
+location / {
+    proxy_pass http://your-open-webui-upstream;
+
+    # 关键：为 SSE 流式传输禁用缓冲
+    proxy_buffering off;
+    proxy_cache off;
+
+    # WebSocket 支持
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+
+    # 标准代理请求头
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+:::tip
+禁用代理缓冲还能**显著提高流式传输速度**，因为响应会逐字节直接传输到客户端，而无需等待 nginx 缓冲。
+:::
+
+### 其他反向代理 {#for-other-reverse-proxies}
+
+- **HAProxy**：确保没有为 SSE 端点启用 `option http-buffer-request`
+- **Traefik**：检查压缩/缓冲中间件设置
+- **Caddy**：通常默认能正确处理 SSE，但仍应检查是否存在缓冲插件
+
+## 模型使用工具时回复为空白 {#blank-replies-when-the-model-uses-a-tool}
+
+### 常见症状 {#common-symptoms-2}
+
+- 助手消息返回后**完全为空**，UI 中没有错误，任何日志级别下也都没有日志。
+- 问题看似**随机**：大多数轮次正常，同一提示词有时成功、有时失败。
+- 对于为空的轮次，提供方仍会收取输出令牌费用。
+- 存储的消息中 `content: ''` 且 `output: []`，而 `usage.completion_tokens` 不为零。
+- 启用工具后问题会严重得多，使用内置工具时尤其严重，因为模型会自行调用这些工具。
+
+### 原因：提供方在流式工具调用中省略 `index` {#cause-the-provider-omits-index-on-streamed-tool-calls}
+
+OpenAI 流式传输架构在每个工具调用增量中都包含一个 `index` 字段，客户端依靠它将一次调用的片段跨块重新拼接起来。Open WebUI 的累加器以该字段为键。如果提供方在一个块中发送完整的工具调用却省略 `index`，就不符合该架构，调用会被丢弃。随后，这一轮结束时既没有文本，也没有运行工具，这就是你看到的空消息。
+
+该问题并不局限于某一家供应商。它会影响任何在流式工具调用中不带 `index` 的 OpenAI 兼容端点。**已知案例是 Google 位于 `https://generativelanguage.googleapis.com/v1beta/openai` 的 OpenAI 兼容层**，而 Gemini 3 模型还增加了第二个问题：专有的 `thought_signature`，Google 要求在后续请求中将其发回，但任何遵循 OpenAI 架构的客户端都不会这样做。
+
+### 用一条命令确认 {#confirm-it-in-one-command}
+
+直接请求端点并查看工具调用块。替换为你自己的 URL、密钥和模型：
+
+```bash
+curl -s -N -X POST "https://your-provider.example/v1/chat/completions" -H "Authorization: Bearer $API_KEY" -H "Content-Type: application/json" -d '{"model":"your-model","stream":true,"messages":[{"role":"user","content":"What is the weather in Paris?"}],"tools":[{"type":"function","function":{"name":"get_weather","parameters":{"type":"object","properties":{"city":{"type":"string"}},"required":["city"]}}}]}'
+```
+
+在 `delta.tool_calls` 条目中查找 `"index"`。如果没有该字段，就是这个问题。外层 `choices` 条目中的 `index` 是另一个字段，不能算数。
+
+### 解决方案 {#solutions}
+
+1. **在前面放置网关。** 使用 LiteLLM、OpenRouter 或任何能与提供方原生 API 通信并输出符合架构的 OpenAI 数据的代理。这是唯一能让原生工具调用和内置工具继续工作的方案。
+2. **将模型切换为 Legacy 函数调用。** 在模型的**高级参数**中，将**函数调用**设置为 **Legacy**。随后，工具由单独的非流式请求选择，不再经过流式累加器。未设置该值表示使用原生模式。代价是内置工具（Memory 等）在 Legacy 模式下不可用，因为它们只会注入原生函数调用。
+3. **关闭该模型的工具。** 如果只需要普通聊天，请禁用模型的**内置工具**能力，使它不再尝试调用任何工具。聊天补全本身不受此问题影响。
+4. **使用管道。** 直接调用提供方自身 API 的[管道函数](/features/extensibility/plugin/functions/pipe)可以完全绕过 OpenAI 兼容路径。
+
+Open WebUI 遵循 OpenAI Chat Completions 架构，不会为偏离该架构的端点添加针对特定提供方的变通方案，其理由与[面向协议的设计](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#protocol-oriented-design)中所述相同。
+
+## 前端与后端连接（localhost 混淆） {#frontend-vs-backend-connections-localhost-confusion}
+
+Open WebUI 的多项功能提供**两种**连接配置方式：**管理员/全局**方式（从 Open WebUI 后端发起）和 [Tether](/ecosystem/tether#bring-your-own-models-and-tools) 方式（从用户自己的计算机发起）。它们工作在完全不同的网络层面，同一个 URL 可能在一种方式下成功，在另一种方式下失败。
+
+### 核心规则 {#the-core-rule}
+
+| 请求来源 | `localhost` 的含义 | 使用方 |
+| :--- | :--- | :--- |
+| **后端（服务器端）** | 运行 Open WebUI 的计算机/容器 | 全局工具服务器、管理员配置的终端、Ollama 连接 |
+| **Tether（你的计算机）** | 运行 Tether 应用程序的计算机 | 在 Tether 中添加的连接 |
+
+### 为什么同一个 URL 可能成功也可能失败 {#why-the-same-url-can-work-and-fail}
+
+在 Tether 中添加 `https://myserver.com/api` 这样的 URL 时，你的计算机会解析 `myserver.com` 并直接连接。将同一个 URL 添加为**管理员/全局**连接时，则由 Open WebUI 后端解析该主机名；在 Docker 容器内，它可能解析为 `127.0.0.1`，从而完全绕过你的反向代理。
+
+**常见症状：**
+- 管理员配置的连接出现 502 Bad Gateway，而 Tether 连接正常
+- 后端日志中出现 `Connect call failed ('127.0.0.1', ...)`
+- 全局工具服务器连接超时
+
+**修复方法：**对于后端/管理员连接，请使用后端实际能够访问的**内部 URL**：
+- Docker 服务名（例如 `http://open-terminal:8000`）
+- `host.docker.internal`（从 Docker 内访问宿主机）
+- 内部 IP（例如 `http://192.168.1.50:8000`）
+
+:::tip
+这适用于 Open WebUI 中**所有**由后端代理的连接，包括 Open Terminal。同样的模式也会影响[工具服务器连接](/features/extensibility/plugin/tools/openapi-servers/open-webui#1-tool-servers-added-by-an-admin)、[Open Terminal 管理员连接](/features/open-terminal#enterprise-multi-user)以及 Ollama/OpenAI API 端点。
+:::
+
+## “Open WebUI backend required”/ 仅前端错误 {#open-webui-backend-required--front-end-only-error}
+
+**症状：**页面可以加载，但显示 *“Open WebUI backend required. Oops! You're using an unsupported method (frontend only). Please serve the WebUI from the backend.”*。它通常出现在**第二个实例**上、反向代理后或通过 **SSH 隧道**访问时，而另一个实例却正常。
+
+**实际含义：**加载时，前端会从自己的源请求 `/api/config`。如果该请求失败，Open WebUI 就会显示此错误。它**并不**表示你正在运行仅前端构建。官方镜像以单个进程同时在容器端口 **`8080`** 上提供 UI 和 API，因此既然页面能够到达你的浏览器，API 理论上也应该可用。该错误表示此源上的 `/api/config` 请求没有到达后端。
+
+几乎所有此类问题都可归结为两个原因：
+
+1. **端口映射或隧道不匹配。** 你打开的源能够提供页面，但没有将 `/api/config` 路由到后端。请检查：
+   - 每个容器都将其主机端口映射到容器端口 **`8080`**，例如 `ports: ["3001:8080"]`。映射到任何其他内部端口都会破坏 API，同时仍可能提供缓存的静态资源。
+   - SSH 隧道将本地端口转发到**该实例实际发布的远程主机端口**。运行多个实例时，很容易转发到错误的实例。
+   - 在浏览器所在计算机上通过隧道快速测试：`curl http://localhost:3001/api/config`。返回 JSON 表示后端可访问，应检查原因 2。空响应或连接被拒绝表示隧道或端口映射有误。
+
+2. **过期的 Service Worker 提供缓存页面。** Open WebUI 不注册 Service Worker，并会在加载时注销它发现的任何 Service Worker，因此，当实时的 `/api/config` 调用失败时，过期的页面外壳可能来自浏览器的 HTTP 缓存，也可能来自同一源上另一个应用遗留的 Worker，进而产生这个错误。普通的强制刷新不会注销 Service Worker。请在 **DevTools > Application > Service Workers > Unregister** 中为该源清除它，或在新的隐私/无痕窗口中打开实例。
+
+这是部署和网络状况，不是 Open WebUI 的缺陷。
+
+## `Unexpected token '<', "<!DOCTYPE "... is not valid JSON` {#unexpected-token--doctype--is-not-valid-json}
+
+**症状：**错误提示框或浏览器控制台显示 `SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON`。如果失败的请求是模型列表请求，控制台中的该行会以 `Failed to load models:` 开头。
+
+**实际含义：**浏览器向 Open WebUI API 路径请求 JSON，却收到了 HTML 页面。该错误并非来自模型或提供方。有两种情况会在这里返回 HTML：
+
+1. **Open WebUI 自身。** 对于没有对应路由的任何路径，Open WebUI 都会以状态码 `200` 返回自己的网页 `index.html` 来响应 `GET` 请求。添加或移除路径前缀的反向代理会将 API 调用发送到不存在的路径，于是返回网页。将 Open WebUI 放在子路径下通常会导致这种结果，而子路径部署[不受支持](/faq#q-can-i-serve-open-webui-under-a-subpath-such-as-examplecomopenwebui)。
+2. **Open WebUI 前面的某个组件。** 请求根本没有到达 Open WebUI，而是由代理、登录网关或同一域名上的另一个站点返回了自己的页面，例如针对过大或耗时过长请求的错误页面。
+
+要区分这两种情况，请打开 **DevTools > Network**，选择失败的请求并查看其响应。Open WebUI 自己的页面标题为 `Open WebUI`。任何其他页面都会指出实际响应的代理或站点。然后，按照 [HTTPS 与反向代理](/reference/https)中的说明，从独立主机名的根路径提供 Open WebUI，并将所有路径原样路由到它。
+
+## 长聊天重新加载后编辑和评分丢失 {#edits-and-ratings-lost-after-reload-in-long-chats}
+
+**症状：**在长聊天中，编辑过的消息、评分或通过**另存为副本**创建的副本会显示在屏幕上，但重新加载页面后便消失。没有错误提示。同一聊天中的新消息和回复仍能保存，较短的聊天也能保留所有更改。
+
+**实际含义：**Open WebUI 前面的反向代理拒绝了保存请求，因为请求大小超过了其请求体大小限制。通过**保存**保存编辑、**另存为副本**、评分和**合并回复**都会通过一个发往 `/api/v1/chats/{id}` 的 `POST` 请求发送整个聊天：每个分支中的每条消息，以及屏幕上当前分支的消息。该请求会随聊天增长。新消息不经过此请求，因为 Open WebUI 会在回复开始时将每一轮存储到服务器上，所以即使聊天已超过限制，新消息仍能继续保存。
+
+要确认这一点，请打开 **DevTools > Network**，再次进行更改，然后选择发往 `/api/v1/chats/<id>` 的 `POST` 请求。状态码 `413` 表示代理拒绝了该请求。
+
+要解决此问题，请提高代理的请求体大小限制。在 nginx 中，对应指令是 [`client_max_body_size`](https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size)，默认值为 `1m`；设为 `0` 可关闭检查。请参阅[请求头和请求体大小限制](/reference/https/nginx#header-and-body-size-limits)；其他代理请参阅[关键配置说明](/reference/https#key-configuration-notes)。重新加载后，代理拒绝的更改已经丢失，需要重新操作。
+
+## 连接到 Ollama 服务器 {#connection-to-ollama-server}
+
+### 从 Open WebUI 访问 Ollama {#accessing-ollama-from-open-webui}
+
+如果 Open WebUI 无法访问 Ollama，很可能是因为 Ollama 仅监听 `127.0.0.1`（localhost）。解决方法如下：
+
+1. **设置 `OLLAMA_HOST=0.0.0.0`**，使 Ollama 监听所有网络接口。
+2. **确保已在部署环境中设置该变量**（systemd 服务、Docker、Shell 配置文件）。
+3. **重启 Ollama**，使更改生效。
+
+重启后访问 WebUI 界面，验证连接是否正常。详细说明请参阅 [Ollama 文档](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#setting-environment-variables-on-linux)。
+
+**检查更改是否已应用。** Ollama 默认绑定 `127.0.0.1` 的端口 `11434`（[Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-can-i-expose-ollama-on-my-network)）。在运行 Ollama 的计算机上，查看端口 `11434` 监听在哪个地址。在 Linux 上：
+
+```bash
+ss -tlnp | grep 11434
+```
+
+在 Windows 上：
+
+```powershell
+netstat -an | findstr 11434
+```
+
+输出中的 `127.0.0.1:11434` 表示 Ollama 仍仅监听回环地址，新的 `OLLAMA_HOST` 尚未生效。`0.0.0.0:11434`、`*:11434` 或 `[::]:11434` 表示它正在监听所有接口。如果设置未生效，请对照 [Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-do-i-configure-ollama-server) 检查你的步骤：
+
+- **使用 systemd 的 Linux：**运行 `systemctl edit ollama.service`，在 `[Service]` 下单独一行添加 `Environment="OLLAMA_HOST=0.0.0.0:11434"`。然后运行 `systemctl daemon-reload` 和 `systemctl restart ollama`。缺少 `[Service]` 行、跳过 `daemon-reload` 或跳过重启，都是地址仍为 `127.0.0.1` 的常见原因。
+- **Windows：**从任务栏退出 Ollama，在用户环境变量中设置 `OLLAMA_HOST`，然后从“开始”菜单重新启动 Ollama。
+- **macOS 应用：**运行 `launchctl setenv OLLAMA_HOST "0.0.0.0:11434"`，然后重启 Ollama 应用程序。
+
+:::warning 不要将端口 11434 暴露到网络
+Open WebUI 从后端调用 Ollama，绝不从浏览器调用，因此用户的浏览器不需要访问端口 `11434`。Ollama 的本地 API 不要求身份验证（[Ollama API 文档](https://github.com/ollama/ollama/blob/main/docs/api/authentication.mdx)），因此设置 `OLLAMA_HOST=0.0.0.0` 后，任何能通过端口 `11434` 访问主机的设备都可以使用它。请在主机防火墙中阻止除 Open WebUI 主机之外的所有设备访问端口 `11434`，或者让 Ollama 与 Open WebUI 位于同一个 Docker 网络中，并且不发布其端口。仓库的 [`docker-compose.yaml`](https://github.com/open-webui/open-webui/blob/main/docker-compose.yaml) 采用后者：`ollama` 服务没有 `ports` 条目，Open WebUI 通过 `OLLAMA_BASE_URL=http://ollama:11434` 访问它。
+:::
+
+### Docker 连接错误 {#docker-connection-error}
+
+如果 Docker 中的 Open WebUI 无法连接到宿主机上运行的 Ollama：
+
+如果你使用桥接网络并将 Ollama URL 设置为 `http://host.docker.internal:11434`，请从 Open WebUI 容器内测试：
+
+```bash
+docker exec open-webui curl --fail --show-error --silent --max-time 5 http://host.docker.internal:11434/api/version
+```
+
+如果容器名称不同，请使用你的容器名称。返回版本信息即可确认容器能够访问 Ollama。如果 Linux Docker Engine 无法解析该主机名，请在创建容器时添加 `--add-host=host.docker.internal:host-gateway`，或在 Compose 中添加等效的 [`extra_hosts` 条目](https://docs.docker.com/compose/how-tos/networking/#custom-dns-with-extra_hosts)。如果主机名可以解析但请求失败，请按上述说明检查 Ollama 监听器，并检查主机防火墙是否允许来自 Docker 网络的流量访问端口 `11434`。请仅允许需要访问该端口的客户端。
+
+你也可以在 Docker 命令中使用 `--network=host` 标志。这会将容器直接连接到主机网络。
+
+**Docker 命令示例**：
+```bash
+docker run -d --network=host -v open-webui:/app/backend/data -e OLLAMA_BASE_URL=http://127.0.0.1:11434 --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+运行上述命令后，WebUI 应可通过 `http://localhost:8080` 访问。
+
+使用 `--network=host` 时：
+
+- Docker 会忽略 `-p` 和 `--publish`，并输出 `WARNING: Published ports are discarded when using host network mode.`（[Docker 文档](https://docs.docker.com/engine/network/drivers/host/)）。Open WebUI 监听 `PORT` 指定的端口，默认为 `8080`。添加 `-e PORT=3000` 可更改端口。
+- 在 Docker Desktop 上，只有 4.34 及更高版本支持主机网络，并且必须开启 **Settings > Resources > Network > Enable host networking**。否则，容器共享的是 Docker Desktop Linux 虚拟机的网络，浏览器无法连接，如[网络图](/reference/network-diagrams)所示。此时请改用 `-p 3000:8080` 发布端口，并使用 `OLLAMA_BASE_URL=http://host.docker.internal:11434`。
+- 其他计算机会直接通过主机的该端口访问 Open WebUI，因此主机防火墙必须允许访问。
+
+### 模型缺失或与 `ollama list` 不同 {#models-missing-or-different-from-ollama-list}
+
+Open WebUI 只列出**管理员面板 > 设置 > 连接**中的 Ollama URL 所返回的模型。它会向每个已启用的 URL 请求 `/api/tags` 并合并结果。未响应的 URL 不会添加任何模型，并会记录 `Connection error:`。当列表与 `ollama list` 不同时，通常是因为 Open WebUI 和你的终端连接的是不同的 Ollama 服务器或使用了不同的模型存储：
+
+- **安装了两个 Ollama**，例如一个原生安装加一个 Ollama 容器，或一个在 WSL 中、另一个在 Windows 上。两者各有自己的模型。请在该 URL 指向的安装环境中运行 `ollama list`，例如对于名为 `ollama` 的容器，运行 `docker exec ollama ollama list`。
+- **Docker 卷被重命名或缺失。** Ollama 将模型保存在挂载到 `/root/.ollama` 的卷中。使用不同卷名启动的容器会以空模型列表开始。
+- **随附的 `:ollama` 镜像运行时未指定 `-v ollama:/root/.ollama`。** 拉取到其中的模型会在容器重建后丢失。
+
+如果在 `docker run` 和 Compose 之间切换或重命名 Compose 项目后模型消失，请检查提供 Ollama 服务的容器挂载：
+
+```bash
+docker inspect --type container --format '{{json .Mounts}}' ollama
+```
+
+对于随附镜像，请使用 `open-webui`，或替换为你的容器名称。找到 `Destination` 为 `/root/.ollama` 的条目。对于命名卷，将其 `Name` 与旧设置进行比较。Compose 通常会在卷名前添加项目名前缀，因此 `myproject_ollama` 和 `ollama` 是两个独立的卷。对于绑定挂载，请比较 `Source`。如果旧卷仍然存在，请将新设置配置为挂载该确切卷。在 Compose 中，请使用[具有现有名称的外部卷](https://docs.docker.com/reference/compose-file/volumes/#external)。
+
+要发现残留的第二台服务器，请打开**设置 > 关于**。**Ollama 版本**显示所有已启用 Ollama 连接报告的最低版本。如果该版本低于你安装的版本，说明某个已配置的 URL 指向另一台 Ollama 服务器。
+
+### `does not support tools` {#ollama-does-not-support-tools}
+
+如果使用 Ollama 模型的每次聊天都以 `registry.ollama.ai/library/<model> does not support tools` 失败，说明 Ollama 正在拒绝请求中的工具定义。当**函数调用**设置为 Native（默认值），并且模型的**内置工具**能力开启（也是默认值）时，Open WebUI 会将其内置工具添加到从聊天界面发送的每个请求中。即使你没有在聊天中开启任何工具，请求也会携带工具。
+
+**解决方案：**
+
+1. **将模型设置为 Legacy。** 在管理员区域的**设置 > 模型**中，进入模型的**高级参数**，将**函数调用**设置为 **Legacy**。Legacy 模式不会发送内置工具。
+2. **关闭模型的内置工具。** 在模型编辑器中禁用**内置工具**能力。你为聊天启用的工作区工具或 MCP 工具仍会在 Native 模式下发送，并导致相同错误。
+3. 如果需要内置工具，**使用支持工具调用的模型**。
+
+### 验证连接成功但聊天失败 {#ollama-model-fails-to-load}
+
+**症状：** **验证连接**显示**服务器连接已验证**，Ollama 模型也出现在模型列表中，但使用模型聊天时最终出现错误。
+
+**原因：**这两项检查都不会运行模型。**验证连接**仅请求 `/api/version`，模型列表来自 `/api/tags`。只有发送到 `/api/chat` 的聊天请求才会要求 Ollama 运行模型。当 Ollama 返回错误时，Open WebUI 会在聊天消息中显示 Ollama 自己的错误文本，并将其记录为 `Error processing chat payload: <text>`。如果 Ollama 的错误不包含消息，聊天会显示 `Open WebUI: Server Connection Error`。
+
+**修复方法：**
+
+1. 在运行 Ollama 的计算机上，在终端中使用 `ollama run <model>` 运行同一模型。对于名为 `ollama` 的 Ollama 容器，运行 `docker exec -it ollama ollama run <model>`。如果在这里也失败，问题就在 Ollama，而不在连接。
+2. 阅读 Ollama 服务器日志以了解原因。[Ollama 故障排除页面](https://github.com/ollama/ollama/blob/main/docs/troubleshooting.mdx)列出了各系统上的日志位置，例如使用 systemd 的 Linux 上可运行 `journalctl -u ollama`，容器则可运行 `docker logs <container-name>`。
+3. 如果错误提到内存，说明可用 RAM 或 VRAM 无法容纳该模型。请尝试更小的模型或其更小的变体。`ollama ps` 会显示已加载的模型，以及每个模型是在 GPU 还是 CPU 上运行（[Ollama FAQ](https://github.com/ollama/ollama/blob/main/docs/faq.mdx#how-can-i-tell-if-my-model-was-loaded-onto-the-gpu)）。
+
+## 验证连接 URL 时出现 `Network Problem` {#network-problem-when-you-verify-a-connection-url}
+
+**症状：** 在**管理员面板 > 设置 > 连接**中**验证连接**时显示 `Ollama: Network Problem` 或 `OpenAI: Network Problem`，并且该 URL 的模型均未出现。
+
+**原因：**Open WebUI 不检查 URL 的格式。它会移除一个末尾斜杠，然后附加固定路径。验证时，Ollama 连接请求 `<url>/api/version`，OpenAI 连接请求 `<url>/models`。聊天则分别发往 Ollama 的 `<url>/api/chat` 和 OpenAI 的 `<url>/chat/completions`。Azure 和 Anthropic URL 遵循各自的规则。Ollama 检查的任何失败都会显示 `Ollama: Network Problem`。OpenAI 检查失败会显示 `OpenAI: Network Problem`；如果提供方返回 JSON 错误，则会显示 `OpenAI:` 加提供方的消息。
+
+| 你输入的内容 | Open WebUI 为验证而请求的内容 | 应改为输入 |
+| :--- | :--- | :--- |
+| `192.168.1.5:11434` | 不发送任何内容：URL 没有 `http://`，请求在发送前就会失败 | `http://192.168.1.5:11434` |
+| `http://192.168.1.5` | 端口 `80`，即 `http://` 的默认端口 | `http://192.168.1.5:11434` |
+| `http://localhost:11434/api` | `http://localhost:11434/api/api/version` | `http://localhost:11434` |
+| `https://api.openai.com/v1/chat/completions` | `https://api.openai.com/v1/chat/completions/models` | `https://api.openai.com/v1` |
+| `https://api.openai.com` | `https://api.openai.com/models` | `https://api.openai.com/v1` |
+
+Ollama URL 是 `http://host:port`，端口后不应有任何内容。OpenAI 兼容 URL 是 `/models` 和 `/chat/completions` 之前的基础 URL。对于大多数提供方，它以 `/v1` 结尾，正如 **URL** 字段提供的建议所示。
+
+## OpenAI 模型 ID 重复 {#duplicate-openai-model-ids}
+
+当两个由管理员管理的 OpenAI 连接公开相同的模型 ID 时，Open WebUI 在合并其模型列表时会保留该 ID 的第一项。针对该 ID 的聊天请求会使用与保留项关联的连接。
+
+要分别选择每个连接，请在**管理员面板 > 设置 > 连接**下编辑每个连接，并在**高级**下设置不同的**前缀 ID**。例如，如果两者都提供 `example-model`，前缀 `local` 和 `hosted` 会分别生成 `local.example-model` 和 `hosted.example-model`。Open WebUI 会在将模型 ID 发送给提供方之前移除前缀。如果某个工作区模型使用了之前的 ID，请重新选择其**基础模型**并保存。
+
+## 间歇性名称解析失败（常报告为“Model not found”） {#intermittent-name-lookup-failures-often-reported-as-model-not-found}
+
+### 常见症状 {#common-symptoms-3}
+
+- 对于已经配置且片刻前还能工作的模型，聊天失败并显示 **“Model not found”**，之后又恢复正常。
+- Ollama 模型列表自行清空，重启后又恢复。
+- 对于在同一容器内的 Shell 中可以正常解析的主机名，日志却显示 `ClientConnectorDNSError` 或 `Cannot connect to host ...`。
+- 在某些 Windows 主机上，从首次启动开始，所有发往外部模型提供方的请求都会失败。
+
+### 原因 {#cause}
+
+除非启用了可选的 c-ares 解析器，否则 Open WebUI 会要求操作系统将主机名转换为地址。c-ares 在不同环境中的表现并不一致：
+
+- 在某些 Windows 主机上，它找不到可用的名称服务器，因此完全无法解析任何外部名称。
+- 在 Docker 中，即使 Docker 自己的 DNS 仍在响应，它也可能间歇性停止解析容器名称。结果是模型列表被清空，正在进行的聊天因误导性的“Model not found”而失败，因为无法解析的名称与没有该模型的提供方无法区分。
+
+### 解决方案 {#solution}
+
+保持 c-ares 关闭。默认情况下，名称解析通过操作系统进行，因此容器名称、`host.docker.internal`、Compose `extra_hosts` 和 Kubernetes `hostAliases` 的行为都与主机上的其他程序一致。
+
+c-ares 可作为选项启用，在繁忙的实例上值得尝试，因为它能消除每个出站请求之前的排队延迟：
+
+```bash
+AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER=true
+```
+
+如果启用它，之后请测试你的模型、网页搜索和所有内部服务，并注意，系统通过 `/etc/resolv.conf` 或 hosts 文件之外的来源提供的名称（通过 avahi/mDNS 提供的 `.local`、NIS 或 LDAP 目录、Windows NBNS）可能无法解析。完整说明请参阅 [`AIOHTTP_CLIENT_ASYNC_DNS_RESOLVER`](/reference/env-configuration#aiohttp_client_async_dns_resolver)，其收益请参阅[性能 → DNS 解析器](/troubleshooting/performance#dns-resolver)。
+
+## 模型列表加载问题（UI 缓慢 / 端点无法访问） {#model-list-loading-issues-slow-ui--unreachable-endpoints}
+
+如果 Open WebUI 加载模型需要很长时间，或模型选择器无限旋转，可能是连接中配置的 API 端点无法访问或响应缓慢所致。
+
+### 常见症状 {#common-symptoms-4}
+
+- 模型选择器长时间显示加载旋转图标
+- 点击**发送**后，所选提供方要过一段时间才收到请求
+- `/api/models` 端点出现 `500 Internal Server Error`
+- 打开设置时 UI 无响应
+- Docker/服务器日志显示：`Connection error: Cannot connect to host...`
+
+### 原因：端点无法访问 {#cause-unreachable-endpoints}
+
+当你配置多个 Ollama 或 OpenAI 基础 URL（用于负载均衡或冗余）时，Open WebUI 会尝试从**所有**已配置端点获取模型。如果任何端点无法访问，系统会等待完整的连接超时后才返回结果。
+
+默认情况下，获取模型列表时，Open WebUI 会为每个无法访问的端点等待 **10 秒**。端点会被并发查询，因此等待时间取决于最慢的一个，而不是所有端点等待时间之和。
+
+如果服务器收到聊天请求时尚未加载模型列表，它会先从已启用的连接获取模型，再转发请求。即使你选择的模型位于正常连接上，离线端点也可能延迟首次发送。
+
+### 解决方案 1：调整超时时间 {#solution-1-adjust-the-timeout}
+
+使用 `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` 环境变量缩短获取模型列表的超时时间：
+
+```bash
+# 设置更短的超时时间（秒），使无法访问的端点更快失败
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=3
+```
+
+这会缩短 Open WebUI 在放弃并继续之前等待每个端点的时间。
+
+### 解决方案 2：修复或移除无法访问的端点 {#solution-2-fix-or-remove-unreachable-endpoints}
+
+1. 进入管理员区域的**设置 > 连接**
+2. 检查你的 Ollama 和 OpenAI 基础 URL
+3. 移除或更正任何无法访问的 IP 地址或主机名
+4. 保存配置
+
+### 解决方案 3：从数据库中持久化的错误配置恢复 {#solution-3-recover-from-database-persisted-bad-configuration}
+
+如果你保存了无法访问的 URL，现在无法进入设置 UI 进行修复，由于错误配置已持久化到数据库并优先于环境变量，请使用以下恢复方法之一：
+
+**选项 A：启动时重置配置**
+```bash
+# 强制环境变量在下次启动时覆盖数据库值
+RESET_CONFIG_ON_START=true
+```
+
+**选项 B：始终使用环境变量**
+```bash
+# 防止数据库值优先（UI 中的更改不会在重启后保留）
+ENABLE_PERSISTENT_CONFIG=false
+```
+
+**选项 C：手动清理数据库（高级）**
+
+如果使用 SQLite，请停止容器并运行：
+```bash
+sqlite3 webui.db "DELETE FROM config WHERE key IN ('ollama.base_urls','openai.api_base_urls');"
+```
+
+:::warning
+
+手动操作数据库应是最后的手段。务必先备份数据库。
+
+:::
+
+### 相关环境变量 {#related-environment-variables}
+
+| 变量 | 默认值 | 描述 |
+|----------|---------|-------------|
+| `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER` | 继承 `AIOHTTP_CLIENT_TIMEOUT` | 执行工具服务器 API 调用的超时时间（秒） |
+| `AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA` | `10` | 加载工具服务器元数据/规范数据的超时时间（秒） |
+| `AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST` | `10` | 获取模型列表的超时时间（秒） |
+| `AIOHTTP_CLIENT_TIMEOUT` | 未设置（无超时） | 常规 API 请求超时。`300` 仅是值不是整数时的回退值 |
+| `RESET_CONFIG_ON_START` | `false` | 启动时将数据库配置重置为环境变量值 |
+| `ENABLE_PERSISTENT_CONFIG` | `true` | 数据库配置是否优先于环境变量 |
+
+更多详细信息请参阅[环境变量配置](/reference/env-configuration#aiohttp_client_timeout_model_list)文档。
+
+## 低配置硬件上的性能缓慢或超时 {#slow-performance-or-timeouts-on-low-spec-hardware}
+
+如果你遇到页面加载缓慢、API 超时或 UI 无响应，尤其是在资源受限的系统上，并且你启用了数据库会话共享，问题可能与此有关。该功能默认关闭。
+
+### 原因 {#cause-1}
+
+数据库会话共享可能会使低配置硬件（Raspberry Pi、CPU 资源极少的容器等）或并发负载下的 SQLite 数据库不堪重负。
+
+### 解决方案 {#solution-1}
+
+重新关闭数据库会话共享：
+
+```bash
+DATABASE_ENABLE_SESSION_SHARING=false
+```
+
+对于硬件资源充足的 PostgreSQL，启用此设置可能提高性能。详细信息请参阅 [DATABASE_ENABLE_SESSION_SHARING](/reference/env-configuration#database_enable_session_sharing) 文档。
+
+## 连接 Hugging Face 时的 SSL 问题 {#ssl-connection-issue-with-hugging-face}
+
+如果连接 Hugging Face 时遇到 SSL 错误：
+
+1. **检查 Hugging Face 服务器状态**：
+   确认其服务端是否存在已知的中断或问题。
+
+2. **切换端点**：
+   如果 Hugging Face 不可用，请在 Docker 命令中切换端点。
+
+**连接问题的 Docker 命令示例**：
+```bash
+docker run -d -p 3000:8080 -e HF_ENDPOINT=https://hf-mirror.com/ --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+## 内部工具的 SSL 证书问题 {#ssl-certificate-issues-with-internal-tools}
+
+如果 Tika、Ollama（用于嵌入）、外部重排序器、模型连接或工具服务器使用自签名证书或私有 CA 颁发的证书，你可能会遇到 SSL 验证错误。
+
+### 常见症状 {#common-symptoms-5}
+
+- 日志显示 `[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: self-signed certificate`
+- Tika 文档摄取失败
+- 嵌入生成失败并出现 SSL 错误
+- 重排序失败并出现 SSL 错误
+
+### 解决方案 {#solution-2}
+
+你可以使用以下环境变量禁用这些内部工具连接的 SSL 验证：
+
+1.  **对于同步请求（Tika、外部重排序器）：**
+    ```bash
+    REQUESTS_VERIFY=false
+    ```
+
+2.  **对于异步请求（Ollama 嵌入）：**
+    ```bash
+    AIOHTTP_CLIENT_SESSION_SSL=false
+    ```
+
+:::warning
+禁用 SSL 验证会降低安全性。只有当你信任网络和所连接的服务时（例如在安全的内部网络中运行），才可这样做。
+:::
+
+### 改为信任私有或自签名 CA {#trust-a-private-or-self-signed-ca-instead}
+
+模型连接和工具服务器可以验证由你自己的 CA 颁发的证书，因此可以保持验证开启。将容器内 CA 证书包文件（PEM）的路径提供给 Open WebUI：
+
+| 变量 | 涵盖的连接 | 值 |
+| :--- | :--- | :--- |
+| [`AIOHTTP_CLIENT_SSL_CERT_FILE`](/reference/env-configuration#aiohttp_client_ssl_cert_file) | 下方所有自身变量为 `true` 的连接 | CA 证书包文件的路径。默认未设置 |
+| [`AIOHTTP_CLIENT_SESSION_SSL`](/reference/env-configuration#aiohttp_client_session_ssl) | Ollama 和 OpenAI 连接（模型列表、连接检查和聊天）、Ollama 嵌入、语音转文字和文字转语音、图片生成，以及 MCP 工具服务器的 OAuth 2.1 发现、注册和令牌刷新请求 | `true`（默认）、`false` 或 CA 证书包文件的路径 |
+| [`AIOHTTP_CLIENT_SESSION_TOOL_SERVER_SSL`](/reference/env-configuration#aiohttp_client_session_tool_server_ssl) | OpenAPI 工具服务器（加载规范和调用工具）以及 MCP 工具服务器流量 | `true`（默认）、`false` 或 CA 证书包文件的路径 |
+
+`true` 和 `false` 不区分大小写。任何其他值都会被读取为文件路径，并且对于该变量涵盖的连接，该路径优先于 `AIOHTTP_CLIENT_SSL_CERT_FILE`。要一次覆盖所有连接，只设置 `AIOHTTP_CLIENT_SSL_CERT_FILE`，并将另外两个变量保持为 `true`。
+
+对于使用证书包的连接，证书包会替换默认信任库：它们只信任该文件中的 CA（[Python `ssl.create_default_context`](https://docs.python.org/3/library/ssl.html#ssl.create_default_context)）。如果相同连接还需要访问公共端点（例如 `api.openai.com`），请将你的 CA 和公共根证书放在同一个文件中，例如复制容器中的 `/etc/ssl/certs/ca-certificates.crt`，再追加你的 CA。
+
+如果文件不存在，Open WebUI 会记录 `SSL CA bundle path does not exist: '<path>', ignoring`，并回退到 `AIOHTTP_CLIENT_SSL_CERT_FILE`；如果后者也未设置，则使用默认信任库，因此 `CERTIFICATE_VERIFY_FAILED` 错误仍会继续出现。这些变量仅在启动时读取一次，因此更改后请重启 Open WebUI。
+
+对于通过 TLS 连接的 Milvus，请将 [`MILVUS_SERVER_PEM_PATH`](/reference/env-configuration#milvus_server_pem_path) 指向 CA 或服务器证书。验证会保持开启。
+
+## MacOS 上的 Podman {#podman-on-macos}
+
+对于 MacOS 上的 Podman：
+
+1. **启用主机访问**：Podman 5.0+ 默认使用 **pasta**，可简化主机回环访问。在较旧版本上，请使用 `--network slirp4netns:allow_host_loopback=true`。
+2. 将 **OLLAMA_BASE_URL** 设置为 **`http://host.containers.internal:11434`**。
+
+**Podman 命令示例**：
+```bash
+podman run -d -p 3000:8080 -e OLLAMA_BASE_URL=http://host.containers.internal:11434 -v open-webui:/app/backend/data --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+
+## 网页搜索的 SSL/TLS 错误 {#ssltls-errors-with-web-search}
+
+如果使用网页搜索功能时遇到 SSL 错误，通常分为两类：代理配置问题或证书验证问题。
+
+### 证书验证问题 {#certificate-verification-issues}
+
+如果 Open WebUI 尝试从网站获取内容（Web Loader）时出现 SSL 验证错误：
+
+- **症状**：加载搜索结果时出现 `[SSL: CERTIFICATE_VERIFY_FAILED]`。
+- **解决方案**：可以专门为 Web Loader（抓取器）禁用 SSL 验证。
+  ```bash
+  ENABLE_WEB_LOADER_SSL_VERIFICATION=false
+  ```
+  > **注意**：此设置适用于网页*获取*。如果搜索引擎本身（例如本地 SearXNG）或后续步骤（嵌入/重排序）出现 SSL 问题，请参阅下面的章节。
+
+### 代理配置问题 {#proxy-configuration-issues}
+
+如果使用网页搜索提供方（Bocha、Tavily 等）时看到 `UNEXPECTED_EOF_WHILE_READING` 或 `Max retries exceeded` 之类的 SSL 错误：
+
+#### 常见症状 {#common-symptoms-6}
+
+- `SSLError(SSLEOFError(8, '[SSL: UNEXPECTED_EOF_WHILE_READING]'))`
+- `Max retries exceeded with url: /v1/web-search`
+- 网页搜索在独立 Python 脚本中正常，但在 Open WebUI 中失败
+
+#### 原因：为 HTTPS 流量配置了 HTTP 代理 {#cause-http-proxy-configured-for-https-traffic}
+
+这通常发生在为 **HTTPS 流量**配置 **HTTP 代理**时。HTTP 代理无法正确处理 TLS 连接，从而导致 SSL 握手失败。
+
+检查环境中的以下变量：
+- `HTTP_PROXY` / `http_proxy`
+- `HTTPS_PROXY` / `https_proxy`
+
+如果你的 `https_proxy` 指向 `http://...`（HTTP）而不是 `https://...`（HTTPS），SSL 握手将失败，因为代理会意外终止连接。
+
+#### 解决方案 {#solutions-1}
+
+1. **修复代理配置**：为 HTTPS 流量使用支持 HTTPS 的代理，或将 HTTP 代理配置为正确支持用于 SSL 的 CONNECT 隧道
+2. **让特定主机绕过代理**：设置 `NO_PROXY` 环境变量：
+   ```bash
+   NO_PROXY=api.bochaai.com,api.tavily.com,api.search.brave.com
+   ```
+3. **不需要代理时将其禁用**：完全取消设置代理环境变量
+
+#### 为什么独立脚本能正常工作 {#why-standalone-scripts-work}
+
+直接运行 Python 脚本时，它可能不会继承 Open WebUI 服务所使用的同一组代理环境变量。服务通常从 systemd、Docker 或 Shell 配置文件继承环境变量，而这些地方的代理设置可能不同。

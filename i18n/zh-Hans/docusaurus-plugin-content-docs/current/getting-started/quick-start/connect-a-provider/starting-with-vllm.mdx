@@ -1,0 +1,57 @@
+---
+sidebar_position: 4
+title: "vLLM"
+---
+
+## 概述 {#overview}
+
+vLLM 提供 **OpenAI 兼容 API**（Chat Completions），可以轻松连接到 Open WebUI。本指南将介绍如何连接你的 vLLM 服务器。
+
+:::tip
+对于实现 [Open Responses](/getting-started/quick-start/connect-a-provider/starting-with-open-responses) 规范的提供方，Open WebUI 也提供支持。
+:::
+
+---
+
+## 第 1 步：设置 vLLM 服务器 {#step-1-set-up-your-vllm-server}
+
+确保你的 vLLM 服务器正在运行且可以访问。默认 API 基础 URL 通常为：
+
+```
+http://localhost:8000/v1
+```
+
+对于远程服务器，请使用相应的主机名或 IP 地址。
+
+---
+
+## 第 2 步：在 Open WebUI 中添加 API 连接 {#step-2-add-the-api-connection-in-open-webui}
+
+1. 转到**设置 > 连接（Settings > Connections）**（管理员区域）。
+2. 找到**管理 OpenAI API 连接（Manage OpenAI API Connections）**列表。
+3. 点击**添加连接（Add Connection）**。
+4. 填写以下内容：
+   - **URL**：`http://localhost:8000/v1`（或你的 vLLM 服务器 URL）
+     *   **Docker 用户**：如果 Open WebUI 在容器中运行，请使用 `http://host.docker.internal:8000/v1`。
+   - **身份验证（Auth）**：如果未配置密钥，请选择**无（None）**；否则选择 **Bearer** 并填写密钥
+   - **高级 > 提供方（Advanced > Provider）**：选择 **vLLM**，以便在后续轮次中将已存储的推理内容发回模型。请参阅[提供方设置](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting)
+5. 点击**保存（Save）**。
+
+---
+
+## 第 3 步：开始使用模型 {#step-3-start-using-models}
+
+从模型选择器中选择 vLLM 服务器上可用的任何模型，然后开始聊天。
+
+:::tip 连接超时配置
+
+如果 vLLM 服务器响应缓慢（尤其是在模型加载期间），可以调整超时：
+
+```bash
+# 为较慢的模型初始化增加超时时间（默认为 10 秒）
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=30
+```
+
+如果保存了无法访问的 URL 并导致界面无响应，请参阅[模型列表加载问题](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints)故障排除指南。
+
+:::

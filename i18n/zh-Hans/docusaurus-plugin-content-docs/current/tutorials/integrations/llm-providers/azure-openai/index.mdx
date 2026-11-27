@@ -1,0 +1,112 @@
+---
+sidebar_position: 1
+title: "通过 Entra ID 使用 Azure OpenAI"
+---
+
+# 通过 Entra ID 使用 Azure OpenAI
+
+:::warning
+
+本教程由社区贡献，Open WebUI 团队不提供支持。它仅用于演示如何针对特定用例自定义 Open WebUI。想要贡献内容？请查看贡献教程。
+
+:::
+
+本节介绍如何通过 Azure Entra ID（以前称为 Azure AD）的安全无密钥身份验证，将 Open WebUI 与 Azure OpenAI 集成。无需管理静态 API 密钥，即可利用 Azure 的标识和访问管理来增强安全性。
+
+:::warning
+Open WebUI 必须使用 0.6.30 或更高版本才能使用此功能！
+:::
+
+## 概述 {#overview}
+
+Open WebUI 支持通过 **Entra ID 身份验证**集成 Azure OpenAI，无需存储 API 密钥即可完成身份验证。这具有以下优势：
+
+- **增强的安全性**：无需管理或轮换静态 API 密钥
+- **Azure RBAC 集成**：使用 Azure 角色分配实现精细的访问控制
+- **审计跟踪**：所有访问都会通过 Azure 的审计系统记录
+- **自动令牌管理**：Azure 自动处理令牌生命周期
+
+## 身份验证方法 {#authentication-methods}
+
+Open WebUI 支持 [`DefaultAzureCredential`](https://learn.microsoft.com/en-us/python/api/azure-identity/azure.identity.defaultazurecredential?view=azure-python) 为 Azure OpenAI 提供的所有身份验证方法。
+
+:::warning
+默认情况下，`DefaultAzureCredential` 会尝试所有 Azure 凭据，包括开发凭据和生产凭据。如果你已经明确知道要使用哪种身份验证类型，这种做法可能并不理想，原因如下：
+- 系统会在**每次**请求时调用 `DefaultAzureCredential`，并逐一尝试大多数身份验证类型，直到找到可用的类型
+- 某些身份验证类型会带来性能开销
+- 如果未配置某些身份验证类型但系统仍尝试使用它们，日志中可能会出现大量误导性错误。
+
+要解决此问题，**如果你使用的是 0.6.31 或更高版本**，可以将环境变量 `AZURE_TOKEN_CREDENTIALS` 设置为以下某个特定值：
+- `EnvironmentCredential`
+- `WorkloadIdentityCredential`
+- `ManagedIdentityCredential`
+- `VisualStudioCodeCredential`
+- `AzureCliCredential`
+- `AzurePowershellCredential`
+- `AzureDeveloperCliCredential`
+- `InteractiveBrowserCredential`
+
+_这样系统就只会选择指定的凭据类型。_
+
+或者，如果你希望保留自动选择行为，但只想在开发或生产选项之间缩小范围，可以使用：
+- `prod`：对应 `EnvironmentCredential`、`WorkloadIdentityCredential` 和 `ManagedIdentityCredential`。
+- `dev`：对应 `SharedTokenCacheCredential`、`AzureCliCredential`、`AzurePowershellCredential` 和 `AzureDeveloperCliCredential`。
+:::
+
+### Azure CLI 身份验证 {#azure-cli-authentication}
+
+**最适用于：**本地开发
+
+Azure CLI 身份验证使用本地 Azure 凭据对 Azure OpenAI 进行身份验证。
+这是最简单的入门方法，非常适合开发环境。
+
+**主要功能：**
+- 通过 Azure CLI 即可轻松设置
+- 适用于本地计算机和容器
+- 使用你的个人 Azure 凭据
+- 需要安装 Azure CLI
+
+[**→ 了解如何设置 Azure CLI 身份验证**](./azure-cli-auth.mdx)
+
+### 2. 工作负载身份验证 {#2-workload-identity-authentication}
+
+**最适用于：**Azure Kubernetes Service（AKS）生产部署和多租户环境
+
+工作负载身份为 AKS 集群提供托管标识解决方案，使 Pod 无需在集群中存储任何凭据即可向 Azure 服务进行身份验证。
+
+**主要功能：**
+- 无需在集群中存储凭据
+- Kubernetes 原生身份验证
+- 联合身份凭据
+- 适用于生产环境的安全模型
+- 通过 Terraform 实现基础设施即代码
+
+[**→ 了解如何设置工作负载身份验证**](./workload-identity-auth.mdx)
+
+## 先决条件 {#prerequisites}
+
+无论选择哪种身份验证方法，都需要：
+
+- **Azure 订阅**：有权访问 Azure OpenAI 资源
+- **Open WebUI**：0.6.30 或更高版本
+- **Azure RBAC 角色**：为你的标识分配 `Cognitive Services OpenAI User` 角色
+- **Azure OpenAI 资源**：已部署的 Azure OpenAI 实例
+
+## 快速比较 {#quick-comparison}
+
+|                  | Azure CLI 身份验证       | 工作负载身份                                       |
+|------------------|--------------------------|----------------------------------------------------|
+| **环境**         | 本地开发                 | Azure Kubernetes Service（AKS）                    |
+| **设置复杂度**   | 简单                     | 中等（需要 Terraform 或 Azure 使用经验）           |
+| **安全模型**     | Azure CLI 凭据           | 工作负载身份                                       |
+| **最适用于**     | 开发和测试               | 生产部署                                           |
+| **凭据存储**     | 本地 `.azure` 目录       | 无（联合令牌）                                     |
+
+## 后续步骤 {#next-steps}
+
+选择最适合部署环境的身份验证方法：
+
+- **本地开发或 Docker 部署**：从 [Azure CLI 身份验证](./azure-cli-auth.mdx)开始
+- **生产 AKS 部署**：使用[工作负载身份验证](./workload-identity-auth.mdx)
+
+这两种方法都能为 Azure OpenAI 提供安全的无密钥身份验证；基础设施设置完成后，即可通过 Open WebUI 管理界面进行配置。

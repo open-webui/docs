@@ -1,0 +1,60 @@
+---
+title: "创建与编辑图像"
+sidebar_position: 0
+slug: /features/chat-conversations/image-generation-and-editing
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import DocCardList from '@theme/DocCardList';
+
+# 图像生成
+
+<ThemedImage
+  alt="图像：支架上的画框"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-images-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-images-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+无需离开聊天，即可使用本地或托管图像模型，根据提示词生成和编辑图像。管理员为每个图像后端设置一个连接，用户从这些连接提供的模型中进行选择。有关视频，请参阅[生成视频](/features/chat-conversations/image-generation-and-editing/video-generation)。
+
+## 设置连接 {#set-up-a-connection}
+
+1. 打开**管理员面板** > **设置** > **图像**，开启**图像生成**、**图像编辑**或两者。
+2. 在**管理图像连接**下，点击 **+**（添加连接）。
+3. 选择**连接类型**，输入**名称**和 **URL**（如果后端需要密钥，还需输入密钥），然后点击 URL 旁的验证图标以检查服务器。
+4. 在**功能**下，保持**生成**、**编辑**或两者开启。只能开启后端支持的功能：AUTOMATIC1111 仅支持生成，ComfyUI 连接则需要相应的工作流。
+5. 将**访问控制**设为可使用此连接的用户，然后点击**保存**。
+
+| 连接类型 | 用途 | 编辑支持 |
+|---|---|---|
+| OpenAI 兼容 | [OpenAI](/features/chat-conversations/image-generation-and-editing/openai)、Azure OpenAI、LiteLLM、[Lumenfall](/features/chat-conversations/image-generation-and-editing/lumenfall)、[Image Router](/features/chat-conversations/image-generation-and-editing/image-router)，以及任何其他提供 OpenAI 风格图像 API 的服务器 | 是 |
+| Gemini | [Imagen 和 Gemini 图像模型](/features/chat-conversations/image-generation-and-editing/gemini) | 是 |
+| ComfyUI | [你自己的 ComfyUI 工作流](/features/chat-conversations/image-generation-and-editing/comfyui) | 是，需要编辑工作流 |
+| AUTOMATIC1111 | [本地 Stable Diffusion 服务器](/features/chat-conversations/image-generation-and-editing/automatic1111) | 否 |
+
+同时提供生成和编辑功能的服务器只需一个连接。OpenAI 兼容连接具有与模型连接相同的身份验证选项，另外还支持自定义**请求头**。
+
+:::warning 访问控制决定谁可以使用连接
+新连接默认仅供管理员使用，直到你将其共享。将**访问控制**设为可以使用其模型的用户或组，或将其公开给所有人。没有访问权限的用户永远不会看到其中的模型。
+:::
+
+## 模型 {#models}
+
+**模型 ID**列出连接提供的模型。将其留空时，连接会提供默认模型：
+
+- OpenAI 兼容：LiteLLM 服务器列出的每个图像模型；否则为 `gpt-image-2`。
+- Gemini：`imagen-3.0-generate-002`。
+- ComfyUI：工作流中设置的模型。
+- AUTOMATIC1111：当前加载的检查点。
+
+当服务器提供多个模型时，可添加模型 ID，例如在 `gpt-image-2` 之外再添加 `gpt-image-1.5`。在 AUTOMATIC1111 连接上设置模型 ID 后，选择尚未加载的模型会为所有使用该服务器的用户切换检查点。
+
+在**默认模型**下，你可以选择当聊天和模型均未指定模型时使用的**默认生成模型**和**默认编辑模型**。模型也可以在模型编辑器的**工作区** > **模型** > **编辑**下设置自己的**默认图像模型**。
+
+**高级**中包含取决于后端的可选设置；每个引擎的页面都会列出其所需的设置。
+
+<DocCardList />

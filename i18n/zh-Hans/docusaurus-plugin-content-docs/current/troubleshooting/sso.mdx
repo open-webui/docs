@@ -1,0 +1,576 @@
+---
+sidebar_position: 4
+title: "SSO 与 OAuth"
+---
+
+OAuth 和单点登录（SSO）为 Open WebUI 提供安全身份验证。发生登录问题时，通常由以下某个常见问题引起。
+
+## 常见 OAuth/SSO 问题 {#common-oauthsso-issues}
+
+### 1. 未配置 WebUI URL {#1-webui-url-not-configured}
+
+大多数 OAuth 流程都需要应用程序的外部 URL（“重定向 URI”），以便服务提供方知道登录后将用户发送到哪里。如果缺少此值，OAuth 将无法完成。
+
+**解决方法：**
+- 导航至：**设置 > 通用**（管理员区域）
+- 确保 **WebUI URL** 字段已填写，并指向你部署的实例（例如 `https://yourwebui.yourdomain.com`）
+
+:::tip
+
+检查拼写错误。OAuth 要求严格，URL 必须完全匹配，包括 `https://`。
+
+:::
+
+---
+
+### 2. 环境变量配置不正确 {#2-incorrect-environment-variable-configuration}
+
+这是 OAuth 失效的**最常见原因**。环境变量拼写错误、遗漏或不正确都会导致身份验证无法工作。
+
+**常见环境变量错误：**
+
+#### 经常误用的不存在变量 {#non-existent-variables-people-often-use}
+- `OIDC_CONFIG` → 请改用 `OPENID_PROVIDER_URL`
+- `WEBUI_OIDC_CLIENT_ID` → 请改用 `OAUTH_CLIENT_ID`
+- `WEBUI_ENABLE_SSO` → OAuth 默认通过 `ENABLE_OAUTH` 启用。只有需要让 SSO 创建新账户时，才需要 `ENABLE_OAUTH_SIGNUP`
+- `WEBUI_AUTH_TYPE` → 此变量不存在；请配置特定服务提供方的变量
+- `OPENID_CLIENT_ID` → 请改用 `OAUTH_CLIENT_ID`
+- `OPENID_CLIENT_SECRET` → 请改用 `OAUTH_CLIENT_SECRET`
+
+#### 正确的 OIDC 变量 {#correct-oidc-variables}
+```bash
+
+# OIDC 必需
+OAUTH_CLIENT_ID=your_client_id
+OAUTH_CLIENT_SECRET=your_client_secret
+OPENID_PROVIDER_URL=https://your-provider/.well-known/openid-configuration
+
+# 仅在需要 SSO 创建尚不存在的账户时才需要
+ENABLE_OAUTH_SIGNUP=true
+
+# 可选，但建议设置
+OAUTH_PROVIDER_NAME=Your Provider Name
+OAUTH_SCOPES=openid email profile
+OPENID_REDIRECT_URI=https://your-domain/oauth/oidc/callback
+
+# 可选：传递服务提供方特定的授权参数（JSON 对象）
+# 例如强制显示同意屏幕、预填用户或邮箱提示
+OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com"}
+```
+
+#### Google 特定的可选授权参数 {#google-specific-optional-authorize-params}
+```bash
+# 可选：以 JSON 形式提供额外的 Google /authorize 参数
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
+```
+
+#### 正确的 Microsoft 变量 {#correct-microsoft-variables}
+```bash
+
+# 将这些变量用于 Microsoft Entra ID
+MICROSOFT_CLIENT_ID=your_client_id
+MICROSOFT_CLIENT_SECRET=your_client_secret
+MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
+OPENID_PROVIDER_URL=https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0/.well-known/openid-configuration
+ENABLE_OAUTH_SIGNUP=true
+```
+
+**解决方法：**
+- **始终参考官方[环境配置文档](https://docs.openwebui.com/reference/env-configuration/)**，获取准确的变量名
+- 仔细检查部署环境：
+  - 确保所有必需的环境变量均严格按文档设置
+  - 如果采用自托管，请确认这些变量存在于 Docker Compose、Kubernetes 清单或 `.env` 文件中
+- 更改变量后重启后端或应用，以加载新值
+
+:::info
+
+如果服务提供方在 `/authorize` 步骤需要额外参数（例如 `prompt`、`login_hint`、`domain_hint` 或 `resource`），请通过 `OAUTH_AUTHORIZE_PARAMS` 以 JSON 对象形式设置。
+
+对于 Google 特定的自定义，也可以使用 `GOOGLE_OAUTH_AUTHORIZE_PARAMS`。
+
+:::
+
+:::tip
+
+大多数 OAuth 错误（循环、401、无响应）都是因为环境变量名称不正确、完全缺失，或使用了过时的变量名。
+
+:::
+
+:::warning
+
+**Kubernetes/YAML 用户：**请注意**环境变量名称中的尾随空格！**在 YAML 中，如果将键写成 `'OAUTH_CLIENT_ID '`（引号内带尾随空格），就会设置名为 `OAUTH_CLIENT_ID `（末尾带空格）的变量，而 Open WebUI **无法**识别它。请务必确保环境变量名没有尾随空白：
+
+```yaml
+# 错误——引号内有尾随空格：
+- name: 'OAUTH_CLIENT_ID '
+  value: your_client_id
+
+# 正确——没有尾随空格：
+- name: OAUTH_CLIENT_ID
+  value: your_client_id
+```
+
+:::
+
+---
+
+### 3. 缺少必需变量 {#3-missing-required-variables}
+
+#### OIDC 必须设置 `OPENID_PROVIDER_URL` {#openid_provider_url-is-mandatory-for-oidc}
+许多用户会忘记这个关键变量。没有它，OIDC 身份验证就无法工作。
+
+**对于 Microsoft Entra ID：**
+```bash
+OPENID_PROVIDER_URL=https://login.microsoftonline.com/YOUR_TENANT_ID/v2.0/.well-known/openid-configuration
+```
+
+**对于 Google：**
+```bash
+OPENID_PROVIDER_URL=https://accounts.google.com/.well-known/openid-configuration
+```
+
+**对于 Authentik：**
+```bash
+OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-name/.well-known/openid-configuration
+```
+
+#### 各服务提供方所需的其他变量 {#other-required-variables-by-provider}
+- **所有 OAuth 服务提供方：**`ENABLE_OAUTH`（默认开启），需要 SSO 创建账户时还要设置 `ENABLE_OAUTH_SIGNUP=true`。只有位于会改变请求 URL 的代理之后时，`WEBUI_URL` 才有影响
+- **Microsoft：**`MICROSOFT_CLIENT_ID`、`MICROSOFT_CLIENT_SECRET`、`MICROSOFT_CLIENT_TENANT_ID`
+- **Google：**`GOOGLE_CLIENT_ID`、`GOOGLE_CLIENT_SECRET`
+- **OIDC：**`OAUTH_CLIENT_ID`、`OAUTH_CLIENT_SECRET`、`OPENID_PROVIDER_URL`
+
+---
+
+### 4. 持久化配置冲突 {#4-persistent-configuration-conflicts}
+
+**重要：**Open WebUI 有**两个**影响 OAuth 的持久化设置：
+
+1. **`ENABLE_PERSISTENT_CONFIG`**（默认为 **`true`**）：控制设置保存到数据库后，是否从数据库而非环境变量加载*所有*设置（包括 OAuth）。
+2. **`ENABLE_OAUTH_PERSISTENT_CONFIG`**（默认为 **`false`**）：专门针对 OAuth 设置的*额外*开关。设置为 `false` 时，即使 `ENABLE_PERSISTENT_CONFIG` 为 `true`，配置路径以 `oauth.` 开头的 OAuth 设置也**不会**从数据库加载。
+
+默认情况下，OAuth 环境变量**会**优先于数据库值，因为 `ENABLE_OAUTH_PERSISTENT_CONFIG` 默认为 `false`。但是，如果你之前通过管理员面板配置过 OAuth，这些数据库值可能已经保存；以后将 `ENABLE_OAUTH_PERSISTENT_CONFIG` 设置为 `true` 时，就会加载这些值。
+
+#### 症状 {#symptoms}
+- 重启后对环境变量的更改未生效
+- 身份验证曾经正常工作，但更改配置后失效
+- 重新配置后出现“No token found in localStorage”错误
+
+**解决方法：**
+1. **对于开发或测试：**确保 `ENABLE_OAUTH_PERSISTENT_CONFIG=false`（这已经是默认值），始终从环境变量读取
+2. **对于生产环境：**选择以下任一方式：
+   - 设置 `ENABLE_OAUTH_PERSISTENT_CONFIG=true`，通过管理员面板而非环境变量配置设置；或者
+   - 保持 `ENABLE_OAUTH_PERSISTENT_CONFIG=false`（默认），使环境变量始终优先用于 OAuth 设置
+3. **重新开始：**删除数据库卷，并使用正确配置重启
+
+当该值为 `false` 时，管理员面板的 OAuth 部分为只读，因此不会出现编辑看似成功、却在下次重启后消失的情况。请参阅 [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config)。
+
+**Docker Compose 示例：**
+```yaml
+environment:
+  - ENABLE_OAUTH_PERSISTENT_CONFIG=false  # 强制从环境变量读取（这是默认值）
+  - OAUTH_CLIENT_ID=your_client_id
+  - OAUTH_CLIENT_SECRET=your_secret
+  - OPENID_PROVIDER_URL=your_provider_url
+```
+
+---
+
+### 5. 服务提供方一侧的 OAuth 配置错误 {#5-oauth-misconfiguration-on-the-provider-side}
+
+有时问题出在身份提供方（例如 Google、Okta、Auth0、Azure AD）的配置与你的 WebUI 设置不一致。
+
+**解决方法：**
+- 验证应用程序已正确注册到 OAuth 服务提供方。确认：
+  - **重定向 URI 与部署的 WebUI 地址完全匹配**
+    - OIDC：`https://your-domain/oauth/oidc/callback`
+    - Microsoft：`https://your-domain/oauth/microsoft/callback`
+    - Google：`https://your-domain/oauth/google/callback`
+  - 客户端 ID 和客户端密钥与环境设置中的值一致
+  - 范围和允许的授权类型（例如 `authorization_code`）已按 Open WebUI 的要求设置
+- 检查服务提供方日志：配置错误的应用通常会在其中显示明确的错误消息
+
+**重定向 URI 格式示例：**
+```
+Correct: https://ai.company.com/oauth/oidc/callback
+Wrong: https://ai.company.com/oauth/callback/oidc
+Wrong: https://ai.company.com/callback
+```
+
+:::tip
+
+如果不确定，请重新检查服务提供方注册，并在需要时重新生成客户端密钥。
+:::
+
+---
+
+### 6. 服务器端缓存问题 {#6-server-side-caching-issues}
+
+如果你使用带服务器端缓存的 Nginx（或其他反向代理），OAuth 端点可能出现异常。这通常表现为随机或间歇性的登录问题，难以调试。
+
+**解决方法：**
+- 在 NGINX（或代理）配置中：
+  - 确保将以下端点**排除**在服务器端缓存之外：
+    - `/api`、`/oauth`、`/callback`、`/login`、`/ws`、`/websocket`
+  - 任何关键登录或身份验证端点都必须保持不缓存！
+- 更改后重新加载代理配置
+
+**NGINX 配置示例：**
+```nginx
+
+# 禁用登录、OAuth 和 WebSocket 端点的缓存
+location ~* ^/(api|oauth|callback|login|ws|websocket) {
+    proxy_no_cache 1;
+    proxy_cache_bypass 1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+    proxy_set_header Accept-Encoding "";
+}
+```
+
+:::warning
+
+切勿缓存 OAuth 或登录端点。缓存可能提供过期令牌或损坏会话，导致不可预测的身份验证错误。
+
+:::
+
+---
+
+### 7. Cookie 配置问题 {#7-cookie-configuration-issues}
+
+**常见问题：**反向代理的 Cookie 设置可能干扰 OAuth 身份验证，尤其是 `HttpOnly` 和 `SameSite` 设置。
+
+#### 症状 {#symptoms-1}
+- “No token found in localStorage”错误
+- 身份验证成功后出现重定向循环
+- 身份验证有效，但立即重定向到登录页
+
+**解决方法：**
+
+#### 对于 NGINX Proxy Manager {#for-nginx-proxy-manager}
+```nginx
+
+# 删除或调整有问题的 Cookie 设置
+
+# 有问题的设置：
+
+# proxy_cookie_path / "/; Secure; HttpOnly; SameSite=None";
+
+# 更好的设置：
+proxy_cookie_flags ~ secure samesite=lax;
+
+# 或者完全删除 Cookie 修改
+```
+
+#### 环境变量 Cookie 设置 {#environment-variable-cookie-settings}
+```bash
+
+# 建议用于 OAuth 的 Cookie 设置
+WEBUI_SESSION_COOKIE_SAME_SITE=lax
+WEBUI_AUTH_COOKIE_SAME_SITE=lax
+WEBUI_SESSION_COOKIE_SECURE=true  # 使用 HTTP 时设置为 false
+WEBUI_AUTH_COOKIE_SECURE=true     # 使用 HTTP 时设置为 false
+```
+
+---
+
+### 8. 网络超时问题 {#8-network-timeout-issues}
+
+OAuth 服务提供方可能响应缓慢，导致身份验证握手期间发生超时错误。请提高 [`OAUTH_TIMEOUT`](/reference/env-configuration#oauth_timeout)，为服务提供方留出更长时间。
+
+#### 症状 {#symptoms-2}
+- 日志中出现 `httpcore.ReadTimeout` 错误
+- 出现 `CSRF Warning! State not equal in request and response` 错误
+- OAuth 登录间歇性失败
+
+**解决方法：**
+```bash
+
+# 增加 OAuth 握手超时时间（秒）。AIOHTTP_CLIENT_TIMEOUT 不会影响
+# 基于 httpx 的 OAuth 客户端。
+OAUTH_TIMEOUT=60
+```
+
+---
+
+### 9. 会话状态不匹配（CSRF 错误） {#9-session-state-mismatch-csrf-errors}
+
+在 OAuth 重定向流程中，会话 Cookie 可能未得到正确维护。
+
+#### 症状 {#symptoms-3}
+- `CSRF Warning! State not equal in request and response`
+- 日志中出现 `mismatching_state` 错误
+- 身份验证看似成功，却重定向到登录页
+
+**解决方法：**
+
+1. **检查 Cookie 域配置：**
+```bash
+
+# 确保为正确的域设置 Cookie
+WEBUI_URL=https://your-exact-domain.com  # 必须完全匹配——检查管理员面板中是否设置了不同的值
+```
+
+2. **会话配置：**
+```bash
+
+# 确保正确配置会话处理
+WEBUI_SECRET_KEY=your_very_secure_random_key_here
+OAUTH_SESSION_TOKEN_ENCRYPTION_KEY=another_secure_key_here
+```
+
+---
+
+### 10. 负载均衡器和多实例问题 {#10-load-balancer-and-multi-instance-issues}
+
+在多实例部署中，如果未正确同步，OAuth 会话可能失败。
+
+#### 集群所需配置 {#required-configuration-for-clusters}
+```bash
+
+# 用于会话同步的 Redis（多实例必需）
+REDIS_URL=redis://your-redis:6379/0
+WEBSOCKET_REDIS_URL=redis://your-redis:6379/0
+
+# 所有实例共享的密钥
+WEBUI_SECRET_KEY=same_on_all_instances
+OAUTH_SESSION_TOKEN_ENCRYPTION_KEY=same_on_all_instances
+
+# 集群的 WebSocket 支持
+ENABLE_WEBSOCKET_SUPPORT=true
+WEBSOCKET_MANAGER=redis
+```
+
+---
+
+### 11. 服务提供方特定的配置问题 {#11-provider-specific-configuration-issues}
+
+#### Microsoft Entra ID 常见问题 {#microsoft-entra-id-common-issues}
+
+**问题：**使用通用 OIDC 变量，而不是 Microsoft 特定变量。
+
+**正确的 Microsoft 配置：**
+```bash
+
+# 使用 Microsoft 特定变量，而不是通用 OIDC 变量
+MICROSOFT_CLIENT_ID=your_azure_app_id
+MICROSOFT_CLIENT_SECRET=your_azure_app_secret
+MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
+MICROSOFT_OAUTH_SCOPE=openid email profile
+MICROSOFT_REDIRECT_URI=https://your-domain/oauth/microsoft/callback
+
+# 仅在需要 SSO 创建尚不存在的账户时才需要。Microsoft 不需要
+# OPENID_PROVIDER_URL：登录和退出使用租户自己的发现 URL。
+ENABLE_OAUTH_SIGNUP=true
+```
+
+**问题：**登录在回调时失败，并显示 `Sign-in with your identity provider failed. Please contact your administrator for assistance.`；以 `OAuth callback error during authorize_access_token for provider microsoft` 开头的日志行包含 `AADSTS7000215`。Microsoft 的[错误代码参考](https://learn.microsoft.com/en-us/entra/identity-platform/reference-error-codes)将该代码描述为“Invalid client secret is provided.”（提供了无效的客户端密钥）。
+
+**解决方法：**`MICROSOFT_CLIENT_SECRET` 必须保存密钥的**值**（Value），而不是旁边列出的**机密 ID**（Secret ID）。在 Microsoft Entra 管理中心，打开**应用注册**下的应用，然后转到**证书和机密** > **客户端密码**。Microsoft 仅在创建客户端密码时显示一次其**值**，因此如果你不再持有该值，请创建新的客户端密码并复制其**值**。请参阅[添加和管理应用凭据](https://learn.microsoft.com/en-us/entra/identity-platform/how-to-add-credentials?tabs=client-secret)。
+
+#### Authentik 常见问题 {#authentik-common-issues}
+
+**问题：**服务提供方 URL 格式不正确。
+
+**正确的 Authentik 配置：**
+```bash
+OAUTH_CLIENT_ID=your_authentik_client_id
+OAUTH_CLIENT_SECRET=your_authentik_client_secret
+OPENID_PROVIDER_URL=https://your-authentik-domain/application/o/your-app-slug/.well-known/openid-configuration
+OAUTH_PROVIDER_NAME=Authentik
+OAUTH_SCOPES=openid email profile
+```
+
+#### 向 ID 令牌添加自有参数的服务提供方 {#providers-that-add-their-own-parameters-to-the-id-token}
+
+**问题：**登录在回调时失败。浏览器显示 `The email or password provided is incorrect`，日志记录了真正原因：
+
+```
+OAuth callback failed: Unsupported {'app_id'} in header
+```
+
+某些服务提供方会向 ID 令牌标头添加供应商特定参数，而旧版本会拒绝此类参数。参数名称因服务提供方而异。
+
+**解决方法：**更新 Open WebUI。无法识别的参数会被忽略，服务提供方一侧无需任何更改。系统仍会验证签名和签名算法。
+
+#### 对 ID 令牌加密的服务提供方 {#providers-that-encrypt-the-id-token}
+
+**问题：**登录在回调时失败，并显示 `Sign-in with your identity provider failed. Please contact your administrator for assistance.`，日志记录：
+
+```
+OAuth callback failed: decode_error: Invalid JSON Web Signature
+```
+
+该 ID 令牌不是 Open WebUI 所验证的三段式签名令牌。通常是因为服务提供方被设置为加密 ID 令牌（JWE）。Open WebUI 没有解密密钥设置，因此无法读取加密的 ID 令牌。
+
+**解决方法：**在服务提供方一侧，关闭 Open WebUI 客户端的 ID 令牌加密，并保持对 ID 令牌签名。
+
+---
+
+### 12. 延迟许久才升级后，现有账户无法登录 {#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade}
+
+**问题：**将一直停留在早于 v0.6.41 版本的实例升级后，所有曾通过 SSO 登录的用户都无法再次登录，这些账户的密码登录也会失败。从未使用过 SSO 的账户不受影响。日志记录：
+
+```
+ERROR - Error during OAuth process: 1 validation error for UserModel
+oauth
+  Input should be a valid dictionary [type=dict_type, input_value='{"oidc": {"sub": "..."}}', input_type=str]
+```
+
+将账户的身份提供方主体移到当前字段的升级步骤对值进行了两次编码，因此该字段保存的是 JSON 对象文本，而不是对象。只有升级时数据库仍早于 v0.6.41 的情况会受影响，并且仅影响当时已存储主体的账户。
+
+**解决方法：**更新 Open WebUI。修复迁移会在启动时运行并重写受影响的行，不会改动其他行。无需手动操作数据库、重新关联账户，也无需更改服务提供方一侧的任何内容。`OAUTH_MERGE_ACCOUNTS_BY_EMAIL` 无法绕过此问题，因为回退查找读取的是同一账户，也会以相同方式失败。
+
+---
+
+### 13. 首次 SSO 登录处于待审核状态或被拒绝 {#13-first-sso-sign-in-is-pending-or-refused}
+
+**问题：**用户首次通过服务提供方登录。他们要么进入**账户等待激活**页面，要么带着以下错误返回登录页：
+
+```
+You do not have permission to access this resource. Please contact your administrator for assistance.
+```
+
+#### 新账户待审核 {#the-new-account-is-pending}
+
+新 SSO 账户会从 **设置 > 身份验证**（管理员区域）的**用户访问**部分获得**默认用户角色**，该角色由 [`DEFAULT_USER_ROLE`](../reference/env-configuration.mdx#default_user_role) 设置。默认值为 `pending`，因此账户会停留在**账户等待激活**页面，直到管理员更改其角色。启用双因素登录后，登录页会改为显示 `Your account is awaiting administrator approval.`。在空实例上创建的第一个账户会成为 `admin`。
+
+**解决方法：**使用以下任一方式：
+- 在 **管理员面板 > 用户**下，将账户角色更改为 `user`。
+- 将**默认用户角色**设置为 `user`，使新账户可以立即使用 Open WebUI。这也适用于通过注册表单和 LDAP 创建的新账户。
+- 开启**角色映射**（[`ENABLE_OAUTH_ROLE_MANAGEMENT`](../reference/env-configuration.mdx#enable_oauth_role_management)），让服务提供方的角色决定使用 `user` 还是 `admin`。请参阅 [OAuth 角色管理](/features/authentication-access/auth/sso#oauth-role-management)。
+
+#### 登录被拒绝 {#the-sign-in-is-refused}
+
+在回调时，Open WebUI 会查找已与该服务提供方及用户 `sub` 关联的账户。如果不存在：
+
+- 启用 [`OAUTH_MERGE_ACCOUNTS_BY_EMAIL`](../reference/env-configuration.mdx#oauth_merge_accounts_by_email) 后，系统会关联并登录具有相同邮箱的现有账户。
+- 否则，如果 [`ENABLE_OAUTH_SIGNUP`](../reference/env-configuration.mdx#enable_oauth_signup) 关闭（默认），登录将被拒绝并显示上述错误。即使用户已经拥有使用相同邮箱的本地邮箱和密码账户，也会发生这种情况。
+- 启用 `ENABLE_OAUTH_SIGNUP` 后，系统会创建新账户。如果已存在使用该邮箱的账户，登录会失败并显示 `Uh-oh! This email is already registered. Sign in with your existing account or choose another email to start anew.`
+
+启用**角色映射**且服务提供方角色与**允许的角色**和**管理员角色**均不匹配时，也会出现相同错误。请参阅 [`OAUTH_ALLOWED_ROLES`](../reference/env-configuration.mdx#oauth_allowed_roles)。
+
+**解决方法：**
+- 若要允许 SSO 创建账户，请设置 `ENABLE_OAUTH_SIGNUP=true`（管理员面板中的 **OAuth 注册**）。
+- 若要允许已有本地账户的用户通过 SSO 登录，请设置 `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true`（**按邮箱合并账户**）。它会将登录关联到使用该邮箱的任何账户，包括管理员账户，而 Open WebUI 不会检查服务提供方是否验证过该地址。只对会验证邮箱地址的服务提供方启用此功能。
+- 当 [`ENABLE_OAUTH_PERSISTENT_CONFIG`](../reference/env-configuration.mdx#enable_oauth_persistent_config) 为 `false`（默认）时，这两个开关在管理员面板中为只读。请设置环境变量并重启。
+
+#### 服务提供方未发送 `roles` 声明 {#the-provider-sends-no-roles-claim}
+
+启用**角色映射**后，Open WebUI 会从 ID 令牌声明与 userinfo 响应合并后的结果中，读取**角色声明**（[`OAUTH_ROLES_CLAIM`](../reference/env-configuration.mdx#oauth_roles_claim)，默认 `roles`）指定的声明。缺少该声明时，新账户会获得**默认用户角色**，现有账户则保留其角色。
+
+**解决方法：**如果服务提供方在另一个声明（例如 `groups`）中发送你要映射的值，请将**角色声明**设置为该声明的名称。然后在**允许的角色**和**管理员角色**中列出该声明中的值。声明可以是列表或字符串；字符串会按 [`OAUTH_ROLES_SEPARATOR`](../reference/env-configuration.mdx#oauth_roles_separator)（默认 `,`）拆分。`user.roles` 之类的点分隔名称会读取嵌套声明。
+
+---
+
+## 高级故障排除技巧 {#advanced-troubleshooting-tips}
+
+### 检查令牌存储方式 {#check-token-storage-method}
+
+Open WebUI 的近期版本已从基于 URL 的令牌改为基于 Cookie 的令牌。如果遇到身份验证问题：
+
+1. **彻底清除浏览器 Cookie 和缓存**
+2. **检查浏览器开发者工具：**
+   - 查找 `oauth_session_id` Cookie（新方式）
+   - 检查是否存在 `oauth_id_token` Cookie（旧方式）
+   - 验证 Cookie 是否具有正确的域和路径设置
+
+### 调试 OAuth 流程 {#debugging-oauth-flow}
+
+启用调试日志并跟踪 OAuth 流程：
+
+```bash
+
+# 启用详细日志
+GLOBAL_LOG_LEVEL=DEBUG
+
+# 检查日志中的以下关键步骤：
+
+# 1. GET /oauth/{provider}/login——应返回 302 重定向
+
+# 2. 用户通过服务提供方进行身份验证
+
+# 3. GET /oauth/{provider}/callback?code=...——应返回 200 或重定向
+
+# 4. 用户应已登录
+```
+
+### 数据库调试 {#database-debugging}
+
+检查是否正在创建用户账户：
+
+```bash
+
+# 进入你的容器
+docker exec -it your-openwebui-container sh
+
+# 检查是否创建了用户（根据数据目录调整路径）
+ls -la /app/backend/data/
+```
+
+### 在不使用反向代理的情况下测试 {#test-without-reverse-proxy}
+
+如果使用反向代理，请直接对 Open WebUI 测试 OAuth：
+
+1. 暂时直接公开 Open WebUI 端口
+2. 更新 OAuth 服务提供方的重定向 URI，使其指向直连端口
+3. 在不使用代理的情况下测试身份验证
+4. 如果可以正常工作，则问题出在代理配置
+
+---
+
+## 专业提示：检查日志 {#pro-tip-check-the-logs}
+
+- 查看后端日志和浏览器网络错误。第一个错误通常会指出配置错误的位置。
+- 如果不确定问题出在哪一侧，请尝试在浏览器无痕窗口中登录，并观察被阻止或失败的请求。
+
+### 需要关注的关键日志消息 {#key-log-messages-to-watch-for}
+- `OAuth callback error: mismatching_state` → 会话或 Cookie 问题
+- `httpcore.ReadTimeout` → 网络超时问题
+- `Sign-in with your identity provider failed. Please contact your administrator for assistance.` → 登录在回调时失败，例如因为服务提供方拒绝访问、账户没有邮箱或其邮箱域不被允许。所有这些情况都显示相同文本，因此请阅读后端日志以了解实际原因。角色不匹配或禁用注册的情况会显示禁止访问文本，邮箱重复会显示已注册错误，其他异常则显示 `Error during OAuth process`
+- `Unsupported {'app_id'} in header` → 服务提供方向 ID 令牌添加了供应商特定参数，而你的版本仍会拒绝它。请参阅[向 ID 令牌添加自有参数的服务提供方](#providers-that-add-their-own-parameters-to-the-id-token)
+- `decode_error: Invalid JSON Web Signature` → ID 令牌不是签名令牌，通常是因为服务提供方对其进行了加密。请参阅[对 ID 令牌加密的服务提供方](#providers-that-encrypt-the-id-token)
+- `Username claim is missing, using email as name` → 由于 [`OAUTH_USERNAME_CLAIM`](../reference/env-configuration.mdx#oauth_username_claim) 指定的声明缺失或为空，系统使用邮箱作为名称创建了新账户
+- `oauth` 字段上的 `1 validation error for UserModel` → 旧的升级步骤将身份提供方主体存储为文本。请参阅[延迟许久才升级后，现有账户无法登录](#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade)
+- 回调 URL 返回 `404` → 重定向 URI 配置错误
+
+---
+
+## 总结检查清单 {#summary-checklist}
+
+| 问题 | 解决方法 |
+|-------------------------------|------------------------------------------------------------|
+| WebUI URL 缺失或错误 | 在管理员面板中设置正确的 WebUI URL |
+| 环境变量拼写错误或缺失 | 对照官方文档仔细检查；避免使用 `OIDC_CONFIG` 等不存在的变量 |
+| 缺少 OPENID_PROVIDER_URL | OIDC 始终需要；设置为服务提供方的 `.well-known/openid-configuration` |
+| 持久化配置冲突 | 使用环境变量时设置 `ENABLE_OAUTH_PERSISTENT_CONFIG=false`，使用管理员面板时设置为 `true`（为 `false` 时面板为只读） |
+| 服务提供方配置错误 | 确认应用注册、URI 及客户端 ID 和密钥 |
+| 代理缓存干扰 | 将所有 OAuth 端点排除在服务器端缓存之外 |
+| Cookie 配置问题 | 检查反向代理 Cookie 设置和环境变量 |
+| 超时问题 | 增大 `AIOHTTP_CLIENT_TIMEOUT` 值 |
+| CSRF 或会话问题 | 验证 `WEBUI_SECRET_KEY` 和会话配置 |
+| 多实例问题 | 配置 Redis 和共享密钥 |
+| 延迟许久才升级后 SSO 账户立即被锁定 | 更新 Open WebUI；修复迁移会在启动时修复存储的身份数据 |
+| 首次 SSO 登录待审核或被拒绝 | 更改**默认用户角色**，或设置 `ENABLE_OAUTH_SIGNUP` 或 `OAUTH_MERGE_ACCOUNTS_BY_EMAIL`。请参阅[首次 SSO 登录处于待审核状态或被拒绝](#13-first-sso-sign-in-is-pending-or-refused) |
+| 仍然无法解决？ | 检查调试日志、在不使用代理的情况下测试、验证服务提供方设置 |
+
+---
+
+通过仔细配置 OAuth 服务提供方和 Open WebUI 环境，并确保关键登录端点不被缓存，几乎可以消除所有 SSO/OAuth 登录问题。
+
+---
+
+:::warning 退出单个会话需要 Redis
+
+没有 Redis 时，**退出登录不会吊销 JWT 令牌**：令牌在过期前一直有效（默认：4 周）。这对 SSO/OAuth 部署尤其重要，因为你可能需要快速撤销访问权限（例如员工离职时），而 OIDC 后端通道退出也需要 Redis 才能吊销令牌。没有 Redis 时，管理员仍可在用户编辑对话框中通过**退出所有设备**结束账户的每个会话。
+
+对于生产 SSO 部署，请配置 Redis 或缩短 `JWT_EXPIRES_IN`，以限制风险暴露时间。详情见[令牌吊销](/getting-started/advanced-topics/hardening#token-revocation)和 [Redis 教程](/tutorials/integrations/redis)。
+
+:::

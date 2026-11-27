@@ -1,0 +1,113 @@
+---
+sidebar_position: 3
+title: "Open WebUI 与 LM Studio"
+sidebar_label: "Open WebUI 与 LM Studio"
+description: "Open WebUI 和 LM Studio 如何协同工作：两种适合搭配使用的本地 AI 方案。"
+keywords: ["Open WebUI 与 LM Studio 对比", "LM Studio 替代方案", "本地 AI 界面", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "我可以将 LM Studio 与 Open WebUI 结合使用吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。启动 LM Studio 的本地 API 服务器，并在 Open WebUI 中将 `http://localhost:1234/v1` 添加为连接。"}}, {"@type": "Question", "name": "LM Studio 和 Open WebUI 如何协同工作？", "acceptedAnswer": {"@type": "Answer", "text": "LM Studio 负责桌面上的模型管理和本地推理。Open WebUI 可以增加基于 Web 的多用户访问、知识库和团队功能。许多人将 LM Studio 作为后端，将 Open WebUI 作为前端。"}}]})}</script>
+</Head>
+
+
+# Open WebUI 与 LM Studio
+
+*最后更新：2026 年 8 月*
+
+[LM Studio](https://lmstudio.ai/) 的本地 AI 桌面体验非常出色。内置模型浏览器让从 Hugging Face 发现和下载模型毫不费力，推理性能可靠，界面简洁直观。对于希望无需接触终端即可运行本地模型的用户，LM Studio 是一个很好的选择。
+
+专有软件 · 个人和商业使用均免费
+
+---
+
+## LM Studio 的优势 {#what-lm-studio-does-well}
+
+- **模型浏览器**，通过图形界面发现、下载和管理 Hugging Face 上的模型
+- **模型搜索和筛选**，按大小、架构或量化方式准确找到合适的模型
+- **量化预览**，在下载前了解不同量化级别对模型质量的影响
+- **强大的性能**，充分利用硬件（Metal、CUDA），实现快速的本地推理
+- **与 OpenAI 兼容的 API 服务器**，向任何支持 OpenAI API 的应用程序提供本地模型
+- **MCP 支持**，连接模型上下文协议服务器，扩展工具使用能力
+- **RAG 功能**，内置基于本地文件的文档聊天
+- **提示词模板**，提供面向常见任务的预配置提示词库
+- **面向所有人免费**，个人和商业使用均可
+- **跨平台**，支持 macOS、Windows 和 Linux
+- **对开发者友好**的本地 API 服务器，便于将本地模型集成到项目中
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，提供由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)，驱动 LM Studio 提供的模型
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **完整的 Web 平台**，提供多用户聊天、笔记、频道、自动化、Open Terminal 等功能
+- **任意服务提供方**，可将 LM Studio 的本地模型与 OpenAI、Anthropic、Google 等结合使用
+- **深度 RAG 与知识功能**，提供 13 种向量数据库、8 种提取引擎，以及带重排序的混合搜索
+- **团队功能**，包括 RBAC、SSO/OIDC/LDAP、SCIM 2.0、分析和模型评估
+- **从一人扩展到数千人**，支持 Docker、Kubernetes 和 pip
+
+---
+
+## 一览 {#at-a-glance}
+
+| | Open WebUI | LM Studio |
+| :--- | :--- | :--- |
+| **设计思路** | 面向团队和个人的自托管 Web 平台 | 用于本地模型管理和聊天的桌面应用 |
+| **模型管理** | 连接模型运行工具（Ollama 等） | 内置模型浏览器，集成 Hugging Face |
+| **多服务提供方** | 在一个界面中使用本地 + 云端模型 | 专注于本地模型 |
+| **知识与 RAG** | 13 种向量数据库、8 种提取引擎、混合搜索 | 内置文档聊天 |
+| **多用户** | SSO、RBAC、SCIM、团队 | 个人桌面使用 |
+| **扩展性** | Python 工具、MCP、OpenAPI、管道 | MCP 支持 |
+| **API 服务器** | 完整 API | 与 OpenAI 兼容的本地服务器 |
+| **定价** | 免费社区版；提供企业套餐 | 个人和商业使用均免费 |
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你希望获得出色的本地模型发现和运行桌面体验，请选择 LM Studio。**模型浏览器让你可以轻松探索 Hugging Face 上的可用模型、比较量化版本并快速开始运行。
+
+**如果你需要支持团队访问、持久知识库的 Web 平台，或希望将本地模型与 OpenAI、Anthropic、Google 等云端服务提供方结合使用，请选择 Open WebUI。**
+
+**两者结合使用。**LM Studio 的模型浏览器和管理功能非常适合发现和运行模型。Open WebUI 可以连接到 LM Studio 的 API 服务器，在此基础上增加 Web 访问、知识库和团队功能。
+
+---
+
+## 结合使用两者 {#use-them-together}
+
+LM Studio 的 OpenAI 兼容 API 服务器很适合作为 Open WebUI 的后端。你可以使用 LM Studio 管理本地模型并提供模型服务，然后将 Open WebUI 连接到 LM Studio 的 API。
+
+**连接方法：**
+
+1. 在 LM Studio 中启动本地 API 服务器（默认端口 1234）
+2. 在 Open WebUI 中，前往**设置 → 连接**（管理员区域）
+3. 添加新的 OpenAI 兼容连接，URL 为 `http://localhost:1234/v1`
+4. 你的 LM Studio 模型将显示在模型选择器中
+
+---
+
+*LM Studio 让本地模型在桌面上易于使用，Open WebUI 增加基于 Web 的平台层。两者都在让本地 AI 更加实用。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**我可以将 LM Studio 与 Open WebUI 结合使用吗？**
+可以。启动 LM Studio 的本地 API 服务器，并在 Open WebUI 中将 `http://localhost:1234/v1` 添加为连接。
+
+**LM Studio 和 Open WebUI 如何协同工作？**
+LM Studio 负责桌面上的模型管理和本地推理。Open WebUI 可以增加基于 Web 的多用户访问、知识库和团队功能。许多人将 LM Studio 作为后端，将 Open WebUI 作为前端。
+
+**LM Studio 免费吗？**
+免费。LM Studio 可供个人和商业免费使用，但它是专有软件。
+
+---
+
+**相关内容：**[Open WebUI 与 Ollama](/alternatives/ollama) · [Open WebUI 与 llama.cpp](/alternatives/llama-cpp) · [Open WebUI 与 Jan](/alternatives/jan)

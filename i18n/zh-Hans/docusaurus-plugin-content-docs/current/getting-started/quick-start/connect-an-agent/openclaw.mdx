@@ -1,0 +1,226 @@
+---
+sidebar_position: 14
+title: "OpenClaw"
+---
+
+# OpenClaw
+
+**将 OpenClaw 自主 Agent 框架连接到 Open WebUI。**
+
+[OpenClaw](https://openclaw.ai) 是一个开源自托管的自主 AI Agent 框架。它为 AI 提供了“双手”：执行 shell 命令、读写文件、浏览网页，以及连接 Telegram、Slack 和 WhatsApp 等消息平台的能力。
+
+OpenClaw 提供 **OpenAI 兼容的 API 端点**，因此 Open WebUI 很适合作为其精致的聊天前端。集成方式有两种，二者用途不同：
+
+| 方法 | 适用场景 |
+|---|---|
+| [**API 连接**](#method-1-api-connection) | 将 Open WebUI 用作 OpenClaw Agent 的完整聊天前端 |
+| [**Channels 插件**](#method-2-channels-plugin) | 让 OpenClaw 机器人与人类用户一起参与 Open WebUI Channels |
+
+:::info 准备工作
+- 在你的机器上安装 **OpenClaw**（[快速上手](https://openclaw.ai)）
+- **Node.js 22+**（推荐 24）
+- 来自受支持 LLM 服务提供方（Anthropic、OpenAI 等）的 **API 密钥**
+- 正在运行的 **Open WebUI**（通过 Docker、pip 或桌面应用）
+- 完成此设置约需 **15 分钟**
+:::
+
+---
+
+## 方法一：API 连接 {#method-1-api-connection}
+
+将 Open WebUI 用作 OpenClaw Agent 的主要聊天界面。这是最简单、最常见的方法。
+
+### 第 1 步：安装 OpenClaw {#step-1-install-openclaw}
+
+如果尚未安装 OpenClaw：
+
+```bash
+# macOS / Linux
+curl -fsSL https://openclaw.ai/install.sh | bash
+
+# Windows (PowerShell)
+iwr -useb https://openclaw.ai/install.ps1 | iex
+```
+
+也可以通过 npm 安装：
+
+```bash
+npm install -g openclaw@latest
+```
+
+然后运行入门向导，配置 LLM 服务提供方并为 Agent 命名：
+
+```bash
+openclaw onboard
+```
+
+### 第 2 步：启用 OpenAI 兼容 API {#step-2-enable-the-openai-compatible-api}
+
+默认情况下，OpenAI 兼容端点出于安全考虑处于**禁用**状态。请在 OpenClaw 配置文件中启用它：
+
+```json title="~/.openclaw/openclaw.json（部分内容）"
+{
+  "gateway": {
+    "http": {
+      "endpoints": {
+        "chatCompletions": {
+          "enabled": true
+        }
+      }
+    }
+  }
+}
+```
+
+如果网关已在运行，请重新启动网关使更改生效。
+
+### 第 3 步：启动网关 {#step-3-start-the-gateway}
+
+```bash
+openclaw gateway
+```
+
+网关默认在 **18789** 端口启动。验证其是否正在运行：
+
+```bash
+openclaw gateway status
+```
+
+### 第 4 步：在 Open WebUI 中添加连接 {#step-4-add-the-connection-in-open-webui}
+
+1. 在浏览器中打开 Open WebUI。
+2. 转到 **Settings > Connections**（管理员区域），找到 **Manage OpenAI API Connections** 列表。
+3. 点击 **Add Connection**。
+4. 输入以下内容：
+
+| 设置 | 值 |
+|---|---|
+| **URL** | `http://localhost:18789/v1` |
+| **API Key** | 你的 OpenClaw Gateway 持有者令牌 |
+
+5. 点击复选标记进行验证，然后点击 **Save**。
+
+:::tip Open WebUI 运行在 Docker 中？
+将 `localhost` 替换为 `host.docker.internal`：
+
+```
+http://host.docker.internal:18789/v1
+```
+:::
+
+### 第 5 步：开始聊天！ {#step-5-start-chatting}
+
+你的 OpenClaw Agent 现在应会显示在模型下拉列表中。选择它并开始聊天。该 Agent 可以通过 Open WebUI 界面使用其配置的全部工具。
+
+:::tip 指定特定 Agent
+OpenClaw 使用模型字段路由到不同的 Agent：
+
+| 模型 ID | 路由目标 |
+|---|---|
+| `openclaw/default` | 你配置的默认 Agent |
+| `openclaw/<agentId>` | 具有指定名称的特定 Agent |
+
+如果配置了多个 Agent，它们会分别作为独立的“模型”显示在下拉列表中。
+:::
+
+---
+
+## 方法二：Channels 插件 {#method-2-channels-plugin}
+
+:::warning 社区插件
+
+Channels 插件是**社区贡献的集成**，并非由 Open WebUI 或 OpenClaw 团队维护。请自行斟酌使用，并参阅[插件仓库](https://github.com/skyzi000/openclaw-open-webui-channels)获取支持。
+
+:::
+
+希望 OpenClaw Agent 作为机器人用户参与 **Open WebUI Channels**，读取消息、回复并与人类用户互动吗？请使用社区 Channels 插件。
+
+### 第 1 步：在 Open WebUI 中创建机器人账户 {#step-1-create-a-bot-account-in-open-webui}
+
+1. 以**管理员**身份登录 Open WebUI。
+2. 转到 **Admin Panel > Users**。
+3. 为机器人创建一个新的用户账户（例如 `openclaw-bot@yourdomain.com`）。
+4. 将此机器人用户添加到你希望它监控的频道。
+
+:::note
+确保 Open WebUI 实例已启用 **Channels**（**Settings > General**，管理员区域）。
+:::
+
+### 第 2 步：安装插件 {#step-2-install-the-plugin}
+
+在与 OpenClaw Agent 的安全聊天会话中（通过其内置仪表板或终端），输入：
+
+> *“我想使用 Open WebUI Channels 插件：`https://github.com/skyzi000/openclaw-open-webui-channels`”*
+
+OpenClaw 会自动下载并安装该插件。
+
+### 第 3 步：配置连接 {#step-3-configure-the-connection}
+
+告诉你的 OpenClaw Agent：
+
+> *“我想连接到 Open WebUI Channels。”*
+
+它会提示你提供以下信息：
+
+| 设置 | 填写内容 |
+|---|---|
+| **Base URL** | 你的 Open WebUI URL（例如 `http://localhost:3000`） |
+| **Email** | 第 1 步中的机器人账户邮箱 |
+| **Password** | 机器人账户密码 |
+| **Channel IDs** | *（可选）*要监控的特定频道 ID；留空则监控所有频道 |
+
+:::warning 安全
+请始终在**私密**聊天环境中配置凭据。插件会将凭据存储在 `~/.openclaw/openclaw.json` 的 `channels.open-webui` 部分中。
+:::
+
+### 第 4 步：验证 {#step-4-verify}
+
+在 Open WebUI 中打开一个已连接的频道，通过用户名提及机器人（例如 `@openclaw-bot`）。如果它做出响应，说明设置已完成！
+
+---
+
+## OpenClaw 内置仪表板 {#openclaws-built-in-dashboard}
+
+OpenClaw 还自带**无需安装**的 Web 仪表板，可用于管理 Agent、查看日志和监控系统资源：
+
+```bash
+openclaw dashboard
+```
+
+该仪表板默认在 `http://localhost:18789` 打开。它是 Open WebUI 的绝佳搭档：使用仪表板管理 Agent，使用 Open WebUI 进行对话。
+
+---
+
+## 故障排除 {#troubleshooting}
+
+### 连接被拒绝 {#connection-refused}
+
+- 确保网关正在运行：`openclaw gateway status`
+- 验证端口（默认为 `18789`，而不是 `8000` 或 `11434`）
+- 确认已在 URL 末尾添加 `/v1`
+
+### 验证失败但模型未加载 {#verification-fails-but-models-dont-load}
+
+URL 必须严格为 `http://localhost:18789/v1`。模型发现需要 `/v1` 后缀。
+
+### Docker 网络问题 {#docker-networking-issues}
+
+如果 Open WebUI 在 Docker 中运行，`localhost` 指向容器本身。请改用 `host.docker.internal`。对于未使用 Docker Desktop 的 Linux：
+
+```bash
+docker run --add-host=host.docker.internal:host-gateway ...
+```
+
+### Channels 机器人无响应 {#channels-bot-not-responding}
+
+- 验证机器人用户已添加到目标频道
+- 检查 **Settings > General**（管理员区域）中是否启用了 Channels
+- 确保 OpenClaw 插件配置（`~/.openclaw/openclaw.json`）中的机器人凭据正确
+
+---
+
+## 了解更多 {#learn-more}
+
+- [OpenClaw 文档](https://openclaw.ai) - 完整文档、技能和 Agent 配置
+- [Channels 插件（社区）](https://github.com/skyzi000/openclaw-open-webui-channels) - 插件源代码和问题跟踪
+- [Open WebUI Channels](/features/channels) - 详细了解 Channels 功能

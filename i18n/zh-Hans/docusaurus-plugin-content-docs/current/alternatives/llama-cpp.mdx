@@ -1,0 +1,138 @@
+---
+sidebar_position: 2
+title: "Open WebUI 与 llama.cpp"
+sidebar_label: "Open WebUI 与 llama.cpp"
+description: "如何将 llama-server 和 Llama app 连接到 Open WebUI：两款重要本地 AI 工具的集成指南。"
+keywords: ["Open WebUI 与 llama.cpp 对比", "Llama app", "llama.app", "llama.cpp 前端", "llama-server 替代方案", "llama.cpp Web UI", "llama-server Web 界面", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "llama.cpp 有官方桌面应用吗？", "acceptedAnswer": {"@type": "Answer", "text": "有。Llama app 是 llama.cpp 团队和 Hugging Face 推出的官方桌面应用，适用于 Mac 和 Windows 11。它负责管理本地模型并打开内置的浏览器聊天。Linux 用户可以使用 CLI 和 Web UI。"}},
+    {"@type": "Question", "name": "我可以将 Llama app 或 llama-server 连接到 Open WebUI 吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。两者都提供与 OpenAI 兼容的 API。对于直接在同一台计算机上运行的 Open WebUI，Llama app 使用 http://localhost:9931/v1，手动服务器则使用你配置的端口。对于无需密钥的服务器，将身份验证设为无。Docker 部署需要使用容器可以访问的地址。"}},
+    {"@type": "Question", "name": "Open WebUI 支持 llama-server 的多模型路由吗？", "acceptedAnswer": {"@type": "Answer", "text": "支持。Open WebUI 会列出路由器 /v1/models 端点公布的模型。当选择模型进行推理时，路由器会按需加载模型。"}},
+    {"@type": "Question", "name": "llama.cpp 免费吗？", "acceptedAnswer": {"@type": "Answer", "text": "免费。llama.cpp 以及官方 Mac 和 Windows 应用均免费并采用 MIT 许可证。下载的模型适用各自的许可证。"}}
+  ]
+})}</script>
+</Head>
+
+
+# Open WebUI 与 llama.cpp
+
+*最后更新：2026 年 11 月 14 日*
+
+由 Georgi Gerganov 发起的 [llama.cpp](https://github.com/ggml-org/llama.cpp)，让整个生态系统都能在日常硬件上运行强大的模型。我们非常喜欢这项工作，而 **[Llama app](https://llama.app/)** 让它更易于使用：这是一款由 llama.cpp 团队和 Hugging Face 推出的官方桌面应用，支持模型下载、浏览器聊天，并为你的其他应用提供本地 API。
+
+[Llama app](https://llama.app/) · [文档](https://llama.app/docs) · [GitHub](https://github.com/ggml-org/llama.cpp) · [MIT 许可证](https://github.com/ggml-org/llama.cpp/blob/master/LICENSE)
+
+## Llama App：点击几下即可使用本地 AI {#llama-app-local-ai-in-a-few-clicks}
+
+Llama 驻留在 **Mac 菜单栏**或 **Windows 11 系统托盘**中。安装后，选择一个推荐模型并下载，然后打开聊天。应用还会安装 `llama` 命令，供终端使用。在 Linux 上，可以通过 CLI 和浏览器界面使用。请参阅[官方安装指南](https://llama.app/docs/installation)。
+
+应用会为你的硬件推荐模型并处理其设置。模型与 llama.cpp 共享 Hugging Face 缓存，在收到请求时加载，空闲时卸载。你可以在本地聊天，也可以让编辑器、编程智能体和其他客户端使用同一个 API。对于希望几乎无需设置即可使用本地 AI 的用户，这是一个很有吸引力的独立选择。[探索 Llama app →](https://llama.app/)
+
+### llama.cpp 的新动态 {#whats-new-in-llamacpp}
+
+团队于 **2026 年 11 月 13 日发布了 v1.0.0**，并承诺通过主版本号升级来标明公共库 API 和 ABI 的破坏性变更。对于众多基于 llama.cpp 构建的项目来说，这是一个有用的里程碑。[阅读公告 →](https://huggingface.co/blog/ggml-org/llama-cpp-v1)
+
+此版本还带来了**聊天分组、重新设计的浏览器界面、实时预览 Markdown 编辑器和移动布局改进**，以及 FP8 KV 缓存、主机内存中混合专家模型缓存的改进，和面向受支持模型的 OpenAI 兼容语音生成端点。[查看 v1.0.0 发行说明 →](https://github.com/ggml-org/llama.cpp/releases/tag/v1.0.0)
+
+---
+
+## llama.cpp 的优势 {#what-llamacpp-does-well}
+
+- **官方桌面应用**，在 Mac 和 Windows 上管理本地模型并与其聊天
+- **内置浏览器聊天**，支持对话分支、搜索、JSON 导入/导出、推理过程显示和 MCP。兼容模型支持图像、PDF 和音频附件。[Web UI 文档](https://llama.app/docs/webui)
+- **广泛的硬件支持**，包括 CPU、CUDA、Metal、Vulkan 和 SYCL
+- **GGUF 模型生态系统**，Hugging Face 上提供可直接运行的量化模型
+- **量化选项**，从 Q2 到 Q8，提供多种策略以权衡质量和速度
+- **推测解码**，使用草稿模型加快生成
+- **Flash Attention** 和其他高级推理优化
+- **语法约束生成**，用于生成结构化输出（JSON、代码等）
+- **与 OpenAI 和 Anthropic 兼容的 API**，包括流式传输、工具调用和结构化输出，用于连接其他应用程序。[API 文档](https://llama.app/docs/api)
+- **多模型路由器模式**，支持按需加载，以及并发请求和连续批处理。[服务器文档](https://llama.app/docs/serve)
+- **采用 MIT 许可证**，维护活跃
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+Llama 已经提供功能完备的聊天界面和工具支持。Open WebUI 在此基础上增加了用于知识、管理、自定义和多个服务提供方的共享工作区：
+
+- **完整的智能体平台**，基于 llama.cpp 提供的模型运行，具有由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **功能丰富的 Web 平台**，提供完整的聊天、对话、历史记录、整理和搜索功能
+- **知识与 RAG**，提供 13 种向量数据库、8 种提取引擎，以及带重排序的混合搜索
+- **多服务提供方支持**，将 llama.cpp 模型与 OpenAI、Anthropic、Google 等结合使用
+- **团队平台**，提供频道、笔记、自动化、RBAC、SSO/OIDC/LDAP 和 SCIM 2.0
+- **Open Terminal**，为代码执行提供完整的计算环境
+- **多用户支持**，从单人到数千人
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你希望以简单的桌面入口下载模型、在本地聊天并连接其他应用，请使用 Llama app。**它的内置聊天或许就能满足你的全部需求。
+
+**如果你希望直接控制推理、编写脚本或部署服务器，请使用 llama.cpp CLI。**当前命令包括用于终端聊天的 `llama cli`，以及用于 HTTP API 和浏览器 UI 的 `llama serve`。[CLI 文档](https://llama.app/docs/cli)
+
+**如果你需要共享知识库、团队访问和权限、自定义工作流，或希望在同一工作区中使用本地和云端服务提供方，请添加 Open WebUI。**它通过与 OpenAI 兼容的 API 连接到 Llama app 或你的 llama.cpp 服务器。
+
+---
+
+## 结合使用两者 {#use-them-together}
+
+使用 **Llama app** 时，下载一个模型并保持应用运行。其默认 API 基础 URL 为 `http://localhost:9931/v1`。[Llama API 详情](https://llama.app/docs/api)
+
+对于**手动启动的服务器**，使用显式端口启动本地 GGUF 模型：
+
+```bash
+llama serve -m /path/to/your-model.gguf --port 9931
+```
+
+如果你的安装提供独立的 `llama-server` 二进制文件，请改用 `llama-server -m /path/to/your-model.gguf --port 9931`。
+
+在 Open WebUI 中，前往**设置 → 连接 → OpenAI → 添加连接**（管理员区域）：
+
+- **URL：**当 Open WebUI 直接在同一台计算机上运行时使用 `http://localhost:9931/v1`。如果配置了其他端口，请使用相应端口。
+- **身份验证：**对于无需密钥的服务器，选择**无（None）**；或者选择 **Bearer**，并使用服务器上配置的密钥。
+- **服务提供方：**在**高级设置**下选择 `llama.cpp`，启用 Open WebUI 的本地模型管理功能。
+
+保存连接并选择模型。有关模型管理和故障排除，请参阅[连接指南](/getting-started/quick-start/connect-a-provider/starting-with-llama-cpp#step-4-connect-llamacpp-to-open-webui)。
+
+:::note Docker 中的 Open WebUI
+在容器内，`localhost` 指容器本身。在 Docker Desktop 上，使用 `http://host.docker.internal:9931/v1`，并确保服务器接受来自 Docker 的连接。手动启动的服务器可以使用 `--host 0.0.0.0`；将其暴露到回环地址之外时，请将访问限制为受信任的客户端并配置 `--api-key`。在 Linux 上，可能需要主机网络或主机网关映射。请参阅[连接故障排除](/troubleshooting/connection-error)。
+:::
+
+---
+
+*llama.cpp 让本地 AI 成为可能，Open WebUI 在其之上构建平台层。两者可以很好地协同工作。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**llama.cpp 有官方桌面应用吗？**
+有。[Llama app](https://llama.app/) 是 llama.cpp 团队和 Hugging Face 推出的官方桌面应用，适用于 Mac 和 Windows 11。它负责管理本地模型并打开内置的浏览器聊天。Linux 用户可以使用 CLI 和 Web UI。
+
+**我可以将 Llama app 或 llama-server 连接到 Open WebUI 吗？**
+可以。两者都提供与 OpenAI 兼容的 API。对于直接在同一台计算机上运行的 Open WebUI，Llama app 添加 `http://localhost:9931/v1`，手动服务器则使用你配置的端口。对于无需密钥的服务器，选择**身份验证：无（Auth: None）**。Docker 部署需要使用容器可以访问的地址。
+
+**Open WebUI 支持 llama-server 的多模型路由吗？**
+支持。Open WebUI 会列出路由器 `/v1/models` 端点公布的模型。当选择模型进行推理时，路由器会按需加载模型。
+
+**llama.cpp 免费吗？**
+免费。llama.cpp 以及官方 [Mac](https://github.com/ggml-org/Llama-macOS) 和 [Windows](https://github.com/ggml-org/Llama-Windows) 应用均免费并采用 MIT 许可证。下载的模型适用各自的许可证。
+
+---
+
+**相关内容：**[Open WebUI 与 Ollama](/alternatives/ollama) · [Open WebUI 与 LM Studio](/alternatives/lm-studio) · [Open WebUI 与 Jan](/alternatives/jan)

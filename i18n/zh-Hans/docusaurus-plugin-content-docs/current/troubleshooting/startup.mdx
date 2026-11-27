@@ -1,0 +1,219 @@
+---
+title: "启动与 Docker 故障"
+sidebar_position: 1
+---
+
+# 启动与 Docker 故障
+
+Open WebUI 完全无法启动？从这里开始。如果是专门针对 Alembic 迁移的故障（`no such table`、`Can't locate revision`），请改为参阅[数据库迁移](./manual-database-migration.md)。
+
+## 容器不断重启 {#container-keeps-restarting}
+
+容器可能已经存在并发布了端口，而 Open WebUI 仍在启动或反复退出。如果浏览器无法连接，请在重新创建容器前检查容器状态和近期日志：
+
+```bash
+docker ps -a --filter name=open-webui
+docker inspect --format 'status={{.State.Status}} restarts={{.RestartCount}} exit={{.State.ExitCode}} oom={{.State.OOMKilled}}' open-webui
+docker logs --tail 100 --timestamps open-webui
+```
+
+将 `open-webui` 替换为你的容器名称。重启次数持续增加表示进程在反复退出。如果 `oom=true`，请检查可用内存和容器的内存限制。否则，请查找每次重启前的最后一个错误。如果日志停在 Open WebUI 横幅而容器仍在运行，请参阅[Hugging Face 缓慢或被阻止时，启动在横幅后停止](#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked)。
+
+## Docker 安装后无法连接 {#cannot-connect-after-docker-install}
+
+先检查 Open WebUI 容器内部的就绪状态，再通过已发布端口检查。v0.13.4 镜像的 Docker 健康检查会在容器内调用 `/health`。健康状态正常可确认 Web 服务器已在该端点响应。`/ready` 端点还会检查启动是否完成，以及数据库和配置的 Redis 连接是否有响应。
+
+```bash
+docker exec open-webui sh -c 'curl -i --max-time 5 "http://127.0.0.1:${PORT:-8080}/ready"'
+curl -i --max-time 5 http://127.0.0.1:3000/ready
+```
+
+在 Docker 主机上运行这两个命令。将 `open-webui` 替换为你的容器名称，并将 `3000` 替换为你发布的主机端口。正在监听的服务器可能从 `/ready` 返回 HTTP 503，并带有 `Startup not complete`、`Database not ready` 或 `Redis not ready`。请根据该响应和容器日志确定仍然失败的部分。如果容器内探测无法连接，请检查上述容器状态和启动日志。
+
+如果容器内探测返回 HTTP 200 和 `{"status":true}`，而主机探测无法连接，请使用 `docker port open-webui` 检查端口发布映射。对于默认容器端口 `8080`，`3000:8080` 这样的映射会将请求从主机端口 `3000` 转发到容器端口 `8080`。如果更改了 `PORT`，请检查映射是否指向该容器端口。
+
+## 设备上没有剩余空间 {#no-space-left-on-device}
+
+如果启动或上传失败并显示 `No space left on device` 或 `database or disk is full`，请检查服务器日志中的路径。在标准 Docker 镜像中，`/app/backend/data` 保存默认 SQLite 数据库、上传内容和应用缓存。使用 S3 存储时，上传内容仍会先写入本地磁盘再发送到存储桶，读取文件时也会下载本地副本。
+
+检查哪个文件系统支撑着失败路径。对于使用默认数据目录且正在运行的 Linux 容器，请使用：
+
+```bash
+docker inspect --format '{{json .Mounts}}' open-webui
+docker exec open-webui df -h /app/backend/data
+docker exec open-webui df -i /app/backend/data
+```
+
+将 `open-webui` 替换为你的容器名称；如果配置了不同的 [`DATA_DIR`](/reference/env-configuration#data_dir) 路径，请使用该路径。第二个命令检查可用空间，第三个命令检查可用 inode；即使仍有剩余空间，inode 也可能耗尽。如果容器无法保持运行，请使用挂载信息检查 Docker 主机上的后备文件系统。对于 Docker 本身在拉取或创建容器时出现的错误，请检查 Docker 存储其数据的文件系统。
+
+释放空间或扩展受影响的文件系统，然后重试。请保留 Open WebUI 数据卷。删除其中的文件之前，请参阅[备份](/tutorials/maintenance/backups)。
+
+## 容器在 Apple Silicon（M1/M2/M3）上启动时卡住 {#container-hangs-at-startup-on-apple-silicon-m1m2m3}
+
+### 症状 {#symptom}
+
+在 macOS Apple Silicon 上，容器会在迁移完成并打印以下行后，**在启动过程中卡住**：
+
+```text
+WARNING: CORS_ALLOW_ORIGIN IS SET TO '*' - NOT RECOMMENDED FOR PRODUCTION DEPLOYMENTS.
+```
+
+没有 `Started server process`，没有 ASCII 横幅，也没有错误。它会**无限期**卡住（一小时后仍然没有响应），即使在**全新的空数据卷**上也能复现。`OFFLINE_MODE` / `HF_HUB_OFFLINE` 没有作用。使用 `Ctrl+C` 停止后容器仍在运行，因此必须使用 `docker kill` 终止。
+
+### 原因 {#cause}
+
+在这个阶段，Open WebUI 自身的逻辑尚未运行，迁移已经完成，也还没有数据库查询或网络调用。此处纯粹是在 Python 中 `import` 应用及其原生依赖（`pycrdt`、嵌入和向量库、`pydub` 等）。
+
+常见触发因素是**架构不匹配**：主机全局设置了 `DOCKER_DEFAULT_PLATFORM=linux/amd64`，因此 Docker 会拉取 **x86_64 镜像，并在 ARM 主机上通过 Rosetta 模拟运行**。原生扩展在模拟环境下导入时会卡住。
+
+### 解决方法 {#fix}
+
+运行**原生 `arm64` 镜像**，不要在 Apple Silicon 上模拟 x86：
+
+1. 让 Docker 自动选择架构，或明确强制指定：
+
+   ```bash
+   docker run --platform linux/arm64 ... ghcr.io/open-webui/open-webui:main
+   ```
+
+2. 检查是否存在全局覆盖并取消设置（或在每次运行时覆盖）：
+
+   ```bash
+   echo $DOCKER_DEFAULT_PLATFORM     # 同时检查 Docker Desktop → 设置
+   ```
+
+3. 确认容器实际运行的架构（在 Apple Silicon 上应为 `aarch64`）：
+
+   ```bash
+   docker run --rm ghcr.io/open-webui/open-webui:main uname -m
+   ```
+
+:::warning 不支持模拟运行
+**在 Apple Silicon 上通过模拟（Rosetta）运行 x86 镜像仅会尽力支持，且不受正式支持**，并可能像这样在启动时卡住。请使用原生 `arm64` 镜像。
+:::
+
+:::tip 捕获确切导致阻塞的导入
+如果启动卡住与架构*无关*，请在 60 秒后转储每个线程的堆栈（无需安装，`faulthandler` 是标准库）：
+
+```bash
+docker run --rm --entrypoint python ghcr.io/open-webui/open-webui:main \
+  -X faulthandler -c "import faulthandler; faulthandler.dump_traceback_later(60); import open_webui.main; print('IMPORT OK')"
+```
+
+`IMPORT OK` 表示导入正常，问题出在其他地方；约 60 秒后出现的堆栈跟踪会指出确切导致阻塞的导入。
+:::
+
+---
+
+## Hugging Face 缓慢或被阻止时，启动在横幅后停止 {#startup-stops-after-the-banner-while-hugging-face-is-slow-or-blocked}
+
+### 症状 {#symptom-1}
+
+日志打印 Open WebUI 横幅后，数分钟内没有新内容。`Application startup complete.` 不会出现，页面也无法加载。当服务器无法快速访问 Hugging Face 时会发生这种情况，例如位于企业代理或防火墙之后，或者无法访问互联网。
+
+### 原因 {#cause-1}
+
+使用 **Default (SentenceTransformers)** 嵌入引擎时，每次启动都会在服务器接受连接前加载本地嵌入模型（[`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model)，默认为 `sentence-transformers/all-MiniLM-L6-v2`）。当 [`RAG_EMBEDDING_MODEL_AUTO_UPDATE`](/reference/env-configuration#rag_embedding_model_auto_update) 为其默认值 `True` 时，即使已有缓存副本，该步骤也会联系 Hugging Face 检查模型并下载缺失文件。启动会等待请求完成或失败。启用混合搜索后，重排序模型也会在 `RAG_RERANKING_MODEL_AUTO_UPDATE` 下经过相同步骤。如果模型未缓存且请求失败，日志会显示 `Cannot determine model snapshot path`。
+
+### 解决方法 {#fix-1}
+
+选择以下任一方式：
+
+- **模型缓存后跳过检查。**设置 `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false`。Open WebUI 随后会加载缓存副本，不再联系 Hugging Face。如果模型尚未缓存，它会记录 `Cannot determine model snapshot path`，并按 Hugging Face 名称加载模型，因此首次启动仍需要网络。
+- **完全离线。**设置 [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode)，这也会设置 `HF_HUB_OFFLINE=1` 并关闭两个自动更新变量。模型必须已经缓存，见下一节。
+- **通过代理下载。**Hugging Face 客户端会从 Open WebUI 进程的环境中读取[标准代理变量](https://www.python-httpx.org/environment_variables/) `HTTPS_PROXY`（或 `https_proxy`）和 `NO_PROXY`。请在设置其他 Open WebUI 变量的位置设置它们，例如 `docker run` 的 `-e`，或在 shell 中导出。
+- **使用外部嵌入引擎。**将 **设置 > 文档**（管理员区域）中的**嵌入模型引擎**设置为 **Ollama**、**OpenAI** 或 **Azure OpenAI**，或设置 [`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine)。这样启动时就不会加载本地嵌入模型。
+
+---
+
+## 全新安装在离线模式下出现 `ValueError: No embedding model is loaded` {#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install}
+
+### 症状 {#symptom-2}
+
+容器启动，日志中包含以下 `LocalEntryNotFoundError`，随后第一次文档上传或 RAG 查询失败并出现 `ValueError`：
+
+```text
+huggingface_hub.errors.LocalEntryNotFoundError: Cannot find an appropriate cached
+snapshot folder ... outgoing traffic has been disabled.
+
+ValueError: No embedding model is loaded. Set RAG_EMBEDDING_MODEL to a valid
+SentenceTransformer model name, or configure an external RAG_EMBEDDING_ENGINE
+(ollama, openai, azure_openai).
+```
+
+当**全新安装**设置了 [`OFFLINE_MODE=true`](/reference/env-configuration#offline_mode) 和/或 [`HF_HUB_OFFLINE=1`](/reference/env-configuration#hf_hub_offline) 时会发生这种情况。
+
+### 原因 {#cause-2}
+
+离线模式会阻止 Hugging Face 下载和版本检查。默认 RAG 嵌入引擎使用**必须下载一次的本地 SentenceTransformers 模型**。在全新安装时已启用离线模式，模型从未缓存，因此没有可加载的内容。该错误会在第一次嵌入调用时出现。
+
+### 解决方法 {#fix-2}
+
+选择以下任一方式：
+
+- **先缓存模型。**在**不设置** `OFFLINE_MODE` / `HF_HUB_OFFLINE` 的情况下启动一次，让嵌入模型下载并缓存，然后为后续运行重新启用离线模式。
+- **使用外部嵌入器**，这样就无需下载任何内容：将 [`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine) 设置为 `ollama`（并拉取 [`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model)）、`openai` 或 `azure_openai`。
+- 对于物理隔离部署，请将模型缓存**预置或挂载**到镜像或卷中。
+
+完整离线设置见[离线模式指南](/tutorials/maintenance/offline-mode)。
+
+---
+
+## 全新安装 Windows 时出现 `WEBUI_SECRET_KEY is not set` {#webui_secret_key-is-not-set-on-a-fresh-windows-install}
+
+### 症状 {#symptom-3}
+
+`backend\start_windows.bat` 在启动时中止：
+
+```text
+WEBUI_SECRET_KEY is not set. It is a hard requirement when authentication is enabled.
+```
+
+### 原因 {#cause-3}
+
+脚本从 `.webui_secret_key` 读取密钥，并且只在该文件不存在时生成密钥。之前某次失败运行留下的空 `.webui_secret_key` 会被读取为空密钥。
+
+### 解决方法 {#fix-3}
+
+从 `backend` 文件夹中**删除空的 `.webui_secret_key` 文件**并重新启动，让脚本生成密钥。
+
+自行设置 `WEBUI_SECRET_KEY` 也可以，而且对于个人机器以外的任何部署，这都是正确的配置方式。设置后，脚本会完全跳过密钥生成。
+
+请参阅 [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key)，了解每种启动方式如何生成并持久化密钥。
+
+---
+
+## 启动时出现 `Could not parse SQLAlchemy URL from given URL string` {#could-not-parse-sqlalchemy-url-from-given-url-string-at-startup}
+
+### 症状 {#symptom-4}
+
+Open WebUI 在加载时停止，回溯信息末尾为：
+
+```text
+sqlalchemy.exc.ArgumentError: Could not parse SQLAlchemy URL from given URL string
+```
+
+### 原因 {#cause-4}
+
+`DATABASE_URL` 被设置为空值，例如 `DATABASE_URL=` 行中等号后没有任何内容。Open WebUI 只有在完全未设置该变量时才使用 SQLite 默认值，因此空值会作为数据库 URL 继续传递。shell 中来自另一个项目的 `DATABASE_URL` 也会替换默认值，导致 Open WebUI 随后连接到该项目的数据库。
+
+### 解决方法 {#fix-4}
+
+删除或取消设置 `DATABASE_URL`（在启动 Open WebUI 的 shell 中执行 `unset DATABASE_URL`），以使用 [`DATA_DIR`](/reference/env-configuration#data_dir) 中的 SQLite 数据库；或者将其设置为完整 URL。请参阅 [`DATABASE_URL`](/reference/env-configuration#database_url)。
+
+---
+
+## Function 导致 Open WebUI 无法加载 {#a-function-stops-open-webui-loading}
+
+### 症状 {#symptom-5}
+
+添加或更新 Function 后，Open WebUI 无法启动，或其界面无法加载。
+
+### 解决方法 {#fix-5}
+
+1. 使用 [`SAFE_MODE=true`](/reference/env-configuration#safe_mode) 重启 Open WebUI。启动时，它会关闭数据库中的每个 Function，因此不会加载任何 Function。
+2. 打开 **管理员面板 > 函数**，删除或修复导致问题的 Function。
+3. 移除 `SAFE_MODE` 并重启。只要设置了该变量，每次重启都会再次关闭所有 Function。
+4. 在 **管理员面板 > 函数**中重新开启仍然需要的每个 Function。移除 `SAFE_MODE` 不会自动重新开启它们。
+
+请参阅[安全模式](/getting-started/advanced-topics/hardening#safe-mode)。

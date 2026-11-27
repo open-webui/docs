@@ -1,0 +1,341 @@
+---
+sidebar_position: 300
+title: "更新 Open WebUI"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 更新 Open WebUI {#updating-open-webui}
+
+**保持最新，同时不丢失数据。**
+
+对于 Docker 安装，更新 Open WebUI 意味着拉取较新的镜像，并使用相同的数据挂载重新创建容器。默认的 SQLite 数据库和本地上传文件位于 `/app/backend/data` 下。请在该路径（或你配置的 `DATA_DIR`）复用现有的命名卷或绑定挂载。如果使用外部数据库或对象存储，请在替换后的容器中保持相同的连接。
+
+---
+
+## 选择更新策略 {#choose-your-update-strategy}
+
+在运行任何命令之前，先确定希望如何跟踪版本发布。合适的选择取决于你使用 Open WebUI 的方式。
+
+| 场景 | 推荐方法 |
+|---|---|
+| **个人 / 家庭实验室** | 使用 `:main` 标签，并在需要最新版本时手动拉取 |
+| **共享 / 团队实例** | 固定到特定版本（例如 `:vX.Y.Z`），并使用 [Diun](#diun) 接收更新通知 |
+| **生产 / 关键环境** | 固定版本，升级前查看[发行说明](https://github.com/open-webui/open-webui/releases)，并先在预发布环境中测试 |
+| **测试下一个版本** | 在第二个实例上运行 `:dev` 预发布版本，为其使用独立卷，并与生产环境所用的实例并行运行 |
+
+无论你属于哪种场景，都值得增设一个运行 `:dev` 的实例，而且只需多用一个标签、一个卷和一个端口。它可以在新版本到达用户之前让你提前了解版本内容，检查插件和配置是否仍然有效，并让你发现的问题在发布前而不是发布后得到修复。
+
+### `:main` 与固定版本 {#main-vs-pinned-versions}
+
+`:main` 标签始终指向**最新构建版本**。它很方便，但也可能在没有警告的情况下包含不兼容变更。
+
+为了提高稳定性，请固定到特定的发行标签：
+
+```
+ghcr.io/open-webui/open-webui:vX.Y.Z
+ghcr.io/open-webui/open-webui:vX.Y.Z-cuda
+ghcr.io/open-webui/open-webui:vX.Y.Z-ollama
+```
+
+`-ollama` 镜像会在构建时安装 Ollama。只有拉取较新的 Open WebUI 镜像，捆绑的 Ollama 才会更新；固定的 `vX.Y.Z-ollama` 标签会保留构建时所用的 Ollama 版本。若要按独立计划更新 Ollama，请按照 [Ollama 的 Docker 指南](https://docs.ollama.com/docker)将其作为单独容器运行。
+
+在 [GitHub 发布页面](https://github.com/open-webui/open-webui/releases)上可以浏览所有可用标签。
+
+---
+
+## 更新前 {#before-you-update}
+
+1. **备份数据**（请参阅下方的[备份与恢复](#backup--restore)）。在包含数据库迁移的版本发布前尤其重要，因为迁移可能难以撤销。
+2. **查看[发行说明](https://github.com/open-webui/open-webui/releases)**，了解不兼容变更。
+3. 更新后**清除浏览器缓存**（`Ctrl+F5` / `Cmd+Shift+R`），避免使用过期前端资源。
+
+:::info 来自较早版本的智能体聊天
+在此次更新前开始的智能体聊天中，第一条新消息会开启一个新的智能体会话。智能体将以文本形式接收迄今为止的聊天记录。
+:::
+
+:::info Direct Connections 已由 Tether 取代
+Direct Connections 以及用户设置中的个人工具服务器和终端已移除。在 Tether 应用中添加的连接会将 URL 和密钥保留在你的计算机上，请参阅[自带模型和工具](/ecosystem/tether#bring-your-own-models-and-tools)。共享连接由管理员在**设置 > 管理员**下添加。
+:::
+
+:::info 图像设置变为图像连接
+用于引擎、模型、API URL、密钥、ComfyUI 工作流和 AUTOMATIC1111 的图像环境变量（`IMAGE_GENERATION_ENGINE`、`IMAGES_OPENAI_API_*`、`COMFYUI_*`、`IMAGE_EDIT_*` 等）仅在首次启动时读取。首次启动会将现有的图像生成和编辑设置以及这些变量转换为名为 OpenAI、Gemini、ComfyUI 或 AUTOMATIC1111 的图像连接；如果使用独立的编辑后端，名称后会追加 ` (edit)`；这些连接对所有用户开放。此后不再读取这些变量，除非设置 `ENABLE_PERSISTENT_CONFIG=false`，此时每次启动都会重复转换。在**设置 > 图像**（管理员区域）中管理连接，请参阅[图像生成与编辑](/features/chat-conversations/image-generation-and-editing)。`ENABLE_IMAGE_GENERATION`、`ENABLE_IMAGE_EDIT` 和 `ENABLE_IMAGE_PROMPT_GENERATION` 仍然有效。
+:::
+
+:::info Arena 模型变为路由模型
+Arena 模型现已成为[路由模型](/features/administration/router-models)。首次启动会将现有 Arena 模型转换为路由模型，并默认采用 **Random（随机）**策略，从而保留盲测比较。已关闭的 Arena 转换后仍保持关闭。从所有模型中抽取或排除了部分模型的 Arena，会获得一份固定列表，其中包含首次启动时已连接的模型。之后连接的模型需要你自行添加到其[默认模型](/features/administration/router-models#default-models)中。只有一个模型的 Arena 仍可运行，但不再隐藏回答所用的模型，因为 **Random** 至少需要两个模型。内置的 **Arena Model** 不会转换；它是在启用 **Arena Models** 且尚未添加任何 Arena 模型时使用的。若要保留盲测比较，请创建一个采用 **Random** 策略且包含两个或更多默认模型的路由模型。包含 **Arena Models** 的 **Evaluations** 设置选项卡已移除，因此请在**设置 > 模型**（管理员区域）中管理。`ENABLE_EVALUATION_ARENA_MODELS` 不再读取。`EVALUATION_ARENA_MODELS` 已由 [`ROUTER_MODELS`](/reference/env-configuration#router_models) 取代，后者使用不同的 [JSON 结构](/features/administration/router-models#set-them-up-from-the-environment)，因此请将部署中设置的所有 `EVALUATION_ARENA_MODELS` 迁移到 `ROUTER_MODELS`。
+:::
+
+:::info v0.12.1 为 SCIM 用户添加登录记录
+此版本会运行一次数据库迁移，为每个缺少登录记录的账户添加一条记录；实际上，这些账户都是通过 [SCIM](/features/authentication-access/auth/scim#integration-with-sso) 创建的。它只更改数据。请先备份。新增记录不包含可用密码，因此这些用户仍通过 SSO 登录。
+:::
+
+:::warning 正在运行多个副本？
+请同时更新所有实例。在会更改数据库结构的版本之间不支持滚动更新：迁移会一次性推进整个数据库，而仍在旧版本上的实例会继续按照旧结构查询。请停止所有副本，让一个实例执行迁移，然后以新版本重新启动其余副本。
+
+在除一个实例以外的所有实例上设置 `ENABLE_DB_MIGRATIONS=false`，只能决定**哪个**实例运行迁移，并不能让混合版本集群安全运行。完整流程请参阅[更新与迁移](/troubleshooting/multi-replica#updates-and-migrations)，相关部署配置请参阅[扩展指南](/getting-started/advanced-topics/scaling)。
+:::
+
+---
+
+## 手动更新 {#manual-update}
+
+在**设置 > 通用**（管理员区域）中，**检查更新**会查询最新的 GitHub 版本。要在 Docker 中安装，请拉取镜像并按照以下步骤重新创建容器。启用 [`ENABLE_VERSION_UPDATE_CHECK`](/reference/env-configuration#enable_version_update_check) 时（默认启用），该按钮会显示在发布渠道构建中。`OFFLINE_MODE=true` 会禁用检查。
+
+<Tabs groupId="setup-method">
+  <TabItem value="docker-run" label="Docker Run" default>
+
+```bash
+# 1. 停止并删除容器（卷中的数据会保留）
+docker rm -f open-webui
+
+# 2. 拉取最新镜像（或将 :main 替换为固定版本）
+docker pull ghcr.io/open-webui/open-webui:main
+
+# 3. 重新创建容器
+docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  -e WEBUI_SECRET_KEY="your-secret-key" \
+  --name open-webui --restart always \
+  ghcr.io/open-webui/open-webui:main
+```
+
+如需 NVIDIA GPU 支持，请在 `docker run` 命令中添加 `--gpus all`，并使用 `:cuda` 标签。第 2 步拉取的标签必须与第 3 步运行的标签相同：如果容器原来使用 `:cuda`、`:ollama` 或某个版本标签，而你只拉取了 `:main`，之后重新创建的容器仍会使用原来的旧版本。
+
+  </TabItem>
+  <TabItem value="docker-compose" label="Docker Compose">
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+请确保 `docker-compose.yml` 包含 `WEBUI_SECRET_KEY`：
+
+```yaml title="docker-compose.yml"
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    environment:
+      - WEBUI_SECRET_KEY=your-secret-key
+    restart: unless-stopped
+
+volumes:
+  open-webui:
+```
+
+  </TabItem>
+  <TabItem value="python" label="Python (pip)">
+
+```bash
+pip install -U open-webui
+```
+
+`-U` 参数会升级到最新版本。然后重启服务器：
+
+```bash
+open-webui serve
+```
+
+  </TabItem>
+</Tabs>
+
+:::warning 设置 WEBUI_SECRET_KEY，避免每次更新后退出登录
+如果没有持久化的 `WEBUI_SECRET_KEY`，每次重新创建容器时都会生成新密钥，使所有会话失效。使用 `openssl rand -hex 32` 生成一个密钥，并在更新间保持不变。详情请参阅[环境变量参考](/reference/env-configuration)。
+:::
+
+### 验证更新 {#verify-the-update}
+
+更新后，请确认一切运行正常：
+
+1. **在日志中检查版本：**
+   ```bash
+   docker logs open-webui 2>&1 | head -20
+   ```
+2. 在 [http://localhost:3000](http://localhost:3000) **加载界面**。你应该会看到登录页面。
+3. **如果界面显示异常**，请清除浏览器缓存（`Ctrl+F5` / `Cmd+Shift+R`）。
+4. **如果日志中出现迁移错误**，请查看[发行说明](https://github.com/open-webui/open-webui/releases)中的已知问题，以及[连接错误](/troubleshooting/connection-error)故障排除页面。
+5. **如果更新后没有任何变化**，请检查卷的挂载位置。必须挂载到 `/app/backend/data`，切勿挂载到 `/app/backend`。镜像将应用代码保存在 `/app/backend`，因此在该路径挂载卷或绑定挂载会覆盖新代码，容器会继续运行挂载内容中的代码。要修正 `./backend:/app/backend` 这样的绑定挂载，请将其改为 `./backend/data:/app/backend/data`。如果从未设置 `WEBUI_SECRET_KEY`，请先将 `./backend/.webui_secret_key` 中的值复制到该变量：生成的密钥保存在数据目录之外的 `/app/backend/.webui_secret_key`，因此移动挂载后 Open WebUI 会生成新密钥，所有人都会退出登录。
+
+---
+
+## 回滚 {#rolling-back}
+
+如果更新导致问题，可以通过固定到旧版本的标签返回该版本。
+
+<Tabs groupId="setup-method">
+  <TabItem value="docker-run" label="Docker Run" default>
+
+```bash
+docker rm -f open-webui
+docker pull ghcr.io/open-webui/open-webui:v0.8.3
+docker run -d -p 3000:8080 -v open-webui:/app/backend/data \
+  --add-host=host.docker.internal:host-gateway \
+  -e WEBUI_SECRET_KEY="your-secret-key" \
+  --name open-webui --restart always \
+  ghcr.io/open-webui/open-webui:v0.8.3
+```
+
+  </TabItem>
+  <TabItem value="docker-compose" label="Docker Compose">
+
+更改 `docker-compose.yml` 中的镜像标签：
+
+```yaml
+image: ghcr.io/open-webui/open-webui:v0.8.3
+```
+
+然后运行：
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+  </TabItem>
+  <TabItem value="python" label="Python (pip)">
+
+```bash
+pip install open-webui==0.8.3
+open-webui serve
+```
+
+  </TabItem>
+</Tabs>
+
+:::caution 数据库迁移不可逆
+如果更新到的版本运行了数据库迁移，回滚容器**不会**撤销迁移。旧版本可能无法与较新的数据库结构配合工作。在这种情况下，需要从更新**前**创建的备份恢复。有关特定数据库的恢复，请参阅[手动数据库迁移](/troubleshooting/manual-database-migration)指南。
+:::
+
+---
+
+## 接收更新通知 {#stay-notified-about-updates}
+
+无需手动检查，可以使用工具监控新版本。以下选项按从最稳妥到最需要动手操作的顺序列出。
+
+:::tip 建议
+- **生产 / 关键系统：**Diun（仅通知）+ 手动更新
+- **托管环境：**WUD（可视化仪表板 + 手动触发）
+- **家庭实验室 / 个人使用：**Watchtower（全自动）
+:::
+
+| 功能 | Diun | WUD | Watchtower |
+|---------|:---:|:---:|:---:|
+| **自动更新容器** | 否 | 否（通过界面手动） | 是 |
+| **Web 界面** | 否 | 是 | 否 |
+| **通知** | 是 | 是 | 是 |
+| **Docker 29+** | 是 | 是 | 是（分支版本） |
+| **资源占用** | 非常低 | 中 | 低 |
+
+### Diun {#diun}
+
+仅发送通知。有可用更新时向你发出提醒（电子邮件、Slack、Discord、Telegram 等），不会改动容器。更新的时间和方式由你决定。
+
+```yaml title="docker-compose.yml"
+services:
+  diun:
+    image: crazymax/diun:latest
+    container_name: diun
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./data:/data
+    environment:
+      - TZ=America/New_York
+      - LOG_LEVEL=info
+      - DIUN_WATCH_WORKERS=10
+      - DIUN_WATCH_SCHEDULE=0 */6 * * *  # 每 6 小时
+      - DIUN_PROVIDERS_DOCKER=true
+      - DIUN_NOTIF_MAIL_HOST=smtp.gmail.com
+      - DIUN_NOTIF_MAIL_PORT=587
+      - DIUN_NOTIF_MAIL_USERNAME=your-email@gmail.com
+      - DIUN_NOTIF_MAIL_PASSWORD=your-app-password
+      - DIUN_NOTIF_MAIL_FROM=your-email@gmail.com
+      - DIUN_NOTIF_MAIL_TO=your-email@gmail.com
+    restart: unless-stopped
+```
+
+完整设置和通知选项请参阅 [Diun 文档](https://crazymax.dev/diun/)。
+
+### What's Up Docker（WUD） {#whats-up-docker-wud}
+
+用于监控容器更新并手动触发更新的 Web 界面。设置方法请参阅 [WUD 文档](https://getwud.github.io/wud/)。
+
+### Watchtower {#watchtower}
+
+全自动化。无需干预即可拉取新镜像并重新创建容器。
+
+:::warning
+原始项目 `containrrr/watchtower` 已**停止维护**，并且无法与 Docker 29+ 配合工作。请改用 [nicholas-fedor/watchtower](https://watchtower.nickfedor.com/) 分支。
+:::
+
+:::warning
+如果版本包含不兼容变更或数据库迁移，自动更新可能破坏部署。自动更新生产系统之前，请查看发行说明，并始终保留备份。
+:::
+
+**一次性更新：**
+```bash
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  nickfedor/watchtower --run-once open-webui
+```
+
+**持续运行（每 6 小时检查一次）：**
+```bash
+docker run -d --name watchtower --restart unless-stopped \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  nickfedor/watchtower --interval 21600 open-webui
+```
+
+设置 `WATCHTOWER_CLEANUP=true` 可自动删除旧镜像。有关调度、通知和仅监控模式，请参阅 [Watchtower 文档](https://watchtower.nickfedor.com/)。
+
+---
+
+## 备份与恢复 {#backup--restore}
+
+所有数据都存储在 `open-webui` Docker 卷中，包括：
+- **数据库**：聊天、用户、设置、管理员配置
+- **上传的文件**：文档、图像、知识库内容
+- **生成的内容**：图像生成输出、导出的数据
+
+### 备份 {#backup}
+
+```bash
+docker run --rm -v open-webui:/data -v $(pwd):/backup \
+  alpine tar czf /backup/openwebui-$(date +%Y%m%d).tar.gz /data
+```
+
+请在**每次更新前**备份，并定期备份（每天或每周一次，具体取决于你使用 Open WebUI 的频繁程度）。
+
+### 恢复 {#restore}
+
+:::caution
+恢复命令会在解压备份前**删除卷中的所有内容**。请确保你恢复的是正确的文件。
+:::
+
+```bash
+docker stop open-webui
+docker run --rm -v open-webui:/data -v $(pwd):/backup \
+  alpine sh -c "rm -rf /data/* && tar xzf /backup/openwebui-YYYYMMDD.tar.gz -C /"
+docker start open-webui
+```
+
+将 `YYYYMMDD` 替换为备份文件的实际日期。
+
+有关特定数据库的恢复，请参阅[手动数据库迁移](/troubleshooting/manual-database-migration)指南。
+
+---
+
+## 相关指南 {#related-guides}
+
+- [扩展 Open WebUI](/getting-started/advanced-topics/scaling)：多副本部署
+- [连接错误](/troubleshooting/connection-error)：更新后连接问题的故障排除
+- [环境变量参考](/reference/env-configuration)：包括 `WEBUI_SECRET_KEY` 在内的所有配置选项
+- [发行说明](https://github.com/open-webui/open-webui/releases)：每个版本的变更日志

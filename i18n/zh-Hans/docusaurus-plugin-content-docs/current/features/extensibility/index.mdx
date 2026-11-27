@@ -1,0 +1,146 @@
+---
+sidebar_position: 0
+title: "可扩展性"
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 可扩展性
+
+<ThemedImage
+  alt="可扩展性：一个模块悬停在与其匹配的插槽上方"
+  sources={{
+    light: useBaseUrl('/images/banners/extensibility-light.svg'),
+    dark: useBaseUrl('/images/banners/extensibility-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+**使用 Python、HTTP 或一键安装的社区插件，让 Open WebUI 实现任意功能。**
+
+Open WebUI 提供了强大的默认功能，但你的工作流程并非千篇一律。可扩展性可以弥补这一差距：为模型提供实时数据、强制执行合规规则、添加新的 AI 提供方，或连接到任意外部服务。你可以编写几行 Python、指向一个 OpenAPI 端点，或浏览社区库。平台会适应你，而不是让你去适应平台。
+
+扩展分为两层，大多数团队最终会同时使用两者：
+
+- **进程内 Python**（Tools 和 Functions）直接在 Open WebUI 内运行，无需额外基础设施，并且可以即时迭代。
+- **外部 HTTP**（OpenAPI 和 MCP 服务器）可连接到运行在任何位置的服务，无论是 sidecar 容器还是第三方 SaaS。
+
+---
+
+## 我需要哪种扩展？ {#which-extension-do-i-need}
+
+这些名称并不总能直观反映其用途。请从你想要实现的目标入手：
+
+| 我想要…… | 使用 | 选择它的原因 |
+|---|---|---|
+| 让模型**调用 API 或执行操作**（并确保用户和模型永远无法读取机密或 API 密钥） | **[Tool](plugin/tools)** | 密钥保存在服务器端的工具内。模型只能看到*结果*，永远看不到凭据。 |
+| 向模型选择器**添加新模型或提供方** | **[Pipe Function](plugin/functions/pipe)** | Pipe 会显示为可选择的“模型”，并按你定义的方式处理请求。 |
+| 在消息上添加一个运行自定义代码的**按钮** | **[Action Function](plugin/functions/action)** | Action 是由用户触发、针对单条消息的操作。 |
+| **修改传入或传出的消息**（隐去 PII、注入系统文本、记录日志、翻译） | **[Filter Function](plugin/functions/filter)** | Filter 通过 `inlet`/`outlet`/`stream` 处理每条消息，无需改动模型配置。 |
+| 连接已支持 HTTP 的**现有外部服务** | **[OpenAPI / MCP 服务器](mcp)** | 将 Open WebUI 指向服务规范，端点就会变成可调用的工具，无需粘合代码。 |
+
+:::info 正在寻找模型、知识库、提示词或技能？
+这些都属于**工作区**构建模块，用于配置模型，而不是通过代码扩展平台。请参阅[**工作区**](/features/workspace)部分。
+:::
+
+---
+
+## 为什么需要可扩展性？ {#why-extensibility}
+
+### 赋予模型现实世界的操作能力 {#give-models-real-world-abilities}
+
+开箱即用时，LLM 只能利用训练数据和当前对话中的信息。Tool 让它能够与外部交互：查询天气、查询数据库、调用 API、执行计算。模型会根据对话决定何时使用工具，你只需提供相应能力。
+
+### 连接任意外部服务 {#connect-any-external-service}
+
+有内部 API？有提供 OpenAPI 规范的第三方 SaaS？技术栈中已有 MCP 服务器在运行？将 Open WebUI 指向服务规范，它就会自动发现端点，并将其公开为模型可调用的工具，无需粘合代码或封装层。
+
+### 控制每条消息 {#control-every-message}
+
+Function 让你能够在消息到达模型之前（输入过滤器）或到达用户之前（输出过滤器）拦截并转换消息。它可以帮助你隐去 PII、强制执行格式规则、将日志记录到可观测性平台、动态注入系统指令，而且完全无需改动模型配置。
+
+### 运行高负载或长时间任务 {#run-heavy-or-long-running-work}
+
+Open WebUI 后端采用**完全异步**的设计。长时间运行的 `async def` Tool 和 Function（等待外部 API、慢速查询或多步骤智能体）不会阻塞其他用户。普通 `def` 处理程序仍会在事件循环中内联运行，并在执行期间阻塞所有其他请求，因此你需要自行将 CPU 密集型或阻塞式插件工作转移到其他线程，例如使用 `anyio.to_thread.run_sync`；它使用的工作线程池大小由 [`THREAD_POOL_SIZE`](/reference/env-configuration#thread_pool_size) 决定。采用这种写法，你可以在**进程内**运行高负载任务，而不会遇到旧版同步实现中的延迟问题。
+
+如果你确实需要 **GPU、庞大或相互冲突的依赖、严格隔离或独立扩缩容**，请将这些工作作为 **[OpenAPI 或 MCP 工具服务器](mcp)背后的外部服务**运行。
+
+### 从社区导入 {#import-from-the-community}
+
+浏览 Open WebUI Community 网站上数百个由社区构建的 Tool 和 Function。找到所需内容，单击**导入（Import）**，即可开始使用。无需 `pip install`，也无需重启。
+
+社区网站上的精选或热门状态并不代表通过了安全或质量审查，因此导入前请阅读代码。有关安全浏览和导入的入门指南，请参阅[社区插件](community)。
+
+---
+
+## 主要功能 {#key-features}
+
+| | |
+| :--- | :--- |
+| **Tools** | 为模型提供新能力的 Python 脚本：网页搜索、API 调用、代码执行 |
+| **Functions** | 用于添加模型提供方（Pipes）、消息处理（Filters）、UI 操作（Actions）或系统事件响应（Events）的平台扩展 |
+| **MCP 支持** | 为 Model Context Protocol 服务器提供原生 Streamable HTTP 支持 |
+| **OpenAPI 服务器** | 从任何兼容 OpenAPI 的端点自动发现并公开工具 |
+| **社区库** | 一键导入社区构建的 Tool 和 Function |
+| **版本历史** | 每次保存 [Tool](/features/extensibility/plugin/tools#version-history) 或 [Function](/features/extensibility/plugin/functions#version-history) 都会生成一个版本，你可以比较版本并重新启用 |
+| **[Tool Search](/features/extensibility/plugin/tools#tool-search)**（实验性） | 在模型请求大型工具定义之前，不将其放入请求中 |
+
+---
+
+## 架构概览 {#architecture-at-a-glance}
+
+了解应使用哪一层可以节省时间：
+
+| 层 | 运行位置 | 最适用的场景 | 权衡 |
+|-------|-----------|----------|-----------|
+| **Tools 和 Functions** | Open WebUI 进程内 | 实时数据、过滤器、UI 操作、新提供方，包括高负载或长时间任务（处理程序为 `async def`，且将 CPU 密集型工作转移到其他线程时） | 与主服务器共享 CPU/RAM |
+| **OpenAPI / MCP** | 任意 HTTP 端点 | 连接现有服务、第三方 API，以及 GPU、重依赖或隔离工作负载 | 需要运行外部服务器 |
+
+大多数用户从 **Tools 和 Functions** 入手。它们无需额外设置，提供内置代码编辑器，并且涵盖大多数用例。
+
+---
+
+## 用例 {#use-cases}
+
+### 实时数据增强 {#real-time-data-enrichment}
+
+销售团队构建了一个查询其 CRM API 的 Tool。当销售代表询问*“Acme 的交易有什么最新进展？”*时，模型会调用该工具，获取销售管道阶段、最近活动和交易金额，并根据实时数据而非过时的训练知识生成简报。
+
+### 企业合规过滤器 {#enterprise-compliance-filters}
+
+某医疗机构部署了一个 Filter Function，用于扫描传出消息中的 PHI 模式（SSN、MRN、出生日期）。匹配内容会在响应到达用户之前被隐去，原始内容则记录到其 SIEM。无需更改模型配置，过滤器会在每次对话中透明运行。*（这是一个说明性示例。基于正则表达式的过滤可能无法捕获所有敏感数据模式。有合规要求的组织应独立验证过滤器的覆盖范围。）*
+
+### 多提供方模型路由 {#multi-provider-model-routing}
+
+某工程团队使用 Pipe Function，在现有 Ollama 模型之外添加 Anthropic、Google Vertex AI 和一个自托管的 vLLM 实例。用户可以在同一个模型选择器中看到所有提供方，无需分别登录，也不必来回处理不同的 API 密钥。
+
+### GPU 密集型外部处理 {#gpu-bound-external-processing}
+
+某研究小组需要使用需要 GPU 的交叉编码器模型对检索结果重新排序。他们在专用 GPU 节点上将其作为小型服务运行，并通过 **[OpenAPI 工具服务器](mcp)**将其公开给 Open WebUI。模型可以像调用其他工具一样调用它，而主实例仍运行在普通硬件上。（异步后端意味着较轻量的自定义逻辑可以直接作为 Function 在进程内运行，只有 GPU 依赖才要求将这个特定工作负载放到单独的服务中。）
+
+---
+
+## 限制 {#limitations}
+
+### 安全性 {#security}
+
+Tool 和 Function 会在你的服务器上执行**任意 Python 代码**。请仅安装来自可信来源的扩展，在导入前审查代码，并将工作区访问权限限制为管理员。详情请参阅[安全策略](/security)。
+
+### 资源共享 {#resource-sharing}
+
+进程内 Tool 和 Function 与 Open WebUI 共享 CPU 和内存。异步后端可防止长时间运行的 `async def` 任务阻塞其他请求（阻塞代码必须转移到线程中），但不会增加硬件资源：真正消耗大量 CPU 或 GPU 的工作负载仍会争用同一台机器的资源。对于这类工作负载，请将其作为 [OpenAPI / MCP 工具服务器](mcp)背后的外部服务运行，以便独立扩缩容。
+
+### MCP 传输 {#mcp-transport}
+
+原生 MCP 支持**仅限 Streamable HTTP**。对于基于 stdio 或 SSE 的 MCP 服务器，请使用 [mcpo](https://github.com/open-webui/mcpo) 作为转换代理。
+
+---
+
+## 深入了解 {#dive-deeper}
+
+| 主题 | 你将学到 |
+|-------|-------------------|
+| [**Tools 和 Functions**](plugin) | 编写 Python Tool、Function（Pipes、Filters、Actions）以及使用开发 API |
+| [**社区插件**](community) | 安全地浏览和导入社区 Tool 与 Function |
+| [**MCP**](mcp) | 连接 Model Context Protocol 服务器、OAuth 设置和故障排除 |

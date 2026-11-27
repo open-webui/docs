@@ -1,0 +1,77 @@
+---
+sidebar_position: 5
+title: "Gemini"
+---
+
+:::warning
+本教程由社区贡献，不受 Open WebUI 团队支持。它仅演示如何针对你的具体用例定制 Open WebUI。想要贡献内容？请查看贡献教程。
+:::
+
+Open WebUI 还支持通过 **Google AI Studio API**（也称为 **Gemini API**）生成图像。
+
+### 初始设置 {#initial-setup}
+
+1. 从 Google AI Studio 获取 [API 密钥](https://aistudio.google.com/api-keys)；也可以使用 Google Cloud 的 API 密钥，但需要为项目激活 `Generative Language API`。
+2. 你可能需要创建一个项目，除了添加结算信息外，还要启用 `Generative Language API`，因为图像生成 API 不提供免费使用。
+
+:::warning
+如果你使用免费 API 密钥，必须在账户中登记付款方式。未设置有效付款方式是配置过程中出现错误的常见原因。
+:::
+
+:::tip
+另外，如果你使用 Vertex AI，可以在 Google Cloud 中创建 API 密钥，而不使用服务账户。只要为该密钥分配了适当的权限，并且已为项目启用 Generative Language API，此密钥即可正常工作。
+:::
+
+### 配置 Open WebUI {#configuring-open-webui}
+
+1. 在 Open WebUI 中，进入**设置** > **图像**（管理员区域）并添加连接。
+2. 将**连接类型**设为 **Gemini**。
+3. 将 **URL** 设为 `https://generativelanguage.googleapis.com/v1beta`。
+4. 输入你的 Google AI Studio [API 密钥](https://aistudio.google.com/api-keys)。
+5. 在**模型 ID**下，添加你要使用的模型，可以是 [Imagen 模型](https://ai.google.dev/gemini-api/docs/imagen#model-versions)或 [Gemini 模型](https://ai.google.dev/gemini-api/docs/image-generation)。
+6. 打开**高级**，将**端点方法**设为与该模型匹配的值：Imagen 使用 `predict`，Gemini 使用 `generateContent`。
+7. 设置**访问控制**并点击**保存**。未授予访问权限时，只有管理员可以使用此连接。
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+### 最小配置示例 {#example-minimal-setup}
+
+<Tabs>
+  <TabItem value="gemini-3-pro" label="Gemini 3 Pro Image（又称 Nano Banana Pro）" default>
+
+- **模型 ID**：`gemini-3-pro-image`
+- **端点方法**：`generateContent`
+
+</TabItem>
+  <TabItem value="gemini-3.1-flash" label="Gemini 3.1 Flash Image（又称 Nano Banana 2）">
+
+- **模型 ID**：`gemini-3.1-flash-image`
+- **端点方法**：`generateContent`
+
+</TabItem>
+</Tabs>
+
+:::info
+
+Imagen 和 Gemini 模型使用不同的端点，因此**端点方法**必须与你输入的模型匹配。
+
+Imagen 模型使用 `predict`：
+
+- `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict`。
+- [Imagen 模型文档](https://ai.google.dev/gemini-api/docs/imagen)
+
+Gemini 模型使用 `generateContent`：
+
+- `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image:generateContent`。
+- [Gemini 模型文档](https://ai.google.dev/gemini-api/docs/image-generation)
+
+保持默认值会使用 `predict`，因此 `gemini-3-pro-image` 等 Gemini 模型会失败，直到你将其切换为 `generateContent`。
+
+`400: [ERROR: models/gemini-3-pro-image is not found for API version v1beta, or is not supported for predict. Call ListModels to see the list of available models and their supported methods.]`
+
+:::
+
+### 使用 Gemini 端点的 LiteLLM 代理 {#litellm-proxy-with-gemini-endpoints}
+
+提供 Gemini 或 Imagen 模型的 LiteLLM 代理应添加为 **OpenAI 兼容**连接。请参阅 [LiteLLM 代理](/features/chat-conversations/image-generation-and-editing/openai#litellm-proxy-with-openai-endpoints)。

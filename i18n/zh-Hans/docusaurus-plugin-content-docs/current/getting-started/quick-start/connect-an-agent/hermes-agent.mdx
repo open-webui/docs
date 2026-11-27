@@ -1,0 +1,192 @@
+---
+sidebar_position: 10
+sidebar_label: "Hermes Agent"
+title: "通过 Open Terminal 或网关连接 Hermes Agent"
+description: "通过 ACP 在 Open Terminal 工作区中运行 Hermes Agent，或使用现有 Hermes 网关的 OpenAI 兼容 API 将其连接到 Open WebUI。"
+---
+
+# 在 Open WebUI 中使用 Hermes Agent
+
+如果希望 Hermes 在聊天中选定的项目文件夹里工作，请通过 **Open Terminal** 使用它。如果你已经运行了具有独立工作区的 Hermes 网关，也可以[连接网关 API](#connect-the-hermes-gateway)。
+
+## 通过 Open Terminal 运行 Hermes {#run-hermes-through-open-terminal}
+
+1. 以运行终端的用户身份安装 Hermes。在该环境中运行 `hermes model` 配置模型服务提供方，然后启动 `hermes` 并发送测试提示词。[Hermes Agent 快速开始](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart)
+2. 按照 [Open Terminal 快速开始](/getting-started/quick-start/connect-an-agent#quick-start-with-open-terminal)连接工作区。在一个新创建的已保存聊天中，选择**终端（Terminal）**，并通过**选择工作目录（Choose working directory）**选择项目。
+3. 选择以 `hermes/` 开头的模型。Open Terminal 会为你启动 `hermes acp`。让它读取项目中的一个文件，并将其回答与**文件（Files）**中的文件内容进行对比。
+
+## 连接 Hermes 网关 {#connect-the-hermes-gateway}
+
+**将 Open WebUI 用作 Nous Research 自主 AI 智能体的聊天前端。**
+
+**Nous Research** 的 [Hermes Agent](https://github.com/NousResearch/hermes-agent) 是一个具有内置工具的自主 AI 智能体，支持终端访问、文件操作、网络搜索、记忆和可扩展技能。它提供 **OpenAI 兼容 API 服务器**，因此只需几分钟即可将其连接到 Open WebUI。
+
+通过 Open WebUI 发送消息时，Hermes Agent 会接收消息，决定使用哪些工具（如果需要），执行工具调用，并将最终响应流式传回。你会实时看到内嵌的进度指示（例如 `ls -la`、`searching...`）。
+
+:::info 准备工作
+- 已在计算机上安装 **Hermes Agent**（[快速开始指南](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart)）
+- **Open WebUI** 正在运行（通过 Docker、pip 或桌面应用）
+- 完成此设置约需 **10 分钟**
+:::
+
+---
+
+### 第 1 步：安装 Hermes Agent {#step-1-install-hermes-agent}
+
+如果尚未安装 Hermes Agent，请按照[官方快速开始指南](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart)操作。安装完成后，验证它能否正常运行：
+
+```bash
+hermes --version
+```
+
+---
+
+### 第 2 步：启用 API 服务器 {#step-2-enable-the-api-server}
+
+将以下内容添加到 Hermes Agent 环境文件：
+
+```bash title="~/.hermes/.env"
+API_SERVER_ENABLED=true
+API_SERVER_KEY=your-secret-key
+```
+
+将 `your-secret-key` 替换为任意高强度随机字符串。它将成为你在 Open WebUI 中输入的 API 密钥。
+
+:::tip 可选配置
+你也可以自定义端口和主机：
+
+| 变量 | 默认值 | 描述 |
+|---|---|---|
+| `API_SERVER_PORT` | `8642` | API 服务器监听的端口 |
+| `API_SERVER_HOST` | `127.0.0.1` | 绑定地址（默认仅限 localhost） |
+:::
+
+---
+
+### 第 3 步：启动网关 {#step-3-start-the-gateway}
+
+```bash
+hermes gateway
+```
+
+你应看到确认 API 服务器正在运行的输出：
+
+```
+[API Server] API server listening on http://127.0.0.1:8642
+```
+
+:::warning 保持网关运行
+网关必须持续运行，Open WebUI 才能与你的智能体通信。对于需要长期运行的部署，可以考虑在终端复用器（`tmux`、`screen`）中运行，或将其配置为系统服务。
+:::
+
+---
+
+### 第 4 步：在 Open WebUI 中添加连接 {#step-4-add-the-connection-in-open-webui}
+
+1. 在浏览器中打开 Open WebUI。
+2. 转到**设置 > 连接（Settings > Connections）**（管理员区域），找到**管理 OpenAI API 连接（Manage OpenAI API Connections）**列表。
+3. 点击**添加连接（Add Connection）**。
+4. 输入以下内容：
+
+| 设置 | 值 |
+|---|---|
+| **URL** | `http://localhost:8642/v1` |
+| **API 密钥（API Key）** | 你在第 2 步中设置的 `API_SERVER_KEY` |
+
+5. 点击勾号进行验证，然后点击**保存（Save）**。
+
+:::tip 在 Docker 中运行 Open WebUI？
+将 `localhost` 替换为 `host.docker.internal`：
+
+```
+http://host.docker.internal:8642/v1
+```
+:::
+
+---
+
+### 第 5 步：开始聊天！ {#step-5-start-chatting}
+
+`hermes-agent` 模型现在应出现在模型下拉菜单中。选择它并开始聊天。你的智能体可以通过 Open WebUI 界面完整使用其工具集（终端、文件操作、网络搜索、记忆和技能）。
+
+流式传输默认启用。在智能体给出最终响应之前，你会在工具执行时看到简短的内嵌指示。
+
+---
+
+## Docker Compose 配置 {#docker-compose-setup}
+
+对于需要长期运行的部署，可以运行预先配置为连接 Hermes Agent 的 Open WebUI：
+
+```yaml title="docker-compose.yml"
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - OPENAI_API_BASE_URL=http://host.docker.internal:8642/v1
+      - OPENAI_API_KEY=your-secret-key
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: always
+
+volumes:
+  open-webui:
+```
+
+```bash
+docker compose up -d
+```
+
+然后打开 [http://localhost:3000](http://localhost:3000) 并创建管理员账户。
+
+:::note
+环境变量仅在 Open WebUI **首次启动**时生效。此后，连接设置会存储在其内部数据库中。如需稍后更改，请使用管理员界面，或删除 Docker 卷并重新开始。
+:::
+
+---
+
+## 故障排除 {#troubleshooting}
+
+### 下拉菜单中没有模型 {#no-models-appear-in-the-dropdown}
+
+- 确认 URL 包含 `/v1`：`http://localhost:8642/v1`（不能只有 `:8642`）
+- 检查网关是否正在运行：`curl http://localhost:8642/health` → `{"status": "ok"}`
+- 检查模型列表：`curl http://localhost:8642/v1/models` → 应列出 `hermes-agent`
+
+### 连接测试通过但未加载模型 {#connection-test-passes-but-no-models-load}
+
+Open WebUI 的连接测试会使用你的密钥请求 `GET <URL>/models`，因此没有 `/v1` 后缀的 URL 通常无法通过测试。如果测试通过但未加载模型，则说明 `/models` 响应不是包含 `data` 列表的 JSON（也不是裸列表），或者连接已关闭。如果填写了 Model IDs，则只列出这些 ID，并且不会查询 `/models`。
+
+### “Invalid API key” 错误 {#invalid-api-key-errors}
+
+确保 Open WebUI 中的 **API 密钥（API Key）**与 `~/.hermes/.env` 中的 `API_SERVER_KEY` 完全一致。
+
+### 响应耗时较长 {#response-takes-a-long-time}
+
+Hermes Agent 可能会在响应前执行多次工具调用。对于复杂查询，这是正常现象，因为智能体正在实际替你完成任务。
+
+### Linux Docker（无 Docker Desktop） {#linux-docker-no-docker-desktop}
+
+在没有 Docker Desktop 的 Linux 上，`host.docker.internal` 默认无法解析：
+
+```bash
+# 选项 1：添加主机映射
+docker run --add-host=host.docker.internal:host-gateway ...
+
+# 选项 2：使用主机网络
+docker run --network=host -e OPENAI_API_BASE_URL=http://localhost:8642/v1 ...
+
+# 选项 3：使用 Docker 网桥 IP
+docker run -e OPENAI_API_BASE_URL=http://172.17.0.1:8642/v1 ...
+```
+
+---
+
+## 了解更多 {#learn-more}
+
+- [Hermes Agent 文档](https://hermes-agent.nousresearch.com/docs/) - 完整文档、技能和集成
+- [Nous Research Discord](https://discord.gg/NousResearch) - 社区支持
+- [GitHub](https://github.com/NousResearch/hermes-agent) - 源代码和问题反馈

@@ -1,0 +1,120 @@
+---
+sidebar_position: 10
+title: "任务模型"
+---
+
+# 任务模型
+
+Open WebUI 会在后台发起小型模型调用，与用户正在等待的回答分开运行。它们负责撰写聊天标题、生成标签、建议后续消息、生成自动补全的灰色提示文本、将消息重写为检索或网页搜索查询、将消息重写为图片提示词，以及在启用[上下文压缩](/troubleshooting/context-window#the-built-in-option-context-compaction)时总结较早的消息。
+
+默认情况下，这些任务全部在用户正在聊天的模型上运行。在昂贵的旗舰模型上，这会产生一笔无人计划的费用；在缓慢的本地模型上，则会让整个界面显得迟钝。将后台工作指向小型快速模型，是管理员在这里能进行的最有价值的更改。
+
+后台调用不会运行[过滤器函数](/features/extensibility/plugin/functions/filter#filter-execution-flow)，因此记录、脱敏或重写聊天消息的过滤器永远不会看到这些调用。
+
+以下设置位于**设置 > 界面**（管理区域）。
+
+---
+
+## 选择任务模型 {#choosing-the-task-model}
+
+**任务**部分包含两个选择器。Open WebUI 会根据聊天模型所来自的连接在两者之间选择：
+
+| 字段 | 环境变量 | 聊天模型以下来源时使用 |
+| :--- | :--- | :--- |
+| **本地任务模型** | [`TASK_MODEL`](/reference/env-configuration#task_model) | 类型为**本地**的连接（Ollama 以及你标记为本地的其他任何连接） |
+| **外部任务模型** | [`TASK_MODEL_EXTERNAL`](/reference/env-configuration#task_model_external) | 所有类型不是**本地**的聊天模型，包括 pipe 和函数模型，以及没有连接类型的模型 |
+
+两者都默认为**当前模型**，即后台工作使用聊天本身的模型运行。如果指定的模型已不在 Open WebUI 的模型列表中，后台工作会回退到聊天模型。
+
+:::warning 用户需要任务模型的读取权限
+该回退仅涵盖模型缺失的情况。如果任务模型存在但用户无法读取，系统仍会为该用户的聊天选择它，随后每个后台请求都会因访问检查失败并报错 `Model not found`。管理员会跳过该检查，因此管理员测试时配置可以正常工作，却只有具有**用户**角色的账户会失败。对于这些用户：
+
+- 新聊天会以其第一条消息的完整内容命名。
+- 标签和后续问题建议永远不会出现。
+- 知识检索和网页搜索会逐字使用用户消息作为搜索查询。
+- **旧版**工具调用不会选择任何工具。
+
+对于用户无法读取的任务模型，服务器日志会显示 `reason=model_read_denied`；对于在**设置 > 模型**（管理区域）中没有已保存条目的模型，则会显示 `reason=model_unregistered`。要解决此问题，请在**设置 > 模型**（管理区域）中任务模型的省略号（**...**）菜单里选择**设为公开**，或在其**访问权限**设置中授予用户组读取权限，方法与[工作区模型的基础模型](/features/workspace/models#the-rule-a-custom-model-always-requires-access-to-its-base-model)相同。也可以将选择器重新设为**当前模型**。
+:::
+
+### 代理聊天 {#agent-chats}
+
+与来自 Open Terminal 的[代理模型](/features/open-terminal/agents)聊天时，无法在该代理上运行后台工作。聊天标题和自动补全会改用**外部任务模型**；当外部任务模型为**当前模型**、不可用或本身也是代理时，则使用**本地任务模型**。这里不考虑连接类型。
+
+当两个选择器都未指定可用的非代理模型时，代理聊天会以其第一条消息的前 50 个字符命名，自动补全不会提供任何内容。无论使用什么任务模型，代理聊天都不会获得标签或后续问题建议。
+
+:::tip 选择建议
+选择小型、快速且**非推理**的模型。推理模型在生成三个词的标题前会花数秒思考，而你还需要为这些思考 token 付费。
+
+- **外部任务模型**：`gpt-5.4-nano`、`gemini-3.5-flash-lite`、`claude-haiku-4-5-20251001`。
+- **本地任务模型**：`qwen3.5:2b`、`gemma4:e2b`、`llama3.2:3b`。
+
+主要聊天体验不会改变，后台工作只是不再拖慢它。
+:::
+
+---
+
+## 任务模型参数 {#task-model-parameters}
+
+同一**任务**部分中的**任务模型参数 > 配置**会打开你已在模型中熟悉的高级参数控件，并将其应用于每个后台请求。等效的环境变量是 [`TASK_MODEL_PARAMS`](/reference/env-configuration#task_model_params)，它接受 JSON 对象，例如 `{"max_tokens":4000,"temperature":0.3}`。
+
+将其留空时，后台请求会保持原有的行为：如果任务调用的任务模型在其模型编辑器中设置了自己的 `max_tokens`，就使用该值；如果未设置，则使用 1000 个输出 token，其他所有参数均省略。上下文压缩在**聊天**下有自己的**上下文压缩模型**选择器（`CONTEXT_COMPACTION_MODEL`，默认为“当前模型”），不使用本地或外部任务模型。除非在这里设置 `max_tokens`，否则其摘要没有输出限制。
+
+以下情况应配置这些参数：
+
+- **返回的标题被截断。**这是推理任务模型的常见症状。思考会占用同一组 1000 个 token，因此可能在写出任何回答之前就耗尽预算。请提高 `max_tokens` 或调低 `reasoning_effort`。
+- **后台调用的成本超出预期。**标签、后续问题、查询和自动补全请求本身没有输出限制。设置 `max_tokens` 可以同时为它们全部设置上限。
+- **后台输出过于发散。**降低 `temperature`，让标题和标签更稳定。
+
+:::warning 设置任何参数都会替换内置限制
+只要设置了一个参数，标题的内置 1000-token 限制就会取消。如果仍希望设置限制，请在所设参数中包含 `max_tokens`。表情符号生成是唯一例外：它始终请求 4 个 token，并忽略此设置。
+:::
+
+面板中的五个控件对后台请求没有影响：**流式聊天回答**、**流式增量块大小**、**函数调用**、**推理标签**和**上下文压缩阈值**。在这里设置它们不会产生任何变化。
+
+后台请求还会接收任务模型在其模型编辑器中设置的模型级参数，发生冲突时以 `TASK_MODEL_PARAMS` 中的键为准。在 Ollama 连接上，`keep_alive`、`format` 和 `think` 是例外：任务模型编辑器中设置的值优先于 `TASK_MODEL_PARAMS` 中的同一个键。用户的单次聊天和账户级[聊天参数](/features/chat-conversations/chat-features/chat-params)永远不会传递给后台请求，全局[模型默认值](/features/workspace/models#global-model-defaults-admin)也不会。
+
+在 Ollama 上，这会体现在 `num_ctx` 中。在聊天的**控制**或用户的**常规**设置中设置的 **num_ctx (Ollama)** 值只随聊天请求发送。同一模型上的标题、标签或查询请求会携带模型编辑器中的 `num_ctx`，或者不携带此值，因此这两个请求会向 Ollama 请求不同的上下文长度。用户会看到下一次回答在长时间停顿后才开始；与聊天回答后相比，执行后台任务后，[`ollama ps`](https://docs.ollama.com/context-length) 可能会显示该模型具有不同的 **CONTEXT** 值。如果单独的任务模型无法与聊天模型同时装入内存，也会出现类似情况，因为 Ollama 会卸载空闲模型以为新模型腾出空间（[Ollama 常见问题](https://docs.ollama.com/faq#how-does-ollama-handle-concurrent-requests)）。当**嵌入模型引擎**为 **Ollama** 时，该 Ollama 上的嵌入模型也是如此。要避免重新加载：
+
+- 在模型编辑器中设置 `num_ctx`，而不是按聊天或按账户设置，使聊天和后台请求发送相同的值。
+- 或者，当每个任务模型都在 Ollama 上时，在**任务模型参数**中设置相同的 `num_ctx`。其他连接会将 `num_ctx` 作为顶级请求字段接收。
+- 或者，选择足够小的任务模型，使其能与聊天模型同时保持加载，并使用 `ollama ps` 检查两者是否都已列出。
+
+---
+
+## 关闭单个任务 {#turning-individual-tasks-off}
+
+每个后台任务在同一面板的**生成**下都有一个开关和一个环境变量：
+
+| 任务 | 管理开关 | 环境变量 |
+| :--- | :--- | :--- |
+| 聊天标题生成 | **标题生成** | [`ENABLE_TITLE_GENERATION`](/reference/env-configuration#enable_title_generation) |
+| 标签生成 | **标签生成** | [`ENABLE_TAGS_GENERATION`](/reference/env-configuration#enable_tags_generation) |
+| 后续问题建议 | **后续问题生成** | [`ENABLE_FOLLOW_UP_GENERATION`](/reference/env-configuration#enable_follow_up_generation) |
+| 自动补全 *（用户输入时触发）* | **自动补全生成** | [`ENABLE_AUTOCOMPLETE_GENERATION`](/reference/env-configuration#enable_autocomplete_generation) |
+| 用于知识检索的查询重写 | **检索查询生成** | [`ENABLE_RETRIEVAL_QUERY_GENERATION`](/reference/env-configuration#enable_retrieval_query_generation) |
+| 用于网页搜索的查询重写 | **网页搜索查询生成** | [`ENABLE_SEARCH_QUERY_GENERATION`](/reference/env-configuration#enable_search_query_generation) |
+
+关闭**标题生成**、**标签生成**或**后续问题生成**，还会隐藏每位用户**设置 > 界面**中的对应开关。
+
+**网页搜索查询生成**仅在启用网页搜索时显示。
+
+图片提示词生成则改为在**设置 > 图片**（管理区域）中关闭（[`ENABLE_IMAGE_PROMPT_GENERATION`](/reference/env-configuration#enable_image_prompt_generation)）。
+
+:::tip 硬件性能较弱
+首先关闭自动补全。它会在用户输入时触发，因此缓慢的任务模型会让提示词输入框变得极为卡顿。
+:::
+
+---
+
+## 更改提示词 {#changing-the-prompts}
+
+大多数任务的提示词位于**生成**下，默认均为空，即使用内置提示词。检索和网页搜索共享一个**查询生成提示词**；**图片提示词生成提示词**位于“生成”下，而其开关位于“图片”标签页；**上下文压缩提示词**位于**聊天**下。[环境配置参考的“任务”部分](/reference/env-configuration#tasks)包含每个内置提示词的完整文本及其接受的占位符。
+
+保存在这些字段中的提示词会原样发送，只有字段为空时才使用内置提示词。升级 Open WebUI 不会改动已保存的提示词，因此，如果实例保存了自己的文本，或通过 `TITLE_GENERATION_PROMPT_TEMPLATE` 等匹配的环境变量设置了文本，即使内置提示词发生变化，也会继续发送该文本。
+
+对于标题，这会表现为聊天名称错误。Open WebUI 从任务模型回答中的 JSON 对象读取标题，例如 `{ "title": "Stock Trends" }`。如果回答中没有这样的对象，聊天就会以其第一条消息的完整内容命名。如果**标题生成提示词**字段中有文本，而生成的标题却是完整的第一条消息，请清空该字段并点击**保存**以恢复内置提示词，或者重写提示词，要求返回该 JSON 对象。
+
+查询的工作方式相同。Open WebUI 从任务模型回答中的 JSON 对象读取查询，例如 `{ "queries": ["stock trends 2026"] }`。如果回答中没有这样的对象，整个回答就会逐字成为唯一的搜索查询，并以这种形式显示在聊天的**正在搜索**或**正在查询**下。已保存的**查询生成提示词**要求返回纯文本时，或者推理任务模型的回答以文本形式包含思考过程时，都会发生这种情况。请清空**查询生成提示词**字段并点击**保存**、重写提示词以返回 `{"queries": [...]}`，或选择非推理任务模型。
+
+这里值得了解[提示词修饰符](/features/workspace/prompts)，因为任务提示词经常需要处理粘贴的文档和长代码块。

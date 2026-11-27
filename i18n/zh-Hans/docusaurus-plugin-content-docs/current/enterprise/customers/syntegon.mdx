@@ -1,0 +1,160 @@
+---
+sidebar_position: 5
+sidebar_label: "Syntegon Technology GmbH"
+title: "Syntegon"
+description: "Syntia（Syntegon Intelligence Assistance）将多个 AI 模型和内部知识整合到一个受治理的平台中，据报告，14 天内拥有 2,000 至 2,500 名活跃用户。"
+keywords: ["Syntegon AI", "Open WebUI 案例研究", "企业 AI", "私有 AI 部署"]
+---
+
+# 全球科技公司 Syntegon 借助 Open WebUI 让 500 多个 RAG 智能体投入工作
+
+![Syntegon](/images/enterprise/customers/syntegon/hero.png)
+
+## 概览 {#overview}
+
+:::info
+Syntegon 基于 Open WebUI 构建了 Syntia（Syntegon Intelligence Assistance），并将其托管在 AWS 上。它为工程、运营、合规及其他职能部门的员工提供了一个受 SSO 保护且可全面审计的统一平台，支持 8 个以上的 AI 模型和 RAG 智能体。
+:::
+
+### 基本信息 {#at-a-glance}
+
+- **行业**：全球性科技公司
+- **公司规模**：在 20 多个国家/地区的 49 个地点拥有 7,300 名员工；总部位于德国斯图加特
+- **上线时间**：2025 年 12 月
+- **活跃用户**：据报告，统计时最近 14 天内有 2,000–2,500 名
+- **访问范围**：已向全球所有 Syntegon 员工授予许可，但合规要求和当地法规限制访问的地区除外
+- **部署**：位于欧盟的 AWS Fargate 上的 Amazon EKS，支持 Kubernetes 自动扩缩容；数据仅驻留在欧盟
+- **模型**：Azure OpenAI 和 AWS Bedrock 上的 8 个以上模型，包括 OpenAI GPT 和 Anthropic Claude；默认使用 GPT-5-mini
+- **集成**：SharePoint、Confluence、Jira 和网页搜索
+- **关键成果**：500 多个活跃 RAG 智能体；Syntia 是 Syntegon 唯一一个根据其数据治理和职工委员会框架获批的 AI 平台
+
+## 关于 Syntegon {#about-syntegon}
+
+[Syntegon](https://www.syntegon.com/) 是一家领先的全球科技公司，也是制药、生物技术和食品行业的战略性全生命周期合作伙伴。公司总部位于德国斯图加特，在 20 多个国家/地区的 49 个地点拥有 7,300 名员工。凭借 160 多年的行业经验，Syntegon 提供的解决方案帮助人们改善生活、保持健康，并信赖他们日常依赖的产品。
+
+## 挑战：负责任地扩展 AI {#the-challenge-scaling-ai-responsibly}
+
+Syntegon 需要在全球性的多站点工程组织中扩大 AI 的使用范围，同时保持严格的数据治理与合规，并完全掌控 AI 模型和数据源。其领导层设定了一个目标：在不牺牲安全性和合规性的前提下，为每位员工提供企业级 AI 能力。
+
+Syntegon 发现，公共 SaaS AI 工具在数据驻留和知识产权暴露方面带来了不可接受的风险。该公司还发现，商业 SaaS 工具存在以下问题：
+
+- 对数据驻留的控制不足；
+- 无法安全地集成专有的内部数据源；
+- 可选择的模型有限；以及
+- 没有与 Syntegon 身份管理体系一致的企业级角色访问控制。
+
+鉴于 AI 对公司未来具有重要的战略意义，供应商锁定也是一大顾虑。
+
+Syntegon 不可妥协的要求包括：
+
+- 部署在 Syntegon 控制的云基础设施中（AWS 欧盟区域）
+- 通过 Microsoft Entra ID 实现 SSO，并通过 IAM 实现基于角色的访问控制
+- 通过统一网关（LiteLLM）支持多个 LLM 提供方（Azure OpenAI 和 AWS Bedrock）
+- 符合当地法规的职工委员会和数据保护官（DPO）审批流程
+- 每位员工都必须完成的结构化 AI 素养培训计划，内容涵盖 AI 的战略收益以及负责任使用 AI 的边界
+
+## 解决方案：AWS 上的 Syntia {#the-solution-syntia-on-aws}
+
+Open WebUI 的开放架构、宽松许可证和企业级功能，使 Syntegon 无需定制代码库即可快速部署一个完全自托管、具备企业级加固能力的 AI 平台。这些功能包括 RAG、模型上下文协议（MCP）、SSO、多模型支持和可扩展的插件框架。
+
+LiteLLM 起到了决定性作用。它作为统一且可控制成本的网关进行集成，在 Azure OpenAI、AWS Bedrock 和未来的 AI 模型之间路由流量。Open WebUI 的可配置性还使 Syntegon 的安全团队能够执行严格的治理策略，包括禁用代码执行和阻止未经授权的 Webhook。
+
+- **计算与编排**：AWS Fargate 上的 Amazon EKS（托管 Kubernetes）
+- **存储与数据库**：兼容 PostgreSQL 的 Amazon Aurora，使用 pgvector 扩展存储 RAG 嵌入；AWS EFS 为跨 Pod 的持久化共享存储提供支持；每日创建 AWS RDS 快照
+- **网络**：所有应用工作负载均运行在 AWS VPC 的私有子网中，Pod 无法从互联网直接入站访问
+- **机密**：所有敏感凭据均使用 AWS Secrets Manager，静态数据加密使用 AWS KMS
+- **CI/CD**：基于 GitOps 的部署，使用 Terraform 实现基础设施即代码，并在 Git 中管理 Kubernetes 清单。计划内更新先在中转环境中测试，再部署到生产环境，并配有书面回滚计划。
+- **日志与监控**：OpenTelemetry Collector 负责跟踪和指标，Prometheus 负责指标存储，Grafana 仪表板负责可视化与告警，AWS SNS 负责电子邮件告警，LiteLLM 仪表板负责展示各模型的使用量和成本
+- **安全控制**：通过身份提供方实现 MFA、设备合规、按组进行角色访问控制、强制数据驻留、内容审核与防护机制、向 SIEM 导出审计记录，以及出站限制
+
+### 模型与数据处理 {#models-and-data-handling}
+
+所有模型路由都通过部署在 Syntegon Kubernetes 集群内的 LiteLLM 网关进行。
+
+- **Azure OpenAI**：GPT-5 用于高质量任务；GPT-5-mini 默认用于经济高效的大批量任务；GPT-4.1 用于复杂推理；另有 GPT-5.4 和 GPT-5.1；GPT 1.5 用于图像生成
+- **AWS Bedrock**：Claude Sonnet 4.5 和 4.6 用于高级推理和长上下文；Pixtral Large 25.02 用于视觉和文本；以及开源的 gpt-oss-120b
+
+GPT-5-mini 是每位用户的默认模型，用户也可以从完整目录中选择其他模型。成本敏感或大批量任务使用 GPT-5-mini 或 gpt-oss-120b。高度敏感或复杂推理任务可以使用 Claude Sonnet 或 GPT-5。
+
+RAG 使用 Azure OpenAI text-embedding-3-large 和 Aurora 上的 pgvector，Syntegon 看重其在多个 Pod 间的可靠性。数据源包括：
+
+- 上传到 Syntia 工作区的内部知识库；
+- 通过 Microsoft Graph API 接入的 SharePoint 文档库；
+- 通过 Atlassian 集成接入的 Confluence 页面。
+
+Syntia 可处理 PDF、Office 文件、CSV、Markdown、HTML、JSON、图像和音频。OCR 和 Azure Document Intelligence 用于从复杂文档中提取内容。
+
+敏感数据通过四种方式得到保护：
+
+- Azure AI Content Safety 筛选所有 Azure 模型的输入和输出，AWS Bedrock Guardrails 对 AWS 模型执行等效筛选。
+- 禁用管理员聊天访问和管理员导出功能，以保护用户隐私。
+- 禁用直接注册。用户只能通过 Entra ID SSO 登录，并通过 Syntegon Identity Manager 进行预配。
+- 每日备份均采用静态加密。
+
+## 采用与赋能 {#adoption-and-enablement}
+
+![Syntia 模型选择器，显示 GPT、Claude 和其他可用模型。](/images/enterprise/customers/syntegon/open-webui.png)
+
+Syntia 于 2025 年 12 月在生产环境上线，通过 Azure Service Group 预配访问权限，此后持续迭代更新。符合条件地区的员工可以通过 Syntegon Identity Manager 自助加入。
+
+Syntegon 通过以下方式推动采用：
+
+- **培训与文档**：专门的 Syntia 培训资料和电子学习模块，并以 Confluence 和 SharePoint 作为 Syntia 文档的唯一权威来源，内容涵盖架构、配置、安全和推广指南。
+- **AI 中心与分支会议**：中央中心团队负责共享 AI 基础设施、治理、获批工具和可复用组件，各部门作为分支，将这一基础应用于各自的问题。
+- **产品委员会会议**：用于收集反馈、确定功能优先级和分享最新进展。AI 创新中心负责协调这些会议、用例构思以及跨部门的路线图治理。
+- **支持与社区**：固定答疑时间、职能团队赋能会议和专门的 AI 中心社区。
+
+Syntia 应用于工程与研发、运营与制造、项目管理、销售、营销与客户体验、财务与人力资源以及数字化转型等领域。它通过 Azure Speech 多语言神经模型支持德语、英语及其他语言。LiteLLM 虚拟 API 密钥使工程团队能够基于 Syntia 的模型基础设施构建自己的 AI 应用。
+
+## 成果 {#results}
+
+> “我们从 AI 试验走向了实实在在的生产力提升，上线后的最初几周内就拥有了 1,000 多名用户，而不是耗时数个季度。Open WebUI 让我们能够大规模落地用例，同时全面掌握成本与合规情况。”
+>
+> — Matti Maier，Syntegon 数字技术应用总监
+
+Syntegon 报告了以下成果：
+
+- **安全与合规**：Syntia 是 Syntegon 唯一一个根据公司数据治理和职工委员会框架获批的 AI 平台。它具备两层内容筛选（Azure AI Content Safety 和 AWS Bedrock Guardrails）、通过 OpenTelemetry 和 Grafana 实现的完整审计跟踪，以及满足备份与恢复 SLA 的每日快照。
+- **企业知识**：500 多个活跃 RAG 智能体基于 Syntegon 产品文档、SharePoint 和 Confluence 提供上下文感知的回答。
+- **生态系统集成**：Syntia 是 Syntegon 唯一一个在单一界面中原生集成 SharePoint、Confluence、Jira、网页搜索、图像生成和文档 RAG 的企业 AI 平台。这消除了使用多个彼此孤立工具的需要。
+- **模型广度与成本效益**：在单一界面中提供 Azure 和 AWS Bedrock 上的 8 个以上模型，日常任务使用 GPT-5-mini，高级模型则留给复杂工作。
+- **平台可靠性**：Syntia 运行在生产级、可自动扩缩容的 Kubernetes 集群上，可用性目标为 99.9% 以上。计划内维护配有完整的回滚计划，且没有记录在案的非计划停机事件。
+
+> “Open WebUI 带来的最大收益，是将所有 LLM 集中在一个地方。我们的团队可以随时在用于推理、编码或基于 RAG 检索的模型之间切换——一个界面，充分灵活，无需在多个独立工具或账户之间来回折腾。”
+>
+> — Matti Maier，Syntegon 数字技术应用总监
+
+![Syntia 工具菜单中的 SharePoint Search 和 Confluence Search。](/images/enterprise/customers/syntegon/search-tools.png)
+
+Syntia 的工具菜单中提供 SharePoint Search 和 Confluence Search。
+
+## 主要用例 {#top-use-cases}
+
+Syntegon 重点介绍了以下用例和收益：
+
+- **企业知识触手可及**：500 多个 RAG 智能体根据产品文档、SharePoint 和 Confluence 回答问题，无需手动搜索
+- **开发者生产力**：集成的代码辅助和审查加快交付周期并提高代码质量
+- **客户与现场服务**：AI 辅助起草简报，使服务沟通更快捷、更一致
+- **视觉内容生成**：按需生成和编辑技术插图与营销素材，减少对外部资源的依赖并缩短周转时间
+- **大规模敏捷实践**：Confluence 集成支持冲刺规划、文档编写和项目跟踪
+
+## Syntegon 选择 Open WebUI 的原因 {#why-syntegon-chose-open-webui}
+
+- **开放且可自托管**：采用开放架构和宽松许可证，完全自托管部署，无需定制代码库
+- **企业级功能**：RAG、MCP、SSO、多模型支持和可扩展的插件框架
+- **统一模型网关**：LiteLLM 集成可在 Azure OpenAI、AWS Bedrock 和未来模型之间路由，Syntegon 认为这一点起到了决定性作用
+- **可配置的治理**：安全团队可以执行严格策略，例如禁用代码执行和阻止未经授权的 Webhook
+
+## 后续计划 {#whats-next}
+
+Syntegon 可以与其合作伙伴共同构建高级集成，从 Confluence 和 SharePoint 拉取数据，同时遵循每位用户的访问权限，确保用户只能检索自己有权查看的内容。
+
+---
+
+:::tip
+
+**正在寻找[企业版方案](/enterprise)？** — **[立即联系我们的销售团队！](/enterprise)**
+
+获取**增强功能**，包括**自定义主题与品牌**、**服务等级协议（SLA）支持**、**长期支持（LTS）版本**以及**更多内容**！
+
+:::

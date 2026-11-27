@@ -26,8 +26,12 @@ export function setAnalyticsConsent(choice) {
 	void syncAnalytics();
 }
 
+function normalizePathname(pathname) {
+	return pathname.replace(/^\/zh-Hans(?=\/|$)/, "") || "/";
+}
+
 export function docsPageProperties(pathname) {
-	const path = pathname.replace(/\/$/, "") || "/";
+	const path = normalizePathname(pathname).replace(/\/$/, "") || "/";
 	const computer = path.startsWith("/ecosystem/computer");
 	return {
 		surface: "docs",
@@ -93,6 +97,7 @@ const methods = {
 	Docker: "docker",
 	"Docker Compose": "compose",
 	Extension: "extension",
+	扩展: "extension",
 	Podman: "podman",
 	Quadlets: "podman_quadlet",
 	"Kube Play": "podman_kube_play",
@@ -106,20 +111,23 @@ const methods = {
 	Kubernetes: "kubernetes",
 	Helm: "helm",
 	Desktop: "desktop",
+	桌面版: "desktop",
 	"Third Party": "third_party",
+	第三方: "third_party",
 };
 
 export function setupMethod(element, pathname = location.pathname) {
-	if (pathname.replace(/\/$/, "") === "/getting-started/quick-start") {
+	const path = normalizePathname(pathname);
+	if (path.replace(/\/$/, "") === "/getting-started/quick-start") {
 		const tab = element
 			.closest(".tabs-container")
 			?.querySelector(':scope > [role="tablist"] > [aria-selected="true"]');
 		return methods[tab?.textContent?.trim()] || "unspecified";
 	}
-	if (/^\/ecosystem\/computer\/(quickstart|install)(\/|$)/.test(pathname)) {
-		return pathname.includes("/docker")
+	if (/^\/ecosystem\/computer\/(quickstart|install)(\/|$)/.test(path)) {
+		return path.includes("/docker")
 			? "docker"
-			: pathname.includes("/windows")
+			: path.includes("/windows")
 				? "windows"
 				: "python";
 	}

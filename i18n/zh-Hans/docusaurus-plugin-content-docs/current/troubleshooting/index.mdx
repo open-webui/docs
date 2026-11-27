@@ -1,0 +1,107 @@
+---
+sidebar_position: 300
+title: "故障排除"
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 故障排除
+
+<ThemedImage
+  alt="故障排除：一排方块中有一个不在队列中"
+  sources={{
+    light: useBaseUrl('/images/banners/troubleshooting-light.svg'),
+    dark: useBaseUrl('/images/banners/troubleshooting-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+使用本页查找适合你所遇问题的指南。如果不确定从哪里开始，请在下表中匹配你的症状。
+
+## 快速症状查询 {#quick-symptom-lookup}
+
+| 你遇到的情况 | 前往 |
+| :--- | :--- |
+| 空 `"{}"` 响应、Markdown 乱码、控制台中的 CORS 错误 | [连接错误 → HTTPS/CORS/WebSocket](/troubleshooting/connection-error#https-tls-cors--websocket-issues) |
+| `WebSocket connection failed: 403` 或聊天卡住 | [连接错误 → WebSocket](/troubleshooting/connection-error#websocket-troubleshooting) |
+| 助手回复随机为空白，启用工具后更严重 | [连接错误 → 工具调用时回复为空白](/troubleshooting/connection-error#blank-replies-when-the-model-uses-a-tool) |
+| 无法从 Open WebUI 连接到 Ollama | [连接错误 → Ollama](/troubleshooting/connection-error#connection-to-ollama-server) |
+| `registry.ollama.ai/library/<model> does not support tools` | [连接错误 → Ollama 工具错误](/troubleshooting/connection-error#ollama-does-not-support-tools) |
+| 模型列表加载时间过长 / `/api/models` 返回 `500` | [连接错误 → 模型列表加载](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints) |
+| 间歇性出现“Model not found”、模型列表自行清空、`ClientConnectorDNSError` | [连接错误 → 间歇性名称解析失败](/troubleshooting/connection-error#intermittent-name-lookup-failures-often-reported-as-model-not-found) |
+| 非管理员用户使用某个工作区模型时出现 `Model not found`，而管理员可以正常使用 | [模型 → 基础模型访问权限](/features/workspace/models#the-rule-a-custom-model-always-requires-access-to-its-base-model) |
+| `[SSL: CERTIFICATE_VERIFY_FAILED]` | [连接错误 → SSL](/troubleshooting/connection-error#ssl-certificate-issues-with-internal-tools) |
+| 登录循环、401 Unauthorized、跨副本的令牌错误 | [扩展与高可用 → 登录循环](/troubleshooting/multi-replica#1-login-loops--401-unauthorized-errors) |
+| `database is locked`、数据在不同实例间消失 | [扩展与高可用 → 数据库](/troubleshooting/multi-replica#4-database-corruption--locked-errors) |
+| 日志中出现 `Redis denied publishing` 或 `Redis denied subscribing`，实时更新停止 | [扩展 → 按房间划分的 Redis 频道](/getting-started/advanced-topics/scaling#per-room-redis-channels) |
+| 工作进程崩溃：上传期间出现 `Child process [pid] died` | [RAG → 工作进程崩溃](/troubleshooting/rag#12-worker-dies-during-document-upload) |
+| 模型忽略附加的知识库 | [RAG → 知识库不工作](/troubleshooting/rag#13-knowledge-base-attached-to-model-not-working) |
+| `Knowledge base file limit exceeded (N files maximum).` 或 `You can only upload a maximum of N file(s) per batch.` | [知识库 → 文件限制](/features/workspace/knowledge#file-limits) |
+| `Could not read content from <url>`，或 YouTube 视频无法附加 | [RAG → 链接和 YouTube 附件](/troubleshooting/rag#14-attaching-a-link-or-a-youtube-video-fails) |
+| 智能体在多次工具调用后中途停止任务，不再使用工具便给出最终答案 | [`CHAT_RESPONSE_MAX_TOOL_CALL_ITERATIONS`](/reference/env-configuration#chat_response_max_tool_call_iterations) |
+| Responses 连接上的回复在生成结束时变为空白或中途停止 | [Open Responses → 偏离格式的提供方](/getting-started/quick-start/connect-a-provider/starting-with-open-responses#providers-that-deviate-from-the-responses-format) |
+| Responses 连接上的模型回答时仿佛自己此前的回复从未发生 | [Open Responses → 偏离格式的提供方](/getting-started/quick-start/connect-a-provider/starting-with-open-responses#providers-that-deviate-from-the-responses-format) |
+| `NoneType object has no attribute 'encode'` | [RAG → 嵌入错误](/troubleshooting/rag#5-400-nonetype-object-has-no-attribute-encode) |
+| 嵌入期间 CUDA 内存不足 | [RAG → CUDA OOM](/troubleshooting/rag#10-cuda-out-of-memory-during-embedding) |
+| OAuth 重定向循环、CSRF 状态不匹配 | [SSO 与 OAuth](/troubleshooting/sso) |
+| `CSRF Warning! State not equal in request and response` | [SSO → CSRF 错误](/troubleshooting/sso#9-session-state-mismatch-csrf-errors) |
+| SSO 登录以“The email or password provided is incorrect”结束，日志显示 `Unsupported {'app_id'} in header` | [SSO → 提供方添加自己的 ID 令牌参数](/troubleshooting/sso#providers-that-add-their-own-parameters-to-the-id-token) |
+| 升级后，所有曾使用 SSO 的用户都无法登录，日志在 `oauth` 上显示 `1 validation error for UserModel` | [SSO → 延迟很久才升级后账户被锁定](/troubleshooting/sso#12-existing-accounts-cannot-sign-in-after-a-long-delayed-upgrade) |
+| 启用双重验证登录后，更改 `WEBUI_SECRET_KEY` 导致 Open WebUI 拒绝启动 | [双重验证登录 → 要求](/features/authentication-access/mfa#requirements) |
+| 用户丢失了验证器和恢复代码 | [双重验证登录 → 找回丢失的验证器](/features/authentication-access/mfa#recovering-a-lost-authenticator) |
+| TTS 一直加载，`Dataset scripts are no longer supported` | [音频 → TTS 问题](/troubleshooting/audio#tts-loading-forever--not-working) |
+| Whisper `int8 compute type` 错误 | [音频 → STT 问题](/troubleshooting/audio#whisper-stt-not-working--compute-type-error) |
+| 麦克风不工作（非 HTTPS） | [音频 → 麦克风](/troubleshooting/audio#microphone-access-issues) |
+| 实时语音通话失败（`Voice connection failed`、`Provider rejected voice configuration`） | [语音模式 → 故障排除](/features/chat-conversations/chat-features/voice-mode#troubleshooting) |
+| 图片未生成、ComfyUI 工作流错误 | [图片生成](/troubleshooting/image-generation) |
+| 聊天中的图片显示“Image unavailable” | [图片生成 → 一般问题](/troubleshooting/image-generation#general-issues) |
+| 网页搜索返回空内容或代理错误 | [网页搜索](/troubleshooting/web-search) |
+| 性能缓慢、内存占用高、OOM 崩溃 | [性能与内存](/troubleshooting/performance) |
+| 编辑模型/知识库权限时容器被 OOM 终止（SQLite） | [性能与内存 → SQLite 内存占用](/troubleshooting/performance#5-sqlite-memory-footprint-on-constrained-containers) |
+| “The prompt is too long”/ 上下文长度超限 | [上下文窗口 / 提示词过长](/troubleshooting/context-window) |
+| 忘记管理员密码 | [重置管理员密码](/troubleshooting/password-reset) |
+| 启动时出现 `no such table` 或 `table already exists` | [数据库迁移](/troubleshooting/manual-database-migration) |
+| `No space left on device` 或 `database or disk is full` | [启动 → No space left on device](/troubleshooting/startup#no-space-left-on-device) |
+| 出现 CORS 警告后，容器在 Apple Silicon（M1/M2/M3）上启动时卡住 | [启动 → Apple Silicon 卡住](/troubleshooting/startup#container-hangs-at-startup-on-apple-silicon-m1m2m3) |
+| 启用 `OFFLINE_MODE` 时，启动阶段出现 `No embedding model is loaded` | [启动 → 离线嵌入](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install) |
+
+## 全部故障排除指南 {#all-troubleshooting-guides}
+
+| 指南 | 涵盖内容 |
+| :--- | :--- |
+| [连接错误](/troubleshooting/connection-error) | HTTPS、CORS、WebSocket、反向代理、流式传输、Ollama、DNS、SSL、Podman |
+| [性能与内存](/troubleshooting/performance) | 速度调优、数据库优化、基础设施扩展、资源效率、精简镜像 |
+| [上下文窗口 / 提示词过长](/troubleshooting/context-window) | 为什么出现“prompt is too long”错误，以及如何使用过滤器管理聊天历史 |
+| [RAG](/troubleshooting/rag) | 文档摄取、检索质量、嵌入、上传限制、工作进程崩溃 |
+| [SSO 与 OAuth](/troubleshooting/sso) | OIDC、Microsoft、Google、Authentik、Cookie 和会话问题 |
+| [音频](/troubleshooting/audio) | 语音转文字、文字转语音、麦克风访问、ElevenLabs |
+| [扩展与高可用](/troubleshooting/multi-replica) | 多副本、Redis、共享存储、数据库并发 |
+| [图片生成](/troubleshooting/image-generation) | OpenAI、ComfyUI、Automatic1111、Gemini |
+| [网页搜索](/troubleshooting/web-search) | 代理问题、SearXNG、空结果、超时 |
+| [启动与 Docker 故障](/troubleshooting/startup) | 容器启动时卡住、Apple Silicon 模拟、离线模式嵌入失败、Windows 上缺少密钥 |
+| [重置管理员密码](/troubleshooting/password-reset) | Docker 和本地安装的密码重置 |
+| [数据库迁移](/troubleshooting/manual-database-migration) | 手动 Alembic 迁移、从失败的升级中恢复 |
+
+## 开始之前 {#before-you-start}
+
+- **先更新。** 许多问题已在较新版本中修复。请确保你使用的是最新版本。
+- **检查 ConfigVar。** Open WebUI 会将部分设置存储在数据库中，这些设置优先于环境变量。如果环境变量的更改似乎被忽略，请参阅[环境变量配置](/reference/env-configuration#important-note-on-configvar-environment-variables)页面。
+
+## 浏览器兼容性 {#browser-compatibility}
+
+Open WebUI 需要现代浏览器。支持的最低版本为：
+
+- **Chrome 111+**（2023 年 3 月）
+- **Safari 16.4+**（2023 年 3 月）
+- **Firefox 128+**（2024 年 7 月）
+
+如果遇到渲染或功能问题，请确保你的浏览器满足这些要求。
+
+## 社区支持 {#community-support}
+
+如果按照相关指南操作后仍无法解决问题：
+
+- 在 [GitHub](https://github.com/open-webui/open-webui/issues) 上搜索现有问题
+- 在 [Discord](https://discord.com/invite/5rJgQTnV4s) 或 [Reddit](https://www.reddit.com/r/OpenWebUI/) 上提问
+- [赞助商](/sponsorships)可以使用专属支持渠道，获得更快的响应

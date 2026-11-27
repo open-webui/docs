@@ -1,0 +1,257 @@
+---
+sidebar_position: 2
+title: "LDAP 身份验证"
+---
+
+# OpenLDAP 集成
+
+本指南全面介绍如何为 Open WebUI 设置 OpenLDAP 身份验证，内容包括使用 Docker 创建测试 OpenLDAP 服务器、写入示例用户、配置 Open WebUI 进行连接，以及排除常见问题。
+
+## 1. 使用 Docker 设置 OpenLDAP {#1-setting-up-openldap-with-docker}
+
+运行测试 OpenLDAP 服务器最简单的方法是使用 Docker。这个 `docker-compose.yml` 文件会创建一个 OpenLDAP 容器，以及一个可选的 phpLDAPadmin 容器，用于提供基于 Web 的图形界面。
+
+```yaml title="docker-compose.yml"
+services:
+  ldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    environment:
+      LDAP_ORGANISATION: "Example Inc"
+      LDAP_DOMAIN: "example.org"
+      LDAP_ADMIN_PASSWORD: admin
+      LDAP_TLS: "false"
+    volumes:
+      - ./ldap/var:/var/lib/ldap
+      - ./ldap/etc:/etc/ldap/slapd.d
+    ports:
+      - "389:389"
+    networks: [ldapnet]
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:0.9.0
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: "ldap"
+    ports:
+      - "6443:443"
+    networks: [ldapnet]
+
+networks:
+  ldapnet:
+    driver: bridge
+```
+
+- `osixia/openldap` 镜像仅凭 `LDAP_DOMAIN` 和 `LDAP_ADMIN_PASSWORD` 就会自动创建基本的组织结构。
+- `osixia/phpldapadmin` 镜像提供用于管理 LDAP 目录的 Web 界面，可通过 `https://localhost:6443` 访问。
+
+运行 `docker compose up -d` 启动容器。通过检查日志确认 LDAP 服务器已启动：`docker logs openldap`。你应该会看到“started slapd”消息。
+
+## 2. 写入示例用户（LDIF） {#2-seeding-a-sample-user-ldif}
+
+要测试登录，需要向 LDAP 目录添加一个示例用户。创建名为 `seed.ldif` 的文件，内容如下：
+
+```ldif title="seed.ldif"
+dn: ou=users,dc=example,dc=org
+objectClass: organizationalUnit
+ou: users
+
+dn: uid=jdoe,ou=users,dc=example,dc=org
+objectClass: inetOrgPerson
+cn: John Doe
+sn: Doe
+uid: jdoe
+mail: jdoe@example.org
+userPassword: {PLAIN}password123
+```
+
+**密码说明：**为简化此测试环境，`userPassword` 字段使用纯文本值。在生产环境中，应始终使用哈希密码。可以使用 `slappasswd` 或 `openssl passwd` 生成哈希密码。例如：
+
+```bash
+
+# 使用 slappasswd（在容器内）
+docker exec openldap slappasswd -s your_password
+
+# 使用 openssl
+openssl passwd -6 your_password
+```
+
+将 LDIF 文件复制到容器中，并使用 `ldapadd` 添加条目：
+
+```bash
+docker cp seed.ldif openldap:/seed.ldif
+docker exec openldap ldapadd -x -D "cn=admin,dc=example,dc=org" -w admin -f /seed.ldif
+```
+
+操作成功时会显示“adding new entry”消息。
+
+## 3. 验证 LDAP 连接 {#3-verifying-the-ldap-connection}
+
+在配置 Open WebUI 之前，请验证 LDAP 服务器可以访问且用户存在。
+
+```bash
+ldapsearch -x -H ldap://localhost:389 \
+  -D "cn=admin,dc=example,dc=org" -w admin \
+  -b "dc=example,dc=org" "(uid=jdoe)"
+```
+
+如果该命令返回 `jdoe` 用户条目，说明 LDAP 服务器已准备就绪。
+
+## 4. 配置 Open WebUI {#4-configuring-open-webui}
+
+现在，配置 Open WebUI 实例使用 LDAP 服务器进行身份验证。
+
+### 环境变量 {#environment-variables}
+
+为 Open WebUI 实例设置以下环境变量。
+
+:::info
+
+Open WebUI 仅在首次启动时读取这些环境变量。除非设置了 `ENABLE_PERSISTENT_CONFIG=false`，否则后续更改必须在界面的管理员设置面板中进行。
+
+:::
+
+```env
+
+# 启用 LDAP
+ENABLE_LDAP="true"
+
+# --- 服务器设置 ---
+LDAP_SERVER_LABEL="OpenLDAP"
+LDAP_SERVER_HOST="localhost"  # 或 LDAP 服务器的 IP / 主机名
+LDAP_SERVER_PORT="389"        # 纯文本使用 389，LDAPS 使用 636
+LDAP_USE_TLS="false"          # LDAPS 设置为 "true"（默认为 "true"）
+LDAP_VALIDATE_CERT="false"    # 在生产环境中使用有效证书时设置为 "true"（默认为 "true"）
+
+# --- 绑定凭据 ---
+LDAP_APP_DN="cn=admin,dc=example,dc=org"
+LDAP_APP_PASSWORD="admin"
+
+# --- 用户架构 ---
+LDAP_SEARCH_BASE="dc=example,dc=org"
+LDAP_ATTRIBUTE_FOR_USERNAME="uid"
+LDAP_ATTRIBUTE_FOR_MAIL="mail"
+# 可选：没有 mail 属性的用户所使用的电子邮件域（参见下方警告）
+# LDAP_DEFAULT_EMAIL_DOMAIN="example.org"
+# LDAP_SEARCH_FILTER 是可选项，用于附加筛选条件。
+# Open WebUI 会自动添加用户名过滤器，因此请勿包含
+# %(user)s 或 %s 等用户占位符语法，它们不受支持。
+# 简单设置可留空，也可以添加组成员过滤器，例如：
+# LDAP_SEARCH_FILTER="(memberOf=cn=allowed-users,ou=groups,dc=example,dc=org)"
+```
+
+:::warning 没有电子邮件地址的用户
+
+Open WebUI 要求每个账户都有电子邮件地址。mail 属性为空的用户无法登录，并会收到错误 `User does not have a valid email address.`。设置 [`LDAP_DEFAULT_EMAIL_DOMAIN`](/reference/env-configuration#ldap_default_email_domain)（界面中的**默认电子邮件域**）后，此类用户将使用 `username@domain` 登录，其中 `username` 是他们在登录页面输入的名称。如果具有该地址的 Open WebUI 账户已经存在，LDAP 用户会登录到该账户。请使用你控制的域，防止 LDAP 用户接管属于他人的账户。
+
+:::
+
+`LDAP_ATTRIBUTE_FOR_USERNAME` 仅用于根据登录页面输入的名称查找用户条目。通过 LDAP 登录创建的账户从条目的 `cn` 属性获取名称，从 mail 属性获取电子邮件，其 Open WebUI 用户名留空。
+
+### 界面配置 {#ui-configuration}
+
+也可以直接在界面中配置这些设置：
+
+1. 以管理员身份登录。
+2. 打开**管理员面板**，转到**设置** > **身份验证**，找到 **LDAP** 部分。
+3. 打开 **LDAP** 开关。
+4. 填写与上述环境变量对应的字段。[LDAP](/reference/env-configuration#ldap) 下会随变量列出每个字段的标签。不要复制**搜索过滤器**的占位符 `(&(objectClass=inetOrgPerson)(uid=%s))`：Open WebUI 不会替换 `%s`，因此该过滤器找不到任何用户，登录会失败并显示 `User not found in the LDAP server`。
+5. 保存设置。设置会应用于下一次登录尝试，无需重启。
+
+## 5. 登录 {#5-logging-in}
+
+打开一个新的浏览器无痕窗口，导航到你的 Open WebUI 实例。
+
+-   **登录 ID：**`jdoe`
+-   **密码：**`password123`（或你设置的密码）
+
+登录成功后，Open WebUI 会自动创建一个新用户账户，并使用实例的默认角色；除非管理员在**设置** > **身份验证**下更改过，否则默认角色为 `pending`。实例上的第一个账户会成为管理员。管理员之后可以根据需要更改用户角色。
+
+## 6. 从 LDAP 同步组 {#6-syncing-groups-from-ldap}
+
+在 **LDAP** 部分开启**组映射**（`ENABLE_LDAP_GROUP_MANAGEMENT`）后，Open WebUI 会在每次 LDAP 登录时，从**组属性**（`LDAP_ATTRIBUTE_FOR_GROUPS`，默认为 `memberOf`）指定的属性中读取用户的组。每个值都是一个组 DN，Open WebUI 使用其第一个 `CN` 作为组名。
+
+:::warning 手动分配的组无法保留到下次登录
+
+当用户条目列出至少一个组时，同步会使用户的 Open WebUI 组与其 LDAP 组保持一致：
+
+- 用户会被加入名称与其 LDAP 组名匹配的每个 Open WebUI 组。
+- 用户会被移出其他所有 Open WebUI 组，包括管理员手动将其加入的组。
+- 用户也会被移出为新用户设置的**默认组**。具有 LDAP 组的新用户会在首次登录时退出默认组，除非默认组名称与其某个 LDAP 组匹配。
+- 管理员账户也以相同方式同步。
+
+要让用户保留在某个组中，请在目录中将其加入同名的 LDAP 组。LDAP 没有可将某个组排除在同步之外的设置。
+
+:::
+
+- 开启**自动创建组**（`ENABLE_LDAP_GROUP_CREATION`）后，如果用户的某个 LDAP 组没有同名 Open WebUI 组，Open WebUI 会创建该组，然后将用户加入其中。关闭时，会跳过这些 LDAP 组。
+- 当用户条目没有组属性或组属性为空时，不会运行同步，用户的 Open WebUI 组保持不变。
+- 目录中的更改会在用户下次通过 LDAP 登录时生效。
+- 如果同步失败，登录仍会成功，服务器日志会显示 `Failed to sync groups for user`。
+
+## 7. 排除常见错误 {#7-troubleshooting-common-errors}
+
+以下是 LDAP 集成过程中常见错误的解决方法。
+
+### `port must be an integer` {#port-must-be-an-integer}
+
+```
+ERROR | open_webui.routers.auths:ldap_auth:447 - LDAP authentication error: port must be an integer - {}
+```
+
+**原因：**`LDAP_SERVER_PORT` 环境变量作为带引号的字符串传入（例如 `"389"`）。
+
+**解决方法：**
+-   确保 `.env` 文件或 export 命令中的 `LDAP_SERVER_PORT` 值不带引号：`LDAP_SERVER_PORT=389`。
+-   从 `LDAP_SERVER_HOST` 中移除协议（`http://`、`ldap://`）。它应该只是主机名或 IP（例如 `localhost`）。
+
+### `[SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred` {#ssl-unexpected_eof_while_reading-eof-occurred}
+
+```
+ERROR | LDAP authentication error: ("('socket ssl wrapping error: [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1016)',)",) - {}
+```
+
+**原因：**这是 TLS 握手失败。客户端（Open WebUI）正在尝试发起 TLS 连接，但服务器（OpenLDAP）未配置 TLS，或期望使用不同的协议。
+
+**解决方法：**
+-   **如果不打算使用 TLS：**设置 `LDAP_USE_TLS="false"` 并连接到标准纯文本端口 `389`。
+-   **如果打算使用 LDAPS：**确保 LDAP 服务器已配置 TLS 并监听端口 `636`。设置 `LDAP_SERVER_PORT="636"` 和 `LDAP_USE_TLS="true"`。
+-   **不支持 StartTLS。**`LDAP_USE_TLS` 仅打开隐式 TLS 连接，因此对端口 `389` 上的纯文本监听器使用 `"true"` 会失败。请在 `636` 上使用 LDAPS，或在 `389` 上使用纯文本。
+
+### `Failed to configure TLS for LDAP connection.` {#failed-to-configure-tls}
+
+**原因：**Open WebUI 无法为 LDAP 连接构建 TLS 设置，因此登录会在联系 LDAP 服务器之前停止。一个常见原因是**证书路径**（[`LDAP_CA_CERT_FILE`](/reference/env-configuration#ldap_ca_cert_file)）指向的文件在 Open WebUI 容器内不存在。此时服务器日志会显示 `TLS configuration error: invalid CA public key file`。
+
+**解决方法：**
+-   **如果使用自定义 CA：**将 CA 证书文件挂载到容器中，并将**证书路径**设置为该文件在容器内的路径，而不是其在主机上的路径。
+-   **如果不需要自定义 CA：**清空**设置 > 身份验证**中 **LDAP** 部分的**证书路径**。
+
+### `err=49 text=`（凭据无效） {#err49-text-invalid-credentials}
+
+```
+openldap | ... conn=1001 op=0 RESULT tag=97 err=49 text=
+```
+
+**原因：**LDAP 服务器拒绝了绑定尝试，因为可分辨名称（DN）或密码不正确。这发生在第二次绑定尝试期间，此时 Open WebUI 尝试使用用户提供的凭据进行身份验证。
+
+**解决方法：**
+1. **验证密码：**确保使用正确的纯文本密码。服务器期望的是 LDIF 文件中的 `userPassword` 值。如果该值是哈希，则必须提供原始的纯文本密码。
+2. **检查用户 DN：**用于绑定的 DN（`uid=jdoe,ou=users,dc=example,dc=org`）必须正确。
+3. **使用 `ldapwhoami` 测试：**直接针对 LDAP 服务器验证凭据，以判断问题是否与 Open WebUI 无关。
+    ```bash
+    ldapwhoami -x -H ldap://localhost:389 \
+      -D "uid=jdoe,ou=users,dc=example,dc=org" -w "password123"
+    ```
+    如果此命令失败并显示 `ldap_bind: Invalid credentials (49)`，则问题在于凭据或 LDAP 服务器的密码配置，而不是 Open WebUI。
+4. **重置密码：**如果不知道密码，请使用 `ldapmodify` 或 `ldappasswd` 重置。初始测试时，通常最简单的方法是使用 `{PLAIN}` 密码，然后切换到 `{SSHA}` 等安全哈希。
+
+    **更改密码的 LDIF 示例：**
+    ```ldif title="change_password.ldif"
+    dn: uid=jdoe,ou=users,dc=example,dc=org
+    changetype: modify
+    replace: userPassword
+    userPassword: {PLAIN}newpassword
+    ```
+    使用以下命令应用：
+    ```bash
+    docker exec openldap ldapmodify -x -D "cn=admin,dc=example,dc=org" -w admin -f /path/to/change_password.ldif
+    ```

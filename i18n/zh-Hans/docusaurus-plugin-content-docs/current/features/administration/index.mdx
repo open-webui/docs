@@ -1,0 +1,111 @@
+---
+sidebar_position: 0
+title: "管理"
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 管理
+
+<ThemedImage
+  alt="管理：三层结构向上收窄，顶层带有标记"
+  sources={{
+    light: useBaseUrl('/images/banners/administration-light.svg'),
+    dark: useBaseUrl('/images/banners/administration-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+**在管理员面板中监控使用情况、评估模型质量并与用户沟通。**
+
+Open WebUI 为管理员提供了一整套运维工具。跟踪团队使用哪些模型及其成本。开展盲测评估，找出最适合你工作负载的模型。通过可自定义的横幅向每位用户推送公告。接入 webhook，在用户注册或长时间运行的任务完成时接收通知。
+
+---
+
+## 本部分内容 {#whats-in-this-section}
+
+| | |
+| :--- | :--- |
+| **[任务模型](/features/administration/task-models)** | 负责生成标题、标签、后续问题、自动补全、搜索查询和压缩摘要的模型及参数 |
+| **[分析](/features/administration/analytics)** | 使用情况仪表板，展示消息量、token 消耗量、模型构成和每位用户的活动 |
+| **[评估](/features/administration/evaluation)** | 盲测 A/B 测试、基于 ELO 的排行榜，以及用于微调的聊天快照 |
+| **[横幅](/features/administration/banners)** | 可自定义的全系统公告，支持可关闭通知 |
+| **[默认界面设置](/features/administration/interface-defaults)** | 为每个人的“设置 > 界面”页面上的选项设置实例级初始值 |
+| **[翻译](/features/administration/translations)** | 为所创建的内容设置按语言区分的名称、说明、阀门标签和横幅文本 |
+| **[Webhooks](/features/administration/webhooks)** | 用于用户注册、聊天完成和外部服务集成的自动通知 |
+
+在大多数管理员设置页面上，点击**保存**后，系统会先列出你更改的每项设置及其旧值和新值，供你确认。
+
+---
+
+![管理员设置的常规页面](/images/admin/admin-general.png)
+
+## 任务模型 {#task-models}
+
+聊天标题、标签、后续问题建议、自动补全、搜索查询重写和上下文压缩摘要，都会作为独立的模型调用在后台运行。开箱即用时，它们使用用户正在聊天的模型，因此旗舰模型可能会悄无声息地生成大量三个词的标题。
+
+**适用于：**将这类工作转移到小型快速模型上，限制这些请求的可用开销，以及关闭实例不需要的功能。
+
+[**了解任务模型 →**](/features/administration/task-models)
+
+---
+
+## 分析 {#analytics}
+
+从全局视角了解实例的使用情况。分析仪表板展示消息量、token 消耗量、模型受欢迎程度和用户活动，并可按时间段和用户组筛选。
+
+**适用于：**容量规划、成本估算、识别热门模型、跟踪采用趋势，以及按部门生成使用情况报告。
+
+[**了解分析 →**](/features/administration/analytics)
+
+---
+
+## 评估 {#evaluation}
+
+不确定哪个模型最适合团队？评估系统让用户在正常对话中通过点赞 / 点踩来评价模型回答。评分会汇入基于 ELO 的排行榜，已评分的聊天会保存快照，供未来微调模型使用。
+
+**两种评估模式：**
+- **盲测比较**：采用随机策略且具有两个或更多默认模型的[路由模型](/features/administration/router-models)，会为每条消息选择一个模型并隐藏所选模型，从而消除偏差
+- **正常互动**：在常规使用过程中评价回答，然后通过更换模型进行比较
+
+[**了解评估 →**](/features/administration/evaluation)
+
+---
+
+## 横幅 {#banners}
+
+向每位已登录用户推送醒目的消息。横幅可用于维护时段、事件警报、政策提醒和功能公告。通过管理员面板配置，或使用 `WEBUI_BANNERS` 环境变量以支持 GitOps 工作流。
+
+| 类型 | 颜色 | 最适用于 |
+|------|-------|----------|
+| `info` | 蓝色 | 一般公告 |
+| `success` | 绿色 | 已解决的事件、已完成的变更 |
+| `warning` | 黄色 | 计划维护、部分降级 |
+| `error` | 红色 | 正在发生的事件、服务中断 |
+
+[**了解横幅 →**](/features/administration/banners)
+
+---
+
+## 默认界面设置 {#default-interface-settings}
+
+为所有人的**设置 > 界面**页面选择初始值，而不是让每个账户都沿用开箱默认值。可以在管理员面板中设置，也可以使用 `DEFAULT_INTERFACE_SETTINGS` 环境变量以支持 GitOps 工作流。
+
+**适用于：**让团队从第一天起就拥有一致的外观、默认关闭容易分散注意力的选项，或推行用户仍可自行调整的统一风格。未改动过的选项会继续沿用你的默认值，因此之后的更改会同步给所有未覆盖该选项的人。
+
+[**了解默认界面设置 →**](/features/administration/interface-defaults)
+
+---
+
+## Webhooks {#webhooks}
+
+三种 webhook 集成可让外部服务保持同步：
+
+| Webhook | 用途 |
+|---------|---------|
+| **事件 Webhooks** | 将目录中的任何事件（包括注册）发送到 Slack、Discord 或你自己的端点 |
+| **用户 Webhook** | 在长时间运行的聊天回答就绪时通知相应用户 |
+| **频道 Webhooks** | 允许外部服务（CI/CD、监控、脚本）向 Open WebUI 频道发布消息 |
+
+[**了解 Webhooks →**](/features/administration/webhooks)

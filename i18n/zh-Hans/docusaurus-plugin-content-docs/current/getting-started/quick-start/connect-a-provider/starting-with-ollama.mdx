@@ -1,0 +1,205 @@
+---
+sidebar_position: 1
+title: "Ollama"
+---
+
+## 概述 {#overview}
+
+Open WebUI 让连接和管理你的 **Ollama** 实例变得简单。本指南将介绍如何设置连接、管理模型并开始使用。
+
+---
+
+## 面向协议的设计 {#protocol-oriented-design}
+
+Open WebUI 采用**面向协议**的设计。这意味着当我们提到“Ollama”时，具体指的是 **Ollama API 协议**（通常运行在端口 `11434`）。
+
+虽然某些工具可能提供基本兼容性，但这种连接类型针对 Ollama 服务的独有功能进行了优化，例如原生模型管理，以及直接通过管理员界面拉取模型。
+
+如果你的后端主要基于 OpenAI 标准（例如 LocalAI 或 Docker Model Runner），建议使用 [OpenAI 兼容服务器指南](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)，以获得最佳体验。
+
+---
+
+## 步骤 1：设置 Ollama 连接 {#step-1-setting-up-the-ollama-connection}
+
+安装并运行 Open WebUI 后，它会自动尝试连接你的 Ollama 实例。如果一切顺利，你就可以立即管理和使用模型。
+
+但是，如果遇到连接问题，最常见的原因是网络配置错误。你可以参阅[连接故障排除指南](/troubleshooting/connection-error)，获取解决这些问题的帮助。
+
+---
+
+## 步骤 2：管理 Ollama 实例 {#step-2-managing-your-ollama-instance}
+
+要在 Open WebUI 中管理 Ollama 实例，请按以下步骤操作：
+
+1. 在 Open WebUI 中前往**设置（Settings）> 连接（Connections）**（管理员区域）。
+2. 在**管理 Ollama API 连接（Manage Ollama API Connections）**下找到你的实例，然后点击**管理（Manage）**（下载图标）。
+   在这里，你可以下载模型、配置设置，并管理与 Ollama 的连接。
+
+### 连接提示 {#connection-tips}
+
+*   **Docker 用户**：如果 Ollama 运行在你的主机上，请使用 `http://host.docker.internal:11434` 作为 URL。
+*   **负载均衡**：你可以添加**多个** Ollama 实例。Open WebUI 会使用**随机选择**策略在它们之间分配请求，为并发用户提供基本的负载均衡。
+    *   **注意**：要启用此功能，请确保各实例上的**模型 ID 完全一致**。如果使用**前缀 ID（Prefix ID）**，它们必须相同（或为空），模型才能合并为一个条目。
+    *   **在每台服务器上拉取相同标签**：模型仅按名称合并。Open WebUI 不会比较版本或摘要，因此，即使两台服务器在同一名称下保存了不同构建，仍会显示为一个模型，并且聊天可能落到其中任意一台。模型选择器中显示的参数规模、量化方式和文件大小，来自列表中第一个具有该模型的连接。更新后，请在每个连接上运行**更新所有模型（Update All Models）**。
+    *   **每个请求都会选择一台服务器**：Open WebUI 会为每个请求从具有该模型的服务器中随机选择一台，因此同一聊天中的消息可能发送到不同服务器。
+    *   **一台服务器上的多个用户**：Open WebUI 会在每个请求到达时将其发送给 Ollama，自身不保留队列。一台 Ollama 服务器是同时响应同一模型的多个请求，还是让它们等待，由 Ollama 服务器上的 `OLLAMA_NUM_PARALLEL` 设置，默认值为 `1`。内存占用会随该值增加。请参阅 Ollama 的[并发请求常见问题](https://docs.ollama.com/faq#how-does-ollama-handle-concurrent-requests)。
+    *   **一台主机上的两个 Ollama 容器**：Ollama 在其容器内监听端口 `11434`，因此请为第二个容器映射不同的主机端口，例如 `docker run -d -v ollama2:/root/.ollama -p 11435:11434 --name ollama2 ollama/ollama`，然后将其添加为 `http://host.docker.internal:11435`。
+
+### 高级配置 {#advanced-configuration}
+
+*   **前缀 ID（Prefix ID）**：如果你有多个提供相同模型名称的 Ollama 实例，请使用前缀（例如 `remote`）加以区分。Open WebUI 使用点号连接前缀和模型名称，因此 `llama3` 会显示为 `remote.llama3`。
+
+    添加、更改或移除**前缀 ID（Prefix ID）**后，请检查使用该连接中模型的所有工作区预设。预设保存的是旧模型 ID。在**工作区（Workspace）> 模型（Models）**中编辑预设，使用更新后的 ID 重新选择**基础模型（Base Model (From)）**，然后保存。
+*   **模型 ID（筛选）（Model IDs (Filter)）**：在此列出特定模型（白名单），使其可见。留空则显示所有模型。
+
+:::tip 连接超时配置
+
+使用多个 Ollama 实例（尤其是跨网络）时，如果某个端点无法访问，可能会出现连接延迟。你可以使用以下设置调整超时：
+
+```bash
+# 降低超时（默认为 10 秒），加快故障转移
+AIOHTTP_CLIENT_TIMEOUT_MODEL_LIST=3
+```
+
+如果你保存了无法访问的 URL，并且无法进入设置进行修正，请参阅[模型列表加载问题](/troubleshooting/connection-error#model-list-loading-issues-slow-ui--unreachable-endpoints)故障排除指南。
+
+:::
+
+管理界面如下所示：
+
+![Ollama 管理界面](/images/getting-started/quick-start/manage-ollama.png)
+
+![Ollama 管理界面](/images/getting-started/quick-start/manage-modal-ollama.png)
+
+## 快速高效的模型下载方式 {#a-quick-and-efficient-way-to-download-models}
+
+如果你希望更快上手，管理员可以直接从**模型选择器（Model Selector）**下载模型。只需输入所需模型的名称；如果该模型尚不可用，Open WebUI 会提示你从 Ollama 下载。
+
+以下是一个示例：
+
+![Ollama 下载提示](/images/getting-started/quick-start/selector-ollama.png)
+
+如果你想跳过管理员设置菜单中的导航，直接使用模型，这种方法非常合适。
+
+### 从 Hugging Face 下载 GGUF 模型 {#downloading-gguf-models-from-hugging-face}
+
+Ollama 还可以直接从 Hugging Face 下载 GGUF 模型。在**从 Ollama.com 拉取模型（Pull a model from Ollama.com）**或模型选择器中，以 `hf.co/{username}/{repository}:{quantization}` 格式输入模型，例如 `hf.co/ggml-org/gemma-3-270m-it-GGUF:Q8_0`。量化方式应与 GGUF 文件名中的量化方式一致，例如 `Q4_K_M` 或 `Q8_0`。随后，模型会以该完整名称列出。请参阅 Hugging Face 的 [Ollama 指南](https://huggingface.co/docs/hub/en/ollama)，了解哪些仓库可用。
+
+### 上传 GGUF 文件 {#uploading-a-gguf-file}
+
+要使用已有的 GGUF 文件，请打开连接的**管理（Manage）**对话框，点击底部**实验性（Experimental）**标记旁边的**显示（Show）**。**上传 GGUF 模型（Upload a GGUF model）**下的模式按钮用于选择来源。**文件模式（File Mode）**从你的计算机上传 `.gguf` 文件，**URL 模式（URL Mode）**接受 Hugging Face resolve（下载）URL。Open WebUI 将文件发送到该 Ollama 服务器，并以去掉扩展名后的文件名创建模型，然后显示**模型创建成功！（Model created successfully!）**。要为其设置系统提示词或参数，请按照[创建模型](#creating-a-model)中的说明，以它为基础创建新模型。
+
+---
+
+## 更新和删除模型 {#updating-and-deleting-models}
+
+两者都位于与下载相同的**管理（Manage）**对话框中（请参阅[步骤 2](#step-2-managing-your-ollama-instance)）。它们只会作用于所打开**管理（Manage）**对话框对应连接背后的 Ollama 服务器，因此有多个 Ollama 连接时，请在每个要更改的连接上打开**管理（Manage）**。
+
+### 更新所有模型 {#updating-all-models}
+
+在**从 Ollama.com 拉取模型（Pull a model from Ollama.com）**旁边，**更新所有模型（Update All Models）**按钮会逐个重新拉取该服务器上的每个模型，将每个模型更新到其标签的最新版本。Ollama 只下载发生变化的内容，因此已经是最新的模型会很快完成。
+
+运行期间，对话框会显示**正在更新“model-name”（Updating "model-name"）**和进度条。**取消（Cancel）**会停止正在下载的模型并跳过其余模型。如果某个模型无法拉取，例如你自行创建而非从 Ollama.com 下载的模型，更新会跳过它并继续处理下一个。运行结束时，Open WebUI 会显示**所有模型均为最新（All models are up to date）**。
+
+更新后，已经加载的模型会继续运行旧版本，直到被卸载。请参阅[卸载已加载的模型](#unloading-loaded-models)。
+
+### 删除模型 {#deleting-a-model}
+
+1. 在**删除模型（Delete a model）**下，从**选择模型（Select a model）**中选择模型。每个条目都会显示其磁盘占用大小。
+2. 点击**删除模型（Delete Model）**并确认。
+
+删除会从 Ollama 服务器本身移除模型并释放其磁盘空间，因此该连接的所有用户都将无法再看到它。如果要停止提供某个模型但不将其删除，请改为在连接的**模型 ID（筛选）（Model IDs (Filter)）**中仅列出要提供的模型（请参阅[高级配置](#advanced-configuration)）。
+
+---
+
+## 创建模型 {#creating-a-model}
+
+**创建模型（Create a model）**同样位于**管理（Manage）**对话框中，它以该 Ollama 服务器上已有的模型为基础，创建一个具有自己系统提示词或参数的新模型。不会下载任何新内容，因此只需几秒钟。
+
+1. 输入新模型的名称，例如 `pirate-gemma`。
+2. 在下方的框中，使用 Ollama [创建 API](https://docs.ollama.com/api/create) 的字段，以 JSON 描述模型。`from` 是要作为基础的模型，且必须已存在于该服务器上。例如：
+
+   ```json
+   {"from": "gemma3:270m", "system": "You answer in one short sentence.", "parameters": {"temperature": 0.3, "num_ctx": 8192}}
+   ```
+
+3. 点击名称旁边的**创建模型（Create Model）**按钮。只有名称和 JSON 均已填写，该按钮才会启用。
+
+Ollama 完成后，Open WebUI 会显示 **success（成功）**，新模型会以 `pirate-gemma:latest` 显示在模型选择器中。如果无法解析 JSON，则会显示错误，并且不会发送任何内容。如果 `from` 模型不在该服务器上，Ollama 会尝试改从 Ollama.com 下载；如果那里也不存在该模型，则会失败并显示 **pull model manifest: file does not exist**。
+
+:::note 此处设置的系统提示词是后备值
+只有当聊天未发送系统提示词时，Ollama 才会使用模型自身的系统提示词。来自**工作区（Workspace）**> **模型（Models）**中模型设置的系统提示词、来自用户设置的系统提示词，或由过滤器添加的系统提示词都会替换它。要为模型设置在 Open WebUI 中始终适用的系统提示词，请改为在**工作区（Workspace）**> **模型（Models）**中设置。
+:::
+
+---
+
+## 卸载已加载的模型 {#unloading-loaded-models}
+
+对于运行时当前保持加载的任何 Ollama 模型，Open WebUI 都会在其旁边显示绿色的“已加载（Loaded）”指示器；管理员还会在模型行看到**卸载（Eject）**按钮，无需重启服务器即可卸载模型。在后台，Open WebUI 会调用 `POST /api/models/unload`（仅限管理员），向提供该模型的每个 Ollama 节点转发一个 `keep_alive=0` 生成调用。
+
+在多个大型模型之间切换时，这可用于释放 GPU/VRAM，也可用于在拉取新修订版本后强制重新加载。如果连接的服务提供方不支持卸载，尝试卸载模型会返回错误，而不是静默失败。
+
+### 暂停后首次回复较慢 {#slow-first-reply-after-a-pause}
+
+如果空闲一段时间后的首次回复比之后的回复慢得多，说明 Ollama 正在重新将模型加载到内存中。默认情况下，Ollama 会卸载 5 分钟未使用的模型。有两个设置可以更改模型保持加载的时长：
+
+- **`OLLAMA_KEEP_ALIVE`** 在 **Ollama 服务器**上设置，适用于所有模型。它接受 `10m` 或 `24h` 等时长、秒数，或让模型保持加载的负数。请参阅 Ollama 的[保持加载常见问题](https://docs.ollama.com/faq#how-do-i-keep-a-model-loaded-in-memory-or-make-it-unload-immediately)。
+- **keep_alive (Ollama)** 是 Open WebUI 高级参数，会作为 `keep_alive` 随每个聊天请求发送到 Ollama，并在该请求中取代 `OLLAMA_KEEP_ALIVE`。可在**工作区（Workspace）**> **模型（Models）**中按模型设置，也可在聊天的**控制（Controls）**或**设置（Settings）> 通用（General）**中设置，后两者仅管理员账号可见（请参阅[聊天参数](/features/chat-conversations/chat-features/chat-params)）。将其从**默认（Default）**切换为**自定义（Custom）**会填入 `5m`。在**默认（Default）**状态下，Open WebUI 不发送任何内容，并应用 `OLLAMA_KEEP_ALIVE`。
+
+模型会按照 keep-alive 指定的时长保留在内存中，因此较长的值会让内存在聊天之间持续被占用。
+
+---
+
+## 使用推理/思考模型 {#using-reasoning--thinking-models}
+
+Ollama 会自行区分模型的思考内容和回答。自 Ollama v0.9.0 起，支持思考的模型（Qwen3、DeepSeek-R1、DeepSeek-V3.1、GPT-OSS）会在单独的 `thinking` 字段中返回思考轨迹，Open WebUI 会将其显示在回答上方的可折叠区域中。这不涉及服务器端标志，`ollama serve` 也不接受此类标志。
+
+### 控制思考 {#controlling-thinking}
+
+**模型控制（Model controls）> 控制（Controls）> 高级参数（Advanced Params）**下的 **think (Ollama)** 控件（或模型编辑器中的按模型设置）会作为 `think` 参数发送到 Ollama：
+
+| 设置 | Ollama 收到的值 |
+|---|---|
+| **默认（Default）** | 不发送任何内容。应用 Ollama 自身的默认行为，即对支持思考的模型启用思考。 |
+| **开启（On）** | `true` |
+| **自定义（Custom）** | 思考级别：`low`、`medium`、`high` 或 `max`。GPT-OSS 仅接受级别。 |
+| **关闭（Off）** | `false` |
+
+如果模型将推理内容以 `<think>...</think>` 文本内联输出，而不是使用 Ollama 的 thinking 字段，则由**推理标签（Reasoning Tags）**设置处理。有关这两个设置和故障排除步骤，请参阅[推理与思考模型指南](/features/chat-conversations/chat-features/reasoning-models)。
+
+---
+
+## 上下文长度（`num_ctx`）与 `OLLAMA_CONTEXT_LENGTH` {#context-length-num_ctx-and-ollama_context_length}
+
+模型实际能看到多少对话内容由**上下文长度**决定。对于 Ollama，它可以来自两个位置，其中一个会在不易察觉的情况下覆盖另一个：
+
+- **`OLLAMA_CONTEXT_LENGTH`** 在 **Ollama 服务器**上设置，是 Ollama 为模型使用的默认上下文长度。自 Ollama v0.15.5 起，Ollama 会根据可用 VRAM 选择此默认值：低于 24 GiB 时为 `4096`，24 至 48 GiB 时为 `32768`，48 GiB 及以上时为 `262144`（请参阅 [Ollama 的上下文长度文档](https://docs.ollama.com/context-length)）。
+- **`num_ctx`** 是 **Open WebUI 高级参数**（位于聊天中的**模型控制（Model controls）> 控制（Controls）> 高级参数（Advanced Params）**，或模型编辑器中的按模型设置）。它**默认未设置**，因此开箱即用时应用 Ollama 的 `OLLAMA_CONTEXT_LENGTH`。
+
+:::warning `num_ctx` 会覆盖 `OLLAMA_CONTEXT_LENGTH`
+如果在 Open WebUI 的任何位置设置了 `num_ctx`（模型预设参数或聊天的高级参数），Open WebUI 就会在每个请求中将其发送到 Ollama，而按请求设置的 `num_ctx` 会**覆盖**服务器的 `OLLAMA_CONTEXT_LENGTH`。开启 `num_ctx` 控件会**预先填入 `2048`**，这个值非常小，因此即使在 Ollama 端提高了 `OLLAMA_CONTEXT_LENGTH`，也很容易在没有意识到的情况下将模型限制为 2048 个令牌。
+:::
+
+过小的上下文会在没有提示的情况下截断提示词。这种情况在**原生函数调用（Native function calling）**中最为明显，因为工具架构会注入提示词：在 `2048` 个令牌下，模型可能耗尽空间并返回**空白响应**，或者输出原始的工具调用 JSON 数据块，而不是实际调用工具。增大上下文即可解决。
+
+**处理方法：**
+
+- 要为所有 Ollama 模型设置默认值，请在 **Ollama 服务器**上设置 `OLLAMA_CONTEXT_LENGTH`，并在 Open WebUI 中**保持 `num_ctx` 未设置**，以免其被覆盖。
+- 要按模型或按聊天设置，请将 `num_ctx` 设为适合模型的实际值（例如 `8192`、`16384` 或模型的最大值），而不是预填的 `2048`。请记住，它会覆盖 `OLLAMA_CONTEXT_LENGTH`。
+- 更大的上下文会占用更多 VRAM 和 RAM，因此请根据硬件容量设置。
+
+---
+
+## 工具调用前生成的文本 {#text-written-before-a-tool-call}
+
+当模型在同一回复中生成一句话并调用工具时，例如生成“让我查看一下日历。”后调用工具，聊天会同时显示两者。对于来自**管理 Ollama API 连接（Manage Ollama API Connections）**下某个连接的模型，之后的每个请求都会将该助手轮次以空文本、仅包含工具调用的形式发送给 Ollama。这适用于工具结果后的后续请求，以及聊天中的之后每条消息。模型的思考内容和工具调用会保留，聊天本身也仍会存储并显示文本。
+
+Open WebUI 会有意对携带工具调用的每个助手轮次执行此操作，使模型在后续轮次中不会看到那句话。
+
+---
+
+## 一切就绪！ {#all-set}
+
+就是这样！配置好连接并下载模型后，你就可以开始在 Open WebUI 中使用 Ollama。无论是探索新模型还是运行现有模型，Open WebUI 都能让一切简单高效。
+
+如果遇到任何问题或需要更多指导，请查看我们的[帮助部分](/troubleshooting)，获取详细解决方案。祝你使用 Ollama 愉快！

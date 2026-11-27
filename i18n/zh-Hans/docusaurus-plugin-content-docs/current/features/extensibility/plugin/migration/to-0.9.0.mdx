@@ -1,0 +1,259 @@
+---
+sidebar_position: 2
+title: "迁移到 0.9.0"
+---
+
+# 迁移指南：升级到 Open WebUI 0.9.0
+
+本指南介绍升级到 **Open WebUI 0.9.0** 时，工具、函数、Pipe、Filter 和 Action 涉及的不兼容变化与必要更新。
+
+---
+
+## 有哪些变化，为什么变化？ {#what-has-changed-and-why}
+
+Open WebUI 0.9.0 包含一次大规模内部重构：后端数据层已从顶层到底层全面由**同步**转为**异步**。几乎所有模型类（Users、Chats、Files、Models、Functions、Tools、Knowledge、Memories、Groups、Folders、Messages、Feedback 等）上涉及数据库的方法现在都是 `async def`，必须使用 `await` 等待。
+
+在存储层，SQLAlchemy 现在以异步模式使用：会话是 `AsyncSession` 实例，查询通过 `await db.execute(select(...))` 发出，不再采用旧式 `db.query(...).first()`。内部仍保留同步引擎，但它仅用于启动阶段任务（配置加载、Alembic/peewee 迁移、健康检查）：**包括插件在内的所有运行时代码都必须使用异步引擎**。
+
+**为什么做出这项变化？**
+- **并发性**：事件循环上的阻塞数据库调用是负载下最大的瓶颈。将数据层异步化后，FastAPI 可以处理更多并发聊天，而不会耗尽线程池。
+- **一致性**：请求处理程序已经是异步的；数据层保持同步会迫使整个代码库使用别扭的 `run_in_threadpool` 包装。
+- **面向未来**：SQLAlchemy 2.0 的异步 API 是今后受支持的路径。
+
+---
+
+## 不兼容变化 {#breaking-changes}
+
+如果你的插件涉及 Open WebUI 数据库或模型（**或调用了最终会涉及它们的任何辅助函数**），就需要更新。由于 `open_webui.utils.*` 中几乎每个实用函数以及每个路由器函数最终都会通过模型读取或写入数据，“异步影响范围”远不止明显的 `Users.`/`Chats.` 调用。具体而言：
+
+1. **所有模型方法现在都是协程。** 任何诸如 `Users.get_user_by_id(...)`、`Chats.get_chat_by_id(...)`、`Files.get_file_by_id(...)`、`Models.get_model_by_id(...)`、`Functions.get_function_by_id(...)`、`Tools.get_tool_by_id(...)`、`Knowledges.get_knowledge_by_id(...)` 的调用，以前都是同步的，现在都会返回可等待对象。不使用 `await` 调用它们，得到的是协程对象，而不是数据。
+2. **模型调用下游的所有内容现在也是异步的。** 你可能从 `open_webui.utils.*`、`open_webui.retrieval.*` 导入的实用辅助函数、路由器辅助函数、访问控制检查等：只要直接或间接访问数据库，它们就已改为 `async def`。你以前不使用 `await` 调用的同步辅助函数，现在几乎都需要 `await`。请重新检查插件中每个从 `open_webui.*` 导入的内容。
+3. **数据库会话现在是 `AsyncSession`。** 请使用 `get_async_db_context`（或不共享会话的变体 `get_async_db`），取代旧的 `get_db_context`。同步辅助函数（`get_db`、`SessionLocal`）仍然存在，但仅供启动代码使用：在请求处理程序或插件中使用它们会阻塞事件循环，并与异步连接池争用资源。直接查询代码需要改写为 SQLAlchemy 2.0 异步风格。
+4. **任何等待上述内容的插件辅助函数，其本身也必须是 `async def`。** 异步会沿调用图向上传播：链中一旦有一个函数变成协程，它的每个调用者也必须变为协程，一直延伸到插件入口。
+
+插件入口本身（`pipe`、`inlet`、`outlet`、`stream`、`action` 和 Tool 方法）从 0.5 起就已经是异步的，因此你声明的签名不变，只有函数体需要修改。
+
+---
+
+## 分步迁移 {#step-by-step-migration}
+
+### 1. 等待每个模型方法 {#1-await-every-model-method}
+
+这是最常见的修改。插件中任何通过模型类读取或写入数据的位置，都要添加 `await`。
+
+#### 之前（0.8.x）： {#before-08x}
+```python
+from open_webui.models.users import Users
+from open_webui.models.chats import Chats
+
+def resolve_user(user_id: str):
+    user = Users.get_user_by_id(user_id)
+    chats = Chats.get_chat_list_by_user_id(user_id)
+    return user, chats
+```
+
+#### 之后（0.9.0）： {#after-090}
+```python
+from open_webui.models.users import Users
+from open_webui.models.chats import Chats
+
+async def resolve_user(user_id: str):
+    user = await Users.get_user_by_id(user_id)
+    chats = await Chats.get_chat_list_by_user_id(user_id)
+    return user, chats
+```
+
+请注意，辅助函数本身也变成了 `async def`。它的调用者现在同样必须 `await` 它：异步会沿代码向上传播。
+
+---
+
+### 2. 将 `get_db_context` 替换为 `get_async_db_context` {#2-replace-get_db_context-with-get_async_db_context}
+
+如果插件会自行打开数据库会话（这种情况很少见，但某些工具会进行自定义查询），则不能再使用同步辅助函数。请切换到异步变体。
+
+#### 之前（0.8.x）： {#before-08x-1}
+```python
+from open_webui.internal.db import get_db_context
+from open_webui.models.users import User
+
+def count_active_users():
+    with get_db_context() as db:
+        return db.query(User).filter_by(role='user').count()
+```
+
+#### 之后（0.9.0）： {#after-090-1}
+```python
+from sqlalchemy import select, func
+from open_webui.internal.db import get_async_db_context
+from open_webui.models.users import User
+
+async def count_active_users():
+    async with get_async_db_context() as db:
+        result = await db.execute(
+            select(func.count()).select_from(User).where(User.role == 'user')
+        )
+        return result.scalar_one()
+```
+
+主要区别：
+- `with` 变为 `async with`。
+- 不再支持 `db.query(Model)`：请使用 `sqlalchemy` 中的 `select(Model)` 和 `await db.execute(...)`。
+- `.first()` / `.all()` / `.count()` 分别变为 `.scalars().first()`、`.scalars().all()` 和 `.scalar_one()`，并应用于 `execute` 返回的 `Result`。
+
+如果你使用类型提示，会话类型现在是 `sqlalchemy.ext.asyncio.AsyncSession`，而不是 `sqlalchemy.orm.Session`。
+
+:::warning 将同步辅助函数视为内部接口
+`SessionLocal`、`get_db` 和 `get_session` 仍然存在，但它们仅供 Open WebUI 的启动和迁移代码使用：**不要在插件、路由处理程序或任何运行于事件循环内的代码中调用它们**。它们会从同步连接池获取连接，在运行时阻塞事件循环，并且在并发负载下可能与异步连接池形成死锁。在启动后运行的任何代码中，都应优先使用异步变体（`get_async_db`、`get_async_db_context`、`get_async_session`）。
+:::
+
+---
+
+### 3. Pipe、Filter 和 Action {#3-pipes-filters-and-actions}
+
+插件入口从 0.5 起就是异步的，因此签名保持不变。变化的是你在其内部与模型交互的方式。
+
+#### 之前（0.8.x）：查询调用者的 Pipe： {#before-08x-a-pipe-that-looks-up-the-caller}
+```python
+from pydantic import BaseModel
+from fastapi import Request
+
+from open_webui.models.users import Users
+from open_webui.utils.chat import generate_chat_completion
+
+class Pipe:
+    async def pipe(
+        self,
+        body: dict,
+        __user__: dict,
+        __request__: Request,
+    ) -> str:
+        full_user = Users.get_user_by_id(__user__["id"])
+        body["model"] = "qwen3.6:27b"
+        return await generate_chat_completion(__request__, body, full_user)
+```
+
+#### 之后（0.9.0）： {#after-090-2}
+```python
+from pydantic import BaseModel
+from fastapi import Request
+
+from open_webui.models.users import Users
+from open_webui.utils.chat import generate_chat_completion
+
+class Pipe:
+    async def pipe(
+        self,
+        body: dict,
+        __user__: dict,
+        __request__: Request,
+    ) -> str:
+        full_user = await Users.get_user_by_id(__user__["id"])
+        body["model"] = "qwen3.6:27b"
+        return await generate_chat_completion(__request__, body, full_user)
+```
+
+在最简单的情况下，差异只有一行，但 `inlet`、`outlet`、`stream` 和 `action` 中的每个模型调用都需要进行相同处理。
+
+---
+
+### 4. 工具 {#4-tools}
+
+Tool 方法可以声明为 `async def`（如果访问数据库，也应该这样做）。对于只调用外部 API、从不查询 Open WebUI 数据库的工具，无需更改。
+
+#### 之前（0.8.x）：读取文件的工具： {#before-08x-a-tool-that-reads-a-file}
+```python
+from open_webui.models.files import Files
+
+class Tools:
+    def get_file_preview(self, file_id: str, __user__: dict) -> str:
+        file = Files.get_file_by_id_and_user_id(file_id, __user__["id"])
+        return file.data.get("content", "") if file else ""
+```
+
+#### 之后（0.9.0）： {#after-090-3}
+```python
+from open_webui.models.files import Files
+
+class Tools:
+    async def get_file_preview(self, file_id: str, __user__: dict) -> str:
+        file = await Files.get_file_by_id_and_user_id(file_id, __user__["id"])
+        return file.data.get("content", "") if file else ""
+```
+
+---
+
+### 5. FastAPI 依赖项和会话类型 {#5-fastapi-dependencies-and-session-types}
+
+如果插件公开自己的 FastAPI 路由（高级工具有时会通过导入路由器来实现）并声明数据库会话依赖项，请同时切换依赖项和类型注解。
+
+#### 之前（0.8.x）： {#before-08x-2}
+```python
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
+from open_webui.internal.db import get_session
+
+@router.get("/my-endpoint")
+def my_endpoint(db: Session = Depends(get_session)):
+    ...
+```
+
+#### 之后（0.9.0）： {#after-090-4}
+```python
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from open_webui.internal.db import get_async_session
+
+@router.get("/my-endpoint")
+async def my_endpoint(db: AsyncSession = Depends(get_async_session)):
+    ...
+```
+
+---
+
+### 6. 事件发射器的调用方式保持不变 {#6-event-emitters-are-still-called-the-same-way}
+
+内部构造函数 `get_event_emitter` / `get_event_call` 在此版本中改为 `async`，但**插件作者不会受到这项变化的影响**。你仍然通过函数签名中的 `__event_emitter__` 和 `__event_call__` 接收已构造的可调用对象，并且仍然像以前一样 `await` 它们：
+
+```python
+await __event_emitter__({"type": "status", "data": {...}})
+response = await __event_call__({"type": "input", "data": {...}})
+```
+
+此处无需修改插件。
+
+---
+
+### 7. 尚不支持异步的第三方库 {#7-third-party-libraries-that-dont-yet-support-async}
+
+如果你依赖的库只提供同步 API（例如旧版 HTTP 客户端，或自行执行阻塞 I/O 的库），请不要阻塞事件循环。将同步调用包装在线程中：
+
+```python
+import anyio
+
+result = await anyio.to_thread.run_sync(legacy_client.fetch, url)
+```
+
+这样，同步调用在工作线程上运行时，Open WebUI 的事件循环仍可处理其他工作。如果有原生异步替代方案（例如 `httpx.AsyncClient`、`aiofiles`），请优先使用。
+
+---
+
+## 回顾 {#recap}
+
+- 为**每个**模型方法调用添加 `await`。它们现在都返回协程。
+- 对每个基于数据库的 `open_webui.*` 辅助函数也执行相同操作（`utils`、检索、访问控制、路由器辅助函数中的大多数）。如果它以前是同步的并且访问数据，现在就是异步的。
+- 任何等待上述内容的函数，其本身必须是 `async def`。异步会沿整个调用图向上传播。
+- 将 `get_db_context` 替换为 `get_async_db_context`（不需要共享会话时使用 `get_async_db`），并使用 SQLAlchemy 2.0 异步风格（`select(...)` + `await db.execute(...)`）重写原始查询。
+- 会话类型现在是 `AsyncSession`，而不是 `Session`。对于 FastAPI 路由，请依赖 `get_async_session`，而不是 `get_session`。
+- 将同步辅助函数（`SessionLocal`、`get_db`、`get_session`）视为仅供启动阶段使用的内部设施：切勿在插件代码或任何运行于事件循环内的代码中调用它们。
+- 插件入口签名不变，只有内部代码需要修改。事件发射器（`__event_emitter__`、`__event_call__`）的使用方式与以前完全相同。
+- 不要阻塞事件循环；使用 `anyio.to_thread.run_sync` 包装无法避免的同步调用。
+- 运维人员：Open WebUI 会自行将数据库 URL 重写为异步驱动，SQLite 使用 `aiosqlite`；从 0.9.2 起，Postgres 使用 `psycopg` v3（0.9.0 和 0.9.1 使用 `asyncpg`）。从 0.9.0 起，不再支持经 SQLCipher 加密的 SQLite。
+
+进行一次系统性检查（在每个 `Users.`/`Chats.`/`Files.`/`Models.`/`Functions.`/`Tools.`/`Knowledges.` 调用前添加 `await`，然后将 `async` 沿调用者向上传播），即可让大多数插件完成迁移。
+
+---
+
+**有疑问或反馈？**
+如果你遇到任何问题或有建议，欢迎提交 [GitHub issue](https://github.com/open-webui/open-webui) 或在社区论坛中提问！

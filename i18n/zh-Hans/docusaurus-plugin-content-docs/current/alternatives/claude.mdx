@@ -1,0 +1,118 @@
+---
+sidebar_position: 31
+title: "自托管 Claude 替代方案"
+sidebar_label: "Open WebUI 与 Claude"
+description: "正在寻找自托管的 Claude 替代方案？通过 Open WebUI 在你自己的基础设施上使用 Claude 模型。"
+keywords: ["Open WebUI 与 Claude 对比", "Claude 替代方案", "自托管 Claude", "自托管 Claude 替代方案", "在自己的服务器上使用 Claude", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "我可以自托管 Claude 吗？", "acceptedAnswer": {"@type": "Answer", "text": "无法自托管 Claude 本身，但你可以通过 Anthropic API 在 Open WebUI 中使用 Claude 模型。Open WebUI 本身在你的基础设施上运行，但 API 调用仍会发送至 Anthropic。"}}, {"@type": "Question", "name": "我可以在 Open WebUI 中使用 Claude 吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。在设置中添加你的 Anthropic API 密钥后，Claude 模型就会显示在模型选择器中。"}}, {"@type": "Question", "name": "我可以将 Claude 和 ChatGPT 结合使用吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以，Open WebUI 支持同时连接多个服务提供方。"}}, {"@type": "Question", "name": "Open WebUI 支持 Claude 的扩展思考吗？", "acceptedAnswer": {"@type": "Answer", "text": "支持。对于提供扩展思考功能的模型，Open WebUI 均支持该功能，包括通过 Anthropic API 使用的 Claude。"}}]})}</script>
+</Head>
+
+
+# Open WebUI 与 Claude
+
+*最后更新：2026 年 8 月*
+
+Anthropic 的 [Claude](https://claude.ai/) 凭借深思熟虑般的写作风格、在长上下文中依然可靠的推理能力，以及能够承接和沉淀工作成果的产品体验，赢得了一批忠实用户。我们也是这些用户中的一员，并且每天都在使用 Claude。模型研究、长上下文工程、安全工作、产品设计上的克制和开发者工具，都在产品中得到了体现。Artifacts 让输出内容更便于检查和完善，Claude Code 将 Claude 带入真实的开发工作流，MCP 则为生态系统提供了一种将模型连接到工具和数据的通用语言。
+
+Anthropic 的团队推动了整个生态系统的发展。Claude 让细致分析、可编辑输出、智能体式编程以及工具/数据连接成为 AI 工作流程中自然的组成部分，也展现了专注于模型与产品的体验可以达到怎样的高度。当团队希望将 Claude 与自己的模型、知识、工具和工作流结合使用时，Open WebUI 可以很好地与其配合。
+
+商业产品 · 提供免费套餐
+
+---
+
+## Claude 的优势 {#what-claude-does-well}
+
+- **写作和推理**，提供周到、细腻的回答和细致的分析
+- **扩展思考**，实时展示复杂问题的逐步推理过程
+- **大上下文窗口**，最高支持 20 万 token，可处理大型文档和代码库
+- **Artifacts**，在对话旁提供交互式输出（代码、文档、可视化内容）
+- **Claude Code**，直接在终端中进行智能体式编程
+- **计算机操作**，让 Claude 能够与桌面应用程序和 Web 界面交互
+- **MCP（模型上下文协议）**，由 Anthropic 创建，用于规范 AI 工具与数据源的连接方式
+- **安全优先的设计**，采用 Anthropic 的宪法式 AI 方法
+- **出色的代码能力**，擅长代码生成、审查和调试
+- **项目**，通过持久上下文和指令整理对话
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，提供由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)，以同样的方式驱动 Claude 和其他所有模型
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **任意模型，一个界面**，让你可以将 Claude 与 GPT-5.6、Gemini 和本地模型结合使用
+- **自托管**，平台本身在你的基础设施上运行
+- **知识与 RAG**，通过高级检索构建持久知识库
+- **团队平台**，提供频道、笔记、自动化、RBAC、SSO/OIDC/LDAP 和 SCIM 2.0
+- **Open Terminal**，提供完整的沙箱计算环境
+- **免费社区版**，在你自己的基础设施上支持不限数量的用户
+
+---
+
+## 一览 {#at-a-glance}
+
+| | Open WebUI | Claude |
+| :--- | :--- | :--- |
+| **模型** | 来自任意服务提供方的任意模型 | Anthropic 的 Claude 模型系列 |
+| **扩展思考** | 支持提供该功能的模型（包括通过 API 使用的 Claude） | 原生扩展思考 |
+| **上下文窗口** | 取决于你连接的模型 | 最高 20 万 token |
+| **知识与 RAG** | 13 种向量数据库、8 种提取引擎、混合搜索 | 具有持久上下文的项目 |
+| **代码执行** | 浏览器内 Python + Open Terminal | 具有交互式代码的 Artifacts |
+| **数据** | 自托管，使用你的基础设施 | 由 Anthropic 托管在云端 |
+| **定价** | 免费社区版；提供企业套餐 | 免费套餐以及 Pro、Team 和 Enterprise 套餐 |
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你希望获得出色的写作和推理体验，请选择 Claude**，它尤其适用于长上下文工作、代码审查或细致分析。扩展思考模式在复杂问题上表现尤为出色。Claude Code 和计算机操作拓展了 AI 自主完成任务的能力边界。
+
+**如果你想在一个界面中将 Claude 与其他模型结合使用、构建持久知识库，或需要团队协作功能，请选择 Open WebUI。**Open WebUI 也支持通过 API 使用 Claude 的扩展思考。
+
+**两者结合使用。**将 Open WebUI 连接到 Anthropic API，用 Claude 进行深度分析，用 GPT-5.6 处理其他任务，并将隐私敏感工作交给本地模型。需要 Artifacts、项目或计算机操作时，直接使用 claude.ai。
+
+---
+
+## 通过 Open WebUI 使用 Claude {#use-claude-through-open-webui}
+
+你可以通过 Anthropic API 在 Open WebUI 中使用 Claude 模型。许多 Open WebUI 用户将 Claude 作为主要模型，在获得 Claude 推理能力的同时，使用 Open WebUI 的知识库、工具和团队功能。
+
+**连接方法：**
+
+1. 从 [console.anthropic.com](https://console.anthropic.com/) 获取 API 密钥
+2. 在 Open WebUI 中，前往**设置 → 连接**（管理员区域）
+3. 使用你的 Anthropic API 密钥和基础 URL `https://api.anthropic.com/v1` 添加新连接
+4. Claude 模型将显示在模型选择器中
+
+你可以用 Claude 进行复杂分析和写作，同时通过 Ollama 将较简单的任务路由到本地模型，一切都在同一个界面中完成。
+
+---
+
+*Claude 提高了细致写作、长上下文工作、智能体式编程和工具标准的标杆。Open WebUI 让团队能够在管理模型、知识、工具和工作流的同一平台中使用 Claude。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**我可以自托管 Claude 吗？**
+无法自托管 Claude 本身，但你可以通过 Anthropic API 在 Open WebUI 中使用 Claude 模型。Open WebUI 本身在你的基础设施上运行，但 API 调用仍会发送至 Anthropic。
+
+**我可以在 Open WebUI 中使用 Claude 吗？**
+可以。在设置中添加你的 Anthropic API 密钥后，Claude 模型就会显示在模型选择器中。
+
+**我可以将 Claude 和 ChatGPT 结合使用吗？**
+可以，Open WebUI 支持同时连接多个服务提供方。
+
+**Open WebUI 支持 Claude 的扩展思考吗？**
+支持。对于提供扩展思考功能的模型，Open WebUI 均支持该功能，包括通过 Anthropic API 使用的 Claude。
+
+
+---
+
+**相关内容：**[Open WebUI 与 ChatGPT](/alternatives/chatgpt) · [Open WebUI 与 Gemini](/alternatives/gemini) · [Open WebUI 与 Ollama](/alternatives/ollama)

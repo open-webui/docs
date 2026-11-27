@@ -1,0 +1,266 @@
+---
+sidebar_position: 2
+title: "函数"
+---
+
+# 函数
+
+:::danger 严重安全警告
+**函数会在你的服务器上执行任意 Python 代码。** 只有管理员可以创建函数。请仅从可信来源安装，并在导入前审查代码。恶意函数可能访问你的文件系统、窃取数据或危及整个系统。完整说明请参阅[插件安全警告](/features/extensibility/plugin/)。
+:::
+
+函数是用于扩展 Open WebUI 自身能力的**模块化 Python 插件**。[工具](/features/extensibility/plugin/tools/)让 LLM 能够在推理期间调用外部 API，而函数则能在更深层改变平台的行为。它们可以添加由任意 Python 逻辑驱动的全新“模型”，拦截并转换流经系统的每条消息，或直接在聊天界面中放置交互按钮。
+
+函数可以实现广泛的功能：连接专有 AI 服务提供方、构建可响应自然语言的智能家居控制器、创建数据库查询界面、为每次对话添加实时翻译、执行合规策略、根据数据生成图表，或通过点击按钮触发外部工作流。只要能使用 Python 编写，就可以将其变为函数。
+
+函数以 Python 源代码的形式存储在数据库中，在运行时动态加载，并在服务器端执行。管理员负责创建和管理函数；普通用户与函数产生的结果交互。
+
+---
+
+## 函数类型 {#function-types}
+
+Open WebUI 支持四种类型的函数。系统会根据 Python 代码中的类名**自动检测**类型，因此无需手动配置。
+
+| 类型 | 类名 | 作用 | 用户看到的形式 |
+|:-----|:-----------|:-------------|:-----------------|
+| **Pipe** | `class Pipe` | 添加自定义模型或智能体 | 在聊天侧边栏中显示为可选模型 |
+| **Filter** | `class Filter` | 拦截流向模型或从模型返回的数据 | 作为中间件在现有模型上透明运行 |
+| **Action** | `class Action` | 为消息添加交互按钮 | 在聊天消息上显示为可点击按钮 |
+| **Event** | `class Event` | 响应系统事件并运行自定义逻辑 | 在后台运行，没有直接的用户界面 |
+
+### Pipe 函数 {#pipe-functions}
+
+Pipe 会在 Open WebUI 中将自身注册为一个新“模型”。用户选择它并发送消息后，`pipe()` 方法会处理整个请求，无需 LLM 后端。因此，Pipe 的用途非常广泛：
+
+- **模型服务提供方**：集成不遵循 OpenAI 协议的 API（Anthropic 原生 API、Google Vertex、自定义推理服务器）。
+- **智能体与工作流**：构建能够调用工具、搜索 Web 并跨多个轮次进行推理的多步骤智能体。
+- **非 LLM 接口**：创建智能家居控制器、数据库查询工具、搜索引擎、计算器或代码执行器。任何接收用户输入并返回响应的功能均可实现。
+- **代理与路由器**：通过自己的逻辑路由请求，并添加缓存、负载均衡或成本跟踪。
+
+单个 Pipe 还可以通过定义 `pipes()` 方法公开**多个模型**（称为“manifold”）。该方法返回一个 `{"id": ..., "name": ...}` 字典列表，每个模型对应一个字典。
+
+→ **[Pipe 函数指南](/features/extensibility/plugin/functions/pipe)**
+
+### Filter 函数 {#filter-functions}
+
+Filter 位于用户与模型之间，在三个阶段拦截数据：
+
+- **`inlet()`**：在请求到达模型**之前**修改请求（添加上下文、清理输入、检测语言、实施速率限制、估算 token 成本）。
+- **`stream()`**：实时拦截模型返回的**流式数据块**（审查内容、替换术语、跟踪 token 用量）。
+- **`outlet()`**：在响应生成**之后**处理完整响应（记录到可观测性平台、格式化引用、附加免责声明、缓存响应）。
+
+Filter 无需修改底层模型，即可实现实时翻译、内容审核、提示词注入检测、A/B 测试、合规日志和 PII 脱敏等强大的横切功能。
+
+Filter 可以全局应用（作用于所有模型），也可以附加到特定模型。可切换的 Filter 允许用户按聊天启用或禁用。
+
+→ **[Filter 函数指南](/features/extensibility/plugin/functions/filter)**
+
+### Action 函数 {#action-functions}
+
+Action 会向聊天消息工具栏添加自定义按钮。用户点击按钮后，`action()` 方法会运行，并可完整访问事件系统，以提供实时界面反馈、用户提示和确认。
+
+Action 可以完成 Python 能做的任何事情：总结或翻译消息、复制格式化输出、置顶重要消息、将对话导出到外部系统、触发 CI/CD 流水线、发送 Slack 通知、生成 PDF 报告、运行代码片段，或启动外部工作流。
+
+→ **[Action 函数指南](/features/extensibility/plugin/functions/action)**
+
+### Event 函数 {#event-functions}
+
+*Open WebUI 0.10.0 新增。*
+
+Event 函数会响应**系统事件**（用户注册、聊天被删除、服务器启动、配置更改）并运行自定义 Python。每次发生事件时都会调用其 `event()` 方法，并根据事件名称进行筛选。Event 函数可以注册自己的 API 端点并调用内部服务，因此适用于生命周期自动化、审计日志、注册限制、资源预配和自安装插件。
+
+→ **[Event 函数指南](/features/extensibility/plugin/functions/event)**
+
+---
+
+## 函数的工作方式 {#how-functions-work}
+
+### 类型检测 {#type-detection}
+
+保存函数时，Open WebUI 会加载 Python 源代码，并按顺序查找名为 `Pipe`、`Filter`、`Action` 或 `Event` 的顶层类。找到的第一个类决定函数类型，因此同时定义 `Pipe` 和 `Filter` 的文件会被识别为 Pipe。类型会从代码推断，无需手动设置。
+
+```
+# 此类会被检测为 Pipe 函数：
+class Pipe:
+    async def pipe(self, body: dict) -> str:
+        return "Hello from my custom model!"
+
+# 此类会被检测为 Filter 函数：
+class Filter:
+    async def inlet(self, body: dict) -> dict:
+        return body
+```
+
+### 模块加载与缓存 {#module-loading--caching}
+
+Python 源代码通过 `exec()` 加载到临时模块命名空间中。加载后，模块会缓存在内存中（`request.app.state.FUNCTIONS`），只有源代码发生变化时才会重新加载。加载时会重写四个旧版导入前缀：`from utils`、`from apps`、`from main` 和 `from config`，分别添加 `open_webui.` 前缀。重写是对整个文件执行的纯文本替换，因此文档字符串和提示词文本中的这些字符串也会被更改。创建或保存函数时会存储重写后的源代码；加载函数时，会对将要运行的代码应用重写，而保留已存储的源代码不变。
+
+### 函数加载失败时 {#when-a-function-fails-to-load}
+
+如果代码在执行时抛出异常，函数就会加载失败，例如语法错误、`import` 失败、构造类时抛出异常，或文件中没有 `Pipe`、`Filter`、`Action` 或 `Event` 类。
+
+- **在编辑器中保存**会先执行新代码，再存储。加载失败的代码会被拒绝：Python 错误显示在编辑器中，新源代码不会写入，已保存的版本保持激活并继续运行。修正代码后重新保存即可。`requirements` 安装失败也会以同样方式被拒绝。
+- **在编辑器之外**，每次加载模块时都会再次执行代码，例如重启后。如果执行失败，Open WebUI 会将函数切换为**非激活**状态，避免每次请求都失败，并记录 `Error loading module: <function id>: <the error>`。常见原因是某个包曾手动安装到容器中，却未加入 `requirements`，重启后该包便不存在了。修正代码后，在 **Admin Panel（管理员面板）> Functions（函数）**中重新启用函数。
+
+### Frontmatter（前置元数据） {#frontmatter}
+
+文件顶部的三引号文档字符串会作为 YAML frontmatter 解析，用于提供元数据：
+
+```python
+"""
+title: My Custom Function
+author: your_name
+author_url: https://github.com/your_name
+version: 1.0.0
+icon_url: https://example.com/icon.svg
+required_open_webui_version: 0.4.0
+requirements: requests, beautifulsoup4
+"""
+```
+
+| 字段 | 用途 |
+|:------|:--------|
+| `title` | 管理界面中的显示名称 |
+| `author` / `author_url` | 作者署名元数据 |
+| `version` | 版本标识符 |
+| `icon_url` | 显示在函数名称旁的图标（使用 URL，不要使用 base64） |
+| `required_open_webui_version` | 兼容的最低 Open WebUI 版本 |
+| `requirements` | 需要自动安装的 pip 包，以逗号分隔 |
+
+:::tip 自动安装依赖
+在 frontmatter 中指定 `requirements` 后，Open WebUI 会在函数首次加载时通过 `pip` 自动安装列出的包。此行为由 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) 环境变量控制（默认启用）。
+:::
+
+---
+
+## 安装函数 {#installing-functions}
+
+### 从社区库安装 {#from-the-community-library}
+
+1. 浏览[社区函数库](https://openwebui.com/search)。
+2. 在所需函数上点击 **Get（获取）**。
+3. 输入你的 Open WebUI 实例 URL（例如 `http://localhost:3000`）。
+4. 点击 **Import to Open WebUI（导入到 Open WebUI）**。系统会将你重定向到函数编辑器。
+5. 审查代码，然后点击 **Save（保存）**。
+
+:::warning
+导入前务必审查源代码。社区函数由用户贡献，并且会**直接在你的服务器上运行**。
+:::
+
+### 从 URL 安装 {#from-a-url}
+
+1. 前往 **Admin Panel（管理员面板）> Functions（函数）**。
+2. 点击 **Import from URL（从 URL 导入）**，粘贴 Python 文件的链接。
+   - GitHub URL 会自动转换为原始文件 URL。
+3. 审查并保存。
+
+### 手动创建 {#create-manually}
+
+1. 前往 **Admin Panel（管理员面板）> Functions（函数）**。
+2. 点击 **Create（创建）**。
+3. 输入 ID（仅限字母、数字和下划线）、名称和描述。
+4. 在编辑器中编写 Python 代码。
+5. 点击 **Save（保存）**。系统会根据代码自动检测函数类型。
+
+---
+
+## 管理函数 {#managing-functions}
+
+### 管理员控件 {#admin-controls}
+
+函数通过 **Admin Panel（管理员面板）> Functions（函数）**管理。当 [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) 设置为 `False` 时，该页面会隐藏。每个函数都有以下控件：
+
+| 控件 | 描述 |
+|:--------|:-----------|
+| **Active（激活）开关** | 启用或禁用函数。禁用的函数不会加载或执行。 |
+| **Global（全局）开关** | 启用后，函数会自动应用于**所有模型**。适用于 Filter 和 Action。 |
+| **Valves**（齿轮图标） | 打开此函数可由管理员配置的设置。 |
+| **Export / Delete（导出/删除）** | 将函数导出为文件或将其删除。 |
+
+### 通过 API 激活 {#activation-via-api}
+
+这些端点要求管理员权限。成功调用 `POST /api/v1/functions/create` 会创建一个 `is_active: false` 且 `is_global: false` 的函数。
+
+| 端点 | 结果 |
+|:---------|:-------|
+| `GET /api/v1/functions/id/{id}` | 返回函数，包括其当前的 `is_active` 和 `is_global` 值。 |
+| `POST /api/v1/functions/id/{id}/toggle` | 切换 `is_active`，并返回更新后的函数。 |
+| `POST /api/v1/functions/id/{id}/toggle/global` | 切换 `is_global`，并返回更新后的函数。 |
+
+仅当当前值与目标值不同时才调用切换端点。如果请求超时，请先读取当前状态，再决定是否重试。对于已激活的 Filter，Global 标志控制它可用于哪些模型。[用户可切换的 Filter](/features/extensibility/plugin/functions/filter#toggleable-filters-making-filters-user-controllable-selftoggle) 还要求在聊天请求中选中它。
+
+### 版本历史 {#version-history}
+
+函数的版本历史工作方式与工具相同：**Back（返回）**旁提供版本选择器、**Compare to current（与当前版本比较）**、**Set as Production（设为生产版本）**和 **Delete（删除）**。详细说明请参阅[版本历史](/features/extensibility/plugin/tools#version-history)。对于函数：
+
+- 只有管理员可以打开和更改版本。
+- **Production（生产版本）**是当前运行的版本。
+- Valves 以及 **Active（激活）**和 **Global（全局）**开关属于函数本身，切换版本时会保留当前值。如果当前 Valves 与旧版本代码不匹配，系统会拒绝将其设为生产版本，并显示 **Current Valves are incompatible with this code（当前 Valves 与此代码不兼容）**，正在运行的版本保持不变。
+
+相同操作也可通过仅限管理员的 API 执行：`GET /api/v1/functions/id/{id}/history`（使用 `?page=` 分页）、`GET /api/v1/functions/id/{id}/history/{history_id}`、`GET /api/v1/functions/id/{id}/history/diff?from_id=...&to_id=...`、`DELETE /api/v1/functions/id/{id}/history/{history_id}`，以及使用 `{"version_id": "..."}` 调用 `POST /api/v1/functions/id/{id}/update/version`。通过 `POST /api/v1/functions/id/{id}/update` 保存时，可传入可选的 `commit_message`。
+
+### 翻译函数 {#translating-a-function}
+
+函数编辑器中的地球仪选择器可为每种语言存储名称、描述、Valve 标签和各个 Action 的标签，使回复下方的 Action 按钮能够以用户自己的语言显示。请参阅[翻译](/features/administration/translations)。
+
+### 将函数分配给特定模型 {#assigning-functions-to-specific-models}
+
+除了将 Filter 或 Action 设为全局，也可以将其附加到特定模型：
+
+1. 前往 **Workspace（工作区）→ Models（模型）**。
+2. 编辑目标模型。
+3. 在 **Filters（过滤器）**或 **Actions（操作）**部分，选择要附加的函数。
+
+这样，不同模型可以使用不同的 Filter。例如，可以仅对面向公众的模型应用内容审核 Filter。
+
+### 可切换的 Filter {#toggleable-filters}
+
+在 `__init__` 中设置 `self.toggle = True`，即可让用户切换 Filter。启用可切换功能后，用户会在聊天输入区域看到开关，并可按对话启用或禁用 Filter。没有 `self.toggle` 的 Filter 在激活后始终运行。
+
+---
+
+## Valves 与 UserValves {#valves--uservalves}
+
+函数支持基于 [Pydantic](https://docs.pydantic.dev/) 的两级配置系统：
+
+| 级别 | 类名 | 配置者 | 位置 |
+|:------|:-----------|:---------------|:------|
+| **管理员** | `Valves` | 仅管理员 | Admin Panel（管理员面板）> Functions（函数）> |
+| **用户** | `UserValves` | 任意用户 | 聊天界面，按函数配置 |
+
+**Valves** 非常适合 API 密钥、模型端点和全局行为设置。**UserValves** 允许各个用户自定义行为，例如首选语言、输出格式或个人 API 密钥。
+
+两者都定义为 `Pipe`、`Filter` 或 `Action` 类内部的嵌套 Pydantic `BaseModel` 类。`Event` 类也可以包含 `Valves`，但不能包含 `UserValves`，因为事件处理程序运行时没有用户上下文。管理员配置的值存储在数据库中，并在运行时自动加载。当 Valves 包含机密时，管理员可以[对其进行静态加密](/features/extensibility/plugin/development/valves#encrypting-valve-values-at-rest)。
+
+→ **[Valves 开发指南](/features/extensibility/plugin/development/valves)**
+
+---
+
+## 函数与工具：如何选择 {#functions-vs-tools-when-to-use-which}
+
+| 使用场景 | 应使用 | 原因 |
+|:---------|:---------|:----|
+| 让 LLM 访问实时数据（天气、股票、API） | **工具** | 工具由模型在推理期间调用 |
+| 添加使用非 OpenAI API 的模型服务提供方 | **Pipe 函数** | Pipe 会在侧边栏中注册为模型 |
+| 构建非 LLM 接口（搜索、数据库、智能家居） | **Pipe 函数** | Pipe 无需 LLM 即可处理整个请求 |
+| 构建具有自定义逻辑的多步骤智能体 | **Pipe 函数** | Pipe 控制完整的请求/响应周期 |
+| 实时翻译、审核或脱敏内容 | **Filter 函数** | Filter 会透明地拦截每条消息 |
+| 将请求记录到可观测性平台 | **Filter 函数** | Inlet/outlet Filter 能看到所有流量 |
+| 实施速率限制或使用策略 | **Filter 函数** | Inlet Filter 可以在请求到达模型前将其拒绝 |
+| 添加用于导出、总结或分享消息的按钮 | **Action 函数** | Action 显示在消息工具栏中 |
+| 从聊天界面触发外部工作流 | **Action 函数** | Action 在点击时运行任意 Python |
+
+---
+
+## 开发资源 {#development-resources}
+
+| 指南 | 描述 |
+|:------|:-----------|
+| [Pipe 函数指南](/features/extensibility/plugin/functions/pipe) | 构建自定义模型、智能体和非 LLM 接口 |
+| [Filter 函数指南](/features/extensibility/plugin/functions/filter) | 拦截、翻译、审核和记录消息 |
+| [Action 函数指南](/features/extensibility/plugin/functions/action) | 添加用于导出、工作流和交互任务的按钮 |
+| [Event 函数指南](/features/extensibility/plugin/functions/event) | 响应系统事件并运行自定义逻辑 |
+| [Valves](/features/extensibility/plugin/development/valves) | 通过管理员和用户设置配置函数 |
+| [事件](/features/extensibility/plugin/development/events) | 向界面发送实时更新 |
+| [保留参数](/features/extensibility/plugin/development/reserved-args) | `__user__`、`__event_emitter__`、`__metadata__` 等 |
+| [富界面](/features/extensibility/plugin/development/rich-ui) | 在响应中嵌入交互式 HTML/JS 内容 |

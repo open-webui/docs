@@ -31,6 +31,16 @@ assert.equal(
 	"setup"
 );
 assert.equal(
+	analytics.docsPageProperties("/zh-Hans/getting-started/quick-start/")
+		.page_group,
+	"setup"
+);
+assert.equal(
+	analytics.docsPageProperties("/zh-Hans/getting-started/quick-start/")
+		.doc_section,
+	"getting-started"
+);
+assert.equal(
 	analytics.docsPageProperties("/enterprise/security").page_group,
 	"evaluation"
 );
@@ -114,6 +124,13 @@ const code = {
 assert.equal(
 	analytics.setupMethod(code, "/getting-started/quick-start/"),
 	"compose"
+);
+const localizedCode = {
+	closest: () => ({ querySelector: () => ({ textContent: "桌面版" }) }),
+};
+assert.equal(
+	analytics.setupMethod(localizedCode, "/zh-Hans/getting-started/quick-start/"),
+	"desktop"
 );
 assert.equal(
 	analytics.setupMethod(code, "/reference/env-configuration"),

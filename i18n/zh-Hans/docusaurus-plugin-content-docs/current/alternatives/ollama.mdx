@@ -1,0 +1,119 @@
+---
+sidebar_position: 1
+title: "Open WebUI 与 Ollama"
+sidebar_label: "Open WebUI 与 Ollama"
+description: "Open WebUI 和 Ollama 如何协同工作：广受欢迎的本地 AI 组合，附设置指南和客观对比。"
+keywords: ["Open WebUI 与 Ollama 对比", "Ollama 替代方案", "Ollama 前端", "最佳 Ollama UI", "Ollama Web 界面", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "我可以将 Ollama 与 Open WebUI 结合使用吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。Open WebUI 原生集成 Ollama，并在两者运行于同一台计算机时自动检测，无需配置。"}},
+    {"@type": "Question", "name": "Ollama 免费吗？", "acceptedAnswer": {"@type": "Answer", "text": "免费。Ollama 采用 MIT 许可证，个人和商业使用均免费。"}},
+    {"@type": "Question", "name": "Ollama 和 Open WebUI 如何协同工作？", "acceptedAnswer": {"@type": "Answer", "text": "Ollama 负责运行和管理模型。Open WebUI 可以作为 Web 界面，还提供知识库、团队功能和扩展性等能力。大多数人会将两者结合使用。"}},
+    {"@type": "Question", "name": "使用 Open WebUI 需要 Ollama 吗？", "acceptedAnswer": {"@type": "Answer", "text": "不需要。Open WebUI 支持任意与 OpenAI 兼容的 API，包括 llama.cpp、LM Studio、OpenAI、Anthropic、Google 等。Ollama 是一个受欢迎的选择，但并非必需。"}}
+  ]
+})}</script>
+</Head>
+
+# Open WebUI 与 Ollama
+
+*最后更新：2026 年 8 月*
+
+[Ollama](https://ollama.com/) 让数百万人真正领略了本地 AI 的魅力，没有它，Open WebUI 也不会发展到今天。一条命令安装，一条命令运行，你就能与模型聊天。桌面应用包含内置聊天界面，CLI 快速直观，背后的团队也在持续交付新成果。我们非常喜欢这个项目。
+
+[GitHub](https://github.com/ollama/ollama) · [MIT 许可证](https://github.com/ollama/ollama/blob/main/LICENSE)
+
+---
+
+## Ollama 的优势 {#what-ollama-does-well}
+
+- **极其简单**，可在数秒内安装并运行模型
+- **带内置聊天的桌面应用**，提供完整的独立使用体验
+- **庞大的模型库**，可从 Ollama 注册表下载数百种模型
+- **Modelfile**，通过系统提示词、参数和适配器自定义模型
+- **出色的性能**，针对消费级硬件（Metal、CUDA、CPU）优化，支持自动 GPU 层拆分
+- **与 OpenAI 兼容的 API**，可作为许多工具和应用程序的后端
+- **并发模型加载**，可同时运行多个模型
+- **跨平台**，支持 macOS、Linux、Windows 和 Docker
+- **积极开发**，迭代快速，团队响应及时
+- **采用 MIT 许可证**
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，基于你的本地模型运行，具有由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **功能丰富的 Web 界面**，提供完整的聊天、对话、历史记录、搜索和整理功能
+- **知识与 RAG**，提供 13 种向量数据库、8 种提取引擎和混合搜索
+- **多服务提供方支持**，可将 Ollama 与 OpenAI、Anthropic、Google 等结合使用
+- **团队平台**，提供频道、笔记、自动化、RBAC、SSO/OIDC/LDAP 和 SCIM 2.0
+- **Open Terminal**，为代码执行提供完整的沙箱计算环境
+- **模型智能体**，可按模型设置自定义指令、绑定工具和知识
+
+---
+
+## 搭配使用更出色 {#better-together}
+
+Ollama 和 Open WebUI 是本地 AI 生态系统中广受欢迎的组合。Ollama 管理你的模型并提供模型服务；Open WebUI 在此基础上增加具有知识管理、团队功能和扩展性的 Web 平台。
+
+```bash
+# 最常见的 Open WebUI 设置
+ollama pull muse-glimmer:30b-q4_K_M
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data --name open-webui \
+  ghcr.io/open-webui/open-webui:main
+```
+
+当 Open WebUI 与 Ollama 运行在同一台计算机上时，会自动检测 Ollama。你的所有 Ollama 模型都会立即显示在模型选择器中，无需配置。
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你希望以最快的方式在本地运行模型，请使用 Ollama。**CLI 和桌面应用本身就很适合快速交互、编写脚本和开发。
+
+**如果你需要具有知识库、团队功能、持久对话的 Web 界面，或希望在使用本地模型的同时连接云端服务提供方，请添加 Open WebUI。**
+
+**大多数人会同时使用两者。**Ollama 负责模型层，Open WebUI 负责平台层。它们会相互自动检测，开箱即用。
+
+---
+
+## 其他优秀的 Ollama 前端 {#other-great-ollama-frontends}
+
+Ollama 的 OpenAI 兼容 API 意味着它可以与许多工具配合使用。如果 Open WebUI 不适合你的偏好，其他适合与 Ollama 搭配的项目包括：
+
+- [**LibreChat**](/alternatives/librechat)，用于支持模型比较的多服务提供方聊天
+- [**AnythingLLM**](/alternatives/anythingllm)，用于基于工作区的文档问答
+
+---
+
+*Ollama 让本地 AI 变得简单，Open WebUI 在此基础上构建。两者共同帮助数百万人在自己的硬件上运行 AI。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**我可以将 Ollama 与 Open WebUI 结合使用吗？**
+可以。Open WebUI 原生集成 Ollama，并在两者运行于同一台计算机时自动检测，无需配置。
+
+**Ollama 免费吗？**
+免费。Ollama 采用 MIT 许可证，个人和商业使用均免费。
+
+**Ollama 和 Open WebUI 如何协同工作？**
+Ollama 负责运行和管理模型。Open WebUI 可以作为 Web 界面，还提供知识库、团队功能和扩展性等能力。大多数人会将两者结合使用。
+
+**使用 Open WebUI 需要 Ollama 吗？**
+不需要。Open WebUI 支持任意与 OpenAI 兼容的 API，包括 llama.cpp、LM Studio、OpenAI、Anthropic、Google 等。Ollama 是一个受欢迎的选择，但并非必需。
+
+---
+
+**相关内容：**[Open WebUI 与 llama.cpp](/alternatives/llama-cpp) · [Open WebUI 与 LM Studio](/alternatives/lm-studio) · [Open WebUI 与 Jan](/alternatives/jan)

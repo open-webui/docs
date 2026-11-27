@@ -1,0 +1,224 @@
+---
+sidebar_position: 2
+title: "快速开始"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+
+import DockerCompose from './tab-docker/DockerCompose.md';
+import Extension from './tab-docker/DockerDesktopExtension.md';
+import Podman from './tab-docker/Podman.md';
+import PodmanQuadlet from './tab-docker/PodmanQuadlet.md';
+import PodmanKubePlay from './tab-docker/PodmanKubePlay.md';
+import ManualDocker from './tab-docker/ManualDocker.md';
+import DockerSwarm from './tab-docker/DockerSwarm.md';
+import WSL from './tab-docker/WSL.md';
+import DockerUpdating from './tab-docker/DockerUpdating.md';
+import Helm from './tab-kubernetes/Helm.md';
+import Venv from './tab-python/Venv.md';
+import Pip from './tab-python/Pip.md';
+import Uv from './tab-python/Uv.md';
+import Conda from './tab-python/Conda.md';
+import PythonUpdating from './tab-python/PythonUpdating.md';
+import PythonCompat from './tab-python/_PythonCompat.md';
+
+# 快速开始 {#quick-start}
+
+在你的计算机上运行 Open WebUI。从下方选择你偏好的方式。
+
+Open WebUI 支持 **macOS、Linux**（x86_64 和 ARM64，包括 Raspberry Pi 和 NVIDIA DGX Spark）以及 **Windows**。通过 pip、uv 或 Conda 在 Windows 上原生安装适合个人使用。生产环境请在 **Linux** 上运行 Open WebUI。
+
+- **Docker：** 官方支持，推荐大多数用户使用。需要安装 [Docker](https://docs.docker.com/get-docker/)。
+- **Python：** 适用于资源受限的环境或手动部署
+- **Kubernetes：** 适合需要扩缩容和编排的企业部署
+
+<Tabs>
+  <TabItem value="docker" label="Docker">
+    <Tabs>
+      <TabItem value="docker" label="Docker">
+        <div className='mt-5'>
+          <ManualDocker />
+          <DockerUpdating />
+        </div>
+      </TabItem>
+
+      <TabItem value="compose" label="Docker Compose">
+        <div className='mt-5'>
+          <DockerCompose />
+        </div>
+      </TabItem>
+
+      <TabItem value="extension" label="扩展">
+        <div className='mt-5'>
+          <Extension />
+        </div>
+      </TabItem>
+
+      <TabItem value="podman" label="Podman">
+        <div className='mt-5'>
+          <Podman />
+        </div>
+      </TabItem>
+
+      <TabItem value="podman-quadlet" label="Quadlets">
+        <div className='mt-5'>
+          <PodmanQuadlet />
+        </div>
+      </TabItem>
+
+    <TabItem value="podman-kube-play" label="Kube Play">
+      <div className='mt-5'>
+        <PodmanKubePlay />
+      </div>
+    </TabItem>
+
+      <TabItem value="swarm" label="Swarm">
+        <div className='mt-5'>
+          <DockerSwarm />
+        </div>
+      </TabItem>
+      <TabItem value="wsl" label="WSL">
+        <div className='mt-5'>
+          <WSL />
+        </div>
+      </TabItem>
+    </Tabs>
+
+  </TabItem>
+  <TabItem value="python" label="Python">
+    <PythonCompat />
+    <Tabs>
+      <TabItem value="pip" label="pip">
+        <div className='mt-5'>
+          <Pip />
+        </div>
+        <PythonUpdating />
+      </TabItem>
+
+      <TabItem value="uv" label="uv">
+        <div className='mt-5'>
+          <Uv />
+        </div>
+        <PythonUpdating />
+      </TabItem>
+
+      <TabItem value="conda" label="Conda">
+        <div className='mt-5'>
+          <Conda />
+        </div>
+        <PythonUpdating />
+      </TabItem>
+
+      <TabItem value="venv" label="Venv">
+        <div className='mt-5'>
+          <Venv />
+        </div>
+        <PythonUpdating />
+
+      </TabItem>
+
+    </Tabs>
+  </TabItem>
+
+  <TabItem value="kubernetes" label="Kubernetes">
+    <Tabs>
+      <TabItem value="helm" label="Helm">
+        <Helm />
+      </TabItem>
+    </Tabs>
+  </TabItem>
+
+  <TabItem value="desktop" label="桌面版">
+
+### 桌面应用 {#desktop-app}
+
+从 [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop) 下载桌面应用。它无需 Docker 或手动配置，即可在你的系统上原生运行 Open WebUI。
+
+:::info
+生产环境请通过 **Docker** 或 **Python** 安装。
+:::
+
+  </TabItem>
+
+  <TabItem value="third-party" label="第三方">
+    <Tabs>
+      <TabItem value="pinokio-computer" label="Pinokio.computer">
+        <h3 id="pinokiocomputer-installation">Pinokio.computer 安装</h3>
+
+        如需通过 Pinokio.computer 安装，请访问其网站：
+
+        [https://pinokio.computer/](https://pinokio.computer/)
+
+        此安装方式的支持由其网站提供。
+      </TabItem>
+    </Tabs>
+  </TabItem>
+</Tabs>
+
+---
+
+## 打开 Open WebUI {#open-it}
+
+Docker：[http://localhost:3000](http://localhost:3000)。Python 和桌面应用：[http://localhost:8080](http://localhost:8080)。首次启动需要约一分钟。
+
+页面无法加载？运行 `docker logs -f open-webui`（使用 Compose 时运行 `docker compose logs -f`），等待出现 `Application startup complete`。如果始终没有出现，请参阅[启动与 Docker 故障](/troubleshooting/startup)。端口已被占用时，更改 `-p 3000:8080` 中左侧的数字；使用 Python 时，运行 `open-webui serve --port 9999`。
+
+## 创建管理员账户 {#create-the-admin-account}
+
+首个界面会显示 **开始使用 Open WebUI（Get started with Open WebUI）**，并提供 **创建管理员账户（Create Admin Account）** 选项。第一个账户就是管理员：它可管理用户和所有实例级设置。包括此登录信息在内的所有数据都保存在你自己的卷中。
+
+管理员账户创建后，注册功能会自动关闭。若要允许其他人加入，请在你的头像 > **设置 > 身份验证（Settings > Authentication）**（管理员部分）下开启 **新用户注册（New Sign Ups）**；新账户随后会处于 **待批准（Pending）** 状态，直到你在管理员面板中批准。请记下管理员密码：丢失后你将无法访问实例设置，请参阅[重置管理员密码](/troubleshooting/password-reset)。
+
+:::note 两个设置区域
+你的头像 > **设置（Settings）** 中的个人设置仅属于你（主题、语言）。其中的 **管理员（Admin）** 部分适用于整个实例。[了解设置](/getting-started/quick-start/settings)介绍了二者的区别。
+:::
+
+## 连接模型服务提供方 {#connect-a-model-provider}
+
+Open WebUI 本身不附带模型。前往你的头像 > **设置 > 连接（Settings > Connections）**（管理员部分）。
+
+**本机运行着 Ollama？** Docker 会通过 `http://host.docker.internal:11434` 自动检测到它（这正是第 1 步中 `--add-host` 的用途），Python 则会通过 `http://localhost:11434` 自动检测；连接会显示在 **管理 Ollama API 连接（Manage Ollama API Connections）** 下。作为管理员，在新聊天的模型选择器中输入模型名称并确认拉取，即可下载模型。Ollama 位于另一台机器时，使用 `-e OLLAMA_BASE_URL=http://server:11434`，或在连接中设置 URL。
+
+**有来自 OpenAI、Anthropic 或任何 OpenAI 兼容服务提供方的 API 密钥？** 点击 **管理 OpenAI API 连接（Manage OpenAI API Connections）** 旁的 **+**，输入服务提供方 URL（OpenAI：`https://api.openai.com/v1`）和你的密钥，然后点击 **保存（Save）**。系统会自动列出模型。
+
+指南：[Ollama](/getting-started/quick-start/connect-a-provider/starting-with-ollama) · [OpenAI](/getting-started/quick-start/connect-a-provider/starting-with-openai) · [Anthropic](/getting-started/quick-start/connect-a-provider/starting-with-anthropic) · [OpenAI 兼容 API 和本地服务器](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible) · [所有服务提供方](/getting-started/quick-start/connect-a-provider)
+
+:::tip 模型列表为空？
+当 Open WebUI 在 Docker 中运行时，宿主机上的 Ollama 必须监听 `0.0.0.0`：[连接 Ollama 服务器](/troubleshooting/connection-error#connection-to-ollama-server)。对于 API 服务提供方，请检查 URL 和密钥；有些服务提供方不发布模型列表，需要在连接的 **模型 ID（Model IDs）** 下输入模型 ID：[OpenAI 兼容服务提供方](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)。
+:::
+
+## 发送第一条消息 {#send-your-first-message}
+
+点击 **新建聊天（New Chat）**，在消息输入框内的模型选择器中选择模型，输入内容后按 Enter。将文件拖入聊天即可针对该文件提问。
+
+![新聊天界面，显示模型选择器和提示建议](/images/features/chat/new-chat-placeholder.png)
+
+如果模型选择器中没有模型，请返回第 4 步。如果通过反向代理访问时回复一直为空或聊天卡住，请参阅 [WebSocket 故障排除](/troubleshooting/connection-error#websocket-troubleshooting)。
+
+安装到此完成。以下内容均为可选。
+
+## 接下来做什么 {#where-to-go-next}
+
+[**Open WebUI 基础使用**](/getting-started/essentials)将从这里继续，介绍大多数人在第一周会配置的功能：
+
+| | |
+|---|---|
+| [插件](/getting-started/essentials#plugins) | 来自社区目录的工具和函数；你缺少的功能通常已能以插件形式提供。 |
+| [工具调用](/getting-started/essentials#tool-calling-native-vs-legacy) | 原生模式让模型决定何时搜索、读取文件或保存记忆。 |
+| [任务模型](/getting-started/essentials#task-models) | 标题、标签和自动补全由独立模型处理；可将其指向一个小型模型。 |
+| [上下文管理](/getting-started/essentials#context-management) | 了解长聊天为何会遇到瓶颈，以及上下文压缩如何应对。 |
+| [基础 RAG](/getting-started/essentials#basic-rag) | 与自己的文档对话，可在聊天中直接使用，也可将其作为知识库。 |
+| [联网搜索](/getting-started/essentials#web-search) | 选择搜索服务提供方，模型会在问题需要时进行搜索。 |
+| [开放终端](/getting-started/essentials#open-terminal) | 一个沙盒 shell，模型可在其中构建和运行程序。 |
+
+**保持运行**
+
+- **更新：** 拉取新镜像，并使用第 1 步的命令和相同的 `WEBUI_SECRET_KEY` 重新创建容器；你的数据保存在卷中。[更新](/getting-started/updating)
+- 每次更新前**备份**卷：[备份与恢复](/getting-started/updating#backup--restore)
+- 与网络或团队中的其他人**共享**：[共享 Open WebUI](/getting-started/sharing)。将其暴露到本机之外前，请阅读[安全加固指南](/getting-started/advanced-topics/hardening)。
+- 在手机或桌面上**将其安装为应用**：[将 Open WebUI 用作应用](/getting-started/open-webui-as-app)
+- **出站请求：** 默认安装会自动发起以下请求：向 GitHub 发起的版本检查，可通过 `ENABLE_VERSION_UPDATE_CHECK=false` 关闭；向默认 OpenAI 连接发起的模型列表请求，删除该连接或设置 `ENABLE_OPENAI_API=false` 后不再发送；每次启动时向 Hugging Face 发起的本地嵌入模型更新检查，可通过 `RAG_EMBEDDING_MODEL_AUTO_UPDATE=false` 关闭。
+
+想要一个可访问终端、文件和网络的自主智能体？[连接智能体](/getting-started/quick-start/connect-an-agent)。如有问题：[Discord](https://discord.gg/5rJgQTnV4s)。报告缺陷：[GitHub Issues](https://github.com/open-webui/open-webui/issues)。

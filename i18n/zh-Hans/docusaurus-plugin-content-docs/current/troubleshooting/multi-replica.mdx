@@ -1,0 +1,270 @@
+---
+sidebar_position: 10
+title: "扩展与高可用"
+---
+
+# 多副本、高可用与并发故障排除
+
+本指南介绍**多副本**部署（Docker Compose、Docker Swarm、Kubernetes）中的常见问题。请使用多个副本进行扩展，每个副本运行一个工作进程；不建议将 `UVICORN_WORKERS` 设置为大于 `1`，否则也会遇到同样的问题。
+
+要搭建扩展部署，请按照[扩展 Open WebUI](/getting-started/advanced-topics/scaling) 操作。有关单实例调优，请参阅[优化、性能与内存占用](/troubleshooting/performance)。
+
+## 核心要求检查清单 {#core-requirements-checklist}
+
+在排查具体错误之前，请确保部署满足以下要求。缺少任何一项都会导致不稳定、登录循环或数据丢失。
+
+1.  **共享密钥：**所有副本上的 [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key) 必须完全相同。
+2.  **PostgreSQL：**[`DATABASE_URL`](/reference/env-configuration#database_url) 指向 PostgreSQL。多实例**不**支持 SQLite。请参阅[步骤 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql)。
+3.  **Redis：**每个副本都设置了 [`REDIS_URL`](/reference/env-configuration#redis_url) 和 [`WEBSOCKET_MANAGER=redis`](/reference/env-configuration#websocket_manager)。请参阅[步骤 2](/getting-started/advanced-topics/scaling#step-2-add-redis)。
+4.  **外部向量数据库：**[`VECTOR_DB`](/reference/env-configuration#vector_db) 指向客户端-服务器型数据库，或者 ChromaDB 作为[独立的 HTTP 服务器](/reference/env-configuration#chroma_http_host)运行。嵌入式 ChromaDB 在多进程写入时会崩溃。请参阅[步骤 4](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database)。
+5.  **共享文件存储：**每个副本都能通过对象存储或共享文件系统访问相同的上传文件。请参阅[步骤 5](/getting-started/advanced-topics/scaling#step-5-share-file-storage-across-instances)。
+6.  **单个迁移进程：**升级时只有一个进程运行数据库迁移。请参阅[更新与迁移](#updates-and-migrations)。
+
+有关在此基础上的推荐调优，请参阅[扩展部署的最低环境变量要求](/getting-started/advanced-topics/scaling#minimum-environment-variables-for-scaled-deployments)。
+
+---
+
+## 常见问题 {#common-issues}
+
+### 1. 登录循环 / 401 Unauthorized 错误 {#1-login-loops--401-unauthorized-errors}
+
+**症状：**
+- 登录成功，但下一次点击就退出登录。
+- 登录后，浏览器控制台立即显示 "Unauthorized" 或 "401" 错误。
+- 日志中出现 "Error decrypting tokens"。
+
+**原因：**
+各副本使用了不同的 `WEBUI_SECRET_KEY` 值。副本 B 会拒绝由副本 A 签名的令牌。如果未设置 `WEBUI_SECRET_KEY`，每个容器都会在首次启动时生成自己的密钥。
+
+**解决方案：**
+在所有副本上将 `WEBUI_SECRET_KEY` 设置为**相同**的高强度随机字符串。如果单独设置了 `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY`，它在所有副本上也必须一致。
+
+```yaml
+# Kubernetes/Compose 示例
+env:
+  - name: WEBUI_SECRET_KEY
+    value: "your-super-secure-static-key-here"
+```
+
+### 2. WebSocket 403 错误 / 连接失败 {#2-websocket-403-errors--connection-failures}
+
+**症状：**
+- 聊天停止响应或卡住。
+- 浏览器控制台显示 `WebSocket connection failed: 403 Forbidden` 或 `Connection closed`。
+- 日志显示 `https://your-domain.com is not an accepted origin`。
+
+**原因：**
+- **CORS：**用户访问 Open WebUI 所用的来源不在允许的来源列表中。
+- **缺少 Redis：**如果未设置 `WEBSOCKET_MANAGER=redis`，实时更新只会留在生成它的副本上，因此连接到其他副本的用户永远看不到响应。
+
+**解决方案：**
+1.  **配置 CORS：**将每个公开来源添加到 [`CORS_ALLOW_ORIGIN`](/reference/env-configuration#cors_allow_origin)，多个值使用**分号分隔**：
+
+    ```bash
+    CORS_ALLOW_ORIGIN="https://chat.yourdomain.com;http://chat.yourdomain.com;https://yourhostname;http://localhost:3000"
+    ```
+
+    包含用户可能使用的每个域名、主机名和 IP。
+2.  在**所有**副本上**为 WebSocket 启用 Redis**：
+
+    ```bash
+    REDIS_URL=redis://your-redis-host:6379/0
+    WEBSOCKET_MANAGER=redis
+    ```
+
+### 3. “找不到模型”或配置不一致 {#3-model-not-found-or-configuration-mismatch}
+
+**症状：**
+- 在管理员界面中启用的模型只在部分请求中出现。
+- 聊天间歇性地因 "Model not found" 而失败。
+
+**原因：**
+设置存储在共享数据库中，每个副本都会从数据库读取，因此无需 Redis 即可将设置更改同步到所有副本。除非通过 `WEBSOCKET_MANAGER=redis` 共享，否则模型列表按副本分别保存。未配置时，每个副本只知道自己加载的模型。
+
+**解决方案：**
+在每个副本上设置 `REDIS_URL` 和 `WEBSOCKET_MANAGER=redis`（请参阅[步骤 2](/getting-started/advanced-topics/scaling#step-2-add-redis)）。
+
+对于 Ollama，如果向副本未知的模型发送聊天请求，副本会先从 Ollama 服务器重新读取模型列表。在副本持有过期列表期间拉取的模型，可在下一次请求时使用。
+
+### 4. 数据库损坏 / “Locked”错误 {#4-database-corruption--locked-errors}
+
+**症状：**
+- 日志显示 `database is locked` 或严重的 SQL 错误。
+- 在一个实例上保存的数据在另一个实例上消失。
+- 短暂预热后，几乎每个请求都出现 `sqlalchemy.exc.TimeoutError: QueuePool limit of size N overflow M reached, connection timed out, timeout 30.00`，而不只是在负载高峰时出现。
+- `/api/config`、聊天列表和 OIDC 回调停滞 10 秒到数分钟。
+- 日志显示 `PRAGMA journal_mode=WAL` 已开始，但始终没有完成。
+
+**原因：**
+多个副本使用 **SQLite**，或者单个副本的 `webui.db` 位于网络文件系统（NFS、CIFS、CephFS、Azure Files、网络 PVC）上。SQLite 的文件锁定在网络文件系统上[并不可靠](https://www.sqlite.org/faq.html#q5)，缓慢的网络 `fsync` 会长时间占用每个连接池连接，直至耗尽连接池。有关其机制，请参阅[磁盘 I/O 延迟](/troubleshooting/performance#disk-io-latency-sqlite--storage)。
+
+**解决方案，按优先顺序排列：**
+
+1. **迁移到 PostgreSQL**（多副本必须使用）。请参阅[步骤 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql)。
+2. **单实例：**将 `webui.db` 移到本地直连的 SSD/NVMe（主机绑定挂载、节点本地卷）。上传文件和 RAG 文件可以继续保留在共享存储上。
+3. 迁移期间的**临时措施**：减少连接数并延长锁定等待时间，以降低锁争用。
+   ```bash
+   DATABASE_POOL_SIZE=1
+   DATABASE_SQLITE_PRAGMA_BUSY_TIMEOUT=30000
+   ```
+
+更大的 `DATABASE_POOL_SIZE` 会让问题恶化，因为它会同时对同一存储执行更多缓慢的 `fsync`。
+
+### 5. 无法访问上传的文件或 RAG 知识 {#5-uploaded-files-or-rag-knowledge-inaccessible}
+
+**症状：**
+- 在一个实例上上传文件后，模型之后无法找到该文件。
+- 聊天中的图片会间歇性显示**图像不可用（Image unavailable）**占位符，具体取决于处理请求的副本。
+
+**原因：**
+上传的文件未在副本之间共享。上传到副本 1 的文件在副本 2 上不存在。
+
+**解决方案：**
+按照[步骤 5](/getting-started/advanced-topics/scaling#step-5-share-file-storage-across-instances)中的说明，在每个副本上使用对象存储或共享文件系统。在 Kubernetes 上，共享卷需要 `ReadWriteMany`（RWX）访问模式。
+
+### 6. 文档上传期间工作进程崩溃（ChromaDB + 多工作进程） {#6-worker-crashes-during-document-upload-chromadb--multi-worker}
+
+**症状：**
+- 日志在同一秒内显示以下序列：
+  ```
+  save_docs_to_vector_db:1619 - adding to collection file-id
+  INFO:     Waiting for child process [pid]
+  INFO:     Child process [pid] died
+  ```
+- 工作进程在 RAG 文档摄取期间立即退出（并非超时）。
+
+**原因：**
+默认 ChromaDB 嵌入在每个 Open WebUI 进程中运行，并将数据存储在本地 SQLite 文件（`data/vector_db/`）中。这些文件只允许一个进程写入。使用多个副本或工作进程时，上传期间的并发写入会导致进程退出。
+
+**解决方案：**
+
+| 选项 | 更改 | 权衡 |
+|--------|--------|----------|
+| **保留 1 个工作进程** | `UVICORN_WORKERS=1`（默认值），并使用多个副本进行扩展 | 副本数超过一个后，仍需要下列选项之一 |
+| **使用 ChromaDB HTTP 模式** | 将 [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port) 指向独立的 Chroma 服务器 | 每个进程都通过 HTTP 连接到同一台服务器 |
+| **更换向量数据库** | 将 [`VECTOR_DB`](/reference/env-configuration#vector_db) 设置为 `pgvector`、`mariadb-vector`、`milvus`、`qdrant` 或其他客户端-服务器型数据库 | 专为多客户端设计 |
+
+要保留 ChromaDB，请将其作为独立服务器运行：
+
+```bash
+# 单独运行 Chroma 服务器
+chroma run --host 0.0.0.0 --port 8000 --path /data/vector_db
+
+# 然后将 Open WebUI 指向该服务器
+CHROMA_HTTP_HOST=localhost
+CHROMA_HTTP_PORT=8000
+```
+
+Chroma 服务器的版本应与 Open WebUI 随附的 `chromadb` 客户端版本相同。每个版本都在 `pyproject.toml` 中固定该客户端版本；v0.13.4 固定为 `chromadb==1.5.9`。如果切换后上传开始失败并出现 Chroma 客户端抛出的错误，请先比较这两个版本。
+
+### 7. 云端 Kubernetes 比本地 Kubernetes 慢 {#7-slow-performance-in-cloud-vs-local-kubernetes}
+
+**症状：**
+- Open WebUI 在本地运行良好，但在 AKS、EKS 或 GKE 上性能下降或超时。
+- 尽管资源充足，并发负载下性能仍急剧下降。
+
+**原因：**
+通常是数据库网络延迟或 SQLite 磁盘 I/O 延迟；与本地 NVMe 和本地网络相比，云端这两项延迟都更高。
+
+**解决方案：**
+请参阅[云基础设施延迟](/troubleshooting/performance#cloud-infrastructure-latency)。
+
+### 8. 优化数据库性能 {#8-optimizing-database-performance}
+
+**症状：**
+- PostgreSQL 在负载下出现 `QueuePool limit of size N overflow M reached` 错误。
+- PostgreSQL 以 `too many clients already` 拒绝连接。
+
+**原因：**
+单个进程的连接池对其负载而言太小，或者所有进程的连接池总数超过 PostgreSQL 的 `max_connections`。每个副本都有自己的连接池。
+
+**解决方案：**
+按照[步骤 1](/getting-started/advanced-topics/scaling#step-1-switch-to-postgresql)中的说明，为每个进程设置 `DATABASE_POOL_SIZE` 和 `DATABASE_POOL_MAX_OVERFLOW`，并根据 `max_connections` 检查总数。如果阻塞任务在排队（CPU 和内存看起来正常，但应用卡住），请增大 [`THREAD_POOL_SIZE`](/troubleshooting/performance#thread-pool-size)。
+
+### 9. 函数/工具依赖安装导致崩溃 {#9-functiontool-dependency-installation-crashes}
+
+**症状：**
+- 工作进程在启动时或首次加载函数或工具时因 `AssertionError` 崩溃。
+- 日志显示 pip 锁定错误或多个 pip 进程相互争用。
+
+**原因：**
+当函数或工具在 frontmatter 中列出 `requirements` 时，Open WebUI 会在运行时执行 `pip install`。当 `UVICORN_WORKERS` 大于 `1` 时，每个工作进程都会同时向同一环境安装依赖。
+
+**解决方案：**
+保持 `UVICORN_WORKERS=1`，设置 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)，并在构建镜像时安装软件包：
+
+```dockerfile
+FROM ghcr.io/open-webui/open-webui:main
+
+RUN pip install --no-cache-dir python-docx requests beautifulsoup4
+```
+
+运行时安装仅适合开发或家庭实验室环境。请参阅[外部软件包](/features/extensibility/plugin/tools/development#external-packages)。
+
+---
+
+## 部署最佳实践 {#deployment-best-practices}
+
+### 更新与迁移 {#updates-and-migrations}
+
+:::danger 关键：避免并发迁移
+**升级 Open WebUI 时，只允许一个进程运行数据库迁移。**
+:::
+
+:::danger 关键：切勿让两个版本同时使用一个数据库
+**新旧 Open WebUI 实例绝不能同时基于同一个数据库处理流量。**对于会改变数据库架构的版本，不支持滚动更新、金丝雀发布以及“先更新一个副本，健康后再扩展其余副本”的策略。
+:::
+
+迁移会在启动时自动运行。如果多个副本同时启动新版本，它们会并发运行迁移，并可能损坏数据库架构。
+
+停止所有副本，让一个实例完成迁移，然后使用新版本重新启动整个副本组。这会造成一次短暂的完全中断；跨架构变更没有通用的零停机路径。
+
+请先备份数据库。恢复旧镜像不会撤销迁移：架构和所有重写的行都会保持迁移后的状态。回退方法是恢复升级前创建的备份。请参阅[备份与恢复](/getting-started/updating#backup--restore)。
+
+**安全更新流程：**
+
+#### 选项 1：指定主迁移 Pod（推荐） {#option-1-designate-a-master-migration-pod-recommended}
+1.  选择一个 Pod 作为迁移“主节点”。
+2.  在该 Pod 上保持 `ENABLE_DB_MIGRATIONS=True`（默认值）。
+3.  在所有其他 Pod 上设置 `ENABLE_DB_MIGRATIONS=False`。
+4.  更新时，主 Pod 迁移数据库架构，其他 Pod 跳过迁移。
+
+`ENABLE_DB_MIGRATIONS` 仅决定**哪个**实例执行迁移。请同时将新镜像部署到每个 Pod。如果平台无法同时替换所有 Pod，请使用选项 2。
+
+#### 选项 2：更新期间缩减副本 {#option-2-scale-down-during-update}
+1.  **缩减副本：**将副本数设为 `1`。
+2.  **更新**镜像或版本。
+3.  **等待**单个实例启动并完成迁移。
+4.  **扩展**到所需的副本数。
+
+### 会话亲和性（粘性会话） {#session-affinity-sticky-sessions}
+
+配置 Redis 并启用 WebSocket（默认）后，任何副本都可以处理任何请求，因此不需要粘性会话。在不稳定的网络中，网络抖动或重连仍可能干扰流式响应或工具调用到达浏览器的方式；如果遇到这种情况，可以尝试启用粘性会话。当 `ENABLE_WEBSOCKET_SUPPORT=false` 时必须启用粘性会话，因为长轮询要求同一连接的每个请求都到达同一副本。
+
+- **Nginx Ingress：**`nginx.ingress.kubernetes.io/affinity: "cookie"`
+- **AWS ALB：**启用 Target Group Stickiness（目标组粘性）。
+
+### 使用更快的 JSON 编码器 {#use-the-faster-json-encoder}
+
+```bash
+ENABLE_ORJSON=True
+```
+
+在多副本部署中，每个 Socket.IO 事件都通过 Redis 发布，发出时编码，接收时解码，因此 JSON 编码是处理实时更新的副本上最大的开销之一。[`ENABLE_ORJSON`](/reference/env-configuration#enable_orjson)（默认 `True`）在整个应用中使用 [orjson](https://pypi.org/project/orjson/)，这是一种快得多的 Rust 实现。它随 Open WebUI 提供，无需另行安装。在小型单实例上，差异主要体现在保存和打开超长聊天时。
+
+orjson 拒绝的负载（非字符串字典键、超过 64 位的整数）会自动回退到标准库，因此原本可用的负载不会变成错误。仍有两点差异：
+
+- **响应正文中的 `NaN` 和 `Infinity` 浮点数会变成 `null`。**使用标准库时，此类响应会失败。仅与发出这些值的自定义工具或管道有关。
+- **编码输出使用原始 UTF-8，而不是 `\uXXXX` 转义。**两者的解析结果相同；这一点只影响对编码后的 JSON 计算校验和的场景。行分隔符仍保持转义，以免流式回复被拆分。启用或关闭该设置都不需要迁移。
+
+---
+
+## 相关文档 {#related-documentation}
+
+- [扩展 Open WebUI](/getting-started/advanced-topics/scaling)：从单实例到生产环境的分步指南
+- [环境变量配置](/reference/env-configuration)
+- [优化、性能与内存占用](/troubleshooting/performance)
+- [Redis WebSocket 支持](/tutorials/integrations/redis)：详细的 Redis 设置教程
+- [连接错误故障排除](/troubleshooting/connection-error)
+- [RAG 故障排除](/troubleshooting/rag)：文档上传和嵌入问题
+- [Open WebUI 日志记录](/getting-started/advanced-topics/logging)

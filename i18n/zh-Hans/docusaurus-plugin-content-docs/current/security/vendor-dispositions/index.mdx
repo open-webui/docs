@@ -1,0 +1,130 @@
+---
+sidebar_position: 0
+title: "厂商处置意见"
+---
+
+# 厂商处置意见
+
+**Open WebUI 对外部报告的 CVE 和安全声明所作的正式评估。**
+
+当有人针对 Open WebUI 提交 CVE 时，我们会依据[安全政策](../security-policy.mdx)、文档记载的[威胁模型](#threat-model)以及软件的实际行为评估报告。如果报告不准确、描述失实或不构成真实漏洞，我们会在此发布厂商处置意见，说明我们的评估。
+
+:::note 自动化扫描器标记
+有关我们对自动化供应链扫描器指标（socket.dev 及类似工具）而非具体 CVE 的立场，请参阅[供应链与安全扫描器](/security/supply-chain-security)。
+:::
+
+:::warning 看到其中某个 CVE 仍显示为有效？
+一些漏洞数据库不会重新处理 CVE 撤回状态，因此签发 CNA 已正式拒绝的标识符仍会向其客户显示为有效发现。[漏洞数据库中已拒绝的 CVE](/security/supply-chain-security/vulnerability-databases)记录了受影响的数据库、我们已采取的措施，以及如何自行对照 cve.org 上的权威状态核查任何记录。
+:::
+
+---
+
+## 什么是厂商处置意见？ {#what-is-a-vendor-disposition}
+
+**厂商处置意见**是软件厂商对 CVE 或漏洞报告作出的正式公开回应。它是协调漏洞披露流程的标准组成部分，具有以下几个作用：
+
+- **透明度**：用户和管理员可以准确了解我们如何评估一项声明，以及为何得出相应结论。
+- **准确性**：CVE 数据库有时收录的报告会错误描述严重程度、误解威胁模型，或将预期行为描述为漏洞。处置意见用于纠正公开记录。
+- **指导**：每份处置意见都包含背景信息，帮助管理员评估所报告的问题是否与其具体部署相关。
+
+---
+
+## 威胁模型 {#threat-model}
+
+Open WebUI 是一个**自托管、单租户、需要身份验证、基于角色的**应用。它可以公开部署，但需要正确的配置（TLS 终止、反向代理、适当的访问控制）。我们的威胁模型假设：
+
+- **用户在访问任何用户数据或产品功能之前均已通过身份验证**。浏览器在登录前需要的端点（登录、注册以及登录界面读取的公开配置）按设计无需账户即可访问。
+- **管理员**是拥有完整系统控制权的可信操作方。
+- **安全设置采用默认值或更严格的设置**：威胁模型不假设有人有意削弱安全设置。有效的漏洞报告必须能在默认或更严格的配置上复现。
+- **Tools、Functions 和 Pipelines** 按设计执行任意代码：这是功能，不是漏洞。管理员控制谁可以安装和使用它们。
+
+忽略这些架构假设的报告可能会受到质疑，例如，声称存在需要管理员级访问权限、有意削弱的设置或错误配置部署才能成立的漏洞。
+
+完整概述请参阅[安全政策](../security-policy.mdx)。
+
+---
+
+## CVE 体系以及本页存在的原因 {#the-cve-system-and-why-this-page-exists}
+
+我们使用 CVE 体系，也信任这一体系。当针对 Open WebUI 的报告有效时，我们会主动为其申请标识符，发布包含受影响版本和已修复版本的安全公告，并致谢发现者。CVE 记录能让从未听说过我们的操作员知道自己需要升级，这一作用值得维护。本页没有任何内容是在反对 CVE 计划。
+
+本页记录的恰恰是其反面：一些记录违背了该体系存在的宗旨。近年来，针对 Open WebUI 签发的标识符中，有相当大一部分未能经受审查，其中一些的产生方式完全无法与协调披露相容。这一模式足够一致，可以明确说明。
+
+截至 2026-11-07，针对 Open WebUI 提交并已发布、之后又被拒绝的 CVE 记录共有 26 条。按这一指标，Open WebUI 在整个 CVE 列表的所有产品中排名第三，仅次于 Linux 内核和机器人操作系统（ROS）。这 26 条记录全部由签发它们的 CNA 撤回，而不是由 CVE 计划推翻：其中 23 条是在我们提出争议、签发 CNA 认可后撤回的；另外 3 条则是在我们知晓其存在之前，由签发 CNA 以它们是第三方依赖项相关 CVE 的重复记录为由主动撤回。
+
+**针对错误产品提交的记录。** 不止一个标识符描述的影响发生在 Open WebUI 不交付、不运行也不控制的软件中，却将 Open WebUI 列为受影响产品。识别受影响产品是 CVE 记录的首要功能。
+
+**描述不存在代码的记录。** 有些记录所依据的机制，恰好被所引用代码排除，而且就在报告自己引用的那几行中。这些不属于判断分歧，只要阅读所引用的代码就足以反驳。
+
+**发布前从未联系我们。** 有些记录发布时，报告从未送达我们的安全渠道；换句话说，在 CVE 公开之前的任何时点，都没有人通知我们。这是六项问题中最严重的一项，因为提前通知厂商正是协调披露的全部前提。针对维护者从未见过的问题发布发现及概念验证，无法保护任何人。它不会缩短暴露窗口，反而会将其最大化。如果这些发现中任何一个是真实的，结果都会形成零日漏洞：一个仍在活跃、尚未修复且具有可用概念验证的漏洞，在同一时刻向攻击者和防御者披露，而发布者却是一个声称以防止此类情况为宗旨的组织。
+
+**以月计的响应时间。** 记录一旦受到质疑，纠正工作就取决于签发它的 CNA，而且没有任何期限强制其采取行动。争议通常要经过签发 CNA、CVE 计划秘书处和计划 Root 才会有所推进；即使 CNA 已书面同意应标记为拒绝，记录仍可能继续发布数月。下方每个页面的时间线都记录了相应争议的进展。在更高一层也是如此。CNA 运营规则 1.2.3.1 规定，严重或反复未遵守规则的情况“必须由适当的 Root 审查”。自 2026 年 8 月以来，我们已依据该规则向 Root 提交了多项合规请求，但没有一项收到自动确认以外的回应。
+
+**不处理拒绝状态的数据库。** cve.org 上的撤回只有在下游数据库据此行动时才有用。一些数据库不会重新处理拒绝状态转换，或者只处理其中一部分，因此签发 CNA 已正式撤回的记录会无限期地继续向其客户显示为有效发现。请参阅[漏洞数据库中已拒绝的 CVE](/security/supply-chain-security/vulnerability-databases)。
+
+**无法就自己的数据联系到的厂商。** 纠正这些条目需要联系数据库运营者，而在某些情况下根本不存在可用的联系途径。有些厂商不公开任何形式的联系地址：没有安全联系方式、没有 `security.txt`，甚至没有销售表单，只留下电话号码作为唯一列出的联系方式。另一些厂商公开的安全地址会直接拒收邮件。即使某个渠道有回应，它往往也仅用于销售咨询或针对厂商自己软件的报告，完全没有告知其公开数据有误的途径。这些组织正在告诉客户应处理哪些发现，而其中一些却没有提供任何途径，让别人告知其某项发现有误。
+
+### 问题在于不对等 {#the-asymmetry-is-the-problem}
+
+一个 CVE 标识符可以在几天内签发，而要让它被正式拒绝，则需要数月时间与签发 CNA、秘书处、计划 Root 以及镜像了它的每个下游数据库往来沟通。这种失衡是解释本页为何存在的核心事实。将一条不准确记录放入公开信息源所需的工作，只是移除它所需工作的一小部分，而后者的全部工作都落在了没有犯错的一方身上。
+
+没有人能从中获益。CNA 要耗费审查人员的时间，为站不住脚的记录辩护。报告者最终既失去标识符，也失去与之相关的荣誉。我们的维护者要花费数月处理往来沟通和公开文档，而不是开发软件。最重要的是，这个体系所服务的人损失最大：评估 Open WebUI 的操作员无法一眼区分真实发现和已撤回的发现，而每一条无效记录都会让真正的安全公告更难得到重视。CVE 计划本身也要付出代价。它的权威完全取决于记录是否准确，每一个站不住脚的标识符都会消耗一点整个体系赖以运转的公信力。
+
+### 因此我们在此记录一切 {#which-is-why-we-document-everything-here}
+
+我们无法从别人的数据库中删除记录，但绝不会把无效发现当作有效发现对待。我们不会发布一个象征性的修复，以便指着某个提交宣布事情已经了结。无效就是无效，无论花多少时间争议一条记录，都不会改变它的性质。下面有些页面提到代码后来得到了加固。那只是常规加固：每条记录对其所指版本而言原本就无效，也没有任何处置意见依赖后来的变更。
+
+CVE 计划已经为不应存在的记录提供了处理机制，那就是拒绝。对于本页上的每条记录，我们每次都采用这一途径。悄悄修补一个从未损坏的东西会快得多，也会让这些问题逐一消失，但这会向公开记录写入虚假陈述，并确认一项我们明知有误的发现。那只是形式上合规、实质上不诚实，对于依赖这些数据的人而言不仅毫无价值，反而有害。
+
+这对语料库本身也很重要。被拒绝的记录会退出传播，信息源的每个使用方都会因此受益。如果厂商选择悄悄修补，相关记录就会永久留在语料库中，被标记为有效，被各数据库镜像，并被扫描器计为一个从未存在过的真实漏洞。拒绝无效记录是两个选项中唯一能提升 CVE 数据质量的做法。假装一项发现真实存在，再发布修复来配合这种伪装，会让错误记录继续存在，并将其认证为正确记录。每一条以这种方式处理的记录，都会拉低其周围所有有效 CVE 的质量，因为防御者信任的信息源，其质量取决于无人移除的最差记录。
+
+我们的做法是公开、详细地根据实际代码回应每一项声明，并让这份回应与相关记录并存，供任何追查的人查阅。
+
+接下来的内容就是如此。我们质疑的每一条由外部针对 Open WebUI 提交的 CVE 都在下方设有页面，说明该记录的声明、软件的实际行为、适用的政策规则，以及争议目前的状态。
+
+### 并非只有我们这样理解这些记录 {#we-are-not-the-only-ones-who-read-these-records-this-way}
+
+2026-09-02，[GitHub Advisory Database](https://github.com/github/advisory-database/pull/8031#issuecomment-5512489251) 的一位维护者表示，三条镜像了针对 Open WebUI 提交的 CVE 的公告被有意保持为 `unreviewed` 状态，“因为我和团队成员担心 CVE 记录中所述漏洞的有效性”。由于未经审查，它们不会触发 Dependabot 警报。
+
+这三条记录来自三个不同的签发 CNA：Zero Day Initiative 的 [CVE-2026-0767](./cve-2026-0767.mdx)、VulDB 的 [CVE-2025-15603](./cve-2025-15603.mdx) 和 huntr / Protect AI 的 [CVE-2024-7040](./cve-2024-7040.mdx)（数据库条目分别为 [GHSA-vh96-p962-544h](https://github.com/advisories/GHSA-vh96-p962-544h)、[GHSA-2rf6-9rc8-rqch](https://github.com/advisories/GHSA-2rf6-9rc8-rqch) 和 [GHSA-cfvq-fj53-j2c7](https://github.com/advisories/GHSA-cfvq-fj53-j2c7)）。
+
+这一决定由与结果没有利害关系、也未就此事联系我们的人独立作出，而且发生在三条记录中的任何一条被撤回之前。此后，三条记录均已由签发它们的 CNA 撤回。
+
+我们记录此事，是因为本页最常遇到的反对意见是，厂商对 CVE 提出争议只不过是因为它不想要 CVE。而在这里，以整理这些数据为业、无论结果如何都不会获益的第三方，阅读了相同记录并得出了与我们相同的结论。
+
+这也是上述不对等现象最清晰的例证。三条记录受到的怀疑足以使其被挡在警报流程之外，但在各 CNA 撤回它们之前，它们仍一直作为已发布 CVE 传播，并带有严重程度和受影响版本范围。
+
+---
+
+## 全部处置意见 {#all-dispositions}
+
+<!-- 顺序与侧边栏一致（按各处置页面的 sidebar_position 升序排列）。 -->
+
+| CVE | 标题 | 签发 CNA | 厂商处置意见 | 解决结果 | CVE 发布日期 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| [CVE-2026-0765](./cve-2026-0765.mdx) | PIP install_frontmatter_requirements 命令注入 | Zero Day Initiative | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2026-01-23 |
+| [CVE-2026-0766](./cve-2026-0766.mdx) | load_tool_module_by_id 代码注入 | Zero Day Initiative | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2026-01-23 |
+| [CVE-2026-0767](./cve-2026-0767.mdx) | 凭据明文传输 | Zero Day Initiative | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2026-01-23 |
+| [CVE-2025-15603](./cve-2025-15603.mdx) | start_windows.bat 中的随机值强度不足 | VulDB | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2026-03-09 |
+| [CVE-2025-29446](./cve-2025-29446.mdx) | verify_connection 中的 SSRF | MITRE | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-04-21 |
+| [CVE-2025-63391](./cve-2025-63391.mdx) | /api/config 中的身份验证绕过 | MITRE（CISA-ADP 补充信息） | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-12-18 |
+| [CVE-2024-7033](./cve-2024-7033.mdx) | 模型下载中的路径遍历 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7034](./cve-2024-7034.mdx) | 模型上传中的路径遍历 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7036](./cve-2024-7036.mdx) | 通过超长注册名称造成 DoS | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7037](./cve-2024-7037.mdx) | Pipeline 上传中的路径遍历 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2024-10-09 |
+| [CVE-2024-7038](./cve-2024-7038.mdx) | 嵌入模型更新中的路径预言机 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2024-10-09 |
+| [CVE-2024-7039](./cve-2024-7039.mdx) | 跨管理员删除用户 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7040](./cve-2024-7040.mdx) | 通过 user_id 参数跨管理员访问聊天 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7045](./cve-2024-7045.mdx) | 通过 /api/v1/prompts/ 泄露提示词 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7046](./cve-2024-7046.mdx) | 通过 /api/v1/auths/admin/details 泄露管理员详情 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7049](./cve-2024-7049.mdx) | 向待分配角色的账户签发令牌 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2024-10-10 |
+| [CVE-2024-7053](./cve-2024-7053.mdx) | 通过 Markdown 图片造成会话固定 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7806](./cve-2024-7806.mdx) | 通过 CSRF 执行 Pipeline 代码 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7959](./cve-2024-7959.mdx) | 通过管理员配置的 OpenAI URL 造成 SSRF | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7990](./cve-2024-7990.mdx) | 通过模型描述造成存储型 XSS | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-7999](./cve-2024-7999.mdx) | 通过格式错误的 Multipart 边界造成 DoS | huntr / Protect AI | 从未向我们披露 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-8060](./cve-2024-8060.mdx) | 音频转录上传中的路径遍历 | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-9840](./cve-2024-9840.mdx) | 通过上传端点的 Multipart 边界造成 DoS | huntr / Protect AI | 从未向我们披露 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-12534](./cve-2024-12534.mdx) | 通过超长登录字段造成 DoS | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-12537](./cve-2024-12537.mdx) | 通过代码格式化端点造成 DoS | huntr / Protect AI | 已拒绝 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |
+| [CVE-2024-12868](./cve-2024-12868.mdx) | 通过易受攻击的 starlette 依赖项造成 DoS | huntr / Protect AI | 从未向我们披露 | <span className="badge badge--success">CNA 已拒绝</span> | 2025-03-20 |

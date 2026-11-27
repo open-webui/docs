@@ -1,0 +1,193 @@
+---
+sidebar_position: 1510
+title: "聊天数据隐私与加密"
+---
+
+# 聊天数据隐私与加密
+
+Open WebUI 是自托管软件。你的组织控制服务器、数据库、存储、模型连接、日志、备份和网络放置。
+
+Open WebUI 可以通过数据库加密、HTTPS/TLS、SSO/RBAC、管理员访问控制、临时聊天、私有模型，以及为敏感群组单独部署来减少聊天数据暴露。
+
+Open WebUI 的标准体验围绕自托管控制、可审计性、历史记录、搜索、RAG、工具和行政治理而设计。以下控制措施帮助组织决定聊天数据的存储位置、谁可以通过产品访问数据、哪些模型端点会接收提示词，以及数据保留多长时间。
+
+## 按关注点划分的控制措施 {#controls-by-concern}
+
+| 关注点 | 最佳可用措施 |
+| :--- | :--- |
+| 在界面中向管理员隐藏用户聊天 | 设置 `ENABLE_ADMIN_CHAT_ACCESS=false` |
+| 控制管理员从产品导出数据 | 设置 `ENABLE_ADMIN_EXPORT=false` |
+| 限制管理员工作区列表/选择器的可见范围 | 设置 `BYPASS_ADMIN_ACCESS_CONTROL=false` |
+| 生产数据库的存储暴露 | 使用 PostgreSQL，并采用加密卷、提供方加密、可用时的 TDE、TLS 和加密备份 |
+| 仅使用 SQLite 的部署 | 将数据目录放在加密文件系统上（LUKS、BitLocker、FileVault） |
+| 员工询问敏感或私人问题 | 使用临时聊天，或通过 `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true` 强制非管理员用户使用临时聊天 |
+| 用户互相讨论敏感话题 | 在私信和私密群组中使用[加密聊天](/features/channels/encrypted-chats)：在浏览器中端到端加密，且绝不存储在服务器上 |
+| 将提示词保留在你的基础设施内 | 使用本地或私有模型端点，并按群组限制获准使用的模型 |
+| 上传或索引敏感文档 | 关闭文件上传权限（默认开启）并保持知识权限关闭；仅按群组授予 |
+| 控制服务器端代码执行 | 将 Tools 和 Functions 限制为仅供受信管理员使用 |
+| 聊天内容出现在日志中 | 除非明确批准记录正文，否则审计日志仅保留元数据级别 |
+| 分享控制 | 关闭社区分享（默认开启），并检查聊天分享权限 |
+| 不同团队需要不同的信任边界 | 运行独立的 Open WebUI 实例，分别使用独立的数据库、备份、凭据、运维人员和模型服务提供方 |
+
+## 推荐基线 {#recommended-baseline}
+
+### 使用 PostgreSQL 和加密存储 {#use-postgresql-with-encrypted-storage}
+
+对于生产部署，请使用 PostgreSQL，并在 PostgreSQL 或存储层配置加密。使用加密卷、提供方管理的加密、可用时的 TDE、数据库连接 TLS、加密备份和网络隔离。
+
+```bash
+DATABASE_URL=postgresql://user:password@db-host:5432/openwebui
+```
+
+数据库加密可保护静态数据。正在运行的 Open WebUI 应用使用数据库密钥，为经过身份验证的用户和正常产品工作流提供服务。
+
+对于仅使用 SQLite 的部署，请将数据目录放在加密文件系统上（Linux 上使用 LUKS，Windows 上使用 BitLocker，macOS 上使用 FileVault）。不支持 SQLCipher。
+
+### 限制管理员的聊天与导出入口 {#limit-admin-chat-and-export-surfaces}
+
+```bash
+ENABLE_ADMIN_CHAT_ACCESS=false
+ENABLE_ADMIN_EXPORT=false
+BYPASS_ADMIN_ACCESS_CONTROL=false
+```
+
+这些设置会在界面中向管理员隐藏其他用户的聊天和导出，但不会阻止管理员接触数据；请参阅[管理员用户](#admin-users)。
+
+### 使用 SSO 并限制账户 {#use-sso-and-restrict-accounts}
+
+```bash
+ENABLE_LOGIN_FORM=false
+ENABLE_PASSWORD_AUTH=false
+ENABLE_PASSWORD_CHANGE_FORM=false
+DEFAULT_USER_ROLE=pending
+```
+
+使用你的身份提供方实现 MFA、条件访问、设备状态、群组成员资格和用户生命周期管理。尽可能使用 SCIM。对于仍直接登录 Open WebUI 的账户，请启用内置的[双因素登录](/features/authentication-access/mfa)。
+
+### 在不需要历史记录时使用临时聊天 {#use-temporary-chat-where-history-is-not-needed}
+
+临时聊天可以减少保存的聊天历史。强制临时聊天可以要求用户采用这种行为，而不是将其作为可选项。
+
+要默认提供临时聊天：
+
+```bash
+USER_PERMISSIONS_CHAT_TEMPORARY=true
+```
+
+要强制非管理员用户使用临时聊天：
+
+```bash
+USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true
+```
+
+相关权限：
+
+- **聊天 > 临时聊天**
+- **聊天 > 强制临时聊天**
+
+对于同时拥有这两项权限的用户，服务器会在所有路径上拒绝保存聊天，包括直接 API 调用、聊天导入、克隆和分叉。他们已有的聊天仍可打开，管理员不受此限制。
+
+临时聊天是一项针对已保存历史记录的数据最小化控制。当前提示词仍会由 Open WebUI 和配置的模型端点处理。在临时聊天中，保持启用的工具仍会运行，并可能自行存储数据，因此在需要时应于模型上禁用这些工具。
+
+### 将敏感提示词保留在私有模型上 {#keep-sensitive-prompts-on-private-models}
+
+对于敏感数据，优先使用由你的组织控制的本地或私有模型端点。按群组限制外部模型，并按数据类别批准服务提供方。
+
+### 限制高级功能 {#restrict-advanced-capabilities}
+
+```bash
+USER_PERMISSIONS_WORKSPACE_TOOLS_ACCESS=false
+USER_PERMISSIONS_WORKSPACE_KNOWLEDGE_ACCESS=false
+USER_PERMISSIONS_CHAT_FILE_UPLOAD=false
+ENABLE_COMMUNITY_SHARING=false
+ENABLE_API_KEYS=false
+```
+
+仅向获准的群组授予高级功能。
+
+### 默认仅记录元数据日志 {#keep-logs-metadata-only-by-default}
+
+```bash
+AUDIT_LOG_LEVEL=METADATA
+ENABLE_AUDIT_STDOUT=true
+LOG_FORMAT=json
+```
+
+只有当日志平台已获准处理聊天内容时，才使用 `REQUEST` 或 `REQUEST_RESPONSE` 审计日志。
+
+审计日志默认关闭（`AUDIT_LOG_LEVEL=NONE`）。默认情况下，除非更改 `AUDIT_EXCLUDED_PATHS` 或设置 `AUDIT_INCLUDED_PATHS`，否则 `/api/v1/chats/*`、`/api/v1/folders/*` 和 `/api/chat/*`（包括 `/api/chat/completions`）路由在所有级别都会被排除，但 `/openai/chat/completions` 和 `/ollama/api/chat` 代理路由不会被排除。正文默认截断为 2048 字节（`MAX_BODY_LOG_SIZE`），除非设置 `AUDIT_LOGS_FILE_PATH`，否则文件接收器会写入数据卷内的 `DATA_DIR/audit.log`。
+
+## 谁可以读取聊天数据？ {#who-can-read-chat-data}
+
+### 普通用户 {#regular-users}
+
+普通用户可以读取自己的聊天以及明确共享给他们的聊天。访问由角色、群组、权限和资源级访问授权控制。
+
+### 管理员用户 {#admin-users}
+
+管理员控制实例，因此应将所有管理员都视为能够读取所有聊天。`ENABLE_ADMIN_CHAT_ACCESS=false` 和 `ENABLE_ADMIN_EXPORT=false` 只会在界面中隐藏其他用户的聊天和导出。管理员仍可通过其他方式接触数据，例如安装在服务器上运行代码的函数或工具，以及通过子智能体聊天等内部聊天；这些聊天始终可以按 ID 读取。仅将管理员角色以及数据库、主机和备份访问权限授予你信任其接触数据的人。
+
+### 数据库、主机和备份运维人员 {#database-host-and-backup-operators}
+
+能够访问数据库、主机、持久卷、应用密钥或未加密备份的运维人员，都属于聊天数据信任边界的一部分。
+
+对于需要独立运维人员信任边界的群组，请使用具有独立基础设施和运维人员的独立 Open WebUI 实例。
+
+### 模型服务提供方 {#model-providers}
+
+如果配置了外部模型服务提供方，发送用于推理的提示词和上下文可能对该提供方可见。对于应保留在基础设施内的数据，请使用私有/本地模型。
+
+## 加密能保护什么 {#what-encryption-protects}
+
+Open WebUI 将聊天标题以纯文本、聊天内容以明文 JSON 存储在数据库中，上传的文件未加密地存储在 `DATA_DIR/uploads`（或配置的对象存储）下，文档分块则以纯文本存储在向量存储中。因此，静态保护来自数据库、卷或存储层（pgvector 可以通过 `PGVECTOR_PGCRYPTO=true` 加密分块文本）。
+
+静态加密有助于防范：
+
+- 磁盘丢失或被盗。
+- 数据库文件被复制。
+- 卷快照存放不当。
+- 备份被入侵，前提是备份已单独加密。
+- 某些未接触实时应用密钥的基础设施入侵。
+
+请将以下路径保留在你的运维信任边界内：
+
+- 正在运行的 Open WebUI 应用、其数据库密钥和 `WEBUI_SECRET_KEY`；后者用于签名会话，并默认加密存储的 OAuth 令牌、OAuth 客户端密钥和其他已存储的密钥（它不加密聊天数据）。
+- 拥有实时查询权限的数据库管理员。
+- 能够访问环境变量或已挂载密钥的主机运维人员。
+- 包含聊天数据的导出、日志、跟踪和备份。
+- 接收提示词以进行推理的模型服务提供方。
+
+## 实用部署模式 {#practical-deployment-patterns}
+
+对于一般内部使用：
+
+- 使用 SSO/MFA。
+- 加密数据库和备份。
+- 限制管理员聊天访问和导出。
+- 日志仅保留元数据。
+- 按群组限制外部模型和文件上传。
+
+对于人力资源、法务或受监管工作负载等敏感部门：
+
+- 运行独立的 Open WebUI 实例。
+- 使用独立的数据库和备份。
+- 使用独立的运维人员和凭据。
+- 使用私有/本地模型。
+- 考虑通过 `USER_PERMISSIONS_CHAT_TEMPORARY_ENFORCED=true`，对非管理员用户强制使用临时聊天。
+
+对于员工的私人或高度敏感问题：
+
+- 发布清晰的使用指南。
+- 提供临时聊天，或要求非管理员用户使用。
+- 仅将这些提示词路由到获准的模型服务提供方。
+- 明确说明系统由谁管理以及保留哪些数据。
+
+## 相关文档 {#related-documentation}
+
+- [加固 Open WebUI](/getting-started/advanced-topics/hardening)
+- [HTTPS 参考](/reference/https)
+- [身份验证与访问](/features/authentication-access)
+- [RBAC 权限](/features/authentication-access/rbac/permissions)
+- [临时聊天 URL 参数](/features/chat-conversations/chat-features/url-params#8-temporary-chat-sessions)
+- [企业安全](/enterprise/security)
+- [主权 AI 平台](/enterprise/sovereign-ai)

@@ -1,0 +1,154 @@
+---
+sidebar_position: 300
+title: "离线运行 Open WebUI"
+sidebar_label: "离线模式"
+description: "准备本地模型和文档处理，启用离线设置，限制网络访问，并在无法访问互联网时验证 Open WebUI。"
+---
+
+# 离线运行 Open WebUI {#running-open-webui-in-offline-mode}
+
+要在没有互联网连接的情况下使用 Open WebUI，请在断开连接前准备好本地推理、嵌入和文档提取服务。在本地运行界面并不代表这些服务也在本地运行。离线设置会阻止特定的下载和更新检查；要阻止外部网络访问，还需要单独的网络控制措施。
+
+:::warning
+
+本教程为社区贡献，不受 Open WebUI 团队支持。它仅用于演示如何针对你的特定用例自定义 Open WebUI。想要贡献内容？请查看[贡献教程](/contributing)。
+
+:::
+
+## 本地必须可用的内容 {#what-does-offline-mode-mean}
+
+首先，确保 Open WebUI 安装可正常运行，并且你拥有管理员访问权限。在移除互联网访问之前，机器、容器及其使用的任何服务都必须具备所需的文件和依赖项：
+
+- **聊天：**本地推理服务器和已下载的模型。按照现有的 [Ollama 连接指南](/getting-started/quick-start/connect-a-provider/starting-with-ollama)操作，然后选择本地模型，而不是 Ollama 云端模型或其他托管端点。
+- **文档检索：**已下载的嵌入模型或可访问的本地嵌入服务、本地文档提取，以及在启用重排序时使用的本地重排序器。检查**设置 → 文档**（管理员区域）中选择的提供方；仅有本地聊天模型并不能保证文档处理也在本地进行。
+- **安装和存储：**Open WebUI 镜像或软件包、所需依赖项以及持久化的模型缓存。任何可选的提取或工具服务也都需要各自的安装文件和依赖项。
+- **登录：**在隔离网络中仍可访问的身份验证方法。在移除对外部身份提供方的访问之前，先对其进行测试。
+- **语音（如需要）：**本地语音模型、语音和依赖项。对于聊天和文档检索，语音功能是可选的。
+
+移除网络访问后，云模型、托管网页搜索、外部身份验证和其他互联网服务可能会停止工作。有关已配置服务如何影响数据流的信息，请参阅[聊天数据隐私与加密](/security/chat-data-privacy-and-encryption)。
+
+## 联网时准备 {#approach-ii}
+
+### 下载并测试依赖项 {#running-open-webui-with-internet-connection-during-setup}
+
+如果机器在设置期间可以连接互联网，请准备好之后将离线运行的同一套安装：
+
+1. 安装 Open WebUI，并按照 [Ollama 指南](/getting-started/quick-start/connect-a-provider/starting-with-ollama)连接本地推理服务器。下载你打算使用的模型并发送一条测试消息。
+2. 配置本地文档提取和嵌入。下载并实际测试你需要的任何可选重排序或语音模型。
+3. 将应用程序数据和模型缓存保存在持久化存储中。在仍然联网时重启一次，确认安装使用的是该存储。
+
+### 准备嵌入模型 {#ii-embedding-model}
+
+在**设置 → 文档**（管理员区域）中，选择本地嵌入模型，例如 [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)，然后使用下载控件。如果使用独立的本地嵌入服务，请准备其模型，并确认 Open WebUI 可以访问该服务。
+
+上传一个小型的文本型 PDF 或文本文件，等待处理完成，然后提出一个答案位于该文件中的问题。完整工作流程请参阅[文档提问快速上手](/features/workspace/knowledge#ask-your-first-document-question)。普通聊天成功并不能确认文档处理已准备就绪。
+
+## 为已离线的机器做准备 {#approach-i}
+
+使用一台联网的中转机器，下载适用于目标机器操作系统和硬件的应用程序镜像或软件包、模型文件及依赖项。通过你获批准的流程传输这些内容。保持模型缓存目录结构完整，包括所有符号链接及其目标，并确保 Open WebUI 进程可以读取传输的文件。
+
+按照 [Ollama 指南](/getting-started/quick-start/connect-a-provider/starting-with-ollama)准备推理服务器及其模型。对于 Open WebUI 的本地处理模型，以下示例会在联网的中转机器上下载缓存。所示目标路径是 Docker 安装的默认路径；如果使用不同的数据目录，请相应调整。
+
+### 可选：语音转文字 {#i-speech-to-text}
+
+本地 Whisper 需要已下载的模型文件。在联网机器上安装 `huggingface_hub` 后，下载所选的 faster-whisper 模型：
+
+```python
+from huggingface_hub import snapshot_download
+
+snapshot_download(
+    repo_id="Systran/faster-whisper-large-v3",
+    cache_dir="/path/to/whisper-cache",
+)
+```
+
+将该缓存目录的内容复制到目标部署中的 `/app/backend/data/cache/whisper/models/`，并保留其结构。配置 `WHISPER_MODEL=Systran/faster-whisper-large-v3`，或者选择较小的模型并使用与其匹配的标识符。有关自定义缓存位置，请参阅[语音转文字配置](/features/chat-conversations/audio/speech-to-text/stt-config)和 [`WHISPER_MODEL_DIR`](/reference/env-configuration#whisper_model_dir)。
+
+### 可选：文字转语音 {#i-text-to-speech}
+
+如果需要语音输出，请准备本地服务，例如 [Openedai-speech](/features/chat-conversations/audio/text-to-speech/openedai-speech-integration)，包括其语音、模型文件和依赖项。确认它无需在运行时下载任何内容即可工作。浏览器语音的可用性取决于浏览器和已安装的语音；请在你将离线使用的客户端设备上进行测试。
+
+### 嵌入模型 {#i-embedding-model}
+
+若要结合 Open WebUI 的本地嵌入引擎进行文档检索，请在联网机器上下载所选模型：
+
+```python
+from huggingface_hub import snapshot_download
+
+snapshot_download(
+    repo_id="sentence-transformers/all-MiniLM-L6-v2",
+    cache_dir="/path/to/embedding-cache",
+)
+```
+
+将该缓存目录的内容复制到目标部署中的 `/app/backend/data/cache/embedding/models/`，并保留其结构。将 [`RAG_EMBEDDING_MODEL`](/reference/env-configuration#rag_embedding_model) 设置为匹配的模型标识符。如果使用独立的本地嵌入服务，请改为按照该服务的说明准备其模型缓存。对于任何已启用的重排序或提取模型，也请按照各自服务的缓存要求以相同方式准备。
+
+## 启用离线设置 {#how-to-enable-offline-mode}
+
+准备好模型和依赖项后，使用部署的环境配置设置以下变量，然后重启 Open WebUI：
+
+```bash
+OFFLINE_MODE=true
+HF_HUB_OFFLINE=1
+RAG_EMBEDDING_MODEL_AUTO_UPDATE=false
+RAG_RERANKING_MODEL_AUTO_UPDATE=false
+WHISPER_MODEL_AUTO_UPDATE=false
+```
+
+仅设置 `OFFLINE_MODE=true` 就会设置 `HF_HUB_OFFLINE=1`、禁用版本检查，并强制将三个 `*_AUTO_UPDATE` 标志全部设为 false，因此另外四行属于冗余配置，但不会产生负面影响；`ENABLE_VERSION_UPDATE_CHECK=false` 是仅控制版本检查的独立开关。`WHISPER_MODEL_AUTO_UPDATE=false` 本身并不会阻止下载：如果缓存中缺少 Whisper 模型，Open WebUI 会在启用下载的情况下重试，只有 `HF_HUB_OFFLINE=1` 才能阻止该尝试，因此必须先准备好缓存。完整行为请参阅[离线配置参考](/reference/env-configuration#offline_mode)。
+
+:::warning 先准备缓存，再启用离线设置
+
+使用 `HF_HUB_OFFLINE=1` 时，无法下载缺失的模型。全新安装可能成功启动，但在你首次上传或查询文档时失败。如果看到**未加载嵌入模型（No embedding model is loaded）**，请查看[离线嵌入故障排除步骤](/troubleshooting/startup#valueerror-no-embedding-model-is-loaded-with-offline-mode-on-a-fresh-install)。
+
+:::
+
+这些变量不会阻止出站连接。如果网络允许，外部模型 API、OAuth 提供方、网页搜索、工具和其他已配置的服务仍然可以发起网络请求。
+
+## 限制外部网络访问 {#sidenote}
+
+根据部署情况，使用防火墙规则、容器网络或物理网络隔离来阻止外部访问。保持所需的本地路径可访问：浏览器必须能够访问 Open WebUI，Open WebUI 必须能够访问其本地推理和处理服务。
+
+以下 Docker Compose 片段是**内部容器网络的示例**，并非完整部署。它假定镜像已经存在、模型缓存目录包含准备好的缓存，并且你提供了连接到此网络的反向代理。你的本地模型服务器以及任何提取或嵌入服务也必须能够从此网络访问；隔离的 Open WebUI 容器无法使用位于无关网络上的模型服务器。在依赖此示例实现隔离之前，请调整并测试连接性。
+
+```yaml
+services:
+  # 需要反向代理以及可访问的本地模型和处理服务。
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    environment:
+      - OFFLINE_MODE=true
+      - HF_HUB_OFFLINE=1
+      - RAG_EMBEDDING_MODEL_AUTO_UPDATE=false
+      - RAG_RERANKING_MODEL_AUTO_UPDATE=false
+      - WHISPER_MODEL_AUTO_UPDATE=false
+      - RAG_EMBEDDING_MODEL=sentence-transformers/all-MiniLM-L6-v2
+      # 可选：仅在使用本地语音转文字时需要。
+      - WHISPER_MODEL=Systran/faster-whisper-large-v3
+    volumes:
+      - ./open-webui-data:/app/backend/data
+      - ./models/embedding-cache:/app/backend/data/cache/embedding/models/
+      # 可选：预先准备的 Whisper 缓存。
+      - ./models/whisper-cache:/app/backend/data/cache/whisper/models/
+    networks:
+      - open-webui-internal
+
+networks:
+  open-webui-internal:
+    name: open-webui-internal-network
+    driver: bridge
+    internal: true
+```
+
+## 验证聊天和文档检索 {#verify-chat-and-document-retrieval}
+
+在阻止互联网访问且所需本地服务仍可访问的情况下：
+
+1. **重启 Open WebUI 及其本地服务。**检查日志中是否有依赖项缺失或尝试下载的记录，然后使用预期的离线身份验证方法登录。
+2. **发送一条普通聊天消息。**选择本地模型，确认它在重启后能够响应。
+3. **上传一个新的小型文档。**使用包含独特事实的文本文件或文本型 PDF，例如“测试办公室于 09:15 开门。”等待处理完成。
+4. **询问该事实。**附加文件或知识库，询问测试办公室何时开门，并将回答与文档进行对照。附件操作步骤和前提条件请参阅[知识库](/features/workspace/knowledge#ask-your-first-document-question)。
+5. **单独检查网络控制。**通过防火墙或网络监控确认外部访问已被阻止。聊天和检索成功表明这些工作流程可以离线运行，但其本身并不能证明网络已隔离。
+
+如果聊天正常但文档测试失败，请检查所选的提取和嵌入提供方、缓存权限以及[文档检索故障排除指南](/troubleshooting/rag)。如果启用了语音，请单独对其进行测试。

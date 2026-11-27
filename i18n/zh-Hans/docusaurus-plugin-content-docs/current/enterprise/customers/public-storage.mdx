@@ -1,0 +1,139 @@
+---
+sidebar_position: 2
+title: "Public Storage"
+description: "Public Storage 如何通过倡导者驱动的推广方式，在 GCP 上利用 Open WebUI 部署安全私密的生成式 AI 平台，在 30 天内实现约 50% 的活跃采用率，并将一项关键运营工作流的耗时缩短超过 80%。"
+keywords: ["Public Storage AI", "Open WebUI case study", "enterprise AI platform", "private AI deployment", "GCP AI deployment", "PII redaction AI", "AI productivity", "secure generative AI", "champion-driven AI adoption", "real estate AI"]
+---
+
+# Public Storage 借助 Open WebUI 将以倡导者驱动的安全 AI 平台扩展至所有公司职能部门
+
+![Public Storage](/images/enterprise/customers/public-storage/hero.png)
+
+## 概览 {#overview}
+
+:::info
+Public Storage 采用**倡导者驱动的推广方式**，在 GCP 上利用 **Open WebUI** 部署安全私密的生成式 AI 平台，在 **30 天内实现约 50% 的活跃采用率**，并将一项关键运营工作流的耗时缩短**超过 80%**。
+:::
+
+### 要点一览 {#at-a-glance}
+
+- **用户**：5,000 至 10,000 名员工
+- **地区**：美国（强制执行数据驻留）
+- **行业**：房地产
+- **部署**：GCP（容器化、专用网络）
+- **模型**：Anthropic Claude（主要）、OpenAI GPT（高用量）、Llama、Gemma（开放权重）
+- **部署耗时**：试点两周，30 天内全面开放
+- **采用情况**：第一个月活跃使用率约 50%
+- **关键成果**：运营工作流显著节省时间，跨职能部门 AI 赋能，企业级治理
+
+
+## 关于 Public Storage {#about-public-storage}
+
+[Public Storage](https://www.publicstorage.com/)是一家财富 500 强自助仓储房地产投资信托基金（REIT），在美国运营 3,000 多处设施。公司拥有数百万客户，数千名员工分布在公司办公室、呼叫中心和现场运营部门，管理着全球最大的房地产组合之一。这样的运营规模，让一致且受治理的 AI 访问成为一项有意义的竞争优势。
+
+## 挑战：在整个企业安全扩展 AI {#the-challenge-scaling-ai-safely-across-the-enterprise}
+
+随着生成式 AI 工具快速发展，Public Storage 同时看到了机遇和风险。整个组织的团队开始独立试用 AI，形成了由临时订阅和缺乏治理的使用行为构成的碎片化局面。
+
+领导层设定了明确目标：提供一个**安全、集中化的 AI 平台**，提高整个组织的 AI 素养，发掘高价值业务使用场景，并实现可重复的生产力提升，同时不损害数据安全或合规。
+
+**关键要求**
+
+- 在企业 GCP 环境中**私密部署**
+- 仅允许公司防火墙后经过身份验证的员工**访问**
+- 与现有身份提供方 **Okta** 进行 **SSO 集成**
+- **模型灵活性**，不受供应商或单一 LLM 锁定
+- **完整审计跟踪**、DLP 政策和 PII 隐去
+- 按组实施**基于角色的访问控制**
+
+基于 SaaS 的 AI 工具虽然方便，但缺乏 Public Storage 所需的隐私控制、网络限制和模型灵活性。
+
+## 解决方案：GCP 上的 Open WebUI {#the-solution-open-webui-on-gcp}
+Open WebUI 凭借其**可扩展的基础**入选：开放架构使 Public Storage 能够从基础聊天界面演进为安全的多模型内部 AI 平台。它支持快速迭代、广泛的模型选择和企业治理，同时保持完全私密。
+
+**架构亮点**
+- **计算/编排**：GCP 上的容器化工作负载，根据内部需求自动扩缩容
+- **存储/数据库**：托管 PostgreSQL 和安全对象存储（GCP 原生）
+- **网络**：专用网络；仅允许公司防火墙后经过身份验证的员工访问；开放权重 LLM API 使用专用端点
+- **CI/CD**：通过自动化管道进行受控的 Open WebUI 升级
+- **日志/监控**：通过 GCP 原生工具实现集中日志和使用仪表板，并使用 **Langfuse** 实现 LLM 可观测性
+- **安全控制**：通过 IdP 实现 MFA、按组实施 RBAC、强制执行数据驻留、隐去 PII 并向用户显示中断通知、内容审核防护栏、向 SIEM 导出审计日志、DLP 政策、出站限制
+
+
+> “我们的目标不仅是部署 AI，更是负责任地扩展 AI。Open WebUI 让我们能够从业务部门汇集高价值使用场景，同时维持所需的治理。”——Public Storage 首席技术官
+
+## 模型与数据处理 {#models--data-handling}
+
+Public Storage 采用**多模型战略**来平衡能力、隐私和成本：
+
+- **主要模型**：Anthropic Claude（零数据保留）
+- **高用量**：OpenAI GPT 模型（零数据保留）
+- **开放权重**：Llama 和 Gemma，用于在自有基础设施上私密运行的工作负载
+- **RAG**：默认使用 Sentence Transformers 生成嵌入，并持续优化检索性能
+- **PII 处理**：自定义过滤器会在任何敏感数据到达模型之前**隐去 PII、停止处理并向用户显示通知**。这种主动中断方式超越了静默隐去
+
+## 采用与赋能 {#adoption--enablement}
+
+Public Storage 采用了经过周密规划、由倡导者驱动的推广方式。在更广泛发布之前，先由指定的采用倡导者开展**为期两周的试点**，并在 30 天内全面开放。
+
+赋能侧重于**实用、针对具体角色的使用场景**，而不是抽象的 AI 培训。团队为早期采用者举办了 1.5 小时的“PS.AI Orientation”入门课程，分享针对各职能部门定制的真实示例和最佳实践。
+
+在第一个月内：
+
+- **约 50% 的已接入用户**积极使用该平台
+- 随着团队与同事**分享成功的工作流**，使用量持续增长
+- **所有公司职能部门**均有参与，包括 HR、营销、财务、法务、呼叫中心、运营、销售/收购、IT 和风险管理
+
+> “我们看到了真正的运营时间节省，这些使用场景由业务部门而非仅由 IT 部门构建，既加速了采用，也带来了实际成果。”——Public Storage 数字技术副总裁
+
+## 成果：生产力、采用与治理 {#results-productivity-adoption-and-governance}
+
+![由 Open WebUI 提供支持的 Public Storage 内部 AI 平台的手机截图。](/images/enterprise/customers/public-storage/open-webui.png)
+
+
+
+### 01. 节省运营时间 {#01-operational-time-savings}
+
+整个组织的团队都报告生产力显著提升。其中一个例子是，一位区域经理**将每周四小时的预订审查流程缩短至约 40 分钟**，降幅超过 80%。
+
+### 02. 跨职能部门采用 {#02-cross-functional-adoption}
+
+**第一个月活跃使用率约 50%**，员工构建自定义模型和角色，并跨部门分享业务应用机会，从而自然推动了采用。
+
+### 03. 企业治理 {#03-enterprise-governance}
+
+- **完全私密的部署**，在 GCP 内强制执行数据驻留
+- 内置 PII 隐去、内容审核防护栏、DLP 政策和审计导出，确保**合规且不妨碍使用**
+- RBAC、MFA 和出站限制为整个平台提供**分层安全防护**
+
+## 主要使用场景 {#top-use-cases}
+
+- **预订分析**：总结报告和预订详情
+- **现场沟通**：起草指引、跟进内容和内部沟通材料
+- **政策检索**：从内部政策、流程和 playbook 中检索知识
+- **跨部门代理**：试用面向特定工具的 AI 代理，并跨部门（HR、法务、呼叫中心、财务等）分享工作流
+
+
+## Public Storage 选择 Open WebUI 的原因 {#why-public-storage-chose-open-webui}
+
+Open WebUI 作为能够伴随 Public Storage 的目标共同成长的平台脱颖而出：
+
+- **可扩展的基础**，从聊天演进为完整的内部 AI 平台
+- **多模型灵活性**：支持商业和开放权重模型，无锁定
+- **企业级治理**：PII 隐去、审计跟踪、RBAC、DLP
+- **快速部署**，IT 开销极小
+- **开放架构**，支持迭代而不依赖供应商
+
+该平台使每个公司职能部门都能安全、大规模地发现和分享 AI 驱动的生产力提升。
+
+
+
+---
+
+:::tip
+
+**正在寻找[企业方案](/enterprise)？** **[立即联系我们的销售团队！](/enterprise)**
+
+获得**增强功能**，包括**自定义主题和品牌**、**服务等级协议（SLA）支持**、**长期支持（LTS）**以及**更多能力！**
+
+:::

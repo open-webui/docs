@@ -1,0 +1,70 @@
+---
+title: "双 OAuth 设置"
+sidebar_label: 双 OAuth 配置
+sidebar_position: 30
+description: 了解如何在 Open WebUI 中同时配置 Microsoft 和 Google OAuth 服务提供方。
+---
+
+# 双 OAuth 配置（Microsoft 和 Google）
+
+:::info 内置服务提供方
+Google、Microsoft、GitHub 和 Feishu 是独立的内置服务提供方，各自独立于通用 OIDC 服务提供方（`OPENID_PROVIDER_URL`）进行注册。只有通用 OIDC 位置是单一的，因此无需变通方案即可同时启用 Microsoft 和 Google。
+:::
+
+## 概述 {#overview}
+
+Open WebUI 将 Google、Microsoft、GitHub 和 Feishu 注册为独立的内置服务提供方，同时提供一个通用 OIDC 服务提供方，因此可以同时启用 **Microsoft** 和 **Google**。
+
+## 先决条件 {#prerequisites}
+
+- 可访问 Open WebUI 环境变量（Docker 或本地）。
+- 来自 [Google Cloud Console](https://console.cloud.google.com/) 和 [Microsoft Azure/Entra ID](https://entra.microsoft.com/) 的客户端 ID 和客户端密钥。
+- 必须启用 `OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true`，确保无论使用哪个服务提供方，用户都映射到同一账户。
+
+## 配置逻辑 {#configuration-logic}
+
+每个内置服务提供方都通过自己的 `*_CLIENT_ID` 和 `*_CLIENT_SECRET` 注册（Microsoft 还需要 `MICROSOFT_CLIENT_TENANT_ID`）。`OPENID_PROVIDER_URL` 只注册通用 OIDC 服务提供方（与 `OAUTH_CLIENT_ID` 和 `OAUTH_CLIENT_SECRET` 一起，或使用 `OAUTH_CODE_CHALLENGE_METHOD` 进行 PKCE）；除此之外，它仅作为没有自己发现 URL 的服务提供方的退出登录回退项。
+
+## 环境变量 {#environment-variables}
+
+将以下内容添加到 `docker-compose.yaml` 或环境配置：
+
+```bash
+# 启用注册和账户合并（关键）
+ENABLE_OAUTH_SIGNUP=true
+OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true
+
+# 1. Microsoft（内置服务提供方）
+# 通过前三个变量注册为内置 Microsoft 服务提供方
+MICROSOFT_CLIENT_ID=your_microsoft_client_id
+MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
+MICROSOFT_CLIENT_TENANT_ID=your_tenant_id
+MICROSOFT_REDIRECT_URI=https://your-webui.com/oauth/microsoft/callback
+# 可选：不用于注册 Microsoft；作为退出登录回退项，同时消除启动时的退出警告
+OPENID_PROVIDER_URL=https://login.microsoftonline.com/your_tenant_id/v2.0/.well-known/openid-configuration
+
+# 可选：Microsoft OAuth 的自定义范围（使用自定义 API 范围时必需）
+# MICROSOFT_OAUTH_SCOPE=openid email profile offline_access api://<Application ID URI>/<custom_scope>
+
+# 可选：在刷新令牌请求中包含范围（某些 Azure AD 配置需要）
+# OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE=true
+
+# 2. Google 作为第二个 OAuth 服务提供方
+# 注意：不要为 Google 提供 OPENID_PROVIDER_URL。
+# 系统将使用其内部 Google OAuth 实现。
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+## 为什么这样可行 {#why-this-works}
+
+1.  **Microsoft** 通过 `MICROSOFT_CLIENT_ID`、`MICROSOFT_CLIENT_SECRET` 和 `MICROSOFT_CLIENT_TENANT_ID` 注册为内置 Microsoft 服务提供方，并使用自己的租户发现 URL。这里的 `OPENID_PROVIDER_URL` 不会注册任何内容，因为通用 OIDC 服务提供方还需要 `OAUTH_CLIENT_ID`。
+2.  只要设置了 `GOOGLE_CLIENT_ID` 和 `GOOGLE_CLIENT_SECRET`，**Google** 就会注册为内置 Google 服务提供方，与任何其他服务提供方无关。
+3.  **账户合并**：由于两个服务提供方都返回用户邮箱，`OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true` 可确保无论用户点击“使用 Google 登录”（“Sign in with Google”）还是“使用 Microsoft 登录”（“Sign in with Microsoft”），都会登录到同一用户资料。
+
+## 故障排除 {#troubleshooting}
+
+- **重定向不匹配**：如果设置了 `MICROSOFT_REDIRECT_URI` 和 `GOOGLE_REDIRECT_URI`，请确保两个控制台中的重定向 URI 与之匹配；否则应与访问 Open WebUI 的 URL 匹配，因为回调 URL 根据传入请求构建。`WEBUI_URL` 不设置回调 URL，只决定登录后浏览器到达的位置。
+- **合并失败**：仔细检查 `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` 是否设置为 `true`。
+- **Microsoft 退出登录**：退出登录会从会话登录时使用的服务提供方发现 end-session 端点，因此 Microsoft 会话无需 `OPENID_PROVIDER_URL` 即可退出；如果设置了 `OPENID_END_SESSION_ENDPOINT`，则由它覆盖发现的端点。
+- **Azure AD 刷新令牌失败（`AADSTS90009`）**：如果令牌刷新失败并显示错误“Application is requesting a token for itself”，请设置 `OAUTH_REFRESH_TOKEN_INCLUDE_SCOPE=true`。Azure AD 要求在刷新令牌请求中显式包含范围。你可能还需要设置 `MICROSOFT_OAUTH_SCOPE`，以包含 `offline_access` 和任何自定义 API 范围。

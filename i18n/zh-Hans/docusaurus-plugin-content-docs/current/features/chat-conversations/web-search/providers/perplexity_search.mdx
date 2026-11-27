@@ -1,0 +1,56 @@
+---
+sidebar_position: 21
+title: "Perplexity Search"
+---
+
+:::warning
+
+本教程为社区贡献，不受 Open WebUI 团队支持。它仅演示如何针对你的具体用例自定义 Open WebUI。想要参与贡献？请查看贡献教程。
+
+:::
+
+:::tip
+
+有关与网页搜索相关的所有环境变量（包括并发设置、结果数量等）的完整列表，请参阅[环境配置文档](/reference/env-configuration#web-search)。
+
+:::
+
+:::tip 故障排除
+
+网页搜索遇到问题？请查看[网页搜索故障排除指南](/troubleshooting/web-search)，了解代理配置、连接超时和内容为空等常见问题的解决方法。
+
+:::
+
+## Perplexity Search API {#perplexity-search-api}
+
+:::info
+
+Perplexity Search API 只是一个搜索引擎；与之不同，Perplexity 集成使用 Perplexity 的模型（并结合其网页搜索）。
+
+:::
+
+### 设置 {#setup}
+
+1. 前往：`Settings` -> `Web Search`（管理员区域）
+2. 开启 `Web Search`
+3. 在下拉菜单中将 `Web Search Engine` 设为 `perplexity_search`
+4. 输入从 [Perplexity API 密钥管理](https://www.perplexity.ai/account/api/keys)获取的 Perplexity API 密钥。
+5. 点击保存
+
+### 使用 LiteLLM 进行搜索 {#using-litellm-for-search}
+
+你可以使用 [LiteLLM](https://docs.litellm.ai/) 代理实例作为搜索服务提供方，而不直接连接 Perplexity。LiteLLM 的 `/search` 端点兼容 Open WebUI 使用的 Perplexity Search API 接口格式。
+
+配置方法如下：
+
+1. 按照上述设置步骤操作，选择 `perplexity_search` 作为引擎。
+2. 在 **Perplexity Search API URL** 字段（`PERPLEXITY_SEARCH_API_URL`，默认值为 `https://api.perplexity.ai/search`）中，将默认值替换为你的 LiteLLM 端点。此字段应填写完整的搜索端点，而不是基础 URL。
+3. URL 必须采用以下特定格式：`http://<your-litellm-url>/search/<your-search-provider-name>`。确保搜索服务提供方名称与你在 LiteLLM 配置中设置的提供方名称一致。
+
+**示例：**
+
+如果你的 LiteLLM 实例运行在 localhost 上，并且你想使用 LiteLLM 配置中定义的 `perplexity-search` 提供方：
+
+```
+http://localhost:4000/search/perplexity-search
+```

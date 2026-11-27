@@ -1,0 +1,117 @@
+---
+sidebar_position: 4
+sidebar_label: "Noerr Partnerschaftsgesellschaft mbB"
+title: "Noerr"
+description: "Noerr 在八周内推出托管于 Azure 的 AI 工作区，最初七天内就有 600 多名员工使用。"
+keywords: ["Noerr AI", "Open WebUI case study", "enterprise AI", "private AI deployment"]
+---
+
+# 律师事务所 Noerr 如何在八周内完成 Open WebUI 推广，并在第一周获得 600 多名活跃用户
+
+![Noerr](/images/enterprise/customers/noerr/hero.png)
+
+## 概览 {#overview}
+
+:::info
+Noerr 在其自己的 Azure 订阅中基于 Open WebUI 构建了 NoerrGPT，这是一个面向全公司的安全 AI 工作区。它在保持对数据、模型和合规完全控制的同时，加快了法律工作。
+:::
+
+### 要点一览 {#at-a-glance}
+
+- **行业**：法律服务
+- **公司规模**：1,000 至 4,999 名员工，其中包括 450 多名顾问
+- **部署**：Noerr 自己的 Azure 订阅，数据仅驻留在欧盟
+- **模型**：Azure OpenAI GPT-6-Luna 和 GPT-6.1-Sol；AWS Anthropic Opus-5.5 和 Sonnet-5
+- **部署耗时**：从项目启动到推广共 8 周
+- **使用情况**：最初 7 天内有 600 多名员工活跃使用；日活跃用量在最初两周内稳定在许可席位的 60% 至 70%
+- **关键成果**：第一周的独立用户数相当于此前平台的月度独立用户数
+
+## 关于 Noerr {#about-noerr}
+
+[Noerr](https://www.noerr.com/)是一家德国顶级律师事务所，在德国六个办事处和包括伦敦、纽约在内的四个国际办事处拥有 450 多名顾问。该事务所全面覆盖公司法和商法的各个领域，并为客户提供复杂的跨境事务支持。
+
+为了保持优势，Noerr 正在投资负责任的 AI，在增强律师和支持专业人员工作能力的同时，不损害严格的客户保密和数据保护要求。
+
+## 挑战：为法律工作提供现代 AI，不作任何妥协 {#the-challenge-modern-ai-for-legal-work-without-compromise}
+
+在使用 Open WebUI 之前，Noerr 运行自己的 LLM 内部界面。随着 AI 创新步伐加快，该事务所需要：
+
+- 更简洁、现代，让律师真正乐于使用的界面
+- 更快获得新功能和新模型
+- 面向法律工作流的深度定制和集成选项
+- 能够继续仅在欧盟托管，并完全控制数据、加密和日志
+
+现成的 SaaS 工具无法达到 Noerr 的标准。功能推出速度太慢，集成能力有限，而且严格的内部数据保护政策不允许将数据发送到外部供应商的基础设施。
+
+## 解决方案：Noerr Azure 环境中的 NoerrGPT {#the-solution-noerrgpt-in-noerrs-azure-environment}
+
+Noerr 选择 Open WebUI，是因为它既可以完全部署在事务所自己的 Azure 订阅中，又保持高度可定制和快速迭代的能力。
+
+- **计算与编排**：Azure Kubernetes Service（AKS），为 OCR 提供 GPU 节点自动扩缩容
+- **存储与数据库**：Azure Database for PostgreSQL，使用客户管理的密钥进行静态加密
+- **网络**：专用 VNet，LiteLLM 作为 LLM 请求的中央枢纽
+- **机密**：Infisical
+- **CI/CD**：Azure DevOps 管道，使用 ArgoCD 进行部署
+- **监控**：Sentry 用于错误日志，Gatus 用于运行时间监控
+- **沙盒终端**：AKS 上的隔离终端，用于智能体式代码执行
+- **安全控制**：MFA、设备合规检查、按组实施基于角色的访问控制、强制执行欧盟数据驻留、内容审核与防护栏、DLP 政策，以及向 SIEM 导出审计日志
+
+## 模型、RAG 与数据保护 {#models-rag-and-data-protection}
+
+Noerr 仅在欧盟区域运行由 Azure 和 AWS 托管的模型。用户可以自行选择模型，也可以依靠智能体式模型选择，由系统根据提示词目标选择最合适的模型。
+
+RAG 专为法律使用场景设置。它采用混合搜索和 Azure 重排序模型，其来源通过内部内容和法律专业内容得到丰富。
+
+为保护高度机密的数据，内置联网搜索已全局关闭，改为通过 Linkup 和 Noerr 自己的来源运行安全的联网搜索。
+
+## 采用与赋能 {#adoption-and-enablement}
+
+在为期 8 周的开发阶段结束时，Noerr 与 15 位数据和 AI 专家开展了为期两周的集中 Beta 测试，随后向全公司开放该平台。所有法律顾问以及 HR、IT 和法律助理等支持职能部门均可使用 NoerrGPT。
+
+赋能措施特意保持轻量并方便律师使用：
+
+- 针对内部使用场景定制的书面文档，以及
+- 带现场演示的录播实操课程，用户可按需回放。
+
+<img
+  src="/images/enterprise/customers/noerr/open-webui.png"
+  alt="NoerrGPT 起始界面，已选择 GPT Sol 6.1，并显示建议的工作流。"
+  style={{ clipPath: "inset(0.25% round 1.5%)" }}
+/>
+
+## 成果 {#results}
+
+Noerr 强调了三个关键成果：
+
+- **快速采用**：第一周有 600 多名员工使用 NoerrGPT。这相当于此前平台的月度独立用户数，表明用户参与度很高，平台也非常契合需求。日活跃用量在最初两周内稳定在许可席位的 60% 至 70%。
+- **高度认可**：尽管与此前界面相比变化很大，律师和员工仍给出了积极反馈。
+- **稳定性与性能**：Noerr 控制的所有服务都稳定且性能出色，能够大规模支持日常法律工作。
+
+## 主要使用场景 {#top-use-cases}
+
+- 通过智能体从核心应用和商业登记簿检索数据
+- 预置提示词库，用于从合同和案件文件中提取信息，以及起草、分析和修改条款
+- 通过专业机器人围绕内部政策和指南进行问答
+- 确定性的数据整理和绘图
+- 完全智能体式的技能选择和执行
+
+## Noerr 选择 Open WebUI 的原因 {#why-noerr-chose-open-webui}
+
+- **开放架构**：不受供应商锁定
+- **速度**：快速完成概念验证，并在 8 周内实施
+- **完全控制**：完全运行在 Noerr 的 Azure 环境中，采用 BYOK 加密并完全拥有数据
+- **灵活性**：足以灵活添加自定义功能并连接内部工具
+
+## 后续计划 {#whats-next}
+
+在安全且获得广泛采用的 AI 工作区就位后，Noerr 计划继续扩展使用场景、深化集成并完善事务所专属工作流，同时维持客户所期望的高标准数据保护与合规水平。
+
+---
+
+:::tip
+
+**正在寻找[企业方案](/enterprise)？**——**[立即联系我们的销售团队！](/enterprise)**
+
+获得**增强功能**，包括**自定义主题和品牌**、**服务等级协议（SLA）支持**、**长期支持（LTS）版本**以及**更多能力！**
+
+:::

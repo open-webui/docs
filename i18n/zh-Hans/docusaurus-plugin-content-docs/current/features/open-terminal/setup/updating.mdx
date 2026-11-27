@@ -1,0 +1,158 @@
+---
+sidebar_position: 3
+title: "更新"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 更新 Open Terminal
+
+Open Terminal 是独立于 Open WebUI 的程序，因此更新 Open WebUI 不会同时更新它。如果这些页面介绍的某项功能缺失，或预览效果不如预期，通常是因为终端服务器已运行很长时间且一直未更新。
+
+## 检查正在运行的版本 {#check-which-version-you-are-running}
+
+在浏览器中打开 `http://localhost:8000/docs`，使用你提供给 Open WebUI 的地址。版本号位于页面顶部的 **Open Terminal** 标题旁。
+
+如果你更喜欢通过 shell 检查：
+
+```bash
+curl -s http://localhost:8000/openapi.json | python -c "import json,sys; print(json.load(sys.stdin)['info']['version'])"
+```
+
+将结果与[最新版本](https://github.com/open-webui/open-terminal/releases)进行比较。这两个请求都不需要你的 API 密钥。
+
+---
+
+## 更新 {#update}
+
+你的文件位于 Docker 卷或自己的磁盘上，更新会替换程序而不是数据，不会改动 `/home/user` 中的任何内容。
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+
+三条命令：获取新镜像、移除旧容器、启动新容器。
+
+```bash
+docker pull ghcr.io/open-webui/open-terminal
+docker rm -f open-terminal
+```
+
+然后运行启动时使用的同一条 `docker run` 命令：
+
+```bash
+docker run -d \
+  --name open-terminal \
+  --restart unless-stopped \
+  -p 8000:8000 \
+  -v open-terminal:/home/user \
+  -e OPEN_TERMINAL_API_KEY=your-secret-key \
+  ghcr.io/open-webui/open-terminal
+```
+
+:::warning 使用与之前相同的参数
+`docker rm -f` 会删除容器及其设置，因此新容器只会获得你在这条命令中输入的配置。尤其要保留 `-v open-terminal:/home/user`，它用于保留你的文件；还要保持 `OPEN_TERMINAL_API_KEY` 不变，使 Open WebUI 仍能连接。你在此处遗漏的任何配置都不会出现在新容器中。
+
+如果不确定旧容器启动时使用了哪些参数，请在移除前运行 `docker inspect open-terminal`。
+:::
+
+使用的是较小的镜像吗？请拉取实际运行的标签，例如 `ghcr.io/open-webui/open-terminal:slim`，并在 `docker run` 命令中使用相同的标签。
+
+  </TabItem>
+  <TabItem value="bare-metal" label="裸机">
+
+**使用 pip 安装：**
+
+```bash
+pip install --upgrade open-terminal
+```
+
+然后按 **Ctrl+C** 停止正在运行的服务器，再重新启动。升级不会影响已经在运行的进程。
+
+如果安装了 MCP 扩展，升级时请保留它：
+
+```bash
+pip install --upgrade "open-terminal[mcp]"
+```
+
+**使用 uvx 运行：**
+
+uvx 会缓存首次下载的版本并持续使用。请明确请求最新版本：
+
+```bash
+uvx open-terminal@latest run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+  </TabItem>
+  <TabItem value="compose" label="Docker Compose">
+
+在包含 `docker-compose.yml` 的目录中运行：
+
+```bash
+docker compose pull open-terminal
+docker compose up -d open-terminal
+```
+
+第一条命令获取新镜像，第二条命令使用该镜像重新创建容器。Compose 文件已经包含数据卷和 API 密钥，因此无需重新输入。
+
+从两条命令中省略服务名称，即可更新文件中的所有服务，包括 Open WebUI。
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 确认更新成功 {#confirm-it-worked}
+
+重新加载 `http://localhost:8000/docs`，再次检查版本号。只要地址和 API 密钥保持不变，就无需更改 Open WebUI 中的任何内容。
+
+---
+
+## 较新服务器带来的功能 {#what-a-newer-server-gives-you}
+
+文件浏览器中的一些功能由终端服务器而非浏览器完成，因此只有服务器版本足够新时才会出现：
+
+| 版本 | 新增功能 |
+| :--- | :--- |
+| 0.12.1 | Word 和 PowerPoint 文件可按实际效果预览。服务器会像 Office 一样渲染它们，而不再由浏览器近似呈现布局。 |
+| 0.12.0 | 文件浏览器可以搜索文件内容和文件名，并显示匹配的行。 |
+| 0.11.35 | 可配置的文件浏览器主目录、无法更改文件的只读标记，以及自定义系统提示词中的模板变量。 |
+
+Office 渲染需要默认镜像。`slim`、`alpine` 和 `openshift` 镜像为保持较小体积而不包含 LibreOffice，因此这些镜像中的文档预览会回退到浏览器自己的渲染，并警告预览可能与下载文件不同。
+
+---
+
+## 故障排除 {#troubleshooting}
+
+**版本没有变化。** 当标签固定为特定版本时，Docker 会持续使用已有的镜像。检查 `docker run` 命令中的标签，并拉取该标签，而不是不带标签的名称。
+
+**Word 和 PowerPoint 预览仍显得不够准确。** 服务器可能早于 0.12.1，也可能使用了不包含 LibreOffice 的小镜像。请切换到不带标签后缀的 `ghcr.io/open-webui/open-terminal`。
+
+**Open WebUI 显示终端不可用。** 新容器未使用与旧容器相同的端口或密钥启动。将 Open WebUI 中的连接与 `docker run` 命令中的参数进行比较，并检查 `docker logs open-terminal`。
+
+**更新后文件丢失。** 新容器启动时未挂载数据卷。停止容器，然后使用 `-v open-terminal:/home/user` 或最初使用的数据卷重新启动。数据仍在数据卷中，只是新容器无法看到它。
+
+---
+
+## 运行 Terminals {#running-terminals}
+
+[Terminals](/features/open-terminal/terminals) 会自行启动实例，因此用户需要在机器中更新镜像。在机器菜单中打开机器，更改**高级**下的**镜像**并保存。下次机器启动实例时会使用新镜像。请参阅[创建机器](/features/open-terminal/terminals/orchestration/creating-terminals)。
+
+### 升级 Terminals {#upgrading-terminals}
+
+Open WebUI 需要 Terminals 0.4.0 或更高版本，而 Terminals 0.4.0 及更高版本需要 Open WebUI 0.13.4 或更高版本。Terminals 0.3.x 及更早版本不支持自动升级，因为数据库架构、存储路径和已保存的终端选择会发生变化，新版本会拒绝已有数据的旧数据库。请备份两个数据库和所有终端文件，使用新的空数据库启动全新的 Terminals 安装，将策略重新创建为模板，将每个工作区的文件复制到新的存储位置，并在 Open WebUI 中重新选择新终端。具体步骤见 [Terminals 更新日志](https://github.com/open-webui/terminals/blob/main/CHANGELOG.md#moving-to-040-manually)。在 Kubernetes 上，还要更新 operator 和 Terminal CRD。从设置中移除 `TERMINALS_OPEN_WEBUI_URL` 和 `TERMINALS_TOKEN_CACHE_TTL`，因为连接使用 `TERMINALS_API_KEY` 进行身份验证。从 Terminals 0.4.0 开始，按通常方式替换镜像即可。
+
+连接不再包含策略。策略 ID、镜像、CPU、内存、存储、空闲超时、环境变量、生命周期和终端上下文均已从连接表单中移除。对连接拥有**写入**权限的用户改为创建机器，各项设置位于每台机器中。升级后：
+
+- 创建所需的机器并共享。
+- 在使用旧连接的每个模型、文件夹、自动化和聊天中重新选择一台新机器。
+- 重新打开较早的聊天并再次选择机器，参见[聊天](/features/open-terminal/terminals/orchestration/creating-terminals#chats)。
+- 在模型名称包含句点的固定项、默认模型和自动化中重新选择智能体模型，参见[模型 ID](/features/open-terminal/agents#model-ids)。
+
+---
+
+## 另请参阅 {#see-also}
+
+- [安装](./installation.mdx)，包含每种方法的原始设置命令。
+- [连接到 Open WebUI](./connecting.md)，适用于需要重新配置连接的情况。
+- [文件浏览器](/features/open-terminal/file-browser)，介绍上述预览的实际外观。
