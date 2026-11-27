@@ -29,7 +29,7 @@ One of the key advantages of RAG is its ability to access and integrate informat
 
 To use a local document in RAG, add it to a knowledge base in **Workspace > Knowledge** or upload it in a chat. In a chat, type `#` before your query and select the document from the suggestion box that appears above the message input.
 
-Click a source under an answer that comes from an uploaded file to open the file in its own tab beside the chat, at the cited page when it is known. The preview highlights the cited text, except on PowerPoint slides, which show as images. In document previews, hovering a highlight shows the passage the model was given. Plain text and code files show it only when the source has a relevance score. Web pages, files the preview cannot show such as `.doc` or `.epub`, and sources in a read-only shared chat open their retrieved text in a popup.
+Click a citation in an answer, or a source under it, that comes from an uploaded file to open the file in its own tab beside the chat. A citation opens the file at the cited page when it is known, and the preview highlights the cited text, except on PowerPoint slides, which show as images. A source in the list under the answer stands for the source as a whole, so a source with several paragraphs opens at the start of the file with no highlights. In document previews, hovering a highlight shows the passage the model was given. Plain text and code files show it only when the source has a relevance score. Web pages, files the preview cannot show such as `.doc` or `.epub`, and sources in a read-only shared chat open their retrieved text in a popup.
 
 ![Document and retrieval settings](/images/admin/admin-documents.png)
 
@@ -83,7 +83,7 @@ Once created, the external source appears in **Workspace > Knowledge** like any 
 
 With [Retrieval Query Generation](/reference/env-configuration#enable_retrieval_query_generation) on, all generated queries run at the same time. Their results are merged by rank (the top result of each query, then the second of each, and so on), duplicates are dropped and the list is cut to the result count.
 
-To improve the order, turn on **Rerank results** under **Advanced** on the connection. Each query's results are then rescored with the reranking model from the **Documents** settings, results below the relevance threshold are dropped, and the merged list is sorted by that score.
+To improve the order, turn on **Rerank results** under **Advanced** on the connection. Each query's results are then rescored with the reranking model from the **Documents** settings, results below the relevance threshold are dropped, and the merged list is sorted by that score. Each query keeps at most **Top K Reranker** results.
 
 In the sources under an answer, each result is listed by its title. For Qdrant, Milvus and pgvector, when a result's **Source Field** holds a web address, clicking its title or the **Content** link in the citation opens that page; otherwise the title is plain text.
 

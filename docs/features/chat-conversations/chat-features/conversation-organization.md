@@ -24,7 +24,7 @@ Create a new folder to organize your conversations:
 2. Enter a name for your folder.
 3. Click **Save**.
 
-To work on a project that lives on a machine, choose **Open directory** in the same menu. Pick the machine if you have several, browse to the project's directory or [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new one, then click **Use this directory**. Open WebUI opens the folder you already have on that directory, or creates one named after it with its [machine and working directory](#default-machine-and-working-directory) set.
+To work on a project that lives on a machine, choose **Open directory** in the same menu. Pick the machine if you have several, browse to the project's directory or [clone a Git repository](/features/open-terminal/file-browser#cloning-a-repository) into a new one, then click **Use this directory**. Open WebUI opens the folder you already have on that directory, or creates one named after it with its [machine and working directory](#default-machine-and-working-directory) set. When you delete a folder that is on a machine directory, or that contains one, **Delete all contents inside this folder** starts unticked, so its chats are kept unless you tick it.
 
 ### Moving Conversations into Folders
 
@@ -41,10 +41,22 @@ Folders can be nested within other folders to create hierarchical organization:
 
 - **Create subfolder from menu**: Click the three-dot menu on any folder and select **"Create Folder"** to create a new subfolder directly inside it.
 - **Drag and drop**: Drag a folder onto another folder to make it a subfolder.
-- **Reorder**: Drag a folder just above or below another one to place it there, at that folder's level. The order is saved with your settings, so it is the same on every device, and folders you have not placed yet sort by name at the end. Shared folders stay sorted by name.
+- **Reorder**: Drag a folder just above or below another one to place it there, at that folder's level. The order is saved with your settings, so it is the same on every device, and folders you have not placed yet sort by name at the end. A top-level folder shared with you can be placed among your top-level folders the same way. Reordering works while **Sort by** is set to **Manual**, see [Arranging the Folder List](#arranging-the-folder-list).
 - **Export**: the same three-dot menu on a folder also has **Export**, which downloads the folder's chats. It needs the [Allow Chat Export](/features/authentication-access/rbac/permissions#3-chat-permissions) permission. There is no move entry. Folders are re-parented by drag and drop only.
 - Folders can be expanded or collapsed to show/hide their contents.
 - Subfolder names must be unique within the same parent folder. If a duplicate name is entered, a number is automatically appended (e.g., "Notes 1").
+
+### Arranging the Folder List
+
+The **More** menu on the Folders section header changes how the sidebar lists your top-level folders. Your choices are saved with your settings.
+
+- **Owner** shows **All** folders, only **Yours** or only those **Shared** with you.
+- **Machine** shows the folders of one machine, or **None** for folders without a machine. It appears once a top-level folder has a machine.
+- **Group by** puts the folders under collapsible headings by **Owner** or **Machine**. **Default** keeps your own layout.
+- **Sort by** orders the folders by **Name**, **Last activity** or **Created**. **Manual** keeps the order you dragged them into.
+- **New section** adds a section of your own. Type its name, then drag folders onto it. A subfolder of yours that you drag onto a section moves to the top level. A section's own **More** menu has **Rename** and **Delete**, and deleting a section puts its folders back in the list.
+
+Sections are hidden while **Group by** is set to **Owner** or **Machine**, and they list after the other folders while **Sort by** is not **Manual**.
 
 A chat in a child folder uses that folder's **System Prompt** and **Knowledge** settings. For example, if a parent folder has a handbook attached, attach the handbook to the child as well to make it available automatically in chats there.
 
@@ -79,7 +91,7 @@ A folder's three-dot menu also has **New Chat**, which opens the folder the same
 
 Each folder in the sidebar is a link to its own page, so a middle click or Ctrl/Cmd click opens the folder in a new tab.
 
-A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. The new chat page lists your folders with work in progress under **Continue**, meaning a chat that is running or waiting for your approval, or tabs left open, so you can pick up where you left off.
+A folder keeps its own tabs for you, so opening it again brings back the chats, files and terminals you left open there. While you are on a folder's page, clicking one of its chats in the sidebar opens the chat as a tab on that page instead of leaving the folder. The new chat page lists your folders with work in progress under **Continue**, meaning a chat that is running or waiting for your approval, or tabs left open, so you can pick up where you left off.
 
 Moving a chat into a folder requires **write access** to it. That means the folder is yours, or it is shared with you with write access, either directly or through a folder above it. Read-only access on a shared folder lets you open it and read the chats in it, but sending the first message of a new chat there is refused instead of quietly moving the chat into the folder.
 
@@ -147,7 +159,7 @@ Folders can be configured as full project workspaces with their own AI behavior 
 2. Click the **three-dot menu** (⋯).
 3. Select **"Edit"** to open the folder settings modal.
 
-On desktop, resting the pointer on a folder's name in the sidebar shows a preview of the folder: its number of chats, its default model and how many knowledge items are attached, plus the owner's name for a folder shared with you. With write access, the preview also has an **Edit Folder** button that opens the same settings.
+On desktop, resting the pointer on a folder's name in the sidebar shows a preview of the folder: its number of chats, its machine and working directory, its default model and how many knowledge items are attached, plus the owner's name for a folder shared with you. With write access, the preview also has an **Edit Folder** button that opens the same settings.
 
 ![The hover preview of the shared Product Launch folder: 5 chats, shared by Alex Chen, the Team Assistant default model, two knowledge items and an Edit Folder button](/images/features/chat/folder-hover-preview.webp)
 
@@ -233,7 +245,7 @@ Shared folders appear in the recipient's sidebar. A few rules to know:
 - **Someone else's chat opens under their name.** In a folder set to **Clone only** it is read-only. With **Allow replies** on and **Write** access to the folder, it opens with the message input and you can write into it. Each message carries the name and profile picture of the person who sent it, both in the conversation and on the message nodes in the **Overview** tab.
 - **The folder's owner can tidy up other people's chats.** In a folder you own, you can rename chats other people started (title only) and move them to other folders in the same shared tree.
 - **Edit and regenerate together.** With **Allow replies** on, people with **Write** access can edit any prompt into a new branch and regenerate any reply, the same as in a [shared chat with replies](/features/chat-conversations/chat-features/chatshare#allowing-replies).
-- **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**. Click the count to see everyone. Hover or click a picture to open that person's profile card.
+- **Each chat shows who wrote in it.** In a shared folder, every chat in the sidebar and on the folder's page shows the profile pictures of the people who wrote in it, the chat's owner first. Up to three pictures show, followed by a count such as **+2**. Click the count to see everyone. Hover a picture to open that person's profile card, or click it to open their full profile.
 - **Chats in a shared folder can be attached as context.** Drag one from the sidebar into the message input of another chat and the model receives that conversation's messages, the same as for a chat you own. Read access on the folder, whether granted on it directly or inherited from a folder above it, is enough.
 - **Archiving a chat takes it out of the folder.** People who could see it only through the folder lose access.
 - **Only the owner or an admin can delete a shared root folder.** People with write access can add and edit chats and subfolders.

@@ -106,7 +106,7 @@ Rewriting happens in the chat, there is no separate **Enhance** button. Select t
 
 Opens the full chat interface in a pane beside the note, or over it on screens narrower than 768 px. It is the same component as a normal chat, so you get the model picker, tool and skill selection, file attachments, web search and the rest of the chat input. Ask the AI to summarize, extract data, critique or rewrite specific sections.
 
-**Voice mode** is the exception. Its button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. Dictation still works, from the microphone button in the chat input.
+**Voice mode** and forking are the exceptions. The voice mode button is not offered in a note's chat, so use a normal chat for a hands-free voice conversation. The `/fork` command and the **Fork chat** action are not offered either. Dictation still works, from the microphone button in the chat input.
 
 **Insert a response into the note.** With write access on the note, every assistant response carries an **Insert into note** button that drops that response into the note at the cursor. A read-only collaborator does not get the button. Insertion creates a note version first, so **Undo/Redo** (top right) reverts it.
 
