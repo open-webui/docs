@@ -175,7 +175,7 @@ curl -X POST https://<host>/api/v1/chats/new \
 
 :::note
 
-The `messages[]` array at the top level is a flat list for older clients. It is read only when `history.messages{}` is missing. The `history.messages{}` object is the authoritative structure. It is a dictionary keyed by message ID, and the frontend uses it to build the conversation tree via `parentId` and `childrenIds`.
+The `messages[]` array at the top level is a flat list for older clients. It is read only when `history.messages{}` is missing, and responses never include it. The `history.messages{}` object is the authoritative structure. It is a dictionary keyed by message ID, and the frontend uses it to build the conversation tree via `parentId` and `childrenIds`.
 
 :::
 

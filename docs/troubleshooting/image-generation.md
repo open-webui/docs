@@ -8,10 +8,10 @@ title: "Image Generation"
 ### General Issues
 
 - **Image Not Generating** (asking for an image produces no image, or an error appears in the chat):
-    - Check the **Images** settings in **Settings** > **Images** (admin section). Ensure "Image Generation" is toggled **ON**.
+    - Check the **Images** settings in **Settings** > **Images & Videos** (admin section). Ensure "Image Generation" is toggled **ON**.
     - Ensure the **Image** toggle is on in the **+** menu of the message input. Nothing image-related happens without it, in any function calling mode.
     - Ensure the model has the **Image Generation** capability in **Workspace** > **Models** > **Edit**, and that your role has the **Image Generation** feature permission.
-    - Open the connection in **Settings** > **Images** (admin section), check its **URL** and key, and click the verify icon next to the URL.
+    - Open the connection in **Settings** > **Images & Videos** (admin section), check its **URL** and key, and click the verify icon next to the URL.
     - Ensure the connection is enabled, has the **Generate** capability on and that **Access Control** includes the user. Non-admin users outside the connection's access list never see its models.
     - Ensure the selected model is available and loaded in your backend service (e.g., check the ComfyUI or Automatic1111 console for activity).
     - **Azure OpenAI**: If you see `[ERROR: azure-openai error: Unknown parameter: 'response_format'.]`, ensure you are using API version `2025-04-01-preview` or later.
@@ -20,7 +20,7 @@ title: "Image Generation"
     - Fill in the **URL**, then save again.
     - Invalid JSON in **Additional Parameters** or **Headers** is refused with `Invalid JSON format for Parameters` or `Headers must be a valid JSON object`. Fix or clear it and save again.
 
-- **Connections are missing** (**Settings** > **Images** (admin section) shows only the **Image Generation** and **Image Edit** switches):
+- **Connections are missing** (**Settings** > **Images & Videos** (admin section) shows only the **Image Generation** and **Image Edit** switches):
     - **Manage Image Connections** and **Default Models** show while **Image Generation** or **Image Edit** is on.
 
 - **Only one image model is offered, or the wrong one is used**:
@@ -71,7 +71,7 @@ title: "Image Generation"
 
 ### Environment Variables & Configuration
 
-The image connections are managed in **Settings** > **Images** (admin section).
+The image connections are managed in **Settings** > **Images & Videos** (admin section).
 
 #### General Image Generation
 

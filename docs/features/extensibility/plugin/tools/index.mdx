@@ -230,7 +230,7 @@ Native Mode is the **default**, so new and existing models use it unless they ar
 
 #### Tool call labels
 
-A finished tool call shows in the chat as **View Result from** and the tool's name. Turn on **Tool Call Labels** in **Settings > Interface** (admin section) ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. Open WebUI adds a required `__labels__` argument to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
+A finished tool call shows in the chat as **View Result from** and the tool's name. Open WebUI's built-in tools show a fixed label instead, such as **Searching the web** while `search_web` runs, **Searched the web** when it finishes and **Failed to search the web** when it fails. Turn on **Tool Call Labels** in **Settings > Interface** (admin section) ([`ENABLE_TOOL_CALL_LABELS`](/reference/env-configuration#enable_tool_call_labels)) to have the model write a short label for each call in the user's language, one shown while the call runs and one after it completes. A label the model writes replaces a built-in tool's fixed label, except on a call that failed. Open WebUI adds a required `__labels__` argument to each tool and removes it before the tool runs. Hidden tools and tools whose parameters are not a plain JSON object keep the default line.
 
 #### Model Requirements & Caveats
 

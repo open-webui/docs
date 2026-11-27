@@ -105,7 +105,7 @@ The following table lists the available URL parameters, their function, and exam
 ### 11. **Settings Deep Link**
 
 - **Description**: The `settings` parameter opens the settings dialog on a given tab and then removes itself from the URL.
-- **How to Set**: Use a user tab id (`general`, `interface`, `notifications`, `shortcuts`, `personalization`, `audio`, `data_controls`, `usage`, `archived_chats`, `account`, `about`) or an admin tab as `admin:<tab>` (`general`, `authentication`, `interface`, `connections`, `models`, `subagents`, `integrations`, `apps`, `documents`, `audio`, `images`, `videos`, `web`, `code-execution`, `pipelines`, `analytics`, `evaluations`, `db`).
+- **How to Set**: Use a user tab id (`general`, `interface`, `notifications`, `shortcuts`, `personalization`, `audio`, `data_controls`, `usage`, `archived_chats`, `account`, `about`) or an admin tab as `admin:<tab>` (`general`, `authentication`, `interface`, `connections`, `models`, `subagents`, `integrations`, `documents`, `web`, `audio`, `images`, `code-execution`, `pipelines`, `analytics`, `db`). Apps are a section of `admin:integrations`, and video settings are a section of `admin:images`. A tab id that does not exist opens the **General** tab.
 - **Example**: `/?settings=admin:documents`
 - **Behavior**: The dialog opens on that tab. A non-admin who follows an `admin:` link gets the General tab instead.
 

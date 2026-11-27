@@ -201,7 +201,7 @@ Connection failures, authentication errors, and tool-server errors still need th
 
 ### Some endpoints are missing from the tool list
 
-Open WebUI turns each operation in the OpenAPI spec that has an `operationId` into a tool, and uses the `operationId` as the tool's name. Operations without an `operationId` are left out without an error or a log message. Set a unique `operationId` on every endpoint the model should call.
+Open WebUI turns each operation in the OpenAPI spec that has an `operationId` into a tool, and uses the `operationId` as the tool's name. Operations without an `operationId` are left out without an error or a log message. Set a unique `operationId` on every endpoint the model should call. A tool name longer than 64 characters is shortened to its first 55 characters, an underscore and an 8-character hash, because providers reject longer names.
 
 ### General tips
 

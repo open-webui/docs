@@ -254,7 +254,11 @@ The first three open a **Create a new note** dialog showing the title and conten
 
 ### View options
 
-Toggle between **Created by you** and **Shared with you** filters, and switch between **List** and **Grid** layouts.
+**Search Notes** at the top of the list, or the `/` key, searches note titles and text. A match in the text shows the words around it next to the title.
+
+The **Filter** menu, or the `f` key, narrows the list. **Show** picks **All**, **Created by you** or **Shared with you**, **Access** picks **Write** or **Read Only**, and **Tags** filters by tag. Active filters appear as chips above the list, with **Clear filters** to remove them. **Display options** switches the **Layout** between **List** and **Grid** and sets the **Ordering** by **Updated** or **Title**.
+
+**Rename** in a note's **⋯** menu renames it in the list when you can edit it.
 
 The [search window](/features/chat-conversations/chat-features/history-search#searching-your-history) also finds your notes and the notes shared with you, by title and content.
 

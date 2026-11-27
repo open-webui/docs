@@ -61,7 +61,7 @@ Click **Save**. The connection appears under **Open Terminal** with its toggle s
 
 ### 6. (Optional) Restrict access to specific groups
 
-Limit access to specific user groups via the access control button.
+Expand **Access** at the bottom of the form and pick the users or groups who may use the machine.
 
 ![The access control panel listing user groups with checkboxes](/images/open-terminal-access-grants.png)
 
@@ -184,7 +184,9 @@ Automations and sub-agents never get the two tools. The field is on every machin
 
 When a terminal is selected in the chat, Open WebUI reads `AGENTS.md` from the home folder of the terminal's user on every message. Its content is added to the conversation as a user message just before the first user message, so the model gets your standing instructions for that workspace. Edits to the file apply from the next message. Windows home folders work too.
 
-A file larger than 32 KiB is skipped, and so is a read that takes longer than 5 seconds. A machine an admin configured is read by the Open WebUI server. A machine a user added in the Tether app is read through Tether, so the Tether app has to stay connected.
+In a chat that belongs to a folder and runs on the folder's machine, Open WebUI also reads `AGENTS.md` from the folder's working directory, or `CLAUDE.md` when that directory has no `AGENTS.md`. The home file comes first and the folder file follows it.
+
+A file larger than 32 KiB is skipped, and so is a read that takes longer than 5 seconds. The limit covers both files together, so a folder file that takes the total over 32 KiB is skipped. A machine an admin configured is read by the Open WebUI server. A machine a user added in the Tether app is read through Tether, so the Tether app has to stay connected.
 
 ---
 

@@ -36,7 +36,7 @@ Go to **Settings > Integrations**, scroll to **Machines** and click **+**, as in
 
 Click **Remote** next to **Type** and pick **Local**. The name is optional.
 
-Only one local machine can exist per Open WebUI instance, so **Type** is gone once you have added one.
+Only one local machine can exist per Open WebUI instance, so **Type** is gone once you have added one. A local machine is meant for a single Open WebUI instance. With several replicas, Open Terminal is installed only on the replica that handled the request.
 
 ### 3. Choose a folder and a version
 

@@ -107,11 +107,15 @@ The page is the editor. Name and instructions sit at the top, followed by a **Pr
 
 The header also has **Run now**, **Copy link** and a **More** menu with **Duplicate** and **Delete**. **Duplicate** opens the new-automation form pre-filled with the same settings and "(Copy)" added to the name. Nothing is saved until you click **Create**.
 
-Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. Runs load incrementally as you scroll.
+Below the properties, **Activity** lists the runs, newest first, each marked **Ran** or **Failed** with its time. Click a run to open its chat. **Show more** at the end of the list loads earlier runs, and the **Sort** button switches between **Newest first** and **Oldest first**. The list ends with an **Automation created** entry that shows when the automation was made. With **Oldest first**, that entry comes first.
 
 The **Destination** menu has a **Start each run in new chat** switch (**Start each run in new thread** for a channel), on by default. Switch it off and every run continues one ongoing chat or channel thread, so each run sees the earlier runs.
 
 For a channel, **Reply in thread** (on by default) decides where the model answers. With the switch on, each run posts its prompt as a channel message and the answer appears as a reply in a thread under it. With it off, each run posts its prompt and its answer as ordinary top-level channel messages, without a thread.
+
+### Filter and switch several at once
+
+In the Automations list header, **Filter** narrows the list by **Status** (**All**, **Active** or **Paused**) and by **Owner** (**All**, **Mine** or **Shared with me**). **Enable All** and **Disable All** in the **More** menu switch every automation that matches the current search and filters. Shared automations you can only read are left as they are.
 
 ### Quick delete
 
@@ -119,9 +123,9 @@ Hold **Shift** while the Automations list is open and each automation's menu but
 
 ## Export and Import
 
-The Automations list header has a split **Create** button. Its dropdown holds **Import JSON** and **Export JSON**, which move automations between instances or accounts.
+The **More** menu in the Automations list header holds **Import JSON** and **Export JSON**, which move automations between instances or accounts.
 
-**Export JSON** downloads every automation you own as `automations-export-<timestamp>.json`, regardless of the search box or the status filter. Each entry keeps its name, schedule and other settings, folder assignment and enabled state. IDs, timestamps and run history are not written to the file, so an export is a copy of your definitions, not a backup of past runs.
+**Export JSON** downloads your automations and the ones shared directly with you as `automations-export-<timestamp>.json`, regardless of the search box or the status filter. It follows the **Owner** filter, so pick **Mine** first to export only your own. Each entry keeps its name, schedule and other settings, folder assignment and enabled state. IDs, timestamps and run history are not written to the file, so an export is a copy of your definitions, not a backup of past runs.
 
 **Import JSON** accepts a `.json` file holding either a bare array of automations or an object with an `automations` key. Anything else is rejected as invalid JSON format.
 
@@ -166,7 +170,7 @@ Admins control webhooks with **Automation Webhooks** in **Admin Settings > Gener
 
 An automation can be shared with specific users and groups, so a team follows a report without each person creating their own. Use **Share** in the automation's header and pick people and groups, like for other [shared items](/features/authentication-access/rbac/permissions#2-sharing-permissions). Non-admin users need the **Automations Sharing** permission to share.
 
-- **Read** lets people open the automation, see its schedule and read the chats its runs created. The **Shared with me** tab of the Automations list shows automations shared directly with you.
+- **Read** lets people open the automation, see its schedule and read the chats its runs created. To list the automations shared directly with you, open **Filter** in the Automations list header and pick **Shared with me** under **Owner**.
 - **Write** adds running it, pausing it and changing its name and schedule.
 - Only the creator changes the instructions, model, destination and webhook, because runs always use the creator's account. The creator and admins can share and delete.
 
@@ -177,8 +181,8 @@ Automations that sit in a shared folder follow the folder's access (see [Folders
 With **Destination** set to **Channel**, a run posts into a [channel](/features/channels) instead of creating a chat. The list shows your channels without direct messages.
 
 - Saving needs write access to a standard channel or membership in a group channel. Users who are not admins also need the **Channels** permission.
-- Each run posts the instructions into the channel as a message from you. The model's reply goes into a thread under that message, or into the timeline when the admin **Model Response Mode** is set to **Channel**.
-- The model receives only the instructions, not earlier messages from the channel.
+- Each run posts the instructions into the channel as a message from you. The model's reply goes into a thread under that message, or into the channel as its own message when **Reply in thread** is off. With **Start each run in new thread** off, the instructions and the reply are both posted into the automation's one ongoing thread.
+- With **Start each run in new thread** on, the model receives only the instructions. With it off, the model also receives the earlier messages of that thread, including replies other people posted there. It never receives messages from the rest of the channel.
 - Clicking a run in **Activity** opens the channel.
 - Agent automations need a chat destination. Saving one with **Channel** is refused with `Agent automations require a chat destination.`, or with `This machine requires a chat destination.` when the machine comes from a template. That second message also refuses a template machine limited to chats.
 - A run fails with `Channel not found` when channels are turned off for the instance, and with `Owner no longer permitted to use channels` when its creator has lost the **Channels** permission.

@@ -29,13 +29,13 @@ A ComfyUI connection holds one workflow for generating images and one for editin
 
 This feature uses a language model to automatically generate more detailed and creative prompts based on your initial input, which can lead to better image results. It only applies to Legacy function calling; in the default Native mode the model writes the prompt itself when it calls the tool.
 
-The **Image Prompt Generation** toggle is in the **Legacy** section of **Settings > Images** (admin section).
+The **Image Prompt Generation** toggle is in the **Legacy** section of **Settings > Images & Videos** (admin section).
 
 To customize the prompt template used for generation, go to **Settings > Interface** (admin section), in the **Generation** section.
 
 ## Create Image (Image Generation)
 
-1. In Open WebUI, go to **Settings** > **Images** (admin section) and switch on **Image Generation**.
+1. In Open WebUI, go to **Settings** > **Images & Videos** (admin section) and switch on **Image Generation**.
 2. Add a connection and set **Connection Type** to **ComfyUI**.
 3. In **URL**, enter the address of your running ComfyUI instance (for example `http://host.docker.internal:8188/`) and click the verify icon next to it. A success message should appear. Open WebUI also opens a WebSocket to `/ws` on this address, so any proxy in front of ComfyUI must pass WebSocket upgrades.
 4. If your ComfyUI instance requires an API key, enter it in the key field.
@@ -78,7 +78,7 @@ To customize the prompt template used for generation, go to **Settings > Interfa
     :::
 
 8. Leave **Model IDs** empty to use the model set in the workflow, or add model names to offer them. The suggested names come from the last verify: from the node mapped as Model (its first input whose name contains `_name`, such as `ckpt_name` or `unet_name`), or from the CheckpointLoaderSimple checkpoints when no Model node is mapped, so verify again after mapping the nodes. Under **Advanced**, **Image Size** and **Steps** are optional defaults. Without an Image Size, ComfyUI receives 512x512. A mapped Seed node gets a new random seed on every request.
-9. Set **Access Control** and click **Save**. Without a grant, only admins can use the connection.
+9. Click **Access**, choose who may use the connection, and click **Save**. Without a grant, only admins can use the connection.
 
 ![Screenshot of an image being generated in the chat using ComfyUI.](/images/image-generation-and-editing/comfyui-create-image-in-chat.png)
 
@@ -90,7 +90,7 @@ Messages have no "Generate Image" button. Generation happens from the chat itsel
 
 Open WebUI also supports image editing through ComfyUI, allowing you to modify existing images.
 
-1. In **Settings** > **Images** (admin section), switch **Image Edit** on.
+1. In **Settings** > **Images & Videos** (admin section), switch **Image Edit** on.
 2. In the **Edit Workflow** section of the same connection, upload a workflow designed for image editing, exported the same way as the generation workflow.
 3. Map the workflow nodes. Image editing has five parameters with different defaults than generation:
 

@@ -186,6 +186,8 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Documents** (admin section) 
 
 ## Troubleshooting
 
+Open WebUI sends each file to docling-serve as a background job. It posts the file to `/v1/convert/file/async`, checks `/v1/status/poll/<task_id>` every 2 seconds until the job is done, then fetches `/v1/result/<task_id>`. Your docling-serve version, and any proxy in front of it, must serve all three paths.
+
 ### "Task result not found. Please wait for a completion status."
 
 **Cause**: Multiple Uvicorn workers with in-memory task storage.
@@ -198,7 +200,7 @@ Configure via `DOCLING_PARAMS` JSON in **Settings > Documents** (admin section) 
 
 **Solution**: Add `DOCLING_SERVE_ENABLE_REMOTE_SERVICES=true` to your docling-serve environment.
 
-### 404 Not Found on `/v1alpha/convert/file`
+### 404 Not Found on `/v1/convert/file/async`
 
 **Cause**: Using outdated docling-serve version or Open WebUI version.
 
