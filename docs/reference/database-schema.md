@@ -839,6 +839,7 @@ Access control for resources (models, knowledge bases, tools, prompts, notes, fi
 | user_id         | String        | indexed                    | Memory owner             |
 | type            | String        | default `context`, indexed | Memory type: `user` or `context` |
 | path            | Text          | nullable                   | Optional path for organizing memories into a hierarchy |
+| folder_id       | Text          | nullable                   | Folder the memory belongs to. Null for an account memory |
 | content         | Text          | -                          | Memory content           |
 | meta            | JSON          | nullable                   | Optional metadata |
 | created_at      | BigInteger    | -                          | Creation timestamp       |
@@ -849,6 +850,7 @@ Things to know about the memory table:
 - `type` distinguishes `user` memories (explicit, user-curated facts) from `context` memories (learned from conversation); it is indexed for per-type lookups. Added in migration `7b3f2a9c1d4e` (with an index fixup migration following it).
 - `path` and `meta` back the expanded builtin memory tools, which let the model organize memories under paths and attach structured metadata.
 - A covering index on `(id, user_id)` was added by migration `55f1302ac17c` to speed up per-user memory lookups.
+- `folder_id` was added in migration `c4e1a7f9b2d3`, with the index `ix_memory_user_id_folder_id` on `(user_id, folder_id)`. It is not a foreign key. Deleting a folder deletes the memories that carry its ID.
 
 ## Message Table
 
@@ -1539,6 +1541,7 @@ erDiagram
         string user_id FK
         string type
         text path
+        text folder_id
         text content
         json meta
     }

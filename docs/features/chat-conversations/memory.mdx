@@ -60,7 +60,7 @@ Each memory carries a **type** and an optional **path** (see [Memory Types & Pat
 -   **`replace_memory_content`**: Update or correct a specific existing memory using its `id`.
 -   **`delete_memory`**: Remove a memory that is no longer relevant or correct, using its `id`.
 -   **`search_memories`**: Search or browse the memory bank by content, path, type, or exact `id`. Results include a unique `id` per snippet (default returns 5).
--   **`list_memories`**: Retrieve all stored memories for the user, including content and timestamps.
+-   **`list_memories`**: Retrieve the memories the chat can use, including content and timestamps. In a [folder's](#folder-memory) chat that includes the folder's memories.
 -   **`list_memory_paths`**: List the saved memory paths (groups), so the model can find where related memories already live before writing.
 -   **`read_memory_path`**: Read the memories stored at a given path, including nearby parent and child paths.
 
@@ -75,14 +75,16 @@ These are set automatically by the memory tools; you do not need to assign them 
 
 ## Folder Memory
 
-A memory saved in a chat that sits in a [folder](/features/chat-conversations/chat-features/conversation-organization) belongs to that folder. Chats in the folder get the folder's memories together with your account memories, and chats outside it never see them. That keeps project details, such as a client's conventions or a codebase's quirks, out of your other conversations.
+A memory saved in a chat that sits in a [folder](/features/chat-conversations/chat-features/conversation-organization) belongs to that folder. Chats in the folder get the folder's memories together with your account memories, and chats outside it never see them. Each folder keeps its own memories, so chats in a subfolder do not get the memories of the folder above it. That keeps project details, such as a client's conventions or a codebase's quirks, out of your other conversations.
 
 To manage them, open the folder's **Edit** dialog and pick **Personalization**. It lists the folder's memories, adds new ones with **Add Memory** and has a **Memory** setting:
 
 - **Default**: the folder's chats use the folder's memories and your account memories.
 - **Folder only**: the folder's chats use only the folder's memories. Their chat search tools look only at the folder's own past chats, and chats elsewhere cannot look up the folder's chats.
 
-Folder memories are your own, also in a folder shared with you. **Settings > Personalization > Memory** lists them along with your account memories, each with its folder's name. Deleting a folder deletes its memories.
+In the folder's chats, all of the folder's **User** memories are given to the model on every reply, and its **Context** memories only when they relate to the chat. Both count against the [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) budget, with the folder's **User** memories first, so a folder with many of them leaves less room for **Context** matches.
+
+Folder memories are your own, also in a folder shared with you. **Settings > Personalization > Memory** lists them along with your account memories, each with its folder's name. Deleting a folder deletes its memories and those of its subfolders, also when you keep its chats.
 
 ## Benefits of the Memory System
 

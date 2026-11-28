@@ -141,7 +141,7 @@ Switch between views using the dropdown in the top bar:
 | **Week** | 7-day time grid with hourly slots. Scroll vertically through the day. |
 | **Day** | Single-day time grid with hourly slots for detailed scheduling. |
 
-Use the **arrow buttons** to navigate forward/backward, or click **Today** to jump to the current date. The mini calendar in the sidebar provides quick date navigation.
+Use the **arrow buttons** to navigate forward/backward, or click **Today** to jump to the current date. The mini calendar in the sidebar provides quick date navigation. Click a date in it to open that day in day view.
 
 ---
 

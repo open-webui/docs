@@ -71,7 +71,7 @@ The **Instances** list in the dialog shows every instance of the machine with it
 
 ## Machine Menu
 
-Each machine in the menu has a **More** menu with **Restart** and **Stop** while the instance runs or **Start** while it is stopped. While the instance runs it also lists **System info** and **View files**. **Machine settings** is always there. **View files** opens the [file browser](/features/open-terminal/file-browser) for that machine without selecting it for the chat. **System info** shows CPU, memory, disk and network use, uptime and top processes, and refreshes every 5 seconds while open.
+Each machine in the menu has a **More** menu with **Restart** and **Stop** while the instance runs or **Start** while it is stopped. While the instance runs it also lists **System info**, **View files** and **Sessions**. **Machine settings** is there too, except while a reply is generating. During a reply the menu still opens, but you cannot pick another machine and the **More** menu lists only **System info**, **View files** and **Sessions**. **Sessions** lists the shells and commands you have running on the machine, see [Select a machine in chat](/features/open-terminal/setup/connecting#7-select-a-machine-in-chat). **View files** opens the [file browser](/features/open-terminal/file-browser) for that machine without selecting it for the chat. **System info** shows CPU, memory, disk and network use, uptime and top processes, and refreshes every 5 seconds while open.
 
 ## Chats
 
