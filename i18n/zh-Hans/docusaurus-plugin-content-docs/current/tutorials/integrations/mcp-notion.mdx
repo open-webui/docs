@@ -1,0 +1,112 @@
+---
+title: Notion（MCP）
+sidebar_label: Notion MCP 集成
+sidebar_position: 50
+description: 通过 Notion 托管的 MCP 端点将 Open WebUI 连接到你的 Notion 工作区。搜索、读取、创建和管理页面与数据库，并自动转换为 Markdown。
+keywords: [notion, mcp, model context protocol, integration, productivity, tools, streamable http, oauth]
+---
+
+:::warning 社区贡献
+
+本教程由社区贡献，Open WebUI 团队不提供支持。它用于演示如何针对特定用例自定义 Open WebUI。想要贡献内容？请查看[贡献教程](/tutorials/contributing-tutorial/)。
+
+:::
+
+Notion 在 `https://mcp.notion.com/mcp` 托管了一个远程 MCP 服务器，Open WebUI 可通过 **Streamable HTTP** 直接连接。身份验证通过 Notion 的 OAuth 流程处理：无需 API 令牌、代理或额外容器。
+
+
+## 设置 {#setup}
+
+:::danger 先决条件：WEBUI_SECRET_KEY
+你**必须**将 `WEBUI_SECRET_KEY` 环境变量设置为一个持久值。否则，OAuth 会话会在每次容器重启时失效，强制你重新进行身份验证。详情请参阅 [MCP 功能文档](/features/extensibility/mcp)。
+:::
+
+### 1. 添加工具 {#1-add-the-tool}
+
+转到**设置 > 集成（Integrations）**（管理员部分），点击 **+** 添加新连接。填写以下内容：
+
+| 字段 | 值 |
+|-------|-------|
+| **类型** | MCP Streamable HTTP |
+| **URL** | `https://mcp.notion.com/mcp` |
+| **身份验证** | OAuth 2.1 |
+| **名称** | `Notion` |
+| **连接 ID** | `ntn`（它会根据名称自动填写，请覆盖该值，使其与下面的导入配置匹配） |
+
+点击**注册客户端（Register Client）**，然后点击**保存（Save）**。如果已预先创建 OAuth 客户端凭据，请使用 `OAuth 2.1 (Static)`。此时，你的 Notion OAuth 客户端需要将重定向 URI 设置为 `<WebUI URL>/oauth/clients/mcp:ntn/callback`，请参阅 [OAuth 2.1 (Static) 设置](/features/extensibility/mcp#oauth-21-static-setup)。
+
+<details>
+<summary>替代方式：导入 JSON</summary>
+
+你也可以将此配置保存为 `.json` 文件，然后在模式对话框中点击**导入（Import）**加载该文件；系统会打开文件选择器。导入后仍需点击“注册客户端”和“保存”：
+
+```json
+[
+  {
+    "type": "mcp",
+    "url": "https://mcp.notion.com/mcp",
+    "spec_type": "url",
+    "spec": "",
+    "path": "openapi.json",
+    "auth_type": "oauth_2.1",
+    "key": "",
+    "info": {
+      "id": "ntn",
+      "name": "Notion",
+      "description": "Search, read, create, and manage Notion pages and databases."
+    }
+  }
+]
+```
+
+</details>
+
+![已导入 Notion MCP 配置的“外部工具”模式对话框。](/images/mcp-notion/notion-setup-step5.png)
+
+### 2. 授权 {#2-authorize}
+
+在任意聊天中，打开 **+ > 工具（Tools）**并启用 **Notion**。系统会将你重定向到 Notion 的 OAuth 流程。选择你的工作区并授予访问权限。
+
+![已启用 Notion 工具的聊天输入栏。](/images/mcp-notion/notion-setup-step6.png)
+
+![Notion OAuth 授权页面。](/images/mcp-notion/notion-setup-step7.png)
+
+:::warning OAuth 2.1 工具无法预先启用
+请**不要**将其设置为模型的默认工具。OAuth 2.1 需要交互式浏览器重定向，无法在请求处理过程中完成。用户必须在每次聊天中通过 **+** 按钮手动启用它。详情请参阅 [MCP 文档](/features/extensibility/mcp)。
+:::
+
+:::note 重新进行身份验证
+Notion 的 OAuth 会话可能会在一段时间不活动或容器重启后过期。如果看到 `Failed to connect to MCP server 'ntn'`，请在任意聊天中重新切换该工具，以再次触发授权流程。
+:::
+
+
+## 速率限制 {#rate-limits}
+
+适用标准的 [Notion API 限制](https://developers.notion.com/reference/request-limits)：
+
+- **一般请求：**每分钟 180 次
+- **搜索：**每分钟 30 次
+
+## 故障排除 {#troubleshooting}
+
+### `Failed to connect to MCP server 'ntn'` {#failed-to-connect-to-mcp-server-ntn}
+
+你的 OAuth 会话已过期。在任意聊天中重新切换 Notion 工具（**+ > 工具**）以重新授权。
+
+![聊天中显示“无法连接到 MCP 服务器”错误。](/images/mcp-notion/notion-setup-step12.png)
+
+### `OAuth callback failed: OAuth callback state is invalid or expired` {#oauth-callback-failed-oauth-callback-state-is-invalid-or-expired}
+
+你正在通过 `localhost` 访问 Open WebUI，但 `WEBUI_URL` 被设置为公共域，因此 Notion 会将你带回到一个无法识别先前授权操作的地址。请使用 `WEBUI_URL` 中的**完全相同的 URL**访问你的实例，然后重新授权。
+
+如果你在流程中途退出登录，或者在一个浏览器中开始流程、却在另一个浏览器中完成流程，也会出现相同的消息。请重新登录，然后在当前使用的浏览器中再次切换该工具。
+
+![从 Notion 返回后显示 OAuth 回调状态错误。](/images/mcp-notion/notion-setup-step13.png)
+
+### `Object not found` {#object-not-found}
+
+该页面尚未与集成共享。在 OAuth 流程中，Notion 会询问要授予哪些页面的访问权限，请确保选择相关页面。你可以随时在 [Notion 集成设置](https://www.notion.so/profile/integrations)中更新访问权限。
+
+### 创建页面时出现 `missing_property` {#missing_property-when-creating-a-page}
+
+Notion 要求提供父页面或数据库。请告诉模型：*“先搜索我的‘Notes’页面，然后在其中创建新页面。”*

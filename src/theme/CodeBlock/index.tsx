@@ -13,6 +13,7 @@ import React, {
 } from "react";
 import type { Props } from "@theme/CodeBlock";
 import useIsBrowser from "@docusaurus/useIsBrowser";
+import { translate } from "@docusaurus/Translate";
 import StringContent from "@theme/CodeBlock/Content/String";
 import clsx from "clsx";
 import { captureCodeCopy } from "../../clientModules/analytics";
@@ -31,6 +32,21 @@ function extractText(node: ReactNode): string {
 
 function CopyButton({ code }: { code: string }) {
 	const [copied, setCopied] = useState(false);
+	const copyLabel = translate({
+		id: "theme.CodeBlock.copy",
+		message: "Copy",
+		description: "The copy button label on code blocks",
+	});
+	const copiedLabel = translate({
+		id: "theme.CodeBlock.copied",
+		message: "Copied",
+		description: "The copied button label on code blocks",
+	});
+	const copyAriaLabel = translate({
+		id: "theme.CodeBlock.copyButtonAriaLabel",
+		message: "Copy code to clipboard",
+		description: "The ARIA label for copy code blocks button",
+	});
 
 	const handleCopy = useCallback(
 		(event: React.MouseEvent<HTMLButtonElement>) => {
@@ -52,8 +68,8 @@ function CopyButton({ code }: { code: string }) {
 	return (
 		<button
 			type="button"
-			aria-label={copied ? "Copied" : "Copy code to clipboard"}
-			title="Copy"
+			aria-label={copied ? copiedLabel : copyAriaLabel}
+			title={copyLabel}
 			className={clsx("clean-btn", "shiki-copy-button")}
 			onClick={handleCopy}
 		>

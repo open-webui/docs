@@ -1,0 +1,68 @@
+---
+sidebar_position: 10
+title: "将搜索结果保存到知识库"
+---
+
+# 将搜索结果保存到知识库
+
+**Add Web Sources to Knowledge Action** 让你只需单击一次，即可将网页搜索结果的 URL 直接保存到知识库。该功能会自动获取、清理并上传网页内容，从而简化研究资料库的构建过程。
+
+## 功能 {#features}
+
+- **一键保存**：快速将聊天消息中选定的来源添加到任意知识库。
+- **URL 选择**：从编号列表中选择要保存的特定 URL。
+- **批量处理**：在单次操作中处理多个 URL。
+- **重复检测**：自动跳过目标知识库中已存在的 URL。
+- **可配置的默认设置**：设置默认知识库并跳过确认对话框，以加快工作流程。
+
+## 设置 {#setup}
+
+“Add Web Sources to Knowledge”功能以**函数 Action** 的形式实现。使用方法如下：
+
+1.  **下载 Action**：访问 Open WebUI Community Hub，下载 [Add Web Sources to Knowledge Action](https://openwebui.com/posts/65d97417-d079-4720-b2cc-a63dd59b7e3e)。
+2.  **启用 Action**：
+    *   导航至**管理员面板 > 函数（Admin Panel > Functions）**。
+    *   导入提供的代码，或使用这些代码创建新函数。
+    *   全局启用该 Action，或仅为特定模型启用。
+
+## 使用方法 {#how-to-use}
+
+:::warning 原生模式仅列出已抓取的页面
+在原生（智能体）工具调用中，搜索命中项不属于来源，因此该 Action 只能提供模型使用 `fetch_url` 打开的网页条目。如果模型仅根据搜索摘要作答，则没有可供保存的内容。传统工具调用模式保持不变，仍会列出检索到的每个搜索结果。请参阅[智能体搜索](/features/chat-conversations/web-search/agentic-search)。
+:::
+
+1.  **触发网页搜索**：提出一个会触发网页搜索的问题（例如使用 DDGS、Google PSE 等）。
+2.  **单击 Action 按钮**：模型返回引用后，单击消息工具栏中的 **folder+** 图标。
+3.  **选择来源**：此时会显示一个对话框。输入要保存的来源编号（例如 `1,3,5`、`1-3` 或 `all`）。
+4.  **选择知识库**：选择用于保存内容的目标知识库。
+5.  **完成**：系统将使用你配置的 **Web Loader** 获取内容，并将其添加到知识库。
+
+## 配置（Valves） {#configuration-valves}
+
+你可以通过函数设置中的 **Valves** 自定义该 Action 的行为。
+
+### 管理员设置（全局默认值） {#admin-settings-global-defaults}
+
+| 设置 | 默认值 | 描述 |
+|---------|---------|-------------|
+| `max_urls_per_action` | `10` | 单次操作中处理的最大 URL 数量。 |
+| `enable_duplicate_check` | `True` | 添加前检查知识库中是否已存在该 URL。 |
+| `default_knowledge_base` | `""` | 系统范围的默认知识库名称或 ID。 |
+| `skip_confirmation` | `False` | 跳过确认对话框并使用默认知识库。 |
+| `file_name_prefix` | `""` | 生成的文件名前缀（例如 `web_`）。 |
+
+### 用户设置（个人覆盖项） {#user-settings-personal-overrides}
+
+用户可以在自己的设置中覆盖全局默认值：
+- **默认知识库**：设置首选知识库，避免手动选择。
+- **跳过确认**：启用后可一键即时保存（需要设置默认知识库）。
+- **文件名前缀**：自定义已保存来源的文件名前缀。
+
+:::tip 高级用户提示
+在 User Valves 中设置**默认知识库**并启用**跳过确认**，即可一键即时保存网页来源！
+:::
+
+## 故障排除 {#troubleshooting}
+
+- **内容质量**：已保存内容的质量取决于你的 **Web Loader Engine** 设置（设置 > 网页搜索（管理员区域）中的 **Loader** 部分）。对于大量使用 JavaScript 的网站，建议使用 **Firecrawl** 或 **Playwright**。
+- **未找到 URL**：该 Action 会读取附加到消息的来源。如果未检测到 URL，请检查网页搜索是否已启用并返回结果；在原生模式下，还要确认模型是否确实使用 `fetch_url` 打开了页面，因为仅凭搜索命中项并不能构成来源。

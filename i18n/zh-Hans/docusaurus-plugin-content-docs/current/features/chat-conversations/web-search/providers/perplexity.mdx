@@ -1,0 +1,39 @@
+---
+sidebar_position: 20
+title: "Perplexity"
+---
+
+:::warning
+
+本教程为社区贡献，不受 Open WebUI 团队支持。它仅演示如何针对你的具体用例自定义 Open WebUI。想要参与贡献？请查看贡献教程。
+
+:::
+
+:::tip
+
+有关与网页搜索相关的所有环境变量（包括并发设置、结果数量等）的完整列表，请参阅[环境配置文档](/reference/env-configuration#web-search)。
+
+:::
+
+:::tip 故障排除
+
+网页搜索遇到问题？请查看[网页搜索故障排除指南](/troubleshooting/web-search)，了解代理配置、连接超时和内容为空等常见问题的解决方法。
+
+:::
+
+## Perplexity API {#perplexity-api}
+
+:::info
+
+本教程中的 Perplexity API 使用 Perplexity 自己的模型，而不仅仅是网页搜索 API。如需使用网页搜索 API，请按照另一篇教程操作。
+
+:::
+
+### 设置 {#setup}
+
+1. 前往：`Settings` -> `Web Search`（管理员区域）
+2. 开启 `Web Search`
+3. 在下拉菜单中将 `Web Search Engine` 设为 `perplexity`
+4. 输入从 [Perplexity API 密钥管理](https://www.perplexity.ai/account/api/keys)获取的 Perplexity API 密钥。
+5. （可选）设置 **Perplexity 模型（Perplexity Model）**（`PERPLEXITY_MODEL`，默认值为 `sonar`）和 **Perplexity 搜索上下文用量（Perplexity Search Context Usage）**（`PERPLEXITY_SEARCH_CONTEXT_USAGE`，可选 `low`、`medium` 或 `high`，默认值为 `medium`）。回答中的引用会成为搜索结果，标题依次为 `Source 1`、`Source 2` 等，回答文本则作为第一条结果的摘要。
+6. 点击保存

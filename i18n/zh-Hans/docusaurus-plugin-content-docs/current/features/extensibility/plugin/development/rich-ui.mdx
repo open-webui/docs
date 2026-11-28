@@ -1,0 +1,557 @@
+---
+sidebar_position: 4
+title: "富 UI 嵌入"
+---
+
+# 富 UI 元素嵌入
+
+工具和操作都支持富 UI 元素嵌入，可以返回 HTML 内容和交互式 iframe，并直接在聊天对话中显示。无论函数是由模型（工具）还是用户（操作）触发，此功能都能实现复杂的可视化界面、交互式小组件、图表、仪表板以及其他富 Web 内容。
+
+当函数返回带有适当标头的 `HTMLResponse` 时，内容会以交互式 iframe 的形式嵌入聊天界面，而不是显示为纯文本。
+
+## 工具用法 {#tool-usage}
+
+要嵌入 HTML 内容，工具应返回带有 `Content-Disposition: inline` 标头的 `HTMLResponse`：
+
+```python
+from fastapi.responses import HTMLResponse
+
+def render_checklist(self, items: list[str]) -> HTMLResponse:
+    """
+    渲染嵌入聊天中的交互式清单。
+
+    :param items: 清单中要显示的条目
+    """
+    items_html = "".join(
+        f'<li><label><input type="checkbox"> {item}</label></li>' for item in items
+    )
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>清单</title>
+        <style>
+            body {{ font-family: system-ui, sans-serif; padding: 1rem; }}
+            ul {{ list-style: none; padding: 0; }}
+            li {{ padding: 0.25rem 0; }}
+        </style>
+    </head>
+    <body>
+        <ul>{items_html}</ul>
+    </body>
+    </html>
+    """
+
+    headers = {"Content-Disposition": "inline"}
+    return HTMLResponse(content=html_content, headers=headers)
+```
+
+### 自定义结果上下文 {#custom-result-context}
+
+默认情况下，当工具返回 `HTMLResponse` 时，LLM 会收到一条通用消息：`"<tool_name>: Embedded UI result is active and visible to the user."`。模型无法从中得知实际生成了*什么内容*。
+
+要向 LLM 提供有关嵌入内容的可操作上下文，请返回一个 `(HTMLResponse, context)` **元组**，其中第二个元素为 `str`、`dict` 或 `list`：
+
+```python
+from fastapi.responses import HTMLResponse
+
+def render_feedback_form(self, prompt: str) -> tuple:
+    """
+    渲染交互式反馈表单，并向 LLM 返回上下文。
+
+    :param prompt: 在表单上方显示给用户的问题
+    """
+    html_content = "<html>...</html>"
+    headers = {"Content-Disposition": "inline"}
+
+    # LLM 会收到此上下文，而不是通用消息
+    result_context = {
+        "status": "success",
+        "form_type": "feedback",
+        "fields": ["rating", "comment"],
+        "description": f"Rendered a feedback form asking: {prompt!r}"
+    }
+
+    return HTMLResponse(content=html_content, headers=headers), result_context
+```
+
+上下文可以是：
+- **字符串**：原样发送给 LLM（例如 `"Rendered a 5-item checklist"`）
+- **字典**：序列化为 JSON，提供结构化上下文
+- **列表**：序列化为 JSON，提供多个条目
+
+如果缺少第二个元素，或其类型不属于上述类型，则使用通用回退消息。
+
+:::tip 何时使用此功能
+当工具生成动态内容，并且 LLM 需要在后续对话中引用所生成的内容时，此功能尤其有用。例如，可以告知 LLM 使用了哪些参数、正在显示哪些数据，或者用户接下来可以执行哪些操作。
+:::
+
+## 操作用法 {#action-usage}
+
+操作的工作方式完全相同。富 UI 嵌入内容通过事件发射器传递到聊天中：
+
+**选项 A：HTMLResponse：**
+
+```python
+from fastapi.responses import HTMLResponse
+
+async def action(self, body, __event_emitter__=None):
+    html = "<html><body><h1>仪表板</h1></body></html>"
+    return HTMLResponse(content=html, headers={"Content-Disposition": "inline"})
+```
+
+**选项 B：带标头的元组：**
+
+```python
+async def action(self, body, __event_emitter__=None):
+    html = "<h1>交互式图表</h1><script>...</script>"
+    return (html, {"Content-Disposition": "inline", "Content-Type": "text/html"})
+```
+
+## Pipe 函数用法 {#pipe-function-usage}
+
+当**工具**通过 Open WebUI 的内置工具调用层（原生或旧版）调用时，中间件会自动检测 `HTMLResponse` 结果，将 HTML 提取为嵌入内容，并发出 `"embeds"` 事件。无需执行任何额外操作。
+
+但是，当 **Pipe 函数**直接向外部服务提供方（例如 Azure OpenAI、Anthropic）发起 API 调用时，会完全绕过中间件。Pipe 自行管理工具调用周期：向服务提供方发送工具定义、接收响应中的 `tool_calls`、执行工具，并将结果反馈给服务提供方。在这种情况下，中间件永远不会看到 `HTMLResponse`，因此 **Pipe 必须手动发出嵌入内容**。
+
+### 实现模式 {#the-pattern}
+
+在 Pipe 的工具执行逻辑中，检测工具是否返回 `HTMLResponse`，提取 HTML 正文，通过事件发射器将其发出，并向 LLM 返回文本摘要：
+
+```python
+from fastapi.responses import HTMLResponse
+
+async def execute_tool(self, tool_call, tools, __event_emitter__):
+    tool = tools.get(tool_call.name)
+    if not tool:
+        return "Tool not found"
+
+    parsed_args = json.loads(tool_call.arguments) if tool_call.arguments else {}
+    result = await tool["callable"](**parsed_args)
+
+    # 检测 HTMLResponse 并作为嵌入内容发出
+    if isinstance(result, HTMLResponse):
+        content_disposition = result.headers.get("Content-Disposition", "")
+        if "inline" in content_disposition:
+            html_content = result.body.decode("utf-8", "replace")
+
+            # 发出嵌入内容，以便前端渲染
+            await __event_emitter__({
+                "type": "embeds",
+                "data": {"embeds": [html_content]},
+            })
+
+            # 向 LLM 返回文本摘要（而不是原始 HTML）
+            return json.dumps({
+                "status": "success",
+                "message": f"{tool_call.name}: UI rendered successfully.",
+            })
+
+    # 对于非 HTML 结果，按正常方式返回
+    return json.dumps(result)
+```
+
+### 为何需要此步骤 {#why-this-is-needed}
+
+Open WebUI 的中间件在 `process_tool_result()` 中处理工具结果，该函数会自动完成 `HTMLResponse` 检测、嵌入内容提取和事件发射。但只有在**中间件**编排工具调用周期时才会调用此函数。当 Pipe 函数自行处理工具调用时（因为它直接向 LLM 服务提供方发送 HTTP 请求），必须复现该逻辑中的相关部分。
+
+### 关键步骤 {#key-steps}
+
+1. **检测 `HTMLResponse`**：检查工具的返回值是否为带有 `Content-Disposition: inline` 的 `HTMLResponse`
+2. **提取 HTML**：解码响应正文
+3. **发出 `"embeds"` 事件**：通过 `__event_emitter__` 发送 HTML，让前端将其渲染为富 UI 卡片
+4. **向 LLM 返回文本**：模型应收到文本摘要（而非原始 HTML），以便自然地继续对话
+
+### 元组上下文支持 {#tuple-context-support}
+
+与标准工具一样，你可以从工具返回 `(HTMLResponse, context)` 元组。在 Pipe 的执行逻辑中，以相同方式解包：
+
+```python
+if isinstance(result, tuple) and len(result) == 2 and isinstance(result[0], HTMLResponse):
+    html_response, result_context = result
+    # ... 将 html_response.body 作为嵌入内容发出 ...
+    # ... 向 LLM 返回 result_context，而不是通用消息 ...
+```
+
+:::tip 社区参考
+[Native Tool Calling Pipe](https://openwebui.com/posts/native_tool_calling_pipe_b3734a34) 是一个社区构建的 Pipe，实现了完整的 OpenAI 原生工具调用周期，并支持流式传输和多次调用。它可以适配 Azure OpenAI 或其他服务提供方，是实现此模式的实用参考。
+:::
+
+## Iframe 高度与自动调整大小 {#iframe-height-and-auto-sizing}
+
+富 UI 嵌入内容在沙盒化的 iframe 中渲染。iframe 需要知道其内容的高度，才能在不出现滚动条的情况下显示内容。有两种机制可以实现这一点：
+
+### postMessage 高度报告（推荐） {#postmessage-height-reporting-recommended}
+
+当 `allowSameOrigin` **关闭**（默认）时，父页面无法直接读取 iframe 的内容高度。你的 HTML 必须通过向父窗口发送消息来报告自身高度：
+
+```html
+<script>
+  function reportHeight() {
+    const h = document.documentElement.scrollHeight;
+    parent.postMessage({ type: 'iframe:height', height: h }, '*');
+  }
+  window.addEventListener('load', reportHeight);
+  // 内容大小发生变化时也重新报告
+  new ResizeObserver(reportHeight).observe(document.body);
+</script>
+```
+
+将此脚本添加到每个富 UI 嵌入内容的 `<body>` 末尾。如果没有此脚本，iframe 会保持较小的默认高度，内容将被截断并显示滚动条。
+
+### 同源自动调整大小 {#same-origin-auto-resize}
+
+当 `allowSameOrigin` **开启**（通过用户设置 `iframeSandboxAllowSameOrigin`）时，父页面可以直接测量 iframe 的内容高度并自动调整其大小，无需在 HTML 中添加脚本。但这会带来安全方面的权衡（见下文）。
+
+## 沙盒与安全 {#sandbox-and-security}
+
+嵌入的 iframe 在[沙盒](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe#sandbox)中运行。`allow-scripts` 和 `allow-downloads` 始终开启。对于工具调用结果、分组详情块内的嵌入内容以及附加到助手消息的嵌入内容，`allow-popups` 会开启；但从“嵌入内容”面板中的引用打开的嵌入内容不会开启该权限。
+
+用户还可以在**设置 → 界面**中切换另外两个标志：
+
+| 设置 | 默认值 | 描述 |
+|---|---|---|
+| iframe Sandbox Allow Same Origin | 关闭 | 允许 iframe 访问父页面上下文 |
+| iframe Sandbox Allow Forms | 关闭 | 允许在嵌入内容中提交表单 |
+
+这些开关有两点注意事项。附加到助手消息的嵌入内容无论设置如何都始终允许表单；从引用打开的嵌入内容则完全忽略这两个开关，因此其沙盒仅包含 `allow-scripts allow-downloads`。
+
+### allowSameOrigin {#allowsameorigin}
+
+这是最需要注意的标志。出于安全考虑，它**默认关闭**。
+
+**关闭时（默认）：**
+- iframe 与父页面完全隔离
+- 它**无法**读取父页面的 Cookie、localStorage 或 DOM
+- 父页面**无法**读取 iframe 的内容高度（因此必须使用上述 postMessage 模式）
+- 这是最安全的选项，建议大多数使用场景采用
+
+**开启时：**
+- iframe 可以与父页面的上下文交互
+- 无需在 HTML 中添加任何脚本即可自动调整大小
+- 检测到 Chart.js 和 Alpine.js 依赖时会自动注入
+- **请谨慎使用**：仅在信任嵌入内容时才启用此选项
+
+用户可以在**设置 → 界面 → iframe Sandbox Allow Same Origin**中切换此设置。
+
+:::caution 沙盒设置的实际影响
+当 `allowSameOrigin` **关闭**（默认）时，富 UI iframe 受到严格的沙盒限制。这意味着：
+- **从嵌入内容内部下载**会很困难或无法实现，尤其是在 iOS 上，沙盒化的 iframe 完全无法触发文件下载
+- **嵌入内容中的 JavaScript 无法与 Open WebUI 本身交互**：iframe 无法访问父页面的 DOM、Cookie、localStorage 或任何 Open WebUI API
+- **跨框架通信**仅限于 `postMessage`。不过，[提示词提交](#prompt-submission)支持跨源，并会显示用户确认对话框
+
+如果富 UI 嵌入内容需要触发下载、与 Open WebUI 前端交互，或执行影响父页面的 JavaScript，则**必须启用同源 iframe 访问**。请在**设置 → 界面 → iframe Sandbox Allow Same Origin**中启用。
+
+对于需要完整页面访问权限的临时交互，也可以考虑使用 [`execute` 事件](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__)，它会在主页面上下文中运行，不受沙盒限制。
+:::
+
+:::tip 社区展示：使用同源访问的流式富 UI
+如果你想了解启用同源访问后富 UI 能达到什么程度，可以查看社区的 **[Inline Visualizer v2](https://github.com/Classic298/open-webui-plugins)** 工具（参见 [Show-and-tell 讨论](https://github.com/open-webui/open-webui/discussions/23901)）。
+
+它展示了基础文档中未介绍的模式：
+
+- **实时流式 HTML/SVG。** 工具返回一个空的外层容器；随后模型在正常响应中的纯文本 `@@@VIZ-START / @@@VIZ-END` 标记之间以内联方式发出标记。iframe 内的同源观察器跟踪父聊天页面的 DOM，提取不断增长的区块，并随着 token 到达将新节点协调到 iframe 中，使仪表板和图表能够逐 token 实时绘制，而不是在流结束时才突然出现。
+- **双向桥接。** `sendPrompt(text)` 可将任何可点击节点转换为后续用户消息。`saveState(k, v)` / `loadState(k, fallback)` 代理父页面的 `localStorage`，并按消息划分作用域，使滑块和开关的状态在重新加载后仍然保留。此外还有 `copyText`、`toast(msg, kind)` 和 `openLink`。
+- **内置设计系统。** 支持主题的 CSS 变量、9 级色板、SVG 实用类、自动浅色/深色适配，以及覆盖 46 种语言的 230 条本地化字符串，全部由单个工具提供，无需修改核心代码。
+- **增量 DOM 协调。** 安全截断 HTML 解析器在每个周期刷新最长的有效前缀；协调器只追加新节点，因此现有元素不会重新挂载，动画也不会在流式传输期间重新触发。
+
+当你需要判断生成式 UI / 流式 UI 功能是否需要修改核心代码，还是完全可以由插件实现时，这是一个很有用的参考。（剧透：几乎总是后者。）
+:::
+
+## 渲染位置 {#rendering-position}
+
+- 工具调用结果中的**工具嵌入内容**会在工具调用指示器（“View Result from...”一行）处**内联**渲染
+- **操作嵌入内容**和消息级嵌入内容会在消息文本内容**上方**渲染
+
+## 高级通信 {#advanced-communication}
+
+iframe 和父窗口除了报告高度外，还可以进行其他通信。可以使用以下模式：
+
+### 载荷请求 {#payload-requests}
+
+iframe 可以在加载后向父页面请求数据载荷：
+
+```html
+<script>
+  // 监听响应
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'payload') {
+      const data = e.data.payload;
+      // 使用载荷数据填充 UI
+      console.log('Received payload:', data);
+    }
+  });
+
+  // 触发请求
+  parent.postMessage({ type: 'payload', requestId: 'my-request' }, '*');
+</script>
+```
+
+父页面会以 `{ type: 'payload', requestId: ..., payload: ... }` 响应。
+
+:::info 载荷的来源
+没有单独的“设置载荷”调用。载荷就是父组件实例化 iframe 时配置的内容，而目前只有一条路径会实际配置载荷：
+
+- **在“预览”选项卡中通过引用打开的嵌入内容**：当用户点击来源具有嵌入 URL 的引用徽章时，“预览”选项卡会打开，并将**完整的引用/来源对象**（即通过 `__event_emitter__` 在 `source` / `citation` 事件中发送的同一个字典）公开为载荷。要设置该载荷，请发出 [`source` 事件](./events.mdx#source-or-citation-and-code-execution)，并在其 `data` 中包含希望 iframe 能够获取的任何内容。随后，iframe 通过上述 postMessage 请求该载荷，并收到引用对象。
+- **内联工具调用嵌入内容**（由工具方法返回 `HTMLResponse` 或 `(HTMLResponse, context)`）：父页面不会在此路径中配置载荷，因此载荷请求会返回 `{ type: 'payload', requestId: ..., payload: null }`。此时请改用[工具参数注入](#tool-args-injection-tools-only)（受 `allowSameOrigin` 限制）向工具调用嵌入内容传递数据。
+- **`__event_emitter__({"type": "embeds", ...})` 和操作嵌入内容**：同样不会配置载荷；响应为 `null`。
+
+简而言之：载荷请求是侧边面板引用通道，而不是通用的 iframe 数据通道。请根据所需的数据流选择正确的渲染路径。
+:::
+
+### 工具参数注入（仅限工具） {#tool-args-injection-tools-only}
+
+当**工具**方法在工具调用显示位置内联返回富 UI 嵌入内容时（即从工具方法本身返回 `HTMLResponse` 或 `(HTMLResponse, context)` 元组），模型传入的参数会以 **JSON 字符串**而非已解析对象的形式暴露在 iframe 的 `window.args` 上。使用前请解析：
+
+```html
+<script>
+  window.addEventListener('load', () => {
+    const raw = window.args;             // JSON 字符串或 undefined
+    if (raw) {
+      const args = JSON.parse(raw);      // 解析为对象
+      document.getElementById('output').textContent = JSON.stringify(args, null, 2);
+    } else {
+      console.warn('window.args not set, see Requirements below.');
+    }
+  });
+</script>
+```
+
+:::warning 需要 `allowSameOrigin`，否则 `window.args` 会静默地为 `undefined`
+参数由父页面通过 `iframe.contentWindow.args = ...` 注入，除非 iframe 沙盒带有 `allow-same-origin`，否则浏览器会根据同源策略阻止此操作。该权限由每位用户的**设置 → 界面 → “iframe Sandbox Allow Same Origin”**开关控制，且**默认关闭**。如果 `window.args` 为 undefined，而你没有更改此设置，原因就是该设置已关闭：请将其开启并重新加载。有关安全方面的权衡，请参阅上文的 [allowSameOrigin](#allowsameorigin)。
+:::
+
+:::note `window.args` 在何处设置、在何处不设置
+- **工具方法返回 `HTMLResponse` 或 `(HTMLResponse, context)` 元组**：在“View Result from...”工具调用指示器处内联渲染。`window.args` 会被注入（须满足上述 `allowSameOrigin` 要求）。
+- **`__event_emitter__({"type": "embeds", "data": {"embeds": [...]}})`**：在消息上方渲染，此路径完全不会接入 `args`。无论沙盒设置如何，此处的 `window.args` 始终为 undefined。这是预期行为：embeds 事件路径没有关联的工具调用，因此没有可注入的参数。
+- **操作嵌入内容**：由用户而非模型触发，因此没有模型提供的参数可注入。
+
+如果需要向通过任一不支持的路径渲染的嵌入内容传递动态数据，请改用上述[载荷请求](#payload-requests)模式。
+:::
+
+### 自动注入的库 {#auto-injected-libraries}
+
+启用 `allowSameOrigin` 后，iframe 组件会自动检测 HTML 中某些库的使用情况并自动注入这些库，无需 CDN `<script>` 标签：
+
+- **Alpine.js**：检测到任何 `x-data`、`x-init`、`x-show`、`x-bind`、`x-on`、`x-text`、`x-html`、`x-model`、`x-modelable`、`x-for`、`x-if`、`x-effect`、`x-ignore`、`x-transition`、`x-cloak`、`x-ref`、`x-teleport` 或 `x-id` 指令时
+- **Chart.js**：HTML 中出现 `new Chart(` 或 `Chart.` 时
+
+这意味着启用同源访问后，你可以直接在 HTML 中编写 Alpine 或 Chart.js 代码，无需导入脚本即可正常工作。
+
+### Ping/Pong 连通性检测 {#pingpong-connectivity}
+
+iframe 可以使用简单的 ping/pong 模式测试与父窗口的连通性：
+
+```html
+<script>
+  window.addEventListener('message', (e) => {
+    if (e.data?.type === 'pong:ack') {
+      console.log('Parent is listening!');
+    }
+  });
+
+  // 发送 pong 以测试连通性
+  parent.postMessage({ type: 'pong' }, '*');
+</script>
+```
+
+### 提示词提交 {#prompt-submission}
+
+富 UI 嵌入内容可以使用三种消息类型与聊天输入框交互：
+
+| 消息类型 | 行为 |
+|---|---|
+| `input:prompt` | 使用文本填充聊天输入框（不提交） |
+| `input:prompt:submit` | 填充提示词并提交到聊天 |
+| `action:submit` | 提交聊天输入框中已有的当前文本 |
+
+```html
+<script>
+  // 填充聊天输入框但不提交
+  parent.postMessage({ type: 'input:prompt', text: 'Analyze this data' }, '*');
+
+  // 填充并提交提示词
+  parent.postMessage({ type: 'input:prompt:submit', text: 'Show me a summary' }, '*');
+
+  // 提交聊天输入框中的当前内容
+  parent.postMessage({ type: 'action:submit', text: '' }, '*');
+</script>
+```
+
+**同源与跨源行为：**
+
+- 当 `allowSameOrigin` **开启**时，`input:prompt:submit` 会**立即**提交提示词，无需用户交互。
+- 当 `allowSameOrigin` **关闭**（默认）时，来自跨源 iframe 的 `input:prompt:submit` 会在提交前向用户显示**确认对话框**。这既能防止滥用，又能让交互式嵌入内容无需同源访问即可使用。
+- 无论是否同源，`input:prompt` 和 `action:submit` 的行为都相同：它们只会填充或提交用户已经能够看到的文本。
+
+:::tip
+这意味着富 UI 嵌入内容可以包含向聊天提交提示词的交互式按钮（例如“解释此图表”、“使用不同参数重新生成”），**无需用户启用同源访问**。用户只需在确认对话框中点击“确认”即可继续。
+:::
+
+## 富 UI 嵌入与 Execute 事件 {#rich-ui-embeds-vs-execute-event}
+
+富 UI 嵌入内容和 [`execute` 事件](/features/extensibility/plugin/development/events#execute-works-with-both-__event_call__-and-__event_emitter__) 是创建交互式体验的两种互补方式。请根据需求选择：
+
+| | 富 UI 嵌入 | `execute` 事件 |
+|---|---|---|
+| **运行位置** | 沙盒化的 iframe | 主页面上下文（无沙盒） |
+| **持久性** | 持久保存于聊天历史中 | 临时存在，重新加载或导航后消失 |
+| **页面访问** | 默认与父页面隔离 | 完全访问（DOM、Cookie、localStorage） |
+| **表单** | 需要启用 `allowForms` 设置 | 始终可用（无沙盒） |
+| **最适用场景** | 持久化视觉内容、仪表板、图表 | 临时交互、副作用、下载、DOM 操作 |
+
+对于希望保留在对话中的持久化视觉内容，请使用富 UI 嵌入。对于自定义对话框、触发下载或读取页面状态等临时交互，请使用 `execute`。
+
+## 使用场景 {#use-cases}
+
+富 UI 嵌入非常适合：
+
+- **交互式仪表板**：实时数据可视化和控件
+- **图表**：使用 Plotly、D3.js 或 Chart.js 等库进行交互式绘图
+- **表单界面**：具有验证和动态行为的复杂输入表单
+- **媒体播放器**：视频、音频或交互式媒体内容
+- **下载触发器**：特别适用于原生下载链接被阻止的 iOS PWA
+- **自定义小组件**：针对特定工具功能的专用 UI 组件
+- **外部集成**：嵌入来自外部服务或 API 的内容
+- **人工触发的可视化**：用户点击按钮时显示结果的操作，例如生成报告或触发下载
+
+## 完整示例操作 {#full-sample-action}
+
+<details>
+<summary>包含富 UI 嵌入的完整可运行示例操作</summary>
+
+此操作返回一个带统计数据的样式化卡片，其中包含推荐的高度报告脚本：
+
+```python
+"""
+title: Rich UI Demo Action
+author: open-webui
+version: 0.1.0
+description: Demonstrates Rich UI embedding from an Action function.
+"""
+
+from pydantic import BaseModel, Field
+
+
+class Action:
+    class Valves(BaseModel):
+        pass
+
+    def __init__(self):
+        self.valves = self.Valves()
+
+    async def action(self, body: dict, __user__=None, __event_emitter__=None) -> None:
+        from fastapi.responses import HTMLResponse
+
+        html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <style>
+                * { margin: 0; padding: 0; box-sizing: border-box; }
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    padding: 24px;
+                    color: #fff;
+                }
+                .card {
+                    background: rgba(255,255,255,0.15);
+                    backdrop-filter: blur(10px);
+                    border-radius: 16px;
+                    padding: 24px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                }
+                h1 { font-size: 1.4em; margin-bottom: 8px; }
+                p { opacity: 0.9; line-height: 1.5; margin-bottom: 12px; }
+                .badge {
+                    display: inline-block;
+                    background: rgba(255,255,255,0.25);
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    font-size: 0.85em;
+                    font-weight: 600;
+                }
+                .stats {
+                    display: flex;
+                    gap: 16px;
+                    margin-top: 16px;
+                }
+                .stat {
+                    flex: 1;
+                    text-align: center;
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 12px;
+                    padding: 12px;
+                }
+                .stat-value { font-size: 1.8em; font-weight: 700; }
+                .stat-label { font-size: 0.8em; opacity: 0.8; margin-top: 4px; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>富 UI 嵌入演示</h1>
+                <p>此嵌入内容渲染在消息文本<strong>上方</strong>。</p>
+                <span class="badge">操作嵌入</span>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">回答</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">99%</div>
+                        <div class="stat-label">准确率</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-value">0ms</div>
+                        <div class="stat-label">延迟</div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                // 向父页面报告高度，以便 iframe 自动调整大小
+                function reportHeight() {
+                    const h = document.documentElement.scrollHeight;
+                    parent.postMessage({ type: 'iframe:height', height: h }, '*');
+                }
+                window.addEventListener('load', reportHeight);
+                new ResizeObserver(reportHeight).observe(document.body);
+            </script>
+        </body>
+        </html>
+        """
+
+        return HTMLResponse(content=html, headers={"Content-Disposition": "inline"})
+```
+
+</details>
+
+## 外部工具示例 {#external-tool-example}
+
+对于通过 HTTP 端点提供的外部工具：
+
+```python
+@app.post("/tools/dashboard")
+async def create_dashboard():
+    html = """
+    <div style="padding: 20px;">
+        <h2>系统仪表板</h2>
+        <canvas id="myChart" width="400" height="200"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const ctx = document.getElementById('myChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: { /* 你的图表数据 */ }
+            });
+        </script>
+    </div>
+    """
+
+    return HTMLResponse(
+        content=html,
+        headers={"Content-Disposition": "inline"}
+    )
+```
+
+嵌入内容会自动继承响应式设计，并无缝集成到聊天界面中，为用户与工具交互提供近似原生的体验。

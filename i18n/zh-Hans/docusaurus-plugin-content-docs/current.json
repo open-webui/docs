@@ -1,0 +1,270 @@
+{
+	"version.label": {
+		"message": "下一版本",
+		"description": "The label for version current"
+	},
+	"sidebar.tutorialSidebar.category.Getting Started": {
+		"message": "快速上手",
+		"description": "The label for category 'Getting Started' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Quick Start": {
+		"message": "快速开始",
+		"description": "The label for category 'Quick Start' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Connect a Provider": {
+		"message": "连接模型服务提供方",
+		"description": "The label for category 'Connect a Provider' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.OpenAI-Compatible": {
+		"message": "OpenAI 兼容",
+		"description": "The label for category 'OpenAI-Compatible' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Connect an Agent": {
+		"message": "连接智能体",
+		"description": "The label for category 'Connect an Agent' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Deploying Open WebUI": {
+		"message": "部署 Open WebUI",
+		"description": "The label for category 'Deploying Open WebUI' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Advanced Topics": {
+		"message": "高级主题",
+		"description": "The label for category 'Advanced Topics' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Reference": {
+		"message": "参考",
+		"description": "The label for category 'Reference' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.HTTPS & Reverse Proxies": {
+		"message": "HTTPS 与反向代理",
+		"description": "The label for category 'HTTPS & Reverse Proxies' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.reference-monitoring": {
+		"message": "监控",
+		"description": "The label for category '监控' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Features": {
+		"message": "功能",
+		"description": "The label for category 'Features' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Chat & Conversations": {
+		"message": "聊天与会话",
+		"description": "The label for category 'Chat & Conversations' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Chat Features": {
+		"message": "聊天功能",
+		"description": "The label for category 'Chat Features' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Code Execution": {
+		"message": "代码执行",
+		"description": "The label for category 'Code Execution' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Retrieval Augmented Generation (RAG)": {
+		"message": "检索增强生成（RAG）",
+		"description": "The label for category 'Retrieval Augmented Generation (RAG)' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Document Extraction": {
+		"message": "文档提取",
+		"description": "The label for category 'Document Extraction' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Data Controls": {
+		"message": "数据控制",
+		"description": "The label for category 'Data Controls' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Create & Edit Images": {
+		"message": "创建与编辑图像",
+		"description": "The label for category 'Create & Edit Images' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Speech-to-Text & Text-to-Speech": {
+		"message": "语音转文字与文字转语音",
+		"description": "The label for category 'Speech-to-Text & Text-to-Speech' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Speech To Text": {
+		"message": "语音转文字",
+		"description": "The label for category 'Speech To Text' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Text-to-Speech": {
+		"message": "文字转语音",
+		"description": "The label for category 'Text-to-Speech' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Web Search": {
+		"message": "联网搜索",
+		"description": "The label for category 'Web Search' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Providers": {
+		"message": "服务提供方",
+		"description": "The label for category 'Providers' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Workspace": {
+		"message": "工作区",
+		"description": "The label for category 'Workspace' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Channels": {
+		"message": "频道",
+		"description": "The label for category 'Channels' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Open Terminal": {
+		"message": "Open Terminal",
+		"description": "The label for category 'Open Terminal' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Setup": {
+		"message": "设置",
+		"description": "The label for category 'Setup' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Use Cases": {
+		"message": "使用场景",
+		"description": "The label for category 'Use Cases' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Advanced Workflows": {
+		"message": "高级工作流",
+		"description": "The label for category 'Advanced Workflows' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Terminals (Orchestrator)": {
+		"message": "终端（编排器）",
+		"description": "The label for category 'Terminals (Orchestrator)' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Orchestration": {
+		"message": "编排",
+		"description": "The label for category 'Orchestration' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Advanced": {
+		"message": "高级",
+		"description": "The label for category 'Advanced' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Plugins & Extensibility": {
+		"message": "插件与扩展性",
+		"description": "The label for category 'Plugins & Extensibility' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Tools & Functions (Plugins)": {
+		"message": "工具与函数（插件）",
+		"description": "The label for category 'Tools & Functions (Plugins)' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Tools": {
+		"message": "工具",
+		"description": "The label for category 'Tools' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.OpenAPI Tool Servers": {
+		"message": "OpenAPI 工具服务器",
+		"description": "The label for category 'OpenAPI Tool Servers' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Functions": {
+		"message": "函数",
+		"description": "The label for category 'Functions' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Development": {
+		"message": "开发",
+		"description": "The label for category 'Development' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Migration Guides": {
+		"message": "迁移指南",
+		"description": "The label for category 'Migration Guides' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Authentication & Access": {
+		"message": "身份验证与访问控制",
+		"description": "The label for category 'Authentication & Access' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Federated Authentication": {
+		"message": "联合身份验证",
+		"description": "The label for category 'Federated Authentication' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.SSO (OAuth, OIDC, Trusted Header)": {
+		"message": "SSO（OAuth、OIDC、受信任请求头）",
+		"description": "The label for category 'SSO (OAuth, OIDC, Trusted Header)' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Role-Based Access Control (RBAC)": {
+		"message": "基于角色的访问控制（RBAC）",
+		"description": "The label for category 'Role-Based Access Control (RBAC)' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Administration": {
+		"message": "管理",
+		"description": "The label for category 'Administration' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Ecosystem": {
+		"message": "生态系统",
+		"description": "The label for category 'Ecosystem' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Knowledge Base Sync (oikb)": {
+		"message": "知识库同步（oikb）",
+		"description": "The label for category 'Knowledge Base Sync (oikb)' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Open WebUI Community": {
+		"message": "Open WebUI 社区",
+		"description": "The label for category 'Open WebUI Community' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Troubleshooting": {
+		"message": "故障排除",
+		"description": "The label for category 'Troubleshooting' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Open WebUI for Enterprise": {
+		"message": "Open WebUI 企业版",
+		"description": "The label for category 'Open WebUI for Enterprise' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Customer Stories": {
+		"message": "客户案例",
+		"description": "The label for category 'Customer Stories' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Deployment Options": {
+		"message": "部署选项",
+		"description": "The label for category 'Deployment Options' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Tutorials": {
+		"message": "教程",
+		"description": "The label for category 'Tutorials' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Community Guides": {
+		"message": "社区指南",
+		"description": "The label for category 'Community Guides' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Authentication & SSO": {
+		"message": "身份验证与 SSO",
+		"description": "The label for category 'Authentication & SSO' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Integrations": {
+		"message": "集成",
+		"description": "The label for category 'Integrations' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.LLM Providers": {
+		"message": "LLM 服务提供方",
+		"description": "The label for category 'LLM Providers' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Azure OpenAI with EntraID": {
+		"message": "Azure OpenAI 与 EntraID",
+		"description": "The label for category 'Azure OpenAI with EntraID' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.tutorial-monitoring": {
+		"message": "监控",
+		"description": "The label for category 'Monitoring' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Dev Tools": {
+		"message": "开发工具",
+		"description": "The label for category 'Dev Tools' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Maintenance": {
+		"message": "维护",
+		"description": "The label for category 'Maintenance' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Alternatives to Open WebUI": {
+		"message": "Open WebUI 替代方案",
+		"description": "The label for category 'Alternatives to Open WebUI' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Security": {
+		"message": "安全",
+		"description": "The label for category 'Security' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Supply Chain and Security Scanners": {
+		"message": "供应链与安全扫描器",
+		"description": "The label for category 'Supply Chain and Security Scanners' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Rejected CVEs in Vulnerability Databases": {
+		"message": "漏洞数据库中已驳回的 CVE",
+		"description": "The label for category 'Rejected CVEs in Vulnerability Databases' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Vendor Dispositions": {
+		"message": "厂商处置意见",
+		"description": "The label for category 'Vendor Dispositions' in sidebar 'tutorialSidebar'"
+	},
+	"sidebar.tutorialSidebar.category.Accepted Risks": {
+		"message": "已接受的风险",
+		"description": "The label for category 'Accepted Risks' in sidebar 'tutorialSidebar'"
+	}
+}

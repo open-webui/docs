@@ -1,0 +1,101 @@
+---
+sidebar_position: 13
+title: "Open WebUI 与 Msty 对比"
+sidebar_label: "Open WebUI 与 Msty"
+description: "Open WebUI 与 Msty 对比：Web 平台与桌面应用，两种不同的 AI 使用方式。"
+keywords: ["Open WebUI 与 Msty 对比", "Msty 替代方案", "AI 桌面应用", "AI 桌面应用对比", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Msty 和 Open WebUI 有何异同？", "acceptedAnswer": {"@type": "Answer", "text": "Msty 拥有精致的桌面体验，其出色的分屏聊天功能可用于比较模型。Open WebUI 采用基于 Web 的方式，提供多用户支持、知识库和扩展性。两者适合不同的偏好。"}}, {"@type": "Question", "name": "Msty 免费吗？", "acceptedAnswer": {"@type": "Answer", "text": "Msty 提供免费套餐。高级功能需要付费的 Aurum 套餐，同时提供 Teams 套餐定价。"}}]})}</script>
+</Head>
+
+
+# Open WebUI 与 Msty
+
+*最后更新：2026 年 8 月*
+
+[Msty](https://msty.app/) 为希望在一个地方同时使用本地和云端模型的人打造了精致的桌面体验。分屏聊天功能可让多个模型并排运行以比较回答，确实非常实用，整体设计也考虑周到。
+
+专有软件 · 提供免费套餐
+
+---
+
+## Msty 的优势 {#what-msty-does-well}
+
+- **分屏聊天**，让多个模型并排运行，实时比较回答
+- **统一中心**，整合本地模型（通过 Ollama、llama.cpp、MLX）和云端 API（OpenAI、Anthropic、Google）
+- **Knowledge Stacks（知识堆栈）**，上传文档并通过内置 RAG 与文档聊天
+- **离线模式**，使用本地模型实现完全物理隔离的运行
+- **批量提示**，同时将同一个提示词发送给多个模型
+- **硬件优化**，在 NVIDIA、AMD 和 Apple Silicon 上均有良好性能
+- **Persona & Prompt Studios（角色与提示词工作室）**，创建可复用的角色和提示词模板
+- **对话导出**，支持多种格式，便于归档和分享
+- **Web 搜索集成**，在对话期间进行实时网页搜索
+- **周到的体验**，精致且经过细致考量
+- **免费套餐**，核心功能可免费使用
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，提供由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)，用于委派和计划任务
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **Web 平台**，任何浏览器都可进行多用户访问
+- **任意模型、任意服务提供方**，可连接任意与 OpenAI 兼容的 API、Ollama 或云端服务提供方
+- **深度 RAG 与知识功能**，提供 13 种向量数据库、8 种提取引擎，以及带重排序的混合搜索
+- **团队功能**，包括频道、笔记、自动化、RBAC、SSO/OIDC/LDAP 和 SCIM 2.0
+- **Open Terminal**，为代码执行提供完整的计算环境
+- **源码可用**，你可以阅读、审计和修改源代码
+
+---
+
+## 一览 {#at-a-glance}
+
+| | Open WebUI | Msty |
+| :--- | :--- | :--- |
+| **设计思路** | 自托管 Web 平台 | 桌面应用 |
+| **多模型比较** | 多模型聊天 | 分屏聊天，并排显示回答 |
+| **多服务提供方** | 任意与 OpenAI 兼容的 API + Ollama | 本地模型 + 云端 API |
+| **知识与 RAG** | 13 种向量数据库、8 种提取引擎、混合搜索 | 具有文档聊天功能的 Knowledge Stacks |
+| **扩展性** | Python 工具、MCP、OpenAPI、管道 | Persona & Prompt Studios |
+| **多用户** | SSO、RBAC、SCIM、团队 | 提供 Teams 套餐 |
+| **源码可用性** | 源码可用 | 专有 |
+| **定价** | 免费社区版；提供企业套餐 | 免费套餐、Aurum 和 Teams 套餐 |
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你想要一款供个人使用的精致桌面应用，请选择 Msty**，特别适合经常比较模型的用户。分屏聊天和批量提示功能让并排评估不同模型十分轻松。
+
+**如果你需要 Web 平台、团队访问、更深入的知识管理、Python 扩展性或企业功能，请选择 Open WebUI。**Open WebUI 作为服务器运行，整个团队都可以从任何浏览器访问。
+
+**形态不同。**Msty 擅长作为个人高级用户的桌面应用，Open WebUI 则很适合作为可从任何地方访问的团队平台。
+
+---
+
+*Msty 为桌面 AI 带来精致体验，Open WebUI 采用基于 Web、面向团队的方式。工具不同，让 AI 更加实用的目标相同。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**Msty 和 Open WebUI 有何异同？**
+Msty 拥有精致的桌面体验，其出色的分屏聊天功能可用于比较模型。Open WebUI 采用基于 Web 的方式，提供多用户支持、知识库和扩展性。两者适合不同的偏好。
+
+**Msty 免费吗？**
+Msty 提供免费套餐。高级功能需要付费的 Aurum 套餐，同时提供 Teams 套餐定价。
+
+**Msty 是开源软件吗？**
+不是。Msty 是提供免费套餐的专有软件。
+
+---
+
+**相关内容：**[Open WebUI 与 LM Studio](/alternatives/lm-studio) · [Open WebUI 与 LibreChat](/alternatives/librechat) · [Open WebUI 与 Jan](/alternatives/jan)

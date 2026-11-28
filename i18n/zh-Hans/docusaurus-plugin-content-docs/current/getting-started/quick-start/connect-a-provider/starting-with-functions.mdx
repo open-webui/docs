@@ -1,0 +1,91 @@
+---
+sidebar_position: 6
+title: "函数"
+---
+
+## 概述 {#overview}
+
+**Pipe 函数**是 Python 插件，会在模型选择器中显示为可选模型。在后台，它们可以完成 Python 能做的任何事情：集成专有 AI 服务提供方、通过自然语言控制智能家居、查询数据库、运行搜索引擎、构建多步骤智能体、生成图表、自动化工作流，或充当计算器。甚至无需 LLM。只要你能用 Python 编写逻辑，它就能成为用户可以与之聊天的“模型”。
+
+本指南以 [Anthropic Pipe](https://openwebui.com/posts/60984ebf-cf4e-4822-98b8-0492463c2852) 为例，介绍如何导入并启用你的第一个 Pipe 函数。
+
+:::info 已有 OpenAI 兼容服务提供方？
+如果你的服务提供方支持 **OpenAI Chat Completions API 协议**（OpenAI、Mistral、Groq、DeepSeek 等），则不需要函数。只需[添加连接](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)。Anthropic 也通过其 OpenAI 兼容端点获得原生支持；请参阅 [Anthropic 指南](/getting-started/quick-start/connect-a-provider/starting-with-anthropic)。函数适用于其他所有场景：专有 API、自定义智能体或全新的接口。
+:::
+
+---
+
+## 步骤 1：查找函数 {#step-1-find-a-function}
+
+1. 前往[社区函数库](https://openwebui.com/search)。
+2. 浏览或搜索你需要的函数。社区贡献了数千个函数，涵盖 AI 服务提供方、搜索工具、家庭自动化、生产力实用程序、内容过滤器等。
+3. 在要导入的函数上点击**获取（Get）**。
+
+:::note 需要社区账号
+直接从社区库导入需要在 [openwebui.com](https://openwebui.com) 注册账号。
+:::
+
+---
+
+## 步骤 2：导入到 Open WebUI {#step-2-import-to-open-webui}
+
+随后会弹出一个模态框：
+
+1. 输入你的 Open WebUI 实例 URL（例如 `http://localhost:3000`）。
+2. 点击**导入到 Open WebUI（Import to Open WebUI）**。
+
+你将被重定向到正在运行的实例中的**函数编辑器（Function Editor）**。
+
+![导入模态框截图](/images/getting-started/pipe-import-modal.png)
+
+---
+
+## 步骤 3：审查并保存 {#step-3-review--save}
+
+在编辑器中审查 Python 源代码。函数会在你的服务器上执行任意代码，因此只安装来自可信来源的函数。
+
+点击**保存（Save）**，将函数添加到你的实例。
+
+![函数编辑器截图](/images/getting-started/pipe-function-editor.png)
+
+---
+
+## 步骤 4：启用函数 {#step-4-enable-the-function}
+
+新函数默认处于禁用状态。切换开关以启用它。
+
+![启用函数截图](/images/getting-started/pipe-enable.png)
+
+---
+
+## 步骤 5：配置 Valves {#step-5-configure-valves}
+
+许多函数需要配置，例如 API 密钥或端点 URL：
+
+1. 点击开关旁边的**齿轮图标**。
+2. 输入所需的值（例如你的 Anthropic API 密钥）。
+3. 保存。
+
+![Valves 配置截图](/images/getting-started/pipe-valves.png)
+
+---
+
+## 步骤 6：开始聊天 {#step-6-start-chatting}
+
+现在，该函数会在聊天顶部的模型选择器中显示为可选模型。选择它并开始聊天。
+
+![选择 Pipe 函数作为模型的截图](/images/getting-started/pipe-select-model.png)
+
+---
+
+:::danger 安全提醒
+函数会在你的服务器上运行任意 Python 代码。启用前务必审查代码，并且只从可信来源导入。详情请参阅[插件安全警告](/features/extensibility/plugin/)。
+:::
+
+## 了解更多 {#learn-more}
+
+- **[函数概述](/features/extensibility/plugin/functions/)**：架构、类型和完整的功能范围。
+- **[Pipe 函数指南](/features/extensibility/plugin/functions/pipe)**：构建自定义模型、智能体和非 LLM 接口。
+- **[Filter 函数指南](/features/extensibility/plugin/functions/filter)**：拦截、翻译、审核和记录消息。
+- **[Action 函数指南](/features/extensibility/plugin/functions/action)**：添加用于导出、工作流等用途的交互按钮。
+- **[社区库](https://openwebui.com/search)**：浏览数千个社区函数。

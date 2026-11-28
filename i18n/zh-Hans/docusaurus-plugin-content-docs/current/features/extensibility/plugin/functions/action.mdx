@@ -1,0 +1,342 @@
+---
+sidebar_position: 2
+title: "操作函数"
+---
+
+import Heading from "@theme/Heading";
+
+# 操作函数：自定义交互式按钮
+
+:::danger 严重安全警告
+**操作函数会在服务器上执行任意 Python 代码。** 只有管理员可以创建函数。请仅从可信来源安装，并在导入前审查代码。恶意函数可能访问文件系统、窃取数据或危及整个系统。完整详情请参阅[插件安全警告](/features/extensibility/plugin/)。
+:::
+
+操作函数允许你编写显示在消息工具栏中的自定义按钮，供最终用户交互。此功能让消息交互更加丰富，用户可以授权后再执行任务、生成结构化数据的可视化内容、下载聊天的音频片段，以及实现许多其他使用场景。
+
+:::warning 使用异步函数以确保未来兼容性
+操作函数应始终定义为 `async`。后端正在逐步转向完全异步执行，同步函数可能阻塞执行，或在未来版本中引发问题。
+:::
+
+操作是由管理员管理的函数，可通过自定义交互功能扩展聊天界面。当消息由配置了操作的模型生成时，这些操作会显示为消息下方工具栏中的可点击按钮，位于复制和重新生成按钮旁边。
+
+下方的[函数结构](#function-structure)部分提供了一个最小骨架。如需社区构建的真实操作示例，请浏览 [openwebui.com](https://openwebui.com/)。
+
+下方视频展示了一个图形可视化操作示例。
+
+<div align="center">
+	<a href="#">
+		<img
+			src="/images/pipelines/graph-viz-action.gif"
+			alt="图形可视化操作"
+		/>
+	</a>
+</div>
+
+## 操作函数架构 {#action-function-architecture}
+
+操作是基于 Python 的函数，可直接集成到聊天消息工具栏中。它们在服务器端执行，可以通过实时事件与用户交互、修改消息内容，并访问完整的 Open WebUI 上下文。
+
+### 函数结构 {#function-structure}
+
+操作遵循特定的类结构，以 `action` 方法作为主入口：
+
+```python
+class Action:
+    def __init__(self):
+        self.valves = self.Valves()
+
+    class Valves(BaseModel):
+        # 配置参数
+        parameter_name: str = "default_value"
+        priority: int = 0  # 控制按钮显示顺序（值越小越靠前）
+
+    async def action(self, body: dict, __user__=None, __event_emitter__=None, __event_call__=None):
+        # 操作实现
+        return {"messages": [{"id": body["id"], "content": "Modified message content"}]}
+```
+
+### Action 方法参数 {#action-method-parameters}
+
+`action` 方法接收多个参数，用于访问执行上下文：
+
+- **`body`**：聊天发送的请求，包含 `messages`（截至目前的对话，每个条目包含 `id`、`role`、`content`、`timestamp`，消息具有相应数据时还包含 `info` 和 `sources`）、`model`、`chat_id`、`session_id` 和 `id`，其中 `id` 是被按下按钮所在消息的 id。消息具有输出文本时，`content` 为该文本。附件不会随请求一起传递。
+- **`__user__`**：以普通 `dict` 表示的用户记录（`UserModel.model_dump()`），函数定义 `UserValves` 时会添加 `valves` 条目
+- **`__event_emitter__`**：向前端发送实时更新的函数
+- **`__event_call__`**：用于双向通信（确认、输入）的函数
+- **`__model__`**：触发操作的模型信息
+- **`__request__`**：用于访问标头等的 FastAPI 请求对象
+- **`__id__`**：单个操作的函数 id。对于子操作，它仅为子操作 id（`summarize`，而不是 `my_fn.summarize`），因此子操作 id 不得包含点号
+
+### 返回值 {#return-value}
+
+要更改聊天中显示的内容，请返回 `{"messages": [...]}`，其中每个条目包含现有消息的 `id` 以及要覆盖的字段。其他任何值都会返回给调用方并被丢弃，因此单独返回 `{"content": "..."}` 不会产生任何效果，也不会提示。唯一的例外是带有 `Content-Disposition: inline` 的 `HTMLResponse`，它会成为[富 UI 嵌入内容](/features/extensibility/plugin/development/rich-ui)。对于只负责产生副作用或事件发射器更新的操作，不返回任何内容也完全可以。
+
+## 事件系统集成 {#event-system-integration}
+
+操作可以利用 Open WebUI 的实时事件系统创建交互式体验：
+
+<Heading as="h3" id="event-emitter-__event_emitter__">事件发射器（<code>__event_emitter__</code>）</Heading>
+
+**有关事件和事件发射器的更多信息，请参阅[事件和事件发射器](/features/extensibility/plugin/development/events)。**
+
+在操作执行期间向前端发送实时更新：
+
+```python
+async def action(self, body: dict, __event_emitter__=None):
+    # 发送状态更新
+    await __event_emitter__({
+        "type": "status",
+        "data": {"description": "Processing request..."}
+    })
+
+    # 发送通知
+    await __event_emitter__({
+        "type": "notification",
+        "data": {"type": "info", "content": "Action completed successfully"}
+    })
+```
+
+<Heading as="h3" id="event-call-__event_call__">事件调用（<code>__event_call__</code>）</Heading>
+在执行期间请求用户输入或确认：
+
+```python
+async def action(self, body: dict, __event_call__=None):
+    # 请求用户确认
+    response = await __event_call__({
+        "type": "confirmation",
+        "data": {
+            "title": "Confirm Action",
+            "message": "Are you sure you want to proceed?"
+        }
+    })
+
+    # 请求用户输入
+    user_input = await __event_call__({
+        "type": "input",
+        "data": {
+            "title": "Enter Value",
+            "message": "Please provide additional information:",
+            "placeholder": "Type your input here..."
+        }
+    })
+```
+
+当浏览器无法作答时，`__event_call__` 不会引发异常，而是返回带有 `error` 键的 `dict`：这可能是选项卡已断开连接，也可能是设置了 [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) 且无人及时响应。使用结果前请检查该键。请参阅[事件 → 交互式事件](/features/extensibility/plugin/development/events#interactive-events)。
+
+## 操作类型与配置 {#action-types-and-configurations}
+
+### 单一操作 {#single-actions}
+具有一个 `action` 方法的标准操作：
+
+```python
+async def action(self, body: dict, **kwargs):
+    # 单一操作实现
+    return {"messages": [{"id": body["id"], "content": "Action result"}]}
+```
+
+### 多重操作 {#multi-actions}
+函数可以通过 `actions` 列表定义多个子操作。该列表必须是 `Action` 类的属性，可以是类属性，也可以在 `__init__` 中设置到 `self` 上。模块级列表永远不会被读取。
+
+```python
+class Action:
+    actions = [
+        {
+            "id": "summarize",
+            "name": "Summarize",
+            "icon_url": "https://example.com/icons/summarize.svg"
+        },
+        {
+            "id": "translate",
+            "name": "Translate",
+            "icon_url": "https://example.com/icons/translate.svg"
+        }
+    ]
+
+    async def action(self, body: dict, __id__=None, **kwargs):
+        if __id__ == "summarize":
+            # 摘要逻辑
+            return {"messages": [{"id": body["id"], "content": "Summary: ..."}]}
+        elif __id__ == "translate":
+            # 翻译逻辑
+            return {"messages": [{"id": body["id"], "content": "Translation: ..."}]}
+```
+
+没有 `name` 的子操作会显示为 `<function name> (<sub id>)`。其图标按以下顺序确定：子操作的 `icon_url`、frontmatter 的 `icon_url`、类上的 `icon_url` 或 `icon` 属性，最后是默认图标。
+
+### 全局操作与模型专属操作 {#global-vs-model-specific-actions}
+- **全局操作**：在操作设置中打开开关，为所有用户和所有模型全局启用。
+- **模型专属操作**：在模型设置中为特定模型配置已启用的操作。
+
+操作仅在启用时提供。非管理员用户只能在自己有权访问且提供该操作的模型上运行它，并且只能在自己拥有的聊天中运行。将 [`ENABLE_PLUGINS`](/reference/env-configuration#enable_plugins) 或 [`ENABLE_FUNCTIONS`](/reference/env-configuration#enable_functions) 设置为 `false` 会完全禁用操作。
+
+### 按钮显示顺序（优先级） {#button-display-order-priority}
+
+助手消息下方的操作按钮按其 `priority` Valve 值以**升序**排序：值越小越靠前（最左），值越大越靠后（最右）。默认优先级为 `0`。
+
+要控制顺序，请在操作的 Valves 中添加 `priority` 字段：
+
+```python
+class Valves(BaseModel):
+    priority: int = 0  # 值越小，在按钮行中越靠前
+```
+
+这使用与[过滤器函数](/features/extensibility/plugin/functions/filter)相同的优先级机制，因此整个插件系统中的行为保持一致。没有 `priority` Valve 时，操作默认使用 `0`，相同优先级的操作按**函数 ID 的字母顺序**排序。
+
+## 高级功能 {#advanced-capabilities}
+
+### 长时间运行的操作 {#long-running-actions}
+操作会在按钮按下所发送的 HTTP 请求中内联运行。没有任务系统钩子，因此请通过 `__event_emitter__` 报告进度，并将工作量控制在客户端愿意等待的范围内：
+
+```python
+async def action(self, body: dict, __event_emitter__=None):
+    # 启动长时间运行的进程
+    await __event_emitter__({
+        "type": "status",
+        "data": {"description": "Starting background processing..."}
+    })
+
+    # 执行耗时操作
+    result = await some_long_running_function()
+
+    return {"messages": [{"id": body["id"], "content": f"Processing completed: {result}"}]}
+```
+
+### 文件与媒体处理 {#file-and-media-handling}
+操作接收的载荷包含对话消息，但不包含其附件，返回 `files` 列表也不会产生任何效果。要访问聊天文件，请将 `body["chat_id"]` 与聊天和文件 API 结合使用，并通过 `__event_emitter__` 或重写消息内容来展示生成的任何内容。
+
+### 用户上下文与权限 {#user-context-and-permissions}
+操作可以访问用户信息并遵守权限：
+
+```python
+async def action(self, body: dict, __user__=None):
+    if __user__["role"] != "admin":
+        return {"messages": [{"id": body["id"], "content": "This action requires admin privileges"}]}
+
+    user_name = __user__["name"]
+    return {"messages": [{"id": body["id"], "content": f"Hello {user_name}, admin action completed"}]}
+```
+
+## 示例：指定操作 Frontmatter {#example-specifying-action-frontmatter}
+
+每个操作函数都可以在顶部包含 docstring，为按钮定义元数据。这有助于自定义操作在 Open WebUI 中的显示和行为。
+
+支持的 frontmatter 字段示例：
+- `title`：操作的显示名称。
+- `author`：创建者名称。
+- `version`：操作的版本号。
+- `required_open_webui_version`：兼容的最低 Open WebUI 版本。
+- `icon_url (optional)`：指向图标图片（PNG、SVG、JPEG 等）的 URL。虽然技术上支持 base64 数据 URI，但**强烈建议使用托管 URL**。请参阅下方警告。
+
+:::danger 避免使用 Base64 图标，请改用 URL
+**不要**将 base64 编码的图片嵌入 `icon_url`。每个操作的图标数据都包含在 `/api/models` API 响应中，而**每个**启用该操作的模型都会在每次页面加载时将此响应发送到前端。
+
+**影响示例：**如果某个操作使用 500 KB 的 base64 图标，且该操作在 20 个模型上启用，仅这一个操作就会使 API 响应增加 **20 × 500 KB = 约 10 MB**。如果有三个这样的操作，就会产生**约 30 MB 的不必要载荷**。这将：
+- **显著减慢所有用户的前端加载速度**
+- **增加每次请求的后端内存用量和网络带宽**
+- **降低整体用户体验**，在较慢的连接上尤其明显
+
+请将图标作为静态文件托管（例如在 Web 服务器、CDN 或公开 URL 上），并通过 URL 引用。这样可以让 API 载荷保持精简。
+:::
+
+**示例（推荐，URL 图标）：**
+
+<details>
+<summary>示例</summary>
+
+```python
+"""
+title: Enhanced Message Processor
+author: @admin
+version: 1.2.0
+required_open_webui_version: 0.5.0
+icon_url: https://example.com/icons/message-processor.svg
+requirements: requests,beautifulsoup4
+"""
+
+from pydantic import BaseModel
+
+class Action:
+    def __init__(self):
+        self.valves = self.Valves()
+
+    class Valves(BaseModel):
+        api_key: str = ""
+        processing_mode: str = "standard"
+
+    async def action(
+        self,
+        body: dict,
+        __user__=None,
+        __event_emitter__=None,
+        __event_call__=None,
+    ):
+        # 发送初始状态
+        await __event_emitter__({
+            "type": "status",
+            "data": {"description": "Processing message..."}
+        })
+
+        # 获取用户确认
+        response = await __event_call__({
+            "type": "confirmation",
+            "data": {
+                "title": "Process Message",
+                "message": "Do you want to enhance this message?"
+            }
+        })
+
+        if not response:
+            return None
+
+        # 处理被按下按钮所在的消息
+        message = body["messages"][-1]
+        enhanced_content = f"Enhanced: {message.get('content', '')}"
+
+        return {"messages": [{"id": body["id"], "content": enhanced_content}]}
+```
+
+</details>
+
+## 最佳实践 {#best-practices}
+
+### 错误处理 {#error-handling}
+始终在操作中实现适当的错误处理：
+
+```python
+async def action(self, body: dict, __event_emitter__=None):
+    try:
+        # 操作逻辑
+        result = perform_operation()
+        return {"messages": [{"id": body["id"], "content": f"Success: {result}"}]}
+    except Exception as e:
+        await __event_emitter__({
+            "type": "notification",
+            "data": {"type": "error", "content": f"Action failed: {str(e)}"}
+        })
+        return {"messages": [{"id": body["id"], "content": "Action encountered an error"}]}
+```
+
+从 `action()` 逃逸的异常会转换为 HTTP 400、界面中的 Toast 通知，以及被按下按钮所在消息上的错误标记。
+
+### 性能注意事项 {#performance-considerations}
+- 对 I/O 操作使用 async/await
+- 为外部 API 调用实现超时
+- 为长时间运行的操作提供进度更新
+- 考虑使用后台任务执行繁重处理
+
+### 用户体验 {#user-experience}
+- 始终通过事件发射器提供清晰的反馈
+- 对破坏性操作使用确认对话框
+- 包含有帮助的错误消息
+
+## 与 Open WebUI 功能集成 {#integration-with-open-webui-features}
+
+操作可以与其他 Open WebUI 功能无缝集成：
+- **模型**：操作可以是模型专属或全局的
+- **工具**：操作可以调用外部工具和 API
+- **文件**：操作载荷不携带附件。操作需要聊天文件时，使用 `body["chat_id"]` 通过文件 API 获取
+- **记忆**：操作可以访问对话历史和上下文
+- **权限**：操作遵守用户角色和访问控制
+- **[富 UI 嵌入](/features/extensibility/plugin/development/rich-ui)**：操作可以返回 HTML 内容，并在聊天中渲染为交互式 iframe
+
+如需更多示例和社区贡献的操作，请访问 [https://openwebui.com/search](https://openwebui.com/search)，在这里可以发现、下载和探索 Open WebUI 社区构建的自定义函数。

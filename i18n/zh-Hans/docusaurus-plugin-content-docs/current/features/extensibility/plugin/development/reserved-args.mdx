@@ -1,0 +1,463 @@
+---
+sidebar_position: 999
+title: "保留参数"
+---
+
+import Heading from "@theme/Heading";
+
+:::warning
+
+本教程由社区贡献，不受 Open WebUI 团队支持，仅用于演示如何针对你的特定用例自定义 Open WebUI。想要参与贡献？请查看贡献教程。
+
+:::
+
+# 特殊参数
+
+开发自己的 `Tools`、`Functions`（`Filters`、`Pipes` 或 `Actions`）、`Pipelines` 等时，你可以使用特殊参数来充分利用 Open WebUI 提供的各种能力。
+
+本页详细介绍每个特殊参数的类型和结构，并提供相应示例。
+
+### `body` {#body}
+
+一个通常会几乎直接传给模型的 `dict`。虽然它严格来说不是特殊参数，但为了便于参考，也因为它本身包含一些特殊参数，所以在这里一并介绍。
+
+:::note Filter 的 `inlet()` 与 `request()` 中 `body` 的差异
+`inlet()` 在管道运行前较早看到 body；`request()` 则在 body 即将发往提供方时最后看到它。此时，`features`、`variables`、`tool_ids`、`files`、`folder_id` 和 `skill_ids` 等键已被移除，而检索到的 RAG 来源和解析后的 `tools` 数组已被添加。下方示例是具有 `inlet()` 阶段结构的 body。请参阅 [`request` 在管道中的位置](/features/extensibility/plugin/functions/filter#where-request-sits-in-the-pipeline)。
+:::
+
+<details>
+<summary>示例</summary>
+
+```json
+
+{
+  "stream": true,
+  "model": "my-cool-model",
+  # 由连字符分隔单词组成的小写字符串：这是模型的 ID
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "type": "text",
+          "text": "What is in this picture?"
+        },
+        {
+          "type": "image_url",
+          "image_url": {
+            "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdYAAAGcCAYAAABk2YF[REDACTED]"
+            # 图片以 base64 编码数据传递
+          }
+        }
+      ]
+    },
+    {
+      "role": "assistant",
+      "content": "The image appears to be [REDACTED]"
+    },
+  ],
+  "features": {
+    "image_generation": false,
+    "code_interpreter": false,
+    "web_search": false
+  },
+  "stream_options": {
+    "include_usage": true
+  },
+  "metadata": "[The exact same dict as __metadata__, present for Filters, removed before a Pipe sees it]",
+  "files": "[The exact same list as __files__]"
+}
+
+```
+
+</details>
+
+<Heading as="h3" id="__user__"><code>__user__</code></Heading>
+
+包含用户信息的 `dict`。它是 `UserModel.model_dump()` 返回的完整用户记录：`id`、`email`、`username`、`role`、`name`、`profile_image_url`、`profile_banner_image_url`、`bio`、`gender`、`date_of_birth`、`timezone`、`presence_state`、`status_emoji`、`status_message`、`status_expires_at`、`info`、`settings`、`oauth`（每个提供方对应一个条目，保存提供方分配的 `sub`）、`scim`、`last_active_at`、`updated_at` 和 `created_at`。用户的 `variables` 不包含在转储结果中。下方示例仅显示大多数插件会读取的字段。
+
+请注意，如果定义了 `UserValves` 类，必须通过 `__user__["valves"]` 访问其实例。否则，`__user__` 中会完全没有 `valves` 键值。
+
+<details>
+<summary>示例</summary>
+
+```json
+{
+  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "email": "cheesy_dude@openwebui.com",
+  "name": "Patrick",
+  "role": "user",
+  # role 可以是 `user` 或 `admin`
+  "valves": "[the UserValve instance]"
+}
+```
+
+</details>
+
+<Heading as="h3" id="__metadata__"><code>__metadata__</code></Heading>
+
+包含聊天、模型、文件等广泛信息的 `dict`。
+
+<details>
+<summary>示例</summary>
+
+```json
+{
+  "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "chat_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "session_id": "xxxxxxxxxxxxxxxxxxxx",
+  "user_agent": "Mozilla/5.0 ...",
+  # 调用方的 User-Agent 标头；不存在时为 ""。
+  "internal": false,
+  # 当服务器自身（任务或自动化）而非客户端发出请求时为 true。
+  "user_message": "[the latest user message dict from body['messages']]",
+  "user_message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "assistant_message_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "automation_id": null,
+  # 当自动化启动本轮对话时设置。
+  "folder_id": null,
+  "filter_ids": [],
+  # 除模型自身的 Filter 外，为此请求选择的 Filter。
+  "chat_variables": {},
+  # 存储在聊天本身的变量，与下方请求级 "variables" 不同。
+  "user_prompt": "What is in this picture?",
+  # 用户最近一条消息，在任何来源引用包装之前捕获。
+  # 原生工具调用循环和 Pipe 应读取此值。
+  "system_prompt": "You are a helpful assistant.",
+  # 聊天的系统消息，在同一时间点捕获。
+  "sources": [],
+  # 本轮对话解析后的来源（例如文件上下文）。
+  # 未附加来源时为空。
+  "tool_ids": null,
+  # tool_ids 是 str 列表。
+  "files": "[Same as in body['files']]",
+  # 如果未提供文件，__metadata__ 中仍存在 files 键，但其值为 None
+  "features": {
+    "image_generation": false,
+    "code_interpreter": false,
+    "web_search": false
+  },
+  "variables": {
+    "{{USER_NAME}}": "cheesy_username",
+    "{{USER_LOCATION}}": "Unknown",
+    "{{CURRENT_DATETIME}}": "2025-02-02 XX:XX:XX",
+    "{{CURRENT_DATE}}": "2025-02-02",
+    "{{CURRENT_TIME}}": "XX:XX:XX",
+    "{{CURRENT_WEEKDAY}}": "Monday",
+    "{{CURRENT_TIMEZONE}}": "Europe/Berlin",
+    "{{USER_LANGUAGE}}": "en-US"
+  },
+  "model": "[The exact same dict as __model__]",
+  "params": {
+    "stream_delta_chunk_size": 1,
+    "reasoning_tags": null,
+    "compact_token_threshold": null,
+    "function_calling": "native",
+    "tool_approval_mode": "full"
+    # 除非启用了工具权限且请求另有选择，否则为 "full"。
+    # 频道消息始终为 "full"。自动化不发送选择，因此在提供 Auto 时会得到 "auto"。
+  },
+  "tools": "[the same dict as __tools__, present once tools have been loaded]",
+  "task": "[the task name for internal task calls, see __task__ below]",
+  "task_body": "[the task's body for internal task calls, see __task_body__ below]"
+}
+
+```
+
+</details>
+
+:::tip 检测请求来源
+
+元数据中没有任何字段直接指明调用方，区分它们的是聊天上下文：来自 Web 界面的请求始终带有 `chat_id` 和 `session_id`；直接 API 调用的 `chat_id` 为空、`session_id` 为 `null`，除非客户端自行设置。这两个键始终存在，因此请检查它们的值，而不是检查键是否存在：
+
+```python
+async def inlet(self, body: dict, __metadata__: dict = None) -> dict:
+    metadata = __metadata__ or {}
+
+    if metadata.get("chat_id") and metadata.get("session_id"):
+        # 来自聊天会话的请求
+        pass
+    else:
+        # 直接 API 请求
+        pass
+    return body
+```
+
+:::
+
+:::tip 在包装前读取用户消息
+
+附加来源时，聊天补全中间件会使用默认引用模板包装用户最近一条消息。包装发生在 Pipe 或 `pipe()` 调用看到 body 之前，并且只会在附加来源时触发。直接读取 `body["messages"][-1]["content"]` 的 Pipe 会看到包装后的形式。
+
+`__metadata__["user_prompt"]` 保存包装前的用户消息。原生工具调用循环和 Pipe 都会读取它，因此无论是否附加来源都可以安全使用。对于任何需要将用户本轮输入交给下游模型的 Pipe，都应使用该值。
+
+```python
+async def pipe(self, body: dict, __metadata__: dict, __user__: dict) -> str:
+    user_prompt = __metadata__.get("user_prompt") or ""
+    system_prompt = __metadata__.get("system_prompt")
+
+    messages = []
+    if system_prompt:
+        messages.append({"role": "system", "content": system_prompt})
+    messages.append({"role": "user", "content": user_prompt})
+    # 将 messages 传给你的下游模型
+```
+
+如果 Pipe 通过跳过标准预处理的路径运行（直接 API 调用方、某些测试夹具），`__metadata__` 可能不存在。在这种情况下，请扫描 `body["messages"]` 以查找最后一条用户消息。
+
+:::
+
+<Heading as="h3" id="__model__"><code>__model__</code></Heading>
+
+包含模型信息的 `dict`。
+
+<details>
+<summary>示例</summary>
+
+```json
+{
+  "id": "my-cool-model",
+  "name": "My Cool Model",
+  "object": "model",
+  "created": 1746000000,
+  "owned_by": "openai",
+  # openai、ollama、anthropic 或 unknown
+  "info": {
+      "id": "my-cool-model",
+      "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "base_model_id": "gpt-5.6-sol",
+      # 这是模型端点所服务的模型名称
+      "name": "My Cool Model",
+      "params": {
+      "system": "You are my best assistant. You answer [REDACTED]",
+      "function_calling": "native"
+      # 自定义选项会显示在这里，例如 "Top K"
+      },
+      "meta": {
+      "description": "Description of my-cool-model",
+      "capabilities": {
+          "vision": true,
+          "usage": true,
+          "citations": true
+      },
+      "position": 17,
+      "tags": [
+          {
+          "name": "for_friends"
+          },
+          {
+          "name": "vision_enabled"
+          }
+      ],
+      "suggestion_prompts": null
+      },
+      "access_control": {
+      "read": {
+          "group_ids": [],
+          "user_ids": []
+      },
+      "write": {
+          "group_ids": [],
+          "user_ids": []
+      }
+      },
+      "is_active": true,
+      "updated_at": 1740000000,
+      "created_at": 1740000000
+  },
+  "preset": true,
+  "actions": [],
+  "tags": [
+      {
+          "name": "for_friends"
+      },
+      {
+          "name": "vision_enabled"
+      }
+  ]
+}
+
+```
+
+</details>
+
+<Heading as="h3" id="__messages__"><code>__messages__</code></Heading>
+
+由之前消息组成的 `list`。只有 Tool 会接收它；Pipe 和 Filter 从 `body["messages"]` 读取同一列表。
+
+参见上方的 `body["messages"]` 值。
+
+<Heading as="h3" id="__chat_id__"><code>__chat_id__</code></Heading>
+
+`chat_id` 的 `str`，表示当前聊天/会话的唯一标识符。
+
+对于源自聊天上下文的调用，Pipe、Tool 以及 Filter 的 `inlet()` 和 `request()` 会接收它。在内部任务调用（标题生成、查询生成、标签生成等）中，如果 Pipe 的模型是[任务模型](/features/administration/task-models)，Pipe 也会接收它。Filter 完全不会在内部任务调用中运行。
+
+Filter 的 `stream()` 和 `outlet()` 不会获得它，Action 也不会。在这些位置请改为读取 `body["chat_id"]`。
+
+这让有状态的函数/Pipe/manifold 能够维护每聊天状态，而不会产生状态碎片。
+
+另请参阅 `__metadata__["chat_id"]`，了解如何通过元数据 dict 访问相同的值。
+
+<Heading as="h3" id="__session_id__"><code>__session_id__</code></Heading>
+
+`session_id` 的 `str`。
+
+参见上方的 `__metadata__["session_id"]` 值。
+
+<Heading as="h3" id="__message_id__"><code>__message_id__</code></Heading>
+
+`message_id` 的 `str`。
+
+参见上方的 `__metadata__["message_id"]` 值。
+
+<Heading as="h3" id="__event_emitter__"><code>__event_emitter__</code></Heading>
+
+一个 `Callable`，通过 socket.io 将当前聊天轮次的事件传递给所有已订阅的客户端（WebUI 是标准订阅方）。Open WebUI 为当前助手轮次跟踪的同一个 `message_id` 会自动包含在内。
+
+最常见的事件是状态胶囊：
+
+```python
+await __event_emitter__({
+    "type": "status",
+    "data": {"description": "Working...", "done": False},
+})
+```
+
+`type` 字段不局限于可渲染的类型。具有任意 `type` 字符串的事件都会通过 socket.io 转发，并保留原始 `type`。当 Pipe 需要发送控制信号或自定义 UI 标记，供前端监听器（例如用户脚本）响应，而不将其渲染为流式消息内容时，这很有用：
+
+```python
+await __event_emitter__({
+    "type": "my-pipe:phase-changed",
+    "data": {"phase": "reasoning"},
+})
+```
+
+`status` 事件会原生渲染在聊天中，因此应用于用户需要看到的进度。自定义事件类型则供前端监听器在 Pipe 运行期间响应事件，而不更改可见消息。
+
+<Heading as="h3" id="__event_call__"><code>__event_call__</code></Heading>
+
+一个 `Callable`，发送事件并等待浏览器应答。Pipe、Filter、Tool 和 Action 均可使用。
+
+它返回浏览器发回的任何内容。无法获得应答时，它不会抛出异常，而是返回带有 `error` 键的 `dict`：如果标签页已关闭，则返回 `{"error": "Client session disconnected."}`；如果设置了 [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) 且等待时间已超过该值，则返回 `{"error": "Event call timed out. The browser tab may be inactive or closed."}`。未设置该变量时完全没有超时，调用会无限期等待。
+
+<Heading as="h3" id="__files__"><code>__files__</code></Heading>
+
+通过聊天发送的文件 `list`；没有附件的消息对应空列表。Pipe 和 Tool 都会接收它。请注意，图片不被视为文件，而是作为 `body["messages"]` 列表的一部分直接发送给模型。
+
+出于性能考虑，文件的实际二进制数据不包含在参数中，但如有需要，仍可通过文件路径访问文件。例如使用 `docker` 时，路径的 Python 写法可以是：
+
+```python
+from pathlib import Path
+
+# `path` 是本地存储下的文件系统路径；在 S3、GCS 或 Azure 上则是存储桶 URL
+the_file = Path(__files__[0]["file"]["path"])
+assert the_file.exists()
+```
+
+请注意，也可以通过 `__metadata__["files"]` 访问相同的文件 dict（如果未发送文件，其值为 `None`），或通过 `body["files"]` 访问（但如果未发送文件，`body` 中会完全没有 `files` 键）。
+
+<details>
+<summary>示例</summary>
+
+```json
+
+[
+  {
+    "type": "file",
+    "file": {
+      "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "filename": "Napoleon - Wikipedia.pdf",
+      "path": "/app/backend/data/uploads/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx_Napoleon - Wikipedia.pdf",
+      "user_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "hash": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "data": {
+        "content": "Napoleon - Wikipedia\n\n\nNapoleon I\n\nThe Emperor Napoleon in His Study at the\nTuileries, 1812\n\nEmperor of the French\n\n1st reign 18 May 1804 – 6 April 1814\n\nSuccessor Louis XVIII[a]\n\n2nd reign 20 March 1815 – 22 June 1815\n\nSuccessor Louis XVIII[a]\n\nFirst Consul of the French Republic\n\nIn office\n13 December 1799 – 18 May 1804\n\nBorn Napoleone Buonaparte\n15 August 1769\nAjaccio, Corsica, Kingdom of\nFrance\n\nDied 5 May 1821 (aged 51)\nLongwood, Saint Helena\n\nBurial 15 December 1840\nLes Invalides, Paris\n\nNapoleon\nNapoleon Bonaparte[b] (born Napoleone\nBuonaparte;[1][c] 15 August 1769 – 5 May 1821), later\nknown [REDACTED]",
+        # content 值是文档解析器的输出，上述示例使用 Tika 作为文档解析器
+      },
+      "meta": {
+        "name": "Napoleon - Wikipedia.pdf",
+        "content_type": "application/pdf",
+        "size": 10486578,
+        # 以字节为单位，此处约为 10Mb
+        "data": {},
+        "collection_name": "file-96xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+        # 始终以 'file' 开头
+      },
+      "created_at": 1740000000,
+      "updated_at": 1740000000
+    },
+    "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "url": "/api/v1/files/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "name": "Napoleon - Wikipedia.pdf",
+    "collection_name": "file-96xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    "status": "uploaded",
+    "size": 10486578,
+    "error": "",
+    "itemId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+    # itemId 与 file["id"] 不同
+  }
+]
+
+```
+
+</details>
+
+<Heading as="h3" id="__request__"><code>__request__</code></Heading>
+
+`fastapi.Request` 的实例。更多信息请参阅[迁移页面](/features/extensibility/plugin/migration/)或 [FastAPI 文档](https://fastapi.tiangolo.com/reference/request/)。
+
+<Heading as="h3" id="__task__"><code>__task__</code></Heading>
+
+表示任务类型的 `str`。如果存在，其值只是 `__metadata__["task"]` 的简写，否则为 `None`。只有 Pipe 会接收它；Filter 或 Tool 即使声明了它，也永远不会获得该值，即使是在真正的任务调用期间。
+
+<details>
+<summary>可能的值</summary>
+
+```json
+
+[
+    "title_generation",
+    "follow_up_generation",
+    "tags_generation",
+    "emoji_generation",
+    "query_generation",
+    "image_prompt_generation",
+    "autocomplete_generation",
+    "function_calling",
+    "moa_response_generation",
+    "context_compaction",
+    "memory_review"
+]
+```
+
+</details>
+
+<Heading as="h3" id="__task_body__"><code>__task_body__</code></Heading>
+
+包含完成给定 `__task__` 所需 `body` 的 `dict`。如果存在，其值只是 `__metadata__["task_body"]` 的简写，否则为 `None`。
+
+其结构与上方的 `body` 相同，但会有所修改，例如使用适当的模型和系统消息等。
+
+<Heading as="h3" id="__tools__"><code>__tools__</code></Heading>
+
+以工具函数名称为键的 `dict`，仅注入 Pipe。每个值都包含 `tool_id`、`callable`（运行工具的可等待对象）和 `spec`（发送给模型的 OpenAI 函数规范）。本地 Python 工具的条目还包含 `metadata`，而内置和外部工具服务器条目则包含值为 `builtin` 或 `external` 的 `type`。
+
+该 dict 由 [tools.py](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/tools.py) 中的 `get_tools()` 组装。
+
+<Heading as="h3" id="__oauth_token__"><code>__oauth_token__</code></Heading>
+
+包含已登录用户 OAuth 令牌数据的 `dict`（`access_token` 和提供方返回的其他内容，过期后会刷新）；如果用户未通过 OAuth 登录或未存储会话令牌，则为 `None`。Pipe、Tool 以及 Filter 的 `inlet()` 和 `request()` 会接收它。令牌来自浏览器的 OAuth 会话 Cookie；对于没有该 Cookie 的自动化和 API 调用，则回退到用户最近存储的 OAuth 会话。
+
+<Heading as="h3" id="__id__"><code>__id__</code></Heading>
+
+插件自身 ID 的 `str`：Tool 的工具 ID、Filter 的过滤器 ID、Action 的 Action ID（单击子 Action 时为子 Action ID）。Pipe 不会接收它。
+
+<Heading as="h3" id="__body__"><code>__body__</code></Heading>
+
+仅限 Filter。`stream()` 通过 `event` 而非 `body` 接收每个分块，因此 `__body__` 携带本轮对话开始时的请求体，其内容为 `inlet()` Filter 运行后的状态。
+
+<Heading as="h3" id="__features__"><code>__features__</code></Heading>
+
+仅限 Tool。请求中的 `features` dict（`web_search`、`image_generation`、`code_interpreter` 以及客户端发送的任何其他开关），取自 `inlet()` Filter 运行后的 body，因此 Tool 可以查看用户开启了哪些开关。

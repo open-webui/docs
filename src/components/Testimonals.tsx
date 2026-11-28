@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { translate } from "@docusaurus/Translate";
 
 export const Testimonals = ({
 	bannerClassName = "h-18",
@@ -10,10 +11,18 @@ export const Testimonals = ({
 		{
 			imgSrc: "https://avatars.githubusercontent.com/u/5860369?v=4",
 			url: "https://github.com/Ithanil/",
-			name: "Jan Kessler, AI Architect",
+			name: translate({
+				id: "testimonials.janKessler.name",
+				message: "Jan Kessler, AI Architect",
+				description: "The testimonial author name and role",
+			}),
 			company: "JGU Mainz",
-			content:
-				"Deploying an self-hosted AI chat stack for a large university like the Johannes Gutenberg University Mainz demands scalable and seamlessly integrable solutions. As the AI Architect at the university's Data Center, I chose Open WebUI as our chat frontend, impressed by its out-of-the-box readiness for enterprise environments and its rapidly paced, community-driven development. Now, our fully open-source stack – comprising LLMs, proxy/loadbalancer, and frontend – is successfully serving our user base of 30,000+ students and 5,000+ employees, garnering very positive feedback. Open WebUI’s user-centric design, rich feature set, and adaptability have solidified it as an outstanding choice for our institution.",
+			content: translate({
+				id: "testimonials.janKessler.content",
+				message:
+					"Deploying an self-hosted AI chat stack for a large university like the Johannes Gutenberg University Mainz demands scalable and seamlessly integrable solutions. As the AI Architect at the university's Data Center, I chose Open WebUI as our chat frontend, impressed by its out-of-the-box readiness for enterprise environments and its rapidly paced, community-driven development. Now, our fully open-source stack – comprising LLMs, proxy/loadbalancer, and frontend – is successfully serving our user base of 30,000+ students and 5,000+ employees, garnering very positive feedback. Open WebUI’s user-centric design, rich feature set, and adaptability have solidified it as an outstanding choice for our institution.",
+				description: "The testimonial from Jan Kessler",
+			}),
 		},
 	];
 

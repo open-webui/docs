@@ -1,0 +1,85 @@
+---
+title: "网页搜索"
+sidebar_position: 0
+slug: /features/chat-conversations/web-search
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import DocCardList from '@theme/DocCardList';
+
+# 网页搜索
+
+<ThemedImage
+  alt="网页搜索：一个方形透镜置于方块阵列上，透镜下方的方块被抬起"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-websearch-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-websearch-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+网页搜索让 AI 能够在线查找信息，帮助回答你的问题。
+
+这里涉及两项工作：**查找页面**和**读取页面**。**搜索引擎负责查找页面**，**网页加载器负责读取页面**。
+
+## 搜索引擎与网页加载器 {#search-engine-vs-web-loader}
+
+可以把这一过程想象成在线查找食谱。你在 Google 中输入“巧克力蛋糕食谱”，然后点击某个结果来阅读食谱。这是两个独立的步骤。Open WebUI 的工作方式与之类似：
+
+| 设置 | 作用 | AI 获得的内容 |
+| --- | --- | --- |
+| **网页搜索引擎** | 搜索“巧克力蛋糕食谱”。 | 食谱页面的链接列表及简短预览。 |
+| **网页加载器引擎** | 打开其中一个链接并获取页面文本。 | 实际食谱：配料和制作步骤。 |
+
+**“网页加载器”就是指“网页阅读器”。**搜索结果通常包含一个链接和简短预览。当 AI 需要更多细节时，加载器会从页面本身获取文本。它也可以读取你粘贴到聊天中的链接。
+
+这就是需要两项设置的原因：一项选择**由谁查找链接**，另一项选择**如何读取这些链接指向的页面**。
+
+即使关闭网页搜索，网页加载器设置也会生效。只有在**网页搜索**开启时才必须设置**网页搜索引擎**，因此未选择搜索引擎也可以保存**加载器**设置。**网页搜索**关闭时，页面会隐藏**网页搜索确认**、**网页搜索引擎**及其设置、**搜索限制**、**获取 URL 内容长度限制**、**域名过滤列表**和**绕过网页加载器**，但会保留它们已保存的值。**绕过嵌入与检索**和**信任代理环境**仍然可见。
+
+### Playwright 和 External 加载器设置 {#playwright-and-external-loader-settings}
+
+选择 `playwright` 或 `external` 作为**网页加载器引擎**时，**加载器**区域会显示额外字段。
+
+- **Playwright WebSocket URL**（`PLAYWRIGHT_WS_URL`）：Open WebUI 会连接此地址上的 Chromium 浏览器，而不是自行启动浏览器。Docker 镜像不包含 Chromium。仅当环境中设置了 `WEB_LOADER_ENGINE=playwright` 且 `PLAYWRIGHT_WS_URL` 为空时，容器才会在启动时安装 Chromium。仅在管理员面板中选择 `playwright` 不会安装任何浏览器，因此请设置环境变量并重启，或者输入一个 WebSocket URL。
+
+如果客户端与服务器版本不同，远程 Playwright 连接可能会失败并返回 `428 Precondition Required`。请将 Playwright 服务器的主版本号和次版本号与 Open WebUI 版本所附带的客户端保持一致。对于 Open WebUI v0.13.4，请使用 Playwright `1.60.x`。该版本的 [Playwright Compose 文件](https://github.com/open-webui/open-webui/blob/v0.13.4/docker-compose.playwright.yaml)将服务器固定为 `1.60.0`。[Playwright 连接要求](https://playwright.dev/python/docs/api/class-browsertype#browser-type-connect)
+- **Playwright 超时时间（毫秒）**（`PLAYWRIGHT_TIMEOUT`，默认 `10000`）：Open WebUI 为每个页面的加载，以及页面加载期间发出的每个请求所分配的毫秒数。超时的页面会被跳过，并记录 `Error loading <url>:`，后接 Playwright 的错误。其他页面仍会加载。如果没有任何页面加载成功，网页搜索将失败并报告 `[ERROR: None of the web search results could be loaded]`（除非开启了**绕过嵌入与检索**）；通过 `#` 附加的链接读取失败时会报告 `[ERROR: Could not read content from <url>]`。
+- **外部网页加载器 URL**（`EXTERNAL_WEB_LOADER_URL`）：Open WebUI 向此 URL 发送 `POST` 请求，JSON 正文为 `{"urls": [...]}`，每个请求最多包含 20 个 URL，标头为 `Authorization: Bearer <External Web Loader API Key>`。该服务必须返回一个由对象组成的 JSON 数组，每个对象都包含 `page_content`（页面文本）和 `metadata`。将 `metadata.source` 设置为文本来源的 URL：网页搜索只保留链接与返回的 `source` 匹配的结果。如果返回错误状态，或响应不是这种数组，则跳过整个批次，并记录 `Error extracting content from batch <urls>: <error>`。Open WebUI 不会为此请求设置超时，因此始终不响应的服务会一直阻塞搜索。
+
+## 为什么有这么多选项？ {#why-are-there-so-many-options}
+
+Open WebUI 允许你选择由哪项服务完成各项工作。这些列表提供的是**可供选择的替代方案**，你**无需**配置所有服务。
+
+- **不同的搜索引擎提供不同的结果查找方式。**有些无需账户即可使用，有些需要账户并可能对搜索收费，还有一些可以在你自己的服务器上运行。对于同一个问题，它们也可能返回不同的结果。
+- **不同的网页加载器提供不同的页面读取方式。**网站的构建方式各不相同：有些会直接提供文本，有些则需要浏览器运行页面后才会显示文本。不同加载器会以不同方式处理这些情况。
+
+某些服务（例如 Tavily 和 [Exa](/features/chat-conversations/web-search/providers/exa#4-optional-use-exa-to-read-pages)）可以同时完成这两项工作，因此你可能会在两个列表中看到同一个名称。你也可以为这两项工作选择不同的服务。
+
+## 入门时应该选择什么？ {#what-should-i-choose-to-get-started}
+
+:::tip 搜索引擎质量
+要获得最佳搜索结果，请从专为 LLM 工作流构建的托管搜索 API 开始，例如 [Exa](/features/chat-conversations/web-search/providers/exa)、[Tavily](/features/chat-conversations/web-search/providers/tavily)、[SearchApi](/features/chat-conversations/web-search/providers/searchapi)、[Serper](/features/chat-conversations/web-search/providers/serper)、[SerpApi](/features/chat-conversations/web-search/providers/serpapi)、[Brave](/features/chat-conversations/web-search/providers/brave) 或 [Kagi](/features/chat-conversations/web-search/providers/kagi)。如果需要自托管且保护隐私的元搜索引擎，[SearXNG](/features/chat-conversations/web-search/providers/searxng) 仍然很有用，但结果质量在很大程度上取决于其上游引擎、速率限制和实例配置。
+:::
+
+1. **选择一个搜索引擎，并按照下方相应的设置指南操作。**托管搜索 API 是一项供 Open WebUI 连接并代你执行搜索的服务。这些服务通常需要账户和 **API 密钥**：密钥是一段用于将 Open WebUI 连接到你在该服务中的账户的代码。
+2. **将网页加载器保留为默认设置。**入门时无需单独的页面读取服务。如果无法读取页面，[故障排除指南](/troubleshooting/web-search)可以帮助你决定是否更换加载器。[加载器设置参考](/reference/env-configuration#web-loader-configuration)介绍了可用选项。
+
+:::tip 搜索正常，但页面内容为空？
+找到页面并不保证 Open WebUI 能读取它。某个网站可能出现在搜索结果中，却会阻止工具打开它，或者采用你的加载器无法读取的方式加载文本。
+:::
+
+![网页搜索设置](/images/admin/admin-web-search.png)
+
+:::tip 搜索前要求确认
+管理员可以要求用户**在网页搜索运行前进行确认**，避免在无意中向外部提供方发送查询。在**设置 → 网页搜索**（管理员区域）中启用此功能；**网页搜索**开启时会显示该开关（也可通过 [`ENABLE_WEB_SEARCH_CONFIRMATION`](/reference/env-configuration#enable_web_search_confirmation) 配置）。提示文本由 [`WEB_SEARCH_CONFIRMATION_CONTENT`](/reference/env-configuration#web_search_confirmation_content) 设置。
+
+提示文本填写在**网页搜索确认内容**中，开关开启时该字段显示在开关下方。用户在聊天输入框中开启**网页搜索**时，以及在网页搜索已开启但尚未确认的情况下发送消息时，都会看到包含**继续（Continue）**和**取消（Cancel）**的 `Use Web Search?` 对话框，其中会显示这段文本。该字段为空时，对话框显示 `Your query will be sent to the configured web search provider.`。一次确认对当前聊天的后续消息持续有效。开始新聊天或关闭网页搜索后会再次要求确认。此检查仅在聊天界面中运行，因此直接发送到 API 的请求不会等待确认。
+:::
+
+:::info 聊天开关关闭时网页搜索仍会运行
+**设置 → 界面**中的**聊天中的网页搜索**可在**默认（Default）**和**始终（Always）**之间切换。选择**始终（Always）**后，即使在聊天输入框中关闭**网页搜索**，每条消息仍会使用网页搜索。唯一的例外是所选模型关闭了**网页搜索**能力。要按聊天开启和关闭网页搜索，请将**聊天中的网页搜索**设回**默认（Default）**。
+:::
+
+<DocCardList />

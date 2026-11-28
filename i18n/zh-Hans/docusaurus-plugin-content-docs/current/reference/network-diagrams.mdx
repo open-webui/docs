@@ -1,0 +1,198 @@
+---
+sidebar_position: 100
+title: "网络图"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+常见部署拓扑的可视化 C4 图，展示 Open WebUI、Ollama 和 Docker 如何通信。可用于排查连接问题或规划架构。
+
+<Tabs groupId="os-platform">
+  <TabItem value="macos-windows" label="macOS / Windows" default>
+
+  <Tabs groupId="macos-topology">
+    <TabItem value="host-ollama-mac" label="主机上的 Ollama" default>
+
+    <h4 id="ollama-on-host-open-webui-in-container">Ollama 在主机上，Open WebUI 在容器中</h4>
+
+`Ollama` 直接在主机上运行，而 `Open WebUI` 在 Docker 容器内运行。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Mac OS/Windows") {
+   Person(user, "用户")
+   Boundary(b1, "Docker Desktop 的 Linux VM") {
+      Component(openwebui, "Open WebUI", "监听端口 8080")
+   }
+   Component(ollama, "Ollama", "监听端口 11434")
+}
+Rel(openwebui, ollama, "通过 Docker 代理进行 API 调用", "http://host.docker.internal:11434")
+Rel(user, openwebui, "通过暴露的端口 -p 3000:8080 发起请求", "http://localhost:3000")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+    <TabItem value="compose-stack-mac" label="Compose 堆栈">
+
+    <h4 id="ollama-and-open-webui-in-compose-stack">Ollama 和 Open WebUI 位于 Compose 堆栈中</h4>
+
+`Ollama` 和 `Open WebUI` 都配置在同一个 Docker Compose 堆栈中，从而简化网络通信。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Mac OS/Windows") {
+   Person(user, "用户")
+   Boundary(b1, "Docker Desktop 的 Linux VM") {
+      Boundary(b2, "Compose 堆栈") {
+         Component(openwebui, "Open WebUI", "监听端口 8080")
+         Component(ollama, "Ollama", "监听端口 11434")
+      }
+   }
+}
+Rel(openwebui, ollama, "通过容器间网络进行 API 调用", "http://ollama:11434")
+Rel(user, openwebui, "通过暴露的端口 -p 3000:8080 发起请求", "http://localhost:3000")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+    <TabItem value="separate-networks-mac" label="独立网络">
+
+    <h4 id="ollama-and-open-webui-separate-networks">Ollama 和 Open WebUI 位于独立网络中</h4>
+
+`Ollama` 和 `Open WebUI` 部署在不同的 Docker 网络中。这会导致连接问题。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Mac OS/Windows") {
+   Person(user, "用户")
+   Boundary(b1, "Docker Desktop 的 Linux VM") {
+      Boundary(b2, "网络 A") {
+         Component(openwebui, "Open WebUI", "监听端口 8080")
+      }
+      Boundary(b3, "网络 B") {
+         Component(ollama, "Ollama", "监听端口 11434")
+      }
+   }
+}
+Rel(openwebui, ollama, "无法连接")
+Rel(user, openwebui, "通过暴露的端口 -p 3000:8080 发起请求", "http://localhost:3000")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+    <TabItem value="host-network-mac" label="主机网络">
+
+    <h4 id="open-webui-in-host-network">Open WebUI 位于主机网络中</h4>
+
+`Open WebUI` 使用主机网络，这会影响它在某些环境中的连接能力。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Mac OS/Windows") {
+   Person(user, "用户")
+   Boundary(b1, "Docker Desktop 的 Linux VM") {
+      Component(openwebui, "Open WebUI", "监听端口 8080")
+   }
+}
+Rel(user, openwebui, "无法连接，主机网络是 VM 的网络")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+  </Tabs>
+
+  </TabItem>
+  <TabItem value="linux" label="Linux">
+
+  <Tabs groupId="linux-topology">
+    <TabItem value="host-ollama-linux" label="主机上的 Ollama" default>
+
+    <h4 id="ollama-on-host-open-webui-in-container-1">Ollama 在主机上，Open WebUI 在容器中</h4>
+
+`Ollama` 在主机上运行，`Open WebUI` 部署在 Docker 容器内。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Linux") {
+   Person(user, "用户")
+   Boundary(b1, "容器网络") {
+      Component(openwebui, "Open WebUI", "监听端口 8080")
+   }
+   Component(ollama, "Ollama", "监听端口 11434")
+}
+Rel(openwebui, ollama, "通过 Docker 代理进行 API 调用", "http://host.docker.internal:11434")
+Rel(user, openwebui, "通过暴露的端口 -p 3000:8080 发起请求", "http://localhost:3000")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+    <TabItem value="compose-stack-linux" label="Compose 堆栈">
+
+    <h4 id="ollama-and-open-webui-in-compose-stack-1">Ollama 和 Open WebUI 位于 Compose 堆栈中</h4>
+
+`Ollama` 和 `Open WebUI` 都位于同一个 Docker Compose 堆栈中，可以直接进行网络通信。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Linux") {
+   Person(user, "用户")
+   Boundary(b1, "容器网络") {
+      Boundary(b2, "Compose 堆栈") {
+         Component(openwebui, "Open WebUI", "监听端口 8080")
+         Component(ollama, "Ollama", "监听端口 11434")
+      }
+   }
+}
+Rel(openwebui, ollama, "通过容器间网络进行 API 调用", "http://ollama:11434")
+Rel(user, openwebui, "通过暴露的端口 -p 3000:8080 发起请求", "http://localhost:3000")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+    <TabItem value="separate-networks-linux" label="独立网络">
+
+    <h4 id="ollama-and-open-webui-separate-networks-1">Ollama 和 Open WebUI 位于独立网络中</h4>
+
+`Ollama` 和 `Open WebUI` 位于不同的 Docker 网络中，这可能会阻碍连接。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Linux") {
+   Person(user, "用户")
+   Boundary(b2, "容器网络 A") {
+      Component(openwebui, "Open WebUI", "监听端口 8080")
+   }
+   Boundary(b3, "容器网络 B") {
+      Component(ollama, "Ollama", "监听端口 11434")
+   }
+}
+Rel(openwebui, ollama, "无法连接")
+Rel(user, openwebui, "通过暴露的端口 -p 3000:8080 发起请求", "http://localhost:3000")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+    <TabItem value="host-network-linux" label="主机网络">
+
+    <h4 id="open-webui-in-host-network-ollama-on-host">Open WebUI 位于主机网络中，Ollama 在主机上</h4>
+
+`Open WebUI` 和 `Ollama` 都使用主机网络，可以实现无缝交互。
+
+```mermaid
+C4Context
+Boundary(b0, "托管机器 - Linux") {
+   Person(user, "用户")
+   Component(openwebui, "Open WebUI", "监听端口 8080")
+   Component(ollama, "Ollama", "监听端口 11434")
+}
+Rel(openwebui, ollama, "通过 localhost 进行 API 调用", "http://localhost:11434")
+Rel(user, openwebui, "通过监听端口发起请求", "http://localhost:8080")
+UpdateRelStyle(user, openwebui, $offsetX="-100", $offsetY="-50")
+```
+
+    </TabItem>
+  </Tabs>
+
+  </TabItem>
+</Tabs>

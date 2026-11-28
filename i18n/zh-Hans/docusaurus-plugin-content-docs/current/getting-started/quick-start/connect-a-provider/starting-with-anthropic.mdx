@@ -1,0 +1,76 @@
+---
+sidebar_position: 3
+title: "Anthropic（Claude）"
+
+---
+
+## 概述 {#overview}
+
+Open WebUI 通过 Anthropic 的 OpenAI 兼容端点原生支持 **Anthropic 的 Claude 模型**。只需填入你的 API 密钥即可开始聊天：无需中间件、管道或额外设置。
+
+Open WebUI 会检测 Anthropic URL（任何包含 `api.anthropic.com` 的 URL）并处理模型发现：使用 `x-api-key` 分页获取原生模型列表，并将其转换为 OpenAI 列表格式。聊天请求本身通过 Bearer 身份验证原封不动地发送到 Anthropic 的 OpenAI 兼容 `/v1/chat/completions`。Open WebUI 还在 `/api/v1/messages` 提供自己的 Anthropic Messages 端点；对于 `api.anthropic.com` 上的连接，这些请求会在聊天管道之外原生传递到 `/v1/messages`。
+
+:::warning Anthropic 的兼容性声明
+Anthropic 表示，其 OpenAI 兼容 API 旨在**用于评估和测试**，而非生产工作负载。实践中，包括工具调用在内的所有功能均能按预期工作，但请注意这一官方立场。对于完整的 Claude 原生功能（PDF 处理、引用、扩展思考、提示词缓存），Anthropic 建议使用其原生 `/v1/messages` API，该 API 可通过[管道函数](/features/extensibility/plugin/functions/pipe)或 [LiteLLM](https://docs.litellm.ai/) 等代理访问。
+:::
+
+---
+
+## 步骤 1：获取 API 密钥 {#step-1-get-your-api-key}
+
+1. 前往 [console.anthropic.com](https://console.anthropic.com/)。
+2. 创建账号或登录。
+3. 进入 **API Keys**，生成新密钥。
+
+---
+
+## 步骤 2：在 Open WebUI 中添加连接 {#step-2-add-the-connection-in-open-webui}
+
+1. 在浏览器中打开 Open WebUI。
+2. 前往**设置（Settings）> 连接（Connections）**（管理员区域），找到**管理 OpenAI API 连接（Manage OpenAI API Connections）**列表。
+3. 点击**添加连接（Add Connection）**。
+4. 输入以下内容：
+
+| 设置 | 值 |
+|---|---|
+| **URL** | `https://api.anthropic.com/v1` |
+| **API 密钥（API Key）** | 你的 Anthropic API 密钥 |
+
+5. 点击**保存（Save）**。
+
+:::tip
+输入时，URL 字段会建议常见的服务提供方端点，只需从下拉菜单中选择 Anthropic URL 即可。
+:::
+
+---
+
+## 步骤 3：开始聊天！ {#step-3-start-chatting}
+
+就是这样！Open WebUI 会自动检测 Anthropic 端点并获取可用模型。从模型下拉菜单中选择一个 Claude 模型，即可开始使用。
+
+流式传输、多轮对话和工具调用均可无缝工作。
+
+:::info 可选：筛选模型
+如果你只希望显示特定模型，可以在连接设置的**模型 ID（Model IDs）**允许列表中添加模型 ID。常见模型 ID：
+
+| 模型 | ID |
+|---|---|
+| Claude Opus 5 | `claude-opus-5` |
+| Claude Sonnet 5 | `claude-sonnet-5` |
+| Claude Haiku 4.5 | `claude-haiku-4-5` |
+
+请查阅 [Anthropic 的模型文档](https://docs.anthropic.com/en/docs/about-claude/models)，获取最新的可用模型 ID。
+:::
+
+---
+
+## 管理连接 {#managing-your-connection}
+
+你可以随时使用连接条目旁边的开关**启用或禁用** Anthropic 连接。这样即可临时停用服务提供方，而不会删除连接或丢失配置。
+
+---
+
+## 了解更多 {#learn-more}
+
+- **[OpenAI 兼容服务提供方](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)**：协议设计理念以及其他服务提供方的设置方法。
+- **[管道函数](/features/extensibility/plugin/functions/pipe)**：通过管道函数使用 Anthropic 的原生 API，获得完整功能支持。

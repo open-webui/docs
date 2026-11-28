@@ -1,0 +1,70 @@
+---
+title: "工作区"
+sidebar_position: 0
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 工作区
+
+<ThemedImage
+  alt="工作区：一个收纳托盘，其中一个格子已放入物品"
+  sources={{
+    light: useBaseUrl('/images/banners/workspace-light.svg'),
+    dark: useBaseUrl('/images/banners/workspace-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+**用五个构建模块打造你自己的 AI。**
+
+工作区可将原始模型定制为适合你工作的形态。绑定知识、附加工具、设置系统提示词、教授技能，并将结果保存为可复用模型。每个模块都是可选的，而且可以叠加使用：为模型附加你的手册、将你的行文风格设为提示词，再接入合适的工具。
+
+| 构建模块 | 用途 |
+| :--- | :--- |
+| [**模型（Models）**](/features/workspace/models) | 为基础模型配置系统提示词、参数、知识和工具，然后将其保存为模型选择器中的可复用预设。 |
+| [**知识库（Knowledge）**](/features/workspace/knowledge) | 上传文档并构建供 AI 检索（RAG）的知识库，使其根据你的来源作答，而不是凭空猜测。 |
+| [**提示词（Prompts）**](/features/workspace/prompts) | 保存带有类型化变量的可复用提示词模板，可在任何聊天中通过 `/` 斜杠命令调用。 |
+| [**技能（Skills）**](/features/workspace/skills) | 通过 Markdown 指令集教模型如何处理任务（方法论、步骤、内部规则），可选择包含[支持文件](/features/workspace/skills#supporting-files)，并按需加载。 |
+| [**工具（Tools）** ↗](/features/extensibility/plugin/tools) | 赋予模型可调用的实际能力：API、代码和网络。工具文档位于[**插件与扩展性（Plugins & Extensibility）**](/features/extensibility/plugin/tools)，不在此处。 |
+
+每个模块都有独立页面，因此可以从任意模块开始。大多数人会先创建自定义**模型（Model）**，再根据需要添加其他模块。
+
+:::tip 列表排序
+
+**模型（Models）**、**知识库（Knowledge）**、**提示词（Prompts）**、**技能（Skills）**和**工具（Tools）**列表，以及**笔记（Notes）**和管理员**函数（Functions）**列表，均可通过点击**标题（Title）**或**更新时间（Updated at）**列标题排序。再次点击当前排序所依据的列标题会反转排序方向。每个列表默认按**更新时间（Updated at）**以最新优先的顺序打开。
+
+:::
+
+:::tip 个人资料卡片
+
+将鼠标指向**模型（Models）**、**知识库（Knowledge）**、**提示词（Prompts）**、**技能（Skills）**和**工具（Tools）**列表或管理员**函数（Functions）**列表中的所有者姓名、版本历史中的版本作者，或项目访问权限设置中的用户，即可打开其个人资料卡片，与[频道](/features/channels)中显示的卡片相同。卡片包含姓名、状态、个人简介、所属群组、当地时间和最后活跃时间。
+
+:::
+
+启用[评论](/features/chat-conversations/chat-features/comments)后，可以在侧面板中讨论这些列表中的每个项目。
+
+## 工作区访问与共享 {#workspace-access-and-sharing}
+
+工作区是 Open WebUI 实例中的一个区域。要进行协作，请与需要的人员或群组共享技能、知识库等单个项目。
+
+每个标签页都有独立的[工作区权限](/features/authentication-access/rbac/permissions#1-workspace-permissions)。如果无法打开某个标签页，请让管理员检查**管理员面板 > 用户 > 群组 > 默认权限（Admin Panel > Users > Groups > Default Permissions）**以及你所在群组的权限。例如，**工作区 > 技能访问（Workspace > Skills Access）**用于开放**技能（Skills）**标签页。对于非管理员，这些标签页权限的内置默认值均为关闭。**工具（Tools）**标签页还要求在实例上启用工具。
+
+要共享你有权编辑的技能，请在**工作区 > 技能（Workspace > Skills）**中打开它，点击**访问权限（Access）**，再使用**添加访问权限（Add Access）**选择符合条件的用户或群组。非管理员使用**访问权限（Access）**按钮需要**共享 > 技能共享（Sharing > Skills Sharing）**权限，该权限默认关闭。接收者对技能的访问权限与其打开**技能（Skills）**标签页的权限会分别检查。
+
+## 创建、导入和导出 {#creating-importing-and-exporting}
+
+所有添加或移动工作区项目的操作都通过同一个**创建（Create）**按钮进行。该按钮位于工作区标题栏右侧、区域标签页旁边。各个页面不单独提供 **+ New Model**、**+ New Prompt** 或类似按钮。该按钮作用于你当前查看的区域，旁边的箭头会打开该区域的其他操作（菜单第一项仍为**创建（Create）**）。
+
+| 区域 | 创建 | 菜单中的其他操作 |
+| :--- | :--- | :--- |
+| **模型（Models）** | 在独立页面中打开模型编辑器 | 导入 JSON（Import JSON）、导出 JSON（Export JSON） |
+| **知识库（Knowledge）** | 在列表上方打开对话框 | 无 |
+| **提示词（Prompts）** | 在列表上方打开对话框 | 导入 JSON（Import JSON）、导出 JSON（Export JSON） |
+| **技能（Skills）** | 在独立页面中打开技能编辑器 | 导入（Import）、从 URL 导入（Import from URL，仅限管理员）、导入文件夹（Import folder）、导出 ZIP（Export ZIP）、导出 JSON（Export JSON） |
+| **工具（Tools）** | 在独立页面中打开工具编辑器 | 从 URL 导入（Import from URL，仅限管理员）、导入 JSON（Import JSON）、导出 JSON（Export JSON） |
+
+如果某个区域只有一个可用操作，箭头不会显示，**创建（Create）**就是一个普通按钮。知识库区域始终如此；其他区域在未授予导入和导出权限时也会如此：每个菜单项都由对应的 `workspace` 权限控制（`models_import`、`prompts_export` 等），管理员始终可以看到所有菜单项。导出会将该区域的项目写入 JSON 文件（技能还可导出为 ZIP），对应的导入操作可将其读回。
+
+旧的创建 URL 仍然可用。`/workspace/prompts/create` 和 `/workspace/knowledge/create` 会打开列表并直接显示创建对话框，关闭对话框后会返回列表。

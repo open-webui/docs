@@ -1,0 +1,399 @@
+---
+sidebar_position: 10
+title: "推理与思考模型"
+---
+
+# 推理与思考模型
+
+Open WebUI 为表现出“思考”或“推理”行为的模型提供一流支持，例如 DeepSeek R1、OpenAI o1 等。这些模型通常会在给出最终答案前生成内部思维链。
+
+## 思考标签的工作原理 {#how-thinking-tags-work}
+
+当模型生成推理内容时，通常会将该内容包裹在特定的类 XML 标签中（例如 `<think>...</think>` 或 `<thought>...</thought>`）。
+
+Open WebUI 会自动：
+1. 在模型的输出流中**检测**这些标签。
+2. **提取**标签之间的内容。
+3. 将提取的内容**渲染**在标记为“思考过程”或“正在思考”的可折叠界面元素中。
+
+这样既能让主聊天界面保持整洁，又允许你查看模型的内部处理过程。
+
+## `reasoning_tags` 参数 {#the-reasoning_tags-parameter}
+
+你可以使用 `reasoning_tags` 参数自定义 Open WebUI 应查找的标签。该参数可以**按聊天**或**按模型**设置。
+
+### 默认标签 {#default-tags}
+
+默认情况下，Open WebUI 会查找几组常见的推理标签对：
+- `<think>`、`</think>`
+- `<thinking>`、`</thinking>`
+- `<reason>`、`</reason>`
+- `<reasoning>`、`</reasoning>`
+- `<thought>`、`</thought>`
+- `<|begin_of_thought|>`、`<|end_of_thought|>`
+
+### 自定义 {#customization}
+
+如果你的模型使用不同的标签，可以在 `reasoning_tags` 参数中提供标签对列表。每一对都是由开始标签和结束标签组成的元组或列表。
+
+## 配置与行为 {#configuration--behavior}
+
+- **从有效载荷中移除**：`reasoning_tags` 参数本身是 Open WebUI 专用的控制项，在发送到 LLM 后端（OpenAI、Ollama 等）之前会**从有效载荷中移除**。这确保了与不识别该参数的服务提供方保持兼容。
+- **聊天历史**：推理内容会保留在聊天历史中。是否会传回模型取决于连接；请参阅[推理内容如何传回](#how-reasoning-is-sent-back)。
+- **界面渲染**：在内部，推理块由专用界面组件处理并渲染。保存或导出时，它们可能表示为 HTML `<details type="reasoning">` 标签。
+
+---
+
+## Open WebUI 设置 {#open-webui-settings}
+
+Open WebUI 提供了多个用于配置推理模型行为的内置设置，可在以下位置找到：
+
+- **模型控制**（消息输入框旁）→ **控制** → **高级参数**：按聊天设置。
+- **工作区** → **模型** → **编辑模型** → **高级参数**：按模型设置（仅限管理员）。
+- **设置** → **模型** → 选择一个模型 → **高级参数**（管理员区域）：另一个按模型设置的位置。
+
+### 推理标签设置 {#reasoning-tags-setting}
+
+此设置控制 Open WebUI 如何解析和显示思考/推理块：
+
+| 选项 | 说明 |
+|--------|-------------|
+| **默认** | 使用系统默认行为 |
+| **已启用** | 使用默认 `<think>...</think>` 标签明确启用推理标签检测 |
+| **已禁用** | 完全关闭推理标签检测 |
+| **自定义** | 允许你指定自定义开始和结束标签 |
+
+#### 使用自定义标签 {#using-custom-tags}
+
+如果你的模型使用非标准推理标签（例如 `<reasoning>...</reasoning>` 或 `[思考]...[/思考]`），请选择**自定义**并输入：
+
+- **开始标签**：起始标签（例如 `<reasoning>`）。
+- **结束标签**：闭合标签（例如 `</reasoning>`）。
+
+这适用于：
+- 使用本地化思考标签的模型；
+- 使用独特标签格式的自定义微调模型；
+- 使用 XML 风格推理标记的模型。
+
+### think（Ollama） {#think-ollama}
+
+此 Ollama 专用设置控制模型内置的推理功能。自 v0.9.0 起，Ollama 已原生支持将思考与答案分离，因此没有需要设置的服务器端标志：
+
+| 选项 | 发送的内容 | 说明 |
+|--------|--------------|-------------|
+| **默认** | 无 | 使用 Ollama 的默认行为，即对支持的模型开启思考 |
+| **开启** | `think: true` | 明确为模型启用思考模式 |
+| **自定义** | `think: "low"`、`"medium"`、`"high"` 或 `"max"` | 设置思考级别。GPT-OSS 只接受级别，从不接受 `true` |
+| **关闭** | `think: false` | 禁用思考模式 |
+
+:::note
+此设置会直接将 `think` 参数发送给 Ollama，Ollama 则在单独的 `thinking` 字段中返回推理轨迹，Open WebUI 会将其作为推理内容读取（请参阅[推理内容如何传回](#how-reasoning-is-sent-back)）。这与 Open WebUI 解析文本中的 `<think>` 标签是两套独立机制，后者只适用于将推理内容直接写入文本的模型。
+:::
+
+### 推理强度 {#reasoning-effort}
+
+对于支持可变推理深度的模型（例如某些 API 服务提供方的模型），此设置控制模型在推理上投入的力度：
+
+- 常见值：`low`、`medium`、`high`。
+- 某些服务提供方接受数值。
+
+Open Terminal 中的[智能体](/features/open-terminal/agents#options)也会接收此设置。
+
+:::info
+推理强度仅适用于支持此参数的特定服务提供方模型。它不会转发到原生 Ollama 连接，在这类连接中，上述 `think` 设置涵盖相同功能。如果将 Ollama 添加为 OpenAI 连接，其 OpenAI 兼容端点则会接受 `reasoning_effort`。
+:::
+
+### 在 vLLM 和 llama.cpp 上关闭思考 {#turning-thinking-off-on-vllm-and-llamacpp}
+
+由 vLLM 或 llama.cpp `llama-server` 提供服务的模型，通常通过聊天模板开启或关闭思考；模板会读取请求中的 `chat_template_kwargs`。Open WebUI 没有对应设置，因此请在 OpenAI 连接上将其作为自定义参数发送：
+
+1. 前往 **工作区 → 模型** 并编辑模型。
+2. 展开**高级参数**。
+3. 在底部点击**添加自定义参数**并设置：
+   - **名称**：`chat_template_kwargs`
+   - **值**：`{"enable_thinking": false}`
+4. 保存模型。
+
+Open WebUI 会将该值解析为 JSON，并添加到请求正文顶层。模板读取哪个键取决于模型。`enable_thinking` 是 Qwen3 使用的键，而其他一些模型会读取 `thinking`。请查看模型卡或 [vLLM 推理输出页面](https://docs.vllm.ai/en/latest/features/reasoning_outputs.html)，并参阅 [llama.cpp 服务器 README](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md) 中的 `chat_template_kwargs`。如果要为每个请求关闭思考，vLLM 还接受启动参数 `--default-chat-template-kwargs`。
+
+---
+
+## 工具调用中的交错思考 {#interleaved-thinking-with-tool-calls}
+
+当模型在单轮对话中使用**原生函数调用**（工具使用）时，Open WebUI 会保留推理内容，并在该轮后续调用中将其传回 API。这实现了真正的“交错思考”，流程如下：
+
+1. 模型生成推理 → 发起工具调用。
+2. 工具执行并返回结果。
+3. 模型收到：原始消息 + 先前的推理 + 工具调用 + 工具结果。
+4. 模型继续推理 → 可能发起更多工具调用或给出最终答案。
+5. 流程重复，直至本轮对话完成。
+
+### 工作原理 {#how-it-works}
+
+在多步骤工具调用轮次中，Open WebUI 会：
+
+1. 从模型回复中**捕获**推理内容，来源可以是 `<think>` 风格的标签，也可以是 `reasoning_content`、`reasoning` 或 `thinking` 字段。
+2. 将其与工具调用一同**存储**。
+3. 在下一次调用中按连接所需的格式**将其传回**；请参阅[推理内容如何传回](#how-reasoning-is-sent-back)。
+
+### 推理内容如何传回 {#how-reasoning-is-sent-back}
+
+无论模型将推理写成 `<think>` 风格的标签，还是在单独字段中发送，Open WebUI 都会将推理与答案分开存储。重放消息时（无论是在工具调用循环内还是下一轮中），推理会按连接的 `Provider`（服务提供方）设置所对应的格式传回（**设置 → 连接 → OpenAI → 高级 → 服务提供方**（管理员区域），请参阅[服务提供方设置](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible#the-provider-setting)；Ollama 连接会自动检测）。同一轮内和跨轮次采用相同规则，请参阅[服务提供方兼容性](#provider-compatibility)。关闭**流式聊天回复**时，模型在回复中写入的 `<think>` 标签会作为回复文本存储，因此会随回复一起传回模型。
+
+大多数 Chat Completions API 会拒绝助手消息中的未知字段，因此这些连接不会包含推理文本。管道函数和过滤器可以按服务提供方特定的格式将其添加回去。
+
+服务提供方在 `reasoning_details` 字段中返回的推理详情（OpenRouter 即采用这种方式），会在工具调用循环内和后续轮次中通过同一字段原样传回。在使用 Responses API 的连接上，服务提供方返回的加密推理也会以相同方式传回，使模型能够保留先前的推理。当另一个模型继续聊天时，这两类内容都会被丢弃。
+
+除非组织使用零数据保留（Zero Data Retention），否则 OpenAI 只有在请求明确要求时才会返回加密推理。要为某个模型启用它，请按以下步骤操作。
+
+1. 前往 **工作区 → 模型** 并编辑模型。
+2. 展开**高级参数**。
+3. 在底部点击**添加自定义参数**并设置：
+   - **名称**：`include`
+   - **值**：`["reasoning.encrypted_content"]`
+4. 保存模型。
+
+要为每个模型启用它，请在 **设置 → 模型**（管理员区域）的**模型默认值**下添加相同参数。
+
+在 [LiteLLM](https://docs.litellm.ai/) 代理后，应在每个模型的 `litellm_params` 中设置一次 `include`，并从 Open WebUI 中省略该自定义参数。Open WebUI 发送的自定义参数会替换 LiteLLM 的值，因此如果同时设置两处，请在其中保留 `reasoning.encrypted_content`。
+
+```yaml
+- model_name: gpt-5.5
+  litellm_params:
+    model: openai/gpt-5.5
+    api_key: os.environ/OPENAI_API_KEY
+    include: ["reasoning.encrypted_content"]
+```
+
+通过 LiteLLM 的 Responses 端点访问 Anthropic 模型时无需设置。LiteLLM 默认会将其思考内容作为加密推理返回。
+
+### 服务提供方兼容性 {#provider-compatibility}
+
+| 服务提供方 | 重放时的推理内容 |
+| :--- | :--- |
+| Ollama | 在 `thinking` 字段中传回 |
+| llama.cpp（*服务提供方*为 `llama.cpp`） | 作为 `reasoning_content` 传回。DeepSeek 思考模式需要此设置 |
+| vLLM 和 OpenRouter（*服务提供方*为 `vLLM` 或 `OpenRouter`） | 作为 `reasoning` 传回 |
+| OpenAI Responses API | 传回已存储的推理项。开启 `ENABLE_RESPONSES_API_STATEFUL` 时，`previous_response_id` 会携带状态 |
+| OpenAI / Azure / Vertex AI（Chat Completions，*服务提供方*为 `Default`） | 不包含（使用管道或过滤器将其添加回去） |
+| Anthropic（扩展思考） | 不原生支持；请使用[管道函数](/features/extensibility/plugin/functions/pipe) |
+
+---
+
+## 流式与非流式 {#streaming-vs-non-streaming}
+
+### 流式模式（默认） {#streaming-mode-default}
+
+在流式模式（`stream: true`）下，Open WebUI 会在令牌到达时处理它们，并可实时检测推理块。通常无需额外配置即可正常工作。
+
+对于随答案而非在答案之前发送推理元数据的服务提供方，系统也会处理：回复开始后才到达的推理会合并到答案上方的思考块中，而不会显示在答案下方。不含推理文本的元数据不会打开思考块。
+
+### 非流式模式 {#non-streaming-mode}
+
+在非流式模式（`stream: false`）下，整个回复会一次性返回。**大多数解析问题都发生在这里**，原因如下：
+
+1. 回复作为单个文本块到达。
+2. 只有在完成后的文本中检测到标签，`<think>` 内容才会被分离。
+3. 原始回复会按原样显示。
+
+:::info 重要
+如果你使用非流式请求（通过 API 或某些配置），**思考块能否分离取决于是否能在完整回复中检测到标签**，或者后端是否将推理作为独立字段返回。
+:::
+
+---
+
+## API 用法 {#api-usage}
+
+通过 Open WebUI API 使用推理模型时：
+
+```json
+{
+  "model": "qwen3.6:27b",
+  "messages": [
+    {"role": "user", "content": "Solve: What is 234 * 567?"}
+  ],
+  "stream": true
+}
+```
+
+**建议**：使用 `"stream": true`，以获得最可靠的推理块解析效果。
+
+---
+
+## 故障排除 {#troubleshooting}
+
+### 思考内容与最终答案合并 {#thinking-content-merged-with-final-answer}
+
+**症状**：使用推理模型时，整个回复（包括 `<think>...</think>` 块）都显示为最终答案，而没有分离成隐藏/可折叠的思考部分。
+
+**错误显示示例**：
+
+```text
+<think>
+Okay, the user wants a code snippet for a sticky header using CSS and JavaScript.
+Let me think about how to approach this.
+...
+I think that's a solid approach. Let me write the code now.
+</think>
+
+Here's a complete code snippet that demonstrates a sticky header using CSS and JavaScript...
+```
+
+**预期行为**：思考内容应隐藏或可折叠，只显示最终答案。
+
+### Ollama 用户 {#for-ollama-users}
+
+Ollama 不接受解析器标志。`ollama serve` 没有命令行选项，某些指南提到的 `--reasoning-parser` 标志属于 vLLM。启用 `think` 参数后，Ollama 会自行将思考与答案分开，Open WebUI 无需任何服务器端设置即可显示这种分离结果。
+
+#### 第 1 步：检查 Ollama 版本 {#step-1-check-the-ollama-version}
+
+Ollama v0.9.0 引入了思考支持。检查你正在运行的版本：
+
+```bash
+ollama --version
+```
+
+#### 第 2 步：为模型开启思考 {#step-2-turn-thinking-on-for-the-model}
+
+打开**模型控制 > 控制 > 高级参数**（或模型编辑器中模型的**高级参数**），将 **think（Ollama）**设置为**开启**；对于 GPT-OSS 等只接受级别的模型，也可设置为**自定义**并指定级别（`low`、`medium`、`high` 或 `max`）。**默认**会将选择权交给 Ollama，后者会为支持的模型开启思考。
+
+#### 第 3 步：在 Open WebUI 中验证 {#step-3-verify-in-open-webui}
+
+1. 前往 Open WebUI，使用推理模型开始新聊天。
+2. 提出一个需要推理的问题，例如数学题或逻辑谜题。
+3. 现在，回复应在答案上方的可折叠部分显示思考内容。
+
+如果模型将推理以 `<think>...</think>` 文本直接写入回复，而不是使用 Ollama 的 thinking 字段，请检查上述**推理标签**设置，并对任何其他标签对使用**自定义**。
+
+### 故障排除检查清单 {#troubleshooting-checklist}
+
+#### 1. 验证 Ollama 会分离思考内容 {#1-verify-ollama-separates-the-thinking}
+
+开启思考后，从 Ollama CLI 运行模型。支持的模型会将推理轨迹和答案分两部分打印：
+
+```bash
+ollama run your-model:tag --think "Explain step by step: What is 15 + 27?"
+```
+
+如果 Ollama 表示模型不支持思考，则该模型没有思考模式，Open WebUI 只能拾取它写入文本的标签。
+
+#### 2. 检查模型兼容性 {#2-check-model-compatibility}
+
+并非所有模型都以相同格式输出推理。请在模型文档中确认：
+
+- 它为思考内容使用什么标签（例如 `<think>`、`<reasoning>` 等）。
+- 是否需要特定提示词才能启用思考模式。
+
+#### 3. 在启用流式传输的情况下测试 {#3-test-with-streaming-enabled}
+
+如果非流式模式无法正常工作，请尝试在聊天中启用流式传输：
+
+1. 打开消息输入框旁的**模型控制 > 控制 > 高级参数**。
+2. 确保已启用流式传输（这是默认设置）。
+3. 再次测试模型。
+
+#### 4. 检查 Open WebUI 版本 {#4-check-open-webui-version}
+
+确保你运行的是最新版 Open WebUI，因为推理模型支持会持续改进：
+
+```bash
+docker pull ghcr.io/open-webui/open-webui:main
+```
+
+#### 5. 验证模型响应格式 {#5-verify-the-model-response-format}
+
+直接使用 Ollama CLI 检查模型输出的格式：
+
+```bash
+ollama run your-model:tag "Explain step by step: What is 15 + 27?"
+```
+
+检查输出中是否有 `<think>` 标签。如果没有，模型可能需要特定的系统提示词才能启用思考模式。
+
+### 工具调用之间丢失推理 {#reasoning-lost-between-tool-calls}
+
+**症状**：工具调用完成后，模型似乎“忘记”了之前思考的内容。
+
+**可能原因**：
+1. 模型没有以可捕获的格式输出推理（`reasoning_content`、`reasoning` 或 `thinking` 增量字段）。
+2. 模型使用基于文本的思考标签，但这些标签未被解析为推理块。
+
+**解决方法**：检查模型是否通过以下方式输出推理：
+- 结构化增量字段（`reasoning_content`、`reasoning`、`thinking`）。
+- Open WebUI 可检测的基于文本的标签（确保已启用推理标签检测）。
+
+### DeepSeek：必须传回 `reasoning_content` {#deepseek-reasoning_content-must-be-passed-back}
+
+**症状**：处于思考模式的 DeepSeek 模型失败并显示以下错误；即使在聊天的第一条消息上也可能发生：
+
+```
+The `reasoning_content` in the thinking mode must be passed back to the API.
+```
+
+**原因**：该错误来自 DeepSeek，它要求将先前的推理随请求传回。当连接的**服务提供方**设为**默认**时，Open WebUI 会在发送的历史记录中省略推理（请参阅[推理内容如何传回](#how-reasoning-is-sent-back)）。可用技能、附加知识和召回的记忆会作为历史记录中的工具调用到达模型，因此即使你从未调用过工具，使用其中任何一项的聊天也存在工具调用轮次。
+
+**解决方法**：
+
+1. 在 **设置 → 连接 → OpenAI**（管理员区域）中编辑 DeepSeek 连接，打开**高级**并将**服务提供方**设置为 **llama.cpp**。随后，Open WebUI 会将已存储的推理作为 `reasoning_content` 传回，并为没有推理的工具调用轮次提供空的 `reasoning_content`。
+2. 如果错误仍然存在，例如对于通过其他服务访问的 DeepSeek 模型，请关闭该模型的思考：在**高级参数**下，将**推理强度**切换为**自定义**并输入 `none`。Open WebUI 会将其转发为 `reasoning_effort: "none"`。
+
+在 **API 类型**设置为 **Responses** 的连接上，同一要求会显示为 ``The `reasoning_text` in the thinking mode must be passed back to the API.``。将 **API 类型**切换为 **Chat Completions**，将**服务提供方**切换为 **llama.cpp**，或将**推理强度**设置为 `none`。
+
+### 由不同模型生成的加密推理 {#encrypted-reasoning-produced-under-a-different-model}
+
+**症状**：通过 OpenRouter 或其他返回 `reasoning_details` 的服务访问推理模型时，失败并显示：
+
+```
+Your request contains encrypted reasoning or compaction content that was produced under a different model.
+```
+
+**原因**：无论**服务提供方**如何设置，Open WebUI 都会在后续轮次传回 `reasoning_details`。它会从其他模型编写的回复中移除这些详情，并通过 Open WebUI 模型 ID 区分模型。如果某个模型 ID 现在连接到不同的上游模型，例如基础模型已更改的工作区模型，它仍会获得先前回复的推理详情。
+
+**解决方法**：开始新聊天，或使用编写先前回复的上游模型继续聊天。更改**服务提供方**不会对此产生影响。
+
+### Anthropic 扩展思考无法与工具调用一起使用 {#anthropic-extended-thinking-not-working-with-tool-calls}
+
+**症状**：使用启用了扩展思考的 Anthropic Claude 模型时，工具调用失败并显示类似以下错误：
+
+```
+Expected `thinking` or `redacted_thinking`, but found `text`. When `thinking` is enabled,
+a final `assistant` message must start with a thinking block.
+```
+
+**原因**：这是根本的架构差异。Open WebUI 遵循 **OpenAI Chat Completions API 标准**，不原生支持 Anthropic 的专有 API 格式。Anthropic 的扩展思考需要 `{"type": "thinking"}` 或 `{"type": "redacted_thinking"}` 形式的结构化内容块，这些是 Anthropic 专有格式，在 OpenAI 标准中不存在。
+
+Open WebUI 不会传回 Anthropic 风格的思考块，因此无法满足 Anthropic 对结构化思考块的要求。
+
+**Open WebUI 为何不原生支持这一点：**
+
+跨不同服务提供方，并没有将推理内容作为 API 有效载荷一部分进行存储的标准方式。如果 Open WebUI 实现对一个服务提供方格式的支持，很可能会破坏许多其他推理服务提供方的现有部署。鉴于 Open WebUI 支持的后端种类繁多，我们遵循 OpenAI Completions API 作为通用标准。有关此架构决策的更多详情，请参阅我们的 **[协议支持常见问题](/faq#q-why-doesnt-open-webui-natively-support-provider-xs-proprietary-api)**。
+
+**替代方案**：
+
+1. **使用管道函数**：创建自定义[管道函数](/features/extensibility/plugin/functions/pipe)，在将请求发送到 Anthropic API 之前，把 Open WebUI 基于文本的思考格式转换为 Anthropic 的结构化思考块。
+
+2. **禁用扩展思考**：如果工具调用工作流不需要扩展思考，请将其禁用，以避免格式不匹配。
+
+:::note
+此限制专门适用于将 Anthropic 的扩展思考与工具调用结合使用。扩展思考可以在没有工具调用的情况下工作，工具调用也可以在没有扩展思考的情况下工作。只有通过 Anthropic API 同时使用这两项功能时才会出现此问题。
+:::
+
+### 有状态推理模型（GPT-5.6 等） {#stateful-reasoning-models-gpt-56-etc}
+
+**症状**：使用隐藏其推理的模型（有状态/内部推理）时，推理未被保留。
+
+**原因**：某些较新的模型（如 GPT-5.6）会将推理保留在内部，不在 API 响应中公开。Open WebUI 只能保留模型实际返回的推理。
+
+**行为**：如果模型返回推理摘要而不是完整推理内容，则保留并传回的就是该摘要。
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+### 为什么思考块显示为原始文本？ {#why-is-the-thinking-block-showing-as-raw-text}
+
+如果模型使用的标签不在默认列表中，且未在 `reasoning_tags` 中配置，Open WebUI 会将其视为普通文本。要解决此问题，请在模型设置或聊天中的**模型控制 > 控制**下，将正确的标签添加到 `reasoning_tags` 参数。
+
+### 模型能看到自己的思考吗？ {#does-the-model-see-its-own-thinking}
+
+这取决于连接。无论是在工具调用循环内还是跨轮次，Ollama、llama.cpp 和 OpenAI Responses API 都会收到模型先前的推理。其他 Chat Completions 连接则不会收到。请参阅[推理内容如何传回](#how-reasoning-is-sent-back)。

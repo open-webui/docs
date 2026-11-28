@@ -1,0 +1,62 @@
+---
+title: "首次运行时的管理员提升"
+---
+
+# 首次运行时的管理员提升
+
+|  |  |
+| :--- | :--- |
+| **类别** | CWE-362，竞争条件 |
+| **状态** | 可被利用的结果已在 0.9.0 中修复；剩余情况采用失败关闭方式，已接受 |
+| **跟踪编号** | [GHSA-h3ww-q6xx-w7x3](https://github.com/open-webui/open-webui/security/advisories/GHSA-h3ww-q6xx-w7x3) / [CVE-2026-45675](https://www.cve.org/CVERecord?id=CVE-2026-45675) |
+
+---
+
+## 概述 {#summary}
+
+新的 Open WebUI 实例在创建第一个账户之前没有管理员。第一个账户会自动提升为管理员，随后注册功能会关闭。
+
+原始实现会先检查是否存在任何用户，根据检查结果决定角色，然后才插入账户。两个同时到达的注册请求可能都读到空表，并都作为管理员插入。该问题已报告给我们、得到修复，并以 [CVE-2026-45675](https://www.cve.org/CVERecord?id=CVE-2026-45675) 发布。
+
+## 我们已修复的问题 {#what-we-fixed}
+
+操作顺序已颠倒。现在会先以默认角色插入账户，之后只有在确认它是当前唯一账户时才将其提升为管理员：
+
+```python
+# 根据可能因其他请求而失效的检查结果决定角色
+has_users = Users.has_users(db=db)
+role = "admin" if not has_users else DEFAULT_USER_ROLE
+user = Auths.insert_new_auth(..., role=role)
+```
+
+```python
+# 先插入，仅当此账户为唯一账户时才提升角色
+user = Auths.insert_new_auth(..., role=DEFAULT_USER_ROLE)
+if Users.get_num_users(db=db) == 1:
+    Users.update_user_role_by_id(user.id, "admin", db=db)
+    ENABLE_SIGNUP = False
+```
+
+注册路径在 **0.8.4** 中采用了这一更改，LDAP 和 OAuth 注册路径则在 **0.9.0** 中采用；0.9.0 也是上述公告对应的修复版本。
+
+## 剩余风险 {#what-remains}
+
+插入操作与随后的计数并未共用同一个数据库事务。因此，在使用 PostgreSQL 的部署中，两个同一时刻到达的注册请求可能都会看到另一个账户已经存在，于是双方的计数都返回 2，两个账户都不会被提升为管理员。实例最终会有账户，但没有管理员。
+
+这正是修复方案设计的失败方向。被替换的行为会将管理员角色授予每个参与竞争的请求，而当前行为不会将其授予其中任何一个，因此没有人能获得不应拥有的权限，实例上也没有可被夺取的内容：没有聊天、设置或其他账户，因为这种情况只可能发生在空数据库上的首次注册过程中。遇到这种状态的运维人员可以删除空数据库并重新开始，不会有任何损失。
+
+使用默认 SQLite 后端的部署不受影响，因为其写入锁可以防止两个注册请求以这种方式重叠执行。
+
+## 为何接受该风险 {#why-it-is-accepted}
+
+与一个拥有管理员角色的竞争者相比，在不含任何数据的实例上采用失败关闭的剩余风险更为可取。要彻底消除该风险，需要重写提升逻辑，使其与插入操作在同一事务中运行；但与当前失败模式相比，这并不会带来安全收益，因为当前失败模式已经拒绝向所有人授予角色，而不是授予该角色。
+
+这一窗口的另一半根本不是剩余风险，而是一项部署决策。首先注册的人会成为管理员；如果实例在完成设置之前就已可被访问，那么首先注册的人可能不是运维人员。**Open WebUI 面向私有、受信网络构建，在任何情况下，我们都不建议将未配置的实例暴露到公共网络。** 请先通过私有网络、VPN 或本地端口完成设置。请参阅加固指南中的[网络放置](/getting-started/advanced-topics/hardening#network-placement)。
+
+如果实例必须立即可被访问，请在首次启动前设置 `WEBUI_ADMIN_EMAIL` 和 `WEBUI_ADMIN_PASSWORD`，以便在启动时创建管理员，而不是通过界面创建。该账户会在启动过程中创建，注册功能会自动禁用，任何其他注册尝试都会被拒绝。请参阅[通过环境变量创建管理员账户](/getting-started/advanced-topics/hardening#admin-account-from-environment-variables)。
+
+## 参考资料 {#references}
+
+- [CWE-362：使用共享资源并发执行时同步不当](https://cwe.mitre.org/data/definitions/362.html)
+- [加固 Open WebUI](/getting-started/advanced-topics/hardening)
+- [Open WebUI 安全政策](../security-policy.mdx)

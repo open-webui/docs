@@ -1,0 +1,50 @@
+---
+title: "OAuth 令牌交换的客户端信任"
+---
+
+# OAuth 令牌交换的客户端信任
+
+|  |  |
+| :--- | :--- |
+| **类别** | CWE-287，身份验证不当 |
+| **状态** | 自 0.11.0 起提供控制措施，需要主动启用；剩余风险已接受 |
+| **跟踪编号** | [GHSA-rq84-p6rr-vf89](https://github.com/open-webui/open-webui/security/advisories/GHSA-rq84-p6rr-vf89) |
+
+---
+
+## 概述 {#summary}
+
+OAuth 令牌交换端点接受提供方的访问令牌，并为该令牌所标识的用户签发 Open WebUI 会话。提供方的 userinfo 端点可以确认令牌是否有效，但不会透露令牌签发给哪个 OAuth 客户端，因此在没有额外检查的情况下，该端点会接受为同一提供方注册的任何客户端签发的令牌，包括运维人员无法控制的应用。
+
+除非运维人员将 [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) 设置为 `True`，否则该端点处于关闭状态；这不是默认值，因此默认部署不受影响。以下所有内容均针对刻意启用该端点的部署。该端点绝不会创建账户：用户必须已经存在，并通过提供方主体标识进行匹配；启用 `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` 时，也可以通过电子邮件匹配。该端点提供按地址限流的配置（`OAUTH_TOKEN_EXCHANGE_RATE_LIMIT` 和 `OAUTH_TOKEN_EXCHANGE_RATE_LIMIT_WINDOW`），但在设置前处于关闭状态。
+
+## 我们已缓解的风险 {#what-we-mitigated}
+
+0.11.0 添加了 `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`。设置后，Open WebUI 会通过 RFC 7662 令牌内省解析签发客户端，并拒绝为未列出的客户端签发的任何令牌，以及无法确定签发客户端的令牌。系统仅认可内省得到的 `client_id`。`aud` 字段会被忽略，因为它标识的是预期资源服务器，而非签发客户端，而且一些提供方允许任何客户端将其他客户端的标识符放入该字段。这是一个部署时环境变量，因此被入侵的管理员会话无法在运行时扩大信任边界。
+
+## 剩余风险及接受原因 {#what-remains-and-why-we-accept-it}
+
+该控制措施在 0.11.0 中发布，并在运维人员配置后生效。未设置该变量时，端点会接受提供方验证通过的任何令牌，与之前的行为完全相同。这是刻意设计，原因有二。
+
+**一些部署依赖现有行为，并且有合理理由需要这种行为。** 对于使用多个自有应用为 Open WebUI 提供入口的运维人员，接受来自多个客户端的令牌正是该功能的意义；每个应用都在同一身份提供方上注册为独立的 OAuth 客户端，例如内部 CLI、报告或自动化服务、部门门户、面向公众的助手，或通过该提供方让用户登录的聊天机器人。如果运维人员预期的访问边界是“我的提供方在允许域内验证通过的任何人”，而不是“仅限这些指定应用”，那么强制检查客户端会增加他们从未要求的限制，并在升级时立即破坏其部署。
+
+**对于多个提供方，该控制措施根本无法满足。** 解析签发客户端需要 RFC 7662 令牌内省，而 Google、Microsoft Entra ID、GitHub 和 Feishu 并未实现该功能，因此无论将 `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` 设置为何值，都无法让令牌在这些提供方上通过。
+
+如果该检查默认强制执行，基于该端点构建的所有应用都会在升级时同时停止身份验证；对运维人员而言，其表现会是用户无法登录，而不会显示为一项已启用的安全控制。在支持内省的提供方（例如 Keycloak、Authentik、Okta 或 Zitadel）上，每次交换都会被拒绝，直到运维人员列出自己的客户端 ID；只要内省解析出了签发客户端，就会返回 `403`，因此运维人员弄清原因后即可恢复服务。对于上述四个提供方，拒绝时返回 `400`，而且没有任何可配置项。他们只能固定使用更改前的版本，这意味着放弃此后发布的所有安全修复；或者只能完全放弃一项原本正常工作的功能，原因是一个无法满足的设置被设为强制要求。
+
+因此，该修复以运维人员可在任何支持它的提供方上主动启用的控制措施形式提供，而不是作为默认设置；后者会破坏正常工作的身份验证，而且对于整类提供方，没有任何可恢复服务的配置。
+
+简而言之：如果默认强制执行该检查，在许多 OAuth 提供方上，仅仅启用该功能就会使其停止工作；一个唯一职责是启用功能的设置，反而会导致所有通过它进行身份验证的应用无法登录。令牌交换默认关闭，除非确有需要，否则最好保持关闭。确实启用时，请同时设置 `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`；只有在你刻意希望接受提供方验证通过的任何令牌时，才不设置该变量。
+
+与本页其他条目不同，这一剩余风险不是技术限制，而是一项兼容性决策。它的边界由配置而非可利用性决定：端点默认关闭，而所有提供方支持内省的运维人员都可以使用该控制措施。
+
+设置 [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](/reference/env-configuration#oauth_token_exchange_trusted_client_ids) 时请注意，该列表是全局的，而非按提供方分别设置。因此，设置该变量后，即使另一个提供方支持内省，任何已配置但未发布内省端点的提供方上的所有交换也会被拒绝。如果已配置的提供方都不支持内省，则只有在域名允许列表本身是可接受的边界时，才应启用令牌交换。设置方法见[面向外部应用的 OAuth 令牌交换](/features/authentication-access/auth/sso#oauth-token-exchange-for-external-applications)。
+
+## 参考资料 {#references}
+
+- [CWE-287：身份验证不当](https://cwe.mitre.org/data/definitions/287.html)
+- [RFC 7662：OAuth 2.0 令牌内省](https://www.rfc-editor.org/rfc/rfc7662)
+- [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange)
+- [`OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS`](/reference/env-configuration#oauth_token_exchange_trusted_client_ids)
+- [SSO（OAuth、OIDC、Trusted Header）](/features/authentication-access/auth/sso)
+- [Open WebUI 安全政策](../security-policy.mdx)

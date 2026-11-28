@@ -1,0 +1,35 @@
+---
+title: "聊天与对话"
+sidebar_position: 0
+slug: /features/chat-conversations
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 聊天与对话
+
+<ThemedImage
+  alt="对话：共享基底上的一组方块，其中一个带有标记"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+**对话是 Open WebUI 的核心，它所能做的远不止收发消息。**
+
+一次聊天可以读取你的文档、搜索实时网络、说话和聆听、生成图像、记住重要信息，还能调用你自己的模型。以下所有能力都接入同一个对话。你可以从普通聊天开始，再按需启用各项能力。
+
+| 能力 | 作用 |
+| :--- | :--- |
+| [**聊天功能**](/features/chat-conversations/chat-features) | 日常聊天：编辑和重新生成消息、格式化、后续问题建议、自动补全、任务管理和时间感知。 |
+| [**文档（RAG）**](/features/chat-conversations/rag) | 附加文件，让模型检索相关段落而不是凭空猜测，并可控制内容提取和分块方式。 |
+| [**网络搜索**](/features/chat-conversations/web-search) | 让模型搜索实时网络并获取 URL，引用来源，还可将结果保存回知识库。 |
+| [**音频**](/features/chat-conversations/audio) | 对 AI 说话并收听它的回复，支持可插拔的语音转文字和文字转语音引擎以及声音克隆。 |
+| [**图像生成**](/features/chat-conversations/image-generation-and-editing) | 通过本地或托管模型，根据提示词直接在聊天中创建和编辑图像，并生成[视频](/features/chat-conversations/image-generation-and-editing/video-generation)。 |
+| [**记忆**](/features/chat-conversations/memory) | 让 AI 跨对话记住与你有关的事实，根据你的上下文给出更贴合需求的回答。 |
+| [**数据控制**](/features/chat-conversations/data-controls) | 决定保留、共享和发送哪些内容：聊天历史、临时聊天以及每次请求的隐私设置。 |
+
+每项能力都有独立页面。大多数时候，你只需使用普通的**聊天（Chat）**，再按对话需要随时调用其他能力，例如在这里附加一份文档，在那里执行一次网络搜索。

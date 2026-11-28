@@ -1,0 +1,105 @@
+---
+sidebar_position: 10
+title: "Open WebUI 与 LibreChat 对比"
+sidebar_label: "Open WebUI 与 LibreChat"
+description: "Open WebUI 与 LibreChat 对比：两个备受认可、各有所长的自托管 AI 聊天平台。"
+keywords: ["Open WebUI 与 LibreChat 对比", "LibreChat 替代方案", "自托管 AI 聊天", "LibreChat 对比", "最佳自托管 AI", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "LibreChat 和 Open WebUI 有何异同？", "acceptedAnswer": {"@type": "Answer", "text": "LibreChat 的多服务提供方聊天界面做得非常出色。Open WebUI 还包含知识库、团队协作、扩展性和企业功能。两者范围不同，但都值得关注。"}}, {"@type": "Question", "name": "LibreChat 免费吗？", "acceptedAnswer": {"@type": "Answer", "text": "免费。LibreChat 采用 MIT 许可证，可免费自托管。"}}]})}</script>
+</Head>
+
+
+# Open WebUI 与 LibreChat
+
+*最后更新：2026 年 8 月*
+
+[LibreChat](https://www.librechat.ai/) 是我们在这个领域由衷尊重的项目之一。它提供多服务提供方聊天体验，拥有强大的身份验证支持、并排模型比较，以及一套专注且扎实的基础功能。该项目采用 MIT 许可证，维护活跃，Danny 和其背后的社区构建了一个可靠的项目。
+
+[GitHub](https://github.com/danny-avila/LibreChat) · [MIT 许可证](https://github.com/danny-avila/LibreChat/blob/main/LICENSE)
+
+---
+
+## LibreChat 的优势 {#what-librechat-does-well}
+
+- **多服务提供方聊天**，通过统一界面支持 OpenAI、Anthropic、Google、Azure、Ollama 和任意与 OpenAI 兼容的 API
+- **模型比较**，在单个对话中并排显示不同模型的回答
+- **预设系统**，保存并快速切换模型配置和系统提示词
+- **Artifacts**，在行内渲染代码输出、文档和可视化内容
+- **身份验证**，包括 LDAP、SSO 和社交登录支持
+- **内置代码解释器**，适用于受支持的模型
+- **提示词缓存**，降低重复交互的 API 成本
+- **范围专注**，做好聊天界面，同时避免过度复杂
+- **活跃开发**，维护者响应及时，社区积极参与
+- **采用 MIT 许可证**
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，提供由模型自行调用的[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)，用于委派和计划任务
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **聊天之外的平台功能**，包括笔记、频道、自动化、Open Terminal、语音/视频通话、图像生成和日历
+- **知识与 RAG**，提供 13 种向量数据库、8 种提取引擎、带重排序的混合搜索和智能体式检索
+- **模型智能体**，为任意模型配备自定义指令、工具、知识和参数
+- **企业功能**，包括 RBAC、SSO/OIDC/LDAP、SCIM 2.0、分析仪表板和模型评估
+- **灵活部署**，支持 Docker、Kubernetes、pip 或桌面应用，并提供水平扩展和 OpenTelemetry
+
+---
+
+## 一览 {#at-a-glance}
+
+| | Open WebUI | LibreChat |
+| :--- | :--- | :--- |
+| **重点** | 具有知识、工具和团队功能的完整 AI 平台 | 多服务提供方 AI 聊天界面 |
+| **多服务提供方** | Ollama、OpenAI、Anthropic、Google、Azure、Bedrock 等 | OpenAI、Anthropic、Google、Azure、Ollama 等 |
+| **模型比较** | 多模型聊天 | 并排比较 |
+| **知识与 RAG** | 13 种向量数据库、8 种提取引擎、混合搜索、智能体式检索 | 文件附件支持 |
+| **扩展性** | Python 工具、MCP、OpenAPI、管道 | 带预设的插件系统 |
+| **代码执行** | 浏览器内 Python + Open Terminal | 内置代码解释器 |
+| **团队协作** | 频道、笔记、RBAC、SSO、SCIM | 支持身份验证的多用户访问 |
+| **许可证** | Open WebUI 许可证 | MIT |
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你想要简洁、专注的多服务提供方聊天界面和强大的模型比较功能，请选择 LibreChat。**预设系统让配置切换十分轻松，MIT 许可证则为你提供最大的灵活性。
+
+**如果你需要范围更广的平台，包括知识库、团队协作工具、Python 扩展性，或 SCIM 和分析等企业功能，请选择 Open WebUI。**
+
+**同时运行两者。**它们连接相同的后端。一些团队用 LibreChat 进行快速个人聊天，用 Open WebUI 开展涉及知识库和工具的协作工作。
+
+---
+
+## 结合使用两者 {#use-them-together}
+
+两个项目连接相同的后端（Ollama、OpenAI 等），因此你可以同时运行它们。一些团队用 LibreChat 进行快速个人聊天，用 Open WebUI 进行团队协作和知识工作。
+
+---
+
+*两个积极维护的项目，让自托管 AI 更易于使用。各有优势，同属一个生态系统。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**LibreChat 和 Open WebUI 有何异同？**
+LibreChat 的多服务提供方聊天界面做得非常出色。Open WebUI 还包含知识库、团队协作、扩展性和企业功能。两者范围不同，但都值得关注。
+
+**LibreChat 免费吗？**
+免费。LibreChat 采用 MIT 许可证，可免费自托管。
+
+**我可以同时使用 LibreChat 和 Open WebUI 吗？**
+可以。两者连接相同的后端（Ollama、OpenAI 等），因此你可以同时运行它们。
+
+---
+
+**相关内容：**[Open WebUI 与 AnythingLLM](/alternatives/anythingllm) · [Open WebUI 与 Msty](/alternatives/msty) · [Open WebUI 与 Ollama](/alternatives/ollama)

@@ -1,0 +1,122 @@
+---
+title: "Azure CLI 身份验证"
+---
+
+:::warning
+
+本教程由社区贡献，不受 Open WebUI 团队支持。它仅用于演示如何针对你的特定用例自定义 Open WebUI。想要贡献内容？请查看贡献教程。
+
+:::
+
+本指南介绍如何配置 Open WebUI，使用 Azure CLI 和 Entra ID 身份验证连接到 Azure OpenAI。
+
+## 前提条件 {#prerequisites}
+
+- **Azure CLI**：从 [Microsoft Learn](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) 安装
+- **Open WebUI**：版本 0.6.30 或更高版本
+- **Azure 订阅**：有权访问 Azure OpenAI 资源
+- **RBAC 角色**：你的用户或组必须已被分配 Azure OpenAI 实例的 `Cognitive Services OpenAI User` 角色
+
+## 身份验证步骤 {#authentication-steps}
+
+### 1. 使用 Azure CLI 登录 {#1-login-with-azure-cli}
+
+运行以下命令，向你的 Azure 订阅进行身份验证：
+
+```bash
+az login
+```
+
+这会打开一个浏览器窗口，供你使用 Azure 凭据登录。
+
+### 2. 验证 RBAC 权限 {#2-verify-rbac-permissions}
+
+确保你的用户账户或组已被分配 Azure OpenAI 资源的 `Cognitive Services OpenAI User` 角色。你可以在 Azure 门户中验证：
+
+1. 导航到你的 Azure OpenAI 资源
+2. 前往 **Access control (IAM)**
+3. 检查 **Role assignments**，确认你具有所需角色
+
+## Docker 配置 {#docker-configuration}
+
+### Dockerfile {#dockerfile}
+
+创建或修改 Dockerfile 以包含 Azure CLI：
+
+```Dockerfile title="Dockerfile"
+FROM --platform=$BUILDPLATFORM ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+RUN pip install azure-cli
+CMD [ "bash", "start.sh"]
+```
+
+### Docker Compose {#docker-compose}
+
+配置 `docker-compose.yml`，挂载 Azure CLI 配置并设置相应的环境变量：
+
+```yaml title="docker-compose.yml"
+services:
+  ollama:
+    volumes:
+      - ollama:/root/.ollama
+    container_name: ollama
+    pull_policy: always
+    tty: true
+    restart: unless-stopped
+    image: ollama/ollama:${OLLAMA_DOCKER_TAG-latest}
+
+  open-webui:
+    build:
+      context: .
+      args:
+        OLLAMA_BASE_URL: '/ollama'
+      dockerfile: Dockerfile
+    container_name: open-webui
+    volumes:
+      - open-webui:/app/backend/data
+      - ${HOME}/.azure:/app/.azure # 这是关键部分；在 Windows 上，将 ${HOME}/.azure 替换为 %USERPROFILE%\.azure*
+    depends_on:
+      - ollama
+    ports:
+      - ${OPEN_WEBUI_PORT-3000}:8080
+    environment:
+      - 'OLLAMA_BASE_URL=http://ollama:11434/'
+      - AZURE_CONFIG_DIR=/app/.azure # 这是关键部分*
+      - 'WEBUI_SECRET_KEY='
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: unless-stopped
+
+volumes:
+  ollama: {}
+  open-webui: {}
+```
+
+此配置：
+- 将本地 Azure CLI 凭据（Linux 上的 `~/.azure`，或 Windows 上的 `%USERPROFILE%\.azure`）挂载到容器中
+- 设置 `AZURE_CONFIG_DIR` 环境变量，使 Open WebUI 能够找到凭据
+
+### 启动 Compose 技术栈 {#start-the-compose-stack}
+使用以下命令启动 Docker Compose 服务：
+```bash
+docker compose up
+```
+
+### 界面配置 {#ui-configuration}
+
+Docker 容器运行后：
+
+1. 导航至 **Admin Panel** &rarr; **Connections**
+2. 点击 **Add Connection**
+3. 选择 **Azure OpenAI** 作为提供方
+4. 选择 **Entra ID** 作为身份验证类型
+5. 配置 Azure OpenAI 端点和部署详细信息
+6. 保存连接
+
+## 故障排除 {#troubleshooting}
+
+如果遇到身份验证问题：
+
+1. **验证 Azure CLI 登录状态**：运行 `az account show`，确认你已登录
+2. **检查权限**：确保已分配 `Cognitive Services OpenAI User` 角色
+3. **卷挂载**：验证 `.azure` 目录已正确挂载到容器中
+4. **环境变量**：确认 `AZURE_CONFIG_DIR` 已设置为 `/app/.azure`

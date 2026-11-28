@@ -1,0 +1,345 @@
+---
+title: Model Context Protocol（MCP）
+sidebar_position: 200
+---
+
+从 **v0.6.31** 开始，Open WebUI 原生支持 **MCP（Model Context Protocol）**。本页介绍如何快速启用 MCP、为生产环境进行安全加固，以及排除常见问题。
+
+:::info
+需要 **Open WebUI v0.6.31+**。
+:::
+
+:::tip MCP 工具需要能力足够强的模型
+MCP 负责将 Open WebUI 连接到你的工具，并不会提升模型使用工具的能力。即使连接正常，模型也可能忽略工具、发送错误参数，或无法完成多步骤任务。遇到这种情况，**请尝试使用原生工具调用更可靠的更强模型**。工具使用效果不佳本身并不意味着 Open WebUI 或 MCP 集成存在故障。请参阅[模型工具使用故障排除](/features/extensibility/plugin/tools/openapi-servers/open-webui#tools-are-enabled-but-the-model-does-not-use-them-correctly)。
+:::
+
+:::danger 前提条件：WEBUI_SECRET_KEY
+你**必须**在 Docker 设置中配置 `WEBUI_SECRET_KEY` 环境变量。否则，**通过 OAuth 连接的 MCP 工具（例如 Notion）**会在每次重启或重新创建容器后**失效**（错误：`Error decrypting tokens`），迫使你重新验证所有连接。
+:::
+
+## 快速开始 {#quick-start}
+
+1. 打开**设置 > 集成（Settings > Integrations）**（管理员区域）。
+2. 在**外部工具服务器（External Tool Servers）**下，单击**+ 添加连接（+ Add Connection）**。集成页面包含多个部分，请务必确认操作的是这一部分。
+3. 将**类型（Type）**设置为 **MCP (Streamable HTTP)**。
+4. 输入你的**服务器 URL（Server URL）**和**身份验证（Auth）**详细信息（如有需要，使用 OAuth 2.1）。
+5. **保存（Save）**。如果系统提示，请重启 Open WebUI。
+
+![管理员设置中的外部工具服务器](/images/admin/admin-integrations.png)
+
+现在，你可以从 Open WebUI 调用 MCP 服务器公开的工具。
+
+Open WebUI 可连接使用无状态 `2026-07-28` 协议修订版及更早修订版的服务器。只有重定向后仍位于同一源时，它才会跟随重定向。
+
+当 [`ENABLE_TOOL_SERVERS`](/reference/env-configuration#enable_tool_servers) 设置为 `False` 时，**外部工具服务器（External Tool Servers）**部分会显示为灰色。
+
+:::warning 常见错误：连接类型不正确
+如果要添加 MCP 服务器，请确保**类型（Type）**设置为 **MCP (Streamable HTTP)**，而不是 **OpenAPI**。
+
+将 MCP 风格的配置（JSON 中包含 `mcpServers`）输入 OpenAPI 连接，会导致 UI 崩溃或一直显示加载画面。遇到这种情况时：
+
+1. 通过**设置 > 集成（Settings > Integrations）**（管理员区域）禁用有问题的工具连接
+2. 重新添加连接，并将**类型（Type）**正确设置为 **MCP**
+:::
+
+## MCP 服务器仅限管理员添加 {#mcp-servers-are-admin-only}
+
+只有**管理员**才能在**设置 > 集成（Settings > Integrations）**（管理员区域）中向实例添加 MCP 服务器。按照设计，普通用户无法在实例上注册 MCP 服务器。
+
+OpenAPI 服务器只是一个公开固定声明端点集合的无状态 HTTP URL，而 MCP 服务器的能力要强大得多。MCP 服务器具有状态且功能丰富（采样、信息征集、持久会话，以及通过 stdio 传输执行任意主机命令），并以连接用户的完整权限范围运行在 Open WebUI 的信任边界内。实际上，恶意或遭到入侵的 MCP 服务器可以利用该用户的访问权限执行代码、读取或外泄数据，因此这项能力仅限管理员使用。Open WebUI 自身的 MCP 支持仅限 Streamable HTTP，但该协议的高权限特性决定了只有管理员才能添加 MCP 服务器。
+
+如果要在不授予服务器配置权限的情况下让用户使用 MCP 提供的能力，管理员可以添加一次服务器，然后通过**访问控制（Access Control）**将其范围限定到相应的用户或组。用户也可以在 [Tether](/ecosystem/tether#bring-your-own-models-and-tools) 应用中为自己添加 MCP 服务器。
+
+## 何时使用 MCP，何时使用 OpenAPI {#when-to-use-mcp-vs-openapi}
+
+:::tip
+对于大多数部署，**OpenAPI** 仍是**首选**集成方式。
+:::
+
+如果你需要以下特性，请选择 **OpenAPI**：
+
+* **企业级就绪能力**：深度 SSO 集成、API 网关、审计、配额和类型化 SDK。
+* **运行韧性**：标准 HTTP 动词、幂等性、缓存和丰富的错误代码。
+* **可观测性**：一流的跟踪和策略集成。
+
+如果你需要以下特性，请选择 **MCP (Streamable HTTP)**：
+
+* MCP 服务器/客户端已经使用的**通用工具协议**。
+* 通过 HTTP 进行的**流式**协议通信（注意：这里指 MCP 的传输层流式通信，而不是 Open WebUI 的 [UI 事件系统](/features/extensibility/plugin/development/events)；后者仅适用于原生 Python 工具）。
+
+> 你不必二选一：许多团队在内部公开 OpenAPI，同时在边缘为特定客户端**封装 MCP**。
+
+:::warning
+基于浏览器的多用户部署会扩大攻击面（CORS/CSRF、每用户隔离、重新连接）。向外部公开 MCP 之前，请检查你所在组织的身份验证、代理和速率限制策略。
+:::
+
+## 配置最佳实践 {#configuration-best-practices}
+
+### 身份验证模式 {#authentication-modes}
+
+*   **None**：用于**本地 MCP 服务器**或不需要令牌的内部网络。
+    *   **重要**：除非服务器明确要求令牌，否则默认选择“None”。选择“Bearer”但不提供密钥会发送空的 Authorization 标头（`Authorization: Bearer`），导致许多服务器立即拒绝连接。
+*   **Bearer**：**仅**在 MCP 服务器需要特定 API 令牌时使用。你**必须**填写“Key”字段。
+*   **Session**：将用户自己的 Open WebUI 会话令牌作为 Bearer 令牌发送。用于针对 Open WebUI 本身进行身份验证的服务器。
+*   **OAuth**：将用户通过 Open WebUI SSO 登录获得的访问令牌作为 Bearer 令牌发送。仅当用户通过同一个 OAuth 提供方登录 Open WebUI，且其令牌包含 MCP 服务器所需的权限范围时才有效。
+*   **OAuth 2.1**：使用动态客户端注册（DCR）。最适合支持自动注册 OAuth 客户端的 MCP 服务器。
+*   **OAuth 2.1 (Static)**：使用预先创建的客户端 ID/客户端密钥。最适合提供方不支持 DCR，或安全团队要求手动管理凭据的场景。
+
+:::info OAuth Resource Parameter
+使用 **OAuth 2.1** 或 **OAuth 2.1 (Static)** 时，会显示 **OAuth Resource Parameter** 设置。它控制 Open WebUI 是否在授权请求和令牌请求中发送 OAuth `resource` 参数（[RFC 8707 资源指示符](https://datatracker.ietf.org/doc/html/rfc8707)）：
+
+- **Automatic**（默认）：Open WebUI 根据服务器公布的信息决定。
+- **Include**：始终发送 `resource` 参数。如果提供方要求该参数，请使用此选项。
+- **Omit**：从不发送。如果提供方会在请求包含 `resource` 参数时拒绝请求，请使用此选项。
+
+除非 OAuth 失败且提供方的错误或文档指向 `resource` 参数，否则请保留 **Automatic**。
+:::
+
+:::info OAuth Scopes
+使用 **OAuth 2.1** 或 **OAuth 2.1 (Static)** 时，**OAuth Scopes** 设置控制 Open WebUI 向服务器的授权服务器请求哪些权限范围：
+
+- **Use discovered scopes**（默认）：请求服务器 OAuth 元数据中公布的权限范围。
+- **Custom scopes**：提供以空格或逗号分隔的显式列表，覆盖发现的权限范围。例如，可用于请求比服务器公布的范围更小的集合，或处理服务器元数据未列出可用权限范围的情况。
+:::
+
+:::info 没有 OAuth 发现文档的服务器
+Open WebUI 通过服务器发布的 OAuth 发现文档查找授权服务器。有些 MCP 服务器不会发布此类文档。如果找不到发现文档，且服务器的受保护资源元数据也未指定授权服务器，Open WebUI 会使用 [MCP 2025-03-26 授权规范](https://modelcontextprotocol.io/specification/2025-03-26/basic/authorization)针对这种情况定义的默认端点：MCP **URL** 源处的 `/authorize`、`/token` 和 `/register`；如果设置了 **OAuth Server URL**，则使用该 URL 的源。对于 `https://mcp.example.com/v1/mcp`，这些端点分别为 `https://mcp.example.com/authorize`、`https://mcp.example.com/token` 和 `https://mcp.example.com/register`。登录和令牌刷新使用 `/authorize` 与 `/token`，**OAuth 2.1** 则在 `/register` 注册客户端。
+
+如果受保护资源元数据指定了授权服务器，但无法获取发现文档，**Register Client** 会因错误而失败。
+:::
+
+:::info Check OAuth Discovery
+在使用 **OAuth 2.1** 或 **OAuth 2.1 (Static)** 的 MCP 连接中，URL 旁的验证按钮显示为 **Check OAuth Discovery**，绿色结果会报告“OAuth discovery successful”。它会读取服务器的受保护资源元数据，然后获取并解析 OAuth 发现文档；这就是它的全部功能。它既不会列出工具，也不会调用工具，因此检查通过只能说明已找到授权服务器，不能说明工具调用是否正常。
+
+只有找到发现文档时，检查才会成功。对于不发布发现文档的服务器，检查会失败，但 **Register Client** 仍可通过上述默认端点处理该服务器。
+
+使用 **OAuth 2.1 (Static)** 时，如果设置了 **OAuth Server URL**，检查会针对该 URL 运行；如果留空，则针对 MCP **URL** 运行。
+:::
+
+:::tip 在 OAuth 2.1 与 OAuth 2.1 (Static) 之间选择
+
+- 如果服务器支持 DCR，请先使用 **OAuth 2.1**。
+- 如果你已经从 IdP 获得凭据，并希望 Open WebUI 直接使用这些凭据，请使用 **OAuth 2.1 (Static)**。
+
+:::
+
+### 连接账户 {#connecting-an-account}
+
+管理员只需注册一次 MCP 服务器。随后，每位用户连接自己的账户：当有人首次在聊天中通过 **+** 菜单启用 OAuth 2.1 工具时，Open WebUI 会将其转到提供方，其授予的访问权限仅存储在该用户自己的账户下，不会由其他任何人继承。
+
+授权与发起授权的账户及浏览器会话绑定，因此必须在同一浏览器中、以同一用户身份登录，并通过 [`WEBUI_URL`](/reference/env-configuration#webui_url) 中的地址完成授权。退出登录会取消仍在进行的授权。其他情况会让浏览器返回 Open WebUI，并显示说明原因的通知；重新启用工具即可重试。
+
+管理员也可以从连接本身发起流程。OAuth 客户端注册并保存连接后，在**设置 > 集成（Settings > Integrations）**（管理员区域）中重新打开该连接，会在 **Register Client** 旁显示 **Authorize OAuth** 按钮。它会发送与在聊天中启用工具相同的授权请求，并遵循相同的规则：授权存储在管理员自己的账户下，不会由其他任何人继承。只有在注册客户端后，该按钮才会出现；在连接至少保存一次之前，它会保持灰色。
+
+流程完成后，提供方会让浏览器返回 Open WebUI 首页，因此请重新打开**设置 > 集成（Settings > Integrations）**（管理员区域），继续编辑连接。
+
+### OAuth 2.1 (Static) 设置 {#oauth-21-static-setup}
+
+如果你已经从身份提供方获得客户端 ID/客户端密钥，请使用此方式。
+
+:::info 重定向 URI
+身份提供方中的 OAuth 客户端必须允许以下重定向 URI：
+
+```text
+<WebUI URL>/oauth/clients/mcp:<Connection ID>/callback
+```
+
+对于地址为 `https://ai.example.com` 的实例和 **Connection ID** 为 `notion` 的连接，重定向 URI 为 `https://ai.example.com/oauth/clients/mcp:notion/callback`。`<WebUI URL>` 是**管理员面板 > 设置 > 通用（Admin Panel > Settings > General）**中的 **WebUI URL** 字段（[`WEBUI_URL`](/reference/env-configuration#webui_url)）。在单击 **Register Client** 之前，请将其设置为用户访问 Open WebUI 的公共地址。该字段为空时，Open WebUI 使用注册客户端的请求地址。
+
+**Register Client** 会根据当时读取到的 **WebUI URL** 和 **Connection ID** 构建重定向 URI，已保存的连接会保留该 URI。更改 **WebUI URL** 或 **Connection ID** 后，请再次单击 **Register Client**，单击 **Save**，并在身份提供方中更新重定向 URI。**OAuth 2.1** 在动态客户端注册期间发送相同的重定向 URI，因此你无需在任何位置手动输入。
+:::
+
+1. 打开**设置 > 集成（Settings > Integrations）**（管理员区域）。
+2. 在**外部工具服务器（External Tool Servers）**下，单击**+ 添加连接（+ Add Connection）**。集成页面包含多个部分，请务必确认操作的是这一部分。
+3. 将**类型（Type）**设置为 **MCP (Streamable HTTP)**。
+4. 输入 MCP 服务器 **URL**。
+5. 在 **Auth** 中选择 **OAuth 2.1 (Static)**。
+6. 输入 **Client ID** 和 **Client Secret**。
+7. *（可选）*如果身份提供方与 MCP 资源服务器位于不同主机，请输入 **OAuth Server URL**。该字段为空时，Open WebUI 从 MCP **URL** 获取 OAuth 发现文档；设置后，发现和静态凭据注册都会改为针对此 URL 运行。这适用于 MCP 服务器代理位于独立源的企业 IdP 的部署。
+8. 单击 **Register Client**。
+9. 单击 **Save**。
+
+保存后：
+
+1. 打开一个聊天。
+2. 单击 **+ > Tools**。
+3. 启用你的 MCP 工具。
+4. 在浏览器重定向中完成 OAuth 同意/授权流程。
+
+重定向会带你返回一个新聊天，其中 MCP 工具已开启，与模型默认启用的工具并列显示。
+
+重新打开连接并单击 **Authorize OAuth**，无需打开聊天即可为你自己的账户完成相同操作。请参阅[连接账户](#connecting-an-account)。
+
+:::info
+
+`oauth_2.1` 和 `oauth_2.1_static` 都需要 `Register Client`。使用静态身份验证时，Open WebUI 使用你提供的凭据和服务器元数据发现（不进行动态客户端注册）。
+
+静态身份验证会在请求正文中发送客户端密钥（`client_secret_post`），或者在服务器仅列出 HTTP Basic 方式时通过该标头发送（`client_secret_basic`）。
+
+:::
+
+:::info 资源指示符（RFC 8707）
+
+如果 MCP 服务器在其 [RFC 9728 受保护资源元数据文档](https://datatracker.ietf.org/doc/html/rfc9728)（`/.well-known/oauth-protected-resource`）中发布 `resource` 字段，Open WebUI 会在发现期间捕获该字段，并在**授权重定向**、**令牌交换**和每次**刷新令牌调用**时将其作为 `resource` 参数转发。这会在签发的令牌上正确设置 `aud` 声明，是按照 [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) 严格验证受众的身份提供方所必需的行为。
+
+Open WebUI 端无需配置：系统会自动发现资源指示符。如果你的 IdP 以 `invalid_audience` 或类似错误拒绝 MCP 工具调用，请确认 MCP 服务器的受保护资源元数据文档公布了正确的 `resource` URL。
+
+:::
+
+:::warning OAuth 2.1 工具不能设置为默认工具
+**不要将 OAuth 2.1 MCP 工具设置为模型的默认或预先启用工具。**OAuth 2.1 授权流程需要交互式浏览器重定向（用户同意、回调），无法在聊天补全请求期间透明完成。
+
+如果将 OAuth 2.1 工具设置为默认工具，而用户之前未通过身份验证（或其刷新令牌已过期），工具调用会因**“Failed to connect to MCP server”**而失败，因为后端无法在请求过程中发起基于浏览器的身份验证流程。
+
+**解决方法：**用户应通过聊天输入区域的 **+** 菜单，在每个聊天中手动启用 OAuth 2.1 工具。这样会在调用工具之前触发身份验证流程。完成初始身份验证后，令牌会自动刷新。刷新期间出现临时性提供方错误（速率限制、服务器错误或提供方无法访问）时，已存储的登录状态会保留，下一次调用会重试。如果提供方拒绝刷新，已存储的登录状态会被删除，你需要重新登录。
+:::
+
+### 连接 URL {#connection-urls}
+
+连接由 Open WebUI 后端发起，因此 URL 必须能从后端访问，而不是从浏览器访问。URL 必须指向服务器的 Streamable HTTP 端点。SSE 端点无法使用，请参阅[SSE URL 无法连接](#an-sse-url-does-not-connect)。
+
+如果你在 **Docker** 中运行 Open WebUI，而 MCP 服务器位于**宿主机**上：
+*   使用 `http://host.docker.internal:<port>`（例如 `http://host.docker.internal:3000/mcp`），而不是 `localhost`。
+
+如果 MCP 服务器与 Open WebUI 运行在**同一 Docker 网络中的另一个容器**内：
+*   使用容器的服务名称和服务器在容器内监听的端口（例如 `http://mcp-server:8000/mcp`）。从 Open WebUI 容器内部，无法通过 `localhost` 和发布到宿主机的端口访问该服务器。请参阅 Docker 的 [Compose 网络](https://docs.docker.com/compose/how-tos/networking/)文档。
+
+### 自定义标头 {#custom-headers}
+
+MCP 和 OpenAPI 工具服务器连接都接受自由格式的 **Headers** 字段（JSON 对象），其内容会合并到每个出站请求中。标头值支持 `{{USER_ID}}`、`{{USER_EMAIL}}`、`{{USER_GROUPS}}`、`{{CHAT_ID}}`、`{{MESSAGE_ID}}`、`{{MODEL_ID}}` 和 `{{USER_IP}}` 等模板占位符，Open WebUI 会在请求时展开它们。这样，一个连接即可路由到按用户、聊天或消息区分的后端逻辑，而无需单独创建连接，还能让工具服务器按组而非按单个用户进行授权。
+
+[自定义转发标头](/reference/env-configuration#custom-forwarded-headers-per-connection)列出了所有占位符及其包含的值。请求中某些占位符没有值时（例如单击 **Verify Connection** 按钮时的 `{{CHAT_ID}}` 和 `{{USER_IP}}`），它们会变成空字符串。未知占位符按字面文本传递，非字符串标头值会在替换前转换为字符串。**设置 > 连接（Settings > Connections）**（管理员区域）中 OpenAI 兼容模型连接的自定义标头也以相同方式展开。
+
+### 函数名称筛选列表 {#function-name-filter-list}
+
+此字段限制向 LLM 公开哪些工具。
+*   **默认**：留空可公开所有工具（适用于大多数情况）。
+*   **解决方法**：如果列表为空时遇到连接错误，请尝试在此字段中添加一个英文逗号（`,`）。这会强制系统将其视为有效（但为空）的筛选器，可能绕过某些解析问题。
+
+### 模型看到的工具名称 {#tool-names-the-model-sees}
+
+Open WebUI 以 `<server ID>_<tool name>` 的形式向模型提供每个 MCP 工具。某些提供方（例如 OpenAI API 和 AWS Bedrock）会拒绝工具名称超过 64 个字符的请求，因此较长的名称会被缩短为前 55 个字符、一个下划线和一个 8 字符哈希值。同一个工具始终获得相同的缩短名称，MCP 服务器仍使用原始工具名称调用。
+
+启用大量 MCP 工具时，[Tool Search](/features/extensibility/plugin/tools#tool-search) 会在模型查找大型工具定义之前，不将它们放入每个请求中。其 **Always Loaded Tools** 模式会匹配这些名称，因此 `github_*` 会让 ID 为 `github` 的服务器的所有工具保持加载状态。
+
+### MCP 工具接收的内容 {#what-an-mcp-tool-receives}
+
+模型调用 MCP 工具时，Open WebUI 只向 MCP 服务器发送工具名称和模型编写的参数，不发送其他内容。[工作区 Python 工具](/features/extensibility/plugin/development/reserved-args)获得的保留参数（例如 `__user__`、`__metadata__` 和 `__files__`）永远不会传递给 MCP 工具，因此附加到聊天的文件也不会到达 MCP 工具。OpenAPI 工具服务器上的工具采用相同处理方式：Open WebUI 会丢弃操作未声明的每个参数，并将其余参数作为路径、查询和正文参数发送。
+
+服务器通过请求标头了解调用者身份：
+
+- **Auth** 设置选择的令牌，请参阅[身份验证模式](#authentication-modes)。**Session**、**OAuth** 和 **OAuth 2.1** 发送属于用户的令牌，而 **Bearer** 为所有用户发送同一个密钥。
+- 你的[自定义标头](#custom-headers)，其中 `{{USER_ID}}` 和 `{{CHAT_ID}}` 等占位符已填入值。
+- 当 [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers) 设置为 `true` 时，通过 `X-OpenWebUI-User-*` 标头发送用户的姓名、ID、电子邮件和角色（如果设置了 `FORWARD_USER_INFO_HEADER_JWT_SECRET`，则发送一个已签名的 JWT），另外还会发送 `X-OpenWebUI-Chat-Id` 和 `X-OpenWebUI-Message-Id`。
+
+要将聊天文件传递给 MCP 或 OpenAPI 工具，可以采用以下方式：
+
+- **传递内容或 URL。**为工具提供文本参数或服务器可下载的 URL 参数，让模型填写。
+- **传递文件 ID。**当 **Function Calling** 未设置为 **Legacy**，且模型的 **Builtin Tools** 能力已开启时，每条用户消息都会带有一个 `<attached_files>` 块到达模型，其中列出每个附加文件的 `id`。为工具提供文件 ID 参数，让服务器使用收到的令牌，从你的 Open WebUI 实例上的 `/api/v1/files/<id>/content` 下载文件。使用 **Session** 身份验证时，收到的是用户自己的 Open WebUI 令牌，可用于下载该用户有权读取的文件。
+- **使用工作区 Python 工具。**在**工作区 > 工具（Workspace > Tools）**中编写的工具会通过 `__files__` 接收附加文件，并可自行将它们转发到你的服务。
+
+### 结构化工具结果 {#structured-tool-results}
+
+MCP 工具可以在常规内容之外返回结构化数据（`structuredContent`）。Open WebUI 会将这些数据作为 JSON 文本添加到模型看到的工具结果中。如果工具的某个文本结果已经包含相同的 JSON，则该结果会原样传给模型，数据只出现一次。如果结构化数据仅包含一个 `result` 字段，且其值与文本结果一一对应，也会采用相同的处理方式；使用官方 MCP Python SDK 构建的服务器正是通过这种方式返回普通值和列表。
+
+### 服务器指令 {#server-instructions}
+
+MCP 服务器可以在 Open WebUI 连接时发送指令。Open WebUI 会将它们追加到系统提示词中的 `MCP server "<server ID>" instructions:` 行下，让模型了解服务器希望如何使用其工具。
+
+### 请求你提供输入 {#requests-for-your-input}
+
+MCP 服务器可以在工具调用过程中请求你提供输入（MCP elicitation）。Open WebUI 会显示一个包含服务器 ID 和服务器消息的对话框：
+
+- **表单请求**会显示一个包含服务器所请求字段的表单。**Submit** 会发送你的答案。Open WebUI 会根据服务器的 schema 检查答案，只发送符合 schema 的答案。
+- **链接请求**会显示一个待打开的链接。打开链接会告知服务器你已继续操作。如果链接不以 `http://` 或 `https://` 开头，或包含用户名或密码，请求会在显示任何对话框之前被取消。
+
+**Decline** 会拒绝请求，**Cancel** 会关闭请求，之后由服务器决定如何继续工具调用。对话框最多等待 120 秒；如果 [`WEBSOCKET_EVENT_CALLER_TIMEOUT`](/reference/env-configuration#websocket_event_caller_timeout) 的值更小，则使用该值，超时后取消请求。只有在浏览器标签页中当前打开的是该聊天时，对话框才会显示；否则请求会立即取消。
+
+### MCP Apps {#mcp-apps}
+
+MCP 工具可以附带交互式应用（[MCP Apps](https://modelcontextprotocol.io/extensions/apps/overview)）。当工具的 `_meta.ui.resourceUri` 指向类型为 `text/html;profile=mcp-app` 的 `ui://` 资源（最大 5 MB）时，Open WebUI 会在工具运行后将该应用内联显示在聊天中。
+
+应用在沙盒 iframe 中运行，可以运行脚本、下载文件和打开弹出窗口，但无法访问 Open WebUI 的源。其 Content-Security-Policy 来自资源的 `csp` 元数据（`resourceDomains`、`connectDomains`、`frameDomains`、`baseUriDomains`），并在此基础上应用 [`IFRAME_CSP`](/reference/env-configuration#iframe_csp)。应用可以读取和列出服务器资源、在新标签页中打开 `http` 和 `https` 链接、调用服务器工具，以及向聊天发送消息。应用发起的每次工具调用都会先要求你在**工具调用（Tool call）**对话框中确认。应用发来的消息会在**确认来自嵌入内容的提示词（Confirm Prompt from Embed）**对话框中显示其文本，确认后会作为你的下一条聊天消息发送。应用只能发送文本，因此消息中的图片和文件会被省略。应用还可以提供文件下载。**下载（Download）**对话框会先列出文件和链接。确认后，每个文件都会被保存，且 `http` 或 `https` 链接会在新标签页中打开。
+
+工具的 `_meta.ui.visibility` 决定谁可以使用它：不包含 `model` 的工具会对模型隐藏，不包含 `app` 的工具无法由应用调用。MCP Apps 需要稳定的 [`WEBUI_SECRET_KEY`](/reference/env-configuration#webui_secret_key)。
+
+## 故障排除 {#troubleshooting}
+
+### “Failed to connect to MCP server” {#failed-to-connect-to-mcp-server}
+
+**症状**：
+使用工具时，即使设置中的验证按钮报告成功，聊天仍会显示“Failed to connect to MCP server”。对于使用任一 OAuth 2.1 模式的连接，该按钮显示为 **Check OAuth Discovery**，它只能确认已找到并可解析授权服务器的发现文档。
+
+服务器日志会以错误级别记录每次失败，格式为 `Failed to connect to MCP server '<id>'`，后接失败原因，因此请先检查日志。如果服务器在聊天期间变得无法访问，只有该次工具调用会失败：模型会收到作为工具结果的连接错误，并完成回复。
+
+**解决方法**：
+1.  **检查身份验证**：确保未在未提供密钥的情况下选择 `Bearer`。如果不需要令牌，请切换为 `None`。
+2.  **筛选列表问题**：如果“Function Name Filter List”为空，请尝试在其中添加一个逗号（`,`）。
+3.  **OAuth 2.1 默认工具**：如果失败的工具使用 OAuth 2.1，且已设置为模型的默认工具，这是已知限制。请将其从模型的默认工具中移除，并让用户在每个聊天中手动启用。
+4.  **握手缓慢**：如果服务器冷启动缓慢或公开了大量工具，连接、列出工具或读取资源可能会超过超时时间。请增大 [`MCP_INITIALIZE_TIMEOUT`](/reference/env-configuration#mcp_initialize_timeout)（默认 `10` 秒）。工具调用则使用 [`AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER`](/reference/env-configuration#aiohttp_client_timeout_tool_server)。
+
+### OAuth 登录后出现 `{"detail":"Not Found"}` {#detailnot-found-after-the-oauth-sign-in}
+
+**症状**：在提供方处批准访问后，浏览器进入 `/oauth/clients/mcp:<Connection ID>/callback`，且仅显示 `{"detail":"Not Found"}`。
+
+**原因**：Open WebUI 没有在该 URL 中的 **Connection ID** 下存储 OAuth 客户端。重定向 URI 保留的是你单击 **Register Client** 时的 **Connection ID**，因此，如果之后更改了 **Connection ID**，或者连接被删除或从未保存，就会出现此问题。
+
+**解决方法**：在**设置 > 集成（Settings > Integrations）**（管理员区域）中打开该连接，使用当前的 **Connection ID** 单击 **Register Client**，然后单击 **Save**。使用 **OAuth 2.1 (Static)** 时，还要在身份提供方中更新重定向 URI 以保持一致，请参阅 [OAuth 2.1 (Static) 设置](#oauth-21-static-setup)。然后在聊天中重新启用工具。
+
+### SSE URL 无法连接 {#an-sse-url-does-not-connect}
+
+**症状**：
+URL 指向服务器 SSE 端点的连接会失败，这种 URL 通常以 `/sse` 结尾。聊天会显示“Failed to connect to MCP server”。
+
+**原因**：
+Open WebUI 仅通过 Streamable HTTP 连接 MCP 服务器。它从不建立 SSE 连接，因此 SSE 端点无法响应其请求。
+
+**解决方法**：
+1.  **使用 Streamable HTTP 路径**：如果服务器也提供 Streamable HTTP，请将该端点输入为 **URL**。具体路径请参阅服务器文档。
+2.  **使用 mcpo 桥接 SSE**：如果服务器仅提供 SSE，请通过 [mcpo](https://github.com/open-webui/mcpo) 运行，例如 `mcpo --port 8000 --server-type "sse" -- http://127.0.0.1:8001/sse`，然后将 mcpo URL 添加为 **OpenAPI** 连接。请参阅 [MCP 支持](/features/extensibility/plugin/tools/openapi-servers/mcp)。
+
+### “Maximum tools limit reached” {#maximum-tools-limit-reached}
+
+错误 `Maximum tools limit reached. <n> tools have been provided but the maximum is <m>` 来自模型提供方或其前面的代理，而不是 Open WebUI。请求中包含的工具定义数量超出了该端点可接受的上限。Open WebUI 会发送聊天中启用的每个 MCP 服务器上所有通过**函数名称筛选列表（Function Name Filter List）**的工具，以及原生模式下的内置工具。
+
+要减少发送的工具数量，可以：
+
+- **开启 [Tool Search](/features/extensibility/plugin/tools#tool-search)。**延迟加载的工具不会包含在发送给提供方的工具列表中，该列表只包含保持加载的工具以及 `search_tools` 和 `call_tool`。只有定义长度超过 **Deferral Threshold (characters)** 的工具才会延迟加载。将其设置为 `0` 可延迟加载所有工具。
+- 在每个服务器的[函数名称筛选列表](#function-name-filter-list)中**只列出需要的工具**。
+- 在聊天中**启用更少的 MCP 服务器**，或关闭模型不需要的[内置工具类别](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model)。
+
+### 添加外部工具后一直显示加载画面 {#infinite-loading-screen-after-adding-external-tool}
+
+**症状**：
+添加外部工具连接后，前端一直停留在加载动画。浏览器控制台显示类似 `Cannot convert undefined or null to object at Object.entries` 的错误。
+
+**原因**：
+你可能使用 **OpenAPI** 连接类型配置了 **MCP 服务器**，或在 OpenAPI 连接中输入了 MCP 风格的 JSON（包含 `mcpServers`）。
+
+**解决方法**：
+1. 打开**设置 > 集成（Settings > Integrations）**（管理员区域）（侧边栏仍可加载）
+2. **禁用**或**删除**有问题的工具连接
+3. 刷新页面（Ctrl+F5）
+4. 重新添加连接，并将**类型（Type）**正确设置为 **MCP (Streamable HTTP)**
+
+## 常见问题 {#faq}
+
+**是否支持 stdio 或 SSE 传输？**
+
+Open WebUI 的原生 MCP 支持**仅限 Streamable HTTP**。这一设计选择反映了我们的架构：Open WebUI 是**基于 Web 的多租户环境**，而不是本地桌面进程。
+
+浏览器在严格的**沙盒和事件驱动 HTTP 约束**下运行，因此很难在不同用户和会话之间安全地维护长时间存在的 stdio 或 SSE 连接。
+
+运行 Tether 的用户可以在自己的计算机上将 stdio MCP 服务器作为本地命令启动，请参阅 [Tether](/ecosystem/tether#bring-your-own-models-and-tools)。要为整个实例桥接这些其他 MCP 传输，请查看 [**mcpo**](https://github.com/open-webui/mcpo)，这是一个开源代理，可将**基于 stdio 或 SSE 的 MCP 服务器转换为 OpenAPI 兼容端点**。它让你无需修改传统 MCP 工具的传输层，即可在 Open WebUI 内运行这些工具。
+
+**这里的 MCP 是否被视为稳定功能？**
+
+已受支持并持续改进。更广泛的生态系统仍在发展，预计偶尔会出现不兼容变更。
+
+**可以混用 OpenAPI 和 MCP 工具吗？**
+
+可以。许多部署都会同时使用两者。
+
+**用户可以添加自己的 MCP 服务器吗？**
+
+可以，但只能通过 Tether 应用为自己添加，请参阅[自带模型和工具](/ecosystem/tether#bring-your-own-models-and-tools)。向实例添加 MCP 服务器仅限管理员操作（**设置 > 集成（Settings > Integrations）**（管理员区域））。有关原因，请参阅[MCP 服务器仅限管理员添加](#mcp-servers-are-admin-only)。

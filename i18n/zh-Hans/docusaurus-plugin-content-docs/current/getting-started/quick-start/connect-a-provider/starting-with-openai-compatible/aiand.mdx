@@ -1,0 +1,49 @@
+---
+sidebar_position: 1
+title: "ai&"
+description: "通过 ai& 将日本托管的 AI 引入你的 Open WebUI 工作区：开放权重模型、日本境内推理和按用量计费。"
+---
+
+[ai&](https://www.aiand.com/inference) 是 Open WebUI 的官方合作伙伴，通过其日本本土基础设施，为日本团队提供开放权重 AI 模型。将 Open WebUI 的聊天与协作功能和 ai& 的托管推理相结合，无需运营 GPU 服务器，即可为团队提供 AI 工作区。
+
+## 为什么日本团队选择 ai&？ {#why-choose-ai-for-teams-in-japan}
+
+- **在靠近用户的位置运行推理。** ai& 在日本的自有基础设施上处理推理，旨在为亚太地区提供低延迟服务。
+- **让推理处理留在日本。** ai& 的[服务条款](https://www.aiand.com/legal/inference-terms-of-service)规定输入和输出在日本境内处理，并禁止将这些内容用于训练模型。
+- **选择适合工作的模型。** 通过一个 API 访问 Kimi、DeepSeek 和 GLM 等模型系列。在 Open WebUI 中比较模型，并从 [ai& 模型目录](https://docs.aiand.com/models/catalog/)中选择适用于编码、推理和日常团队聊天的模型。
+- **从小规模开始，逐步扩展。** 从按令牌计费开始，然后随着团队需求增长，探索预留算力和自定义 SLA。请参阅 [ai& 的套餐与价格](https://www.aiand.com/inference)。
+
+**准备将日本托管的 AI 引入你的工作区？**[创建 ai& API 密钥](https://console.aiand.com/)，然后按照以下步骤操作。日语版概述请访问 [ai& Inference 日语版](https://www.aiand.com/jp/inference)。
+
+## 步骤 1：获取 API 密钥 {#step-1-get-your-api-key}
+
+1. 在 [console.aiand.com](https://console.aiand.com/) 登录。
+2. 创建 API 密钥并妥善保存；该密钥仅显示一次。
+3. 为账号充值额度以使用 API。
+
+有关账号和计费设置，请参阅 [ai& 快速开始](https://docs.aiand.com/getting-started/)。
+
+## 步骤 2：在 Open WebUI 中添加连接 {#step-2-add-the-connection-in-open-webui}
+
+1. 前往**设置（Settings）> 连接（Connections）**（管理员区域），找到**管理 OpenAI API 连接（Manage OpenAI API Connections）**列表。
+2. 点击**添加连接（Add Connection）**。
+3. 输入以下设置：
+
+| 设置 | 值 |
+|---|---|
+| **URL** | `https://api.aiand.com/v1` |
+| **API 密钥（API Key）** | 你的 ai& API 密钥 |
+| **模型 ID（Model IDs）** | 留空以发现可用模型，或添加特定模型 ID 来限制列表 |
+
+4. 将**高级（Advanced）**下的**提供方（Provider）**保留为**默认（Default）**。
+5. 点击**验证连接（Verify Connection）**，然后点击**保存（Save）**。
+
+ai& 提供用于模型发现的 [`/v1/models` 端点](https://docs.aiand.com/api/models/)。将模型添加到允许列表时，请使用该端点返回的准确模型 ID。
+
+## 步骤 3：开始聊天 {#step-3-start-chatting}
+
+打开新聊天，从模型选择器中选择一个 ai& 模型，然后发送消息。
+
+选择具备工作流所需能力的模型。查看 [ai& 模型目录](https://docs.aiand.com/models/catalog/)，了解可用模型、上下文窗口，以及对推理、视觉和工具调用等功能的支持。
+
+有关连接故障排除和其他配置选项，请参阅 [OpenAI 兼容指南](/getting-started/quick-start/connect-a-provider/starting-with-openai-compatible)。

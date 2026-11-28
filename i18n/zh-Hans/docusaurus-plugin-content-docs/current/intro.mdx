@@ -1,0 +1,192 @@
+---
+sidebar_position: 0
+slug: /
+title: 首页
+hide_title: true
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# Open WebUI {#open-webui}
+
+Open WebUI 是 **AI 之家**，一个自托管的 AI 平台，**[可扩展](/features/extensibility/plugin/)**、**[功能丰富](/features/)**、易于使用，并专为**[完全离线](https://openwebui.com/sovereign-ai)**运行而构建。它支持 **Ollama**、**OpenAI 兼容 API** 和 **[Agent Client Protocol (ACP)](/features/open-terminal/agents)**，为本地和云端模型及智能体提供强大且不依赖特定模型服务提供方的界面。
+
+<ThemedImage
+  alt="Open WebUI：一个由方块组成的立方体，其中一角的一块被向上提起"
+  sources={{
+    light: useBaseUrl('/images/banners/home-light.svg'),
+    dark: useBaseUrl('/images/banners/home-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+![GitHub 星标](https://img.shields.io/github/stars/open-webui/open-webui?style=social)
+![GitHub 复刻](https://img.shields.io/github/forks/open-webui/open-webui?style=social)
+[![Discord](https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white)](https://discord.gg/5rJgQTnV4s)
+
+---
+
+## 快速开始 {#quick-start}
+
+<Tabs>
+  <TabItem value="python" label="Python" default>
+
+```bash
+# 已安装 uv（macOS/Linux）
+DATA_DIR=~/.open-webui uvx --python 3.12 open-webui@latest serve
+
+# 或使用 pip 安装并运行
+pip install open-webui
+open-webui serve
+```
+
+然后打开 [http://localhost:8080](http://localhost:8080)。
+
+  </TabItem>
+  <TabItem value="docker" label="Docker">
+
+:::tip 选择合适的镜像
+使用 `:main` 可获得内置的嵌入、文档提取和语音识别功能。选择 `:slim` 可获得**轻量、节省内存、易于扩展**的部署：**下载量仅 197 MB**（减小 88%），在我们的[测试](/getting-started/quick-start#slim-memory-usage)中，**空闲时内存占用约 300 MiB**。嵌入、文档提取和语音处理由外部服务负责，因此你能以**极低开销**和**小巧的占用空间**获得相同的聊天体验。[为什么选择 slim？](/getting-started/quick-start#what-slim-leaves-out)
+:::
+
+```bash
+docker run -d -p 3000:8080 --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data -e WEBUI_SECRET_KEY=your-secret-key --name open-webui --restart always ghcr.io/open-webui/open-webui:main
+```
+
+GPU 支持、Docker Compose 及更多信息 → [快速开始](/getting-started/quick-start)和 [Docker 镜像与标签](/getting-started/quick-start#image-variants)
+
+然后打开 [http://localhost:3000](http://localhost:3000)。
+
+  </TabItem>
+  <TabItem value="desktop" label="桌面版">
+
+:::info
+对于生产部署，请通过 **Docker** 或 **Python** 安装。
+:::
+
+从 [**github.com/open-webui/desktop**](https://github.com/open-webui/desktop) 下载桌面应用。它无需 Docker 或手动配置，即可在你的系统上原生运行 Open WebUI。
+
+  </TabItem>
+</Tabs>
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  poster={useBaseUrl('/images/landing/hero.png')}
+  aria-label="Open WebUI 正在执行实时分析：本地模型通过 Open Terminal 读取电子表格，使用 Python 汇总数据，并在集成浏览器中构建收入仪表板"
+  style={{ display: 'block', width: '100%', borderRadius: 12, margin: '0.75rem 0 0.5rem' }}
+>
+  <source src={useBaseUrl('/images/landing/hero.mp4')} type="video/mp4" />
+</video>
+
+<p style={{ fontSize: '0.85rem', opacity: 0.7, margin: '0 0 1rem' }}>
+  由 <a href="/features/open-terminal">Open Terminal</a> 和我们的部分<a href="/features/extensibility/community">优秀社区插件</a>提供支持。
+</p>
+
+:::tip 已在运行？接下来阅读这篇。
+已经安装 Open WebUI，但不知道从哪里开始？[**Open WebUI 基础使用**](/getting-started/essentials)指南涵盖每位新用户都需要了解的内容：插件、工具调用、任务模型、上下文管理、RAG、Web 搜索和 Open Terminal。
+:::
+
+---
+
+## 快速上手 {#getting-started}
+
+- [**快速开始**](/getting-started/quick-start)：Docker、Python、Kubernetes 和桌面应用安装选项
+- [**连接模型服务提供方**](/getting-started/quick-start/connect-a-provider)：Ollama、OpenAI、Anthropic、vLLM 等
+- [**Open WebUI 基础使用**](/getting-started/essentials)：首次安装后从这里开始。插件、工具调用、任务模型、上下文管理、RAG、Web 搜索、Open Terminal。
+- [**连接智能体**](/getting-started/quick-start/connect-an-agent)：Claude Code、Codex、Hermes Agent、OpenClaw 和其他自主 AI 智能体
+- [**更新**](/getting-started/updating)：让实例保持最新状态
+- [**开发分支**](/getting-started/quick-start#using-the-dev-branch)：帮助在稳定版发布前测试最新更改
+- [**高级主题**](/getting-started/advanced-topics)：扩展、日志和高级配置
+
+---
+
+## 探索 {#explore}
+
+- [**功能**](/features)：了解 Open WebUI 能做什么
+- [**教程**](/tutorials)：分步指南
+- [**常见问题**](/faq)：常见问题解答
+- [**故障排除**](/troubleshooting)：解决常见问题
+- [**参考**](/reference)：环境变量和 API 详情
+
+---
+
+## 使用 Open Terminal 进行智能体执行 {#agentic-execution-with-open-terminal}
+
+[**Open Terminal**](/features/open-terminal) 为智能体提供真实的终端和文件系统，使其能够实际完成多步骤工作，而不只是描述工作过程：分析数据、运行脚本、自行修正错误，并将生成的文件交给你，一切都在聊天中完成。对话旁的[文件浏览器](/features/open-terminal/file-browser)会显示它创建的所有内容。
+
+对于团队，[**Terminals**](/features/open-terminal/terminals) 是在此基础上提供的企业级功能层，为每位用户提供具有资源限制和自动生命周期管理的隔离环境。
+
+---
+
+## Open WebUI 的其他项目 {#also-by-open-webui}
+
+- [**open-terminal**](https://github.com/open-webui/open-terminal)：通过真实的操作运行时，将 Open WebUI 变成完整的智能体运行框架：沙箱文件、Shell、代码执行、预览和产物。
+- [**oikb**](https://github.com/open-webui/oikb)：让你的 Open WebUI 知识库保持同步。监视本地文件夹、GitHub 仓库、S3 存储桶、Confluence 和其他 40 多种来源。
+- [**mcpo**](https://github.com/open-webui/mcpo)：MCP 到 OpenAPI 代理。无需编写自定义适配代码，即可将任何 MCP 工具服务器与 Open WebUI（或任何 OpenAPI 客户端）结合使用。
+
+---
+
+## 企业版 {#enterprise}
+
+Open WebUI 面向团队和组织构建，既能让你完全掌控数据和基础设施，又采用可[从试点扩展到全组织部署](/getting-started/advanced-topics/scaling)的无状态架构。
+
+需要**自定义品牌**、**SLA 支持**或**长期支持（LTS）**？
+→ [了解企业版方案](/enterprise)
+
+---
+
+## 参与贡献 {#get-involved}
+
+- [**参与贡献**](/contributing)：帮助构建 Open WebUI
+- [**开发环境搭建**](/getting-started/advanced-topics/development)：从源码在本地运行项目
+- [**Discord**](https://discord.gg/5rJgQTnV4s)：加入社区
+- [**GitHub**](https://github.com/open-webui/open-webui)：报告问题、提交 PR
+- [**招贤纳士**](https://careers.openwebui.com/)：加入我们的团队
+
+---
+
+## 鸣谢 {#acknowledgements}
+
+<div className="grid gap-4 items-start grid-cols-1 md:grid-cols-3">
+
+  <a href="https://a16z.com/advancing-open-source-ai-through-benchmarks-and-bold-experimentation/" title="A16z 2025 年开源 AI 资助计划" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
+    <div className="max-w-full h-auto">
+      ![A16z](/sponsors/grants/a16z.png)
+    </div>
+    <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>A16z 2025 年开源 AI 资助计划</span>
+  </a>
+
+  <a href="https://builders.mozilla.org/" title="Mozilla Builders 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
+    <div className="max-w-full h-auto">
+      ![Mozilla](/sponsors/grants/mozilla.png)
+    </div>
+    <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>Mozilla Builders 2024</span>
+  </a>
+
+  <a href="https://github.com/accelerator" title="GitHub Accelerator 2024" target="_blank" rel="noopener" className="flex flex-col w-fit gap-2 items-center">
+    <div className="max-w-full h-auto">
+      ![GitHub](/sponsors/grants/github.png)
+    </div>
+    <span style={{verticalAlign:'middle', fontWeight:600, fontSize:'1.05em'}}>GitHub Accelerator 2024</span>
+  </a>
+
+</div>
+
+---
+
+## 供 LLM 和编程智能体使用 {#for-llms-and-coding-agents}
+
+本文档的机器可读入口：
+
+- [llms.txt](https://docs.openwebui.com/llms.txt)：汇总每个文档页面的精选索引，附简短描述。
+- [llms-full.txt](https://docs.openwebui.com/llms-full.txt)：将所有文档页面拼接为一个 Markdown 文件。
+- [agents.txt](https://docs.openwebui.com/agents.txt)：为使用这些文档的智能体提供简明说明。
+- [api/search?q=YOUR_QUERY](https://docs.openwebui.com/api/search?q=YOUR_QUERY)：确定性文档搜索。
+
+每次部署都会重新生成所有文件。

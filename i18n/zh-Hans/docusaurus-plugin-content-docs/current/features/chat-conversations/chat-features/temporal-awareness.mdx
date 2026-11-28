@@ -1,0 +1,43 @@
+---
+sidebar_position: 11
+title: "时间感知"
+---
+
+# 时间感知（日期与时间）
+
+AI 要真正提供帮助，就需要理解时间概念。Open WebUI 会向模型提供当前日期、时间和时区，使其能够给出与上下文相关的回答（例如“我今天有什么安排？”或“总结一下我昨天的会议”）。
+
+## 系统级感知 {#system-level-awareness}
+
+日期或时间信息不会自行传递给模型。只有系统提示词、模型文件或提示词包含以下占位符之一时，这些信息才会随请求发送；Open WebUI 会在发送请求前填入相应内容：
+
+- **`CURRENT_DATE`**：以 YYYY-MM-DD 格式注入。
+- **`CURRENT_TIME`**：对于从界面发起的聊天，使用浏览器本地的 24 小时制时间，格式为 `HH:MM:SS`。对于不带浏览器变量的请求（API 调用、自动化、定时器），使用服务器本地时间，格式为 `hh:MM:SS AM/PM`。
+- **`CURRENT_DATETIME`**：日期和时间的组合。`CURRENT_TIMEZONE` 和 `USER_LANGUAGE` 仅由浏览器填写，因此对于 API 调用方、自动化和定时器，它们会保持字面值。
+- **`CURRENT_WEEKDAY`**：星期几（例如 Monday、Tuesday）。
+
+服务器本地时间遵循 [`TZ`](/reference/env-configuration#tz) 环境变量。如果 API 调用、自动化或定时器获得的是 UTC 时间，请在 Open WebUI 服务器或容器上设置 `TZ`。
+
+可以在[**提示词**](/features/workspace/prompts)或[**模型文件**](/features/workspace/models)中使用 `{{CURRENT_DATE}}` 语法手动引用这些变量。
+
+---
+
+## 原生时间工具（智能体） {#native-temporal-tools-agentic}
+
+使用启用了**原生函数调用**的模型时（请参阅[**工具调用中心指南**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)），模型可以精细地控制时间计算和查询。
+
+### 可用的时间工具 {#available-time-tools}
+
+- **`get_current_timestamp`**：模型可以获取精确的当前 Unix 时间戳（UTC）和 ISO 日期字符串。
+- **`calculate_timestamp`**：从当前时间减去指定的天数、周数、月数或年数（例如“3 天前的日期”）。它无法计算“下周五”之类的未来日期。模型必须根据 `get_current_timestamp` 自行推理；如果用户资料中设置了本地时间和时区，该工具也会返回这些信息。
+
+### 为什么使用原生工具调用处理时间？ {#why-use-native-tool-calling-for-time}
+
+静态变量只能告诉模型“现在是什么时候”，原生工具则让模型能够**对时间进行推理**。
+
+如果你问：*“查找我上周二写的笔记”*，没有工具的模型可能会猜错日期。配备工具的模型会：
+
+1. **计算**：使用 `calculate_timestamp` 计算“上周二”的准确日期。
+2. **搜索**：通过 `search_notes`，以该具体日期作为筛选条件搜索你的笔记。
+
+对于涉及搜索历史记录、安排任务或分析时效性数据的可靠智能体工作流，这种精确性至关重要。

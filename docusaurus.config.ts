@@ -44,7 +44,16 @@ const config: Config = {
 	// may want to replace "en" with "zh-Hans".
 	i18n: {
 		defaultLocale: "en",
-		locales: ["en"],
+		locales: ["en", "zh-Hans"],
+		localeConfigs: {
+			en: {
+				label: "English",
+			},
+			"zh-Hans": {
+				label: "简体中文",
+				htmlLang: "zh-Hans",
+			},
+		},
 	},
 
 	// Enable Mermaid for diagrams
@@ -61,6 +70,7 @@ const config: Config = {
 			require.resolve("@easyops-cn/docusaurus-search-local"),
 			{
 				hashed: true,
+				language: ["en", "zh"],
 				indexBlog: false,
 				docsRouteBasePath: "/",
 				highlightSearchTermsOnTargetPage: true,
@@ -113,6 +123,10 @@ const config: Config = {
 					href: "https://openwebui.com/blog",
 					label: "Blog",
 					position: "left",
+				},
+				{
+					type: "localeDropdown",
+					position: "right",
 				},
 				{
 					label: "GitHub",

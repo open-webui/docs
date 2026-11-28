@@ -1,0 +1,36 @@
+---
+title: "语音转文字与文字转语音"
+sidebar_position: 0
+slug: /features/chat-conversations/audio
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import DocCardList from '@theme/DocCardList';
+
+# 音频
+
+<ThemedImage
+  alt="音频：标有驱动单元的扬声器箱体"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-audio-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-audio-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+![语音转文字和文字转语音设置](/images/admin/admin-audio.png)
+
+与 Open WebUI 对话，并让它开口回复。通过语音转文字进行听写，通过文字转语音收听回复，支持多种引擎和声音。
+
+<DocCardList />
+
+## 个人文字转语音设置 {#personal-text-to-speech-settings}
+
+每位用户都可以在**设置（Settings）**的**音频（Audio）**标签页中，通过 **TTS 设置（TTS Settings）**和**声音（Voice）**调整回复的朗读方式。
+
+| 设置 | 显示条件 | 作用 |
+|---------|------------|--------------|
+| **Kokoro.js 数据类型（Kokoro.js Dtype）** | 你的**文字转语音引擎（Text-to-Speech Engine）**为 **Kokoro.js（浏览器）** | 设置浏览器下载并运行的 Kokoro 模型（`onnx-community/Kokoro-82M-v1.0-ONNX`）的精度：`fp32`（全精度）、`fp16`、`q8` 或 `q4`。选择之前不会加载模型，**声音（Voice）**部分会一直显示**正在加载 Kokoro.js...（Loading Kokoro.js...）**，且没有声音列表。选择后，模型开始加载，消息会显示百分比。请保持设置页面打开，直到声音列表出现，然后点击**保存（Save）**以保留该数据类型。浏览器提供 GPU 适配器时，模型在 WebGPU 上运行，否则在 WebAssembly 上运行。如果未保存数据类型，**朗读（Read Aloud）**和语音通话会使用 `fp32`。 |
+| **自动播放回复（Auto-Playback Response）** | 始终显示 | 切换后立即保存，无需点击**保存（Save）**。回复完成时，Open WebUI 会触发该消息的**朗读（Read Aloud）**按钮，因此播放使用相同的引擎和声音。它不会播放以错误结束的回复，也不会在语音通话期间运行，因为语音通话会自行朗读回复。此功能依赖**朗读（Read Aloud）**按钮，因此没有**允许文字转语音（Allow Text to Speech）**权限的用户无法播放。开启期间，Open WebUI 会在你首次点击或按键时播放一小段无声音频，以便 Safari 和其他 WebKit 浏览器允许后续播放。 |
+| **允许非本地声音（Allow non-local voices）** | 管理员的**文字转语音引擎（Text-to-Speech Engine）**为 **Web API**，且你的**文字转语音引擎（Text-to-Speech Engine）**为**默认（Default）** | 默认关闭，因此**设置声音（Set Voice）**只列出浏览器报告为本地（`localService` 为 `true`）的浏览器声音。开启后，还会列出浏览器报告为非本地的声音。点击**保存（Save）**保留更改。 |

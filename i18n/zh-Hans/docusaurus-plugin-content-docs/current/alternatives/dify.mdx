@@ -1,0 +1,114 @@
+---
+sidebar_position: 20
+title: "Open WebUI 与 Dify 对比"
+sidebar_label: "Open WebUI 与 Dify"
+description: "Open WebUI 与 Dify 对比：面向不同使用场景的 AI 聊天平台与可视化工作流构建工具。"
+keywords: ["Open WebUI 与 Dify 对比", "Dify 替代方案", "AI 工作流构建工具", "AI 工作流构建工具对比", "Open WebUI 替代方案", "Open WebUI 对比"]
+---
+
+import Head from '@docusaurus/Head';
+
+<Head>
+<script type="application/ld+json">{JSON.stringify({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Dify 和 Open WebUI 有何异同？", "acceptedAnswer": {"@type": "Answer", "text": "Dify 采用以工作流为先的可视化方式构建 AI 应用程序。Open WebUI 更侧重于对话和日常 AI 使用。两者从不同角度应用 AI，许多团队可以同时使用。"}}, {"@type": "Question", "name": "我可以将 Dify 与 Open WebUI 结合使用吗？", "acceptedAnswer": {"@type": "Answer", "text": "可以。Dify 提供与 OpenAI 兼容的 API。将 Open WebUI 连接到 Dify 的 API，即可在 Open WebUI 中将 Dify 工作流作为模型使用。"}}]})}</script>
+</Head>
+
+
+# Open WebUI 与 Dify
+
+*最后更新：2026 年 8 月*
+
+LangGenius 的 [Dify](https://dify.ai/) 采用了截然不同的 AI 工具设计思路。本页许多工具侧重于对话，而 Dify 侧重于*构建*：可视化工作流设计、智能体编排、提示词工程，以及部署 AI 驱动的应用程序。如果你将 AI 视为构建产品、自动化和面向用户功能的平台，Dify 值得认真考虑。
+
+[GitHub](https://github.com/langgenius/dify) · [源码可用（修改版 Apache 2.0）](https://github.com/langgenius/dify/blob/main/LICENSE)
+
+---
+
+## Dify 的优势 {#what-dify-does-well}
+
+- **可视化工作流构建工具**，通过拖放界面设计复杂的 AI 管道和逻辑
+- **智能体框架**，用于构建能够推理、使用工具和采取行动的自主智能体
+- **提示词工程 IDE**，在专门的环境中编写、版本管理、测试和比较提示词
+- **工作流市场**，用于共享和导入社区构建的工作流与模板
+- **模型路由**，跨多个服务提供方智能路由，优化成本和能力
+- **RAG 管道**，内置文档摄取、处理和检索功能
+- **批处理**，针对大型数据集运行提示词和工作流
+- **标注和反馈**，收集人工反馈，持续改进 AI 输出
+- **可观测性**，包括面向生产使用的集成监控、日志记录和成本跟踪
+- **后端即服务**，可将 AI 应用即时部署为 API
+- **可嵌入小组件**，将 AI 聊天添加到任何网站或应用程序
+- **强大的社区**，拥有庞大而活跃的贡献者和用户群体
+
+---
+
+## Open WebUI 的优势 {#what-open-webui-does-well}
+
+- **完整的智能体平台**，模型可以在以对话为中心的工作区中使用[内置工具](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)、[MCP](/features/extensibility/mcp) 服务器、[子智能体](/features/chat-conversations/chat-features/subagents)、[定时器](/features/chat-conversations/chat-features/timers)和[自动化](/features/chat-conversations/chat-features/automations)完成工作
+- **几乎可以自定义一切**，从按模型设置提示词、工具、知识和参数，到可在管道任意环节改变行为的[过滤器、管道、操作和事件函数](/features/extensibility/plugin/functions)，此外还有主题、横幅和按组权限
+- **任意模型、任意服务提供方**，在一个界面中支持 Ollama、OpenAI、Anthropic、Google、Azure 和 Bedrock
+- **知识与 RAG**，提供 13 种向量数据库、8 种提取引擎，以及带重排序的混合搜索
+- **团队协作**，包括频道、模型智能体、RBAC、SSO/OIDC/LDAP 和 SCIM 2.0
+- **Open Terminal**，为代码执行提供完整的沙箱计算环境
+- **更简单的部署**，只需一个 Docker 容器即可开始
+
+---
+
+## 一览 {#at-a-glance}
+
+| | Open WebUI | Dify |
+| :--- | :--- | :--- |
+| **主要重点** | 具有知识、工具和团队功能的 AI 聊天平台 | 具有可视化工作流的 AI 应用程序构建工具 |
+| **设计思路** | 对话优先 | 构建优先 |
+| **工作流构建** | Python 工具和管道 | 可视化拖放工作流设计器 |
+| **RAG** | 13 种向量数据库、8 种提取引擎、混合搜索 | 内置 RAG 管道 |
+| **智能体能力** | 绑定了工具和知识的模型智能体 | 具有推理和工具使用能力的智能体框架 |
+| **多服务提供方** | 任意与 OpenAI 兼容的 API + Ollama | 支持模型路由的多服务提供方 |
+| **可观测性** | OpenTelemetry、分析仪表板 | 内置监控、日志记录和成本跟踪 |
+| **许可证** | Open WebUI 许可证 | 源码可用（修改版 Apache 2.0，含商业限制） |
+
+---
+
+## 如何选择 {#when-to-use-each}
+
+**如果你想通过可视化工作流构建 AI 驱动的应用程序，请选择 Dify。**拖放构建工具、提示词 IDE 和智能体框架专为正在创建 AI 功能而非仅进行聊天的开发者和产品团队而设计。
+
+**如果你的团队需要用于聊天、知识管理和协作的日常 AI 工作区，请选择 Open WebUI。**Open WebUI 专注于使用 AI，而不是构建 AI 应用程序。
+
+**两者结合使用。**Dify 提供与 OpenAI 兼容的 API。将 Open WebUI 连接到 Dify 的 API，你的 Dify 工作流就会作为模型显示在 Open WebUI 中。在 Dify 中构建，在 Open WebUI 中使用。
+
+---
+
+## 结合使用两者 {#use-them-together}
+
+Dify 为你构建的任何工作流或应用程序提供与 OpenAI 兼容的 API。你可以将 Open WebUI 连接到 Dify 的 API 端点，在 Open WebUI 中将用 Dify 构建的 AI 应用程序作为模型使用，从而把 Dify 的工作流编排与 Open WebUI 的聊天界面、知识管理和团队功能结合起来。
+
+**连接方法：**
+
+1. 在 Dify 中发布你的应用，并复制 API 端点和密钥
+2. 在 Open WebUI 中，前往**设置 → 连接**（管理员区域）
+3. 使用 Dify 的 API URL 和密钥添加新的 OpenAI 兼容连接
+4. 你的 Dify 应用将作为模型显示在 Open WebUI 中
+
+---
+
+*Dify 用于构建 AI 应用程序，Open WebUI 用于日常使用 AI。AI 生态系统既需要构建者，也需要使用者。*
+
+**准备好尝试 Open WebUI 了吗？**[快速上手 →](/getting-started)
+
+
+
+---
+
+## 常见问题 {#frequently-asked-questions}
+
+**Dify 和 Open WebUI 有何异同？**
+Dify 采用以工作流为先的可视化方式构建 AI 应用程序。Open WebUI 更侧重于对话和日常 AI 使用。两者从不同角度应用 AI，许多团队可以同时使用。
+
+**我可以将 Dify 与 Open WebUI 结合使用吗？**
+可以。Dify 提供与 OpenAI 兼容的 API。将 Open WebUI 连接到 Dify 的 API，即可在 Open WebUI 中将 Dify 工作流作为模型使用。
+
+**Dify 免费吗？**
+社区版可以免费自托管。Dify 采用修改版 Apache 2.0 许可证，以源码可用形式发布。
+
+---
+
+**相关内容：**[Open WebUI 与 Onyx](/alternatives/onyx) · [Open WebUI 与 LibreChat](/alternatives/librechat) · [Open WebUI 与 AnythingLLM](/alternatives/anythingllm)

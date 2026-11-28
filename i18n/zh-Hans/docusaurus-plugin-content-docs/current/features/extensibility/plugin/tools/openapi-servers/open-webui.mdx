@@ -1,0 +1,212 @@
+---
+sidebar_position: 1
+title: "Open WebUI 集成"
+---
+
+## 概述 {#overview}
+
+Open WebUI v0.6+ 支持通过 OpenAPI 服务器与外部工具无缝集成，这意味着你可以使用自定义或社区提供的工具服务器，轻松扩展 LLM 工作流程。
+
+本指南将介绍如何启动兼容 OpenAPI 的工具服务器，并通过直观的用户界面将其连接到 Open WebUI。让我们开始吧！
+
+:::tip 选择能够可靠使用工具的模型
+外部工具依赖模型来选择工具、生成有效参数并解释响应。支持工具调用并不保证能够做好。如果已连接并启用的工具被忽略或使用不当，请先**尝试原生工具调用能力可靠的更强模型**，再假定问题出在 Open WebUI。这适用于 OpenAPI 工具、原生 MCP 连接以及通过 `mcpo` 公开的 MCP 工具。
+:::
+
+---
+
+## 第 1 步：启动 OpenAPI 工具服务器 {#step-1-launch-an-openapi-tool-server}
+
+首先，需要启动 [openapi-servers 仓库](https://github.com/open-webui/openapi-servers)中提供的一个参考工具服务器。为了快速测试，我们以 time 工具服务器为例。
+
+示例：在本地启动 `time` 服务器
+
+```bash
+git clone https://github.com/open-webui/openapi-servers
+cd openapi-servers
+
+# 进入 time 服务器目录
+cd servers/time
+
+# 安装所需依赖
+pip install -r requirements.txt
+
+# 启动服务器
+uvicorn main:app --host 0.0.0.0 --reload
+```
+
+运行后，它将在 http://localhost:8000 托管一个本地 OpenAPI 服务器，你可以将 Open WebUI 指向该地址。
+
+![Time 服务器](/images/openapi-servers/open-webui/time-server.png)
+
+---
+
+## 第 2 步：在 Open WebUI 中连接工具服务器 {#step-2-connect-tool-server-in-open-webui}
+
+接下来，将正在运行的工具服务器连接到 Open WebUI。注册工具服务器有两种方式：
+
+#### 1. 由管理员添加的工具服务器 {#1-tool-servers-added-by-an-admin}
+
+管理员可添加共享工具服务器，供部署中的所有用户或指定用户使用：
+
+1. 打开**设置 > 集成**（管理员区域），进入**工具**部分。
+2. 点击加号按钮，添加新的工具服务器。
+3. 输入 OpenAPI 工具服务器的运行 URL（例如 `http://localhost:8000`）。
+4. 点击**保存**。
+
+![设置页面](/images/openapi-servers/open-webui/settings.png)
+
+对这些服务器的请求由 Open WebUI 后端发送，因此后端必须能够访问该 URL。`localhost` 指的是后端服务器。如果后端在 Docker 中运行，容器内的 `localhost` 无法访问宿主机，因此请改用 `host.docker.internal` 或计算机的实际 IP。如果工具服务器在同一 Docker 网络中的另一个容器内运行，请使用其服务名称及其在容器内监听的端口，例如 `http://time-server:8000`，而不是 `localhost` 或发布到宿主机的端口。请参阅 Docker 的 [Compose 网络](https://docs.docker.com/compose/how-tos/networking/)。只公开可安全供多个用户使用的端点。
+
+#### 2. 在 Tether 中添加的工具服务器 {#2-tool-servers-added-in-tether}
+
+用户在 Tether 应用中添加自己的 OpenAPI 工具服务器。这些服务器仅对添加它们的用户可见，通过该用户计算机上的 Tether 访问，并显示在 **+** 菜单的**工具**列表中的**你的设备**下。请参阅[自带模型和工具](/ecosystem/tether#bring-your-own-models-and-tools)。
+
+### 可选：在 mcpo 中使用配置文件 {#optional-using-a-config-file-with-mcpo}
+
+如果你使用配置文件通过 mcpo 运行多个工具，请注意：
+
+每个工具都挂载在各自独立的路径下！
+
+例如，如果通过 mcpo 同时使用 memory 和 time 工具，它们将分别通过不同的路由提供：
+
+- http://localhost:8000/time
+- http://localhost:8000/memory
+
+这意味着：
+
+- 在 Open WebUI 中连接工具时，必须输入该特定工具的完整路由。不要只输入根 URL（[http://localhost:8000](http://localhost:8000)）。
+- 在**设置 > 集成**（管理员区域）下，使用各自的子路径 URL 逐个添加工具。
+
+![MCPO 配置工具设置](/images/openapi-servers/open-webui/mcpo-config-tools.png)
+
+正确：
+
+http://localhost:8000/time
+http://localhost:8000/memory
+
+无效：
+
+http://localhost:8000
+
+这样可以确保 Open WebUI 正确识别每个工具服务器并与之通信。
+
+---
+
+:::info 转发 Cookie
+
+**高级 > 转发 Cookie** 决定是否将浏览器请求中的 Cookie 继续发送到此服务器。该选项默认关闭。
+
+仅对你控制的服务器启用它，且该服务器通常位于你自己的网络内、使用相同的登录系统，并通过 Cookie 验证请求背后的用户身份。浏览器为你的 Open WebUI 域保存的所有内容都会随请求发送，包括会话 Cookie，因此绝不应为第三方端点启用此选项。
+
+**此行为已更改：**使用 **Session** 或 **System OAuth** 身份验证类型的连接过去会无条件转发 Cookie，现在不再如此。如果此类连接在升级后无法通过身份验证，请启用此选项。
+
+:::
+
+## 第 3 步：确认工具服务器已连接 {#step-3-confirm-your-tool-server-is-connected}
+
+当聊天已选择工具，并且**设置 > 界面**中的**显示输入选择项**已开启时，消息输入框中的 **+** 按钮旁会显示工具指示器：
+
+![工具服务器指示器](/images/openapi-servers/open-webui/message-input.png)
+
+点击此图标会打开一个弹出窗口，你可以在其中：
+
+- 查看为聊天选择的工具及其来源工具服务器
+- 展开 MCP 服务器，实时加载其工具名称和描述
+- 检查每台服务器是已连接还是显示**需要身份验证**，并使用**重新连接**再次登录
+
+转发用户 SSO 令牌（**System OAuth**）的工具服务器，在 SSO 会话失效后，会在 **+ > 工具** 下显示为需要登录。选择其中一台服务器会将用户带到登录页面。
+
+要断开 MCP 服务器的 OAuth 连接，请在消息输入框的 **+ > 工具** 下，使用工具旁边的**断开 OAuth 连接**。
+
+工具信息模态框如下所示：
+
+![展开的工具信息模态框](/images/openapi-servers/open-webui/info-modal.png)
+
+### 全局工具服务器外观不同，并且默认隐藏！ {#global-tool-servers-look-different-and-are-hidden-by-default}
+
+如果你连接了全局工具服务器（即由管理员配置的服务器），它不会自动显示在输入区域中。
+
+而是：
+
+- 全局工具默认隐藏，每位用户必须明确启用。
+- 要启用它们，需要打开消息输入区域中的 **+** 菜单，选择**工具**，然后手动开启要使用的特定全局工具。
+- 如果希望在某个模型的每次新聊天中都启用某个工具，请在模型编辑器（**工作区 > 模型**）中将它添加到该模型的**工具**列表。对于有权访问该工具服务器的用户，与此模型开始的每次新聊天都会默认启用它。用户仍可在聊天中将其关闭。
+
+界面如下所示：
+
+![全局工具服务器消息输入区域](/images/openapi-servers/open-webui/global-message-input.png)
+
+全局工具服务器的重要注意事项：
+
+- 在通过 **+** 菜单启用之前，它们不会显示在工具指示器弹出窗口中。
+- 除非模型已将其列入自己的**工具**列表，否则必须分别开启每个全局工具，才能在当前聊天中激活。
+- 管理员可以通过基于角色的权限控制对全局工具的访问。
+
+这非常适合团队或共享环境，在这类环境中，常用工具（例如文档搜索、记忆或 Web 查询）应集中提供给多个用户使用。
+
+---
+
+## （可选）第 4 步：选择函数调用模式 {#optional-step-4-choosing-the-function-calling-mode}
+
+原生函数调用是默认模式，无需额外开启。模型使用其自身内置的工具调用能力，因此需要模型真正支持该能力。一些本地模型声称支持，但实际效果很差，因此在有条件时，请优先选择原生工具调用能力可靠的模型。
+
+`Legacy` 是另一种选择：Open WebUI 将工具定义注入提示词，并在生成前调用一次工具。它适用于更广泛的模型，但代价是只能进行这一轮工具调用；而 Native 会持续调用工具，直到模型完成。
+
+切换模式的方法：
+
+1. 打开聊天窗口。
+2. 打开消息输入框旁的**模型控制 > 控制 > 高级参数**。
+3. 设置**函数调用**参数。`Default` 与 `Native` 的行为相同，`Legacy` 选择提示词注入。
+
+![原生工具调用](/images/openapi-servers/open-webui/native.png)
+
+---
+
+## 需要更多工具？探索并扩展！ {#need-more-tools-explore--expand}
+
+[openapi-servers 仓库](https://github.com/open-webui/openapi-servers)包含多种实用的参考服务器：
+
+- 文件系统访问
+- 记忆与知识图谱
+- Git 仓库浏览
+- Web 搜索（开发中）
+- 数据库查询（开发中）
+
+你可以按照相同方式运行其中任意服务器，并重复上述步骤将其连接到 Open WebUI。
+
+---
+
+## 故障排除与提示 {#troubleshooting--tips}
+
+### 工具已启用，但模型未正确使用 {#tools-are-enabled-but-the-model-does-not-use-them-correctly}
+
+如果模型未调用所需工具便直接回答、虚构工具结果、提供无效参数或中途停止任务，原因可能是模型能力。Open WebUI 负责提供工具并执行调用，如何使用工具则由模型决定。
+
+1. 确认当前聊天已启用该工具，并且所选模型支持原生工具调用。
+2. 开始一次新聊天，只启用一个简单请求所需的工具，例如让 time 工具返回当前时间。
+3. 保持工具和服务器配置不变，使用能力更强的模型重复相同请求。如果该模型成功，则原模型或其服务配置很可能是原因。即使简单调用可以成功，多步骤工作流程也可能需要更强的模型。
+
+连接失败、身份验证错误和工具服务器错误仍需分别排查，切换模型无法修复这些问题。有关模型选择的更多信息，请参阅[模型要求与注意事项](/features/extensibility/plugin/tools#model-requirements--caveats)。
+
+### 添加 URL 后立即连接失败 {#connection-fails-immediately-after-adding-the-url}
+
+**检查协议（HTTP 与 HTTPS）。**大多数本地工具服务器不使用 TLS，因此 URL 需要使用普通的 `http://`，例如 `http://localhost:8000`。
+
+**检查端口号。**默认端口因服务器而异。例如，uvicorn 默认使用 `8000`，而 Open Terminal 默认使用 `8888`。请确保 URL 中的端口与工具服务器实际监听的端口一致。
+
+### 服务器正在运行，但连接仍然失败 {#connection-fails-even-though-the-server-is-running}
+
+**明确“localhost”指的是哪台计算机。**这是最常见的连接问题。请求由后端发送，因此 `localhost` 和 `host.docker.internal` 遵循[管理员添加的服务器](#1-tool-servers-added-by-an-admin)规则。如果工具服务器在另一台计算机上运行，请确保它绑定到 `0.0.0.0`。
+
+### 工具列表中缺少某些端点 {#some-endpoints-are-missing-from-the-tool-list}
+
+Open WebUI 会将 OpenAPI 规范中每个具有 `operationId` 的操作转换为工具，并将 `operationId` 用作工具名称。没有 `operationId` 的操作会被省略，且不会显示错误或记录日志。请为模型需要调用的每个端点设置唯一的 `operationId`。
+
+### 通用提示 {#general-tips}
+
+- 如果使用远程服务器，请检查防火墙和 HTTPS 配置。
+- 要使服务器在重启后仍然运行，可以考虑将其部署在 Docker 中或配置为系统服务。
+- 如果不确定，请尝试从发送请求的计算机（即 Open WebUI 后端主机）打开工具服务器 URL（例如 `http://localhost:8000/docs`）。
+
+需要帮助？请访问[讨论页面](https://github.com/open-webui/openapi-servers/discussions)或[提交问题](https://github.com/open-webui/openapi-servers/issues)。

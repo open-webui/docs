@@ -1,0 +1,580 @@
+---
+sidebar_position: 3
+title: "文档检索（RAG）故障排除"
+sidebar_label: "RAG"
+description: "诊断 Open WebUI 中文档答案缺失、上传失败、上下文限制和知识检索问题。"
+---
+
+如果模型无法从你的文档中找到答案，请检查文件是否已完成处理、对话是否可以访问这些文件，以及模型是否具备检索其内容所需的工具和上下文。本指南介绍上传失败、检索设置和模型特定的上下文限制。
+
+本页介绍最常见的 RAG 问题及其解决方法。
+
+---
+
+## 按场景推荐的设置 {#recommended-settings-by-scenario}
+
+RAG 性能在很大程度上取决于模型配置。默认设置较为保守，可在各种环境中工作，但根据具体部署进行调优会获得更好的效果。以下所有设置均在 **设置 > 文档**（管理员区域）中配置。
+
+:::tip 智能体检索：启用 kb_exec
+如果模型使用**原生函数调用**，请设置 [`ENABLE_KB_EXEC=True`](/reference/env-configuration#enable_kb_exec)，以显著改善知识库体验。它为模型提供面向知识的文件系统式接口（`ls`、`tree`、`grep`、`cat`、按行读取），能力较强的模型通常能更可靠地串联这些操作，而不是使用单独的搜索工具。此设置在旧版模式下无效。请参阅[文件系统式访问](/features/workspace/knowledge#filesystem-style-access-kb_exec)。
+:::
+
+### 上下文受限的本地模型（≤ 8K token） {#local-models-with-constrained-context--8k-tokens}
+
+适用于消费级硬件上的 Ollama 模型（Qwen 3.5 4B、Gemma 4 12B、Muse Glimmer 30B 等），这些模型的上下文窗口有限。
+
+| 设置 | 值 | 原因 |
+|---------|-------|-----|
+| **文本分割器** | `token` | 分块大小一致，并与实际 token 数量对齐 |
+| **Markdown 标题文本分割器** | **开启** | 保留文档结构 |
+| **分块大小** | `1000` | 较小的分块可让每个检索结果轻松放入上下文 |
+| **分块重叠** | `100` | 标准重叠量 |
+| **Top K** | `3` 到 `5` | 减少分块数量，避免耗尽有限的上下文预算 |
+| **始终使用全文** | 关闭 | 无法承担发送完整文档的开销 |
+
+:::tip 上下文预算计算
+当分块大小为 1000 token、Top K 为 5 时，RAG 将注入约 5,000 token 的检索内容。启用混合搜索后，**Top K Reranker** 决定有多少分块会送达模型，因此应使用该值进行计算。再加上系统提示词和对话历史。如果模型具有 8K 上下文窗口，那么对话本身只剩约 2K 到 3K token。如果后续问题被截断，请调低 Top K。
+:::
+
+### 具有大上下文的云端模型（32K+ token） {#cloud-models-with-large-context-32k-tokens}
+
+适用于 OpenAI（GPT-5.6）、Anthropic（Claude）、Google（Gemini）、DeepSeek 及其他 API 服务提供方，其上下文窗口为 32K 到 1M+ token。
+
+| 设置 | 值 | 原因 |
+|---------|-------|-----|
+| **文本分割器** | `token` | 分块大小一致 |
+| **Markdown 标题文本分割器** | **开启** | 保留文档结构 |
+| **分块大小** | `2000` | 较大的分块可为每次命中保留更多周边上下文 |
+| **分块重叠** | `200` | 更多重叠可避免句子被拆开 |
+| **Top K** | `15` 到 `25` | 扩大检索范围，充足的上下文预算可以支持 |
+| **始终使用全文** | 小型文档可考虑开启 | 如果文档少于约 20K token，全文的效果可能优于检索。**全文阈值**（以字符或 token 为单位）决定在未开启该选项时，哪些文件仍会完整纳入 |
+
+:::tip 何时使用全文
+如果你正在处理单篇中小型文档（少于约 50 页），并使用大上下文模型，全文通常比分块检索效果更好，因为模型可以看到所有内容，不存在检索遗漏。若只对一个文件这样做，请开启附件的**全文**开关；若要对所有文件这样做，请在**设置** > **文档**（管理员区域）中开启**始终使用全文**。
+:::
+
+### 混合环境（本地 + 云端） {#mixed-environment-local--cloud}
+
+如果同时使用本地模型和云端模型，请按两者中能力较低的一方进行配置，再按模型或按对话覆盖设置：
+
+| 设置 | 值 | 原因 |
+|---------|-------|-----|
+| **文本分割器** | `token` | 两者均适用 |
+| **Markdown 标题文本分割器** | **开启** | 两者均适用 |
+| **分块大小** | `1500` | 折中值，对本地模型不会太大，对云端模型不会太小 |
+| **分块重叠** | `200` | 稳妥的默认值 |
+| **Top K** | `10` | 适中的值，适合混合使用模型的中间方案 |
+
+---
+
+## 嵌入模型建议 {#embedding-model-recommendations}
+
+嵌入模型决定检索质量。正确的选择取决于你的部署方式：
+
+| 场景 | 推荐 | 原因 |
+|----------|-------------|-----|
+| **单用户，刚开始使用** | `all-MiniLM-L6-v2`（默认） | 在本地运行，无需额外设置 |
+| **多用户，可使用 Ollama** | 通过 Ollama 使用 `nomic-embed-text` | 将工作卸载到 Ollama，释放 Open WebUI 内存 |
+| **生产环境，有 API 预算** | 通过 OpenAI 使用 `text-embedding-3-small` | 单位成本可获得最佳检索质量 |
+| **物理隔离 / 自托管** | 通过 Ollama 使用 `nomic-embed-text` 或 `mxbai-embed-large` | 无需调用外部 API |
+
+更改嵌入模型后，请在 **设置 > 文档**（管理员区域）中**重新索引所有现有文档**，使新的嵌入生效。
+
+---
+
+## 常见 RAG 问题及解决方法 {#common-rag-issues-and-how-to-fix-them}
+
+### 1. 模型“看不到”你的内容 {#1-the-model-cant-see-your-content}
+
+这是最常见的问题，通常由内容导入过程中的问题引起。模型产生幻觉并非因为模型本身有误，而是因为它一开始就没有获得正确的内容。
+
+**解决方法：**检查内容提取设置。
+
+- 导航至：**设置 > 文档**（管理员区域）。
+- 确保使用可靠的内容提取引擎，例如：
+  - Apache Tika
+  - Docling
+  - 自定义提取器（取决于文档类型）
+
+:::tip
+
+尝试上传文档并预览提取的内容。如果内容为空或缺少关键部分，则需要调整提取器设置或更换引擎。
+
+:::
+
+---
+
+### 2. 只使用了文档的一小部分 {#2-only-a-small-part-of-the-document-is-being-used}
+
+Open WebUI 默认面向上下文窗口有限的模型。例如，Ollama 会根据可用显存选择模型的默认上下文长度；在显存小于 24 GiB 的 GPU 上，该长度为 4096 token（请参阅 [Ollama 上下文长度文档](https://docs.ollama.com/context-length)），远低于大多数模型支持的长度。Open WebUI 不会测量模型的上下文，也不会裁剪检索内容以适应该上下文。它会注入 Top K 个检索分块（默认 10 个），因此只有文档的这些部分会送达模型，而较小的上下文窗口甚至可能截断这些分块。
+
+**解决方法：**
+
+- 转到 **设置 > 文档**（管理员区域）
+- 选择以下任一方式：
+  - **启用“绕过嵌入和检索”**：直接发送完整内容，不应用检索过滤。
+  - **开启“始终使用全文”**：将更全面的内容注入模型提示词。
+
+:::warning
+
+请注意上下文限制：如果模型无法处理更多 token，内容仍会被截断。
+
+:::
+
+---
+
+### 3. Token 上限太小 {#3-token-limit-is-too-short}
+
+即使检索正常工作，模型仍可能无法处理接收到的全部内容，因为它根本不具备这样的处理能力。
+
+默认情况下，在显存小于 24 GiB 的 GPU 上，Ollama 托管的模型使用 4096 token 的上下文窗口（Ollama 根据可用显存选择默认值：小于 24 GiB 时为 4096，24 到 48 GiB 时为 32768，48 GiB 及以上时为 262144）。这意味着实际只会使用检索数据中的一小部分。
+
+**为什么网络搜索尤其需要更大的上下文窗口：**
+网页对小上下文窗口尤其具有挑战性，因为其内容远多于一般文档。单个网页通常包括：
+- 主要内容（你真正需要的信息）
+- 导航菜单、页眉和页脚
+- 侧边栏内容和广告
+- 评论区和相关链接
+- 元数据和嵌入脚本
+
+即使经过内容提取和清理，网页也很容易占用 4,000–8,000+ token 的上下文。在 4096 token 的限制下，你通常只能获得一半内容，并错过页面后面最相关的信息。对于全面的网页内容分析，4096 token 往往也不够。
+
+**解决方法：**
+
+- **对于 Ollama 模型**：扩展模型的上下文长度：
+  - 导航至：**设置 > 模型**（管理员区域），然后点击要修改模型上的铅笔（**编辑**）图标
+  - 转到 **高级参数**
+  - 修改上下文长度（例如，增加到 8192+；如果模型支持，最好超过 16000 token）
+
+- **对于 OpenAI 及其他集成模型**：这些模型通常有各自的上下文限制，无法通过 Open WebUI 设置修改。请确保使用上下文长度足够的模型。
+
+在较小 GPU 上，Ollama 默认的 4096 token 是网络搜索的重要限制因素。为了获得更好的网页 RAG 效果，请至少使用 8192 token；对于复杂网页，16384+ 更为理想。
+
+**替代方案：**使用上下文容量更大的外部 LLM（例如具有 8k+ 上下文的 GPT-5.6、Claude、Gemini）。将结果与大上下文模型进行比较，是判断 token 上限是否构成瓶颈的好方法。
+
+:::tip
+
+对于生产环境中的网络搜索和复杂文档分析，请使用支持 8192+ token 上下文的模型。
+
+:::
+
+---
+
+### 4. 嵌入模型质量低或不匹配 {#4-embedding-model-is-low-quality-or-mismatched}
+
+嵌入质量差会导致检索质量差。如果内容的向量表示不佳，无论 LLM 多强大，检索器都无法提取正确的内容。
+
+**解决方法：**
+
+- 更换为高质量嵌入模型（例如 all-MiniLM-L6-v2、Instructor X 或 OpenAI embeddings）
+- 转到：**设置 > 文档**（管理员区域）
+- 更改模型后，**重新索引所有现有文档**，使新的嵌入生效。嵌入质量会直接影响检索到的内容。
+
+---
+
+### 5. 400 错误：'NoneType' object has no attribute 'encode' {#5-400-nonetype-object-has-no-attribute-encode}
+
+此错误表示嵌入模型配置错误或缺失。当 Open WebUI 尝试创建嵌入，但没有加载有效模型时，就无法处理文本，并产生这个难以理解的错误。
+
+**原因：**
+- 嵌入模型未正确设置。
+- 模型可能未完整下载。
+- 如果使用外部嵌入模型，该模型可能无法访问。
+
+**解决方法：**
+
+- 转到：**设置 > 文档 > 嵌入模型**（管理员区域）
+- 即使已经选择了嵌入模型，也请再次保存。这会强制重新检查或下载。
+- 如果使用远程或外部嵌入工具，请确保其正在运行且 Open WebUI 可以访问。
+
+:::tip
+
+修复配置后，尝试重新嵌入一篇文档，并确认日志中未显示错误。
+
+:::
+
+---
+
+### 6. 上传限制与约束 {#6-upload-limits-and-restrictions}
+
+Open WebUI 实施了多种限制，以确保系统稳定并防止滥用。了解这些限制如何应用于不同的上传方式非常重要：
+
+*   **聊天上传：**受全局文件大小和数量限制。
+    *   **最大文件大小：**由 `RAG_FILE_MAX_SIZE` 控制（默认：无限制）。可在 **设置 > 文档 > 文件 > 最大上传大小**（管理员区域）中配置。
+    *   **Office 和 EPUB 文档**还会根据其所含内容进行额外检查，因为这些格式属于归档文件。如果解压后的内容远大于文件本身，即使文件很小，也会因解压后归档过大而被拒绝。正常文档很少触发此限制；触发的文档要么已损坏，要么就是旨在耗尽打开它的设备的内存。
+    *   **最大文件数量：**由 `RAG_FILE_MAX_COUNT` 控制（默认：无限制）。可在 **设置 > 文档 > 文件 > 最大上传数量**（管理员区域）中配置。
+    *   **允许的文件扩展名：**由 `RAG_ALLOWED_FILE_EXTENSIONS` 控制（默认：全部）。可在 **设置 > 文档 > 文件 > 允许的文件扩展名**（管理员区域）中配置。
+*   **文件夹上传：**受 `FOLDER_MAX_FILE_COUNT` [环境变量](/reference/env-configuration/#folder_max_file_count)限制（默认无限制；仅浏览器强制执行）。此限制适用于直接与文件夹关联的文件数量。
+*   **知识库上传：**
+    *   **文件限制：**受 `RAG_FILE_MAX_SIZE` 和知识库[文件限制](/features/workspace/knowledge#file-limits)约束。
+    *   **向量索引：**默认情况下，Open WebUI 会在文件添加到知识库时为其建立索引。**设置 > 文档**（管理员区域）中的**绕过嵌入和检索**会同时跳过聊天上传文件和知识库新增文件的向量索引。Open WebUI 仍会从上传的文档中提取并存储文本。
+    *   **全文附件：**若要在保留索引的同时对单个附件使用全文，请点击聊天中的附件并开启**全文**。对于由文件组成的知识库，全文模式可以包含集合中每个文件提取出的文本。请根据模型的上下文预算检查合并后的文本量。
+
+:::info
+通过分离这些限制，管理员可以更好地管理不同功能的资源使用。例如，你可能希望允许在精选知识库中上传较大的文件，同时限制临时文件夹上传中的文件数量。
+:::
+
+---
+
+### 7. 分块零碎或过小 {#7-fragmented-or-tiny-chunks}
+
+使用 **Markdown 标题文本分割器**时，文档有时会被拆成非常小的片段（例如仅包含一个目录条目或一个简短的子标题）。这些小分块通常缺乏足够的语义上下文，嵌入模型无法准确表示它们，从而导致 RAG 效果不佳并产生不必要的开销。
+
+**解决方法：**
+
+- 转到 **设置 > 文档**（管理员区域）。
+- 增大**分块最小大小目标**。
+- 将其设置为**分块大小**的约 50–60%（例如分块大小为 `2000` 时设置为 `1000`），可将小片段与相邻分块合并，从而获得更好的语义连贯性并减少分块总数。
+
+---
+
+### 8. 后续响应缓慢（KV 缓存失效） {#8-slow-follow-up-responses-kv-cache-invalidation}
+
+如果首次响应很快，但后续问题变得越来越慢，那么你很可能遇到了 **KV 缓存失效**。
+
+**问题**：默认情况下，Open WebUI 将 RAG 上下文注入**用户消息**。随着聊天继续，新消息会改变此上下文的位置，迫使模型（如 Ollama、llama.cpp 或 vLLM）和云服务提供方（如 OpenAI 或 Vertex AI）在每轮重新处理整个上下文。
+
+**解决方法：**
+- 将环境变量设置为 `RAG_SYSTEM_CONTEXT=True`。
+- 这会将 RAG 上下文注入**系统消息**，使其固定在对话开头。
+- 这样，服务提供方就能有效使用 **KV 前缀缓存**或**提示词缓存**，即使处理大型文档，后续响应也几乎是即时的。
+
+---
+
+| 问题 | 解决方法 |
+|--------|------|
+| 模型无法“看到”内容 | 检查文档提取器设置 |
+| 只使用了部分内容 | 启用“始终使用全文”或“绕过嵌入” |
+| 受较小上下文长度限制 | 增加模型上下文长度或使用大上下文 LLM |
+| 检索不准确 | 切换到更好的嵌入模型，然后重新索引 |
+| 绕过上传限制 | 使用文件夹上传（受 `FOLDER_MAX_FILE_COUNT` 限制）；知识库限制独立计算 |
+| 分块零碎或过小 | 增大**分块最小大小目标**以合并小部分 |
+| 后续响应缓慢 | 启用 `RAG_SYSTEM_CONTEXT=True` 以解决 KV 缓存失效 |
+| API 返回“empty content” | 等待文件处理完成后再添加到知识库 |
+| 嵌入期间 CUDA OOM | 减小批大小、隔离 GPU 或重启容器 |
+| 大型上传嵌入缓慢 | 提高**嵌入批大小**、使用外部嵌入引擎或绕过嵌入 |
+| 混合搜索没有变化 | 设置 `GLOBAL_LOG_LEVEL=DEBUG`，并检查重排序模型和端点 |
+| 未提取 PDF 图像 | 使用 Tika/Docling、启用 OCR 或更新 pypdf |
+| 上传期间工作进程立即退出 | 在多副本或多工作进程部署中弃用默认 ChromaDB（SQLite） |
+| 上传期间工作进程超时退出 | 更新 Open WebUI，或增大 `--timeout-worker-healthcheck` |
+| 模型忽略附加的知识库 | 启用内置工具、添加系统提示词提示，或在聊天中附加小文档并开启其“全文”开关 |
+| 单个附加文件未返回任何内容 | 重新索引以重建单文件索引 |
+| Docling 引用显示错误页码 | [重新索引或重新上传文件](/features/chat-conversations/rag/document-extraction/docling#citations-point-to-the-wrong-page) |
+
+---
+
+### 9. API 文件上传：“The content provided is empty”错误 {#9-api-file-upload-the-content-provided-is-empty-error}
+
+通过 API 上传文件并立即将其添加到知识库时，你可能会遇到：
+
+```
+400: The content provided is empty. Please ensure that there is text or data present before proceeding.
+```
+
+**问题**：这是一个**竞态条件**。文件包含内容，但提取尚未完成。默认情况下，文件上传以异步方式处理：上传端点立即返回文件 ID，而内容提取和嵌入计算在后台进行。如果在处理完成前尝试将文件添加到知识库，系统就会看到空内容。
+
+**解决方法：等待处理完成**
+
+将文件添加到知识库之前，请轮询状态端点，直到处理完成：
+
+```python
+import requests
+import time
+
+def wait_for_processing(token, file_id, timeout=300):
+    url = f'http://localhost:3000/api/v1/files/{file_id}/process/status'
+    headers = {'Authorization': f'Bearer {token}'}
+
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        response = requests.get(url, headers=headers)
+        status = response.json().get('status')
+
+        if status == 'completed':
+            return True
+        elif status == 'failed':
+            raise Exception(f"Processing failed: {response.json().get('error')}")
+
+        time.sleep(2)  # 每 2 秒轮询一次
+
+    raise TimeoutError("File processing timed out")
+```
+
+**状态值：**
+| 状态 | 含义 |
+|--------|---------|
+| `pending` | 等待处理 |
+| `processing` | 正在进行内容提取和嵌入 |
+| `completed` | 处理已完成，包括与知识库建立关联 |
+| `failed` | 处理失败（检查 error 字段） |
+
+:::tip
+有关包含正确状态检查的完整 API 工作流示例，请参阅 [API 端点文档](/reference/api-endpoints#checking-file-processing-status)。
+:::
+
+---
+
+### 10. 嵌入期间 CUDA 内存不足 {#10-cuda-out-of-memory-during-embedding}
+
+处理大型文件或连续处理大量文件时，你可能会遇到如下 CUDA OOM 错误：
+
+```
+CUDA out of memory. Tried to allocate X MiB. GPU has a total capacity of Y GiB of which Z MiB is free.
+```
+
+**常见原因：**
+- 嵌入模型与聊天模型争用 GPU 内存
+- 反复进行小规模分配导致 PyTorch 内存碎片化
+- 大型文档在嵌入期间造成内存峰值
+
+**解决方法：**
+
+1. **将嵌入隔离到另一块 GPU**（如果可用）：
+   设置 `CUDA_VISIBLE_DEVICES`，将嵌入固定到与聊天模型不同的特定 GPU。
+
+2. **减小嵌入批大小**：
+   如果调大了 `RAG_EMBEDDING_BATCH_SIZE`（默认值为 1；`RAG_RERANKING_BATCH_SIZE` 的默认值为 32），请再次调低，以降低峰值内存使用量。
+
+3. **启用可扩展段**：
+   设置以下环境变量以减少碎片化：
+   ```
+   PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+   ```
+
+4. **在大型导入任务之间重启**：
+   如果内存碎片不断累积，请重启 Open WebUI 容器以清除 CUDA 上下文。
+
+5. **使用较小的嵌入模型**：
+   批量导入时可考虑使用轻量级嵌入模型，生产查询时再切换到质量更高的模型。
+
+6. **将导入与聊天分开**：
+   大型导入任务期间不要运行聊天模型。嵌入完成后再加载聊天模型。
+
+---
+
+### 10b. 嵌入期间出现 429 速率限制错误 {#10b-429-rate-limit-errors-during-embedding}
+
+使用**远程或外部嵌入服务提供方**（OpenAI、Azure OpenAI 等）并启用 [`ENABLE_ASYNC_EMBEDDING`](/reference/env-configuration#enable_async_embedding) 时，批量导入文档期间日志中可能出现 HTTP 429 “Too Many Requests”错误：
+
+```
+aiohttp.client_exceptions.ClientResponseError: 429, message='Too Many Requests', url='https://api.openai.com/v1/embeddings'
+```
+
+**问题**：启用异步嵌入后，Open WebUI 会并发发送嵌入请求。如果一次导入大量文档或大型文档，就很容易超过服务提供方的 API 速率限制，在免费套餐或较低级别套餐上尤其如此。
+
+**解决方法：**
+
+1. **限制并发嵌入请求数**：
+   设置 [`RAG_EMBEDDING_CONCURRENT_REQUESTS`](/reference/env-configuration#rag_embedding_concurrent_requests)，限制同时进行的嵌入 API 调用数。例如，根据服务提供方的速率限制将其设置为 `5` 或 `10`：
+   ```yaml
+   # docker-compose.yaml
+   environment:
+     RAG_EMBEDDING_CONCURRENT_REQUESTS: 5
+   ```
+   也可以在 **设置 > 文档 > 嵌入并发请求数**（管理员区域）字段中配置，该字段会在使用 Ollama、OpenAI 和 Azure OpenAI 嵌入引擎时显示。默认值 `0` 表示不限制并发数。
+
+2. **减小批大小**：
+   调低 [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size)，减少每次 API 调用发送的文本数。
+
+3. **禁用异步嵌入**：
+   如果速率限制问题仍然存在，请将 `ENABLE_ASYNC_EMBEDDING` 设置为 `False`，按顺序处理嵌入（速度较慢，但可避免速率限制压力）。
+
+### 11. PDF OCR 未从图像中提取文本 {#11-pdf-ocr-not-extracting-text-from-images}
+
+如果包含文字图像的 PDF 返回空内容：
+
+**问题**：默认的“pypdf”内容提取器可能难以处理某些 PDF 格式，尤其是主要包含图像内容的 PDF。
+
+默认提取器只读取每页的文本层。**PDF 提取图像（OCR）**默认关闭，因此扫描页不会产生文本。如果每页都为空，上传将失败并显示 `The content provided is empty. Please ensure that there is text or data present before proceeding.`。如果至少一页包含文本，则上传成功，扫描页会在没有任何错误提示的情况下从搜索结果中缺失。
+
+开启 **PDF 提取图像（OCR）**后，默认提取器无法解码的图像将被跳过，服务器日志会显示 `Skipping unreadable PDF image`，随后显示图像名称和错误。文件的其余部分仍会被处理。对于遇到此问题的扫描 PDF，请改用自带 OCR 的内容提取引擎。
+
+**解决方法：**
+
+1. **使用其他内容提取引擎**：
+   - 导航至 **设置 > 文档**（管理员区域）
+   - 尝试使用 **Apache Tika** 或 **Docling**，以获得更好的 OCR 支持
+
+2. **启用 PDF 图像提取**：
+   - 在 **设置 > 文档**（管理员区域）中，确保已启用 **PDF 提取图像（OCR）**
+   - OCR 每次上传使用一个处理器线程。在空闲的多核服务器上，可提高 [`RAPIDOCR_PARAMS`](/reference/env-configuration#rapidocr_params) 中的 `intra_op_num_threads`，加快单次上传的 OCR 速度。
+
+3. **更新 pypdf**（如果使用默认引擎）：
+   近期的 pypdf 版本（6.0.0+）改进了对各种 PDF 格式的处理。每个 Open WebUI 版本都会固定其 pypdf 版本，因此更新 pypdf 意味着更新 Open WebUI
+
+4. **检查 PDF 是否损坏**：
+   上传前，确认 PDF 可以在标准 PDF 查看器中正常打开
+
+---
+
+### 12. 文档上传期间工作进程退出 {#12-worker-dies-during-document-upload}
+
+在具有多个副本或工作进程的部署中上传文档时，你可能会看到：
+
+```
+INFO:     Waiting for child process [12]
+INFO:     Child process [12] died
+```
+
+原因是使用**默认 ChromaDB** 向量数据库，同时设置了 `UVICORN_WORKERS > 1` 或使用多个副本。嵌入式 ChromaDB 将数据保存在只允许一个进程写入的本地 SQLite 文件中。多个进程同时写入时就会崩溃。你通常会在同一秒内看到以下日志模式：
+
+```
+save_docs_to_vector_db:1573 - adding to collection file-id
+INFO:     Waiting for child process [pid]
+INFO:     Child process [pid] died
+```
+
+**解决方法：**设置 `UVICORN_WORKERS=1`，并通过副本进行扩展。如果使用多个副本，请弃用嵌入式 ChromaDB：
+- 将 [`VECTOR_DB`](/reference/env-configuration#vector_db) 设置为 `pgvector`、`mariadb-vector`、`milvus` 或 `qdrant`
+- 或者将 ChromaDB 作为独立的 HTTP 服务器运行，并设置 [`CHROMA_HTTP_HOST`](/reference/env-configuration#chroma_http_host) / [`CHROMA_HTTP_PORT`](/reference/env-configuration#chroma_http_port)
+
+完整详情见[扩展与高可用指南](/troubleshooting/multi-replica#6-worker-crashes-during-document-upload-chromadb--multi-worker)。
+
+---
+
+### 13. 附加到模型的知识库不起作用 {#13-knowledge-base-attached-to-model-not-working}
+
+你已在 **设置 > 模型 > 编辑**（管理员区域）（自己的模型则在 **工作区 > 模型**）中将知识库附加到模型，但与模型聊天时，它似乎完全不了解知识库内容。
+
+**问题**：Open WebUI 有两种不同的 RAG 模式，它们处理模型附加知识库的方式截然不同：
+
+| 模式 | 知识的工作方式 |
+|------|-------------------|
+| **旧版（非原生）** | Open WebUI 自动执行 RAG：查询附加的知识库、检索相关分块，并将其注入对话上下文。这一切都在后台发生，模型无需执行任何操作。 |
+| **原生函数调用** | 知识**不会自动注入**。模型会收到工具（如 `query_knowledge_bases`），并且必须主动决定调用这些工具。这就是**智能体 RAG**：模型在判断需要信息时自主搜索。 |
+
+由于**原生函数调用是默认设置**，模型需要同时具备使用知识工具的**能力**和**指令**。检查下面的检索设置时，请保持原生模式启用。
+
+#### 知识检索行为矩阵 {#knowledge-retrieval-behavior-matrix}
+
+| | **知识已附加到模型** | **未附加知识** |
+|---|---|---|
+| **旧版模式** | Open WebUI 仅从**附加的知识**中自动注入 RAG 结果 | 不自动执行 RAG；用户必须通过 `#` 手动将知识库添加到聊天 |
+| **原生函数调用** | 模型收到仅限访问**附加知识**的工具（必须主动调用） | 模型收到可访问**所有可访问知识库**的工具（需启用内置工具）；必须主动调用 |
+
+关键要点：在原生模式下，模型无论如何都必须使用其知识工具。附加知识只会限制可搜索的*范围*；[范围化访问](/features/workspace/knowledge#scoped-access-keeps-things-organized)列出了所有算作已附加的内容。
+
+:::tip 在原生模式下阻止知识库访问
+如果要阻止模型在原生模式下访问**任何**知识库，无需完全禁用内置工具。只需在 **设置 > 模型 > 编辑 > 内置工具**（管理员区域）（自己的模型则在 **工作区 > 模型**）中禁用**知识库**类别。这会移除所有知识相关工具，同时保留其他内置工具（网络搜索、记忆、笔记等）。完整类别列表见[精细的内置工具类别](/features/extensibility/plugin/tools#granular-builtin-tool-categories-per-model)。
+:::
+
+![模型编辑器中的内置工具类别](/images/features/plugin/tools/builtin_tools.png)
+
+**解决方法（按顺序检查）：**
+
+1. **先检查全局模型设置**：
+   - 转到 **设置 > 模型**（管理员区域），打开**模型默认设置**
+   - 展开**模型参数**，检查**函数调用**是否设置为 `native`
+   - 未显式设置单模型值的模型会继承此设置。保持有效值为 `native`，并检查所选模型是否支持工具调用
+   - 还要检查模型编辑器的**功能**部分：**预加载文件**控制文件处理，而**内置工具**及其**知识库**类别控制原生知识工具访问
+
+:::info 检查有效的模型设置
+**设置 > 模型 > 编辑 > 高级参数**（管理员区域）（自己的模型则在 **工作区 > 模型**）中的单模型设置，在显式设置后会覆盖全局默认值。没有自己的 `function_calling` 值的模型会继承全局设置。如果模型行为与预期不同，请检查这两处。
+:::
+
+2. **确保为模型启用了内置工具**：
+   - 转到你的模型对应的 **设置 > 模型 > 编辑**（管理员区域）（自己的模型则在 **工作区 > 模型**）
+   - 在**内置工具**下，确保启用了**知识库**类别（默认启用）
+   - 如果禁用此项，模型将无法查询附加的知识库
+
+3. **添加系统提示词提示**：
+   - 某些模型需要明确指导才能使用工具。可以添加如下内容：
+     > “当用户询问附加文档时，请在回答前使用可用的知识工具搜索这些文档，并引用相关段落。”
+
+4. **检查处理状态和访问权限**：
+   - 确认上传的文件已完成处理，且当前用户可以访问该知识库
+   - 尝试使用原生工具调用可靠的模型，然后询问文档中某个可核实的具体事实
+
+5. **对于小文档，尝试“全文”开关**：
+   - 在聊天中附加知识库，点击它并开启**全文**，同时开启模型的**预加载文件**能力。对于附加到模型的知识库，此开关仅在使用旧版函数调用时生效
+   - 这会发送完整提取内容，而不是检索选定的段落。请确保文档可放入模型的上下文窗口
+
+:::info 为什么使用智能体 RAG？
+Open WebUI 使用**智能体 RAG**，由模型决定何时以及如何搜索知识库，并可以使用不同查询重试。这需要模型能够有效使用工具。如果所选模型无法可靠检索已知事实，请使用工具调用能力更强的模型，或开启**全文**开关测试小文档。
+:::
+
+有关知识范围和检索模式工作方式的完整说明，请参阅[知识文档](/features/workspace/knowledge#agentic-knowledge-tools)和[预加载文件与内置工具](/features/chat-conversations/rag#preload-files-vs-builtin-tools)。
+
+---
+
+### 14. 附加链接或 YouTube 视频失败 {#14-attaching-a-link-or-a-youtube-video-fails}
+
+网页或 YouTube 附件返回了错误提示。消息会指出失败的步骤：无法读取链接时会给出链接名称，YouTube 字幕被拒绝时会给出原因，而提到知识库的消息则表示内容已读取，只有保存失败。
+
+`[ERROR: Could not read content from <url>]` 表示未附加任何内容。常见原因包括：网站阻止请求，或仅在 JavaScript 运行后才提供内容（可使用 [`WEB_LOADER_ENGINE=playwright`](../reference/env-configuration.mdx#web_loader_engine) 处理）；Open WebUI 未配置使用代理（见 [`WEB_SEARCH_TRUST_ENV`](../reference/env-configuration.mdx#web_search_trust_env)）；或者地址被有意拒绝。云元数据端点和 [`WEB_FETCH_FILTER_LIST`](../reference/env-configuration.mdx#web_fetch_filter_list) 匹配的任何地址都不会被请求，日志会显示 `Blocked by filter list:`。默认情况下，私有、环回、链路本地及其他非全局可路由地址都会被拒绝，日志会显示 `Blocked non-global address:`，随后显示该地址。
+
+若要附加自己网络中的页面，例如内联网 Wiki 或同一主机上的服务，请设置 [`ENABLE_LOCAL_WEB_FETCH=True`](../reference/env-configuration.mdx#enable_local_web_fetch)（旧名称 `ENABLE_RAG_LOCAL_WEB_FETCH` 仍然有效）并重启。此后，每个可以聊天的用户都能让服务器请求内部地址，因此只有在信任所有这些用户时才应开启。无论如何，过滤列表及其中的元数据端点仍会被阻止。
+
+YouTube 附件是视频的字幕文本，因此没有可用字幕的视频完全无法附加。如果消息指出 YouTube 阻止了来自你服务器地址的请求（云服务提供方地址段较常见），请通过 [`YOUTUBE_LOADER_PROXY_URL`](../reference/env-configuration.mdx#youtube_loader_proxy_url) 路由请求。如果存在字幕，但没有所请求语言的字幕，请将你的语言添加到 [`YOUTUBE_LOADER_LANGUAGE`](../reference/env-configuration.mdx#youtube_loader_language)。此时的消息为 `No transcript found for the YouTube video <id> in these languages: <list>.`。请在 **设置 > 网络搜索**（管理员区域）下的 **Youtube Language** 中设置该列表，使用以逗号分隔的语言代码，例如 `de,fr`。环境变量中不要包含空格，因为只有管理员字段会去除空格。Open WebUI 按顺序尝试这些语言，并在缺少 `en` 时将其追加到末尾，因此 `de,fr` 会依次尝试德语、法语和英语。对于每种语言，手动创建的字幕优先于自动生成的字幕。上传者关闭字幕、年龄限制和视频不可用的情况无法绕过。
+
+### 15. 附加单个文件时未返回来源 {#15-attaching-a-single-file-returns-no-sources}
+
+使用 `#` 附加一个文件时未检索到任何内容，而附加包含同一文件的知识库则工作正常。
+
+**问题**：属于知识库的文件会被索引两次，一次随知识库索引，另一次单独索引。单独附加该文件时，只搜索它自己的索引；向量数据库迁移、部分重置或直接在向量数据库中删除数据后，此索引可能丢失。
+
+**解决方法：**
+
+1. 在 **设置 > 文档 > 重新索引知识和记忆向量**（管理员区域）中执行**重新索引**。这会重建每个知识库、其中每个文件的单文件索引以及每个用户的记忆。它会重新提取并嵌入所有内容，因此请预留处理时间；如果使用付费嵌入模型，还要考虑成本。
+2. 如果文件不属于任何知识库，请**重新上传文件**，因为重新索引只涵盖知识库。
+
+### 16. 未读取附加图像中的文字 {#16-text-in-an-attached-image-is-not-read}
+
+聊天中附加的图像会作为图像发送给模型。它不会经过内容提取引擎，因此无论在 **设置 > 文档**（管理员区域）中设置了哪种引擎，都不会对其运行 OCR。只有视觉模型才能读取图像。
+
+- 如果所有选定模型的**视觉**能力均已关闭，Open WebUI 会拒绝图像并显示 `Selected model(s) do not support image inputs`。
+- 未设置任何能力的模型会被视为支持视觉，因此图像仍会被发送。如果模型服务器无法接收图像，则会返回自己的错误，例如 `Multimodal data provided, but model does not support multimodal requests.`。该文本来自模型服务器，而不是 Open WebUI。
+
+**解决方法：**
+
+1. 对于包含图像的聊天，请**使用视觉模型**；对于无法接收图像的模型，请在 **设置 > 模型 > 编辑**（管理员区域）中关闭**视觉**，让用户看到 Open WebUI 的提示，而不是模型服务器错误。
+2. 将图像上传到知识库，**使用 OCR 提取文本**。这需要将 **设置 > 文档**（管理员区域）中的**内容提取引擎**设置为 **Default** 以外的引擎，并在**支持的媒体 MIME 类型**中列出图像类型，例如 `image/*`。如果从未设置过该字段，**External** 引擎也接受图像。否则，上传会显示警告 `File type image/png is not supported for processing`，其中包含图像自身的类型。
+
+### 17. 大型上传需要很长时间才能完成嵌入 {#17-large-uploads-take-a-long-time-to-embed}
+
+大型 CSV 或 XLSX 文件，或者一次上传的许多 PDF，会在 **Default (SentenceTransformers)** 嵌入引擎上长时间处于处理状态。每个分块都必须完成嵌入，文件才可搜索。
+
+**问题**：**设置 > 文档**（管理员区域）中的**嵌入批大小**由 [`RAG_EMBEDDING_BATCH_SIZE`](/reference/env-configuration#rag_embedding_batch_size) 设置，默认值为 `1`。本地引擎会将其作为批大小传给模型，因此每次只嵌入一个分块。
+
+**解决方法：**
+
+1. **提高嵌入批大小**，例如设置为 `32`。更大的批次会使用更多内存。如果随后出现 CUDA 内存不足错误，请再次调低（见[第 10 节](#10-cuda-out-of-memory-during-embedding)）。
+2. **使用外部嵌入引擎**：将**嵌入模型引擎**设置为 **Ollama**、**OpenAI** 或 **Azure OpenAI**（[`RAG_EMBEDDING_ENGINE`](/reference/env-configuration#rag_embedding_engine)）。此时，相同的批大小决定一个请求包含多少分块，因此只有服务提供方接受每个请求包含多个输入时才应提高。使用 **Ollama** 时，每次上传和每次搜索还会通过 `/api/embed` 将文本发送到嵌入模型。如果同一 Ollama 同时运行聊天模型，而两者无法同时放入内存，Ollama 就需要重新加载模型，回复会在长时间停顿后才开始。请选择足够小、可与聊天模型同时保持加载的嵌入模型，并使用 `ollama ps` 检查两者是否均已列出；或者将 [`RAG_OLLAMA_BASE_URL`](/reference/env-configuration#rag_ollama_base_url) 指向专用于嵌入的另一个 Ollama（见[任务模型参数](/features/administration/task-models#task-model-parameters)）。
+3. **跳过嵌入**：开启**绕过嵌入和检索**（[`BYPASS_EMBEDDING_AND_RETRIEVAL`](/reference/env-configuration#bypass_embedding_and_retrieval)）。上传内容会作为提取文本存储，不生成嵌入，全文将发送给模型，因此每篇文档都必须能放入其上下文窗口。
+
+### 18. 混合搜索或重排序器没有明显效果 {#18-hybrid-search-or-the-reranker-has-no-visible-effect}
+
+开启**混合搜索**后，答案看起来与普通向量搜索相同，聊天中也没有错误。
+
+**问题**：混合搜索会自行回退到向量搜索。
+
+- 如果混合搜索查询引发错误，Open WebUI 会改为运行向量搜索，并仅在 `DEBUG` 级别记录 `Hybrid search failed, falling back to vector search:`。
+- 混合查询失败的知识库会从结果中剔除，其他知识库仍会被搜索。日志会在 `ERROR` 级别显示 `query_collection_with_hybrid_search: <n> collection(s) had failing queries:`，随后显示集合名称。
+- 如果外部重排序器请求失败或其响应中没有 `results`，日志会显示 `Error in external reranking:` 或 `No results found in external reranking response`，随后显示 `No valid scores found, check your reranking function. Returning original documents.`。文档将不经重排序直接传递。
+- 如果保存设置时无法加载本地重排序模型，日志会显示 `Error loading reranking model:`，Open WebUI 会再次关闭**混合搜索**。
+
+**解决方法：**
+
+1. **查看调试日志**：设置 [`GLOBAL_LOG_LEVEL=DEBUG`](/reference/env-configuration#global_log_level)，重启，询问一个与文档有关的问题，然后在日志中搜索上述行。
+2. **检查重排序模型**：当**重排序引擎**设置为 **Default (SentenceTransformers)** 时，**重排序模型**必须是 Hugging Face 模型 ID，例如 `BAAI/bge-reranker-v2-m3`，或此类模型的本地路径。Open WebUI 会将其作为 SentenceTransformers CrossEncoder 加载，因此这里不能使用 Ollama 模型标签。
+3. **检查外部重排序器**：当**重排序引擎**设置为 **External** 时，**API Base URL** 必须是完整的 rerank 端点。Open WebUI 会发送包含 `model`、`query`、`documents` 和 `top_n` 的 JSON，并从响应中读取 `results[].index` 和 `results[].relevance_score`。聊天补全或嵌入端点不会返回这种结构。
+4. **关闭混合搜索**以隔离问题。如果检索有所改善或发生变化，则故障出在混合搜索或重排序器设置，而不是嵌入。
+
+### 19. 同一个问题每次检索到不同来源 {#19-the-same-question-retrieves-different-sources-each-time}
+
+针对相同文件提出同一个问题，每次运行都会返回不同来源或不同答案。
+
+**问题**：启用**检索查询生成**（默认）后，任务模型会读取对话并编写搜索查询，而这些查询可能在多次运行之间发生变化。生成响应时，聊天会将这些查询显示为**正在查询**下方的标签。
+
+- 如果任务模型的回复中没有 JSON 对象，则整个回复会用作一条查询。
+- 如果查询生成失败，或**检索查询生成**已关闭，Open WebUI 会完全按原样使用你的最后一条消息进行搜索。
+
+**解决方法：**
+
+1. **比较查询**：打开每个响应的状态历史，检查**正在查询**下方的标签。
+2. 在 **设置 > 界面**（管理员区域）的**生成**下关闭**检索查询生成**，或设置 [`ENABLE_RETRIEVAL_QUERY_GENERATION=False`](/reference/env-configuration#enable_retrieval_query_generation)。此后，检索只会原样使用你的最后一条消息，因此相同消息每次都会以相同方式搜索，而“第二个怎么样？”之类的后续问题只会使用这几个字进行搜索。
+3. 如果保留查询生成功能，请在同一页面的**任务**部分更改**任务模型**下的模型。查询由该模型生成，而不是聊天模型。
+
+---
+
+通过优化这些方面（提取、嵌入、检索和模型上下文），可以显著提高 LLM 处理文档时的准确性。

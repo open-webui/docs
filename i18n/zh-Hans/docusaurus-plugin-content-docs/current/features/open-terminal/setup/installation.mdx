@@ -1,0 +1,216 @@
+---
+sidebar_position: 1
+title: "安装"
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+# 安装
+
+根据需求选择安装方法：
+
+| 方法 | 适用情况 |
+| :--- | :--- |
+| **Docker** | 在隔离的容器中运行，与主机系统分离。 |
+| **裸机** | AI 直接在你的机器上处理真实文件、工具和环境。 |
+| **Docker Compose** | 已经使用 Docker Compose 运行 Open WebUI，并希望将 Open Terminal 添加进去。 |
+
+在下方选择你的方法，然后按照步骤操作。
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
+
+需要 [Docker](https://www.docker.com/products/docker-desktop/)。
+
+### 1. 启动容器 {#1-start-the-container}
+
+```bash
+docker run -d \
+  --name open-terminal \
+  --restart unless-stopped \
+  -p 8000:8000 \
+  -v open-terminal:/home/user \
+  -e OPEN_TERMINAL_API_KEY=your-secret-key \
+  ghcr.io/open-webui/open-terminal
+```
+
+将 `your-secret-key` 替换为你选择的密码。
+
+{/* TODO：截图展示终端中的 docker run 命令以及 Docker 拉取镜像的过程。 */}
+
+<details>
+<summary><b>命令详解</b></summary>
+
+| 参数 | 用途 |
+| :--- | :--- |
+| `-d` | 在后台运行 |
+| `--name open-terminal` | 供后续引用的容器名称 |
+| `--restart unless-stopped` | 重启后自动启动 |
+| `-p 8000:8000` | 在 `http://localhost:8000` 上开放访问 |
+| `-v open-terminal:/home/user` | 在重启后保留文件 |
+| `-e OPEN_TERMINAL_API_KEY=...` | 身份验证密钥 |
+
+</details>
+
+### 2. 验证 {#2-verify}
+
+在浏览器中打开 `http://localhost:8000/docs`。你应能看到 Open Terminal API 页面。
+
+:::tip 自动生成的 API 密钥
+如果未设置 API 密钥，系统会自动生成一个。通过以下命令查找：
+```bash
+docker logs open-terminal
+```
+:::
+
+:::note OpenShift
+对于 OpenShift 受限 SCC，请通过 Terminals 使用 `ghcr.io/open-webui/open-terminal:openshift`。该镜像支持受限的非 root Pod，但不支持运行时安装软件包、访问 Docker 套接字、使用 iptables 出站防火墙或设置 `OPEN_TERMINAL_MULTI_USER=true`。
+:::
+
+  </TabItem>
+  <TabItem value="bare-metal" label="裸机">
+
+:::warning
+在此模式下，AI 可以执行你的用户账户能够执行的任何操作，包括修改和删除文件。
+:::
+
+### 1. 运行 Open Terminal {#1-run-open-terminal}
+
+**选项 A：无需安装，直接运行：**
+
+```bash
+uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+通过 [uv](https://docs.astral.sh/uv/) 下载并运行，不会永久安装。
+
+**选项 B：使用 pip 安装：**
+
+```bash
+pip install open-terminal
+open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+Open Terminal 启动时会打印其地址和密钥：
+
+```
+  Local:    http://localhost:8000
+  Network:  http://<this-machine-ip>:8000
+
+  API Key:  <your key appears here>
+```
+
+当 Open WebUI 运行在同一台机器上时，使用 **Local** 地址；当它从其他位置访问终端时，使用 **Network** 地址。
+
+### 2. 工作目录 {#2-working-directory}
+
+Open Terminal 从当前目录提供文件。若要将其限定到特定项目：
+
+```bash
+cd /path/to/your/project
+uvx open-terminal run --host 0.0.0.0 --port 8000 --api-key your-secret-key
+```
+
+也可以省略 `cd`，使用 `--cwd` 参数将服务器指向项目：
+
+```bash
+uvx open-terminal run --cwd /path/to/your/project --host 0.0.0.0 --port 8000 --api-key your-secret-key
+open-terminal run --cwd /path/to/your/project
+```
+
+### Windows {#windows}
+
+通过 [pywinpty](https://github.com/andfoy/pywinpty) 提供支持。完整支持 PowerShell，包括彩色输出和交互式程序。
+
+  </TabItem>
+  <TabItem value="compose" label="Docker Compose">
+
+在现有的 `docker-compose.yml` 中将 Open Terminal 添加为服务：
+
+### 1. 更新 Compose 文件 {#1-update-your-compose-file}
+
+```yaml title="docker-compose.yml"
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    ports:
+      - "3000:8080"
+    volumes:
+      - open-webui:/app/backend/data
+
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal
+    container_name: open-terminal
+    volumes:
+      - open-terminal:/home/user
+    environment:
+      - OPEN_TERMINAL_API_KEY=your-secret-key
+
+volumes:
+  open-webui:
+  open-terminal:
+```
+
+### 2. 启动服务 {#2-start-the-services}
+
+```bash
+docker compose up -d
+```
+
+在项目文件夹名为 `myproject` 时，Compose 会同时启动这两个服务：
+
+```
+ Container myproject-open-terminal-1  Started
+ Container myproject-open-webui-1     Started
+```
+
+继续操作前，请使用 `docker compose ps` 检查两个服务是否均正常。
+
+:::tip 连接 URL
+当两个服务共享 Docker Compose 网络时，请使用服务名称作为主机名：
+```
+http://open-terminal:8000
+```
+容器之间无法通过 `localhost` 相互访问。
+:::
+
+  </TabItem>
+</Tabs>
+
+---
+
+## 作为 MCP 服务器运行 {#run-as-an-mcp-server}
+
+Open Terminal 还可以通过 `open-terminal mcp` 作为[模型上下文协议（Model Context Protocol）](https://modelcontextprotocol.io/)服务器运行，向兼容 MCP 的客户端提供终端。这需要可选的 `mcp` 扩展（会引入 [FastMCP](https://github.com/jlowin/fastmcp)）。
+
+**选项 A：无需安装，直接运行：**
+
+```bash
+uvx --from "open-terminal[mcp]" open-terminal mcp
+```
+
+**选项 B：使用 pip 安装：**
+
+```bash
+pip install "open-terminal[mcp]"
+open-terminal mcp
+```
+
+默认情况下，服务器使用 `stdio` 传输（客户端启动进程，并通过标准输入/输出与其通信），因此大多数 MCP 客户端只需使用上述命令。
+
+若要改为通过 HTTP 提供服务，请切换到 `streamable-http` 传输。`--host` 和 `--port` 参数仅适用于此传输方式（默认值：主机 `0.0.0.0`，端口 `8000`）：
+
+```bash
+open-terminal mcp --transport streamable-http --host 127.0.0.1 --port 8000
+```
+
+`--config`（TOML 配置文件的路径）和 `--cwd`（服务器进程的工作目录）参数的用法与 `open-terminal run` 相同。
+
+---
+
+## 后续步骤 {#next-steps}
+
+- [**连接到 Open WebUI →**](./connecting.md)
+- [**更新 →**](./updating.mdx)，了解如何将现有安装升级到较新版本。

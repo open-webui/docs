@@ -1,0 +1,279 @@
+---
+sidebar_position: 5
+title: "内部机制"
+---
+
+# 内部机制：插件加载器实际执行的操作
+
+:::danger 严重安全警告
+**工具、函数、Pipe、过滤器和操作会在服务器上执行任意 Python 代码。** 只有管理员可以创建函数，创建工作区工具则受 `workspace.tools` 权限控制。授予该权限等同于向用户提供服务器 shell 访问权限。请仅从可信来源安装，在导入前审查代码，并将创建权限限制给可信管理员。恶意插件可能访问文件系统、窃取数据或危及整个系统。完整详情请参阅[插件安全警告](/features/extensibility/plugin/)。
+:::
+
+Open WebUI 的插件（工具、函数 = 过滤器 / Pipe / 操作）不是在某种受限运行时中运行的沙盒脚本。它们是**在 Open WebUI 进程内执行的 Python 模块**，可以完整访问标准库、任何 pip 软件包、整个 `open_webui` 代码库、正在运行的 FastAPI 应用以及数据库。文档中介绍的钩子（`inlet`、`outlet`、`stream`、`pipe`、`action`）只是利用这些访问权限的*一种*方式，并非唯一方式。
+
+本页介绍加载器的实际行为及其带来的可能性，帮助你构建（或审计）超越各类型页面所示模式的插件，同时列出随之而来的常见陷阱。
+
+---
+
+## 插件的加载方式 {#how-a-plugin-is-loaded}
+
+[`backend/open_webui/utils/plugin.py`](https://github.com/open-webui/open-webui/blob/main/backend/open_webui/utils/plugin.py) 中的一个加载器负责处理所有插件类型：
+
+1. 从数据库读取插件的 Python 源代码。
+2. 创建一个新的 `types.ModuleType`，并在加载期间以当前源代码版本的唯一名称 `function_{id}_<32 hex characters>`（或 `tool_{id}_<32 hex characters>`）将其注册到 `sys.modules` 中。该唯一名称就是插件的 `__name__`，因此 `logging.getLogger(__name__)` 也会使用它。
+3. 将源代码传给 `exec(content, module.__dict__)`。此时会执行模块顶层的所有内容。
+4. 加载器查找**一个**入口类：`Tools`、`Pipe`、`Filter`、`Action` 或 `Event`。该类成为 Open WebUI 调用的句柄。
+5. 成功加载后，模块会以唯一名称和稳定别名 `function_{id}`（或 `tool_{id}`）发布到 `sys.modules`，并删除先前版本的条目。加载失败则不会发布任何内容。已发布的模块会保留，直到被更新版本替换或进程重启。第 3 步产生的任何副作用（导入、猴子补丁、后台任务、路由注册）此时都已安装到正在运行的应用中。
+
+Open WebUI 的其他部分只关心入口类。文件中的其余内容均由你自行掌控。
+
+:::tip 读取插件自身的 id
+`__name__` 返回的 id 附带 32 个十六进制字符，因此插件无法直接从中取得自身 id。请在处理程序内读取 [`__id__`](./reserved-args.mdx#__id__) 参数（Pipe 不会收到该参数）。对于在任何处理程序被调用之前、模块加载时运行的代码，可以去除前缀和后缀；这种方法同时适用于旧名称和新名称：
+
+```python
+import re
+
+PLUGIN_ID = re.sub(r"^(?:function|tool)_|_[0-9a-f]{32}$", "", __name__)
+```
+
+:::
+
+### 模块何时重新执行 {#when-the-module-is-re-executed}
+
+inlet/outlet 钩子传入 `load_from_db=True`。如果源代码没有变化，加载器仍会从缓存提供模块，但会在每次调用时查询数据库以作出判断。stream 钩子传入 `load_from_db=False`，直接读取缓存。
+
+| 钩子 | 每次调用检查数据库？ | 模块何时重新执行？ |
+|---|---|---|
+| `inlet` / `outlet`（过滤器） | 是 | 两次调用之间源代码发生变化 |
+| `stream`（过滤器） | 否 | 仅当另一个钩子重新加载时 |
+| 工具、Pipe、操作 | 调度时检查 | 两次调用之间源代码发生变化 |
+
+实际影响：
+
+- **通过编辑器编辑过滤器后，`inlet`/`outlet` 会在下一次聊天时生效。** stream 会在下一次 `inlet` 或 `outlet` 触发重新加载时应用更改。
+- **重新执行并非按请求进行**，因此模块顶层工作按每个内容版本执行一次，而不是每次聊天执行一次。顶层导入、补丁和单例均可正常使用。
+- **禁用或删除插件**会将其从活动集合中移除，但**不会**撤销其模块顶层执行的任何操作。模块会保留在 `sys.modules` 中，它安装到其他模块的任何猴子补丁也会一直生效，直到进程重启。
+
+---
+
+## 实际可以访问的内容 {#what-you-actually-have-access-to}
+
+从任何钩子（以及模块顶层）都可以访问：
+
+- 完整的 `open_webui.*` 软件包。例如：`from open_webui.models.chats import Chats`、`from open_webui.utils.middleware import process_chat_payload`、`from open_webui.models.config import Config`。
+- 通过 `__request__` 访问正在运行的 FastAPI `Request`，其中包含 `__request__.app`（FastAPI 应用）、`__request__.app.state`（配置、缓存、处理程序）和 `__request__.state`（请求级临时数据）。
+- [保留参数](./reserved-args.mdx)中记录的保留双下划线参数：`__user__`、`__metadata__`、`__model__`、`__request__`、`__event_emitter__`、`__event_call__`、`__features__`、`__body__`、`__id__`、`__oauth_token__`，以及仅限 stream 和各钩子特有的额外参数。
+- [事件](./events.mdx)中记录的事件：向前端发出任何事件，或使用 `event_call` 请求用户响应。
+- 通过 `requirements:` frontmatter 使用任何 pip 软件包，并在加载时安装（受 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS`](/reference/env-configuration#enable_pip_install_frontmatter_requirements) 控制）。
+- Python 标准库，以及容器中通过 pip 安装的所有内容。只有你在 `requirements:` 中声明的软件包才能作为可靠依赖。Open WebUI 恰好安装的软件包可能随版本增删，因此，导入未声明软件包的插件可能会在更新后无法加载。
+
+这里没有沙盒、允许列表或能力系统。执行模型就是**“这是 Python，你位于服务器进程内部”**。
+
+---
+
+## 实现模式 {#patterns}
+
+### 1. 在 `inlet` 中修改请求级模型字典 {#1-mutate-the-per-request-model-dict-from-inlet}
+
+你收到的 `__model__` 与请求其余部分读取的是**同一个字典对象**。在 `inlet` 中修改其键会改变本次请求后续管线的行为。例如（针对 DeepSeek / Kimi / MiMo 的推理内容修正）：
+
+```python
+class Filter:
+    async def inlet(self, body: dict, __model__: dict = None) -> dict:
+        # 将请求级模型切换到这样的代码路径：在原生工具调用循环期间，
+        # 将 reasoning_content 作为助手消息的顶层字段发出
+        if __model__ and __model__.get("provider") not in ("ollama", "llama.cpp"):
+            __model__["provider"] = "llama.cpp"
+        return body
+```
+
+同样的技巧适用于中间件从模型字典读取的任何其他字段：`params`、`meta`，以及你自行写入后再从另一个钩子读取的自定义键。
+
+### 2. 为后端函数应用猴子补丁 {#2-monkey-patch-a-backend-function}
+
+插件模块可以 `import open_webui.*` 并重新绑定模块属性：
+
+```python
+import open_webui.utils.middleware as _mw
+
+_original = _mw.process_chat_payload
+
+async def _patched(request, form_data, user, metadata, model):
+    # ...你的包装逻辑，然后委托给原函数...
+    return await _original(request, form_data, user, metadata, model)
+
+_mw.process_chat_payload = _patched
+```
+
+代码在模块加载时运行（每个源代码版本一次）。补丁会在进程生命周期内一直保留在 `sys.modules` 中。删除或禁用插件**不会**还原补丁。唯一彻底的回滚方式是重启进程。
+
+请谨慎使用。跨插件干扰是实际风险：如果两个插件为同一函数应用补丁，结果取决于加载顺序，而加载顺序并不确定。
+
+:::tip 先检查 `request` 过滤器钩子是否已满足需求
+人们过去为 `generate_chat_completion` 或 `process_chat_payload` 应用补丁，最常见的原因是要访问**每次**服务提供方调用的载荷，而不只是第一次调用，因为 `inlet` 每轮用户对话只运行一次，无法看到工具循环的后续调用。[`request` 过滤器钩子](/features/extensibility/plugin/functions/filter#the-request-step) 以受支持的钩子形式提供完全相同的能力，无需补丁，不存在加载顺序风险，也无须重启即可回滚。
+
+如果你使用 0.11.2+，且补丁用于拦截传出载荷，请将其迁移到 `request` 并删除补丁。请注意，插件早期版本安装的补丁仍会在每个已加载它的工作进程中生效，因此仍需在整个实例集群中重启，才能真正移除补丁。
+:::
+
+### 3. 通过路由提供页面或资源 {#3-serve-a-page-or-asset-from-a-route}
+
+```python
+from fastapi.responses import HTMLResponse, Response
+
+def _ensure_routes(app):
+    if any(getattr(r, "path", None) == "/my/tool" for r in app.routes):
+        return  # 幂等性保护：加载器可能会在编辑后重新执行
+
+    async def page():
+        return HTMLResponse(
+            "<html><head><link rel=stylesheet href=/my/tool.css></head>"
+            "<body><div id=app></div><script src=/my/tool.js></script></body></html>"
+        )
+
+    async def script():
+        return Response(MY_JS, media_type="application/javascript")
+
+    async def style():
+        return Response(MY_CSS, media_type="text/css")
+
+    app.add_api_route("/my/tool", page, methods=["GET"])
+    app.add_api_route("/my/tool.js", script, methods=["GET"])
+    app.add_api_route("/my/tool.css", style, methods=["GET"])
+```
+
+从第一个具有 `__request__.app` / `__app__` 的钩子（或 `system.startup.completed` 事件）调用。幂等性保护很重要：加载器可能会在编辑后重新执行，而 `add_api_route` 会重复注册相同路径且不会报错。
+
+`__app__` 是**真正的** FastAPI 应用，因此路由可以返回 HTTP 能承载的任何内容：JSON、`HTMLResponse`、JavaScript、CSS、图片，甚至整个打包后的 SPA。你可以将完整的独立工具托管在自己的 URL 上，以插件形式交付，且**无需重新构建前端**。插件可以通过这种方式提供服务条款/同意页面、审批界面、OAuth 回调、状态仪表板或一键安装 UI。
+
+**不可混淆的界限：**路由是*你自己的页面*。你的页面可以引用自己的 `/my/tool.js` 和 `/my/tool.css`，它们会正常加载，但这**不会**将内容注入 Open WebUI 聊天 UI。注册 `/my/tool.js` 不会让 Open WebUI 自身的 `index.html` 加载它；用户只有导航到*你的*路由才能获取你的资源。
+
+要将 JS/CSS 放入**实际的** Open WebUI SPA（在真实消息上添加按钮、为真实应用添加主题、在真实界面上提供首次使用导览），前端必须引用你的资源。这意味着在启动时写入自定义 CSS / 自定义 JS 加载器的接入点，这是一条间接且脆弱的路径。专用资源注入原语可以将该接入点规范化，使多个插件能够安全地使用。仅注册路由只能得到**页面**，不能实现**注入**。
+
+:::warning
+注册的路由运行在真实应用上，除非你自行添加身份验证依赖，否则**不会**进行身份验证。你在某个路径公开的任何内容，任何能访问服务器的人都可以访问，因此请明确保护敏感路由（管理员检查、签名令牌）。
+:::
+
+### 4. 启动后台任务 {#4-spawn-a-background-task}
+
+```python
+import asyncio
+
+async def _loop(app):
+    while True:
+        # ...周期性工作...
+        await asyncio.sleep(60)
+
+def _start_once(app):
+    if getattr(app.state, "_my_plugin_started", False):
+        return
+    app.state._my_plugin_started = True
+    asyncio.create_task(_loop(app))
+```
+
+`app.state` 标志使其“每个进程一次”，而不是“每个源代码版本一次”。完全重启后会重新启动。
+
+### 5. 在 `app.state` 中保存状态 {#5-stash-state-in-appstate}
+
+```python
+async def inlet(self, body, __request__):
+    cache = __request__.app.state.__dict__.setdefault("my_cache", {})
+    # ...读取/写入缓存...
+    return body
+```
+
+状态在同一进程内跨请求、**跨插件**共享。没有命名空间隔离，请选择唯一的键。
+
+### 6. 使用 `event_emitter` 在 UI 中产生任意副作用 {#6-use-event_emitter-for-arbitrary-side-effects-in-the-ui}
+
+`event_emitter` 接受前端能够处理的任何事件结构：状态横幅、来源引用、文件附件、聊天消息更新、Toast 通知。你并不局限于各类型页面中记录的事件。完整目录请参阅[事件](./events.mdx)。
+
+### 7. 使用 `event_call` 在处理程序中提示用户 {#7-prompt-the-user-mid-handler-with-event_call}
+
+`event_call` 相当于会**等待响应**的 `event_emitter`。可以显示表单、确认框或输入对话框，并阻塞到用户作答。它适用于需要人工参与的工具方法，或执行前需要确认的操作处理程序。
+
+### 8. 将 Pipe 用作完整的服务提供方替代实现 {#8-pipes-as-full-provider-replacements}
+
+`Pipe` 会替换整个 LLM 调用。Open WebUI 将请求交给你并要求返回响应。中间件不会限制你在响应中放入什么内容，因此你可以：
+
+- 包装外部 API（任何服务提供方、任何协议），
+- 根据请求结构在服务提供方之间路由，
+- 在 `pipe()` 内运行完整的智能体，并以流式方式返回智能体输出，
+- 完全跳过任何模型，直接返回预设内容。
+
+Pipe 之所以是最强大的入口，正是因为中间件不会干预。
+
+### 9. 执行超出 docstring 描述范围操作的工具 {#9-tools-that-do-more-than-their-docstring-says}
+
+`Tools` 类的方法会作为可调用工具公开给模型（其 docstring 会转换为 JSON schema）。方法体可以执行**任何操作**：调用外部 API、使用 `__event_emitter__` 发出 UI 事件、在 `app.state` 中保存数据、在首次调用时应用猴子补丁。docstring 仅用于工具向模型描述自身，实现不受其约束。
+
+### 10. 将操作用作任意一次性操作 {#10-actions-as-arbitrary-one-shot-operations}
+
+`Action` 在助手消息上渲染一个按钮。处理程序在服务器端针对消息所属的聊天运行，可用的双下划线参数比过滤器和工具更少：只有 `__model__`、`__id__`、`__event_emitter__`、`__event_call__`、`__request__` 和 `__user__`，没有其他参数。适用于“批准此项”、“使用……重新运行”、“发送到外部系统”，或用户应能从特定消息触发的任何一次性操作。
+
+---
+
+## 并发与多实例 {#concurrency-and-multiple-instances}
+
+**Open WebUI 不会串行执行插件代码，也不提供恰好一次保证。** 钩子和处理程序在异步事件循环中运行，可能相互重叠；在多副本部署中，同一项逻辑工作可能同时在多个工作进程上运行。必须*至多一次*执行的副作用需要由你自行协调，而不是由平台负责。
+
+这里有两个不同层级：
+
+- **单个进程内。** 异步钩子会交错执行。如果两个请求并发进入同一钩子，而钩子对共享状态（模块全局变量、`app.state` 缓存、文件）执行读取—修改—写入，就可能发生竞争。`asyncio.Lock`（用于协程）或 `threading.Lock`（用于卸载到线程池的任务）可以将操作串行化，但仅在*该进程内部*有效。
+- **跨副本。** 每个副本都是独立进程，拥有自己的 `sys.modules` 和 `app.state`。模块全局变量或进程内锁无法在它们之间协调*任何内容*。两个工作进程可能在同一时刻针对同一事件运行同一处理程序。任何必须全局只触发一次的操作（发送电子邮件、预配资源、写入一条审计记录、调用非幂等外部 API），除非使用共享状态加以保护，否则都会在**每个副本**上触发一次。
+
+Open WebUI 自身使用的共享状态原语是 **Redis**。在配置正确的多实例部署中，`REDIS_URL` 已经设置（WebSocket 和共享缓存要跨副本工作，就必须设置）。可以用它获取分布式锁或强制执行幂等键：
+
+```python
+from open_webui.utils.redis import get_redis_connection
+from open_webui.env import REDIS_URL, REDIS_KEY_PREFIX
+
+# decode_responses=True 使值以 str 而非 bytes 返回。
+_redis = get_redis_connection(REDIS_URL, decode_responses=True) if REDIS_URL else None
+
+
+def run_once(key: str, ttl: int = 300) -> bool:
+    """在 `ttl` 秒内，所有副本中恰好有一个调用方得到 True。
+
+    底层使用 Redis `SET key value NX EX ttl`，即带过期时间的原子
+    “不存在时设置”，因此只有一个工作进程能取得键，其余进程均无法取得。
+    """
+    if _redis is None:
+        # 没有 Redis 表示单进程部署：没有其他副本需要协调，
+        # 因此当前调用方就是唯一调用方。
+        return True
+    return bool(_redis.set(f"{REDIS_KEY_PREFIX}:plugin:{key}", "1", nx=True, ex=ttl))
+```
+
+然后用它控制副作用：
+
+```python
+if run_once(f"signup-log:{event['actor']['id']}"):
+    await log_signup(event)   # 恰好在一个副本上运行
+```
+
+请谨慎选择 `ttl` 和键。键定义了“同一项工作”的含义（用户 id、事件 id、日期桶）；`ttl` 决定该声明保留多长时间，因此窗口内的重试或缓慢的重复调用会被抑制，而相同键在之后仍可合法地再次出现。
+
+对于持续时间超过单次原子声明的工作，Open WebUI 提供了可续期锁辅助工具 `RedisLock`，位于 `backend/open_webui/socket/utils.py`（`aquire_lock()` / `renew_lock()` / `release_lock()`），WebSocket 层的清理任务使用的就是它。该工具很方便，但属于内部 API，受下文“常见陷阱”中的稳定性限制；上述原始 `set(..., nx=True, ex=...)` 调用则直接使用 redis-py，不会发生变动。
+
+---
+
+## 常见陷阱 {#footguns}
+
+- **没有沙盒。** 工具和函数以后端用户身份在后端进程中执行 Python。安全策略（[规则 9](/security/security-policy#reporting-guidelines)）将此视为预期行为：授予工具或函数创建权限等同于授予主机 shell 访问权限。请将插件作者视为管理员。
+- **Stream 钩子使用旧缓存。** 对 `stream` 方法的编辑只有在另一个钩子（或进程重启）刷新模块后才会生效。如果你编辑了 stream 过滤器而更改似乎未应用，请触发 `inlet`/`outlet` 重新加载或重启进程。
+- **不会检测跨插件干扰。** 两个插件为同一函数应用补丁、注册同一路由或写入同一个 `app.state` 键时会发生冲突。加载顺序并不确定。优先采用增量式模式（自己的命名空间、委托给原实现的包装器），而不是破坏性模式。
+- **禁用不等于卸载。** 模块会保留在 `sys.modules` 中，任何模块级副作用也都会保留。重启进程才能完全还原。
+- **没有并发控制，也没有恰好一次保证。** Open WebUI 不会串行执行处理程序，也不会跨副本去重。异步钩子在进程内交错执行；在多副本部署中，同一处理程序可能同时在每个工作进程上运行，必须全局只触发一次的副作用会在*每个副本*上触发一次，除非你自行协调。请参阅[并发与多实例](#concurrency-and-multiple-instances)。
+- **`requirements:` 会在加载时于每个副本上运行 `pip install`。** 在多副本部署中，请设置 [`ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS=False`](/reference/env-configuration#enable_pip_install_frontmatter_requirements)，并在镜像中预装依赖；运行时安装会在工作进程之间发生竞争并导致崩溃。请参阅[扩展 → 函数/工具依赖安装崩溃](/troubleshooting/multi-replica#9-functiontool-dependency-installation-crashes)。安装失败会导致保存失败，例如使用 `smtplib` 等标准库名称，或环境中没有 pip 时。请参阅[外部软件包](/features/extensibility/plugin/tools/development#external-packages)。
+- **同步工具方法在事件循环上运行。** 非 `async def` 的工具方法在运行期间会阻塞其工作进程上的所有其他请求。请参阅[使用 `async def` 定义工具方法](/features/extensibility/plugin/tools/development#writing-a-custom-toolkit)。
+- **内部 API 不是稳定的公开接口。** `open_webui.utils.*`、内部模型类、中间件辅助工具，以及文档中双下划线参数和事件类型之外的几乎所有内容，都可能在版本之间重命名、移动或更改签名。如果你的猴子补丁在升级后失效，需要由你自行修复。
+
+---
+
+## 何时不适合使用此方式 {#when-this-is-the-wrong-tool}
+
+对于任何可以通过文档中钩子表达的功能（修改 `body` 的过滤器、调用 API 并返回结果的工具、发出事件的操作），**请坚持使用文档中的钩子**。上述模式功能强大，但持久性较差：一旦开始修补模块内部实现，跨插件交互、升级兼容性和回滚能力都会变差。
+
+如果插件需要尚不存在的接口，向上游提交 PR 比使用猴子补丁更持久。
+
+如果你针对插件正在应用猴子补丁的代码路径提交缺陷报告，该报告可能会被关闭。报告必须能够在未修改的 Open WebUI 上复现（[规则 5](/security/security-policy#reporting-guidelines)）。

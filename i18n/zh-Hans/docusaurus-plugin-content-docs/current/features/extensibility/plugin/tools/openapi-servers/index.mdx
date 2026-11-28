@@ -1,0 +1,96 @@
+---
+sidebar_position: 400
+title: "OpenAPI 工具服务器"
+---
+
+
+# OpenAPI 工具服务器
+
+本仓库提供 OpenAPI 工具服务器参考实现，让开发者能够轻松、安全地将外部工具和数据源集成到 LLM 智能体与工作流中。这些实现以易用性最大化和学习曲线最小化为设计目标，采用广泛使用的 [OpenAPI 规范](https://www.openapis.org/)作为标准协议。
+
+借助 OpenAPI，我们消除了使用专有或不熟悉的通信协议的需要，确保你可以快速、放心地构建或集成服务器。这意味着你可以减少研究自定义接口的时间，将更多时间用于构建能够增强 AI 应用的强大工具。
+
+:::tip 工具可靠性取决于模型
+连接外部工具只是让模型可以使用它；模型仍然需要选择正确的工具、提供有效的参数并使用结果。即使模型支持工具调用，也可能难以完成这些步骤，尤其是在跨多次调用时。如果已启用工具，但模型忽略工具或错误调用，请先**尝试使用原生工具调用更可靠、能力更强的模型**，不要直接认定问题出在 Open WebUI。请参阅[排查模型使用工具的问题](/features/extensibility/plugin/tools/openapi-servers/open-webui#tools-are-enabled-but-the-model-does-not-use-them-correctly)。
+:::
+
+:::tip 官方示例
+[oikb](/ecosystem/knowledge-base-sync) 同步守护进程是一个现成的 OpenAPI 工具服务器。运行它并将其 URL 添加到**设置 → 集成（Settings → Integrations）**后，模型即可在聊天中触发知识库同步并检查同步状态。请参阅[让模型触发同步](/ecosystem/knowledge-base-sync/daemon#let-the-model-trigger-syncs)。
+:::
+
+## 为什么选择 OpenAPI？ {#why-openapi}
+
+- **成熟的标准**：OpenAPI 是经过生产环境验证、应用广泛的 API 标准，得到数千种工具、公司和社区的支持。
+
+- **无需重复造轮子**：无需学习额外文档，也不必为专有规范感到困惑。如果你已经在构建 REST API 或使用 OpenAPI，就已经准备就绪。
+
+- **易于集成和托管**：可以在外部或本地部署工具服务器，不受供应商锁定，也不需要复杂配置。
+
+- **高度重视安全**：OpenAPI 围绕 HTTP/REST API 构建，天然支持 HTTPS 等广泛使用的安全通信方式，以及久经验证的身份验证标准（OAuth、JWT、API Key）。
+
+- **面向未来且稳定**：OpenAPI 拥有广泛的采用基础、长期的社区支持和明确的演进流程。
+
+## 限制 {#limitations}
+
+虽然 OpenAPI 工具可以有力地扩展 Open WebUI 的外部服务能力，但与原生 Python 工具相比，它们存在一些限制：
+
+- **仅支持单向事件**：OpenAPI 工具可以通过 REST 端点发出状态更新、通知和其他[单向事件](/features/extensibility/plugin/development/events#external-tool-events)。Open WebUI 会传递 `X-OpenWebUI-Chat-Id` 和 `X-OpenWebUI-Message-Id` 请求头来支持这一功能，但前提是启用 [`ENABLE_FORWARD_USER_INFO_HEADERS`](/reference/env-configuration#enable_forward_user_info_headers)，而该配置默认关闭。不过，交互式事件（用户输入提示、确认）仅适用于原生 Python 工具。
+- **不支持流式输出**：工具响应以完整结果返回，而不是逐令牌流式返回。
+
+如果需要交互式界面反馈（确认、用户输入提示），请考虑将工具实现为[原生 Python 工具](/features/extensibility/plugin/tools/development)。
+
+## 支持的规范结构 {#supported-spec-shapes}
+
+Open WebUI 根据 OpenAPI 3.x 路径项模型解析工具服务器规范。解析器：
+
+- 仅将八个标准 HTTP 方法键（`get`、`put`、`post`、`delete`、`options`、`head`、`patch`、`trace`）识别为操作。路径下的任何其他键，包括扩展键（`x-codeSamples`、`x-internal` 等）、`summary`、`description`、`servers` 和 `parameters`，都会在操作发现过程中被跳过，因此绝不会导致解析错误。
+- **遵循路径级 `parameters`**：在路径级声明一次的参数适用于该路径下的每个操作。具有相同 `(name, in)` 组合的操作级参数会覆盖路径级参数，这与 OpenAPI 规范一致。
+- 对路径参数值（`{id}` 替换）和查询参数值进行 URL 编码，确保包含空格、`/`、`&`、`?` 或其他保留字符的值能够正确传输。
+- 将数组查询参数按每个数组项一个值的方式发送，例如 `tags=red&tags=blue`，这是 OpenAPI 的默认形式。
+- 获取规范时在 JSON 和 YAML 之间平滑回退：`.yaml`/`.yml` URL 按 YAML 解析；其他 URL 先尝试按 JSON 解析，失败后再按 YAML 解析。
+
+将 `parameters` 放在路径级、公开扩展键或依赖路径项元数据字段的规范无需更改即可工作。
+
+## 快速开始 {#quickstart}
+
+使用 `servers/` 目录中提供的 FastAPI 参考实现快速上手。（你可以根据需要将这些示例改编为自己偏好的技术栈，例如使用 [FastAPI](https://fastapi.tiangolo.com/)、[FastOpenAPI](https://github.com/mr-fatalyst/fastopenapi) 或任何其他 OpenAPI 兼容库）：
+
+```bash
+git clone https://github.com/open-webui/openapi-servers
+cd openapi-servers
+```
+
+### 使用 Bash {#with-bash}
+
+```bash
+
+# 示例：为特定服务器“filesystem”安装依赖
+cd servers/filesystem
+pip install -r requirements.txt
+uvicorn main:app --host 0.0.0.0 --reload
+```
+
+文件系统服务器应可通过以下地址访问：[http://localhost:8000](http://localhost:8000)
+
+文档路径为：[http://localhost:8000](http://localhost:8000)
+
+### 使用 Docker {#with-docker}
+
+如果已安装 docker compose，可以使用以下命令启动服务器：
+
+```bash
+docker compose up
+```
+
+这些服务可通过以下地址访问：
+
+ * [文件系统服务器 localhost:8081](http://localhost:8081)
+ * [记忆服务器 localhost:8082](http://localhost:8082)
+ * [时间服务器 localhost:8083](http://localhost:8083)
+
+现在，只需将 OpenAPI 兼容客户端或 AI 智能体指向本地或公开部署的 URL：没有配置烦恼，也没有复杂的传输协议。
+
+## Open WebUI 社区 {#open-webui-community}
+
+- 如需参与一般讨论、技术交流和获取公告，请访问我们的[社区讨论](https://github.com/open-webui/openapi-servers/discussions)页面。
+- 有想法或反馈？请提交 issue！

@@ -1,0 +1,58 @@
+{
+	"link.title.Docs": {
+		"message": "文档",
+		"description": "The title of the footer links column with title=Docs in the footer"
+	},
+	"link.title.Community": {
+		"message": "社区",
+		"description": "The title of the footer links column with title=Community in the footer"
+	},
+	"link.title.More": {
+		"message": "更多",
+		"description": "The title of the footer links column with title=More in the footer"
+	},
+	"link.item.label.Getting Started": {
+		"message": "快速上手",
+		"description": "The label of footer link with label=Getting Started linking to getting-started"
+	},
+	"link.item.label.FAQ": {
+		"message": "常见问题",
+		"description": "The label of footer link with label=FAQ linking to faq"
+	},
+	"link.item.label.Help Improve The Docs": {
+		"message": "帮助改进文档",
+		"description": "The label of footer link with label=Help Improve The Docs linking to https://github.com/open-webui/docs"
+	},
+	"link.item.label.GitHub": {
+		"message": "GitHub",
+		"description": "The label of footer link with label=GitHub linking to https://github.com/open-webui/open-webui"
+	},
+	"link.item.label.Discord": {
+		"message": "Discord",
+		"description": "The label of footer link with label=Discord linking to https://discord.gg/5rJgQTnV4s"
+	},
+	"link.item.label.Reddit": {
+		"message": "Reddit",
+		"description": "The label of footer link with label=Reddit linking to https://www.reddit.com/r/OpenWebUI/"
+	},
+	"link.item.label.𝕏": {
+		"message": "𝕏",
+		"description": "The label of footer link with label=𝕏 linking to https://x.com/OpenWebUI"
+	},
+	"link.item.label.Release Notes": {
+		"message": "发行说明",
+		"description": "The label of footer link with label=Release Notes linking to https://github.com/open-webui/open-webui/blob/main/CHANGELOG.md"
+	},
+	"link.item.label.About": {
+		"message": "关于",
+		"description": "The label of footer link with label=About linking to https://openwebui.com"
+	},
+	"link.item.label.Sovereign AI": {
+		"message": "主权 AI",
+		"description": "The label of footer link with label=Sovereign AI linking to /enterprise/sovereign-ai"
+	},
+	"link.item.label.Report a Vulnerability / Responsible Disclosure": {
+		"message": "报告漏洞 / 负责任披露",
+		"description": "The label of footer link with label=Report a Vulnerability / Responsible Disclosure linking to https://github.com/open-webui/open-webui/security"
+	}
+}

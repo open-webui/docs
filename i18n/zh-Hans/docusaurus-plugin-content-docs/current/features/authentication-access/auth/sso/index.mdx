@@ -1,0 +1,550 @@
+---
+sidebar_position: 1
+title: "SSO（OAuth、OIDC、受信任标头）"
+description: "使用 OAuth、OpenID Connect 或受信任标头身份验证将 Open WebUI 连接到身份提供方，并提供各提供方设置指南的链接。"
+---
+
+Open WebUI 支持通过 OAuth 和 OpenID Connect（OIDC）使用提供方登录，也支持在身份验证代理后使用受信任标头身份验证。请选择贵组织采用的方式，然后为用户配置账户创建、角色和组访问权限。
+
+## 选择设置方式 {#choose-your-setup}
+
+- **内置提供方：**[Google](#google)、[Microsoft](#microsoft) 或 [GitHub](#github)。
+- **其他 OpenID Connect 提供方：**从 [OIDC](#oidc) 开始，或按照 [Okta](/tutorials/auth-sso/okta-oidc-sso) 或 [Keycloak](/features/authentication-access/auth/sso/keycloak) 教程操作。
+- **由代理处理身份验证：**使用[受信任标头](#trusted-header)，并确保只有受信任的代理可以访问 Open WebUI。
+
+:::danger 仅支持一个 OIDC 提供方
+目前，通过 `OPENID_PROVIDER_URL` 一次只能配置**一个** OpenID Connect（OIDC）提供方。
+不能同时将 Microsoft **和** Google 配置为 OIDC 提供方。
+
+*不过，社区提供了一种同时使用两者的变通方案！有关详细信息，请参阅我们的[双重 OAuth 教程](/tutorials/auth-sso/dual-oauth-configuration)。*
+:::
+
+:::info
+
+有关所有环境变量的详细信息，请查看[环境变量文档页面](/reference/env-configuration/)。
+强烈建议查阅环境变量页面，以详细了解如何设置变量以及应使用哪些值。
+
+:::
+
+:::tip
+
+需要帮助排查 SSO 设置问题吗？
+请查看我们的[故障排除指南](/troubleshooting/sso)
+
+:::
+
+## OAuth 配置概览 {#oauth-configuration-overview}
+
+| 环境变量 | 默认值 | 描述 |
+| --- | --- | --- |
+| `WEBUI_URL` | *（无）* | **必需。**你的公共 WebUI 地址，例如 `http://localhost:8080`。 |
+| `ENABLE_OAUTH_PERSISTENT_CONFIG` | `false` | 从数据库加载 OAuth 设置（启用持久化配置时）。默认值 `false` 会让环境变量继续作为 OAuth 配置的权威来源，并将管理员面板中的 OAuth 部分显示为只读；设置为 `true` 可在管理员面板中管理 OAuth。 |
+| `ENABLE_OAUTH` | `true` | 提供方登录的总开关。设置为 `false` 可在保留客户端 ID、密钥和端点配置的同时关闭 SSO。**设置 > 身份验证**（管理员区域）中 LDAP 开关旁也有对应的切换开关。 |
+| `ENABLE_OAUTH_SIGNUP` | `false` | 允许在 OAuth 登录时创建账户（独立于 `ENABLE_SIGNUP`）。 |
+| `OAUTH_AUTO_REDIRECT` | `false` | 将访问 `/auth` 的未通过身份验证用户直接发送到提供方登录页，跳过“继续使用 SSO”（Continue with SSO）界面。要求恰好配置一个提供方、`ENABLE_LOGIN_FORM=false` 且不使用 LDAP；访问 `/auth?form=true` 可打开本地登录表单。 |
+| `OAUTH_MERGE_ACCOUNTS_BY_EMAIL` | `false` | 根据匹配的电子邮件地址合并 OAuth 登录（注意：如果提供方不验证电子邮件地址，这可能不安全）。对应管理员面板中的**按电子邮件合并账户**（Merge Accounts by Email）。它会将登录关联到使用该电子邮件地址的任何账户，包括本地账户和管理员账户，而 Open WebUI 不会检查提供方是否验证过该地址。 |
+| `OAUTH_UPDATE_PICTURE_ON_LOGIN` | `false` | 每次登录时从 OAuth 提供方更新用户个人资料图片。 |
+| `OAUTH_PICTURE_CLAIM` | `picture` | 声明中包含个人资料图片的字段。设置为空字符串可禁用图片更新（用户将使用默认图标）。如果提供方返回经过压缩的图片，也会回退到默认图标。 |
+| `ENABLE_PROFILE_IMAGE_URL_FORWARDING` | `true` | 不影响 SSO 头像：OAuth 流程会下载 IdP 图片，并将其存储为 `data:` URI（或 `/user.png`），因此 IdP URL 不会写入 `profile_image_url`。此变量控制的是用户自行设置的 URL。值为 `true` 时，后端会通过 `302` 重定向，将 `/api/v1/users/{id}/profile/image` 的请求转到存储在 `profile_image_url` 中的外部 URL。随后，每个浏览器都会直接从该源加载头像，从而泄露客户端 IP、User-Agent 和 Referer 标头。设置为 `false` 可阻止重定向；IdP 提供的 URL 仍会被存储，但 Open WebUI 会改为提供内置的默认图片。**建议：**除非 IdP 以 `data:` URI 形式返回头像（Open WebUI 会将其持久化到本地，不受此设置影响），或者你接受上述信息泄露以显示 IdP 托管的头像，否则请禁用此功能。完整语义请参阅 [`ENABLE_PROFILE_IMAGE_URL_FORWARDING`](/reference/env-configuration#enable_profile_image_url_forwarding)。 |
+| `WEBUI_AUTH_SIGNOUT_REDIRECT_URL` | *空* | 用户退出登录后重定向到此 URL。例如 `https://your-company.com/logout-success`。 |
+| `WEBUI_SECRET_KEY` | *空* | 必须设置，尤其是在集群环境中。否则会出现会话问题和异常 OAuth 问题。 |
+| `OAUTH_SESSION_TOKEN_ENCRYPTION_KEY` | `WEBUI_SECRET_KEY` | 用于加密存储在服务器上的 OAuth 令牌的密钥。集群中的所有实例必须共享此密钥。 |
+| `OAUTH_CLIENT_INFO_ENCRYPTION_KEY` | `WEBUI_SECRET_KEY` | 用于加密存储在服务器上的 OAuth 客户端信息的密钥，供 MCP 服务器的 OAuth 2.1 身份验证使用。 |
+| `ENABLE_OAUTH_ID_TOKEN_COOKIE` | `true` | 用于向后兼容。控制是否设置旧版 `oauth_id_token` Cookie。建议设置为 `false`。跳过 MFA 步骤的 OAuth 登录会设置此 Cookie；启用 MFA 后，依赖此 Cookie 的集成需要设置 [`MFA_ALLOW_OAUTH_BYPASS=true`](/reference/env-configuration#mfa_allow_oauth_bypass)。 |
+| `ENABLE_OAUTH_TOKEN_EXCHANGE` | `false` | 启用令牌交换端点，供外部应用程序将 OAuth 令牌交换为 Open WebUI JWT。需与 `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` 搭配使用。 |
+| `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` | *空* | 以逗号分隔的 OAuth 客户端 ID 列表，交换端点接受这些客户端的令牌。留空表示不检查客户端，接受提供方验证通过的任何令牌。 |
+| `ENABLE_OAUTH_BACKCHANNEL_LOGOUT` | `false` | 启用 OIDC 后端通道注销端点（`POST /oauth/backchannel-logout`），支持由 IdP 发起注销。JWT 吊销需要 Redis。 |
+| `OAUTH_MAX_SESSIONS_PER_USER` | `10` | 每个用户在每个提供方下的最大并发 OAuth 会话数。在支持多设备使用的同时，防止会话数量无限增长。 |
+
+:::warning
+
+**关键配置注意事项：**
+
+1. **WEBUI_URL 与重定向**：发送给提供方的重定向 URI 来自该提供方的 `*_REDIRECT_URI` 变量；如果未设置，则来自传入请求的 URL。回调执行完毕后，`WEBUI_URL` 用于将浏览器送回登录页；为空时回退到请求 URL。当 Open WebUI 位于会改变请求 URL 的代理之后时，请设置此变量。
+
+2. **持久化配置行为**：当 `ENABLE_OAUTH_PERSISTENT_CONFIG=true` 时，OAuth 设置会在首次启动后存入数据库。初始设置完成后，如需更改环境变量，请采用以下任一方式：
+   - 设置 `ENABLE_OAUTH_PERSISTENT_CONFIG=false`，始终从环境变量读取
+   - 通过管理员面板更新设置，而不是使用环境变量
+
+   使用默认值 `ENABLE_OAUTH_PERSISTENT_CONFIG=false` 时，**设置 > 身份验证**（管理员区域）中的 **OAuth / OIDC** 部分为只读，因此在将该变量设置为 `true` 之前，无法通过管理员面板修改。请参阅[管理员面板中的只读 OAuth 设置](#read-only-oauth-settings-in-the-admin-panel)。
+
+3. **必需变量**：务必确认使用的变量名与[环境配置文档](/reference/env-configuration/)中的名称完全一致。常见错误包括使用 `OIDC_CONFIG` 等不存在的变量。
+
+:::
+
+### 管理员面板中的只读 OAuth 设置 {#read-only-oauth-settings-in-the-admin-panel}
+
+`ENABLE_OAUTH_PERSISTENT_CONFIG` 决定 OAuth 设置的存储位置，管理员面板会遵循此设置。使用默认值 `false` 时，每次启动都会从环境变量读取这些设置，因此**设置 > 身份验证**（管理员区域）中的 **OAuth / OIDC** 部分会显示为只读。保存“身份验证”页面不会改动 OAuth 设置。该页面上的其他部分（例如 LDAP）仍会正常保存。
+
+设置 `ENABLE_OAUTH_PERSISTENT_CONFIG=true` 可使该部分可编辑，并将保存的值持久化到数据库。对提供方连接设置（例如提供方 URL、客户端 ID 和密钥、重定向 URI 及作用域）的更改，需要重启每个 Open WebUI 实例后才会生效。如需继续以环境变量为权威来源，请保留 `false`，改为修改环境变量，然后重启。
+
+真正起决定作用的是 `ENABLE_PERSISTENT_CONFIG`。当它设为 `false` 时，无论 `ENABLE_OAUTH_PERSISTENT_CONFIG` 如何设置，都不会将任何内容保存到数据库，因此 OAuth 变量只决定该部分是否可输入，而不能决定这些值在重启后是否保留。只有两者都为 `true`，才能通过管理员面板管理 OAuth。
+
+### 服务器端 OAuth 会话管理 {#server-side-oauth-session-management}
+
+为解决大型令牌相关问题（例如 AD FS 组声明超出 Cookie 大小限制），并支持自动刷新令牌，Open WebUI 现在提供稳健的服务器端会话管理系统。
+
+**工作方式：**
+
+1. **服务器端存储：**不再将大型 `access_token` 和 `id_token` 值存储在浏览器 Cookie 中，而是对整个令牌负载进行加密，并安全地存储在 Open WebUI 数据库新建的 `oauth_session` 表中。
+2. **安全会话 Cookie：**用户的浏览器只会收到一个小巧且安全的 `httponly` Cookie，名为 `oauth_session_id`。此 Cookie 充当不透明标识符，本身不包含任何敏感信息。
+3. **多设备支持：**每个用户在每个提供方下都可以有多个并发会话。从第二台设备（例如手机）登录**不会**使第一台设备的会话失效。为防止会话数量无限增长，可配置数量上限（`OAUTH_MAX_SESSIONS_PER_USER`，默认值：10）；超过上限时，会按最近登录或令牌刷新时间移除最旧的会话。退出登录会移除该浏览器存储的会话，除非这是此用户在该提供方下唯一的会话。
+4. **自动刷新：**下游服务（例如工具或 OpenAI 兼容端点）需要令牌时，后端会使用 `oauth_session_id` 检索令牌。如果令牌已过期或即将过期，系统会先自动使用存储的 `refresh_token` 从提供方获取新令牌，再进行转发。这可以确保服务始终收到有效令牌，并避免无提示失败。当多个请求同时使用即将过期的令牌时，令牌只会刷新一次：配置 Redis 后，每个会话的锁会覆盖所有工作进程和副本；未配置 Redis 时，锁仅覆盖单个进程。这样即可与轮换刷新令牌的提供方保持兼容，这类提供方会拒绝第二次刷新。
+5. **简洁的令牌访问：**此架构让内部工具和其他服务能够以一种简洁可靠的方式访问用户令牌，无需依赖脆弱的 Cookie 提取方式。
+
+**当提供方未说明令牌何时过期时：**大多数提供方会返回 `expires_in` 或 `expires_at`，Open WebUI 会采用收到的值。如果两者都不存在，后续行为取决于响应是否包含刷新令牌。如果包含，系统会假定令牌有效期为一小时，据此进行刷新，并记录一条警告。如果不包含，则没有可用于刷新的令牌，此时人为设定一个较短的过期时间只会无故结束会话；因此，系统会将该令牌视为不过期，并保留会话。这样，签发长期有效令牌但不提供刷新令牌的提供方，就不会再在一小时后使其用户掉线。
+
+**退出登录后仍保留的存储内容：**退出登录时，会保留某提供方下最后一个存储的会话，因为未携带 `oauth_session_id` Cookie 的请求仍会使用它。自动化和 API 密钥调用就属于此类请求：Open WebUI 会选择该用户最近更新的存储会话，跳过 MCP 工具服务器会话，并在需要时刷新。因此，用户退出登录后，当自动化或 API 密钥代表该用户执行操作时，设置为 **OAuth** 身份验证的连接和工具服务器，以及读取用户 OAuth 令牌的工具或函数，仍会收到该用户的提供方令牌。更改密码和**退出所有设备**（Sign out all devices）都不会移除存储的 OAuth 会话。
+
+要彻底移除存储的会话：
+
+- 用户可以调用 `DELETE /api/v1/auths/oauth/sessions/{provider}`，其中 `{provider}` 是提供方名称（`google`、`microsoft`、`github`、`oidc` 或 `feishu`）。这会移除该用户在此提供方下的所有存储会话。已连接 MCP 工具服务器旁的**断开 OAuth 连接**（Disconnect OAuth）按钮会仅针对该服务器调用同一端点。
+- 管理员可以使用 `GET /api/v1/users/{user_id}/oauth/sessions` 列出用户存储的会话。没有端点允许管理员删除其他用户的会话。提供方发送注销令牌时，[OIDC 后端通道注销](#oidc-back-channel-logout)会删除所有这些会话。
+- 在提供方处吊销用户的刷新令牌后，Open WebUI 下次需要新令牌时，存储的会话就会结束：刷新失败，会话被删除。在此之前，存储的访问令牌仍会被发送，直到距离过期不足五分钟。刷新期间发生网络错误或超时会保留会话。
+
+此系统默认启用，但可以使用上面详细介绍的环境变量进行微调。
+
+有关详细信息，请查看[环境变量文档页面](/reference/env-configuration/)。
+
+### 面向外部应用程序的 OAuth 令牌交换 {#oauth-token-exchange-for-external-applications}
+
+Open WebUI 还支持 **OAuth 令牌交换**（OAuth Token Exchange），允许外部应用程序通过将 OAuth 提供方的访问令牌交换为 Open WebUI JWT 会话令牌，向 Open WebUI 进行身份验证。这适用于从已经持有身份提供方 OAuth 令牌的脚本、CLI 工具或服务进行编程访问。
+
+**示例用例：**已从身份提供方获取 OAuth 访问令牌的 CLI 工具，可以将其交换为 Open WebUI 令牌，以调用 Open WebUI API。
+
+要启用此功能，请设置 `ENABLE_OAUTH_TOKEN_EXCHANGE=true`，并在 `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` 中列出你信任的 OAuth 客户端。有关用法、请求/响应示例和安全注意事项，请参阅 [`ENABLE_OAUTH_TOKEN_EXCHANGE`](/reference/env-configuration#enable_oauth_token_exchange) 环境变量文档。启用双重验证登录后，该端点会返回 [MFA 步骤](/features/authentication-access/mfa#api-access-and-automation)，而不是会话令牌，除非 [`MFA_ALLOW_OAUTH_BYPASS`](/reference/env-configuration#mfa_allow_oauth_bypass) 为 `true`。
+
+:::danger
+
+成功交换会以令牌所标识的用户及其角色签发会话。由于提供方的 userinfo 端点无法表明令牌签发给哪个 OAuth 客户端，因此必须向该端点明确指定你信任的客户端。未设置 `OAUTH_TOKEN_EXCHANGE_TRUSTED_CLIENT_IDS` 时，系统完全不会检查签发客户端，因此会接受用户授权的任何应用程序的令牌；设置后，任何持有列表中客户端令牌的人，都可以获取对应用户的会话。此处仍会强制执行 `OAUTH_ALLOWED_DOMAINS`，但这无济于事，因为被冒充的用户本身就是允许域中的合法成员。
+
+解析签发客户端需要 RFC 7662 令牌内省，而 Google、Microsoft Entra ID、GitHub 和 Feishu 均未实现该功能，因此无法对这些提供方应用此限制。
+
+:::
+
+### OIDC 后端通道注销 {#oidc-back-channel-logout}
+
+Open WebUI 支持 **OIDC 后端通道注销**（OIDC Back-Channel Logout），使身份提供方（IdP）能够通过服务器之间的直接通信，将用户注销事件通知 Open WebUI，而无需浏览器重定向。
+
+要启用此功能，请设置 `ENABLE_OAUTH_BACKCHANNEL_LOGOUT=true`。
+
+启用后，Open WebUI 会公开：
+
+- `POST /oauth/backchannel-logout`
+
+该端点需要 IdP 签发的表单编码 `logout_token`，并根据配置的 OAuth/OIDC 提供方元数据和 JWKS 对其进行验证。
+
+:::warning
+
+强烈建议配置 Redis；要完整执行注销，实际上必须配置 Redis。
+
+- 配置 Redis 后，Open WebUI 会吊销受影响用户的现有 JWT，并移除存储的 OAuth 会话。
+- 未配置 Redis 时，Open WebUI 可以删除存储的 OAuth 会话，但已签发的 JWT 在过期前仍然有效。
+
+:::
+
+有关实现详情和行为说明，请参阅 [`ENABLE_OAUTH_BACKCHANNEL_LOGOUT`](/reference/env-configuration#enable_oauth_backchannel_logout)。
+
+### Google {#google}
+
+要配置 Google OAuth 客户端，请参阅 [Google 文档](https://support.google.com/cloud/answer/6158849)，了解如何为 **Web 应用程序**创建 Google OAuth 客户端。
+允许的重定向 URI 应包含 `<open-webui>/oauth/google/callback`。
+
+需要以下环境变量：
+
+1. `GOOGLE_CLIENT_ID`：Google OAuth 客户端 ID
+1. `GOOGLE_CLIENT_SECRET`：Google OAuth 客户端密钥
+1. `OPENID_PROVIDER_URL`：Google 不需要此变量。退出登录时，会根据创建会话时使用的提供方解析发现文档。
+
+Google 专用的可选设置：
+
+1. `GOOGLE_OAUTH_AUTHORIZE_PARAMS`：用于额外 Google `/authorize` 参数的 JSON 对象（例如 `prompt`、`login_hint`、`hd`）。
+
+```bash
+GOOGLE_OAUTH_AUTHORIZE_PARAMS={"prompt":"consent","login_hint":"user@example.com","hd":"example.com"}
+```
+
+### Microsoft {#microsoft}
+
+要配置 Microsoft OAuth 客户端，请参阅 [Microsoft 文档](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app)，了解如何为 **Web 应用程序**创建 Microsoft OAuth 客户端。
+允许的重定向 URI 应包含 `<open-webui>/oauth/microsoft/callback`。此值应用于 `MICROSOFT_REDIRECT_URI` 环境变量。
+
+目前，Microsoft OAuth 支持仅限于单个租户，即单个 Entra 组织或个人 Microsoft 账户。
+
+需要以下环境变量：
+
+1. `MICROSOFT_CLIENT_ID`：Microsoft OAuth 客户端 ID
+1. `MICROSOFT_CLIENT_SECRET`：Microsoft OAuth 客户端密钥
+1. `MICROSOFT_CLIENT_TENANT_ID`：Microsoft 租户 ID；个人账户请使用 `9188040d-6c67-4c5b-b112-36a304b66dad`
+1. `MICROSOFT_REDIRECT_URI`：重定向 URI 的可选覆盖值。留空时，Open WebUI 会根据传入请求推导出 `<open-webui>/oauth/microsoft/callback`，并应将该值注册到 Microsoft。
+1. `OPENID_PROVIDER_URL`：Microsoft 不需要此变量。退出登录时，会根据创建会话时使用的提供方解析发现文档。
+
+#### 令牌刷新（`offline_access`） {#token-refresh-offline_access}
+
+默认情况下，Microsoft 身份平台只返回 `access_token`，它大约会在 1 小时后过期。要启用自动令牌刷新（避免用户需要重新进行身份验证），请添加 `offline_access` 作用域：
+
+```
+MICROSOFT_OAUTH_SCOPE=openid email profile offline_access
+```
+
+`offline_access` 作用域会指示 Microsoft 同时返回**刷新令牌**，Open WebUI 的服务器端会话中间件会使用它在访问令牌过期前自动获取新的访问令牌。
+
+:::warning 缺少 `offline_access` 的症状
+
+如果没有 `offline_access`，用户登录超过 1 小时后，你可能会在日志中反复看到警告：
+
+```
+WARNING | No refresh token available for session xxx
+WARNING | Token refresh failed for user xxx, deleting session
+```
+
+基本聊天功能（使用 Open WebUI 的 JWT）**不受**影响，但以下功能**会**失败：
+
+- 使用 `auth_type: "system_oauth"` 的 MCP 工具服务器
+- **身份验证**（Auth）设置为 **OAuth** 的模型连接
+- OneDrive / SharePoint 文件访问
+
+个人资料图片不受影响：图片会在登录回调期间使用刚签发的访问令牌获取，因此不需要刷新令牌。
+
+:::
+
+:::tip
+
+无需在 Microsoft Entra ID 中进行其他配置。对于带客户端密钥的 Web 应用程序，`offline_access` 作用域[默认可用](https://learn.microsoft.com/en-us/entra/identity-platform/scopes-oidc#openid-connect-scopes)。
+
+:::
+
+:::tip 使用 Microsoft Entra ID 进行角色映射
+
+如果使用 Entra ID **应用角色**控制谁获得 Open WebUI 的 `admin` 或 `user` 访问权限，还需要配置下面的 [OAuth 角色管理](#oauth-role-management)。尤其要根据分配的应用角色值检查 `OAUTH_ALLOWED_ROLES`（默认值 `user,admin`）和 `OAUTH_ADMIN_ROLES`（默认值 `admin`），此外还需设置 `ENABLE_OAUTH_ROLE_MANAGEMENT=true`。当声明携带的角色与两个列表都不匹配时，登录会被拒绝并返回 403。只有在声明缺失或为空时，才会使用默认角色。
+
+:::
+
+### GitHub {#github}
+
+要配置 GitHub OAuth 客户端，请参阅 [GitHub 文档](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps)，了解如何为 **Web 应用程序**创建 OAuth App 或 GitHub App。
+允许的重定向 URI 应包含 `<open-webui>/oauth/github/callback`。
+
+需要以下环境变量：
+
+1. `GITHUB_CLIENT_ID`：GitHub OAuth App 客户端 ID
+1. `GITHUB_CLIENT_SECRET`：GitHub OAuth App 客户端密钥
+
+### OIDC {#oidc}
+
+可以配置任何支持 OIDC 的身份验证提供方。
+必须提供 `email` 声明。
+如果可用，会使用 `name` 和 `picture` 声明。
+允许的重定向 URI 应包含 `<open-webui>/oauth/oidc/callback`。
+
+使用以下环境变量：
+
+1. `OAUTH_CLIENT_ID`：OIDC 客户端 ID
+1. `OAUTH_CLIENT_SECRET`：OIDC 客户端密钥
+1. `OPENID_PROVIDER_URL`：**必需。**OIDC well-known URL，例如 `https://accounts.google.com/.well-known/openid-configuration`
+1. `OAUTH_PROVIDER_NAME`：在界面上显示的提供方名称，默认为 SSO
+1. `OAUTH_SCOPES`：要请求的作用域。默认为 `openid email profile`
+1. [`OAUTH_TOKEN_ENDPOINT_AUTH_METHOD`](/reference/env-configuration#oauth_token_endpoint_auth_method)：可选。Open WebUI 向提供方令牌端点进行身份验证的方式（`client_secret_basic`、`client_secret_post` 或 `none`）。如果提供方只接受一种方法，请设置此变量。登录和令牌刷新都使用此方法，因此使用 `client_secret_basic` 时，刷新令牌的 HTTP Basic 标头中也会包含客户端 ID 和密钥。
+1. `OPENID_REDIRECT_URI`：重定向 URI 的可选覆盖值。留空时，Open WebUI 会根据传入请求推导出 `<open-webui>/oauth/oidc/callback`，并应将该值注册到提供方。
+1. `OAUTH_AUDIENCE`：可选的 `audience` 值，会作为附加查询参数传递给 OAuth 提供方的授权端点。
+
+:::warning
+
+**常见 OIDC 错误：**
+- 使用 `OIDC_CONFIG` 或 `WEBUI_OIDC_CLIENT_ID` 等不存在的环境变量
+- 忘记设置 `OPENID_PROVIDER_URL`（这是 OIDC 的必填项）
+- 使用错误的重定向 URI 格式；必须严格为 `<your-domain>/oauth/oidc/callback`
+
+:::
+
+:::info 提供方向 ID 令牌添加自有参数
+
+某些提供方会在其签发的 ID 令牌标头中添加供应商专用参数。Open WebUI 会忽略其中无法识别的参数，因此通过此类提供方登录仍可正常完成，令牌签名和签名算法也仍会像以前一样得到验证。
+
+早期版本会拒绝整个令牌，导致登录在回调时结束，浏览器显示 `The email or password provided is incorrect`，服务器日志显示 `Unsupported {'app_id'} in header`。如果同时看到这两条信息，请更新 Open WebUI。
+
+:::
+
+:::tip 社区变通方案：多提供方 OAuth
+如果需要同时支持 Microsoft 和 Google，请查看我们的**[双重 OAuth 配置教程](/tutorials/auth-sso/dual-oauth-configuration)**。
+:::
+### OAuth 角色管理 {#oauth-role-management}
+
+任何可配置为在 ID 令牌或 userinfo 响应中返回角色的 OAuth 提供方，都可以用于管理 Open WebUI 中的角色。Open WebUI 会读取与 userinfo 响应合并后的 ID 令牌声明。在[令牌交换端点](/reference/env-configuration#enable_oauth_token_exchange)上，提供方的 userinfo 端点接受所提供的访问令牌后，如果 userinfo 中没有角色声明，Open WebUI 会在不验证签名的情况下解码该令牌，并从中读取角色声明。如果 `OAUTH_ALLOWED_ROLES` 限制了角色（不含 `*`），且两个来源都没有可读取的角色声明，交换会被拒绝并返回 `403`。
+要使用此功能，请将 `ENABLE_OAUTH_ROLE_MANAGEMENT` 设置为 `true`。
+可以配置以下环境变量，以匹配 OAuth 提供方返回的角色：
+
+1. `OAUTH_ROLES_CLAIM`：包含角色的声明。默认为 `roles`。也支持嵌套声明，例如 `user.roles`。声明可以是列表或字符串。如果提供方不发送 `roles` 声明，请指定包含待映射值的声明名称，例如 `groups`。
+1. `OAUTH_ALLOWED_ROLES`（管理员面板中的**允许的角色**）：允许登录的角色列表，以逗号分隔（对应 Open WebUI 角色 `user`）。使用 `*` 通配符可允许任何角色。
+1. `OAUTH_ADMIN_ROLES`（管理员面板中的**管理员角色**）：允许以管理员身份登录的角色列表，以逗号分隔（对应 Open WebUI 角色 `admin`）。即使用户的角色不在 `OAUTH_ALLOWED_ROLES` 中，只要位于此列表中，就允许其登录；同时匹配两个列表时，以 `admin` 为准。角色与两个列表都不匹配的用户会被拒绝。提供方未发送角色的用户会保留当前角色，新账户则获得**默认用户角色**（默认为 `pending`）。请参阅[首次 SSO 登录处于待处理状态或被拒绝](/troubleshooting/sso#13-first-sso-sign-in-is-pending-or-refused)。
+1. `OAUTH_ROLES_SEPARATOR`：允许为 `OAUTH_*_ROLES` 变量指定其他分隔符。如果声明是字符串且包含该分隔符，也会按该分隔符进行拆分。
+
+:::info
+
+如果更改已登录用户的角色，该用户需要退出并重新登录，才能获得新角色。
+
+当某次登录确实更改角色时，Open WebUI 会终止该账户的其他活动 WebSocket 连接，使旧标签页无法继续沿用之前的角色。这些浏览器会自动重新连接并重新进行身份验证。请参阅[角色更改何时生效](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect)。
+
+:::
+
+### OAuth 组管理 {#oauth-group-management}
+
+任何可配置为在 ID 令牌或 userinfo 响应中返回组的 OAuth 提供方，都可以在用户登录时用于管理 Open WebUI 中的用户组。在令牌交换端点上，如果 userinfo 中没有组声明，Open WebUI 也会从所提供的访问令牌中读取组声明。如果两者都不包含组声明，且用户已属于至少一个组，令牌交换会被拒绝并返回 `403`。
+要启用此同步，请将 `ENABLE_OAUTH_GROUP_MANAGEMENT` 设置为 `true`。
+
+可以配置以下环境变量：
+
+1. `OAUTH_GROUP_CLAIM`：ID 令牌或 userinfo 响应中包含用户组成员关系的声明。默认为 `groups`，因此只有提供方使用其他名称时才需要设置。也支持嵌套声明，例如 `user.memberOf`。`OAUTH_GROUPS_CLAIM` 是当前名称，会优先读取。
+1. `ENABLE_OAUTH_GROUP_CREATION`（管理员面板中的**自动创建组**）：如果为 `true`（且 `ENABLE_OAUTH_GROUP_MANAGEMENT` 也为 `true`），Open WebUI 将执行**即时（JIT）组创建**。这意味着，如果用户 OAuth 声明中的组在系统中尚不存在，Open WebUI 会在 OAuth 登录期间自动创建这些组。默认为 `false`。如果为 `false`，则只管理用户在 Open WebUI *现有*组中的成员关系。
+1. `OAUTH_GROUP_DEFAULT_SHARE`：控制通过 JIT 组创建所建组的默认共享权限。默认为 `true`（与任何人共享）。设置为 `members` 可仅限组成员共享，设置为 `false` 可完全禁用共享。仅在启用 `ENABLE_OAUTH_GROUP_CREATION` 时适用。
+
+:::warning
+
+严格组同步
+当 `ENABLE_OAUTH_GROUP_MANAGEMENT` 设置为 `true` 时，每次登录都会将用户在 Open WebUI 中的组成员关系与其 OAuth 声明中收到的组进行**严格同步**。
+
+*   用户会被**添加**到与其 OAuth 声明匹配的 Open WebUI 组。
+*   如果用户所属的 Open WebUI 组（包括在 Open WebUI 中手动创建或分配的组）**未**出现在该次登录会话的 OAuth 声明中，用户就会被**移除**出这些组。只有声明存在且非空时，才会执行移除和添加。组声明缺失或为空时，成员关系保持不变；与 [`OAUTH_BLOCKED_GROUPS`](/reference/env-configuration#oauth_blocked_groups) 匹配的组永远不会被创建、添加或移除。
+
+确保所有必要的组都已在 OAuth 提供方中正确配置，并包含在组声明（`OAUTH_GROUP_CLAIM`）中。
+
+:::
+
+:::warning
+
+管理员用户
+管理员用户的组成员关系与其他用户一样，也会由 OAuth 组管理更新。角色不会带来例外。
+
+:::
+
+:::info
+
+更新需要重新登录
+
+如果用户的组在 OAuth 提供方中发生更改，该用户需要退出 Open WebUI 并重新登录，更改才会反映出来。
+
+:::
+
+#### OAuth 组同步会更改哪些内容 {#what-oauth-group-sync-changes}
+
+启用**组映射**（`ENABLE_OAUTH_GROUP_MANAGEMENT`）后，每次通过提供方登录时（无论新账户还是现有账户），以及每次[令牌交换](#oauth-token-exchange-for-external-applications)时，都会执行同步。同步会将**组声明**（`OAUTH_GROUP_CLAIM`）中的名称与 Open WebUI 组名称进行比较。以单个字符串发送的声明会按 [`OAUTH_GROUPS_SEPARATOR`](/reference/env-configuration#oauth_groups_separator)（默认 `;`）拆分。
+
+当声明列出至少一个组时：
+
+- 管理员手动将用户加入的组，会在用户下次登录时移除，除非其名称出现在声明中或与**受阻组**匹配。
+- 为新用户设置的**默认组**也会以同样方式移除。新用户首次登录时会离开默认组，除非其名称出现在声明中或与**受阻组**匹配。
+- 启用**自动创建组**（`ENABLE_OAUTH_GROUP_CREATION`）后，如果声明中的某个组在 Open WebUI 中没有同名组，系统会使用默认用户权限创建该组，描述为 `Group '<name>' created automatically via OAuth.`，然后将用户加入其中。禁用此功能时，会跳过声明中的这些条目。
+
+**受阻组**（`OAUTH_BLOCKED_GROUPS`）不会阻止登录，尽管管理员面板中的描述写的是“Provider groups blocked from signing in.”。名称与其中条目匹配的组会被同步跳过：永远不会创建该组，也永远不会将用户添加到其中或从其中移除。在管理员面板中，请输入以逗号分隔的列表。每个条目都可以是精确匹配、shell 风格通配符（`*`、`?`）或正则表达式。要保留由管理员手动管理的组，请将其名称添加到**受阻组**。
+
+## 受信任标头 {#trusted-header}
+
+Open WebUI 可以将身份验证委托给身份验证反向代理，由代理通过 HTTP 标头传入用户详细信息。
+本页提供了多个配置示例。
+
+:::danger
+
+配置错误可能允许用户以 Open WebUI 实例中任何用户的身份通过身份验证。
+请确保仅允许身份验证代理访问 Open WebUI，例如不直接开放容器的任何端口，或设置 `HOST=127.0.0.1`，使其仅监听环回接口。
+
+:::
+
+### 通用配置 {#generic-configuration}
+
+设置 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` 环境变量后，Open WebUI 会将指定标头的值用作用户的电子邮件地址，并处理自动注册和登录。
+
+例如，设置 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-User-Email` 并传递 HTTP 标头 `X-User-Email: example@example.com`，会使用电子邮件 `example@example.com` 对请求进行身份验证。
+
+还可以选择定义 `WEBUI_AUTH_TRUSTED_NAME_HEADER`，确定通过受信任标头创建的任何用户的名称。如果用户已存在，此设置不起作用。
+如果未设置 `WEBUI_AUTH_TRUSTED_NAME_HEADER`，则会使用电子邮件地址作为用户名。
+
+用户首次请求时创建的账户受电子邮件唯一约束保护，因此，对于从未登录过的用户，即使多个请求同时到达，也都会解析到同一个账户：竞争失败的请求会按电子邮件重新读取账户，而不会报错。以前，这些请求可能各自创建一个账户，导致同一人出现重复用户；当页面首次访问时同时加载多个资源，这种情况确实可能发生。
+
+#### 组管理 {#group-management}
+
+可以使用 `WEBUI_AUTH_TRUSTED_GROUPS_HEADER` 环境变量同步 Open WebUI 中的用户组。请将此变量设置为 HTTP 标头的名称，该标头包含已通过身份验证用户的组名称列表，名称之间以逗号分隔。
+
+当请求通过 `WEBUI_AUTH_TRUSTED_EMAIL_HEADER` 进行身份验证，并且已设置且存在受信任组标头时，Open WebUI 会更新用户的组成员关系，使其与标头中列出的组一致。
+
+- 标头值必须是以逗号分隔的组名称列表（例如 `X-User-Groups: admins,editors,users`）。
+- 如果标头不存在或为空，则不会更新用户的组成员关系。
+- 用户会被移出标头中未列出的组。
+- 受信任标头不会自动创建组；只会分配 Open WebUI 中已有的组。
+
+#### 角色管理 {#role-management}
+
+可以使用 `WEBUI_AUTH_TRUSTED_ROLE_HEADER` 环境变量，通过身份验证反向代理控制用户角色。请将此变量设置为 HTTP 标头的名称，该标头包含已通过身份验证用户所需的角色。
+
+- 标头值必须为 `admin`、`user` 或 `pending` 之一（不区分大小写，并会去除首尾空白）。
+- 标头存在且有效时，每次登录都会更新用户角色，使其与标头值一致。
+- 如果标头包含无效值，则不会更改角色，并会记录警告。
+- 如果标头不存在或为空，则保留用户现有角色。
+- 当标头确实更改角色时，该账户的活动 WebSocket 连接会被终止，避免打开的标签页继续沿用之前的角色。这些浏览器会自动重新连接并重新进行身份验证。请参阅[角色更改何时生效](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect)。
+
+:::warning
+
+配置后，此标头允许客户端通过 HTTP 标头设置管理员级访问权限。你**必须**确保只有受信任的反向代理或身份提供方可以设置此标头。允许不受信任的客户端直接访问 Open WebUI，会使任何人都能提升为管理员。这与其他受信任标头采用相同的安全模型；请参阅本节顶部的警告。
+
+:::
+
+### Tailscale Serve {#tailscale-serve}
+
+:::tip
+有关涵盖安装、HTTPS、身份验证和 Docker Compose 设置的完整端到端指南，请参阅 [**Tailscale 集成教程**](/tutorials/auth-sso/tailscale)。
+:::
+
+[Tailscale Serve](https://tailscale.com/kb/1242/tailscale-serve) 允许你在 tailnet 内共享服务，Tailscale 会设置 `Tailscale-User-Login` 标头，其值为请求者的电子邮件地址。
+
+下面是一个 Serve 配置示例及相应的 Docker Compose 文件，它会启动 Tailscale sidecar，使用标签 `open-webui` 和主机名 `open-webui` 将 Open WebUI 公开到 tailnet，并可通过 `https://open-webui.TAILNET_NAME.ts.net` 访问。
+你需要创建一个具有设备写入权限的 OAuth 客户端，并将其作为 `TS_AUTHKEY` 传入 Tailscale 容器。
+
+```json title="tailscale/serve.json"
+{
+    "TCP": {
+        "443": {
+            "HTTPS": true
+        }
+    },
+    "Web": {
+        "${TS_CERT_DOMAIN}:443": {
+            "Handlers": {
+                "/": {
+                    "Proxy": "http://open-webui:8080"
+                }
+            }
+        }
+    }
+}
+
+```
+
+```yaml title="docker-compose.yaml"
+---
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=Tailscale-User-Login
+      - WEBUI_AUTH_TRUSTED_NAME_HEADER=Tailscale-User-Name
+    restart: unless-stopped
+  tailscale:
+    image: tailscale/tailscale:latest
+    environment:
+      - TS_AUTH_ONCE=true
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_EXTRA_ARGS=--advertise-tags=tag:open-webui
+      - TS_SERVE_CONFIG=/config/serve.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_HOSTNAME=open-webui
+    volumes:
+      - tailscale:/var/lib/tailscale
+      - ./tailscale:/config
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+      - sys_module
+    restart: unless-stopped
+
+volumes:
+  open-webui: {}
+  tailscale: {}
+```
+
+:::warning
+
+如果 Tailscale 与 Open WebUI 运行在同一网络上下文中，默认情况下用户将能够直接访问 Open WebUI，而无需经过 Serve 代理。
+你需要使用 Tailscale 的 ACL 将访问限制为仅端口 443。
+
+:::
+
+### 将 Cloudflare Tunnel 与 Cloudflare Access 结合使用 {#cloudflare-tunnel-with-cloudflare-access}
+
+可以将 [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-remote-tunnel/) 与 [Cloudflare Access](https://developers.cloudflare.com/cloudflare-one/policies/access/) 结合使用，通过 SSO 保护 Open WebUI。
+Cloudflare 对此几乎没有文档说明，但 `Cf-Access-Authenticated-User-Email` 会被设置为已通过身份验证用户的电子邮件地址。
+
+下面是一个设置 Cloudflare sidecar 的 Docker Compose 文件示例。
+配置通过控制面板完成。
+在控制面板中获取隧道令牌，将隧道后端设置为 `http://open-webui:8080`，并确保选中并配置“Protect with Access”。
+
+```yaml title="docker-compose.yaml"
+---
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - WEBUI_AUTH_TRUSTED_EMAIL_HEADER=Cf-Access-Authenticated-User-Email
+    restart: unless-stopped
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    command: tunnel run
+    restart: unless-stopped
+
+volumes:
+  open-webui: {}
+
+```
+
+### oauth2-proxy {#oauth2-proxy}
+
+[oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) 是一种身份验证反向代理，支持社交 OAuth 提供方和 OIDC。
+
+由于可能的配置非常多，下面仅给出一个使用 Google OAuth 的潜在设置示例。
+有关详细设置和任何潜在的安全注意事项，请参阅 `oauth2-proxy` 的文档。
+
+```yaml title="docker-compose.yaml"
+services:
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - 'WEBUI_AUTH_TRUSTED_EMAIL_HEADER=X-Forwarded-Email'
+      - 'WEBUI_AUTH_TRUSTED_NAME_HEADER=X-Forwarded-User'
+    restart: unless-stopped
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.6.0
+    environment:
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_UPSTREAMS: http://open-webui:8080/
+      OAUTH2_PROXY_PROVIDER: google
+      OAUTH2_PROXY_CLIENT_ID: REPLACEME_OAUTH_CLIENT_ID
+      OAUTH2_PROXY_CLIENT_SECRET: REPLACEME_OAUTH_CLIENT_ID
+      OAUTH2_PROXY_EMAIL_DOMAINS: REPLACEME_ALLOWED_EMAIL_DOMAINS
+      OAUTH2_PROXY_REDIRECT_URL: REPLACEME_OAUTH_CALLBACK_URL
+      OAUTH2_PROXY_COOKIE_SECRET: REPLACEME_COOKIE_SECRET
+      OAUTH2_PROXY_COOKIE_SECURE: "false"
+    restart: unless-stopped
+    ports:
+      - 4180:4180/tcp
+```
+
+### Authentik {#authentik}
+
+要配置 [Authentik](https://goauthentik.io/) OAuth 客户端，请参阅有关如何创建应用程序和 `OAuth2/OpenID Provider` 的[文档](https://integrations.goauthentik.io/miscellaneous/open-webui/)。
+允许的重定向 URI 应包含 `<open-webui>/oauth/oidc/callback`。
+
+创建提供方时，请记下 `App-name`、`Client-ID` 和 `Client-Secret`，并将它们用于 Open WebUI 环境变量：
+
+```
+      - 'ENABLE_OAUTH_SIGNUP=true'
+      - 'OAUTH_MERGE_ACCOUNTS_BY_EMAIL=true'
+      - 'OAUTH_PROVIDER_NAME=Authentik'
+      - 'OPENID_PROVIDER_URL=https://<authentik-url>/application/o/<App-name>/.well-known/openid-configuration'
+      - 'OAUTH_CLIENT_ID=<Client-ID>'
+      - 'OAUTH_CLIENT_SECRET=<Client-Secret>'
+      - 'OAUTH_SCOPES=openid email profile'
+      - 'OPENID_REDIRECT_URI=https://<open-webui>/oauth/oidc/callback'
+```
+
+### Authelia {#authelia}
+
+可以将 [Authelia](https://www.authelia.com/) 配置为返回用于受信任标头身份验证的标头。
+相关文档请参阅[此处](https://www.authelia.com/integration/trusted-header-sso/introduction/)。
+
+由于部署 Authelia 较为复杂，此处不提供示例配置。

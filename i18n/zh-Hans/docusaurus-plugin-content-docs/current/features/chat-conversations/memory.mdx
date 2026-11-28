@@ -1,0 +1,143 @@
+---
+sidebar_position: 700
+title: "记忆与个性化"
+---
+
+import ThemedImage from '@theme/ThemedImage';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+# 记忆与个性化
+
+<ThemedImage
+  alt="记忆：三个堆叠的抽屉，中间一个被拉出"
+  sources={{
+    light: useBaseUrl('/images/banners/chat-conversations-memory-light.svg'),
+    dark: useBaseUrl('/images/banners/chat-conversations-memory-dark.svg'),
+  }}
+  style={{ width: '100%', margin: '0.25rem 0 1.75rem' }}
+/>
+
+:::info 质量取决于模型
+记忆的存储和召回效果在很大程度上取决于模型。前沿模型能够很好地管理记忆；小型本地模型在存储或检索信息时可能不够稳定。
+:::
+
+Open WebUI 内置记忆系统，可让模型跨对话记住事实、偏好和上下文。
+通过**原生工具调用（Native Tool Calling）**，模型可以自行管理记忆，将其作为主动的“长期记忆”使用。
+
+## 工作原理 {#how-it-works}
+
+记忆系统会存储与你有关的信息片段（例如“我在后端任务中偏好使用 Python”或“我住在维也纳”）。记忆记录存储在 Open WebUI 数据库中，其内容还会通过配置的嵌入模型在向量存储中建立索引。添加记忆或更改其内容需要可用的嵌入模型和向量数据库。
+
+精简镜像需要外部嵌入引擎，以及带 pgvector 的 PostgreSQL 作为向量存储。如果添加或编辑记忆时返回 `Configure PGVECTOR_DB_URL for remote vector storage`，请配置向量数据库连接。请参阅[精简镜像省略的内容](/getting-started/quick-start#what-slim-leaves-out)和[切换到外部向量数据库](/getting-started/advanced-topics/scaling#step-4-switch-to-an-external-vector-database)。
+
+记忆有两种使用方式：
+
+### 1. 手动管理（设置） {#1-manual-management-settings}
+
+用户可以前往以下位置手动添加、编辑或删除记忆：
+**设置 > 个性化 > 记忆（Settings > Personalization > Memory）**
+
+只有在**记忆（Memory）**开关开启时，才会列出**已保存的记忆（Saved Memories）**。关闭该开关会隐藏列表，并停止将记忆添加到你的聊天中，但不会删除任何内容；重新开启后，相同的记忆会恢复显示。
+
+**添加记忆（Add Memory）**会要求选择**类型（Type）**。**用户（User）**记忆是与你有关的事实、偏好或指令，每次回复时都会将所有这类记忆提供给模型，但总量不超过 [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit) 预算。**上下文（Context）**记忆只在与聊天相关时提供：Open WebUI 会使用你的最近七条消息搜索记忆，并添加最接近的匹配项，但总量不超过 [`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) 预算。记忆按字母顺序列出，有路径时路径排在前面；超出预算的文本会在没有警告的情况下被截断。存在大量**用户（User）**记忆时，排序靠后的记忆将始终无法到达模型。
+
+此搜索还会应用**设置（Settings）** > **文档（Documents）**（管理员区域）中的**相关性阈值（Relevance Threshold）**，或 [`RAG_RELEVANCE_THRESHOLD`](/reference/env-configuration#rag_relevance_threshold)。当阈值大于 `0` 时，如果某条**上下文（Context）**记忆与消息的向量相似度得分低于该阈值，它就会从搜索结果中剔除，且不会显示错误或警告。记忆不会运行重排序器；即使**混合搜索（Hybrid Search）**关闭且该字段被隐藏，阈值也仍然适用，因此针对重排序器得分调整的值可能导致所有**上下文（Context）**记忆都无法匹配。如果**上下文（Context）**记忆不再到达模型，请降低阈值或将其设为 `0`。**用户（User）**记忆和按文本匹配的 `search_memories` 工具不受影响。
+
+列表上方**操作（Actions）**菜单中的**清除记忆（Clear memory）**会删除你账户中的每条记忆，包括被搜索框隐藏的记忆。确认**清除记忆（Clear Memory）**对话框（`Are you sure you want to clear all memories? This action cannot be undone.`）后，Open WebUI 会从数据库中删除这些记忆并移除其搜索索引，随后你会看到 `Memory cleared successfully`。此操作无法撤销，也没有回收站。如果只想删除部分记忆，请改为从列表中逐条删除。
+
+### 2. 原生记忆工具（智能体模式） {#2-native-memory-tools-agentic-mode}
+
+使用启用了**原生函数调用（Native Function Calling，智能体模式）**的模型时，高质量模型可以通过内置工具自主管理你的记忆。有关管理员如何配置和管理这些系统级工具的详细说明，请参阅[**集中式工具调用指南**](/features/extensibility/plugin/tools#tool-calling-modes-default-vs-native)。
+
+:::tip 最低模型等级
+自主记忆管理需要模型能够判断哪些事实值得保存，以及何时召回这些事实。并非必须使用前沿模型：**GPT-5.6 Luna**、**Gemini 3.5 Flash-Lite**、**MiniMax M3**，或本地的 **Qwen 3.6 27B**、**Muse Glimmer 30B** 是最低要求。只有非常小的模型会在记忆选择方面遇到困难。该列表不会随每次模型发布而更新；任何近期发布且工具调用能力可靠的模型都可以使用。
+:::
+
+每条记忆都带有一个**类型（type）**和一个可选的**路径（path）**（参见下方的[记忆类型与路径](#memory-types--paths)）。模型通过以下工具管理记忆：
+
+-   **`add_memory`**：保存新的事实、偏好或指令，标记为 `user` 或 `context`，并可选择归入某个 `path`。
+-   **`update_memory`**：在单次调用中应用一批更改（添加 / 替换 / 移动 / 删除）。
+-   **`replace_memory_content`**：使用现有记忆的 `id` 更新或纠正指定的记忆。
+-   **`delete_memory`**：使用记忆的 `id` 删除不再相关或不再正确的记忆。
+-   **`search_memories`**：按内容、路径、类型或精确 `id` 搜索或浏览记忆库。结果包含每个信息片段的唯一 `id`（默认返回 5 条）。
+-   **`list_memories`**：检索为用户存储的所有记忆，包括内容和时间戳。
+-   **`list_memory_paths`**：列出已保存的记忆路径（分组），让模型在写入前找到相关记忆的已有位置。
+-   **`read_memory_path`**：读取存储在给定路径下的记忆，包括邻近的父路径和子路径。
+
+## 记忆类型与路径 {#memory-types--paths}
+
+每条记忆都有一个**类型（type）**和一个可选的**路径（path）**：
+
+- **类型（Type）**：`user` 记忆是**与你有关**的事实、偏好或指令（例如“后端开发偏好 Python”）；`context` 记忆是其他值得在聊天之间保留的持久上下文。两者注入提示词时分别计算预算（参见[后台审查与限制](#background-review--limits)）。
+- **路径（Path）**：可选的稳定“地址”，用于**对相关记忆进行分组**（例如 `work/projects`），让模型可以通过 `list_memory_paths` / `read_memory_path` 按层级组织和浏览记忆，而不是使用一个扁平列表。
+
+这些属性由记忆工具自动设置，无需手动指定。
+
+## 记忆系统的优势 {#benefits-of-the-memory-system}
+
+-   **主动学习**：无需你手动输入偏好，模型就可以表示：*“我会记住你在 UI 项目中偏好深色模式”*，并在后台调用 `add_memory`。
+-   **上下文检索**：如果对话转到几个月前提及的话题，模型可以使用 `search_memories`“搜索自己的大脑”，找到那些历史细节。
+-   **动态纠正**：如果模型记住了不正确的内容，可以使用 `replace_memory_content` 修正事实，而不是创建重复记忆。
+-   **清理**：模型可以使用 `delete_memory` 删除过时或不相关的事实，保持记忆库整洁。
+-   **完全可见**：模型可以使用 `list_memories` 审查它掌握的与你有关的全部信息，并找出缺失或矛盾之处。
+-   **用户控制**：即使模型可以添加记忆，用户仍保留完全控制权。模型添加的每条记忆都可以在个性化设置中查看和删除。
+
+## 启用记忆工具 {#enabling-memory-tools}
+
+1.  **管理员启用**：确保管理员已[全局启用](#administrative-controls)记忆功能，并且你拥有所需权限。
+2.  **原生模式（智能体模式）**：在模型的高级参数中启用**原生函数调用（Native Function Calling）**（**设置 > 模型 > 编辑（Settings > Models > Edit）**（管理员区域），然后选择模型的**高级参数（Advanced Params）**）。
+3.  **模型级开关**：确保已在**设置 > 模型 > 编辑（Settings > Models > Edit）**（管理员区域，或用于自有模型的**工作区 > 模型（Workspace > Models）**）中为模型启用**记忆（Memory）**能力和**内置工具（Builtin Tools）**下的**记忆（Memory）**类别，两者默认均开启。模型还需要开启**内置工具（Builtin Tools）**。
+
+只要记忆对拥有[自动化](/features/chat-conversations/chat-features/automations)的用户开启，自动化就会在相同条件下获得记忆工具。这取决于用户在**设置 > 个性化（Settings > Personalization）**中的**记忆（Memory）**开关。如果用户从未设置过，则由默认界面设置决定；如果默认界面设置也未指定，则由实例范围的**记忆（Memories）**设置决定。
+
+:::warning 空白回复而非记忆操作
+记忆作为原生工具调用运行，因此只适用于流式输出遵循 OpenAI 架构的连接。如果某个终结点在流式工具调用中省略 `index` 字段（尤其是 Google 的 OpenAI 兼容层），该调用会被丢弃，本轮对话返回一条空白的助手消息，日志中也没有任何内容。由于模型会自行决定何时调用 `list_memories` 或 `add_memory`，因此该问题表现为偶发的空白回复，而不是明显的记忆故障。请参阅[模型使用工具时出现空白回复](/troubleshooting/connection-error#blank-replies-when-the-model-uses-a-tool)。
+:::
+
+:::info 集中式工具文档
+有关所有内置智能体工具（包括记忆、网络搜索和知识库）及其配置方法的完整详细信息，请参阅[**原生/智能体模式工具指南**](/features/extensibility/plugin/tools#built-in-system-tools-nativeagentic-mode)。
+:::
+
+## 管理员控制 {#administrative-controls}
+
+管理员可以完全控制记忆功能，包括全局禁用，或将其限制为仅特定用户组可用。
+
+### 全局开关 {#global-toggle}
+可以为整个实例开启或关闭记忆功能。禁用后，所有用户的“个性化”标签页都会被隐藏，记忆相关 API 终结点会被阻止，已存储的记忆不再添加到模型上下文中，模型也不会再获得记忆工具。
+- **管理员 UI**：设置 > 通用 > 功能 > **记忆（Settings > General > Features > Memories）**（管理员区域）
+- **环境变量**：[`ENABLE_MEMORIES`](/reference/env-configuration#enable_memories)（默认值：`True`）
+
+### 细粒度权限 {#granular-permissions}
+管理员还可以在权限界面中按角色或用户组控制记忆访问权限。
+- **管理员 UI**：管理员面板 > 用户 > 权限 > 功能 > **记忆（Admin Panel > Users > Permissions > Features > Memories）**
+- **环境变量**：[`USER_PERMISSIONS_FEATURES_MEMORIES`](/reference/env-configuration#user_permissions_features_memories)（默认值：`True`）
+
+移除该权限会切断记忆到达模型的所有途径。受影响的用户会失去**个性化（Personalization）**标签页，记忆 API 终结点会向他们返回 `403`，模型不再获得记忆工具，其已存储的记忆也不再添加到模型上下文中。最后一项检查会在服务器端针对每个聊天请求执行，因此，即使请求仍要求使用记忆（例如之前开启的个人**记忆（Memory）**开关仍然打开，或 API 客户端发送 `features: {"memory": true}`），也不会恢复记忆。管理员不受此权限检查限制。
+
+### 后台审查与限制 {#background-review--limits}
+
+- **后台审查**：启用 [`ENABLE_MEMORY_BACKGROUND_REVIEW`](/reference/env-configuration#enable_memory_background_review) 后（默认**关闭**），Open WebUI 会使用当前聊天自己的模型，每隔 [`MEMORIES_REVIEW_INTERVAL_TURNS`](/reference/env-configuration#memories_review_interval_turns) 轮（默认 `10`）定期审查最近的对话，并可添加、替换、移动或删除任一类型的记忆，包括 `user`，而不只依赖显式工具调用。
+- **注入预算**：[`MEMORIES_CONTEXT_CHAR_LIMIT`](/reference/env-configuration#memories_context_char_limit) 和 [`MEMORIES_USER_CHAR_LIMIT`](/reference/env-configuration#memories_user_char_limit)（默认值均为 `2000`）分别限制注入提示词的 `context` 和 `user` 记忆字符数。
+
+字符限制在 Open WebUI 将记忆包含到模型请求中时生效。提高限制可让模型看到更多现有记忆。已保存的记忆条目始终保留完整文本。
+
+对于启用了持久配置的实例，如果在限制值已保存后更改环境变量，存储的值仍会生效。要更新已存储的用户记忆限制，请使用管理员会话令牌向下列终结点发送此 JSON：`POST /api/v1/configs/import`：
+
+```json
+{
+  "config": {
+    "memories.user_char_limit": 6000
+  }
+}
+```
+
+上下文记忆预算使用 `memories.context_char_limit`。
+
+### 记忆系统上下文 {#memory-system-context}
+默认情况下，Open WebUI 会将用户存储的记忆添加到模型上下文中，让模型能够感知这些记忆。使用原生函数调用时，记忆会在每次回复中以隐藏的 `recall_memories` 工具结果形式在用户消息之后到达一次；否则，它们会追加到用户消息中。召回还要求模型开启**记忆（Memory）**能力。此注入可以独立于记忆工具关闭：禁用后，模型仍可按需添加、更新和删除记忆，但记住的信息不再自动添加到提示词中。
+- **管理员 UI**：设置 > 通用 > 功能 > **记忆系统上下文（Settings > General > Features > Memory System Context）**（管理员区域，启用记忆时显示）
+- **环境变量**：[`ENABLE_MEMORY_SYSTEM_CONTEXT`](/reference/env-configuration#enable_memory_system_context)（默认值：`True`）
+
+## 隐私与安全 {#privacy--security}
+
+记忆存储在本地 Open WebUI 数据库中，并限定在你的用户账户范围内。默认情况下不会与其他用户共享，你可以随时清空整个记忆库。

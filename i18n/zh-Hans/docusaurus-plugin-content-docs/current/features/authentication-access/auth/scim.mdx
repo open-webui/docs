@@ -1,0 +1,256 @@
+---
+sidebar_position: 3
+title: "SCIM 2.0"
+---
+
+# SCIM 2.0 支持
+
+Open WebUI 支持 SCIM 2.0（跨域身份管理系统，System for Cross-domain Identity Management），可从 Okta、Azure AD 和 Google Workspace 等身份提供方自动预配用户和组。
+
+## 概述 {#overview}
+
+SCIM 是一项支持自动预配用户的开放标准。启用后，你的身份提供方可以自动：
+- 在用户被添加到你的组织时，在 Open WebUI 中创建用户
+- 在发生更改时更新用户信息
+- 在用户被移出你的组织时停用用户
+- 管理组成员关系
+
+## 配置 {#configuration}
+
+SCIM 完全通过环境变量配置，没有用于 SCIM 设置的界面配置。
+
+### 环境变量 {#environment-variables}
+
+通过设置以下环境变量配置 SCIM：
+
+- **`SCIM_ENABLED`**：设置为 `true` 以启用 SCIM 支持（默认值：`false`）
+- **`SCIM_TOKEN`**：用于 SCIM 身份验证的 Bearer 令牌（启用 SCIM 时必填）
+- **`SCIM_AUTH_PROVIDER`**：与 SCIM `externalId` 值关联的 OAuth 提供方名称（例如 `microsoft`、`oidc`）。存储 `externalId` 和关联账户时必需。
+
+:::warning
+
+安全提示
+SCIM 令牌应是安全的随机生成字符串。可以使用以下命令生成：
+```bash
+openssl rand -base64 32
+```
+请妥善保管此令牌，因为它提供用户管理操作的访问权限。
+
+:::
+
+### 配置示例 {#example-configuration}
+
+```bash
+
+# 启用 SCIM
+export SCIM_ENABLED=true
+
+# 设置安全令牌（替换为你自己生成的令牌）
+export SCIM_TOKEN="your-secure-token-here"
+
+# 设置用于关联 externalId 的 OAuth 提供方名称
+export SCIM_AUTH_PROVIDER="microsoft"
+```
+
+## SCIM API 配置 {#scim-api-configuration}
+
+配置身份提供方时，使用以下设置：
+
+- **SCIM 基础 URL**：`<your-openwebui-url>/api/v1/scim/v2/`
+- **身份验证**：Bearer 令牌
+- **令牌**：`Bearer <your-scim-token>`
+
+### 常见身份提供方示例 {#example-for-popular-identity-providers}
+
+#### Okta {#okta}
+1. 在 Okta 中添加 SCIM 应用
+2. 将 SCIM 连接器基础 URL 设置为：`https://your-domain.com/api/v1/scim/v2/`
+3. 将身份验证设置为“HTTP Header”
+4. 添加 Authorization 请求头，值为：`Bearer your-scim-token`
+
+## 支持的 SCIM 操作 {#supported-scim-operations}
+
+Open WebUI 的 SCIM 实现支持以下操作：
+
+### 用户操作 {#user-operations}
+- **创建用户**（`POST /Users`）：创建新用户账户
+- **获取用户**（`GET /Users/{id}`）：检索用户信息
+- **更新用户**（`PUT /Users/{id}`、`PATCH /Users/{id}`）：更新用户属性
+- **删除用户**（`DELETE /Users/{id}`）：删除用户账户及其聊天和登录记录。对于 SCIM 可见的管理员账户，请求会返回 `403`（`The requested action has been restricted as a security measure.`），账户会保留，因此清理用户的同步无法移除管理员。本地创建的管理员会返回 `404`，如下文所述。请在**管理员面板 > 用户**下移除管理员。
+- **列出用户**（`GET /Users`）：列出外部预配的用户，支持筛选
+
+#### PATCH 操作 {#patch-operations}
+
+`add`、`replace` 和 `remove` 均会应用。操作可以指定一个 `path`，也可以携带不带路径的属性对象；后一种情况下，会依次应用该对象中的每个属性。`remove` 需要路径，并支持 `externalId`，会将其清除。
+
+Open WebUI 处理的路径包括 `userName`、`displayName`、`name.formatted`、`emails[primary eq true].value`、`active` 和 `externalId`。
+
+请求上述范围之外的内容会返回 SCIM 错误且不做任何更改，因为系统会在写入任何内容之前验证每个操作：值类型错误返回 `invalidValue`，属性不在上述列表中返回 `invalidPath`，移除 `externalId` 以外的任何内容返回 `mutability`，不带路径的 `remove` 返回 `noTarget`。
+
+:::info 只有通过外部预配的账户才对 SCIM 可见
+每个用户操作都限定在通过身份提供方创建的账户范围内，即由 SCIM 本身创建，或通过 OAuth 或 OIDC 登录创建的账户。本地创建的账户（例如第一个管理员或任何手动添加的用户）不会由列表操作返回，也无法通过 ID 寻址，因此对其执行读取、更新或删除会返回 `404`。
+
+这将身份提供方的视野限定在它拥有的账户内。本地账户之后通过提供方登录时就会变得可见，因为登录会将提供方记录在该账户上。
+:::
+
+
+:::info 取消预配会终止活动会话
+
+`active` 标志映射到 Open WebUI 角色：`active: false` 将角色设置为 `pending`，`active: true` 将其恢复为 `user`。由于这是角色变更，SCIM 更新一到达，Open WebUI 就会终止该账户的活动 WebSocket 连接，随后 `pending` 账户在 API 和 WebSocket 握手中都会被拒绝。通过 SCIM 删除用户也会以相同方式终止其活动连接。无论 `active` 为何值，管理员账户都会保留其角色，因此同步无法降级管理员。请参阅[角色更改何时生效](/features/authentication-access/rbac/roles#when-a-role-change-takes-effect)。
+
+:::
+
+### 组操作 {#group-operations}
+- **创建组**（`POST /Groups`）：创建新组
+- **获取组**（`GET /Groups/{id}`）：检索组信息
+- **更新组**（`PUT /Groups/{id}`、`PATCH /Groups/{id}`）：更新组成员关系
+- **删除组**（`DELETE /Groups/{id}`）：移除组。其子组会上移至其父组，其访问授权会被删除
+- **列出组**（`GET /Groups`）：列出所有组，支持筛选
+
+通过 SCIM 创建的组初始位于顶级。管理员面板中设置的父组在 SCIM 更新后仍会保留，成员会按照[嵌套组](/features/authentication-access/rbac/groups#nested-groups)中的说明继承其访问权限。
+
+### 支持的属性 {#supported-attributes}
+
+#### 用户属性 {#user-attributes}
+- `userName`：用户的电子邮件地址（必填、唯一）
+- `name.givenName`：名
+- `name.familyName`：姓
+- `emails`：电子邮件地址（提供多个地址时，使用标记为 `primary: true` 的条目）
+- `active`：用户状态（活动 / 非活动）
+- `externalId`：来自身份提供方的外部标识符（按提供方存储在用户的 `scim` JSON 字段中，请参阅 [externalId 与账户关联](#externalid-and-account-linking)）
+
+#### 组属性 {#group-attributes}
+- `displayName`：组名（必填）
+- `members`：用户成员数组。每个成员都必须是现有用户。如果成员类型为 `Group`、引用了 Group 资源或包含未知用户 ID，Open WebUI 会拒绝整个请求并返回 `400` `invalidValue` 错误，不做任何更改
+- `externalId`：来自身份提供方的外部标识符
+
+## 筛选支持 {#filtering-support}
+
+SCIM API 支持对用户和组进行筛选：
+
+```
+GET /api/v1/scim/v2/Users?filter=userName eq "user@example.com"
+GET /api/v1/scim/v2/Users?filter=externalId eq "abc-123"
+GET /api/v1/scim/v2/Groups?filter=displayName eq "Engineering"
+```
+
+支持的筛选运算符：
+- `eq`：等于
+- `ne`：不等于
+- `co`：包含
+- `sw`：开头为
+- `ew`：结尾为
+- `pr`：存在（有值）
+- `gt`：大于
+- `ge`：大于或等于
+- `lt`：小于
+- `le`：小于或等于
+
+## externalId 与账户关联 {#externalid-and-account-linking}
+
+配置 `SCIM_AUTH_PROVIDER` 后，Open WebUI 会在用户的 `scim` JSON 字段内按提供方使用单独的结构存储 `externalId` 值：
+
+```json
+{
+  "microsoft": { "external_id": "abc-123" },
+  "okta": { "external_id": "def-456" }
+}
+```
+
+这支持以下行为：
+
+- **按 externalId 查找用户**：当身份提供方发送 `filter=externalId eq "..."` 请求时，Open WebUI 会在 `scim` 字段中搜索所配置提供方下的匹配条目。
+- **OAuth 回退**：如果未通过 `externalId` 找到用户，Open WebUI 会回退到匹配 OAuth `sub` 值，自动将 SCIM 预配的账户与现有的 OAuth 身份验证用户关联。
+- **创建和更新**：通过 SCIM 创建或更新用户时，`externalId` 会存储在 `scim` 字段中，并在后续响应中返回。
+
+:::warning
+
+如果在启用 SCIM 时未设置 `SCIM_AUTH_PROVIDER`，任何需要 `externalId` 的操作（创建、查找或更新）都会返回 `500` 错误。启动时也会记录一条警告来提醒你。
+
+:::
+
+## 故障排除 {#troubleshooting}
+
+### 常见问题 {#common-issues}
+
+1. **401 Unauthorized 错误**
+   - 确认 `SCIM_ENABLED` 已设置为 `true`
+   - 检查身份提供方中的 Bearer 令牌是否与 `SCIM_TOKEN` 匹配
+   - 确保 Authorization 请求头格式为：`Bearer <token>`
+
+2. **404 Not Found 错误**
+   - 确认 SCIM 基础 URL 以 `/api/v1/scim/v2/` 结尾
+   - 检查路径是否包含 `/api/v1` 前缀
+
+3. **用户创建失败**
+   - 确保 `userName` 字段包含有效的电子邮件地址
+   - 检查电子邮件或 `externalId` 是否已被使用
+
+4. **externalId 操作返回 500 错误**
+   - 确认 `SCIM_AUTH_PROVIDER` 已设置为正确的 OAuth 提供方名称
+
+
+### 测试 SCIM 端点 {#testing-scim-endpoints}
+
+可以使用 curl 测试 SCIM 端点：
+
+```bash
+
+# 测试身份验证并列出用户
+curl -H "Authorization: Bearer your-scim-token" \
+  https://your-domain.com/api/v1/scim/v2/Users
+
+# 获取特定用户
+curl -H "Authorization: Bearer your-scim-token" \
+  https://your-domain.com/api/v1/scim/v2/Users/user-id
+
+# 创建测试用户
+curl -X POST \
+  -H "Authorization: Bearer your-scim-token" \
+  -H "Content-Type: application/scim+json" \
+  -d '{
+    "schemas": ["urn:ietf:params:scim:schemas:core:2.0:User"],
+    "userName": "test@example.com",
+    "externalId": "idp-user-id-123",
+    "displayName": "Test User",
+    "name": {
+      "givenName": "Test",
+      "familyName": "User"
+    },
+    "emails": [{
+      "value": "test@example.com",
+      "primary": true
+    }],
+    "active": true
+  }' \
+  https://your-domain.com/api/v1/scim/v2/Users
+```
+
+## 安全注意事项 {#security-considerations}
+
+1. **使用 HTTPS**：在生产环境中始终使用 HTTPS 来保护 Bearer 令牌
+2. **安全存储令牌**：安全存储 SCIM 令牌并定期轮换
+3. **IP 允许列表**：考虑将 SCIM API 访问限制为身份提供方的 IP 地址
+4. **审计日志**：记录 SCIM 操作以进行安全审计
+
+## 限制 {#limitations}
+
+- 目前不支持自定义架构扩展
+- 尚未实现批量操作
+- 不支持用于资源版本控制的 ETag
+
+## 与 SSO 集成 {#integration-with-sso}
+
+SCIM 与 SSO（单点登录）结合使用时效果最佳。典型设置包括：
+1. 使用 SCIM 自动预配用户
+2. 使用 OIDC 进行用户身份验证
+
+这可以确保用户自动创建，并能够立即使用其企业凭据进行身份验证。
+
+:::info SCIM 用户的登录记录
+
+SCIM 创建的每个账户都会获得一条登录记录，其中包含无人知晓的随机密码，因此用户通过 SSO 登录。管理员也可以在**管理员面板 > 用户**下编辑用户，为其设置密码。当 SCIM 更改用户的电子邮件时，登录电子邮件也会随之改变。
+
+:::
+
+有关 SSO 配置，请参阅 [SSO 文档](/features/authentication-access/auth/sso/)。
