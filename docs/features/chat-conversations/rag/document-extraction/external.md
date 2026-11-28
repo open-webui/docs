@@ -51,6 +51,11 @@ Your service replies `2xx` with a JSON body, either a single object or a list of
 
 Returning a list produces one Document per entry, each retrieved independently. That's how you split a single upload into several retrievable pieces, one entry per sheet, per page, per slide, rather than one giant blob. A non-2xx response, or a response with no content, fails the extraction and surfaces an error to the user.
 
+Two things to know when you return more than one entry:
+
+- **Page numbers in citations.** An integer `page` in an entry's `metadata`, counted from 0, is shown in the citation as "page N+1", and the citation opens a PDF at that page (`#page=N+1`). The link is a PDF page anchor, so set it on entries that are pages of a PDF.
+- **The file's full text.** Open WebUI also keeps the whole text of the file, which is what the model gets when the file is used as the entire document, when retrieval is bypassed, or when the file is under **Full Text Threshold (Characters)**. That text is the entries' `page_content` joined by a single space, so if your entries are Markdown, end each one with a blank line (`\n\n`). Otherwise a heading or a table at the start of an entry runs on from the last line of the entry before it.
+
 ## Minimal example
 
 A bare FastAPI service that implements the contract above, returning a placeholder instead of real extraction:
