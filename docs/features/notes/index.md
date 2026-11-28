@@ -200,7 +200,7 @@ Access management options via the **More (...)** menu in the top right corner.
 ### Export
 
 * **Plain text (.txt)** or **Plain text (.md)** for raw content
-* **PDF document (.pdf)** with visual formatting and the images pasted into the note (dark mode detected automatically)
+* **PDF document (.pdf)** with the note's text as plain body text and the images pasted into the note (dark mode detected automatically). The `.md` file keeps the formatting as Markdown
 
 **Download** in the **More (...)** menu exports the whole note, with each page under its own heading. **Download page** in a page's **⋯** menu exports that page alone.
 
